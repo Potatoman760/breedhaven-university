@@ -1,0 +1,260 @@
+[
+  {
+    "id": "great-court",
+    "name": "the Great Court",
+    "description": "The terraced court at the heart of the University, where every path crosses. The bell that rings the lecture hours hangs here, beside the board where notices are nailed.",
+    "backgrounds": [
+      {
+        "id": "court",
+        "name": "Terraces",
+        "image": "backgrounds/great-court/court.png"
+      }
+    ],
+    "trains": [
+      "charisma"
+    ]
+  },
+  {
+    "id": "lecture-halls",
+    "name": "the Lecture Halls",
+    "description": "The open pavilions and stone halls where the colleges teach. Students sit on tiered benches; the lecturer reads from the table in the middle.",
+    "open": {
+      "fromHour": 7,
+      "toHour": 17
+    },
+    "backgrounds": [
+      {
+        "id": "pavilion",
+        "name": "Lecture pavilion",
+        "image": "backgrounds/lecture-halls/pavilion.png"
+      },
+      {
+        "id": "seminar",
+        "name": "Seminar hall",
+        "image": "backgrounds/lecture-halls/seminar.png"
+      }
+    ],
+    "trains": [
+      "intelligence"
+    ]
+  },
+  {
+    "id": "library",
+    "name": "the Chained Library",
+    "description": "A cold stone library where the valuable books are chained to the shelves and the reading cells are lit by oil lamps.",
+    "open": {
+      "fromHour": 8,
+      "toHour": 21
+    },
+    "backgrounds": [
+      {
+        "id": "cell",
+        "name": "Reading cell",
+        "image": "backgrounds/library/cell.png"
+      }
+    ],
+    "trains": [
+      "intelligence",
+      "wisdom"
+    ]
+  },
+  {
+    "id": "commons",
+    "name": "the Student Commons",
+    "description": "The refectory and common room: long tables, a great hearth, cheap stew, and somewhere warm to sit when the lectures are over.",
+    "open": {
+      "fromHour": 6,
+      "toHour": 23
+    },
+    "backgrounds": [
+      {
+        "id": "hall",
+        "name": "Common room",
+        "image": "backgrounds/commons/hall.png"
+      }
+    ],
+    "trains": [
+      "charisma"
+    ]
+  },
+  {
+    "id": "chapel",
+    "name": "the Furrow Chapel",
+    "description": "The College of Divinity's chapel of the First Furrow, open to any student who wants quiet or counsel.",
+    "open": {
+      "fromHour": 5,
+      "toHour": 22
+    },
+    "backgrounds": [],
+    "trains": [
+      "wisdom"
+    ]
+  },
+  {
+    "id": "tiltyard",
+    "name": "the Tiltyard",
+    "description": "The University's sports ground: a sanded ring with stands for bouts and games, archery butts, and the drill yard where the Cadet Watch trains at dawn.",
+    "open": {
+      "fromHour": 6,
+      "toHour": 20
+    },
+    "backgrounds": [
+      {
+        "id": "ring",
+        "name": "The ring",
+        "image": "backgrounds/tiltyard/ring.png"
+      },
+      {
+        "id": "yard",
+        "name": "Drill yard",
+        "image": "backgrounds/tiltyard/yard.png"
+      }
+    ],
+    "trains": [
+      "strength",
+      "dexterity",
+      "endurance"
+    ]
+  },
+  {
+    "id": "physic-garden",
+    "name": "the Physic Garden",
+    "description": "The walled garden of the College of Husbandry and Herbcraft: raised beds of herbs and vegetables, bean poles, and a still pond at the far end.",
+    "backgrounds": [
+      {
+        "id": "night",
+        "name": "By moonlight",
+        "image": "backgrounds/physic-garden/night.png",
+        "periods": [
+          "evening",
+          "night"
+        ]
+      },
+      {
+        "id": "beds",
+        "name": "Garden beds",
+        "image": "backgrounds/physic-garden/beds.png"
+      }
+    ],
+    "trains": [
+      "wisdom",
+      "endurance"
+    ]
+  },
+  {
+    "id": "bathhouse",
+    "name": "the Bathhouse",
+    "description": "The students' communal baths: a warm tiled pool under a vaulted roof, fed from the hot spring the University was built over.",
+    "open": {
+      "fromHour": 6,
+      "toHour": 23
+    },
+    "backgrounds": [
+      {
+        "id": "pool",
+        "name": "The pool",
+        "image": "backgrounds/bathhouse/pool.png"
+      }
+    ],
+    "trains": [
+      "endurance"
+    ]
+  },
+  {
+    "id": "dormitories",
+    "name": "the Cloister Halls",
+    "description": "The student dormitories: timbered halls around a cloister, two beds to a room under the rafters, a porter at the gate after dark. Your own room is here.",
+    "backgrounds": [
+      {
+        "id": "room",
+        "name": "A shared room",
+        "image": "backgrounds/dormitories/room.png"
+      }
+    ]
+  },
+  {
+    "id": "lantern-row",
+    "name": "Lantern Row",
+    "description": "The street outside the University gate where students who can afford it rent rooms above the shops, away from the porters and the curfew.",
+    "backgrounds": [
+      {
+        "id": "street",
+        "name": "The street",
+        "image": "backgrounds/lantern-row/street.png"
+      }
+    ]
+  },
+  {
+    "id": "honeyed-bee-inn",
+    "name": "the Honeyed Bee Inn",
+    "description": "The inn on Lantern Row where half the University drinks: card games, strong ale, and rooms upstairs.",
+    "open": {
+      "fromHour": 12,
+      "toHour": 2
+    },
+    "backgrounds": [
+      {
+        "id": "tavern",
+        "name": "Common room",
+        "image": "backgrounds/honeyed-bee-inn/tavern.png"
+      },
+      {
+        "id": "exterior",
+        "name": "Outside",
+        "image": "backgrounds/honeyed-bee-inn/exterior.png"
+      },
+      {
+        "id": "guest-room",
+        "name": "Guest room",
+        "image": "backgrounds/honeyed-bee-inn/guest-room.png"
+      }
+    ],
+    "trains": [
+      "charisma",
+      "dexterity"
+    ]
+  },
+  {
+    "id": "market",
+    "name": "the Market Square",
+    "description": "Seedblossom's market, a short walk from the gate: a sea of awnings where students find work, supplies and gossip.",
+    "open": {
+      "fromHour": 7,
+      "toHour": 19
+    },
+    "backgrounds": [
+      {
+        "id": "market",
+        "name": "Market",
+        "image": "backgrounds/market/market.png"
+      },
+      {
+        "id": "south-gate",
+        "name": "South Gate",
+        "image": "backgrounds/market/south-gate.png"
+      }
+    ]
+  },
+  {
+    "id": "dawnbloom-house",
+    "name": "Dawnbloom House",
+    "description": "The crown's white marble house in a walled garden at the north-east corner of the grounds. The Chancellor receives guests here, and by custom the heir to the throne lodges in it during term.",
+    "backgrounds": [
+      {
+        "id": "reception",
+        "name": "Reception",
+        "image": "backgrounds/dawnbloom-house/reception.png"
+      },
+      {
+        "id": "library",
+        "name": "Study",
+        "image": "backgrounds/dawnbloom-house/library.png"
+      },
+      {
+        "id": "dining",
+        "name": "Dining room",
+        "image": "backgrounds/dawnbloom-house/dining.png"
+      }
+    ]
+  }
+]

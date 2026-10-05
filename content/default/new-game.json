@@ -1,0 +1,18 @@
+{
+  "player": {
+    "name": "Kael",
+    "stats": {
+      "strength": 5,
+      "dexterity": 5,
+      "endurance": 5,
+      "intelligence": 5,
+      "charisma": 5,
+      "wisdom": 5
+    },
+    "energy": 100,
+    "maxEnergy": 100,
+    "money": 50,
+    "traitIds": []
+  },
+  "locationId": "dormitories"
+}

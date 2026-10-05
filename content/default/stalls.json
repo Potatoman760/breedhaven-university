@@ -1,0 +1,34 @@
+[
+  {
+    "id": "petal-and-posy",
+    "name": "Petal and Posy",
+    "description": "A flower seller's barrow, crowded with pots and buckets.",
+    "icon": "flower",
+    "locationId": "market",
+    "itemIds": ["posy", "potted-fern", "moss-ball", "seed-packets", "lavender-soap"]
+  },
+  {
+    "id": "the-sweet-tooth",
+    "name": "The Sweet Tooth",
+    "description": "A baker's stall under a striped awning. You can smell it from the gate.",
+    "icon": "sweet",
+    "locationId": "market",
+    "itemIds": ["honey-cakes", "candied-plums", "spiced-cider", "salt-pretzels"]
+  },
+  {
+    "id": "quill-and-binding",
+    "name": "Quill and Binding",
+    "description": "A stationer who sells to students and knows what they can afford.",
+    "icon": "book",
+    "locationId": "market",
+    "itemIds": ["blank-ledger", "trade-treatise", "book-of-hymns", "sketchbook", "old-map", "playing-cards"]
+  },
+  {
+    "id": "tinkers-tray",
+    "name": "The Tinker's Tray",
+    "description": "A travelling tinker's table of small things, useful and otherwise.",
+    "icon": "necklace",
+    "locationId": "market",
+    "itemIds": ["silk-ribbon", "lace-choker", "river-stone", "whetstone", "sword-belt", "lockpicks", "glass-vials"]
+  }
+]

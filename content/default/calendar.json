@@ -1,0 +1,103 @@
+{
+  "months": [
+    {
+      "id": "thawmoon",
+      "name": "Thawmoon",
+      "days": 30
+    },
+    {
+      "id": "bloomtide",
+      "name": "Bloomtide",
+      "days": 32
+    },
+    {
+      "id": "suncrest",
+      "name": "Suncrest",
+      "days": 35
+    },
+    {
+      "id": "emberfall",
+      "name": "Emberfall",
+      "days": 30
+    },
+    {
+      "id": "harvestwane",
+      "name": "Harvestwane",
+      "days": 28
+    },
+    {
+      "id": "frostveil",
+      "name": "Frostveil",
+      "days": 33
+    }
+  ],
+  "weekdays": [
+    "Solday",
+    "Moonday",
+    "Tidesday",
+    "Windsday",
+    "Hearthday",
+    "Marketday",
+    "Restday"
+  ],
+  "hoursPerDay": 24,
+  "periods": [
+    {
+      "id": "morning",
+      "name": "Morning",
+      "startHour": 6
+    },
+    {
+      "id": "afternoon",
+      "name": "Afternoon",
+      "startHour": 12
+    },
+    {
+      "id": "evening",
+      "name": "Evening",
+      "startHour": 18
+    },
+    {
+      "id": "night",
+      "name": "Night",
+      "startHour": 22
+    }
+  ],
+  "start": {
+    "year": 412,
+    "month": "bloomtide",
+    "day": 1,
+    "hour": 8
+  },
+  "startWeekday": 0,
+  "lengthDays": 90,
+  "weather": [
+    { "id": "clear", "name": "Clear skies", "icon": "clear", "weight": 4, "description": "Bright and dry, with a light breeze." },
+    { "id": "overcast", "name": "Overcast", "icon": "cloudy", "weight": 3, "description": "A flat grey sky, mild and still." },
+    { "id": "drizzle", "name": "Light rain", "icon": "rain", "weight": 2, "description": "A soft, steady drizzle that beads on cloaks and darkens the paths." },
+    { "id": "downpour", "name": "Heavy rain", "icon": "storm", "weight": 1, "description": "Rain coming down in sheets, with thunder somewhere off over the fields. Nobody is outdoors who can help it." },
+    { "id": "windy", "name": "High wind", "icon": "wind", "weight": 1, "description": "A gusting wind that snatches at papers, hems and awnings." },
+    { "id": "mist", "name": "Morning mist", "icon": "fog", "weight": 2, "months": ["thawmoon", "harvestwane", "frostveil"], "description": "Low mist lying over the grounds, muffling sound." },
+    { "id": "snow", "name": "Snow", "icon": "snow", "weight": 3, "months": ["frostveil", "thawmoon"], "description": "Snow falling quietly and settling on the roofs and walls." },
+    { "id": "heat", "name": "Sweltering heat", "icon": "clear", "weight": 2, "months": ["suncrest", "emberfall"], "description": "Heavy, close heat. Everyone is slow and looking for shade." }
+  ],
+  "events": [
+    {
+      "id": "lantern-festival",
+      "name": "the Lantern Festival",
+      "month": "bloomtide",
+      "day": 20,
+      "locationId": "physic-garden",
+      "description": "The University floats paper lanterns on the Physic Garden pond at dusk, each carrying a wish."
+    },
+    {
+      "id": "midsummer-fair",
+      "name": "the Midsummer Fair",
+      "month": "suncrest",
+      "day": 10,
+      "durationDays": 3,
+      "locationId": "market",
+      "description": "Traders, games and dancing fill the market square until late."
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+  "name": "Breedhaven University",
+  "image": "backgrounds/map.png",
+  "travelHours": 1,
+  "pins": [
+    {
+      "locationId": "library",
+      "x": 12,
+      "y": 31.9
+    },
+    {
+      "locationId": "lecture-halls",
+      "x": 30.5,
+      "y": 30.8
+    },
+    {
+      "locationId": "tiltyard",
+      "x": 49.6,
+      "y": 30.8
+    },
+    {
+      "locationId": "dawnbloom-house",
+      "x": 65.8,
+      "y": 34
+    },
+    {
+      "locationId": "chapel",
+      "x": 11.4,
+      "y": 53.1
+    },
+    {
+      "locationId": "great-court",
+      "x": 31.1,
+      "y": 64.8
+    },
+    {
+      "locationId": "commons",
+      "x": 50.8,
+      "y": 57.4
+    },
+    {
+      "locationId": "dormitories",
+      "x": 67.3,
+      "y": 66.4
+    },
+    {
+      "locationId": "physic-garden",
+      "x": 16.1,
+      "y": 85
+    },
+    {
+      "locationId": "bathhouse",
+      "x": 44.9,
+      "y": 86.6
+    },
+    {
+      "locationId": "lantern-row",
+      "x": 87.9,
+      "y": 45.7
+    },
+    {
+      "locationId": "honeyed-bee-inn",
+      "x": 88.5,
+      "y": 65.9
+    },
+    {
+      "locationId": "market",
+      "x": 87.9,
+      "y": 88
+    }
+  ]
+}

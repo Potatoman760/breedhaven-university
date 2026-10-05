@@ -1,0 +1,109 @@
+{
+  "meterMax": 100,
+  "stages": [
+    {
+      "id": "stranger",
+      "name": "Stranger",
+      "minAffection": 0,
+      "description": "You have barely met."
+    },
+    {
+      "id": "acquaintance",
+      "name": "Acquaintance",
+      "minAffection": 10,
+      "description": "You know each other by name and exchange small talk."
+    },
+    {
+      "id": "friend",
+      "name": "Friend",
+      "minAffection": 30,
+      "description": "You enjoy each other's company and talk openly."
+    },
+    {
+      "id": "dating",
+      "name": "Dating",
+      "minAffection": 60,
+      "description": "You are romantically involved and still finding your footing."
+    },
+    {
+      "id": "lover",
+      "name": "Lover",
+      "minAffection": 85,
+      "description": "You are deeply in love and committed to each other."
+    }
+  ],
+  "statuses": [
+    {
+      "id": "casual",
+      "name": "Lovers without promises",
+      "minStage": "friend",
+      "description": "You share a bed when you both want to, and owe each other nothing more.",
+      "guidance": "Be easy and unpossessive about it. Do not speak as though you were a couple."
+    },
+    {
+      "id": "exclusive",
+      "name": "Courting",
+      "minStage": "dating",
+      "exclusive": true,
+      "description": "You are a couple, and have promised to see only each other.",
+      "guidance": "You may speak of the two of you as a couple, expect to be put first, and be hurt by any sign of someone else."
+    },
+    {
+      "id": "open",
+      "name": "Open courtship",
+      "minStage": "dating",
+      "description": "You are a couple, and have agreed that either of you may also see other people.",
+      "guidance": "You may speak of the two of you as a couple. Other lovers are no betrayal; you can be curious, teasing or a little jealous about them, in character, but never wronged."
+    },
+    {
+      "id": "triad",
+      "name": "Triad",
+      "minStage": "dating",
+      "minMembers": 2,
+      "maxMembers": 2,
+      "mutual": true,
+      "exclusive": true,
+      "minTie": 30,
+      "description": "The three of you are together, each with both of the others, and see nobody outside it.",
+      "guidance": "Treat both of them as your lovers. Speak of the three of you as one household of the heart, and give the other woman her due as readily as him."
+    },
+    {
+      "id": "open-triad",
+      "name": "Open triad",
+      "minStage": "dating",
+      "minMembers": 2,
+      "maxMembers": 2,
+      "mutual": true,
+      "minTie": 30,
+      "description": "The three of you are together, each with both of the others, and any of you may also see other people.",
+      "guidance": "Treat both of them as your lovers. Other lovers outside the three of you are no betrayal; you can be curious or teasing about them, but never wronged."
+    }
+  ],
+  "tieLevels": [
+    {
+      "id": "strangers",
+      "name": "barely acquainted",
+      "min": 0,
+      "description": "You know her by sight and little more."
+    },
+    {
+      "id": "friendly",
+      "name": "friendly",
+      "min": 15,
+      "description": "You like her and are easy in her company."
+    },
+    {
+      "id": "close",
+      "name": "close",
+      "min": 30,
+      "description": "You trust her, seek her out, and there is some warmth between you that is more than friendship."
+    },
+    {
+      "id": "intimate",
+      "name": "intimate",
+      "min": 60,
+      "description": "You are drawn to her and openly affectionate with her."
+    }
+  ],
+  "ties": []
+}

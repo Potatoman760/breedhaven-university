@@ -1,0 +1,419 @@
+[
+  {
+    "id": "study",
+    "name": "Read in the library",
+    "description": "Claim a reading cell and a chained book.",
+    "durationHours": 2,
+    "locationId": "library",
+    "tags": [
+      "study"
+    ],
+    "requirements": [
+      {
+        "type": "energy",
+        "min": 10
+      }
+    ],
+    "effects": [
+      {
+        "type": "stat",
+        "stat": "intelligence",
+        "amount": 1
+      },
+      {
+        "type": "energy",
+        "amount": -10
+      }
+    ]
+  },
+  {
+    "id": "train",
+    "name": "Train at the Tiltyard",
+    "description": "Spar, run and drill with whoever is on the sand.",
+    "durationHours": 2,
+    "locationId": "tiltyard",
+    "tags": [
+      "sport"
+    ],
+    "requirements": [
+      {
+        "type": "energy",
+        "min": 25
+      }
+    ],
+    "effects": [
+      {
+        "type": "stat",
+        "stat": "endurance",
+        "amount": 1
+      },
+      {
+        "type": "energy",
+        "amount": -25
+      }
+    ]
+  },
+  {
+    "id": "eat",
+    "name": "Eat at the Commons",
+    "description": "A bowl of stew and a seat by the hearth.",
+    "durationHours": 1,
+    "locationId": "commons",
+    "tags": [
+      "rest"
+    ],
+    "requirements": [
+      {
+        "type": "money",
+        "min": 2
+      }
+    ],
+    "effects": [
+      {
+        "type": "money",
+        "amount": -2
+      },
+      {
+        "type": "energy",
+        "amount": 15
+      }
+    ]
+  },
+  {
+    "id": "bathe",
+    "name": "Soak in the baths",
+    "description": "An hour in the warm pool.",
+    "durationHours": 1,
+    "locationId": "bathhouse",
+    "tags": [
+      "rest"
+    ],
+    "effects": [
+      {
+        "type": "energy",
+        "amount": 10
+      },
+      {
+        "type": "stat",
+        "stat": "charisma",
+        "amount": 1
+      }
+    ]
+  },
+  {
+    "id": "work-market",
+    "name": "Work a market stall",
+    "description": "Haul crates and haggle for a stallholder.",
+    "durationHours": 4,
+    "locationId": "market",
+    "tags": [
+      "work"
+    ],
+    "availability": {
+      "latestHour": 14
+    },
+    "requirements": [
+      {
+        "type": "energy",
+        "min": 30
+      }
+    ],
+    "effects": [
+      {
+        "type": "money",
+        "amount": 20
+      },
+      {
+        "type": "energy",
+        "amount": -30
+      }
+    ]
+  },
+  {
+    "id": "sleep",
+    "name": "Sleep",
+    "description": "Turn in for the night in your room.",
+    "durationHours": 8,
+    "locationId": "dormitories",
+    "tags": [
+      "rest"
+    ],
+    "availability": {
+      "periods": [
+        "evening",
+        "night"
+      ]
+    },
+    "effects": [
+      {
+        "type": "energy",
+        "amount": 100
+      }
+    ]
+  },
+  {
+    "id": "talk",
+    "name": "Talk",
+    "description": "Find a quiet moment to chat.",
+    "durationHours": 1,
+    "tags": [
+      "social"
+    ],
+    "withLoveInterest": "required",
+    "effects": [
+      {
+        "type": "meter",
+        "meter": "affection",
+        "amount": 1
+      }
+    ]
+  },
+  {
+    "id": "study-together",
+    "name": "Study together",
+    "description": "Share a reading cell and a lamp.",
+    "durationHours": 2,
+    "locationId": "library",
+    "tags": [
+      "social",
+      "study"
+    ],
+    "withLoveInterest": "required",
+    "requirements": [
+      {
+        "type": "energy",
+        "min": 10
+      }
+    ],
+    "effects": [
+      {
+        "type": "stat",
+        "stat": "intelligence",
+        "amount": 1
+      },
+      {
+        "type": "energy",
+        "amount": -10
+      },
+      {
+        "type": "meter",
+        "meter": "affection",
+        "amount": 2
+      },
+      {
+        "type": "meter",
+        "meter": "trust",
+        "amount": 1
+      }
+    ]
+  },
+  {
+    "id": "meal-together",
+    "name": "Share a meal",
+    "description": "Two bowls, one bench, and time to talk.",
+    "durationHours": 1,
+    "locationId": "commons",
+    "tags": [
+      "social"
+    ],
+    "withLoveInterest": "required",
+    "requirements": [
+      {
+        "type": "money",
+        "min": 4
+      }
+    ],
+    "effects": [
+      {
+        "type": "money",
+        "amount": -4
+      },
+      {
+        "type": "energy",
+        "amount": 15
+      },
+      {
+        "type": "meter",
+        "meter": "affection",
+        "amount": 3
+      }
+    ]
+  },
+  {
+    "id": "spar-together",
+    "name": "Spar together",
+    "description": "A friendly bout on the sand.",
+    "durationHours": 1,
+    "locationId": "tiltyard",
+    "tags": [
+      "social",
+      "sport"
+    ],
+    "withLoveInterest": "required",
+    "requirements": [
+      {
+        "type": "energy",
+        "min": 15
+      }
+    ],
+    "effects": [
+      {
+        "type": "stat",
+        "stat": "endurance",
+        "amount": 1
+      },
+      {
+        "type": "energy",
+        "amount": -15
+      },
+      {
+        "type": "meter",
+        "meter": "affection",
+        "amount": 2
+      },
+      {
+        "type": "meter",
+        "meter": "trust",
+        "amount": 1
+      }
+    ]
+  },
+  {
+    "id": "court-stroll",
+    "name": "Walk the Great Court",
+    "description": "A slow circuit of the terraces, in no hurry to be anywhere.",
+    "durationHours": 1,
+    "locationId": "great-court",
+    "tags": [
+      "social",
+      "date"
+    ],
+    "withLoveInterest": "required",
+    "requirements": [
+      {
+        "type": "stage",
+        "min": "acquaintance"
+      }
+    ],
+    "effects": [
+      {
+        "type": "meter",
+        "meter": "affection",
+        "amount": 3
+      },
+      {
+        "type": "meter",
+        "meter": "desire",
+        "amount": 2
+      }
+    ]
+  },
+  {
+    "id": "drinks",
+    "name": "Share a drink",
+    "description": "Buy a round at the Honeyed Bee and talk.",
+    "durationHours": 2,
+    "locationId": "honeyed-bee-inn",
+    "tags": [
+      "social"
+    ],
+    "withLoveInterest": "required",
+    "requirements": [
+      {
+        "type": "money",
+        "min": 5
+      }
+    ],
+    "effects": [
+      {
+        "type": "money",
+        "amount": -5
+      },
+      {
+        "type": "meter",
+        "meter": "affection",
+        "amount": 4
+      },
+      {
+        "type": "meter",
+        "meter": "trust",
+        "amount": 1
+      }
+    ]
+  },
+  {
+    "id": "float-lantern",
+    "name": "Float a lantern together",
+    "description": "Write a wish and set it on the garden pond, side by side.",
+    "durationHours": 1,
+    "locationId": "physic-garden",
+    "tags": [
+      "date",
+      "festival"
+    ],
+    "withLoveInterest": "required",
+    "availability": {
+      "periods": [
+        "evening"
+      ]
+    },
+    "requirements": [
+      {
+        "type": "event",
+        "eventId": "lantern-festival"
+      }
+    ],
+    "effects": [
+      {
+        "type": "meter",
+        "meter": "affection",
+        "amount": 6
+      },
+      {
+        "type": "meter",
+        "meter": "trust",
+        "amount": 2
+      }
+    ]
+  },
+  {
+    "id": "night-together",
+    "name": "Spend the night together",
+    "description": "Invite them back to your room.",
+    "durationHours": 8,
+    "locationId": "dormitories",
+    "tags": [
+      "date"
+    ],
+    "withLoveInterest": "required",
+    "nsfw": true,
+    "availability": {
+      "periods": [
+        "evening",
+        "night"
+      ]
+    },
+    "requirements": [
+      {
+        "type": "stage",
+        "min": "dating"
+      }
+    ],
+    "effects": [
+      {
+        "type": "meter",
+        "meter": "affection",
+        "amount": 5
+      },
+      {
+        "type": "meter",
+        "meter": "desire",
+        "amount": 5
+      },
+      {
+        "type": "energy",
+        "amount": 60
+      }
+    ]
+  }
+]

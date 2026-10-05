@@ -1,0 +1,27 @@
+[
+  { "id": "posy", "name": "Wildflower posy", "description": "Meadow flowers tied with twine, picked this morning.", "price": 5, "icon": "flower", "tags": ["flowers"] },
+  { "id": "potted-fern", "name": "Potted fern", "description": "A small fern in a clay pot, hard to kill.", "price": 8, "icon": "plant", "tags": ["plants"] },
+  { "id": "moss-ball", "name": "Moss ball", "description": "A damp, velvety ball of pond moss in a dish.", "price": 4, "icon": "plant", "tags": ["moss", "plants"] },
+  { "id": "seed-packets", "name": "Seed packets", "description": "Paper twists of herb and bean seed, labelled by hand.", "price": 4, "icon": "plant", "tags": ["gardening"] },
+  { "id": "lavender-soap", "name": "Lavender soap", "description": "A pale cake of scented soap wrapped in linen.", "price": 6, "icon": "soap", "tags": ["soap"] },
+
+  { "id": "honey-cakes", "name": "Honey cakes", "description": "Three sticky cakes in a twist of paper, still warm.", "price": 4, "icon": "sweet", "tags": ["sweets"] },
+  { "id": "candied-plums", "name": "Candied plums", "description": "A small box of sugared plums.", "price": 6, "icon": "sweet", "tags": ["sweets"] },
+  { "id": "spiced-cider", "name": "Flask of spiced cider", "description": "Strong, sweet and best drunk in company.", "price": 7, "icon": "bottle", "tags": ["ale"] },
+  { "id": "salt-pretzels", "name": "Salt pretzels", "description": "Knotted bread crusted with coarse salt.", "price": 3, "icon": "salt", "tags": ["salt"] },
+
+  { "id": "blank-ledger", "name": "Blank ledger", "description": "Ruled pages bound in good leather, waiting for figures.", "price": 10, "icon": "book", "tags": ["ledgers"] },
+  { "id": "trade-treatise", "name": "On Coin and Credit", "description": "A much-argued treatise on trade, in a cheap student binding.", "price": 12, "icon": "book", "tags": ["books", "trade"] },
+  { "id": "book-of-hymns", "name": "Book of furrow hymns", "description": "A pocket book of the Order's hymns with a ribbon marker.", "price": 9, "icon": "book", "tags": ["devotional"] },
+  { "id": "sketchbook", "name": "Pink sketchbook", "description": "Thick drawing paper between rose-coloured boards.", "price": 10, "icon": "book", "tags": ["art"] },
+  { "id": "old-map", "name": "Old map of the Expanse", "description": "Out of date, beautifully drawn, slightly foxed.", "price": 8, "icon": "map", "tags": ["maps"] },
+  { "id": "playing-cards", "name": "Deck of cards", "description": "A worn deck. Possibly marked; the seller won't say.", "price": 6, "icon": "cards", "tags": ["cards"] },
+
+  { "id": "silk-ribbon", "name": "Silk ribbon", "description": "A length of bright silk for hair or a wrist.", "price": 5, "icon": "ribbon", "tags": ["ribbons"] },
+  { "id": "lace-choker", "name": "Lace choker", "description": "Fine black lace with a small silver clasp.", "price": 12, "icon": "necklace", "tags": ["finery"] },
+  { "id": "river-stone", "name": "River stone", "description": "A smooth grey stone that holds the sun's warmth.", "price": 3, "icon": "stone", "tags": ["stones"] },
+  { "id": "whetstone", "name": "Whetstone", "description": "A fine-grained stone for keeping an edge honest.", "price": 6, "icon": "blade", "tags": ["weapons"] },
+  { "id": "sword-belt", "name": "Tooled sword-belt", "description": "Sturdy leather with a plain brass buckle, made to last.", "price": 14, "icon": "belt", "tags": ["leatherwork"] },
+  { "id": "lockpicks", "name": "Set of picks", "description": "Sold as 'clock-mender's tools'. Nobody is fooled.", "price": 12, "icon": "key", "tags": ["lockpicks"] },
+  { "id": "glass-vials", "name": "Glass vials", "description": "Six stoppered vials in a padded case, for careful brewing.", "price": 9, "icon": "vial", "tags": ["potions"] }
+]
