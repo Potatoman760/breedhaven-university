@@ -1,9 +1,13 @@
 import { z } from 'zod'
-import { MAX_SCENE_CAST, STATS, StatSchema, type ContentPack, type GameState, type Effect, type Scene, type Stat } from '../model'
+import { MAX_SCENE_CAST, STATS, StatSchema, trainsAt, type ContentPack, type Drill, type Location, type GameState, type Effect, type Scene, type Stat } from '../model'
 import { formatTime, isGameOver, toDate } from './calendar'
 import { applyEffects } from './conditions'
-import { meetingNow } from './courses'
-import { locationOf } from './map'
+import { courseMembers, meetingNow } from './courses'
+import { locationOf, loveInterestsAt } from './map'
+import { npcsAt } from './npcs'
+import { shiftKey } from './jobs'
+import { timeOn } from './agenda'
+import { addCoursePoints, studyPoints } from './grades'
 import { firstNames, sceneBaseline } from './scene'
 import { isOpen } from './schedule'
 
@@ -28,8 +32,6 @@ const STAT_WORDS: Record<Stat | 'rest', RegExp> = {
 }
 // Waiting for people to be free only looks this far ahead; beyond it, a plan is the thing.
 const MAX_WAIT_DAYS = 1
-// What time spent together at the player's own suggestion is worth to each person who came.
-const OUTING_AFFECTION = 1
 const TITLE_CHARS = 60
 
 /** Something the player made up to do: what, where, how long, and with whom. */
@@ -43,7 +45,19 @@ export const OutingSchema = z.object({
   locationId: z.string(),
   hours: z.number().int().min(1).max(MAX_REST_HOURS).default(DEFAULT_HOURS),
   /** What it does for the player: raises a stat, restores energy, or neither. */
-  trains: z.union([StatSchema, z.literal('rest')]).optional()
+  trains: z.union([StatSchema, z.literal('rest')]).optional(),
+  /**
+   * Nobody is invited, but whoever is at the place when he gets there is part of it: love
+   * interests who happen to be there, or failing them someone who works there. Something he
+   * goes to do on his own is then still a scene.
+   */
+  dropIn: z.boolean().optional(),
+  /** The course it is a session of study for, when it is one: it earns marks in the course. */
+  studyCourseId: z.string().optional(),
+  /** It is in the player's own room, where the work goes further. */
+  ownRoom: z.boolean().optional(),
+  /** It is in this love interest's own room. */
+  roomOf: z.string().optional()
 })
 export type Outing = z.infer<typeof OutingSchema>
 
@@ -54,7 +68,7 @@ export function fallbackOuting(content: ContentPack, state: GameState, text: str
   const named = content.locations.find((l) => mentions(l.name.replace(/^the /i, '')))
   const trains = (['rest', ...STATS] as const).find((kind) => STAT_WORDS[kind].test(said))
   // Somewhere suited to it, when the player didn't say where.
-  const suited = trains && trains !== 'rest' ? content.locations.find((l) => l.trains.includes(trains)) : undefined
+  const suited = trains && trains !== 'rest' ? content.locations.find((l) => trainsAt(l).includes(trains)) : undefined
   const place = named ?? suited
   return {
     trains,
@@ -97,7 +111,7 @@ export function buildOutingPrompt(content: ContentPack, state: GameState, text: 
     '',
     'Places:',
     ...content.locations.map(
-      (l) => `- ${l.id}: ${l.name}${l.trains.length > 0 ? ` (a good place to work on ${l.trains.join(', ')})` : ''}`
+      (l) => `- ${l.id}: ${l.name}${trainsAt(l).length > 0 ? ` (a good place to work on ${trainsAt(l).join(', ')})` : ''}`
     ),
     '',
     `${state.player.name} typed: ${text}`
@@ -156,13 +170,13 @@ function busyReason(content: ContentPack, state: GameState, id: string, from: nu
   const li = content.loveInterests.find((c) => c.id === id)
   if (!li) return 'nobody by that name'
   const name = li.name.split(' ')[0]
-  const length = content.coursework?.hours ?? 0
   for (let time = from; time < from + hours; time++) {
     const then = { ...state, time }
-    for (const course of state.courses.filter((c) => c.studentIds.includes(id))) {
+    for (const course of state.courses.filter((c) => courseMembers(c).includes(id))) {
       const meeting = meetingNow(content, then, course)
       if (!meeting) continue
-      const ends = String(meeting.startHour + length).padStart(2, '0')
+      const ends = String(meeting.startHour + meeting.hours).padStart(2, '0')
+      if (course.teacherId === id && time === from) return `${name} is teaching ${course.number} until ${ends}:00`
       return time === from
         ? `${name} is in ${course.number} until ${ends}:00`
         : `${name} has ${course.number} at ${String(meeting.startHour).padStart(2, '0')}:00`
@@ -195,7 +209,7 @@ function blockersAt(content: ContentPack, state: GameState, outing: Outing, time
   const plan = state.appointments.find((a) => a.time < start + outing.hours && time < a.time + a.hours)
   if (plan) other.push(`You have a plan at ${formatTime(toDate(content.calendar, plan.time))}: ${plan.title}`)
   if (isGameOver(content.calendar, start + outing.hours - 1)) other.push('There is not enough of the season left')
-  if (outing.trains && outing.trains !== 'rest' && state.player.energy < ENERGY_PER_HOUR * outing.hours) {
+  if (((outing.trains && outing.trains !== 'rest') || outing.studyCourseId) && state.player.energy < ENERGY_PER_HOUR * outing.hours) {
     other.push('You are too tired for that. Rest first')
   }
 
@@ -231,7 +245,7 @@ export function checkOuting(content: ContentPack, state: GameState, outing: Outi
 /**
  * Goes on the outing after waiting the given hours: the wait and the walk pass, the
  * player ends up at the place, and the time it takes is spent. With company it opens a
- * scene with them, and each thinks a little better of the player for the invitation.
+ * scene with them, and what they make of it is settled when the scene is over.
  */
 export function startOuting(
   content: ContentPack,
@@ -245,14 +259,26 @@ export function startOuting(
   if (problems.length > 0) throw new Error(`Cannot do "${outing.title}": ${problems.join('; ')}`)
 
   const there = { ...waited, time: waited.time + walkHours(content, state, outing), locationId: outing.locationId }
-  const arrived = applyEffects(there, outingEffects(outing), { content })
-  const after = outing.withIds.reduce(
-    (current, loveInterestId) =>
-      applyEffects(current, [{ type: 'meter', meter: 'affection', amount: OUTING_AFFECTION }], { content, loveInterestId }),
-    arrived
-  )
-  const [leadId, ...companionIds] = outing.withIds
+  const worked = applyEffects(there, outingEffects(outing), { content })
+  // Study is work like any other, and what it earns goes on the course.
+  const arrived = outing.studyCourseId
+    ? addCoursePoints(content, applyEffects(worked, [{ type: 'energy', amount: -ENERGY_PER_HOUR * outing.hours }], { content }), outing.studyCourseId, studyPoints(content, outing))
+    : worked
+  const after = arrived
   const place = content.locations.find((l) => l.id === outing.locationId)
+  // Whoever he asked along; or, for something he drops in on alone, whoever is there when he arrives:
+  // love interests first, and failing them someone who works at the place.
+  const found = outing.dropIn && outing.withIds.length === 0 ? loveInterestsAt(content, there, outing.locationId).map((li) => li.id).slice(0, MAX_SCENE_CAST) : []
+  const staff = outing.dropIn && outing.withIds.length === 0 && found.length === 0 ? npcsAt(content, there, outing.locationId)[0] : undefined
+  const [leadId, ...companionIds] = outing.withIds.length > 0 ? outing.withIds : staff ? [staff.id] : found
+  const what = outing.studyCourseId ? 'to study' : outing.trains && outing.trains !== 'rest' ? `to work on his ${outing.trains}` : 'on his own'
+  const direction = !outing.dropIn
+    ? undefined
+    : `${state.player.name} has come here ${what}: ${outing.title.toLowerCase()}. ${outing.description} ` +
+      (staff
+        ? `You are at your work here, and he is one of the people about the place. Let him get on with it; talk when he talks, and say what you make of how he is doing.`
+        : `Nobody arranged this: you happen to be here while he is at it. You may watch, join in, tease him, help or get in his way, as you would.`) +
+      ` By the end of the scene the two hours are up and he is the better for it.`
   return {
     state: { ...after, time: after.time + outing.hours },
     scene: leadId
@@ -260,9 +286,10 @@ export function startOuting(
           loveInterestId: leadId,
           companionIds,
           nsfw: false,
-          beats: [{ activityName: outing.title, locationName: place?.name, description: outing.description || undefined }],
+          beats: [{ activityName: outing.title, locationName: place?.name, description: outing.description || undefined, direction }],
           messages: [],
-          gifts: [],
+          gifts: [], conceived: [], departed: [], npc: staff !== undefined,
+          roomOf: outing.roomOf,
           baseline: sceneBaseline(state, leadId, companionIds)
         }
       : null
@@ -274,4 +301,82 @@ export function describeOuting(content: ContentPack, outing: Outing): string {
   const place = content.locations.find((l) => l.id === outing.locationId)
   const company = outing.withIds.length > 0 ? ` with ${firstNames(content, outing.withIds)}` : ', alone'
   return `${outing.title}${company} at ${place?.name ?? outing.locationId}, ${outing.hours} hour${outing.hours === 1 ? '' : 's'}`
+}
+
+/** How long working on a stat at a place takes: long enough to be worth a scene. */
+export const DRILL_HOURS = 2
+
+/** A way of raising a stat that the day view can suggest: what, and where. */
+export interface StatSuggestion {
+  stat: Stat
+  location: Location
+  drill: Drill
+}
+
+/** A repeatable number in [0, 1) for one stat at one moment of one game. */
+function pick(seed: number, time: number, index: number): number {
+  let x = (seed ^ Math.imul(time + 1, 0x9e3779b1) ^ Math.imul(index + 1, 0x7f4a7c15)) >>> 0
+  x = Math.imul(x ^ (x >>> 16), 0x85ebca6b) >>> 0
+  x = Math.imul(x ^ (x >>> 13), 0xc2b2ae35) >>> 0
+  return ((x ^ (x >>> 16)) >>> 0) / 4294967296
+}
+
+/**
+ * One way to raise each stat right now, picked from everything the places of the game have
+ * to offer for it: a workout at the gym for strength, a bowl of something enormous at the
+ * restaurant for endurance. What is open when he would get there is preferred. The pick
+ * changes as time passes, so that the same thing is not always suggested, and is the same
+ * each time it is looked at within the hour. A stat nowhere has anything for is left out.
+ */
+export function suggestDrills(content: ContentPack, state: GameState): StatSuggestion[] {
+  return STATS.flatMap((stat, index) => {
+    const all = content.locations.flatMap((location) => location.drills.filter((drill) => drill.stat === stat).map((drill) => ({ stat, location, drill })))
+    const doable = all.filter((option) => checkOuting(content, state, drillOuting(option)).blockers.length === 0)
+    const from = doable.length > 0 ? doable : all
+    return from.length > 0 ? [from[Math.floor(pick(state.weatherSeed, state.time, index) * from.length)]] : []
+  })
+}
+
+/** The outing a suggestion is: two hours at the place, on his own, with whoever happens to be there. */
+export function drillOuting(suggestion: StatSuggestion): Outing {
+  return {
+    title: suggestion.drill.title,
+    description: suggestion.drill.description,
+    withIds: [],
+    locationId: suggestion.location.id,
+    hours: DRILL_HOURS,
+    trains: suggestion.stat,
+    dropIn: true
+  }
+}
+
+/**
+ * What the player would miss by going on an outing now, after the given wait: a class he
+ * is taking, or a shift at his job, that falls in the hours it takes, the walk included.
+ * Each as a line. He may still go; it is for him to be told first.
+ */
+export function outingMisses(content: ContentPack, state: GameState, outing: Outing, waitHours = 0): string[] {
+  const from = state.time + waitHours
+  const until = from + walkHours(content, state, outing) + outing.hours
+  const clock = (hour: number) => `${String(hour).padStart(2, '0')}:00`
+  const missed: string[] = []
+  for (let time = from; time < until; time++) {
+    const then = { ...state, time }
+    const { dayIndex, hour, weekday } = toDate(content.calendar, time)
+    for (const course of state.courses.filter((c) => state.enrolment?.includes(c.id))) {
+      const meeting = meetingNow(content, then, course)
+      // Counted at the hour it begins, or at the first hour if it is already under way; not one he has sat.
+      if (!meeting || (meeting.startHour !== hour && time !== from)) continue
+      if (state.attendance[course.id]?.last === `${dayIndex}:${meeting.startHour}`) continue
+      missed.push(`${course.number} ${course.title}, ${meeting.kind === 'lab' ? 'a lab' : 'a lecture'} at ${clock(meeting.startHour)}`)
+    }
+    const job = content.jobs?.jobs.find((j) => j.id === state.job?.jobId)
+    for (const shift of job?.shifts ?? []) {
+      if (shift.weekday !== weekday || hour < shift.startHour || hour >= shift.startHour + shift.hours) continue
+      if (shift.startHour !== hour && time !== from) continue
+      if (timeOn(content, dayIndex, shift.startHour) < (state.job?.hiredAt ?? 0) || state.job?.worked.includes(shiftKey(dayIndex, shift))) continue
+      missed.push(`your shift as ${job!.title.toLowerCase()} at ${clock(shift.startHour)}, which would be a strike`)
+    }
+  }
+  return [...new Set(missed)]
 }

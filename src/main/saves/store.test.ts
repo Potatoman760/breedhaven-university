@@ -11,12 +11,13 @@ import { SaveStore } from './store'
 const tempDir = () => join(mkdtempSync(join(tmpdir(), 'bh-saves-')), 'saves')
 const state = { ...createInitialState(fixture()), time: 14 }
 const scene: Scene = {
+  baseline: { stats: {}, energy: 0, money: 0, time: 0, relationship: { affection: 0, trust: 0, desire: 0 }, companions: {} },
   loveInterestId: 'ana',
   companionIds: [],
   nsfw: false,
   beats: [{ activityName: 'Date' }],
   messages: [{ role: 'user', content: 'Hi' }],
-  gifts: []
+  gifts: [], conceived: [], departed: [], npc: false
 }
 
 describe('SaveStore', () => {

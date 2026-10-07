@@ -1,34 +1,45 @@
 import { describe, expect, it } from 'vitest'
 import { LocationSchema } from '../model'
-import { backgroundFor } from './schedule'
+import { backgroundFor, viewImage } from './schedule'
 
 const location = LocationSchema.parse({
   id: 'inn',
   name: 'the Inn',
   backgrounds: [
-    { id: 'night', name: 'By candlelight', image: 'inn-night.png', periods: ['night'] },
-    { id: 'room', name: 'Common room', image: 'inn.png' },
-    { id: 'outside', name: 'Outside', image: 'inn-outside.png' }
+    { id: 'room', name: 'Common room', images: { day: 'inn.png', night: 'inn-night.png' } },
+    { id: 'outside', name: 'Outside', images: { night: 'inn-outside-night.png' } },
+    { id: 'cellar', name: 'Cellar' }
   ]
 })
 
 describe('backgroundFor', () => {
-  it('prefers a view made for the current period', () => {
-    expect(backgroundFor(location, 'night')?.id).toBe('night')
+  it('shows the first view unless another is chosen', () => {
+    expect(backgroundFor(location)?.id).toBe('room')
+    expect(backgroundFor(location, 'outside')?.id).toBe('outside')
+    expect(backgroundFor(location, 'gone')?.id).toBe('room')
+    expect(backgroundFor({ ...location, backgrounds: [] })).toBeUndefined()
   })
 
-  it('otherwise uses the first view that is not tied to a period', () => {
-    expect(backgroundFor(location, 'day')?.id).toBe('room')
+  it('shows a view named for something going on today, whatever the case, unless another is chosen', () => {
+    expect(backgroundFor(location, undefined, ['the Feast', ' OUTSIDE '])?.id).toBe('outside')
+    expect(backgroundFor(location, undefined, ['the Feast'])?.id).toBe('room')
+    // Only the whole name counts.
+    expect(backgroundFor(location, undefined, ['Outside the walls'])?.id).toBe('room')
+    expect(backgroundFor(location, 'cellar', ['Outside'])?.id).toBe('cellar')
+  })
+})
+
+describe('viewImage', () => {
+  const [room, outside, cellar] = location.backgrounds
+
+  it('is the picture drawn for the light', () => {
+    expect(viewImage(room, 'day')).toBe('inn.png')
+    expect(viewImage(room, 'night')).toBe('inn-night.png')
   })
 
-  it('uses the chosen view when it exists', () => {
-    expect(backgroundFor(location, 'night', 'outside')?.id).toBe('outside')
-    expect(backgroundFor(location, 'day', 'gone')?.id).toBe('room')
-  })
-
-  it('falls back to any view, or none', () => {
-    const nightOnly = { ...location, backgrounds: [location.backgrounds[0]] }
-    expect(backgroundFor(nightOnly, 'day')?.id).toBe('night')
-    expect(backgroundFor({ ...location, backgrounds: [] }, 'day')).toBeUndefined()
+  it('falls back to the other when that one has not been drawn, and to nothing when the view has none', () => {
+    expect(viewImage(outside, 'day')).toBe('inn-outside-night.png')
+    expect(viewImage(cellar, 'day')).toBeUndefined()
+    expect(viewImage(undefined, 'day')).toBeUndefined()
   })
 })

@@ -11,7 +11,9 @@ export type Month = z.infer<typeof MonthSchema>
 export const PeriodSchema = z.object({
   id: z.string(),
   name: z.string(),
-  startHour: z.number().int().min(0)
+  startHour: z.number().int().min(0),
+  /** Whether it is light or dark out: which of a place's two pictures is shown. */
+  light: z.enum(['day', 'night']).default('day')
 })
 export type Period = z.infer<typeof PeriodSchema>
 
@@ -30,12 +32,18 @@ export const CalendarEventSchema = z.object({
   year: z.number().int().optional(),
   durationDays: z.number().int().min(1).default(1),
   locationId: z.string().optional(),
+  /** No classes meet while it lasts: a holiday, or a break between terms. */
+  noClasses: z.boolean().default(false),
   /** True for events invented by the LLM. */
   generated: z.boolean().default(false)
 })
 export type CalendarEvent = z.infer<typeof CalendarEventSchema>
 
 /** A kind of weather a day can have. Each day's weather is drawn from the kinds its month allows. */
+/** What a kind of weather looks like on the stage. */
+export const WEATHER_EFFECTS = ['none', 'rain', 'storm', 'snow', 'mist', 'wind', 'motes'] as const
+export type WeatherEffect = (typeof WEATHER_EFFECTS)[number]
+
 export const WeatherTypeSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -43,7 +51,18 @@ export const WeatherTypeSchema = z.object({
   description: z.string().default(''),
   /** Name of a built-in weather icon: clear, cloudy, rain, storm, fog, snow or wind. */
   icon: z.string().default('cloudy'),
-  /** How likely it is relative to the other kinds. */
+  /**
+   * What is drawn over outdoor views while it lasts: rain, a storm with lightning, snow,
+   * drifting mist, leaves on the wind, or motes hanging in still air.
+   */
+  effect: z.enum(WEATHER_EFFECTS).default('none'),
+  /**
+   * How likely it is in each month, by month id, relative to the other kinds: written as
+   * the percentage of days, though any numbers in proportion will do. A month left out
+   * never has it. When given, it takes the place of `weight` and `months`.
+   */
+  chance: z.record(z.string(), z.number().min(0)).optional(),
+  /** How likely it is relative to the other kinds, the same in every month it occurs in. */
   weight: z.number().positive().default(1),
   /** Month ids it can occur in. Omitted means any month. */
   months: z.array(z.string()).optional()

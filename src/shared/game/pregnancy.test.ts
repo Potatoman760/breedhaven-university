@@ -1,0 +1,174 @@
+import { describe, expect, it } from 'vitest'
+import { PregnancyConfigSchema, type ContentPack, type GameState } from '../model'
+import { evaluateCondition } from './conditions'
+import {
+  birthNote,
+  birthsDue,
+  canConceive,
+  conceive,
+  daysUntilDue,
+  deliver,
+  describeChildren,
+  describePregnancy,
+  pregnancyStage,
+  wearableOutfits,
+  wornOutfit
+} from './pregnancy'
+import { buildCharacterPrompt } from './prompt'
+import { parseDirectives } from './scene'
+import { createInitialState } from './state'
+import { fixture } from './testFixture'
+
+// A 20-hour day. Pregnancies last 10 days here, and show from the third; Bea's last 2.
+const base = fixture()
+const [ana] = base.loveInterests
+const content: ContentPack = {
+  ...base,
+  loveInterests: [
+    {
+      ...ana,
+      outfits: [...ana.outfits, { id: 'round', name: 'Round', description: 'visibly pregnant', sprites: {}, pregnant: true }]
+    },
+    { ...ana, id: 'bea', name: 'Bea Stone', pregnancyDays: 2 }
+  ],
+  pregnancy: PregnancyConfigSchema.parse({
+    chance: 0.5,
+    lengthDays: 10,
+    recoveryDays: 3,
+    daughterChance: 0.5,
+    stages: [
+      { id: 'early', name: 'newly with child', from: 0, description: 'Nothing shows yet.' },
+      { id: 'showing', name: 'showing', from: 0.25, showing: true, description: 'Your belly has rounded.' }
+    ]
+  })
+}
+const start = createInitialState(content)
+const certain: ContentPack = { ...content, pregnancy: { ...content.pregnancy!, chance: 1 } }
+const pregnant = conceive(certain, start, 'ana')
+const at = (state: GameState, day: number): GameState => ({ ...state, time: day * 20 })
+
+describe('conception', () => {
+  it('is a throw of the dice once a day for each woman, the same however often it is thrown', () => {
+    const results = Array.from({ length: 400 }, (_, seed) => conceive(content, { ...start, weatherSeed: seed }, 'ana'))
+    const took = results.filter((state) => state.pregnancies['ana']).length
+    expect(took).toBeGreaterThan(150)
+    expect(took).toBeLessThan(250)
+
+    const unlucky = results.findIndex((state) => !state.pregnancies['ana'])
+    const state = { ...start, weatherSeed: unlucky }
+    expect(conceive(content, { ...state, time: 5 }, 'ana').pregnancies).toEqual({})
+    // Another day is another throw.
+    expect(Array.from({ length: 30 }, (_, day) => conceive(content, at(state, day), 'ana')).some((s) => s.pregnancies['ana'])).toBe(true)
+  })
+
+  it('sets the day the child is due, by her own length when she has one', () => {
+    expect(pregnant.pregnancies['ana']).toEqual({ conceivedAt: 0, dueAt: 200 })
+    expect(conceive(certain, { ...start, time: 7 }, 'bea').pregnancies['bea']).toEqual({ conceivedAt: 7, dueAt: 47 })
+    expect(daysUntilDue(content, at(pregnant, 4), 'ana')).toBe(6)
+  })
+
+  it('cannot happen to someone already carrying, a stranger to the game, or a pack without the rules', () => {
+    expect(conceive(certain, at(pregnant, 3), 'ana')).toEqual(at(pregnant, 3))
+    expect(conceive(certain, start, 'nobody')).toBe(start)
+    expect(conceive(base, createInitialState(base), 'ana').pregnancies).toEqual({})
+    expect(canConceive(base, createInitialState(base), 'ana')).toBe(false)
+  })
+
+  it('is asked of the LLM with a tag, which is taken out of the reply', () => {
+    expect(parseDirectives('Stay.\n[SEEDED]\n[END SCENE]')).toMatchObject({ text: 'Stay.', ended: true, seeded: [''] })
+    expect(parseDirectives('Ana: Oh.\n[seeded: Ana]\n[SEEDED: Bea Stone]').seeded).toEqual(['Ana', 'Bea Stone'])
+    expect(parseDirectives('Hello.').seeded).toEqual([])
+
+    const scene = { content, state: start, loveInterestId: 'ana', sceneBeats: [{ activityName: 'Tea' }] }
+    expect(buildCharacterPrompt(scene)).toContain('write [SEEDED] on a line of its own')
+    expect(buildCharacterPrompt({ ...scene, companionIds: ['bea'] })).toContain('write [SEEDED: name]')
+    // Not asked for when it could come to nothing.
+    expect(buildCharacterPrompt({ ...scene, state: pregnant })).not.toContain('## Conception')
+    expect(buildCharacterPrompt({ ...scene, mode: 'courier' })).not.toContain('## Conception')
+  })
+})
+
+describe('carrying', () => {
+  it('moves through its stages, and shows in what she wears once it shows', () => {
+    expect(pregnancyStage(content, start, 'ana')).toBeUndefined()
+    expect(pregnancyStage(content, at(pregnant, 2), 'ana')?.id).toBe('early')
+    expect(pregnancyStage(content, at(pregnant, 3), 'ana')?.id).toBe('showing')
+
+    const her = content.loveInterests[0]
+    expect(wornOutfit(content, at(pregnant, 2), her)?.id).toBe('default')
+    expect(wornOutfit(content, at(pregnant, 3), her)?.id).toBe('round')
+    expect(wearableOutfits(content, at(pregnant, 2), her).map((o) => o.id)).toEqual(['default'])
+    expect(wearableOutfits(content, at(pregnant, 3), her).map((o) => o.id)).toEqual(['round'])
+    // With the four standard outfits, whatever is chosen for her is given in the form that fits her now.
+    const blank = (id: string, isPregnant: boolean) => ({ id, name: id, description: '', sprites: {}, pregnant: isPregnant })
+    const four = { ...her, outfits: [blank('default', false), blank('pregnant', true), blank('nude', false), blank('nude-pregnant', true)] }
+    const showing = at(pregnant, 3)
+    expect(wornOutfit(content, showing, four)?.id).toBe('pregnant')
+    expect(wornOutfit(content, showing, four, 'nude')?.id).toBe('nude-pregnant')
+    expect(wornOutfit(content, showing, four, 'nude-pregnant')?.id).toBe('nude-pregnant')
+    expect(wornOutfit(content, at(pregnant, 2), four, 'nude')?.id).toBe('nude')
+    expect(wornOutfit(content, start, four, 'nude-pregnant')?.id).toBe('nude')
+    expect(wornOutfit(content, start, four, 'pregnant')?.id).toBe('default')
+    expect(buildCharacterPrompt({ content: { ...content, loveInterests: [four, ...content.loveInterests.slice(1)] }, state: showing, loveInterestId: 'ana', look: {} })).toContain(
+      'showing, so you wear only your pregnant outfits: "pregnant" dressed, "nude-pregnant" undressed.'
+    )
+    // Someone with no pregnant outfit keeps what she has.
+    const bea = conceive(certain, start, 'bea')
+    expect(wornOutfit(content, { ...bea, time: 30 }, content.loveInterests[1])?.id).toBe('default')
+  })
+
+  it('is told to her, and to the others once anyone could see it', () => {
+    expect(describePregnancy(content, pregnant, 'ana')[0]).toMatch(/^Today the Bloom locked in/)
+    const later = describePregnancy(content, at(pregnant, 4), 'ana')
+    expect(later[0]).toBe("You are carrying Pat's child: day 5 of about 10, showing. Pat knows.")
+    expect(later[1]).toBe('Your belly has rounded.')
+    expect(later[2]).toBe('The child is due in about 6 days.')
+
+    expect(describePregnancy(content, at(pregnant, 2), 'bea')).toEqual([])
+    expect(describePregnancy(content, at(pregnant, 4), 'bea')).toEqual([
+      "Ana is visibly pregnant, and the whole University knows the child is Pat's."
+    ])
+    expect(buildCharacterPrompt({ content, state: at(pregnant, 4), loveInterestId: 'ana' })).toContain(
+      "## Children\nYou are carrying Pat's child"
+    )
+    expect(buildCharacterPrompt({ content, state: at(pregnant, 4), loveInterestId: 'bea', companionIds: ['ana'] })).toContain(
+      "Of Ana, in her own words: You are carrying Pat's child"
+    )
+  })
+
+  it('can be asked about by activities and secrets', () => {
+    const ctx = { content, state: pregnant, loveInterestId: 'ana' }
+    expect(evaluateCondition({ type: 'pregnant', value: true }, ctx)).toBe(true)
+    expect(evaluateCondition({ type: 'pregnant', loveInterestId: 'bea', value: true }, ctx)).toBe(false)
+    expect(evaluateCondition({ type: 'pregnant', loveInterestId: 'bea', value: false }, ctx)).toBe(true)
+  })
+})
+
+describe('birth', () => {
+  it('comes when the time is up, records the child, and leaves her able to conceive again after a rest', () => {
+    expect(birthsDue(at(pregnant, 9))).toBe(false)
+    expect(deliver(content, at(pregnant, 9)).born).toEqual([])
+    const due = at(pregnant, 11)
+    expect(birthsDue(due)).toBe(true)
+    const { state: after, born } = deliver(content, due)
+    expect(born).toHaveLength(1)
+    expect(born[0]).toMatchObject({ motherId: 'ana', bornAt: 200 })
+    expect(after.pregnancies).toEqual({})
+    expect(after.children).toEqual(born)
+
+    expect(canConceive(content, after, 'ana')).toBe(false)
+    expect(canConceive(content, at(after, 13), 'ana')).toBe(true)
+    expect(describePregnancy(content, after, 'ana')[0]).toMatch(/^You have borne Pat a (daughter|son), born yesterday\./)
+    expect(describePregnancy(content, after, 'bea')[0]).toMatch(/^Ana has borne Pat a (daughter|son)\.$/)
+    expect(birthNote(content, after, born[0])).toMatch(/^Pat\. It is done, and we are both well: you have a (daughter|son)\. Come and see us\. Ana$/)
+  })
+
+  it('gives daughters and sons in the proportion the content sets', () => {
+    const girls = Array.from({ length: 400 }, (_, seed) => deliver(content, at({ ...pregnant, weatherSeed: seed }, 10)).born[0].daughter).filter(Boolean).length
+    expect(girls).toBeGreaterThan(150)
+    expect(girls).toBeLessThan(250)
+    const child = (daughter: boolean) => ({ motherId: 'ana', bornAt: 0, daughter })
+    expect(describeChildren([child(true)])).toBe('a daughter')
+    expect(describeChildren([child(true), child(false), child(true)])).toBe('2 daughters and a son')
+  })
+})

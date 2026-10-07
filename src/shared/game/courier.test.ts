@@ -8,8 +8,11 @@ import {
   courierRound,
   courierRoundDue,
   fallbackInvite,
+  giveContact,
+  hasContact,
   inviteStands,
   markRead,
+  offersContact,
   unreadNotes
 } from './courier'
 import { buildCharacterPrompt } from './prompt'
@@ -21,8 +24,10 @@ const content: ContentPack = {
   ...base,
   loveInterests: [{ ...base.loveInterests[0], admires: ['strength'] }]
 }
-const start = createInitialState(content)
-const strong: GameState = { ...start, player: { ...start.player, stats: { strength: 14 } } }
+const fresh = createInitialState(content)
+// She has given him her Chats already, except where a test says otherwise.
+const start: GameState = { ...fresh, contacts: ['ana'] }
+const strong: GameState = { ...start, player: { ...start.player, stats: { strength: 19 } } }
 const tea = { loveInterestId: 'ana', companionIds: [], title: 'Tea', time: 4, hours: 2, locationId: 'home' }
 
 describe('notes', () => {
@@ -73,13 +78,13 @@ describe('notes', () => {
     expect(kept.length).toBeLessThan(30)
 
     const scene = buildCharacterPrompt({ content, state: chatted, loveInterestId: 'ana', sceneBeats: [{ activityName: 'Tea' }] })
-    expect(scene).toContain('## Notes you and Pat have sent each other by courier, oldest first\nPat: Lunch?')
-    expect(buildCharacterPrompt({ content, state: start, loveInterestId: 'ana' })).not.toContain('by courier')
+    expect(scene).toContain('## Messages you and Pat have sent each other on Chats, oldest first\nPat: Lunch?')
+    expect(buildCharacterPrompt({ content, state: start, loveInterestId: 'ana' })).not.toContain('on Chats')
   })
 
   it('are written with a prompt of their own', () => {
     const note = buildCharacterPrompt({ content, state: chatted, loveInterestId: 'ana', mode: 'courier' })
-    expect(note).toContain('## How to write your note')
+    expect(note).toContain('## How to write your message')
     expect(note).toContain('You are at the Shop; Pat is elsewhere.')
     expect(note).not.toContain('How to write your reply')
     expect(note).not.toContain('Nobody has written to you just now')
@@ -129,5 +134,30 @@ describe('writing unprompted', () => {
     const plain = fallbackInvite(content, strong, 'ana')
     expect(plain?.proposal).toMatchObject({ loveInterestId: 'ana', locationId: 'shop', time: 2 })
     expect(plain?.text).toContain('come and find me at the Shop')
+  })
+})
+
+describe('her Chats', () => {
+  it('has to be given before he can message her or she writes to him', () => {
+    expect(hasContact(fresh, 'ana')).toBe(false)
+    expect(chanceOfWriting(content, { ...strong, contacts: [] }, 'ana')).toBe(0)
+    const given = giveContact(fresh, 'ana')
+    expect(hasContact(given, 'ana')).toBe(true)
+    expect(giveContact(given, 'ana')).toBe(given)
+  })
+
+  it('is offered unasked only by someone taken with him', () => {
+    const feeling = (affection: number, desire: number): GameState => ({ ...fresh, relationships: { ana: { affection, trust: 0, desire } } })
+    expect(offersContact(content, fresh, 'ana')).toBe(false)
+    expect(offersContact(content, feeling(60, 0), 'ana')).toBe(true)
+    expect(offersContact(content, feeling(10, 50), 'ana')).toBe(true)
+    expect(offersContact(content, { ...strong, contacts: [] }, 'ana')).toBe(true)
+    expect(offersContact(content, giveContact(feeling(60, 0), 'ana'), 'ana')).toBe(false)
+
+    const asked = buildCharacterPrompt({ content, state: fresh, loveInterestId: 'ana', sceneBeats: [{ activityName: 'Tea' }] })
+    expect(asked).toContain('## Chats')
+    expect(asked).toContain('You do not offer Pat your Chats unasked.')
+    expect(buildCharacterPrompt({ content, state: feeling(60, 0), loveInterestId: 'ana', sceneBeats: [{ activityName: 'Tea' }] })).toContain('offer it unasked')
+    expect(buildCharacterPrompt({ content, state: start, loveInterestId: 'ana', sceneBeats: [{ activityName: 'Tea' }] })).not.toContain('## Chats')
   })
 })

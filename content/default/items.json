@@ -1,27 +1,506 @@
 [
-  { "id": "posy", "name": "Wildflower posy", "description": "Meadow flowers tied with twine, picked this morning.", "price": 5, "icon": "flower", "tags": ["flowers"] },
-  { "id": "potted-fern", "name": "Potted fern", "description": "A small fern in a clay pot, hard to kill.", "price": 8, "icon": "plant", "tags": ["plants"] },
-  { "id": "moss-ball", "name": "Moss ball", "description": "A damp, velvety ball of pond moss in a dish.", "price": 4, "icon": "plant", "tags": ["moss", "plants"] },
-  { "id": "seed-packets", "name": "Seed packets", "description": "Paper twists of herb and bean seed, labelled by hand.", "price": 4, "icon": "plant", "tags": ["gardening"] },
-  { "id": "lavender-soap", "name": "Lavender soap", "description": "A pale cake of scented soap wrapped in linen.", "price": 6, "icon": "soap", "tags": ["soap"] },
-
-  { "id": "honey-cakes", "name": "Honey cakes", "description": "Three sticky cakes in a twist of paper, still warm.", "price": 4, "icon": "sweet", "tags": ["sweets"] },
-  { "id": "candied-plums", "name": "Candied plums", "description": "A small box of sugared plums.", "price": 6, "icon": "sweet", "tags": ["sweets"] },
-  { "id": "spiced-cider", "name": "Flask of spiced cider", "description": "Strong, sweet and best drunk in company.", "price": 7, "icon": "bottle", "tags": ["ale"] },
-  { "id": "salt-pretzels", "name": "Salt pretzels", "description": "Knotted bread crusted with coarse salt.", "price": 3, "icon": "salt", "tags": ["salt"] },
-
-  { "id": "blank-ledger", "name": "Blank ledger", "description": "Ruled pages bound in good leather, waiting for figures.", "price": 10, "icon": "book", "tags": ["ledgers"] },
-  { "id": "trade-treatise", "name": "On Coin and Credit", "description": "A much-argued treatise on trade, in a cheap student binding.", "price": 12, "icon": "book", "tags": ["books", "trade"] },
-  { "id": "book-of-hymns", "name": "Book of furrow hymns", "description": "A pocket book of the Order's hymns with a ribbon marker.", "price": 9, "icon": "book", "tags": ["devotional"] },
-  { "id": "sketchbook", "name": "Pink sketchbook", "description": "Thick drawing paper between rose-coloured boards.", "price": 10, "icon": "book", "tags": ["art"] },
-  { "id": "old-map", "name": "Old map of the Expanse", "description": "Out of date, beautifully drawn, slightly foxed.", "price": 8, "icon": "map", "tags": ["maps"] },
-  { "id": "playing-cards", "name": "Deck of cards", "description": "A worn deck. Possibly marked; the seller won't say.", "price": 6, "icon": "cards", "tags": ["cards"] },
-
-  { "id": "silk-ribbon", "name": "Silk ribbon", "description": "A length of bright silk for hair or a wrist.", "price": 5, "icon": "ribbon", "tags": ["ribbons"] },
-  { "id": "lace-choker", "name": "Lace choker", "description": "Fine black lace with a small silver clasp.", "price": 12, "icon": "necklace", "tags": ["finery"] },
-  { "id": "river-stone", "name": "River stone", "description": "A smooth grey stone that holds the sun's warmth.", "price": 3, "icon": "stone", "tags": ["stones"] },
-  { "id": "whetstone", "name": "Whetstone", "description": "A fine-grained stone for keeping an edge honest.", "price": 6, "icon": "blade", "tags": ["weapons"] },
-  { "id": "sword-belt", "name": "Tooled sword-belt", "description": "Sturdy leather with a plain brass buckle, made to last.", "price": 14, "icon": "belt", "tags": ["leatherwork"] },
-  { "id": "lockpicks", "name": "Set of picks", "description": "Sold as 'clock-mender's tools'. Nobody is fooled.", "price": 12, "icon": "key", "tags": ["lockpicks"] },
-  { "id": "glass-vials", "name": "Glass vials", "description": "Six stoppered vials in a padded case, for careful brewing.", "price": 9, "icon": "vial", "tags": ["potions"] }
+  {
+    "id": "posy",
+    "name": "Wildflower posy",
+    "description": "Meadow flowers tied with twine, picked this morning.",
+    "price": 5,
+    "icon": "flower",
+    "tags": [
+      "flowers"
+    ]
+  },
+  {
+    "id": "potted-fern",
+    "name": "Potted fern",
+    "description": "A small fern in a clay pot, hard to kill.",
+    "price": 8,
+    "icon": "plant",
+    "tags": [
+      "plants"
+    ]
+  },
+  {
+    "id": "moss-ball",
+    "name": "Moss ball",
+    "description": "A damp, velvety ball of pond moss in a dish.",
+    "price": 4,
+    "icon": "plant",
+    "tags": [
+      "moss",
+      "plants"
+    ]
+  },
+  {
+    "id": "seed-packets",
+    "name": "Seed packets",
+    "description": "Paper twists of herb and bean seed, labelled by hand.",
+    "price": 4,
+    "icon": "plant",
+    "tags": [
+      "gardening"
+    ]
+  },
+  {
+    "id": "lavender-soap",
+    "name": "Lavender soap",
+    "description": "A pale cake of scented soap wrapped in linen.",
+    "price": 6,
+    "icon": "soap",
+    "tags": [
+      "soap"
+    ]
+  },
+  {
+    "id": "honey-cakes",
+    "name": "Honey cakes",
+    "description": "Three sticky cakes in a paper bag, still warm.",
+    "price": 4,
+    "icon": "sweet",
+    "tags": [
+      "sweets"
+    ]
+  },
+  {
+    "id": "candied-plums",
+    "name": "Candied plums",
+    "description": "A small box of sugared plums.",
+    "price": 6,
+    "icon": "sweet",
+    "tags": [
+      "sweets"
+    ]
+  },
+  {
+    "id": "loose-leaf-tea",
+    "name": "Tin of loose-leaf tea",
+    "description": "An upland black tea in a small painted tin.",
+    "price": 7,
+    "icon": "sweet",
+    "tags": [
+      "tea"
+    ]
+  },
+  {
+    "id": "coffee-beans",
+    "name": "Bag of coffee beans",
+    "description": "Roasted this week by the people who supply Spell & Sip.",
+    "price": 8,
+    "icon": "sweet",
+    "tags": [
+      "coffee"
+    ]
+  },
+  {
+    "id": "spiced-cider",
+    "name": "Bottle of spiced cider",
+    "description": "Strong, sweet and best drunk in company.",
+    "price": 7,
+    "icon": "bottle",
+    "tags": [
+      "ale"
+    ]
+  },
+  {
+    "id": "salt-pretzels",
+    "name": "Salt pretzels",
+    "description": "Knotted bread crusted with coarse salt.",
+    "price": 3,
+    "icon": "salt",
+    "tags": [
+      "salt"
+    ]
+  },
+  {
+    "id": "blank-ledger",
+    "name": "Ruled ledger",
+    "description": "A hardback accounts book with ruled pages, for people who still think better on paper.",
+    "price": 10,
+    "icon": "book",
+    "tags": [
+      "ledgers"
+    ]
+  },
+  {
+    "id": "trade-treatise",
+    "name": "On Coin and Credit",
+    "description": "A much-argued classic of economics, in a battered student paperback.",
+    "price": 12,
+    "icon": "book",
+    "tags": [
+      "books",
+      "trade"
+    ]
+  },
+  {
+    "id": "book-of-hymns",
+    "name": "Book of furrow hymns",
+    "description": "A pocket book of the Order's hymns with a ribbon marker.",
+    "price": 9,
+    "icon": "book",
+    "tags": [
+      "devotional"
+    ]
+  },
+  {
+    "id": "sketchbook",
+    "name": "Pink sketchbook",
+    "description": "Thick drawing paper between rose-coloured boards.",
+    "price": 10,
+    "icon": "book",
+    "tags": [
+      "art"
+    ]
+  },
+  {
+    "id": "old-map",
+    "name": "Old rail map of the Expanse",
+    "description": "Out of date, beautifully drawn, slightly foxed. Two of the portal lines on it were never built.",
+    "price": 8,
+    "icon": "map",
+    "tags": [
+      "maps"
+    ]
+  },
+  {
+    "id": "playing-cards",
+    "name": "Deck of cards",
+    "description": "A worn deck. Possibly marked; the seller won't say.",
+    "price": 6,
+    "icon": "cards",
+    "tags": [
+      "cards"
+    ]
+  },
+  {
+    "id": "silk-ribbon",
+    "name": "Silk ribbon",
+    "description": "A length of bright silk for hair or a wrist.",
+    "price": 5,
+    "icon": "ribbon",
+    "tags": [
+      "ribbons"
+    ]
+  },
+  {
+    "id": "lace-choker",
+    "name": "Lace choker",
+    "description": "Fine black lace with a small silver clasp.",
+    "price": 12,
+    "icon": "necklace",
+    "tags": [
+      "finery"
+    ]
+  },
+  {
+    "id": "river-stone",
+    "name": "River stone",
+    "description": "A smooth grey stone that holds the sun's warmth.",
+    "price": 3,
+    "icon": "stone",
+    "tags": [
+      "stones"
+    ]
+  },
+  {
+    "id": "whetstone",
+    "name": "Whetstone",
+    "description": "A fine-grained stone for keeping a competition blade honest.",
+    "price": 6,
+    "icon": "blade",
+    "tags": [
+      "weapons"
+    ]
+  },
+  {
+    "id": "sword-belt",
+    "name": "Tooled duty belt",
+    "description": "Sturdy leather with a plain brass buckle, made to carry a blade and a radio and to last.",
+    "price": 14,
+    "icon": "belt",
+    "tags": [
+      "leatherwork"
+    ]
+  },
+  {
+    "id": "lockpicks",
+    "name": "Set of picks",
+    "description": "Sold as 'ward-testing tools'. Nobody is fooled.",
+    "price": 12,
+    "icon": "key",
+    "tags": [
+      "lockpicks"
+    ]
+  },
+  {
+    "id": "glass-vials",
+    "name": "Glass vials",
+    "description": "Six stoppered vials in a padded case, for careful potion-work.",
+    "price": 9,
+    "icon": "vial",
+    "tags": [
+      "potions"
+    ]
+  },
+  {
+    "id": "game-cartridge",
+    "name": "Retro game cartridge",
+    "description": "A classic for a console older than you are. The label is worn and the save file is someone else's.",
+    "price": 9,
+    "icon": "cards",
+    "tags": [
+      "games"
+    ]
+  },
+  {
+    "id": "hobby-kit",
+    "name": "Charm-circuit kit",
+    "description": "A solder-it-yourself board that takes one small enchantment. The box says ages ten and up.",
+    "price": 12,
+    "icon": "key",
+    "tags": [
+      "gadgets"
+    ]
+  },
+  {
+    "id": "earbuds",
+    "name": "Refurbished earbuds",
+    "description": "Good sound, one careful owner, a case with a scratch on it.",
+    "price": 14,
+    "icon": "gift",
+    "tags": [
+      "music"
+    ]
+  },
+  {
+    "id": "charm-case",
+    "name": "Warded phone case",
+    "description": "A slim case with a drop-ward stitched into the lining. Rated for one flight of stairs.",
+    "price": 10,
+    "icon": "gift",
+    "tags": [
+      "gadgets"
+    ]
+  },
+  {
+    "id": "instant-ramen",
+    "name": "Cup of Ember Ramen",
+    "description": "The instant version of Cauldron's famous dish. Heats itself when you pull the tab, usually.",
+    "price": 3,
+    "icon": "salt",
+    "tags": [
+      "salt"
+    ]
+  },
+  {
+    "id": "energy-drink",
+    "name": "Can of Sparkroot",
+    "description": "An energy drink in a can that hums slightly. Popular in exam season.",
+    "price": 3,
+    "icon": "bottle",
+    "tags": [
+      "coffee"
+    ]
+  },
+  {
+    "id": "scratchcard",
+    "name": "Lucky Seven scratchcard",
+    "description": "Seven petals to scratch. The odds are printed on the back in small type.",
+    "price": 2,
+    "icon": "cards",
+    "tags": [
+      "cards"
+    ]
+  },
+  {
+    "id": "phone-charger",
+    "name": "Phone charger",
+    "description": "A charger and cable, because everyone has lost theirs.",
+    "price": 6,
+    "icon": "key",
+    "tags": [
+      "gadgets"
+    ]
+  },
+  {
+    "id": "bath-salts",
+    "name": "Lavender bath salts",
+    "description": "A jar of scented salts for a long soak.",
+    "price": 7,
+    "icon": "soap",
+    "tags": [
+      "soap"
+    ]
+  },
+  {
+    "id": "chamomile-tea",
+    "name": "Box of chamomile tea",
+    "description": "Twenty bags of something calming, from the shelf by the till.",
+    "price": 5,
+    "icon": "sweet",
+    "tags": [
+      "tea"
+    ]
+  },
+  {
+    "id": "study-tonic",
+    "name": "Study tonic",
+    "description": "A licensed focus tonic in a brown bottle. One before a lecture, never two.",
+    "price": 9,
+    "icon": "vial",
+    "tags": [
+      "potions"
+    ]
+  },
+  {
+    "id": "pocket-speaker",
+    "name": "Pocket speaker",
+    "description": "A speaker the size of a plum that is louder than it has any right to be.",
+    "price": 15,
+    "icon": "gift",
+    "tags": [
+      "music"
+    ]
+  },
+  {
+    "id": "game-controller",
+    "name": "Game controller",
+    "description": "A wireless controller in translucent purple.",
+    "price": 14,
+    "icon": "cards",
+    "tags": [
+      "games"
+    ]
+  },
+  {
+    "id": "smart-lamp",
+    "name": "Charm-light desk lamp",
+    "description": "A desk lamp with a small light-charm in place of a bulb. Dims when you tell it to.",
+    "price": 12,
+    "icon": "key",
+    "tags": [
+      "gadgets"
+    ]
+  },
+  {
+    "id": "quartz-point",
+    "name": "Quartz point",
+    "description": "A clear crystal the length of a finger, sold for focusing small workings and bought mostly because it is pretty.",
+    "price": 6,
+    "icon": "stone",
+    "tags": [
+      "stones"
+    ]
+  },
+  {
+    "id": "component-pouch",
+    "name": "Pouch of spell components",
+    "description": "Dried herbs, salts and powders in labelled twists, for potion-work and practicals.",
+    "price": 10,
+    "icon": "vial",
+    "tags": [
+      "potions"
+    ]
+  },
+  {
+    "id": "charm-bracelet",
+    "name": "Charm bracelet",
+    "description": "A fine silver chain with one small luck-charm on it and room for more.",
+    "price": 13,
+    "icon": "necklace",
+    "tags": [
+      "finery"
+    ]
+  },
+  {
+    "id": "tarot-deck",
+    "name": "Tarot deck",
+    "description": "Seventy-eight cards in a velvet bag. The Bloom is trump twenty-two.",
+    "price": 9,
+    "icon": "cards",
+    "tags": [
+      "cards"
+    ]
+  },
+  {
+    "id": "grimoire",
+    "name": "Facsimile grimoire",
+    "description": "A printed copy of a four-hundred-year-old spellbook, marginal notes and all.",
+    "price": 14,
+    "icon": "book",
+    "tags": [
+      "books"
+    ]
+  },
+  {
+    "id": "heretics-history",
+    "name": "A Heretic's History of the Furrow",
+    "description": "A history of the Order by one of its own priestesses. Not banned, exactly.",
+    "price": 11,
+    "icon": "book",
+    "tags": [
+      "books",
+      "devotional"
+    ]
+  },
+  {
+    "id": "antique-atlas",
+    "name": "Antique atlas",
+    "description": "Hand-coloured maps of the Expanse from before the railways.",
+    "price": 12,
+    "icon": "map",
+    "tags": [
+      "maps"
+    ]
+  },
+  {
+    "id": "curio",
+    "name": "Questionable artefact",
+    "description": "A small brass thing with a hinge and no obvious purpose. The label says only \"opens\".",
+    "price": 8,
+    "icon": "key",
+    "tags": [
+      "lockpicks"
+    ]
+  },
+  {
+    "id": "vintage-scarf",
+    "name": "Vintage silk scarf",
+    "description": "A printed silk scarf older than you, in very good condition.",
+    "price": 6,
+    "icon": "ribbon",
+    "tags": [
+      "ribbons",
+      "finery"
+    ]
+  },
+  {
+    "id": "band-tee",
+    "name": "Old band T-shirt",
+    "description": "Faded tour dates on the back, from a band that split up before you were born.",
+    "price": 5,
+    "icon": "gift",
+    "tags": [
+      "music"
+    ]
+  },
+  {
+    "id": "worn-leather-jacket",
+    "name": "Worn leather jacket",
+    "description": "Soft with age, mended at one elbow by someone who knew how.",
+    "price": 14,
+    "icon": "belt",
+    "tags": [
+      "leatherwork"
+    ]
+  },
+  {
+    "id": "paperback",
+    "name": "Second-hand paperback",
+    "description": "A novel with a cracked spine and someone's bus ticket for a bookmark.",
+    "price": 3,
+    "icon": "book",
+    "tags": [
+      "books"
+    ]
+  }
 ]

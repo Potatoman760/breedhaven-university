@@ -137,7 +137,9 @@ describe('an open three', () => {
     const prompt = buildCharacterPrompt({ content, state: three, loveInterestId: 'ana', companionIds: ['bea'] })
     expect(prompt).toContain('## What you are to each other, and to the others\nYou and Pat are in a relationship: Open triad.')
     expect(prompt).toContain('She and Pat are in a relationship: Open triad.')
-    expect(prompt).toContain('You and she are close.')
+    // What she and the other are to each other is said once, and not again under the other's name.
+    expect(prompt).toContain('You and Bea: close.')
+    expect(prompt).not.toContain('You and she are close.')
     expect(buildCharacterPrompt({ content: base, state: createInitialState(base), loveInterestId: 'ana' })).not.toContain(
       'What you are to each other'
     )

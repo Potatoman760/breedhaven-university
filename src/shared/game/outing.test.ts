@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { CourseSchema, CourseworkConfigSchema, type ContentPack } from '../model'
-import { buildOutingPrompt, checkOuting, describeOuting, fallbackOuting, parseOuting, startOuting } from './outing'
+import { CourseSchema, CourseworkConfigSchema, NpcSchema, type ContentPack } from '../model'
+import { buildOutingPrompt, checkOuting, describeOuting, drillOuting, fallbackOuting, outingMisses, parseOuting, startOuting, suggestDrills } from './outing'
 import { createInitialState } from './state'
 import { fixture } from './testFixture'
 
@@ -11,7 +11,7 @@ const bea = { ...base.loveInterests[0], id: 'bea', name: 'Bea Stone', schedule: 
 const content: ContentPack = {
   ...base,
   loveInterests: [...base.loveInterests, bea],
-  coursework: CourseworkConfigSchema.parse({ weekdays: ['Two'], startHours: [6], locationId: 'shop', hours: 3 })
+  coursework: CourseworkConfigSchema.parse({ weekdays: ['Two'], locationId: 'shop' })
 }
 // Bea has a class from 06:00 to 09:00 on the first day.
 const course = CourseSchema.parse({
@@ -20,9 +20,11 @@ const course = CourseSchema.parse({
   title: 'Riddles',
   professor: 'Prof. Q',
   subject: 'Riddles',
+  code: 'RID',
+  level: 1,
   studentIds: ['bea'],
   locationId: 'shop',
-  meetings: [{ weekday: 'Two', startHour: 6 }]
+  meetings: [{ weekday: 'Two', startHour: 6, hours: 3, kind: 'lecture' }]
 })
 const state = { ...createInitialState(content), courses: [course], enrolment: [] }
 const tea = { title: 'Tea', description: 'You put the kettle on.', withIds: ['ana'], locationId: 'home', hours: 2 }
@@ -102,8 +104,8 @@ describe('startOuting', () => {
     const { state: after, scene } = startOuting(content, state, outing, 1)
     expect(after.time).toBe(1 + 2 + 2)
     expect(after.locationId).toBe('shop')
-    expect(after.relationships['bea'].affection).toBe(1)
-    expect(after.relationships['ana'].affection).toBe(1)
+    // An invitation earns nothing of itself: the scene decides what they make of it.
+    expect(after.relationships).toEqual(state.relationships)
     expect(scene).toMatchObject({
       loveInterestId: 'bea',
       companionIds: ['ana'],
@@ -127,7 +129,7 @@ describe('startOuting', () => {
 describe('working on yourself', () => {
   const gym: ContentPack = {
     ...content,
-    locations: content.locations.map((l) => (l.id === 'shop' ? { ...l, trains: ['strength' as const] } : l))
+    locations: content.locations.map((l) => (l.id === 'shop' ? { ...l, drills: [{ stat: 'strength' as const, title: 'A workout', description: 'You load a bar.' }] } : l))
   }
 
   it('is read off the words, and sent somewhere suited to it', () => {
@@ -149,7 +151,7 @@ describe('working on yourself', () => {
   it('raises the stat for energy, or restores energy, and needs enough left to do it', () => {
     const run = { title: 'Run', description: '', withIds: [], locationId: 'home', hours: 3, trains: 'endurance' as const }
     const { state: after } = startOuting(content, state, run)
-    expect(after.player.stats['endurance']).toBe(3)
+    // Three hours' work in a day counts as two and a half: the third hour for half.
     expect(after.player.energy).toBe(50 - 24)
 
     const spent = { ...state, player: { ...state.player, energy: 10 } }
@@ -157,5 +159,66 @@ describe('working on yourself', () => {
     expect(checkOuting(content, spent, run).waitHours).toBeUndefined()
     const { state: rested } = startOuting(content, spent, { ...run, trains: 'rest' as const, hours: 4 })
     expect(rested.player.energy).toBe(70)
+  })
+})
+
+describe('raising a stat', () => {
+  // The shop has a workout for strength; home has somewhere to sit and think.
+  const town: ContentPack = {
+    ...content,
+    locations: content.locations.map((l) =>
+      l.id === 'shop'
+        ? { ...l, drills: [{ stat: 'strength' as const, title: 'A workout', description: 'You load a bar.' }] }
+        : { ...l, drills: [{ stat: 'wisdom' as const, title: 'Sit and think', description: '' }] }
+    )
+  }
+
+  it('is suggested one way for each stat that somewhere has something for, the same each time it is looked at', () => {
+    const suggested = suggestDrills(town, state)
+    expect(suggested.map((s) => [s.stat, s.location.id, s.drill.title])).toEqual([
+      ['strength', 'shop', 'A workout'],
+      ['wisdom', 'home', 'Sit and think']
+    ])
+    expect(suggestDrills(town, state)).toEqual(suggested)
+    expect(suggestDrills(content, state)).toEqual([])
+    expect(drillOuting(suggested[0])).toEqual({ title: 'A workout', description: 'You load a bar.', withIds: [], locationId: 'shop', hours: 2, trains: 'strength', dropIn: true })
+  })
+
+  it('is two hours that always raise it, as a scene with whoever is there', () => {
+    const [workout] = suggestDrills(town, state)
+    const { state: after, scene } = startOuting(town, state, drillOuting(workout))
+    expect(after.player.stats['strength']).toBe((state.player.stats['strength'] ?? 0) + 2)
+    expect(after.locationId).toBe('shop')
+    expect(after.time).toBeGreaterThanOrEqual(state.time + 2)
+    // Ana is at the shop by day, and nobody asked her: she is simply there.
+    expect(scene).toMatchObject({ loveInterestId: 'ana', npc: false })
+    expect(scene?.beats[0]).toMatchObject({ activityName: 'A workout', description: 'You load a bar.' })
+    expect(scene?.beats[0].direction).toContain('Pat has come here to work on his strength: a workout.')
+    expect(scene?.beats[0].direction).toContain('you happen to be here')
+  })
+
+  it('still raises it with nobody about, and is a scene with whoever works there when only she is', () => {
+    const empty: ContentPack = { ...town, loveInterests: town.loveInterests.map((li) => ({ ...li, schedule: [] })) }
+    const quiet = { ...state, courses: [] }
+    const [workout] = suggestDrills(empty, quiet)
+    const alone = startOuting(empty, quiet, drillOuting(workout))
+    expect(alone.scene).toBeNull()
+    expect(alone.state.player.stats['strength']).toBe((state.player.stats['strength'] ?? 0) + 2)
+
+    const smith = NpcSchema.parse({ id: 'bryn', name: 'Bryn', age: 34, outfits: [{ id: 'default', name: 'Apron' }], defaultOutfitId: 'default', schedule: [{ locationId: 'shop' }] })
+    const staffed = startOuting({ ...empty, npcs: [smith] }, quiet, drillOuting(workout))
+    expect(staffed.scene).toMatchObject({ loveInterestId: 'bryn', npc: true })
+    expect(staffed.scene?.beats[0].direction).toContain('You are at your work here')
+  })
+
+  it('says beforehand what he would miss by going: a class he is taking', () => {
+    const [workout] = suggestDrills(town, state)
+    const enrolled = { ...state, enrolment: ['c1'] }
+    // His class is on from 06:00 to 09:00, and the workout would take him through it.
+    expect(outingMisses(town, enrolled, drillOuting(workout))).toEqual(['RID 101 Riddles, a lecture at 06:00'])
+    // Not one he is not taking, nor one he has already sat, nor one that is over by then.
+    expect(outingMisses(town, state, drillOuting(workout))).toEqual([])
+    expect(outingMisses(town, { ...enrolled, attendance: { c1: { count: 1, last: '0:6' } } }, drillOuting(workout))).toEqual([])
+    expect(outingMisses(town, { ...enrolled, time: 3 }, drillOuting(workout))).toEqual([])
   })
 })

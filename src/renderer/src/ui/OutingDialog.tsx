@@ -1,4 +1,4 @@
-import { checkOuting, describeOuting, describeWhen, firstNames, type Outing } from '../../../shared/game'
+import { checkOuting, describeOuting, describeWhen, firstNames, outingMisses, studyPoints, trainingToward, type Outing } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { Dialog } from './Dialog'
 
@@ -18,6 +18,8 @@ export function OutingDialog({ content, state, outing, onGo, onClose }: Props) {
   const check = checkOuting(content, state, outing)
   const walk = outing.locationId === state.locationId ? 0 : (content.map?.travelHours ?? 0)
   const wait = check.waitHours
+  // What going would cost him: a class or a shift that falls in those hours.
+  const missed = wait === undefined ? [] : outingMisses(content, state, outing, wait)
 
   return (
     <Dialog title={outing.title} onClose={onClose} narrow>
@@ -25,8 +27,35 @@ export function OutingDialog({ content, state, outing, onGo, onClose }: Props) {
         {describeOuting(content, outing)}
         {walk > 0 && `, after a walk of ${hours(walk)}`}.
       </p>
+      {outing.trains && outing.trains !== 'rest' && (
+        <p className="hint">
+          It is {outing.hours} hour{outing.hours === 1 ? '' : 's'} of work on your {outing.trains}: you have {trainingToward(state, outing.trains).banked} of the{' '}
+          {trainingToward(state, outing.trains).needed} training points your next point takes. The first two hours on a stat in a day count in full, the next two for half.
+        </p>
+      )}
+      {outing.studyCourseId && (
+        <p className="hint">
+          It is worth {studyPoints(content, outing)} points in the course{outing.ownRoom ? ', one of them for the quiet of your own room' : ''}.
+        </p>
+      )}
       {outing.withIds.length === 0 && (
-        <p className="hint">Nobody was invited, so this passes the time without a scene.</p>
+        <p className="hint">
+          {outing.dropIn
+            ? 'Nobody is invited: whoever is there when you arrive will be part of it.'
+            : outing.ownRoom
+              ? 'On your own, so this passes the time without a scene.'
+              : 'Nobody was invited, so this passes the time without a scene.'}
+        </p>
+      )}
+      {missed.length > 0 && (
+        <div className="notice">
+          <strong>You would miss:</strong>
+          <ul className="blockers">
+            {missed.map((line) => (
+              <li key={line}>{line}</li>
+            ))}
+          </ul>
+        </div>
       )}
 
       {check.blockers.length > 0 && (
@@ -45,7 +74,7 @@ export function OutingDialog({ content, state, outing, onGo, onClose }: Props) {
       <div className="outing-options">
         {wait === 0 && (
           <button autoFocus onClick={() => onGo(outing, 0)}>
-            Go
+            {missed.length > 0 ? 'Go anyway' : 'Go'}
           </button>
         )}
         {wait !== undefined && wait > 0 && (

@@ -1,0 +1,582 @@
+{
+  "energyPerHour": 5,
+  "strikes": 3,
+  "missedStrike": 1,
+  "excusedStrike": 0.5,
+  "jobs": [
+    {
+      "id": "market-stallhand",
+      "title": "Stallhand",
+      "description": "Haul crates, mind the card reader and haggle for a stallholder.",
+      "locationId": "market",
+      "bossId": "odile",
+      "hourlyRate": 6,
+      "trains": "strength",
+      "requirements": {},
+      "shifts": [
+        {
+          "weekday": "Solday",
+          "startHour": 8,
+          "hours": 4
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 11,
+          "hours": 4
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 14,
+          "hours": 4
+        }
+      ]
+    },
+    {
+      "id": "commons-kitchen",
+      "title": "Kitchen hand",
+      "description": "Wash up, carry trays and serve at the hot counter through the rush.",
+      "locationId": "commons",
+      "bossId": "dorrit",
+      "hourlyRate": 6,
+      "trains": "endurance",
+      "requirements": {},
+      "shifts": [
+        {
+          "weekday": "Moonday",
+          "startHour": 12,
+          "hours": 4
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 7,
+          "hours": 4
+        },
+        {
+          "weekday": "Restday",
+          "startHour": 11,
+          "hours": 4
+        }
+      ]
+    },
+    {
+      "id": "halls-desk",
+      "title": "Front desk",
+      "description": "Sit the front desk of the Cloister Halls: sign for parcels, let in the locked-out, keep the peace.",
+      "locationId": "dormitories",
+      "bossId": "helga",
+      "hourlyRate": 6,
+      "trains": "charisma",
+      "requirements": {},
+      "shifts": [
+        {
+          "weekday": "Solday",
+          "startHour": 17,
+          "hours": 4
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 19,
+          "hours": 3
+        },
+        {
+          "weekday": "Restday",
+          "startHour": 19,
+          "hours": 3
+        }
+      ]
+    },
+    {
+      "id": "store-tills",
+      "title": "Till assistant",
+      "description": "Work the tills and tidy the shelves under the slogan.",
+      "locationId": "bloom-and-co",
+      "bossId": "pernille",
+      "hourlyRate": 7,
+      "trains": "charisma",
+      "requirements": {},
+      "shifts": [
+        {
+          "weekday": "Tidesday",
+          "startHour": 11,
+          "hours": 4
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 9,
+          "hours": 4
+        },
+        {
+          "weekday": "Marketday",
+          "startHour": 15,
+          "hours": 4
+        },
+        {
+          "weekday": "Restday",
+          "startHour": 13,
+          "hours": 4
+        }
+      ]
+    },
+    {
+      "id": "lumen-usher",
+      "title": "Usher",
+      "description": "Tear tickets, show people to their seats and sweep up popcorn between screenings.",
+      "locationId": "lumen",
+      "bossId": "coralie",
+      "hourlyRate": 7,
+      "trains": "charisma",
+      "requirements": {},
+      "shifts": [
+        {
+          "weekday": "Solday",
+          "startHour": 15,
+          "hours": 4
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 19,
+          "hours": 4
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 17,
+          "hours": 4
+        }
+      ]
+    },
+    {
+      "id": "bathhouse-attendant",
+      "title": "Bath attendant",
+      "description": "Hand out towels, mop the tiles and keep an eye on the hot end of the pool.",
+      "locationId": "bathhouse",
+      "bossId": "sunna",
+      "hourlyRate": 7,
+      "trains": "endurance",
+      "requirements": {
+        "endurance": 12
+      },
+      "shifts": [
+        {
+          "weekday": "Solday",
+          "startHour": 16,
+          "hours": 3
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 8,
+          "hours": 3
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 10,
+          "hours": 4
+        }
+      ]
+    },
+    {
+      "id": "boba-maker",
+      "title": "Tea maker",
+      "description": "Shake, seal and serve bubble tea, and smile at the queue.",
+      "locationId": "boba-blossom",
+      "bossId": "mimi",
+      "hourlyRate": 8,
+      "trains": "dexterity",
+      "requirements": {
+        "charisma": 12
+      },
+      "shifts": [
+        {
+          "weekday": "Moonday",
+          "startHour": 17,
+          "hours": 4
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 15,
+          "hours": 4
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 17,
+          "hours": 4
+        }
+      ]
+    },
+    {
+      "id": "garden-hand",
+      "title": "Garden hand",
+      "description": "Dig, weed, water and carry in the teaching garden, in all weathers.",
+      "locationId": "physic-garden",
+      "bossId": "rowena",
+      "hourlyRate": 8,
+      "trains": "endurance",
+      "requirements": {
+        "endurance": 13
+      },
+      "shifts": [
+        {
+          "weekday": "Moonday",
+          "startHour": 10,
+          "hours": 4
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 8,
+          "hours": 3
+        },
+        {
+          "weekday": "Marketday",
+          "startHour": 9,
+          "hours": 3
+        }
+      ]
+    },
+    {
+      "id": "library-page",
+      "title": "Library page",
+      "description": "Shelve returns, fetch from the stacks and keep the reading cells quiet.",
+      "locationId": "library",
+      "bossId": "agnes",
+      "hourlyRate": 9,
+      "trains": "intelligence",
+      "requirements": {
+        "intelligence": 13
+      },
+      "shifts": [
+        {
+          "weekday": "Windsday",
+          "startHour": 17,
+          "hours": 4
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 11,
+          "hours": 4
+        },
+        {
+          "weekday": "Marketday",
+          "startHour": 9,
+          "hours": 4
+        }
+      ]
+    },
+    {
+      "id": "arcade-floor",
+      "title": "Floor staff",
+      "description": "Give change, clear jams, reset cabinets and referee the air hockey.",
+      "locationId": "pixel-and-rune",
+      "bossId": "jax",
+      "hourlyRate": 9,
+      "trains": "dexterity",
+      "requirements": {
+        "dexterity": 13
+      },
+      "shifts": [
+        {
+          "weekday": "Tidesday",
+          "startHour": 16,
+          "hours": 3
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 12,
+          "hours": 4
+        },
+        {
+          "weekday": "Marketday",
+          "startHour": 17,
+          "hours": 3
+        },
+        {
+          "weekday": "Restday",
+          "startHour": 20,
+          "hours": 4
+        }
+      ]
+    },
+    {
+      "id": "barista",
+      "title": "Barista",
+      "description": "Pull espresso, serve pastries and keep the study booths from being hexed.",
+      "locationId": "spell-and-sip",
+      "bossId": "wren",
+      "hourlyRate": 10,
+      "trains": "charisma",
+      "requirements": {
+        "charisma": 13,
+        "dexterity": 12
+      },
+      "shifts": [
+        {
+          "weekday": "Moonday",
+          "startHour": 7,
+          "hours": 4
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 10,
+          "hours": 4
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 9,
+          "hours": 4
+        },
+        {
+          "weekday": "Restday",
+          "startHour": 7,
+          "hours": 4
+        }
+      ]
+    },
+    {
+      "id": "armoury-assistant",
+      "title": "Armoury assistant",
+      "description": "Carry kit, rack blades and work the bellows in the Tiltyard workshop.",
+      "locationId": "tiltyard",
+      "bossId": "bryn",
+      "hourlyRate": 11,
+      "trains": "strength",
+      "requirements": {
+        "strength": 14
+      },
+      "shifts": [
+        {
+          "weekday": "Solday",
+          "startHour": 8,
+          "hours": 4
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 15,
+          "hours": 4
+        },
+        {
+          "weekday": "Restday",
+          "startHour": 14,
+          "hours": 4
+        }
+      ]
+    },
+    {
+      "id": "bar-staff",
+      "title": "Bar staff",
+      "description": "Pull pints, collect glasses and run the quiz-night scoreboard.",
+      "locationId": "honeyed-bee-inn",
+      "bossId": "marda",
+      "hourlyRate": 12,
+      "trains": "charisma",
+      "requirements": {
+        "charisma": 14,
+        "endurance": 13
+      },
+      "shifts": [
+        {
+          "weekday": "Moonday",
+          "startHour": 17,
+          "hours": 4
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 18,
+          "hours": 4
+        },
+        {
+          "weekday": "Marketday",
+          "startHour": 14,
+          "hours": 4
+        },
+        {
+          "weekday": "Restday",
+          "startHour": 17,
+          "hours": 4
+        }
+      ]
+    },
+    {
+      "id": "clinic-reception",
+      "title": "Clinic receptionist",
+      "description": "Book appointments, hand out prescriptions and say nothing to anyone.",
+      "locationId": "health-centre",
+      "bossId": "ilse",
+      "hourlyRate": 13,
+      "trains": "wisdom",
+      "requirements": {
+        "wisdom": 16,
+        "charisma": 13
+      },
+      "shifts": [
+        {
+          "weekday": "Solday",
+          "startHour": 8,
+          "hours": 4
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 9,
+          "hours": 4
+        },
+        {
+          "weekday": "Marketday",
+          "startHour": 11,
+          "hours": 4
+        }
+      ]
+    },
+    {
+      "id": "gym-floor",
+      "title": "Gym floor staff",
+      "description": "Spot lifters, rack weights and run the beginners' circuit.",
+      "locationId": "ironroot",
+      "bossId": "kessa",
+      "hourlyRate": 14,
+      "trains": "strength",
+      "requirements": {
+        "strength": 18,
+        "endurance": 16
+      },
+      "shifts": [
+        {
+          "weekday": "Moonday",
+          "startHour": 10,
+          "hours": 4
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 15,
+          "hours": 3
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 12,
+          "hours": 4
+        },
+        {
+          "weekday": "Marketday",
+          "startHour": 8,
+          "hours": 3
+        }
+      ]
+    },
+    {
+      "id": "club-door",
+      "title": "Door and floor staff",
+      "description": "Work the door and the floor of the club, and walk people to the quiet room.",
+      "locationId": "undergrowth",
+      "bossId": "nyx",
+      "hourlyRate": 15,
+      "trains": "strength",
+      "requirements": {
+        "strength": 16,
+        "charisma": 16
+      },
+      "shifts": [
+        {
+          "weekday": "Windsday",
+          "startHour": 20,
+          "hours": 4
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 20,
+          "hours": 4
+        },
+        {
+          "weekday": "Restday",
+          "startHour": 20,
+          "hours": 4
+        }
+      ]
+    },
+    {
+      "id": "waiter",
+      "title": "Waiter",
+      "description": "Serve dishes that are on fire, below freezing or humming, without dropping any of them.",
+      "locationId": "cauldron",
+      "bossId": "yann",
+      "hourlyRate": 16,
+      "trains": "dexterity",
+      "requirements": {
+        "charisma": 18,
+        "dexterity": 18
+      },
+      "shifts": [
+        {
+          "weekday": "Windsday",
+          "startHour": 17,
+          "hours": 4
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 16,
+          "hours": 4
+        },
+        {
+          "weekday": "Marketday",
+          "startHour": 12,
+          "hours": 4
+        },
+        {
+          "weekday": "Restday",
+          "startHour": 16,
+          "hours": 4
+        }
+      ]
+    },
+    {
+      "id": "foundry-technician",
+      "title": "Lab technician",
+      "description": "Calibrate the benches, recharge the wards and stop first-years blowing up the test cell.",
+      "locationId": "foundry",
+      "bossId": "halla",
+      "hourlyRate": 18,
+      "trains": "intelligence",
+      "requirements": {
+        "intelligence": 20,
+        "dexterity": 18
+      },
+      "shifts": [
+        {
+          "weekday": "Moonday",
+          "startHour": 16,
+          "hours": 4
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 13,
+          "hours": 4
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 18,
+          "hours": 4
+        }
+      ]
+    },
+    {
+      "id": "research-assistant",
+      "title": "Research assistant",
+      "description": "Read, sort and summarise archive boxes for a professor's book on the Sire Registry.",
+      "locationId": "lecture-halls",
+      "bossId": "edda",
+      "hourlyRate": 20,
+      "trains": "wisdom",
+      "requirements": {
+        "intelligence": 22,
+        "wisdom": 18
+      },
+      "shifts": [
+        {
+          "weekday": "Moonday",
+          "startHour": 12,
+          "hours": 4
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 13,
+          "hours": 4
+        }
+      ]
+    }
+  ]
+}

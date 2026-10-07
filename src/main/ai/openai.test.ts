@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { LlmProfileSchema } from '../../shared/settings'
 import { chatCompletion, listModels, RefusalError } from './openai'
+import { excuseTool, leaveTool, moveTool, revealTool, type Leaving, type Revelation } from './tools'
+import { createInitialState } from '../../shared/game/state'
+import { fixture } from '../../shared/game/testFixture'
+import { JobsConfigSchema, NpcSchema, type Scene } from '../../shared/model'
+import { applyForJob } from '../../shared/game/jobs'
 
 const profile = LlmProfileSchema.parse({
   baseUrl: 'http://host/v1/',
@@ -19,6 +24,21 @@ function fakeFetch(status: number, body: unknown) {
   }) as typeof fetch
   return { impl, calls }
 }
+
+/** A scene with everything in it, for the tests to vary. */
+const sceneOf = (patch: Partial<Scene> = {}): Scene => ({
+  loveInterestId: 'ana',
+  npc: false,
+  companionIds: [],
+  nsfw: false,
+  beats: [],
+  messages: [],
+  gifts: [],
+  departed: [],
+  conceived: [],
+  baseline: { stats: {}, energy: 0, money: 0, time: 0, relationship: { affection: 0, trust: 0, desire: 0 }, companions: {} },
+  ...patch
+})
 
 describe('listModels', () => {
   it('asks the endpoint for its models and returns their ids, sorted', async () => {
@@ -170,5 +190,127 @@ describe('chatCompletion', () => {
     await expect(chatCompletion(profile, input, down)).rejects.toThrow(
       'Could not reach http://host/v1/chat/completions: ECONNREFUSED'
     )
+  })
+})
+
+describe('moveTool', () => {
+  const content = fixture()
+  const state = createInitialState(content)
+  const scene = sceneOf({ beats: [{ activityName: 'Tea' }] })
+
+  it('offers only where the scene can go, and reports the move it made', () => {
+    const moves: string[] = []
+    const tool = moveTool(content, state, scene, (d) => moves.push(d.id))!
+    expect(tool.name).toBe('move_scene')
+    expect((tool.parameters['properties'] as { place: { enum: string[] } }).place.enum).toEqual(['shop'])
+    expect(tool.description).toContain('It ends "Tea" here')
+
+    expect(tool.run({ place: 'the moon' })).toMatch(/^You cannot go to "the moon"\. Stay where you are/)
+    expect(moves).toEqual([])
+    // The fixture's walk is two hours, from 06:00.
+    expect(tool.run({ place: 'shop' })).toMatch(/^You and Pat go to the Shop\. The walk takes 2 hours; it is 08:00 when you get there\./)
+    expect(moves).toEqual(['shop'])
+  })
+
+  it('is the only way time passes: hours stayed on are added with the walk', () => {
+    const moves: [string, number][] = []
+    const tool = moveTool(content, state, scene, (d, hours) => moves.push([d.id, hours]))!
+    expect(tool.description).toContain('the only way time passes')
+    // Three hours more here from 06:00, then the two-hour walk.
+    expect(tool.run({ place: 'shop', hours: 3 })).toMatch(/^3 more hours pass here first\. You and Pat go to the Shop\. The walk takes 2 hours; it is 11:00 when you get there\./)
+    // Nonsense for the hours is no hours, and the move is still made.
+    expect(tool.run({ place: 'shop', hours: 'soon' })).toMatch(/^You and Pat go to the Shop\./)
+    // Never more than twelve at once.
+    expect(tool.run({ place: 'shop', hours: 500 })).toMatch(/^12 more hours pass here first\./)
+    expect(moves).toEqual([['shop', 3], ['shop', 0], ['shop', 12]])
+  })
+
+  it('is not offered when there is nowhere to go, or to an NPC', () => {
+    expect(moveTool(content, { ...state, time: 7 }, scene, () => undefined)).toBeUndefined()
+    expect(moveTool(content, state, { ...scene, npc: true }, () => undefined)).toBeUndefined()
+  })
+})
+
+describe('leaveTool', () => {
+  const base = fixture()
+  const [ana] = base.loveInterests
+  const content = { ...base, loveInterests: [ana, { ...ana, id: 'bea', name: 'Bea Stone' }, { ...ana, id: 'cy', name: 'Cy' }] }
+  const state = createInitialState(content)
+  const group = sceneOf({ companionIds: ['bea', 'cy'] })
+
+  it('is offered only where more than one love interest is in the scene', () => {
+    expect(leaveTool(content, state, sceneOf(), () => undefined)).toBeUndefined()
+    expect(leaveTool(content, state, { ...group, npc: true }, () => undefined)).toBeUndefined()
+    const tool = leaveTool(content, state, group, () => undefined)!
+    expect(tool.name).toBe('leave_scene')
+    const who = (tool.parameters['properties'] as { who: { maxItems: number; items: { enum: string[] } } }).who
+    expect(who.items.enum).toEqual(['ana', 'bea', 'cy'])
+    expect(who.maxItems).toBe(2)
+  })
+
+  it('lets some go and tells the model who it is now writing for, but never lets everyone go', () => {
+    const gone: Leaving[] = []
+    const tool = leaveTool(content, state, group, (leaving) => gone.push(leaving))!
+    expect(tool.run({ who: ['ana', 'bea', 'cy'], feeling: 'angry' })).toMatch(/^Someone has to stay/)
+    expect(tool.run({ who: ['dee'], feeling: 'content' })).toMatch(/^Nobody by that name is in the scene/)
+    expect(gone).toEqual([])
+
+    expect(tool.run({ who: ['Bea'], feeling: 'hurt', why: ' saw she was not wanted ' })).toBe(
+      'Bea leaves, hurt. Write her going in this reply, then carry on with Ana and Cy and Pat. From the next reply on, write only for Ana and Cy.'
+    )
+    expect(gone).toEqual([{ ids: ['bea'], feeling: 'hurt', reason: 'saw she was not wanted' }])
+    // A feeling the model made up is taken as none in particular.
+    tool.run({ who: ['cy'], feeling: 'bored' })
+    expect(gone[1]).toEqual({ ids: ['cy'], feeling: 'content', reason: '' })
+  })
+})
+
+describe('revealTool', () => {
+  const base = fixture()
+  const content = { ...base, loveInterests: [{ ...base.loveInterests[0], likes: ['tea'], dislikes: ['cards'] }] }
+  const state = createInitialState(content)
+
+  it('offers what the player does not yet know, and records only what is on that list', () => {
+    const told: Revelation[] = []
+    const tool = revealTool(content, state, ['ana'], (revelation) => told.push(revelation))!
+    const offered = (tool.parameters['properties'] as { facts: { items: { enum: string[] } } }).facts.items.enum
+    expect(offered).toEqual(['ana/like:tea', 'ana/dislike:cards', 'ana/trait:shy', 'ana/age'])
+    // What she likes is in the prompt already, and the name on the list says what it is: it is not spelled out again.
+    expect(tool.description).not.toContain('Ana likes tea')
+    // Her secret is not yet hers to share, so it is not on offer.
+    expect(tool.description).not.toContain('dragon')
+
+    expect(tool.run({ facts: ['ana/like:coffee'] })).toMatch(/^None of those is on the list/)
+    expect(tool.run({ facts: ['ANA/dislike:cards', 'ana/like:coffee'] })).toMatch(/^Recorded: Ana dislikes cards\./)
+    expect(told).toEqual([{ loveInterestId: 'ana', factId: 'dislike:cards' }])
+  })
+
+  it('is not offered once everything is known', () => {
+    const known = { ...state, revealed: { ana: ['like:tea', 'dislike:cards', 'trait:shy', 'age'] } }
+    expect(revealTool(content, known, ['ana'], () => undefined)).toBeUndefined()
+  })
+})
+
+describe('excuseTool', () => {
+  const smith = NpcSchema.parse({ id: 'bryn', name: 'Bryn', role: 'the shopkeeper', age: 34, outfits: [{ id: 'default', name: 'Apron' }], defaultOutfitId: 'default' })
+  const jobs = JobsConfigSchema.parse({
+    jobs: [{ id: 'clerk', title: 'Shop clerk', locationId: 'shop', bossId: 'bryn', hourlyRate: 4, shifts: [{ weekday: 'Two', startHour: 8, hours: 3 }] }]
+  })
+  const content = { ...fixture(), npcs: [smith], jobs }
+  const hired = applyForJob(content, createInitialState(content), 'clerk')
+
+  it('lets his boss record a shift he says he will miss, while it has not started', () => {
+    const told: string[] = []
+    const tool = excuseTool(content, hired, 'bryn', (key) => told.push(key))!
+    expect(tool.name).toBe('excuse_shift')
+    expect(tool.description).toContain('his shift today at 08:00')
+    expect(tool.run({ reason: 'ill' })).toMatch(/^Recorded: Pat will miss today's 08:00 shift/)
+    expect(told).toEqual(['0:8'])
+  })
+
+  it('is offered to nobody else, and not once the shift is under way', () => {
+    expect(excuseTool(content, hired, 'ana', () => undefined)).toBeUndefined()
+    expect(excuseTool(content, { ...hired, time: 2 }, 'bryn', () => undefined)).toBeUndefined()
+    expect(excuseTool(content, createInitialState(content), 'bryn', () => undefined)).toBeUndefined()
   })
 })

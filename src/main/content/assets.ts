@@ -1,6 +1,7 @@
 import { createReadStream, statSync } from 'node:fs'
 import { extname, resolve, sep } from 'node:path'
 import { Readable } from 'node:stream'
+import { ADDON_PREFIX } from '../../shared/editor'
 
 /** The scheme the renderer uses to load artwork and video from the content pack. */
 export const CONTENT_SCHEME = 'content'
@@ -20,9 +21,12 @@ const CONTENT_TYPES: Record<string, string> = {
  * Maps a `content://pack/<path>` URL to a file inside the content pack directory.
  * Returns undefined for anything that would resolve outside it.
  */
-export function resolveContentPath(packDir: string, url: string): string | undefined {
-  const root = resolve(packDir)
-  const file = resolve(root, `.${decodeURIComponent(new URL(url).pathname)}`)
+export function resolveContentPath(packDir: string, url: string, addonDir?: string): string | undefined {
+  const path = decodeURIComponent(new URL(url).pathname)
+  // The user's own artwork lives outside the game's pack.
+  const addon = addonDir !== undefined && path.startsWith(`/${ADDON_PREFIX}`)
+  const root = resolve(addon ? addonDir : packDir)
+  const file = resolve(root, `.${addon ? path.slice(ADDON_PREFIX.length) : path}`)
   return file.startsWith(root + sep) ? file : undefined
 }
 
@@ -43,8 +47,8 @@ export function parseRange(
  * Answers a `content://` request with the file from the pack. Range requests are
  * honoured, which video playback needs in order to seek and loop.
  */
-export function serveContent(packDir: string, request: Request): Response {
-  const file = resolveContentPath(packDir, request.url)
+export function serveContent(packDir: string, request: Request, addonDir?: string): Response {
+  const file = resolveContentPath(packDir, request.url, addonDir)
   if (!file) return new Response(null, { status: 403 })
 
   let size: number

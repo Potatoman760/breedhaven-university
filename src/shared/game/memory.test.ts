@@ -2,9 +2,13 @@ import { describe, expect, it } from 'vitest'
 import type { GameState, Scene } from '../model'
 import {
   addMemory,
+  amendMemory,
+  applyFeelings,
   buildSummaryPrompt,
   describeAge,
   fallbackSummary,
+  parseSummary,
+  PLAIN_FEELINGS,
   selectMemories
 } from './memory'
 import { buildCharacterPrompt } from './prompt'
@@ -14,6 +18,7 @@ import { fixture } from './testFixture'
 const content = fixture()
 const start = (): GameState => createInitialState(content)
 const scene: Scene = {
+  baseline: { stats: {}, energy: 0, money: 0, time: 0, relationship: { affection: 0, trust: 0, desire: 0 }, companions: {} },
   loveInterestId: 'ana',
   companionIds: [],
   nsfw: false,
@@ -22,19 +27,20 @@ const scene: Scene = {
     { role: 'user', content: 'Do you like it here?' },
     { role: 'assistant', content: 'More than I expected.' }
   ],
-  gifts: []
+  gifts: [], conceived: [], departed: [], npc: false
 }
 
 describe('buildSummaryPrompt', () => {
   it('lists what happened in order and attributes each line of the conversation', () => {
     const { system, user } = buildSummaryPrompt({ content, state: start(), scene })
     expect(system).toContain('what Ana remembered most')
+    expect(system).toContain('Exactly one sentence')
     expect(user).toContain('1. Work at the Shop\n2. Date')
     expect(user).toContain('Pat: Do you like it here?\nAna: More than I expected.')
   })
 
   it('mentions gifts and how they were received', () => {
-    const gifted: Scene = { ...scene, gifts: [{ name: 'Posy', description: '', reaction: 'loved' }] }
+    const gifted: Scene = { ...scene, gifts: [{ name: 'Posy', description: '', reaction: 'loved', recipientId: 'ana' }] }
     const { user } = buildSummaryPrompt({ content, state: start(), scene: gifted })
     expect(user).toContain('Gifts Pat gave Ana:\n- Posy (Ana loved it)')
     expect(buildSummaryPrompt({ content, state: start(), scene }).user).not.toContain('Gifts')
@@ -139,5 +145,81 @@ describe('memories of a group scene', () => {
     expect(fallbackSummary({ content: crowd, state: start(), scene: group, forId: 'bea' })).toMatch(
       /^Pat, Ana and Bea Stone /
     )
+  })
+})
+
+describe('amendMemory', () => {
+  const kept = addMemory(addMemory(start(), 'ana', 'They talked.'), 'ana', 'They walked.')
+
+  it('rewords the newest memory with that wording, keeping when it was', () => {
+    const twice = addMemory({ ...kept, time: 9 }, 'ana', 'They talked.')
+    const after = amendMemory(twice, 'ana', 'They talked.', '  They argued about dragons.  ')
+    expect(after.memories['ana']).toEqual([
+      { time: 0, summary: 'They talked.' },
+      { time: 0, summary: 'They walked.' },
+      { time: 9, summary: 'They argued about dragons.' }
+    ])
+  })
+
+  it('forgets a memory edited down to nothing, and leaves alone what was not changed', () => {
+    expect(amendMemory(kept, 'ana', 'They walked.', '   ').memories['ana'].map((m) => m.summary)).toEqual(['They talked.'])
+    expect(amendMemory(kept, 'ana', 'They walked.', 'They walked.')).toBe(kept)
+    expect(amendMemory(kept, 'ana', 'Never happened.', 'Something else.')).toBe(kept)
+    expect(amendMemory(kept, 'nobody', 'They walked.', 'x')).toBe(kept)
+  })
+})
+
+describe('what a scene does to how she feels', () => {
+  const content = fixture()
+  const state = { ...createInitialState(content), relationships: { ana: { affection: 28, trust: 10, desire: 5 } } }
+  const scene: Scene = {
+    loveInterestId: 'ana',
+    companionIds: [],
+    npc: false,
+    nsfw: false,
+    beats: [{ activityName: 'Tea', locationName: 'Home' }],
+    messages: [
+      { role: 'user', content: 'Tell me about the shop.' },
+      { role: 'assistant', content: 'You are the first to ask.' }
+    ],
+    gifts: [],
+    conceived: [],
+    departed: [],
+    comfort: { ana: { level: 4, reason: 'he listened' } },
+    baseline: { stats: {}, energy: 0, money: 0, time: 0, relationship: { affection: 28, trust: 10, desire: 5 }, companions: {} }
+  }
+
+  it('is asked of the LLM along with the memory, as her own judgement of the scene', () => {
+    const { system, user } = buildSummaryPrompt({ content, state, scene })
+    expect(system).toContain('{"memory": string, "affection": number, "trust": number, "desire": number, "reason": string}')
+    expect(system).toContain('whole numbers from -10 to 10')
+    expect(system).toContain('Nothing is owed for turning up')
+    expect(user).toContain('About Ana:')
+    expect(user).toContain('affection 28, trust 10, desire 5, each of 100')
+    expect(user).toContain('By the end she put how much she wanted to be there at 4 of 5: he listened.')
+    // An NPC is asked for a memory and nothing else.
+    const plain = buildSummaryPrompt({ content, state, scene: { ...scene, npc: true } })
+    expect(plain.system).toContain('Reply with only the memory itself.')
+    expect(plain.system).not.toContain('"affection"')
+    expect(plain.user).not.toContain('About Ana:')
+  })
+
+  it('is read out of the answer, kept within what one scene can do', () => {
+    const read = parseSummary('Here:\n{"memory": "Pat asked Ana about the shop.", "affection": 3, "trust": 2.6, "desire": -40, "reason": "He was the first to ask."}')
+    expect(read).toEqual({ memory: 'Pat asked Ana about the shop.', feelings: { affection: 3, trust: 3, desire: -10, reason: 'He was the first to ask.' } })
+    expect(parseSummary('{"memory": "x", "affection": "lots"}').feelings).toEqual({ affection: 0, trust: 0, desire: 0, reason: '' })
+    // An answer that is not the JSON asked for is the memory alone.
+    expect(parseSummary('Pat and Ana had tea.')).toEqual({ memory: 'Pat and Ana had tea.' })
+  })
+
+  it('moves what she feels, up or down, and never off the scale', () => {
+    const warmer = applyFeelings(content, state, 'ana', { affection: 3, trust: 2, desire: 0, reason: '' })
+    expect(warmer.relationships['ana']).toEqual({ affection: 31, trust: 12, desire: 5 })
+    const colder = applyFeelings(content, state, 'ana', { affection: -6, trust: -10, desire: -10, reason: '' })
+    expect(colder.relationships['ana']).toEqual({ affection: 22, trust: 0, desire: 0 })
+    const full = applyFeelings(content, { ...state, relationships: { ana: { affection: 97, trust: 0, desire: 0 } } }, 'ana', { affection: 10, trust: 0, desire: 0, reason: '' })
+    expect(full.relationships['ana'].affection).toBe(100)
+    // Nobody the game keeps no feelings for.
+    expect(applyFeelings(content, state, 'a-porter', PLAIN_FEELINGS)).toBe(state)
   })
 })

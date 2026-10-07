@@ -2,7 +2,7 @@ import type { Condition, ContentPack, Effect, GameState } from '../model'
 import { toDate } from './calendar'
 import { eventsOn } from './events'
 import { stageFor, stageRank } from './relationships'
-import { affectionGain } from './stats'
+import { affectionGain, trainStat } from './stats'
 
 export interface RuleContext {
   state: GameState
@@ -42,6 +42,8 @@ export function evaluateCondition(c: Condition, ctx: RuleContext): boolean {
     }
     case 'flag':
       return (state.flags[c.flag] ?? false) === c.value
+    case 'pregnant':
+      return (state.pregnancies[c.loveInterestId ?? ctx.loveInterestId ?? ''] !== undefined) === c.value
     case 'event':
       return eventsOn(content, state).some((e) => e.id === c.eventId)
     case 'day':
@@ -73,6 +75,8 @@ export function describeCondition(c: Condition, content: ContentPack): string {
     }
     case 'flag':
       return c.value ? `"${c.flag}" has happened` : `"${c.flag}" has not happened`
+    case 'pregnant':
+      return `${who(c.loveInterestId)} ${c.value ? 'to be' : 'not to be'} with child`
     case 'event':
       return `it to be ${content.calendar.events.find((e) => e.id === c.eventId)?.name ?? c.eventId}`
     case 'day':
@@ -85,13 +89,8 @@ export function applyEffect(state: GameState, e: Effect, ctx: Omit<RuleContext, 
   const { player } = state
   switch (e.type) {
     case 'stat':
-      return {
-        ...state,
-        player: {
-          ...player,
-          stats: { ...player.stats, [e.stat]: (player.stats[e.stat] ?? 0) + e.amount }
-        }
-      }
+      // Not a point of the score, but that much work toward one.
+      return trainStat(ctx.content, state, e.stat, e.amount)
     case 'money':
       return { ...state, player: { ...player, money: player.money + e.amount } }
     case 'energy':

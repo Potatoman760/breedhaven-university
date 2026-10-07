@@ -6,14 +6,29 @@
       "days": 30
     },
     {
+      "id": "greening",
+      "name": "Greening",
+      "days": 30
+    },
+    {
       "id": "bloomtide",
       "name": "Bloomtide",
-      "days": 32
+      "days": 31
     },
     {
       "id": "suncrest",
       "name": "Suncrest",
-      "days": 35
+      "days": 30
+    },
+    {
+      "id": "highsun",
+      "name": "Highsun",
+      "days": 31
+    },
+    {
+      "id": "goldenhay",
+      "name": "Goldenhay",
+      "days": 31
     },
     {
       "id": "emberfall",
@@ -23,12 +38,27 @@
     {
       "id": "harvestwane",
       "name": "Harvestwane",
-      "days": 28
+      "days": 31
+    },
+    {
+      "id": "mistmoon",
+      "name": "Mistmoon",
+      "days": 30
     },
     {
       "id": "frostveil",
       "name": "Frostveil",
-      "days": 33
+      "days": 31
+    },
+    {
+      "id": "deepwinter",
+      "name": "Deepwinter",
+      "days": 31
+    },
+    {
+      "id": "icebreak",
+      "name": "Icebreak",
+      "days": 28
     }
   ],
   "weekdays": [
@@ -45,59 +75,260 @@
     {
       "id": "morning",
       "name": "Morning",
-      "startHour": 6
+      "startHour": 6,
+      "light": "day"
     },
     {
       "id": "afternoon",
       "name": "Afternoon",
-      "startHour": 12
+      "startHour": 12,
+      "light": "day"
     },
     {
       "id": "evening",
       "name": "Evening",
-      "startHour": 18
+      "startHour": 18,
+      "light": "night"
     },
     {
       "id": "night",
       "name": "Night",
-      "startHour": 22
+      "startHour": 22,
+      "light": "night"
     }
   ],
   "start": {
     "year": 412,
-    "month": "bloomtide",
-    "day": 1,
+    "month": "goldenhay",
+    "day": 15,
     "hour": 8
   },
   "startWeekday": 0,
-  "lengthDays": 90,
+  "lengthDays": 133,
   "weather": [
-    { "id": "clear", "name": "Clear skies", "icon": "clear", "weight": 4, "description": "Bright and dry, with a light breeze." },
-    { "id": "overcast", "name": "Overcast", "icon": "cloudy", "weight": 3, "description": "A flat grey sky, mild and still." },
-    { "id": "drizzle", "name": "Light rain", "icon": "rain", "weight": 2, "description": "A soft, steady drizzle that beads on cloaks and darkens the paths." },
-    { "id": "downpour", "name": "Heavy rain", "icon": "storm", "weight": 1, "description": "Rain coming down in sheets, with thunder somewhere off over the fields. Nobody is outdoors who can help it." },
-    { "id": "windy", "name": "High wind", "icon": "wind", "weight": 1, "description": "A gusting wind that snatches at papers, hems and awnings." },
-    { "id": "mist", "name": "Morning mist", "icon": "fog", "weight": 2, "months": ["thawmoon", "harvestwane", "frostveil"], "description": "Low mist lying over the grounds, muffling sound." },
-    { "id": "snow", "name": "Snow", "icon": "snow", "weight": 3, "months": ["frostveil", "thawmoon"], "description": "Snow falling quietly and settling on the roofs and walls." },
-    { "id": "heat", "name": "Sweltering heat", "icon": "clear", "weight": 2, "months": ["suncrest", "emberfall"], "description": "Heavy, close heat. Everyone is slow and looking for shade." }
+    {
+      "id": "clear",
+      "name": "Clear skies",
+      "icon": "clear",
+      "description": "Bright and dry, with a light breeze.",
+      "effect": "none",
+      "chance": {
+        "thawmoon": 28,
+        "greening": 32,
+        "bloomtide": 40,
+        "suncrest": 46,
+        "highsun": 46,
+        "goldenhay": 44,
+        "emberfall": 40,
+        "harvestwane": 28,
+        "mistmoon": 18,
+        "frostveil": 18,
+        "deepwinter": 20,
+        "icebreak": 22
+      }
+    },
+    {
+      "id": "overcast",
+      "name": "Overcast",
+      "icon": "cloudy",
+      "description": "A flat grey sky, mild and still.",
+      "effect": "none",
+      "chance": {
+        "thawmoon": 30,
+        "greening": 26,
+        "bloomtide": 24,
+        "suncrest": 20,
+        "highsun": 16,
+        "goldenhay": 18,
+        "emberfall": 24,
+        "harvestwane": 28,
+        "mistmoon": 32,
+        "frostveil": 32,
+        "deepwinter": 30,
+        "icebreak": 30
+      }
+    },
+    {
+      "id": "drizzle",
+      "name": "Light rain",
+      "icon": "rain",
+      "description": "A soft, steady drizzle that beads on coats and darkens the paths.",
+      "effect": "rain",
+      "chance": {
+        "thawmoon": 18,
+        "greening": 22,
+        "bloomtide": 18,
+        "suncrest": 12,
+        "highsun": 8,
+        "goldenhay": 8,
+        "emberfall": 14,
+        "harvestwane": 18,
+        "mistmoon": 20,
+        "frostveil": 14,
+        "deepwinter": 8,
+        "icebreak": 10
+      }
+    },
+    {
+      "id": "downpour",
+      "name": "Heavy rain",
+      "icon": "storm",
+      "description": "Rain coming down in sheets, with thunder somewhere off over the river. The trams are packed and nobody is outdoors who can help it.",
+      "effect": "storm",
+      "chance": {
+        "thawmoon": 6,
+        "greening": 6,
+        "bloomtide": 6,
+        "suncrest": 8,
+        "highsun": 10,
+        "goldenhay": 10,
+        "emberfall": 6,
+        "harvestwane": 6,
+        "mistmoon": 6,
+        "frostveil": 4,
+        "deepwinter": 2,
+        "icebreak": 2
+      }
+    },
+    {
+      "id": "windy",
+      "name": "High wind",
+      "icon": "wind",
+      "description": "A gusting wind that snatches at papers, hems and awnings.",
+      "effect": "wind",
+      "chance": {
+        "thawmoon": 10,
+        "greening": 8,
+        "bloomtide": 6,
+        "suncrest": 4,
+        "highsun": 2,
+        "goldenhay": 4,
+        "emberfall": 6,
+        "harvestwane": 8,
+        "mistmoon": 8,
+        "frostveil": 8,
+        "deepwinter": 8,
+        "icebreak": 10
+      }
+    },
+    {
+      "id": "mist",
+      "name": "Mist",
+      "icon": "fog",
+      "description": "Mist lying over the grounds, muffling sound and beading on wool.",
+      "effect": "mist",
+      "chance": {
+        "thawmoon": 6,
+        "greening": 6,
+        "bloomtide": 4,
+        "suncrest": 2,
+        "goldenhay": 2,
+        "emberfall": 8,
+        "harvestwane": 12,
+        "mistmoon": 14,
+        "frostveil": 8,
+        "deepwinter": 6,
+        "icebreak": 6
+      }
+    },
+    {
+      "id": "snow",
+      "name": "Snow",
+      "icon": "snow",
+      "description": "Snow falling quietly and settling on the roofs and walls.",
+      "effect": "snow",
+      "chance": {
+        "thawmoon": 2,
+        "mistmoon": 2,
+        "frostveil": 16,
+        "deepwinter": 26,
+        "icebreak": 20
+      }
+    },
+    {
+      "id": "heat",
+      "name": "Sweltering heat",
+      "icon": "clear",
+      "description": "Heavy, close heat. Everyone is slow and looking for shade.",
+      "effect": "motes",
+      "chance": {
+        "bloomtide": 2,
+        "suncrest": 8,
+        "highsun": 18,
+        "goldenhay": 14,
+        "emberfall": 2
+      }
+    }
   ],
   "events": [
     {
-      "id": "lantern-festival",
-      "name": "the Lantern Festival",
-      "month": "bloomtide",
-      "day": 20,
-      "locationId": "physic-garden",
-      "description": "The University floats paper lanterns on the Physic Garden pond at dusk, each carrying a wish."
+      "id": "orientation-day",
+      "name": "Orientation Day",
+      "month": "goldenhay",
+      "day": 15,
+      "locationId": "great-court",
+      "description": "The first day of the autumn term: the Chancellor's assembly, a tour of the grounds for new students, and a first-night supper in the halls. No classes meet."
     },
     {
-      "id": "midsummer-fair",
-      "name": "the Midsummer Fair",
-      "month": "suncrest",
-      "day": 10,
+      "id": "societies-fair",
+      "name": "the Societies Fair",
+      "month": "goldenhay",
+      "day": 20,
+      "durationDays": 2,
+      "locationId": "great-court",
+      "description": "Every club and society in the University sets up a table in the Great Court: sports in all three divisions, the debating union, Bloomist and Freewill student groups a careful distance apart, and free pens."
+    },
+    {
+      "id": "harvest-fair",
+      "name": "the Harvest Fair",
+      "month": "emberfall",
+      "day": 20,
       "durationDays": 3,
       "locationId": "market",
-      "description": "Traders, games and dancing fill the market square until late."
+      "description": "The harvest is in. Traders, food vans, fairground rides, cider and dancing fill the market square until late."
+    },
+    {
+      "id": "lantern-festival",
+      "name": "the Lantern Festival",
+      "month": "harvestwane",
+      "day": 31,
+      "locationId": "physic-garden",
+      "description": "On the last night of Harvestwane the University floats paper lanterns on the Physic Garden pond at dusk, each carrying a wish for the dark half of the year."
+    },
+    {
+      "id": "arena-finals",
+      "name": "the Arena Finals",
+      "month": "mistmoon",
+      "day": 6,
+      "durationDays": 2,
+      "locationId": "tiltyard",
+      "description": "The student combat-sports finals at the Tiltyard, in all three divisions: unaugmented, mage and Bloom. The stands are full, the wards on the ring are doubled for the Bloom bouts, and the argument about whether pregnancy is an unfair advantage starts up again on schedule."
+    },
+    {
+      "id": "first-frost",
+      "name": "the Feast of First Frost",
+      "month": "mistmoon",
+      "day": 22,
+      "locationId": "commons",
+      "description": "The Commons lays on a hot supper to mark the turn of the weather: roast roots, spiced wine, and every hearth lit."
+    },
+    {
+      "id": "examinations",
+      "name": "Examinations",
+      "month": "frostveil",
+      "day": 12,
+      "durationDays": 5,
+      "locationId": "lecture-halls",
+      "description": "The last week of teaching: practicals, presentations and written papers in every college. Everyone is short of sleep, the Library is full and Spell & Sip runs out of oat milk."
+    },
+    {
+      "id": "winter-break",
+      "name": "the Winter Break",
+      "month": "frostveil",
+      "day": 19,
+      "durationDays": 7,
+      "noClasses": true,
+      "description": "Term is over. No classes meet; the halls are half empty, the heating is turned up, and those who have not gone home keep Midwinter together."
     }
   ]
 }

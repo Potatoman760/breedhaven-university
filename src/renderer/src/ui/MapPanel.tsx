@@ -13,7 +13,7 @@ interface Props {
 }
 
 /** A face-sized crop of the character's neutral sprite. */
-export function Portrait({ li }: { li: LoveInterest }) {
+export function Portrait({ li }: { li: Pick<LoveInterest, 'name' | 'outfits' | 'defaultOutfitId' | 'faceY'> }) {
   const outfit = li.outfits.find((o) => o.id === li.defaultOutfitId)
   const sprite = (outfit?.sprites['neutral'] ?? Object.values(outfit?.sprites ?? {})[0])?.image
   const firstName = li.name.split(' ')[0]

@@ -2,12 +2,12 @@
   "player": {
     "name": "Kael",
     "stats": {
-      "strength": 5,
-      "dexterity": 5,
-      "endurance": 5,
-      "intelligence": 5,
-      "charisma": 5,
-      "wisdom": 5
+      "strength": 10,
+      "dexterity": 10,
+      "endurance": 10,
+      "intelligence": 10,
+      "charisma": 10,
+      "wisdom": 10
     },
     "energy": 100,
     "maxEnergy": 100,

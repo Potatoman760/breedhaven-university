@@ -1,0 +1,189 @@
+import type { Child, ContentPack, GameState, LoveInterest, Outfit, Pregnancy, PregnancyStage } from '../model'
+import { toDate } from './calendar'
+
+/** A repeatable number in [0, 1) for one love interest on one day of one game, by purpose. */
+function roll(seed: number, dayIndex: number, index: number, salt: number): number {
+  let x = (seed ^ Math.imul(dayIndex + 1, 0x9e3779b1) ^ Math.imul(index + 1, 0x7f4a7c15) ^ Math.imul(salt, 0x165667b1)) >>> 0
+  x = Math.imul(x ^ (x >>> 16), 0x85ebca6b) >>> 0
+  x = Math.imul(x ^ (x >>> 13), 0xc2b2ae35) >>> 0
+  return ((x ^ (x >>> 16)) >>> 0) / 0x100000000
+}
+
+export function pregnancyOf(state: GameState, loveInterestId: string): Pregnancy | undefined {
+  return state.pregnancies[loveInterestId]
+}
+
+export function childrenOf(state: GameState, loveInterestId: string): Child[] {
+  return state.children.filter((child) => child.motherId === loveInterestId)
+}
+
+/** How long this love interest carries a child, in days: her own length if she has one, else the usual. */
+export function pregnancyLength(content: ContentPack, li: Pick<LoveInterest, 'pregnancyDays'>): number {
+  return li.pregnancyDays ?? content.pregnancy?.lengthDays ?? 0
+}
+
+/** How far along a pregnancy is, from 0 at conception to 1 when due. */
+export function pregnancyProgress(pregnancy: Pregnancy, time: number): number {
+  const length = Math.max(1, pregnancy.dueAt - pregnancy.conceivedAt)
+  return Math.min(1, Math.max(0, (time - pregnancy.conceivedAt) / length))
+}
+
+/** The stage a love interest's pregnancy has reached, if she is pregnant. */
+export function pregnancyStage(content: ContentPack, state: GameState, loveInterestId: string): PregnancyStage | undefined {
+  const pregnancy = pregnancyOf(state, loveInterestId)
+  if (!pregnancy || !content.pregnancy) return undefined
+  const progress = pregnancyProgress(pregnancy, state.time)
+  return [...content.pregnancy.stages].sort((a, b) => a.from - b.from).filter((stage) => stage.from <= progress).at(-1)
+}
+
+/** Whole days until the birth, counting today as none. */
+export function daysUntilDue(content: ContentPack, state: GameState, loveInterestId: string): number | undefined {
+  const pregnancy = pregnancyOf(state, loveInterestId)
+  if (!pregnancy) return undefined
+  return Math.max(0, Math.ceil((pregnancy.dueAt - state.time) / content.calendar.hoursPerDay))
+}
+
+/** Whether she could conceive now: not already carrying, and recovered from her last birth. */
+export function canConceive(content: ContentPack, state: GameState, loveInterestId: string): boolean {
+  const config = content.pregnancy
+  if (!config || pregnancyOf(state, loveInterestId) || !state.relationships[loveInterestId]) return false
+  const last = Math.max(-Infinity, ...childrenOf(state, loveInterestId).map((child) => child.bornAt))
+  return state.time - last >= config.recoveryDays * content.calendar.hoursPerDay
+}
+
+/**
+ * What comes of the player and a love interest having sex. Each day is one throw of the
+ * dice for each of them, however many times it happens that day, so the answer is the
+ * same until tomorrow. Returns the state, changed only if she has conceived.
+ */
+export function conceive(content: ContentPack, state: GameState, loveInterestId: string): GameState {
+  const config = content.pregnancy
+  const index = content.loveInterests.findIndex((li) => li.id === loveInterestId)
+  if (!config || index < 0 || !canConceive(content, state, loveInterestId)) return state
+  const { dayIndex } = toDate(content.calendar, state.time)
+  if (roll(state.weatherSeed, dayIndex, index, 1) >= config.chance) return state
+  const days = pregnancyLength(content, content.loveInterests[index])
+  return {
+    ...state,
+    pregnancies: {
+      ...state.pregnancies,
+      [loveInterestId]: { conceivedAt: state.time, dueAt: state.time + days * content.calendar.hoursPerDay }
+    }
+  }
+}
+
+/** Whether any pregnancy has reached its time. */
+export function birthsDue(state: GameState): boolean {
+  return Object.values(state.pregnancies).some((pregnancy) => pregnancy.dueAt <= state.time)
+}
+
+/**
+ * Brings every pregnancy that has reached its time to its end: the child is recorded and
+ * the mother is no longer carrying. Returns the children born, for the news to be told.
+ */
+export function deliver(content: ContentPack, state: GameState): { state: GameState; born: Child[] } {
+  const born: Child[] = []
+  const pregnancies = { ...state.pregnancies }
+  for (const [motherId, pregnancy] of Object.entries(state.pregnancies)) {
+    if (pregnancy.dueAt > state.time) continue
+    const index = content.loveInterests.findIndex((li) => li.id === motherId)
+    const { dayIndex } = toDate(content.calendar, pregnancy.dueAt)
+    born.push({
+      motherId,
+      bornAt: pregnancy.dueAt,
+      daughter: roll(state.weatherSeed, dayIndex, index, 2) < (content.pregnancy?.daughterChance ?? 0.5)
+    })
+    delete pregnancies[motherId]
+  }
+  return born.length > 0 ? { state: { ...state, pregnancies, children: [...state.children, ...born] }, born } : { state, born }
+}
+
+/**
+ * What she is wearing: the outfit chosen for her, or her usual clothes when none has been,
+ * in the form that fits her now. From her second trimester, when she shows, that is the
+ * pregnant one (`pregnant` for her clothes, `nude-pregnant` undressed); before then, and
+ * after the birth, the ordinary one.
+ */
+export function wornOutfit(content: ContentPack, state: GameState, li: LoveInterest, chosenId?: string): Outfit | undefined {
+  const has = (id: string) => li.outfits.find((o) => o.id === id)
+  const chosen = (chosenId !== undefined ? has(chosenId) : undefined) ?? has(li.defaultOutfitId)
+  if (!chosen) return undefined
+  const showing = pregnancyStage(content, state, li.id)?.showing === true
+  if (chosen.pregnant === showing) return chosen
+  const undressed = /nude/.test(chosen.id)
+  const fitting = showing
+    ? (has(undressed ? 'nude-pregnant' : 'pregnant') ?? li.outfits.find((o) => o.pregnant))
+    : (has(undressed ? 'nude' : li.defaultOutfitId) ?? li.outfits.find((o) => !o.pregnant))
+  return fitting ?? chosen
+}
+
+/** The outfits she can be shown in now. From her second trimester, while she shows, only her pregnant ones. */
+export function wearableOutfits(content: ContentPack, state: GameState, li: LoveInterest): Outfit[] {
+  const pregnant = li.outfits.filter((o) => o.pregnant)
+  const showing = pregnancyStage(content, state, li.id)?.showing
+  return showing && pregnant.length > 0 ? pregnant : li.outfits.filter((o) => !o.pregnant)
+}
+
+const childWord = (child: Child) => (child.daughter ? 'a daughter' : 'a son')
+
+/** "a daughter", "two daughters and a son" */
+export function describeChildren(children: Child[]): string {
+  const count = (n: number, one: string, many: string) => (n === 0 ? '' : n === 1 ? `a ${one}` : `${n} ${many}`)
+  const daughters = children.filter((c) => c.daughter).length
+  return [count(daughters, 'daughter', 'daughters'), count(children.length - daughters, 'son', 'sons')].filter(Boolean).join(' and ')
+}
+
+/**
+ * Told to a character: her own pregnancy and children by the player, and what she can
+ * see or would have heard of the others'.
+ */
+export function describePregnancy(content: ContentPack, state: GameState, loveInterestId: string): string[] {
+  if (!content.pregnancy) return []
+  const { name } = state.player
+  const hoursPerDay = content.calendar.hoursPerDay
+  const lines: string[] = []
+  const mine = pregnancyOf(state, loveInterestId)
+  const stage = pregnancyStage(content, state, loveInterestId)
+
+  if (mine && stage) {
+    const day = Math.floor((state.time - mine.conceivedAt) / hoursPerDay) + 1
+    const length = Math.round((mine.dueAt - mine.conceivedAt) / hoursPerDay)
+    lines.push(
+      day === 1 && state.time - mine.conceivedAt < hoursPerDay
+        ? `Today the Bloom locked in: you felt it take, and you know you are carrying ${name}'s child. ` +
+            `If this has only just happened, it changes the moment; say so in your own way.`
+        : `You are carrying ${name}'s child: day ${day} of about ${length}, ${stage.name}. ${name} knows.`
+    )
+    if (stage.description) lines.push(stage.description)
+    const left = daysUntilDue(content, state, loveInterestId) ?? 0
+    lines.push(left <= 1 ? 'The child could come any hour now.' : `The child is due in about ${left} days.`)
+  }
+  const born = childrenOf(state, loveInterestId)
+  if (born.length > 0) {
+    const newest = Math.max(...born.map((c) => c.bornAt))
+    const ago = Math.floor((state.time - newest) / hoursPerDay)
+    lines.push(
+      `You have borne ${name} ${describeChildren(born)}` +
+        `${born.length === 1 ? `, born ${ago === 0 ? 'today' : ago === 1 ? 'yesterday' : `${ago} days ago`}` : `, the youngest ${ago} days ago`}. ` +
+        `The child is nursed and minded at the University's creche while you study, and is never far from your thoughts.`
+    )
+  }
+
+  // What anyone can see, or would have heard: a belly that shows, a child born.
+  for (const other of content.loveInterests) {
+    if (other.id === loveInterestId) continue
+    const first = other.name.split(' ')[0]
+    const theirs = childrenOf(state, other.id)
+    if (pregnancyStage(content, state, other.id)?.showing) {
+      lines.push(`${first} is visibly pregnant, and the whole University knows the child is ${name}'s.`)
+    }
+    if (theirs.length > 0) lines.push(`${first} has borne ${name} ${describeChildren(theirs)}.`)
+  }
+  return lines
+}
+
+/** The news a mother sends by courier when no LLM is there to write it. */
+export function birthNote(content: ContentPack, state: GameState, child: Child): string {
+  const mother = content.loveInterests.find((li) => li.id === child.motherId)?.name.split(' ')[0] ?? ''
+  return `${state.player.name}. It is done, and we are both well: you have ${childWord(child)}. Come and see us. ${mother}`
+}

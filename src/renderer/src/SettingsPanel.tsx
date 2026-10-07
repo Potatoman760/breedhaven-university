@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { LLM_PROFILE_IDS, type LlmProfileId, type LlmProfileView } from '../../shared/settings'
 import { errorMessage } from './errors'
+import { Overlay } from './ui/Dialog'
 import { ModelField } from './ModelField'
 
 const LABELS: Record<LlmProfileId, { title: string; hint: string }> = {
@@ -79,7 +80,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
     })
 
   return (
-    <div className="overlay">
+    <Overlay onClose={onClose}>
       <form className="settings" onSubmit={onSave}>
         <h1>Settings</h1>
         <p className="hint">
@@ -175,6 +176,6 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
           </button>
         </div>
       </form>
-    </div>
+    </Overlay>
   )
 }

@@ -42,15 +42,15 @@
     },
     {
       "id": "exclusive",
-      "name": "Courting",
+      "name": "Exclusive",
       "minStage": "dating",
       "exclusive": true,
-      "description": "You are a couple, and have promised to see only each other.",
+      "description": "You are a couple, and have promised to see only each other: an old-fashioned choice, and yours.",
       "guidance": "You may speak of the two of you as a couple, expect to be put first, and be hurt by any sign of someone else."
     },
     {
       "id": "open",
-      "name": "Open courtship",
+      "name": "Open relationship",
       "minStage": "dating",
       "description": "You are a couple, and have agreed that either of you may also see other people.",
       "guidance": "You may speak of the two of you as a couple. Other lovers are no betrayal; you can be curious, teasing or a little jealous about them, in character, but never wronged."
@@ -105,5 +105,18 @@
       "description": "You are drawn to her and openly affectionate with her."
     }
   ],
-  "ties": []
+  "ties": [
+    {
+      "a": "anwen",
+      "b": "elowen",
+      "affection": 60,
+      "note": "You are identical twin sisters who came to Seedblossom together and all but run the Honeyed Bee between you. You would each like to be known as more than one of the twins."
+    },
+    {
+      "a": "daphne",
+      "b": "grushka",
+      "affection": 35,
+      "note": "Coach and champion for four years. You trust each other completely on the sand and say very little about it."
+    }
+  ]
 }

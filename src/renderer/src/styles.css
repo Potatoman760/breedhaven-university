@@ -915,19 +915,62 @@ pre {
   color: #fff;
 }
 
-.textbox {
+/* The text box and, standing on its top edge, the tab that names whoever is speaking. */
+.textbox-wrap {
   position: absolute;
   right: 208px;
   bottom: 24px;
   left: 160px;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  max-height: calc(100vh - 120px);
+}
+
+.speaker-tab {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  /* Half on the box, half above it. */
+  margin: 0 0 -26px 36px;
+  filter: drop-shadow(4px 4px 0 var(--madder-deep));
+}
+
+.speaker-face {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  width: 76px;
+  height: 88px;
+  border: 3px solid var(--paper-raised);
+  border-radius: 38px 38px 6px 6px;
+  background-color: var(--wood);
+  /* Zoom into the top of the full-body sprite, where the face is. */
+  background-size: 300%;
+  background-position: 50% 4%;
+  background-repeat: no-repeat;
+}
+
+.speaker-name {
+  margin: 0 0 6px -10px;
+  padding: 6px 26px 8px 24px;
+  background: var(--madder);
+  color: #fff;
+  font: 700 1.75rem/1.1 var(--display);
+  white-space: nowrap;
+}
+
+.textbox {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
   justify-content: flex-end;
   gap: 10px;
   box-sizing: border-box;
   min-height: 194px;
-  max-height: calc(100vh - 120px);
-  padding: 22px 28px;
+  min-width: 0;
+  padding: 34px 28px 22px;
   overflow-y: auto;
 }
 
@@ -947,15 +990,6 @@ pre {
   font-size: 1.25rem;
   line-height: 1.5;
   white-space: pre-wrap;
-}
-
-.nameplate {
-  padding: 2px 12px;
-  border-radius: 4px;
-  background: var(--madder);
-  color: #fff;
-  font: 600 1.25rem var(--display);
-  white-space: nowrap;
 }
 
 .textbox form {
@@ -1033,6 +1067,28 @@ pre {
   background: var(--moss-tint);
   color: var(--wood);
   font-size: 0.9rem;
+}
+
+.partner.npc {
+  border-style: dashed;
+}
+
+textarea.memory {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  font: inherit;
+}
+
+.roll {
+  align-self: flex-start;
+  margin: 0;
+  padding: 2px 10px;
+  border: 1px dashed var(--ochre, #7a5418);
+  border-radius: 4px;
+  color: var(--ochre, #7a5418);
+  font: 700 0.8125rem var(--ui);
+  letter-spacing: 0.02em;
 }
 
 .day-note.plan {
@@ -1281,6 +1337,7 @@ pre {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 
@@ -1290,11 +1347,13 @@ pre {
   color: var(--ink-soft);
 }
 
+/* An hour of a day: every course meeting in it, each a small tag with its number. */
 .cell {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: flex-start;
   gap: 3px;
-  min-height: 0;
+  min-height: 30px;
   padding: 3px;
   border: 1px solid var(--rule);
   border-radius: 4px;
@@ -1308,14 +1367,14 @@ pre {
 }
 
 .block {
-  flex: 1;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: 1px;
-  min-height: 0;
-  padding: 3px 7px;
+  flex: none;
+  gap: 4px;
+  min-height: 22px;
+  padding: 0 6px;
   overflow: hidden;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
   border-color: var(--rule-strong);
   background: var(--paper);
   color: var(--ink);
@@ -1329,8 +1388,16 @@ pre {
 }
 
 .block span {
-  font-size: 0.8125rem;
-  line-height: 1.15;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+/* A lab is a long block, and is told from a lecture at a glance. */
+.block.lab {
+  border-style: double;
+  border-width: 3px;
 }
 
 .block .block-who {
@@ -1928,4 +1995,1866 @@ legend {
 .outing-options button:not(.secondary) .hint {
   color: inherit;
   opacity: 0.85;
+}
+
+/* The content editor: who on the left, their form on the right. */
+.editor {
+  display: grid;
+  grid-template-columns: auto 300px minmax(0, 1fr);
+  height: 100vh;
+  background: var(--parchment, #efe6d0);
+  color: var(--ink, #2a281f);
+}
+
+.editor-list,
+.editor-main {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  padding: 20px;
+}
+
+.editor-list {
+  border-right: 1px solid rgba(42, 40, 31, 0.2);
+  background: var(--paper, #f8f2e2);
+}
+
+.editor-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.editor-head h1 {
+  margin: 0;
+}
+
+.editor-people {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+}
+
+.editor-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.editor-body .row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.editor-body .row > label {
+  flex: 1;
+  min-width: 0;
+}
+
+.editor-body .row.checks {
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.editor-body .row.checks > label {
+  flex: none;
+}
+
+.editor-body .card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.editor-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(42, 40, 31, 0.15);
+}
+
+.editor-group h2 {
+  margin: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field-label {
+  font-weight: 700;
+}
+
+.editor-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(42, 40, 31, 0.2);
+}
+
+.editor-status {
+  flex: 1;
+  min-width: 0;
+}
+
+.editor-status p {
+  margin: 0;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.tab {
+  border: 1px solid transparent;
+  border-bottom: 2px solid transparent;
+  border-radius: 4px 4px 0 0;
+  background: transparent;
+  color: inherit;
+}
+
+.tab.selected {
+  border-bottom-color: var(--moss, #4c6a3a);
+  color: var(--moss, #4c6a3a);
+}
+
+.portrait-crop {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.portrait-crop label {
+  flex: 1;
+}
+
+.sprite-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.sprite-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid rgba(42, 40, 31, 0.2);
+  border-radius: var(--radius);
+  background: var(--paper, #f8f2e2);
+}
+
+.sprite-card img {
+  height: 200px;
+  object-fit: contain;
+  object-position: bottom;
+  background: rgba(42, 40, 31, 0.08);
+  border-radius: 4px;
+}
+
+.sprite-card textarea {
+  resize: vertical;
+}
+
+.room-art {
+  width: 240px;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.sprite-add {
+  min-height: 120px;
+}
+
+/* The traits screen: what she has in a rail on the left, and the whole library beside it, as tall as the screen. */
+.traits {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 20px;
+  min-height: 0;
+}
+
+.trait-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 16px;
+  border-right: 1px solid var(--rule-soft);
+}
+
+.trait-picked {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.trait-picked .pill {
+  max-width: 100%;
+}
+
+.trait-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.trait-row {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 2px 4px 2px 10px;
+  border-radius: var(--radius);
+}
+
+.trait-row:hover {
+  background: var(--moss-tint);
+}
+
+.trait-row.picked {
+  background: var(--moss-tint);
+}
+
+.editor-body .trait-row label.trait-pick {
+  flex: 1;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  margin: 0;
+  padding: 8px 0;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.trait-pick input {
+  flex: none;
+  width: 18px;
+  min-height: 18px;
+  height: 18px;
+  margin: 3px 0 0;
+  padding: 0;
+  accent-color: var(--moss);
+}
+
+.trait-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.trait-text .caps {
+  margin-left: 8px;
+  font-size: 0.6875rem;
+}
+
+.trait-form {
+  flex: none;
+  margin: 6px 0;
+}
+
+/* The stage's effects: weather over the artwork and behind the characters. */
+.fx-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.fx-layer canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* A transition covers everything on the stage, panels included. */
+.fx-layer.covering {
+  z-index: 40;
+}
+
+/* The calendar: a week by the hour, or a month at a glance. */
+.calendar {
+  grid-template-columns: minmax(0, 1fr) 260px;
+}
+
+.calendar-main {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.month-nav .tabs {
+  margin-left: auto;
+}
+
+.entry {
+  display: block;
+  overflow: hidden;
+  padding: 1px 6px;
+  border-left: 3px solid var(--ink-soft, #6b6757);
+  border-radius: 3px;
+  background: rgba(42, 40, 31, 0.08);
+  color: var(--ink, #2a281f);
+  font: 600 0.75rem/1.35 var(--ui);
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.entry.class {
+  border-left-color: var(--moss, #4c6a3a);
+  background: rgba(76, 106, 58, 0.18);
+}
+
+.entry.plan {
+  border-left-color: var(--madder, #8a3a3f);
+  background: rgba(138, 58, 63, 0.16);
+}
+
+.entry.event {
+  border-left-color: var(--ochre, #7a5418);
+  background: rgba(122, 84, 24, 0.18);
+}
+
+.entry.orientation {
+  border-left-color: #3d5a73;
+  background: rgba(61, 90, 115, 0.18);
+}
+
+.entry.birth {
+  border-left-color: #8a4a78;
+  background: rgba(138, 74, 120, 0.16);
+}
+
+.week {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 2px 4px;
+  height: min(470px, calc(100vh - 290px));
+}
+
+.week-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
+  padding: 2px 0;
+  border-bottom: 2px solid transparent;
+}
+
+.week-head.today {
+  border-bottom-color: var(--moss, #4c6a3a);
+  color: var(--moss, #4c6a3a);
+}
+
+.week-head.faded,
+.week-head.faded strong {
+  opacity: 0.55;
+}
+
+.week-whole {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 20px;
+}
+
+.week-time {
+  color: var(--ink-soft, #6b6757);
+  font: 600 0.6875rem var(--ui);
+  text-align: right;
+}
+
+.week-hours {
+  display: flex;
+  flex-direction: column;
+}
+
+.week-hours .week-time {
+  flex: 1;
+  transform: translateY(-0.4em);
+}
+
+.week-day {
+  position: relative;
+  border-radius: 4px;
+  background:
+    repeating-linear-gradient(to bottom, rgba(42, 40, 31, 0.1) 0, rgba(42, 40, 31, 0.1) 1px, transparent 1px, transparent calc(100% / 15)),
+    rgba(248, 242, 226, 0.6);
+}
+
+.week-day.today {
+  background-color: rgba(76, 106, 58, 0.08);
+}
+
+.entry.timed {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  padding: 2px 5px;
+  border-radius: 4px;
+  white-space: normal;
+}
+
+.entry.timed span {
+  font-weight: 400;
+  opacity: 0.85;
+}
+
+.week-day .now {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  height: 2px;
+  background: var(--madder, #8a3a3f);
+}
+
+.month-grid button.day {
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 2px;
+  min-height: 78px;
+  padding: 4px;
+  border: 1px solid rgba(42, 40, 31, 0.15);
+  background: rgba(248, 242, 226, 0.6);
+  color: inherit;
+  font-weight: 400;
+  text-align: left;
+}
+
+.month-grid button.day.today {
+  border-color: var(--moss, #4c6a3a);
+  background: rgba(76, 106, 58, 0.12);
+  color: inherit;
+}
+
+.month-grid button.day .hint {
+  font-size: 0.6875rem;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Everyone the player knows: who on the left, her on the right. */
+.people-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.people-head h2 {
+  margin: 0;
+}
+
+.people-head .badge {
+  margin-left: 6px;
+}
+
+.people-about {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.people-about h2 {
+  margin: 8px 0 0;
+}
+
+.people-about p {
+  margin: 0;
+}
+
+.fact-group {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 8px;
+}
+
+.chip.fact {
+  background: var(--moss-tint, rgba(76, 106, 58, 0.18));
+  text-transform: none;
+}
+
+.chip.fact.disliked {
+  background: rgba(138, 58, 63, 0.16);
+}
+
+.chip.unknown {
+  border: 1px dashed rgba(42, 40, 31, 0.4);
+  background: transparent;
+  color: var(--ink-soft, #6b6757);
+  font-style: italic;
+  text-transform: none;
+}
+
+/* The calendar's heading keeps its width, whatever the dates in it. */
+.calendar .month-nav {
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+.calendar .month-nav > div:not(.tabs) {
+  flex: none;
+  min-width: 250px;
+  text-align: center;
+}
+
+.calendar .month-nav h2 {
+  white-space: nowrap;
+}
+
+/* The phone: a dark wood case with its apps down the left edge and one screen open beside them. */
+.phone {
+  display: grid;
+  grid-template-columns: 104px minmax(0, 1fr);
+  box-sizing: border-box;
+  width: min(1240px, 100%);
+  height: min(800px, 100%);
+  padding: 14px 14px 14px 0;
+  border-radius: 72px 14px 14px 72px;
+  background: var(--wood);
+  box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.35);
+}
+
+.phone-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 14px;
+  /* The tabs reach over the edge of the screen, like index tabs on a folder. */
+  margin-right: -10px;
+  z-index: 1;
+}
+
+.phone-back {
+  align-self: center;
+  width: 52px;
+  min-height: 52px;
+  margin-bottom: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--paper-raised);
+  color: var(--moss-deep);
+}
+
+.phone-tab {
+  position: relative;
+  flex-direction: column;
+  gap: 6px;
+  width: 88px;
+  min-height: 84px;
+  padding: 0;
+  border: 0;
+  border-radius: 18px 6px 6px 18px;
+  background: var(--paper-raised);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
+  color: var(--moss-deep);
+  font: 700 0.6875rem var(--ui);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.phone-tab.selected {
+  width: 96px;
+  background: var(--moss);
+  box-shadow: none;
+  color: #fff;
+}
+
+.phone-tab .badge {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+}
+
+.phone-screen {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 60px 6px 6px 60px;
+  background: var(--paper-raised);
+}
+
+/* An app's name, on a soft blot of colour. */
+.phone-title {
+  align-self: flex-start;
+  position: relative;
+  z-index: 0;
+  margin: 0 0 6px;
+  font-size: 2.5rem;
+}
+
+.phone-title::before {
+  content: '';
+  position: absolute;
+  inset: -6px -18px -8px -4px;
+  z-index: -1;
+  border-radius: 20px 26px 22px 30px;
+  background: var(--moss-tint);
+  transform: rotate(-3deg);
+}
+
+.phone-empty {
+  margin: auto;
+  font-size: 1rem;
+  font-style: italic;
+}
+
+.avatar {
+  flex: none;
+  display: block;
+  border: 2px solid var(--moss);
+  border-radius: 50%;
+  background-color: var(--wood);
+  /* Zoom into the top of the full-body sprite, where the face is. */
+  background-size: 300%;
+  background-position: 50% 4%;
+  background-repeat: no-repeat;
+}
+
+.handle {
+  color: var(--ink-soft);
+  font: 400 0.8125rem ui-monospace, 'Cascadia Mono', Consolas, monospace;
+}
+
+.presence {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+}
+
+.presence i {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--leaf);
+}
+
+.presence.away i {
+  background: var(--rule);
+}
+
+/* Chats: the conversations in a column, the open one filling the rest. */
+.chat-list {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-sizing: border-box;
+  width: 380px;
+  padding: 36px 14px 0 44px;
+  background: var(--paper);
+}
+
+.chat-rows {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  padding: 2px 6px 16px 0;
+}
+
+.chat-row {
+  flex: none;
+  justify-content: flex-start;
+  gap: 14px;
+  min-height: 84px;
+  padding: 10px 16px 10px 14px;
+  border: 0;
+  border-radius: 42px 6px 6px 42px;
+  background: var(--paper-raised);
+  color: var(--ink);
+  font-weight: 400;
+  text-align: left;
+}
+
+.chat-row.selected {
+  background: var(--moss-tint);
+}
+
+.chat-row-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.chat-row strong,
+.chat-row .preview {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.chat-row strong {
+  font-size: 1.0625rem;
+}
+
+.chat-row .preview {
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+}
+
+.chat-row .preview.unread {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.stamp {
+  flex: none;
+  font-size: 0.6875rem;
+}
+
+.chat-thread {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 20px 24px 20px;
+}
+
+.chat-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.chat-head > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.chat-head strong {
+  font-size: 1.125rem;
+}
+
+.chat-messages {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.message.mine {
+  align-items: flex-end;
+}
+
+.message .stamp {
+  align-self: center;
+  margin: 10px 0 2px;
+}
+
+.bubble {
+  max-width: min(78%, 560px);
+  padding: 9px 14px;
+  border-radius: 18px 18px 18px 4px;
+  background: var(--parchment);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.message.mine .bubble {
+  border-radius: 18px 18px 4px 18px;
+  background: var(--moss);
+  color: #fff;
+}
+
+.message .proposal {
+  max-width: min(78%, 560px);
+}
+
+.bubble.typing {
+  display: flex;
+  gap: 5px;
+  padding: 14px;
+}
+
+.bubble.typing i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ink-soft);
+  animation: typing 1.2s infinite ease-in-out;
+}
+
+.bubble.typing i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.bubble.typing i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes typing {
+  0%,
+  60%,
+  100% {
+    opacity: 0.25;
+  }
+  30% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bubble.typing i {
+    animation: none;
+  }
+}
+
+.chat-compose {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-compose input {
+  flex: 1;
+  padding: 8px 18px;
+  border-radius: 22px;
+}
+
+.chat-compose button {
+  border-radius: 50%;
+}
+
+.chat-compose button:disabled {
+  border-color: var(--rule);
+  background: #e6dcc3;
+}
+
+/* Friends: a wall of cards, and behind each a page. */
+.friend-list,
+.friend-page,
+.feed {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 36px 40px 28px 56px;
+}
+
+.friend-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 14px;
+}
+
+/* A card is two buttons side by side: the one that opens her page, and, once she has given her Chats, one that writes to her. */
+.friend-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-right: 14px;
+  border-radius: 56px 6px 6px 56px;
+  background: var(--parchment);
+}
+
+.friend-open {
+  flex: 1;
+  justify-content: flex-start;
+  gap: 16px;
+  min-width: 0;
+  min-height: 112px;
+  padding: 8px 4px 8px 8px;
+  border: 0;
+  border-radius: 56px 6px 6px 56px;
+  background: transparent;
+  color: var(--ink);
+  font-weight: 400;
+  text-align: left;
+}
+
+.friend-card:hover,
+.chat-row:hover {
+  background: var(--moss-tint);
+}
+
+button.btn.friend-message {
+  flex: none;
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.friend-card-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.friend-card-text strong {
+  font-size: 1.1875rem;
+}
+
+.friend-card-text .caps {
+  font-size: 0.6875rem;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.friend-card .chip {
+  flex: none;
+  background: var(--paper);
+  font: 700 0.75rem var(--ui);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.friend-card .chip.madder {
+  background: var(--madder);
+  color: #fff;
+}
+
+.friend-page-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.friend-banner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.friend-banner > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.friend-page .people-about {
+  flex: none;
+  overflow: visible;
+}
+
+/* Updates: Bloomr's feed, one column of posts. */
+.feed {
+  align-items: center;
+}
+
+.feed > * {
+  box-sizing: border-box;
+  width: min(640px, 100%);
+}
+
+.post {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px 8px;
+  border: 1px solid var(--rule-soft);
+  border-radius: 18px;
+  background: var(--paper);
+}
+
+.post header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.post header > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.post > p {
+  font-size: 1.0625rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.post > img {
+  display: block;
+  width: 100%;
+  max-height: 520px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.post footer {
+  display: flex;
+  gap: 8px;
+  border-top: 1px solid var(--rule-soft);
+}
+
+.post footer button {
+  min-height: 40px;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+.post footer .like.liked {
+  color: var(--madder);
+}
+
+.post footer .like.liked svg {
+  fill: currentColor;
+}
+
+/* Too narrow for two columns: the conversations give way to the open one. */
+@media (max-width: 900px) {
+  .chat-list {
+    width: 280px;
+    padding-left: 28px;
+  }
+
+  .friend-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.note-date {
+  flex: none;
+  color: var(--ink-soft, #6b6757);
+  font-size: 0.6875rem;
+}
+
+/* Rows of the people list keep their height, and a long name is cut short rather than wrapped. */
+.courier-person {
+  flex: none;
+  min-height: 56px;
+}
+
+.courier-person strong {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* The art tool: a dialog that nearly fills the window, what to draw on its left and what came back on its right. */
+.dialog.art-tool {
+  width: min(1500px, 100%);
+  height: 100%;
+  overflow: hidden;
+}
+
+.art-tool .dialog-head .tabs {
+  flex: 1;
+  justify-content: flex-end;
+  border-bottom: 0;
+}
+
+.studio-main {
+  flex: 1;
+  display: flex;
+  gap: 20px;
+  min-height: 0;
+}
+
+.studio-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  padding-right: 8px;
+}
+
+.studio-form {
+  flex: 1 1 54%;
+  min-width: 0;
+}
+
+.studio-results {
+  flex: 1 1 46%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  overflow-y: auto;
+  padding-left: 20px;
+  border-left: 1px solid rgba(42, 40, 31, 0.2);
+}
+
+.studio-results h2 {
+  margin: 0;
+}
+
+.studio-result {
+  display: flex;
+  gap: 14px;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius);
+  background: var(--paper);
+}
+
+/* A picture wider than it is tall sits over its caption, not beside it. */
+.studio-result.of-background,
+.studio-result.of-photo {
+  flex-direction: column;
+}
+
+.studio-result img {
+  display: block;
+  max-width: 100%;
+  max-height: 46vh;
+  border-radius: 4px;
+  /* A chequer, so a cut-out's transparency can be told from white. */
+  background: repeating-conic-gradient(var(--track) 0% 25%, var(--paper-raised) 0% 50%) 50% / 20px 20px;
+  object-fit: contain;
+}
+
+.studio-result.of-sprite img {
+  flex: none;
+  width: 42%;
+}
+
+.studio-result figcaption {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.studio-result code {
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
+}
+
+.studio-result .row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.studio-workflows {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 30vh;
+  overflow-y: auto;
+}
+
+.studio-workflow {
+  flex: none;
+  overflow: visible;
+}
+
+.studio-kind {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.editor-body .row > label.studio-narrow,
+label.studio-narrow {
+  flex: 0 0 110px;
+}
+
+.art-tool .hint .quiet {
+  min-height: 0;
+  padding: 0;
+  font: inherit;
+}
+
+/* A sprite's actions wrap rather than squeeze, now that there are four of them. */
+.sprite-card .row {
+  flex-wrap: wrap;
+  gap: 2px 8px;
+}
+
+/* A face of an outfit that has not been drawn: a place for it, in the same grid as the ones that have. */
+.sprite-slot {
+  justify-content: center;
+  align-items: center;
+  min-height: 150px;
+  border: 1px dashed var(--rule-strong);
+  background: transparent;
+  text-align: center;
+}
+
+/* Fields side by side line up along their tops, so a hint under one does not push its box out of line with its neighbour's. */
+.editor-body .row {
+  align-items: flex-start;
+}
+
+.editor-body .row.checks {
+  align-items: center;
+}
+
+/* The gap between fields comes from the column they are in, not from each label. */
+.editor-body label {
+  margin-bottom: 0;
+}
+
+/* A button beside labelled fields sits level with their boxes, below where a label would be. */
+.editor-body .row:not(.checks):has(> label) > button {
+  flex: none;
+  margin-top: 23px;
+}
+
+.editor-body .card .row:not(.checks) > button.quiet {
+  margin-left: auto;
+}
+
+/* A sprite's actions are buttons in the editor's own style, two to a line and small enough to fit the card. */
+.sprite-card .row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  width: 100%;
+}
+
+.sprite-card .row button {
+  min-height: 34px;
+  padding: 0 8px;
+  font-size: 0.875rem;
+}
+
+.sprite-slot .row {
+  margin-top: 4px;
+  padding: 0 8px;
+  box-sizing: border-box;
+}
+
+/* How far a run of generated sprites has got: what is being drawn, a bar, and a way to stop. */
+.batch {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--moss);
+  border-radius: var(--radius);
+  background: var(--moss-tint);
+}
+
+.batch .meter {
+  flex: 1;
+}
+
+.batch .meter > div {
+  transition: width 0.3s;
+}
+
+.batch button {
+  min-height: 34px;
+  padding: 0 12px;
+}
+
+/* A sprite in a card is a button that opens the whole picture. */
+.sprite-thumb {
+  display: block;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.sprite-thumb img {
+  display: block;
+  width: 100%;
+}
+
+.studio-thumb {
+  flex: none;
+  cursor: zoom-in;
+}
+
+.studio-result.of-sprite .studio-thumb {
+  width: 42%;
+}
+
+.studio-result.of-sprite .studio-thumb img {
+  width: 100%;
+}
+
+/* A picture looked at whole, over everything. A chequer behind it shows what has been cut out. */
+.lightbox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  max-height: 100%;
+  margin: 0;
+  cursor: zoom-out;
+}
+
+.lightbox img {
+  min-height: 0;
+  max-width: 100%;
+  max-height: calc(100vh - 110px);
+  border-radius: var(--radius);
+  background: repeating-conic-gradient(var(--track) 0% 25%, var(--paper-raised) 0% 50%) 50% / 24px 24px;
+  object-fit: contain;
+}
+
+.lightbox figcaption {
+  color: var(--on-wood);
+  font-size: 0.875rem;
+}
+
+/* To the picture before and the one after, either side of the one shown. */
+.lightbox {
+  position: relative;
+  padding: 0 72px;
+}
+
+button.btn.lightbox-step {
+  position: absolute;
+  top: 50%;
+  left: 8px;
+  width: 48px;
+  min-height: 48px;
+  padding: 0;
+  border-radius: 50%;
+  transform: translateY(-50%);
+}
+
+button.btn.lightbox-step.next {
+  right: 8px;
+  left: auto;
+}
+
+.lightbox.over {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(20, 26, 16, 0.85);
+}
+
+/* The one button (ui/Button.tsx): the same height and padding wherever it sits. */
+button.btn {
+  align-self: auto;
+  min-height: 40px;
+  padding: 0 18px;
+  white-space: nowrap;
+}
+
+button.btn.quiet {
+  padding: 0 10px;
+}
+
+button.btn.small,
+.sprite-card .row button.btn {
+  min-height: 34px;
+  padding: 0 10px;
+  font-size: 0.875rem;
+}
+
+/* An outfit's own actions, in one row, with the one that removes it set apart at the end. */
+.outfit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.outfit-actions .outfit-remove {
+  margin-left: auto;
+}
+
+/* Things picked from a list, each a pill with a cross to take it off, and a dropdown to add another. */
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 36px;
+  padding: 0 6px 0 14px;
+  border: 1px solid var(--moss-deep);
+  border-radius: 999px;
+  background: var(--moss);
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Said in full, so that a pill is the same wherever it sits: a card's own rules for its buttons do not reach in. */
+.pill button,
+.card .pill button {
+  flex: none;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 1.125rem;
+  line-height: 1;
+}
+
+.pill button:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+select.pill-add {
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  width: auto;
+}
+
+/* A percentage set by a short slider or typed into the box beside it. */
+.percent-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.percent-field input[type='range'] {
+  flex: none;
+  width: 220px;
+  min-height: 0;
+  padding: 0;
+}
+
+.percent-box {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+}
+
+.percent-box input {
+  width: 64px;
+  min-height: 36px;
+  padding: 4px 8px;
+  text-align: right;
+}
+
+/* The seed for a run of missing expressions, beside the button that starts it. */
+.outfit-actions input.batch-seed {
+  flex: none;
+  width: 130px;
+  min-height: 40px;
+  padding: 0 10px;
+}
+
+/* The course catalogue in the editor: the week, the course picked out, and the whole list under them. */
+.editor-body.catalogue .planner {
+  flex: none;
+}
+
+.catalogue-filter {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.catalogue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.catalogue-list .trait-row {
+  justify-content: flex-start;
+  min-height: 0;
+  padding: 6px 10px;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-weight: 400;
+  text-align: left;
+}
+
+.catalogue-list .trait-row strong {
+  flex: none;
+  width: 80px;
+}
+
+.catalogue-list .trait-row.picked,
+.catalogue-list .trait-row:hover {
+  background: var(--moss-tint);
+}
+
+/* The planner at enrolment scrolls when the day is long. */
+.planner-body > .planner {
+  overflow-y: auto;
+  grid-auto-rows: minmax(30px, auto);
+}
+
+/* The text box while there is more to read: the whole of it turns the page. */
+.textbox.turning {
+  cursor: pointer;
+}
+
+.textbox.turning:focus {
+  outline: none;
+}
+
+.textbox.turning:focus-visible {
+  outline: 2px solid var(--moss);
+  outline-offset: 2px;
+}
+
+.turn-mark {
+  align-self: flex-end;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-soft);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+/* The places in the editor: a small picture of each in the list, and its views as cards with their settings beside them. */
+.place-thumb {
+  flex: none;
+  width: 64px;
+  height: 40px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--track) center / cover no-repeat;
+}
+
+.place-views {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.editor-body .place-view.card {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.place-view-thumb {
+  flex: none;
+  width: 320px;
+  min-height: 0;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--track);
+  overflow: hidden;
+  cursor: zoom-in;
+}
+
+.place-view-thumb img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.place-view-fields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+/* Jobs: the board of openings, and the job he holds at the top of it. */
+.post.job header {
+  justify-content: space-between;
+}
+
+.post.job header > div {
+  gap: 2px;
+}
+
+.post.job.mine {
+  border-color: var(--moss);
+  background: var(--moss-tint);
+}
+
+.post.job.gone {
+  opacity: 0.6;
+}
+
+.post.job footer button {
+  min-height: 40px;
+}
+
+.entry.work {
+  border-left-color: var(--ochre);
+  background: rgba(122, 84, 24, 0.16);
+}
+
+/* The editor's sides, one under another in a rail down the left edge, with the way out at its foot. */
+.editor-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 148px;
+  min-height: 0;
+  padding: 20px 12px;
+  background: var(--wood);
+  color: var(--on-wood);
+}
+
+.editor-rail .caps {
+  padding: 0 10px;
+  color: var(--on-wood);
+  opacity: 0.7;
+}
+
+.editor-sides {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+}
+
+.editor-sides .tab {
+  justify-content: flex-start;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-left: 3px solid transparent;
+  border-radius: 0 4px 4px 0;
+  background: transparent;
+  color: var(--on-wood);
+  font: 700 1rem var(--ui);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.editor-sides .tab:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.editor-sides .tab.selected {
+  border-left-color: var(--leaf);
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* A grid of slots for pictures that are wider than they are tall: a view of a place at each time of day. */
+.sprite-grid.wide {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.sprite-grid.wide .sprite-card img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  object-position: center;
+}
+
+.sprite-grid.wide .sprite-slot {
+  min-height: 0;
+  aspect-ratio: 16 / 11;
+}
+
+/* Every dropdown draws its own arrow, set in from the right edge, so that it sits the same in every box and every size. */
+select,
+select.pill-add {
+  appearance: none;
+  padding-right: 38px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none' stroke='%232a281f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px 8px;
+}
+
+select:disabled {
+  opacity: 0.6;
+}
+
+/* A dropdown that sits in a line of text is as wide as what it shows, arrow included: never squeezed narrower. */
+label.inline select,
+select.pill-add {
+  flex: none;
+  field-sizing: content;
+  width: auto;
+  min-width: max-content;
+}
+
+/* Setting stats at the start of a game: six scores, each with a step down and a step up. */
+.ability-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.ability {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 6px;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+}
+
+.ability .caps {
+  font-size: 0.6875rem;
+}
+
+.ability strong {
+  font: 600 2rem/1.1 var(--display);
+}
+
+.ability-mod {
+  color: var(--ink-soft);
+  font-size: 0.8125rem;
+}
+
+.ability-steps {
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.ability-steps button {
+  width: 36px;
+  min-height: 36px;
+  padding: 0;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.ability-foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.ability-foot button {
+  flex: none;
+}
+
+@media (max-width: 720px) {
+  .ability-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* The Stats option on the day view: a button that opens into one suggestion for each stat. */
+.stat-menu {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.stat-menu > .featured {
+  grid-column: 1 / -1;
+}
+
+.stat-menu > .featured.open svg {
+  transform: rotate(90deg);
+}
+
+.stat-option {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  font-weight: 400;
+  text-align: left;
+}
+
+.stat-option:hover:not(:disabled) {
+  border-color: var(--moss);
+  background: var(--moss-tint);
+}
+
+.stat-option .caps {
+  font-size: 0.6875rem;
+}
+
+.stat-option strong {
+  font-size: 1rem;
+  line-height: 1.25;
+}
+
+/* A stat on the day view, with a thin bar under it for how far he is toward the next point. */
+.stat-cell {
+  position: relative;
+  padding-bottom: 4px;
+}
+
+.stat-cell i {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  max-width: 100%;
+  border-radius: 1px;
+  background: var(--leaf);
 }

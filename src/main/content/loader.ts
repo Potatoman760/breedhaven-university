@@ -17,13 +17,18 @@ function optionalJson(path: string): unknown {
 
 /** Reads and validates a content pack directory. Throws if anything is missing or invalid. */
 export function loadContentPack(dir: string): ContentPack {
+  return validateContentPack(readPack(dir))
+}
+
+/** Reads a content pack directory as it is written, without checking it. */
+export function readPack(dir: string): Record<string, unknown> {
   const loveInterestDir = join(dir, 'love-interests')
   const loveInterests = readdirSync(loveInterestDir)
     .filter((file) => file.endsWith('.json'))
     .sort()
     .map((file) => readJson(join(loveInterestDir, file)))
 
-  return validateContentPack({
+  return {
     calendar: readJson(join(dir, 'calendar.json')),
     relationships: readJson(join(dir, 'relationships.json')),
     traits: readJson(join(dir, 'traits.json')),
@@ -33,8 +38,12 @@ export function loadContentPack(dir: string): ContentPack {
     newGame: readJson(join(dir, 'new-game.json')),
     map: optionalJson(join(dir, 'map.json')),
     coursework: optionalJson(join(dir, 'coursework.json')),
+    orientation: optionalJson(join(dir, 'orientation.json')),
+    jobs: optionalJson(join(dir, 'jobs.json')),
+    pregnancy: optionalJson(join(dir, 'pregnancy.json')),
+    drama: optionalJson(join(dir, 'drama.json')),
     items: optionalJson(join(dir, 'items.json')),
     stalls: optionalJson(join(dir, 'stalls.json')),
     loveInterests
-  })
+  }
 }

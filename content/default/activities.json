@@ -1,8 +1,8 @@
 [
   {
     "id": "study",
-    "name": "Read in the library",
-    "description": "Claim a reading cell and a chained book.",
+    "name": "Study in the library",
+    "description": "Claim a reading cell, a socket and a quiet two hours.",
     "durationHours": 2,
     "locationId": "library",
     "tags": [
@@ -29,7 +29,7 @@
   {
     "id": "train",
     "name": "Train at the Tiltyard",
-    "description": "Spar, run and drill with whoever is on the sand.",
+    "description": "Weights, laps and sparring with whoever is on the sand.",
     "durationHours": 2,
     "locationId": "tiltyard",
     "tags": [
@@ -56,7 +56,7 @@
   {
     "id": "eat",
     "name": "Eat at the Commons",
-    "description": "A bowl of stew and a seat by the hearth.",
+    "description": "A tray of something hot and a seat by the hearth.",
     "durationHours": 1,
     "locationId": "commons",
     "tags": [
@@ -101,38 +101,9 @@
     ]
   },
   {
-    "id": "work-market",
-    "name": "Work a market stall",
-    "description": "Haul crates and haggle for a stallholder.",
-    "durationHours": 4,
-    "locationId": "market",
-    "tags": [
-      "work"
-    ],
-    "availability": {
-      "latestHour": 14
-    },
-    "requirements": [
-      {
-        "type": "energy",
-        "min": 30
-      }
-    ],
-    "effects": [
-      {
-        "type": "money",
-        "amount": 20
-      },
-      {
-        "type": "energy",
-        "amount": -30
-      }
-    ]
-  },
-  {
     "id": "sleep",
     "name": "Sleep",
-    "description": "Turn in for the night in your room.",
+    "description": "Turn in for the night in your suite.",
     "durationHours": 8,
     "locationId": "dormitories",
     "tags": [
@@ -160,18 +131,12 @@
       "social"
     ],
     "withLoveInterest": "required",
-    "effects": [
-      {
-        "type": "meter",
-        "meter": "affection",
-        "amount": 1
-      }
-    ]
+    "effects": []
   },
   {
     "id": "study-together",
     "name": "Study together",
-    "description": "Share a reading cell and a lamp.",
+    "description": "Share a reading cell and a desk lamp.",
     "durationHours": 2,
     "locationId": "library",
     "tags": [
@@ -194,23 +159,13 @@
       {
         "type": "energy",
         "amount": -10
-      },
-      {
-        "type": "meter",
-        "meter": "affection",
-        "amount": 2
-      },
-      {
-        "type": "meter",
-        "meter": "trust",
-        "amount": 1
       }
     ]
   },
   {
     "id": "meal-together",
     "name": "Share a meal",
-    "description": "Two bowls, one bench, and time to talk.",
+    "description": "Two trays, one bench, and time to talk.",
     "durationHours": 1,
     "locationId": "commons",
     "tags": [
@@ -231,11 +186,6 @@
       {
         "type": "energy",
         "amount": 15
-      },
-      {
-        "type": "meter",
-        "meter": "affection",
-        "amount": 3
       }
     ]
   },
@@ -265,16 +215,6 @@
       {
         "type": "energy",
         "amount": -15
-      },
-      {
-        "type": "meter",
-        "meter": "affection",
-        "amount": 2
-      },
-      {
-        "type": "meter",
-        "meter": "trust",
-        "amount": 1
       }
     ]
   },
@@ -295,18 +235,7 @@
         "min": "acquaintance"
       }
     ],
-    "effects": [
-      {
-        "type": "meter",
-        "meter": "affection",
-        "amount": 3
-      },
-      {
-        "type": "meter",
-        "meter": "desire",
-        "amount": 2
-      }
-    ]
+    "effects": []
   },
   {
     "id": "drinks",
@@ -328,18 +257,414 @@
       {
         "type": "money",
         "amount": -5
-      },
-      {
-        "type": "meter",
-        "meter": "affection",
-        "amount": 4
-      },
-      {
-        "type": "meter",
-        "meter": "trust",
-        "amount": 1
       }
     ]
+  },
+  {
+    "id": "revise-cafe",
+    "name": "Revise at Spell & Sip",
+    "description": "A flat white, an armchair and your notes.",
+    "durationHours": 2,
+    "locationId": "spell-and-sip",
+    "tags": [
+      "study"
+    ],
+    "requirements": [
+      {
+        "type": "money",
+        "min": 3
+      }
+    ],
+    "effects": [
+      {
+        "type": "money",
+        "amount": -3
+      },
+      {
+        "type": "stat",
+        "stat": "intelligence",
+        "amount": 1
+      },
+      {
+        "type": "energy",
+        "amount": -5
+      }
+    ]
+  },
+  {
+    "id": "tinker",
+    "name": "Tinker at the Foundry",
+    "description": "Borrow a bench and build something small that mostly works.",
+    "durationHours": 2,
+    "locationId": "foundry",
+    "tags": [
+      "study"
+    ],
+    "requirements": [
+      {
+        "type": "energy",
+        "min": 10
+      }
+    ],
+    "effects": [
+      {
+        "type": "stat",
+        "stat": "dexterity",
+        "amount": 1
+      },
+      {
+        "type": "energy",
+        "amount": -10
+      }
+    ]
+  },
+  {
+    "id": "arcade",
+    "name": "Play the cabinets",
+    "description": "An hour of tokens, high scores and the claw machine.",
+    "durationHours": 1,
+    "locationId": "pixel-and-rune",
+    "tags": [
+      "play"
+    ],
+    "requirements": [
+      {
+        "type": "money",
+        "min": 3
+      }
+    ],
+    "effects": [
+      {
+        "type": "money",
+        "amount": -3
+      },
+      {
+        "type": "stat",
+        "stat": "dexterity",
+        "amount": 1
+      },
+      {
+        "type": "energy",
+        "amount": -5
+      }
+    ]
+  },
+  {
+    "id": "river-run",
+    "name": "Run the river path",
+    "description": "Out to the stone bridge and back.",
+    "durationHours": 1,
+    "locationId": "riverside-park",
+    "tags": [
+      "sport"
+    ],
+    "requirements": [
+      {
+        "type": "energy",
+        "min": 20
+      }
+    ],
+    "effects": [
+      {
+        "type": "stat",
+        "stat": "endurance",
+        "amount": 1
+      },
+      {
+        "type": "energy",
+        "amount": -20
+      }
+    ]
+  },
+  {
+    "id": "coffee-together",
+    "name": "Get coffee",
+    "description": "Two cups, the good armchairs, and nowhere to be.",
+    "durationHours": 1,
+    "locationId": "spell-and-sip",
+    "tags": [
+      "social",
+      "date"
+    ],
+    "requirements": [
+      {
+        "type": "money",
+        "min": 6
+      }
+    ],
+    "effects": [
+      {
+        "type": "money",
+        "amount": -6
+      }
+    ],
+    "withLoveInterest": "required"
+  },
+  {
+    "id": "arcade-together",
+    "name": "Play the arcade together",
+    "description": "Air hockey, the rhythm game, and a wager on who buys the next round of tokens.",
+    "durationHours": 2,
+    "locationId": "pixel-and-rune",
+    "tags": [
+      "social",
+      "date",
+      "play"
+    ],
+    "requirements": [
+      {
+        "type": "money",
+        "min": 6
+      }
+    ],
+    "effects": [
+      {
+        "type": "money",
+        "amount": -6
+      },
+      {
+        "type": "stat",
+        "stat": "dexterity",
+        "amount": 1
+      }
+    ],
+    "withLoveInterest": "required"
+  },
+  {
+    "id": "film-together",
+    "name": "See a film",
+    "description": "Two seats in the balcony at the Lumen.",
+    "durationHours": 3,
+    "locationId": "lumen",
+    "tags": [
+      "social",
+      "date"
+    ],
+    "requirements": [
+      {
+        "type": "stage",
+        "min": "acquaintance"
+      },
+      {
+        "type": "money",
+        "min": 8
+      }
+    ],
+    "effects": [
+      {
+        "type": "money",
+        "amount": -8
+      }
+    ],
+    "withLoveInterest": "required"
+  },
+  {
+    "id": "river-walk",
+    "name": "Walk by the river",
+    "description": "The long way round the park, under the orchard trees.",
+    "durationHours": 1,
+    "locationId": "riverside-park",
+    "tags": [
+      "social",
+      "date"
+    ],
+    "effects": [],
+    "withLoveInterest": "required"
+  },
+  {
+    "id": "dance-together",
+    "name": "Go dancing",
+    "description": "A night on the sprung floor at the Undergrowth.",
+    "durationHours": 3,
+    "locationId": "undergrowth",
+    "tags": [
+      "social",
+      "date"
+    ],
+    "requirements": [
+      {
+        "type": "stage",
+        "min": "friend"
+      },
+      {
+        "type": "money",
+        "min": 6
+      },
+      {
+        "type": "energy",
+        "min": 20
+      }
+    ],
+    "effects": [
+      {
+        "type": "money",
+        "amount": -6
+      },
+      {
+        "type": "energy",
+        "amount": -20
+      }
+    ],
+    "withLoveInterest": "required"
+  },
+  {
+    "id": "lift",
+    "name": "Lift at Ironroot",
+    "description": "An hour on the racks, with the mages drilling on the other side of the glass.",
+    "durationHours": 1,
+    "locationId": "ironroot",
+    "tags": [
+      "sport"
+    ],
+    "requirements": [
+      {
+        "type": "money",
+        "min": 3
+      },
+      {
+        "type": "energy",
+        "min": 25
+      }
+    ],
+    "effects": [
+      {
+        "type": "money",
+        "amount": -3
+      },
+      {
+        "type": "stat",
+        "stat": "strength",
+        "amount": 1
+      },
+      {
+        "type": "energy",
+        "amount": -25
+      }
+    ]
+  },
+  {
+    "id": "bubble-tea",
+    "name": "Get a bubble tea",
+    "description": "Something cold, sweet and chewy in the window seat.",
+    "durationHours": 1,
+    "locationId": "boba-blossom",
+    "tags": [
+      "rest"
+    ],
+    "requirements": [
+      {
+        "type": "money",
+        "min": 4
+      }
+    ],
+    "effects": [
+      {
+        "type": "money",
+        "amount": -4
+      },
+      {
+        "type": "energy",
+        "amount": 10
+      }
+    ]
+  },
+  {
+    "id": "bubble-tea-together",
+    "name": "Get bubble tea together",
+    "description": "Two cups, one window seat, and an argument about toppings.",
+    "durationHours": 1,
+    "locationId": "boba-blossom",
+    "tags": [
+      "social",
+      "date"
+    ],
+    "requirements": [
+      {
+        "type": "money",
+        "min": 8
+      }
+    ],
+    "effects": [
+      {
+        "type": "money",
+        "amount": -8
+      }
+    ],
+    "withLoveInterest": "required"
+  },
+  {
+    "id": "workout-together",
+    "name": "Work out together",
+    "description": "Spot each other at Ironroot, or watch her drill next door at Aether.",
+    "durationHours": 1,
+    "locationId": "ironroot",
+    "tags": [
+      "social",
+      "sport"
+    ],
+    "requirements": [
+      {
+        "type": "money",
+        "min": 3
+      },
+      {
+        "type": "energy",
+        "min": 15
+      }
+    ],
+    "effects": [
+      {
+        "type": "money",
+        "amount": -3
+      },
+      {
+        "type": "stat",
+        "stat": "strength",
+        "amount": 1
+      },
+      {
+        "type": "energy",
+        "amount": -15
+      }
+    ],
+    "withLoveInterest": "required"
+  },
+  {
+    "id": "dinner-together",
+    "name": "Dinner at Cauldron",
+    "description": "A table by the open kitchen, and a Thundercake to share.",
+    "durationHours": 2,
+    "locationId": "cauldron",
+    "tags": [
+      "social",
+      "date"
+    ],
+    "availability": {
+      "periods": [
+        "evening"
+      ]
+    },
+    "requirements": [
+      {
+        "type": "stage",
+        "min": "friend"
+      },
+      {
+        "type": "money",
+        "min": 14
+      }
+    ],
+    "effects": [
+      {
+        "type": "money",
+        "amount": -14
+      },
+      {
+        "type": "energy",
+        "amount": 15
+      }
+    ],
+    "withLoveInterest": "required"
   },
   {
     "id": "float-lantern",
@@ -363,23 +688,12 @@
         "eventId": "lantern-festival"
       }
     ],
-    "effects": [
-      {
-        "type": "meter",
-        "meter": "affection",
-        "amount": 6
-      },
-      {
-        "type": "meter",
-        "meter": "trust",
-        "amount": 2
-      }
-    ]
+    "effects": []
   },
   {
     "id": "night-together",
     "name": "Spend the night together",
-    "description": "Invite them back to your room.",
+    "description": "Invite them back to your suite.",
     "durationHours": 8,
     "locationId": "dormitories",
     "tags": [
@@ -400,16 +714,6 @@
       }
     ],
     "effects": [
-      {
-        "type": "meter",
-        "meter": "affection",
-        "amount": 5
-      },
-      {
-        "type": "meter",
-        "meter": "desire",
-        "amount": 5
-      },
       {
         "type": "energy",
         "amount": 60

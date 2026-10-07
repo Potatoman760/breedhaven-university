@@ -79,8 +79,9 @@ export function buildEventPrompt(input: EventGenerationInput): { system: string;
     `- ${e.name}: ${e.day} ${calendar.months.find((m) => m.id === e.month)?.name ?? e.month}`
 
   const system = [
-    'You invent calendar events for a low-fantasy dating sim: local festivals, markets, ' +
-      'weather, visitors, small-town happenings. Keep them grounded and fit the setting.',
+    'You invent calendar events for a dating sim set at a modern university in a magitech fantasy ' +
+      'city: festivals, markets, matches, gigs, society nights, visitors, campus and city happenings. ' +
+      'Keep them grounded and fit the setting.',
     'Reply with only a JSON array and nothing else. Each element is an object with:',
     '- "name": short event name',
     '- "description": one or two sentences on what happens and why people care',
@@ -180,6 +181,8 @@ export function parseGeneratedEvents(
       month: month.id,
       day,
       year,
+      // Something the LLM made up never cancels classes.
+      noClasses: false,
       durationDays: Math.min(durationDays, MAX_GENERATED_DURATION_DAYS),
       locationId: content.locations.some((l) => l.id === locationId) ? locationId! : undefined,
       generated: true

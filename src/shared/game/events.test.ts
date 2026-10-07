@@ -20,6 +20,7 @@ const start = (): GameState => createInitialState(content)
 const atDay = (dayIndex: number): GameState => ({ ...start(), time: dayIndex * 20 })
 const ids = (events: CalendarEvent[]) => events.map((e) => e.id)
 const event = (extra: Partial<CalendarEvent>): CalendarEvent => ({
+  noClasses: false,
   id: 'fair',
   name: 'the Fair',
   description: '',
@@ -131,7 +132,8 @@ describe('parseGeneratedEvents', () => {
         year: 1,
         durationDays: 2,
         locationId: 'shop',
-        generated: true
+        generated: true,
+        noClasses: false
       }
     ])
   })

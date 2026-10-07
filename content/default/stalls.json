@@ -2,33 +2,150 @@
   {
     "id": "petal-and-posy",
     "name": "Petal and Posy",
-    "description": "A flower seller's barrow, crowded with pots and buckets.",
+    "description": "A flower seller's barrow, crowded with pots and buckets, every stem kept fresh by a charm she renews at dawn.",
     "icon": "flower",
     "locationId": "market",
-    "itemIds": ["posy", "potted-fern", "moss-ball", "seed-packets", "lavender-soap"]
+    "itemIds": [
+      "posy",
+      "potted-fern",
+      "moss-ball",
+      "seed-packets",
+      "lavender-soap"
+    ]
   },
   {
     "id": "the-sweet-tooth",
     "name": "The Sweet Tooth",
-    "description": "A baker's stall under a striped awning. You can smell it from the gate.",
+    "description": "A baker's van under a striped awning. You can smell it from the gate.",
     "icon": "sweet",
     "locationId": "market",
-    "itemIds": ["honey-cakes", "candied-plums", "spiced-cider", "salt-pretzels"]
+    "itemIds": [
+      "honey-cakes",
+      "candied-plums",
+      "loose-leaf-tea",
+      "coffee-beans",
+      "spiced-cider",
+      "salt-pretzels"
+    ]
   },
   {
     "id": "quill-and-binding",
     "name": "Quill and Binding",
-    "description": "A stationer who sells to students and knows what they can afford.",
+    "description": "A stationer and second-hand bookseller who knows what students can afford.",
     "icon": "book",
     "locationId": "market",
-    "itemIds": ["blank-ledger", "trade-treatise", "book-of-hymns", "sketchbook", "old-map", "playing-cards"]
+    "itemIds": [
+      "blank-ledger",
+      "trade-treatise",
+      "book-of-hymns",
+      "sketchbook",
+      "old-map",
+      "playing-cards"
+    ]
   },
   {
     "id": "tinkers-tray",
     "name": "The Tinker's Tray",
-    "description": "A travelling tinker's table of small things, useful and otherwise.",
+    "description": "A folding table of small things, useful and otherwise, and a card reader held together with tape.",
     "icon": "necklace",
     "locationId": "market",
-    "itemIds": ["silk-ribbon", "lace-choker", "river-stone", "whetstone", "sword-belt", "lockpicks", "glass-vials"]
+    "itemIds": [
+      "silk-ribbon",
+      "lace-choker",
+      "river-stone",
+      "whetstone",
+      "sword-belt",
+      "lockpicks",
+      "glass-vials"
+    ]
+  },
+  {
+    "id": "second-circuit",
+    "name": "Second Circuit",
+    "description": "Refurbished phones, old consoles and boxes of parts, sold by a woman who can tell you what is wrong with yours by listening to it.",
+    "icon": "key",
+    "locationId": "market",
+    "itemIds": [
+      "game-cartridge",
+      "hobby-kit",
+      "earbuds",
+      "charm-case"
+    ]
+  },
+  {
+    "id": "seven-petals",
+    "name": "Seven Petals",
+    "description": "The convenience store on every corner in the country, open twenty-four hours: snacks, chargers, contraception, pregnancy tests, lottery cards and cheap charms, under very bright lights.",
+    "icon": "sweet",
+    "locationId": "lantern-row",
+    "itemIds": [
+      "instant-ramen",
+      "energy-drink",
+      "scratchcard",
+      "phone-charger"
+    ]
+  },
+  {
+    "id": "petal-and-pill",
+    "name": "Petal & Pill",
+    "description": "The pharmacy chain: general medicine on one side, Bloom and pregnancy on the other, and a pharmacist who has stopped being surprised by anything.",
+    "icon": "vial",
+    "locationId": "lantern-row",
+    "itemIds": [
+      "bath-salts",
+      "chamomile-tea",
+      "study-tonic"
+    ]
+  },
+  {
+    "id": "byte-and-bloom",
+    "name": "Byte & Bloom",
+    "description": "Phones, PCs, components and repairs. The staff will tell you, unasked, that it is not their fault if you enchanted it yourself.",
+    "icon": "key",
+    "locationId": "lantern-row",
+    "itemIds": [
+      "pocket-speaker",
+      "game-controller",
+      "smart-lamp"
+    ]
+  },
+  {
+    "id": "arcana",
+    "name": "Arcana",
+    "description": "The magical supply shop next door to Byte & Bloom: wands, crystals, spell components and small enchantments. A man can buy here; he just can't use most of it.",
+    "icon": "stone",
+    "locationId": "lantern-row",
+    "itemIds": [
+      "quartz-point",
+      "component-pouch",
+      "charm-bracelet",
+      "tarot-deck"
+    ]
+  },
+  {
+    "id": "forbidden-shelf",
+    "name": "The Forbidden Shelf",
+    "description": "The occult bookshop beside the Book Nook: magical theory, grimoires in facsimile, histories nobody set as reading, and a locked case of questionable artefacts.",
+    "icon": "book",
+    "locationId": "lantern-row",
+    "itemIds": [
+      "grimoire",
+      "heretics-history",
+      "antique-atlas",
+      "curio"
+    ]
+  },
+  {
+    "id": "second-bloom",
+    "name": "Second Bloom",
+    "description": "The thrift shop, named for what it gives old clothes and for what women past fifty call the years after the Bloom lets go. Run by three of them.",
+    "icon": "ribbon",
+    "locationId": "lantern-row",
+    "itemIds": [
+      "vintage-scarf",
+      "band-tee",
+      "worn-leather-jacket",
+      "paperback"
+    ]
   }
 ]

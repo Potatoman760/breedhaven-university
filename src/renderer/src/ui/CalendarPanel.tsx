@@ -1,18 +1,5 @@
 import { useState } from 'react'
-import {
-  addEvents,
-  attendees,
-  dayIndexOf,
-  describeMeetings,
-  describeWhen,
-  upcomingAppointments,
-  enrolledCourses,
-  eventsOn,
-  firstNames,
-  removeEvent,
-  toDate,
-  upcomingEvents
-} from '../../../shared/game'
+import { addEvents, dayAgenda, dayIndexOf, removeEvent, toDate, upcomingEvents, type AgendaItem } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { errorMessage } from '../errors'
 import { Dialog } from './Dialog'
@@ -20,6 +7,11 @@ import { ChevronIcon } from './icons'
 
 // How far ahead the "Coming up" list looks.
 const UPCOMING_DAYS = 30
+// The hours the week view lays out. Anything outside them is still listed, at the edge.
+const FIRST_HOUR = 7
+const LAST_HOUR = 22
+// How many things a day of the month view names before it says how many more there are.
+const MONTH_LINES = 3
 
 interface Props {
   content: ContentPack
@@ -28,36 +20,43 @@ interface Props {
   onClose: () => void
 }
 
-/** The player's calendar: a month at a time, with events, plus what is coming up. */
+const clock = (hour: number) => `${String(hour).padStart(2, '0')}:00`
+
+/** Timed things side by side where they overlap: each gets a lane, and the lanes share the day's width. */
+function lanes(items: AgendaItem[]): { item: AgendaItem; lane: number; of: number }[] {
+  const placed: { item: AgendaItem; lane: number; end: number }[] = []
+  for (const item of items) {
+    const start = item.startHour ?? 0
+    const taken = placed.filter((p) => p.end > start).map((p) => p.lane)
+    let lane = 0
+    while (taken.includes(lane)) lane++
+    placed.push({ item, lane, end: start + (item.hours ?? 1) })
+  }
+  return placed.map((p) => {
+    const start = p.item.startHour ?? 0
+    // Everything it overlaps, itself included, decides how narrow it has to be.
+    const beside = placed.filter((q) => (q.item.startHour ?? 0) < p.end && q.end > start)
+    return { item: p.item, lane: p.lane, of: Math.max(...beside.map((q) => q.lane)) + 1 }
+  })
+}
+
+/**
+ * The player's calendar. It opens on the week, hour by hour, with classes, plans and
+ * events where they fall; the month is a step back from that. What is coming up further
+ * off is listed beside it.
+ */
 export function CalendarPanel({ content, state, onChange, onClose }: Props) {
   const { calendar } = content
   const today = toDate(calendar, state.time)
-  // Months away from the current one being viewed.
+  const [mode, setMode] = useState<'week' | 'month'>('week')
+  // Weeks, or months, away from the current one.
   const [offset, setOffset] = useState(0)
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState('')
 
-  const monthCount = calendar.months.length
-  const absolute = today.monthIndex + offset
-  const month = calendar.months[((absolute % monthCount) + monthCount) % monthCount]
-  const year = today.year + Math.floor(absolute / monthCount)
-
-  const firstDay = dayIndexOf(calendar, year, month.id, 1)
   const week = calendar.weekdays.length
-  const lead = (((calendar.startWeekday + firstDay) % week) + week) % week
-
-  const days = Array.from({ length: month.days }, (_, i) => {
-    const dayIndex = firstDay + i
-    const time = state.time + (dayIndex - today.dayIndex) * calendar.hoursPerDay
-    return {
-      n: i + 1,
-      isToday: dayIndex === today.dayIndex,
-      inGame: dayIndex >= 0 && dayIndex < calendar.lengthDays,
-      isPast: dayIndex < today.dayIndex,
-      events: eventsOn(content, state, time),
-      plans: state.appointments.filter((a) => toDate(calendar, a.time).dayIndex === dayIndex)
-    }
-  })
+  const weekdayOf = (dayIndex: number) => (((calendar.startWeekday + dayIndex) % week) + week) % week
+  const label = (dayIndex: number) => toDate(calendar, Math.max(0, dayIndex) * calendar.hoursPerDay)
 
   async function generate() {
     setBusy(true)
@@ -73,88 +72,186 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
     }
   }
 
+  const switchTo = (next: 'week' | 'month', nextOffset = 0) => {
+    setMode(next)
+    setOffset(nextOffset)
+  }
+
+  // ----- the week
+  const weekStart = today.dayIndex - weekdayOf(today.dayIndex) + offset * week
+  const weekDays = Array.from({ length: week }, (_, i) => {
+    const dayIndex = weekStart + i
+    const items = dayAgenda(content, state, dayIndex)
+    return {
+      dayIndex,
+      date: dayIndex >= 0 ? label(dayIndex) : undefined,
+      whole: items.filter((item) => item.startHour === undefined),
+      timed: lanes(items.filter((item) => item.startHour !== undefined))
+    }
+  })
+  const hours = Array.from({ length: LAST_HOUR - FIRST_HOUR }, (_, i) => FIRST_HOUR + i)
+  const firstShown = weekDays.find((d) => d.date)?.date
+  const lastShown = [...weekDays].reverse().find((d) => d.date)?.date
+
+  // ----- the month
+  const monthCount = calendar.months.length
+  const absolute = today.monthIndex + offset
+  const month = calendar.months[((absolute % monthCount) + monthCount) % monthCount]
+  const year = today.year + Math.floor(absolute / monthCount)
+  const firstDay = dayIndexOf(calendar, year, month.id, 1)
+  const lead = weekdayOf(firstDay)
+
+  const title =
+    mode === 'month'
+      ? `${month.name}, Year ${year}`
+      : firstShown && lastShown
+        ? firstShown.month.id === lastShown.month.id
+          ? `${firstShown.day} to ${lastShown.day} ${lastShown.month.name}`
+          : `${firstShown.day} ${firstShown.month.name} to ${lastShown.day} ${lastShown.month.name}`
+        : 'Before term'
+
   return (
-    <Dialog title="Calendar" onClose={onClose}>
+    <Dialog title="Calendar" onClose={onClose} wide>
       <div className="calendar">
-        <div>
+        <div className="calendar-main">
           <div className="month-nav">
-            <button className="secondary icon flip" aria-label="Previous month" onClick={() => setOffset(offset - 1)}>
+            <button className="secondary icon flip" aria-label={mode === 'week' ? 'Previous week' : 'Previous month'} onClick={() => setOffset(offset - 1)}>
               <ChevronIcon size={16} />
             </button>
             <div>
-              <h2>{month.name}</h2>
+              <h2>{title}</h2>
               <span className="hint">
-                Year {year} · {month.days} days
+                Day {today.dayIndex + 1} of {calendar.lengthDays}
               </span>
             </div>
-            <button className="secondary icon" aria-label="Next month" onClick={() => setOffset(offset + 1)}>
+            <button className="secondary icon" aria-label={mode === 'week' ? 'Next week' : 'Next month'} onClick={() => setOffset(offset + 1)}>
               <ChevronIcon size={16} />
             </button>
+            <button className="quiet" disabled={offset === 0} onClick={() => setOffset(0)}>
+              Today
+            </button>
+            <div className="tabs" role="tablist">
+              <button role="tab" aria-selected={mode === 'week'} className={mode === 'week' ? 'tab selected' : 'tab'} onClick={() => switchTo('week')}>
+                Week
+              </button>
+              <button role="tab" aria-selected={mode === 'month'} className={mode === 'month' ? 'tab selected' : 'tab'} onClick={() => switchTo('month')}>
+                Month
+              </button>
+            </div>
           </div>
-          <div className="month-grid" style={{ gridTemplateColumns: `repeat(${week}, minmax(0, 1fr))` }}>
-            {calendar.weekdays.map((name) => (
-              <div key={name} className="caps weekday">
-                {name.replace(/day$/, '')}
-              </div>
-            ))}
-            {Array.from({ length: lead }, (_, i) => (
-              <div key={`lead-${i}`} />
-            ))}
-            {days.map((d) => (
-              <div
-                key={d.n}
-                className={[
-                  'day',
-                  d.isToday && 'today',
-                  d.events.length > 0 && 'has-event',
-                  (d.isPast || !d.inGame) && 'faded'
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
-              >
-                <span className="day-number">{d.n}</span>
-                {d.isToday && <span className="day-note">Today</span>}
-                {d.events.map((e) => (
-                  <span key={e.id} className="day-note">
-                    {e.name}
+
+          {mode === 'week' ? (
+            <div className="week" style={{ gridTemplateColumns: `52px repeat(${week}, minmax(0, 1fr))` }}>
+              <span />
+              {weekDays.map((d) => (
+                <div
+                  key={d.dayIndex}
+                  className={['week-head', d.dayIndex === today.dayIndex && 'today', (d.dayIndex < today.dayIndex || d.dayIndex >= calendar.lengthDays) && 'faded']
+                    .filter(Boolean)
+                    .join(' ')}
+                >
+                  <span className="caps">{calendar.weekdays[weekdayOf(d.dayIndex)].replace(/day$/, '')}</span>
+                  <strong>{d.date ? d.date.day : ''}</strong>
+                </div>
+              ))}
+
+              <span className="week-time">All day</span>
+              {weekDays.map((d) => (
+                <div key={d.dayIndex} className="week-whole">
+                  {d.whole.map((item) => (
+                    <span key={item.id} className={`entry ${item.kind}`} title={item.detail}>
+                      {item.title}
+                    </span>
+                  ))}
+                </div>
+              ))}
+
+              <div className="week-hours">
+                {hours.map((hour) => (
+                  <span key={hour} className="week-time">
+                    {clock(hour)}
                   </span>
                 ))}
-                {d.plans.map((plan) => (
-                  <span key={plan.id} className="day-note plan">
-                    {plan.title}
-                  </span>
-                ))}
               </div>
-            ))}
+              {weekDays.map((d) => (
+                <div
+                  key={d.dayIndex}
+                  className={d.dayIndex === today.dayIndex ? 'week-day today' : 'week-day'}
+                  style={{ gridTemplateRows: `repeat(${hours.length}, 1fr)` }}
+                >
+                  {d.dayIndex === today.dayIndex && today.hour >= FIRST_HOUR && today.hour < LAST_HOUR && (
+                    <span className="now" style={{ top: `${((today.hour - FIRST_HOUR) / hours.length) * 100}%` }} />
+                  )}
+                  {d.timed.map(({ item, lane, of }) => {
+                    // Kept within the hours shown, so something very early or late is still there to see.
+                    const start = Math.min(Math.max(item.startHour ?? FIRST_HOUR, FIRST_HOUR), LAST_HOUR - 1)
+                    const end = Math.min(Math.max((item.startHour ?? FIRST_HOUR) + (item.hours ?? 1), start + 1), LAST_HOUR)
+                    return (
+                      <div
+                        key={item.id}
+                        className={`entry timed ${item.kind}`}
+                        title={[`${clock(item.startHour ?? 0)} to ${clock((item.startHour ?? 0) + (item.hours ?? 1))}`, item.title, item.detail].filter(Boolean).join(' · ')}
+                        style={{
+                          top: `${((start - FIRST_HOUR) / hours.length) * 100}%`,
+                          height: `${((end - start) / hours.length) * 100}%`,
+                          left: `${(lane / of) * 100}%`,
+                          width: `${100 / of}%`
+                        }}
+                      >
+                        <strong>{item.title}</strong>
+                        {item.detail && <span>{item.detail}</span>}
+                      </div>
+                    )
+                  })}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="month-grid" style={{ gridTemplateColumns: `repeat(${week}, minmax(0, 1fr))` }}>
+              {calendar.weekdays.map((name) => (
+                <div key={name} className="caps weekday">
+                  {name.replace(/day$/, '')}
+                </div>
+              ))}
+              {Array.from({ length: lead }, (_, i) => (
+                <div key={`lead-${i}`} />
+              ))}
+              {Array.from({ length: month.days }, (_, i) => {
+                const dayIndex = firstDay + i
+                const items = dayAgenda(content, state, dayIndex)
+                const weeksAway = Math.floor((dayIndex - (today.dayIndex - weekdayOf(today.dayIndex))) / week)
+                return (
+                  <button
+                    key={i}
+                    className={['day', dayIndex === today.dayIndex && 'today', (dayIndex < today.dayIndex || dayIndex >= calendar.lengthDays) && 'faded']
+                      .filter(Boolean)
+                      .join(' ')}
+                    title="See this week"
+                    onClick={() => switchTo('week', weeksAway)}
+                  >
+                    <span className="day-number">{i + 1}</span>
+                    {items.slice(0, MONTH_LINES).map((item) => (
+                      <span key={item.id} className={`entry ${item.kind}`}>
+                        {item.startHour !== undefined && `${clock(item.startHour)} `}
+                        {item.title}
+                      </span>
+                    ))}
+                    {items.length > MONTH_LINES && <span className="hint">+{items.length - MONTH_LINES} more</span>}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+          <div className="legend">
+            <span className="entry class">Class</span>
+            <span className="entry plan">Plan</span>
+            <span className="entry event">Event</span>
+            <span className="entry orientation">Orientation</span>
+            <span className="entry birth">Expected</span>
           </div>
-          <p className="hint">
-            Day {today.dayIndex + 1} of {calendar.lengthDays}.
-          </p>
         </div>
 
         <div className="upcoming">
-          {upcomingAppointments(state).length > 0 && <h2>Your plans</h2>}
-          {upcomingAppointments(state).map((plan) => (
-            <div key={plan.id} className="card">
-              <span className="hint">{describeWhen(content, plan.time)}</span>
-              <strong>
-                {plan.title} with {firstNames(content, attendees(plan))}
-              </strong>
-              <span>At {content.locations.find((l) => l.id === plan.locationId)?.name}</span>
-            </div>
-          ))}
-          {enrolledCourses(state).length > 0 && <h2>Your classes</h2>}
-          {enrolledCourses(state).map((course) => (
-            <div key={course.id} className="card">
-              <span className="hint">
-                {describeMeetings(course)} · attended {state.attendance[course.id]?.count ?? 0}
-              </span>
-              <strong>
-                {course.number} · {course.title}
-              </strong>
-              <span>{course.professor}</span>
-            </div>
-          ))}
           <h2>Coming up</h2>
           {upcomingEvents(content, state, UPCOMING_DAYS).map(({ event, inDays }) => (
             <div key={event.id} className="card">

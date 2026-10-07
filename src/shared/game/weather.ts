@@ -9,6 +9,12 @@ function roll(seed: number, dayIndex: number): number {
   return ((x ^ (x >>> 16)) >>> 0) / 0x100000000
 }
 
+/** How likely a kind of weather is in a month, relative to the others: its chance for that month, or its flat weight. */
+export function weatherWeight(kind: WeatherType, monthId: string): number {
+  if (kind.chance) return kind.chance[monthId] ?? 0
+  return !kind.months || kind.months.includes(monthId) ? kind.weight : 0
+}
+
 /**
  * The weather on the day of the given time (defaults to now). It holds all day, depends
  * only on the game's seed and the day, and is drawn by weight from the kinds the month
@@ -16,11 +22,12 @@ function roll(seed: number, dayIndex: number): number {
  */
 export function weatherOn(content: ContentPack, state: GameState, time = state.time): WeatherType | undefined {
   const date = toDate(content.calendar, time)
-  const kinds = content.calendar.weather.filter((w) => !w.months || w.months.includes(date.month.id))
-  const total = kinds.reduce((sum, w) => sum + w.weight, 0)
+  const month = date.month.id
+  const kinds = content.calendar.weather.filter((w) => weatherWeight(w, month) > 0)
+  const total = kinds.reduce((sum, w) => sum + weatherWeight(w, month), 0)
   let at = roll(state.weatherSeed, date.dayIndex) * total
   for (const kind of kinds) {
-    at -= kind.weight
+    at -= weatherWeight(kind, month)
     if (at < 0) return kind
   }
   return kinds[kinds.length - 1]

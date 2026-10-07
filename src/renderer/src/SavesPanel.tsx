@@ -10,6 +10,7 @@ import {
   type SlotId
 } from '../../shared/saves'
 import { errorMessage } from './errors'
+import { Overlay } from './ui/Dialog'
 
 export function describeSave(content: ContentPack, save: SaveSummary): string {
   if (save.unreadable) return 'Unreadable save (damaged, or from a different version)'
@@ -68,7 +69,7 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
     })
 
   return (
-    <div className="overlay">
+    <Overlay onClose={onClose}>
       <div className="settings">
         <h1>{mode === 'save' ? 'Save game' : 'Load game'}</h1>
         {(mode === 'save' ? MANUAL_SLOT_IDS : SLOT_IDS).map((slotId) => {
@@ -100,6 +101,6 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
           </button>
         </div>
       </div>
-    </div>
+    </Overlay>
   )
 }

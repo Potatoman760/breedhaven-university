@@ -1,0 +1,35 @@
+{
+  "chance": 0.6,
+  "lengthDays": 56,
+  "recoveryDays": 7,
+  "daughterChance": 0.857,
+  "stages": [
+    {
+      "id": "early",
+      "name": "in her first trimester",
+      "from": 0,
+      "description": "Nothing shows yet, but you feel it: a warmth low in the belly, the Bloom humming in you, your magic coming easier than it ever has. You are hungrier, more tender, and want him near."
+    },
+    {
+      "id": "showing",
+      "name": "in her second trimester",
+      "from": 0.334,
+      "showing": true,
+      "description": "Your belly has rounded and your clothes fit differently. People notice and make way for you. The amplification is plain now: you can channel more than you ever could, your tutors have moved you to a warded bench, and you carry yourself with a new pride."
+    },
+    {
+      "id": "heavy",
+      "name": "in her third trimester",
+      "from": 0.667,
+      "showing": true,
+      "description": "You are big with it and feel the child move, and sometimes feel her moods as your own. You tire sooner, sit when you can, and rest a hand on your belly without thinking. Your magic is at its height and you have to be careful with it. You want comfort, closeness and reassurance from him more than adventure."
+    },
+    {
+      "id": "due",
+      "name": "near her time",
+      "from": 0.92,
+      "showing": true,
+      "description": "The birth is days away at most and the Health Centre has a Bloom Chamber booked. You move slowly, sleep badly, and think of little else. You want him close, and you want to know he will be there."
+    }
+  ]
+}

@@ -1,33 +1,59 @@
 import { useState } from 'react'
-import { backgroundFor } from '../../../shared/game'
-import type { Location } from '../../../shared/model'
+import { backgroundFor, isIndoors, viewImage } from '../../../shared/game'
+import type { Location, WeatherEffect, Light } from '../../../shared/model'
+import { FxLayer } from '../fx/FxLayer'
 
 interface Props {
   location: Location | undefined
   periodId: string
+  /** Whether it is light or dark out: which of the view's two pictures is shown. */
+  light: Light
   /** A view the player picked, if any. */
   backgroundId?: string
+  /** Which screen this is the stage of, so that moving between screens can be given a transition. */
+  screen: string
+  /** Artwork to show in place of the location's: a love interest's own room. Always indoors. */
+  room?: { image: string | undefined; key: string }
+  /** What the weather looks like. Drawn only over views that are out of doors. */
+  weather?: WeatherEffect
 }
 
 /** The location artwork that fills the stage, or a note when there is none. */
-export function Backdrop({ location, periodId, backgroundId }: Props) {
-  const background = location && backgroundFor(location, periodId, backgroundId)
+export function Backdrop({ location, periodId, light, backgroundId, screen, room, weather = 'none' }: Props) {
+  const view = location && backgroundFor(location, backgroundId)
+  // The view as it is at this time of day. In someone's room, her room's picture if she has one; until then, the place it is in.
+  const shown = view && viewImage(view, light)
+  const background =
+    room?.image && view ? { ...view, id: room.key, image: room.image, indoors: true } : view && shown !== undefined ? { ...view, image: shown } : undefined
   const [failed, setFailed] = useState<string | null>(null)
+
+  const fx = (
+    <FxLayer
+      view={{ screen, locationId: room ? room.key : location?.id, backgroundId: background?.id, periodId }}
+      weather={room || isIndoors(location, background) ? 'none' : weather}
+    />
+  )
 
   if (!background || failed === background.image) {
     return (
-      <div className="stage-art">
-        {background ? background.image : `No background set for ${location?.name ?? 'here'}`}
-        <span>{background ? 'Background file not found' : 'Add one to locations.json'}</span>
-      </div>
+      <>
+        <div className="stage-art">
+          {background ? background.image : `No background set for ${location?.name ?? 'here'}`}
+          <span>{background ? 'Background file not found' : 'Add one under Edit game content, Locations'}</span>
+        </div>
+        {fx}
+      </>
     )
   }
   return (
-    <img
-      className="backdrop"
-      src={`content://pack/${background.image}`}
-      alt=""
-      onError={() => setFailed(background.image)}
-    />
+    <>
+      <img
+        className="backdrop"
+        src={`content://pack/${background.image}`}
+        alt=""
+        onError={() => setFailed(background.image)}
+      />
+      {fx}
+    </>
   )
 }

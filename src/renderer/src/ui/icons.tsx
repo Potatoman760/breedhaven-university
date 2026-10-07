@@ -246,3 +246,44 @@ export function VineCorner({ corner }: { corner: 'tl' | 'tr' | 'bl' | 'br' }) {
     </svg>
   )
 }
+
+// The phone's own icons, drawn on a 24-unit grid.
+
+export const ChatIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 24 24" {...p}>
+    <path d="M21 11.500a8.400 8.400 0 01-12.300 7.400L3 21l2.100-5.700A8.400 8.400 0 1121 11.500z" />
+  </Icon>
+)
+
+export const FriendsIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 24 24" {...p}>
+    <circle cx="9" cy="7.500" r="3.500" />
+    <path d="M2.500 20.500v-1.500a5 5 0 015-5h3a5 5 0 015 5v1.500M16 4.200a3.500 3.500 0 010 6.600M18.500 14.300a5 5 0 013 4.700v1.500" />
+  </Icon>
+)
+
+export const FeedIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 24 24" {...p}>
+    <path d="M4 11a9 9 0 019 9M4 4a16 16 0 0116 16" />
+    <circle cx="5" cy="19" r="1.500" />
+  </Icon>
+)
+
+export const WorkIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 24 24" {...p}>
+    <rect x="3" y="7.500" width="18" height="12.500" rx="2" />
+    <path d="M9 7.500V6a2 2 0 012-2h2a2 2 0 012 2v1.500M3 13h18" />
+  </Icon>
+)
+
+export const HeartIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 24 24" {...p}>
+    <path d="M12 20.500s-8-4.800-8-10.700A4.600 4.600 0 0112 7a4.600 4.600 0 018 2.800c0 5.900-8 10.700-8 10.700z" />
+  </Icon>
+)
+
+export const BackIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 24 24" {...p}>
+    <path d="M19 12H5M11 6l-6 6 6 6" />
+  </Icon>
+)

@@ -12,8 +12,34 @@ const BASE_CHANCE = 0.04
 const CHANCE_PER_APPEAL = 0.1
 const CHANCE_AT_FULL_AFFECTION = 0.35
 const MAX_CHANCE = 0.5
-// Not before the couriers are up.
+// Not before anyone is up.
 const FIRST_ROUND_HOUR = 9
+
+// How strongly she has to feel before she offers her Chats without being asked.
+const OFFERS_AT_AFFECTION = 60
+const OFFERS_AT_DESIRE = 50
+
+/** Whether the player can message her: she has given him her Chats. */
+export function hasContact(state: GameState, loveInterestId: string): boolean {
+  return state.contacts.includes(loveInterestId)
+}
+
+/** Records that she has given the player her Chats. */
+export function giveContact(state: GameState, loveInterestId: string): GameState {
+  return state.contacts.includes(loveInterestId) ? state : { ...state, contacts: [...state.contacts, loveInterestId] }
+}
+
+/**
+ * Whether she is taken enough with the player to give him her Chats unasked: he is just
+ * what she admires, or she already wants him or is fond of him.
+ */
+export function offersContact(content: ContentPack, state: GameState, loveInterestId: string): boolean {
+  const li = content.loveInterests.find((c) => c.id === loveInterestId)
+  const rel = state.relationships[loveInterestId]
+  if (!li || !rel || hasContact(state, loveInterestId)) return false
+  const scale = content.relationships.meterMax / 100
+  return appealLevel(state, li) === 2 || rel.affection >= OFFERS_AT_AFFECTION * scale || rel.desire >= OFFERS_AT_DESIRE * scale
+}
 
 export function courierThread(state: GameState, loveInterestId: string): CourierNote[] {
   return state.courier[loveInterestId] ?? []
@@ -110,7 +136,8 @@ function roll(seed: number, dayIndex: number, index: number): number {
 export function chanceOfWriting(content: ContentPack, state: GameState, loveInterestId: string): number {
   const li = content.loveInterests.find((c) => c.id === loveInterestId)
   const rel = state.relationships[loveInterestId]
-  if (!li || !rel) return 0
+  // She can't write to someone she hasn't given her Chats to.
+  if (!li || !rel || !hasContact(state, loveInterestId)) return 0
   const level = appealLevel(state, li)
   if (level === 0 && rel.affection < WRITES_AT_AFFECTION) return 0
   // Someone waiting on an answer, or with a plan already, doesn't write again.
@@ -129,7 +156,7 @@ export function courierRoundDue(content: ContentPack, state: GameState): boolean
 
 /**
  * Today's round: marks it made, and names the love interest who writes to the player
- * unprompted, if any does. At most one a day, so the courier stays a pleasure.
+ * unprompted, if any does. At most one a day, so a message stays a pleasure.
  */
 export function courierRound(content: ContentPack, state: GameState): { state: GameState; writerId: string | undefined } {
   const { dayIndex } = toDate(content.calendar, state.time)
@@ -142,7 +169,7 @@ export function courierRound(content: ContentPack, state: GameState): { state: G
 
 /**
  * An invitation made without the LLM: a time both are free at somewhere the love interest
- * spends their days, and a plain note saying so. Undefined when no time can be found.
+ * spends their days, and a plain message saying so. Undefined when no time can be found.
  */
 export function fallbackInvite(
   content: ContentPack,
@@ -159,6 +186,6 @@ export function fallbackInvite(
   const where = content.locations.find((l) => l.id === proposal.locationId)?.name ?? proposal.locationId
   return {
     proposal,
-    text: `${state.player.name}, come and find me at ${where}: ${describeWhen(content, proposal.time)}. Send word if you will. ${li.name.split(' ')[0]}`
+    text: `${state.player.name}, come and find me at ${where}: ${describeWhen(content, proposal.time)}. Let me know?`
   }
 }

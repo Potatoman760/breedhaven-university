@@ -1,11 +1,15 @@
 import {
+  type Comfort,
+  picturedOutfit,
   METERS,
+  type DepartureFeeling,
   type ContentPack,
   type GameState,
   type LoveInterest,
   type Scene,
   type SceneBaseline
 } from '../model'
+import { standardExpression } from './looks'
 import { stageFor } from './relationships'
 
 /** The LLM puts this at the end of a reply to say the scene has reached its close. */
@@ -32,20 +36,69 @@ export interface Directives extends SceneLook {
   /** The reply with every tag removed. */
   text: string
   ended: boolean
+  /**
+   * Who the reply says could have conceived, by the name written in the tag. An empty
+   * name means the scene's love interest.
+   */
+  seeded: string[]
+  /** Looks asked for by name: in a group, each love interest's own. */
+  named: NamedLook[]
+  /** How comfortable each love interest says she is, by the name written in the tag. An empty name means the scene's love interest. */
+  comfort: NamedComfort[]
 }
+
+/** A love interest's own reading of how much she wants to be here, as written in a reply. */
+export interface NamedComfort extends Comfort {
+  name: string
+}
+
+/** The LLM writes this when sex in the scene ends in a way that could leave her with child. */
+export const SEEDED_TAG = '[SEEDED]'
+const SEEDED = /\[\s*SEEDED\s*(?::\s*([^\]]*?)\s*)?\]/gi
 
 const LOOK_TAG = /\[\s*(OUTFIT|EXPRESSION|ANIMATION)\s*:\s*([^\]]*?)\s*\]/gi
 
+// [COMFORT: 3 he keeps asking] or, in a group, [COMFORT: Anwen=2 they are kissing in front of her].
+const COMFORT_TAG = /\[\s*COMFORT\s*:\s*([^\]]*?)\s*\]/gi
+
 /** Reads the tags the LLM may put in a reply: scene end, outfit, expression and animation. */
+/** A look asked for by name, in a scene with more than one love interest in it. */
+export interface NamedLook {
+  name: string
+  outfitId?: string
+  expression?: string
+}
+
 export function parseDirectives(reply: string): Directives {
   const look: SceneLook = {}
-  const withoutLook = reply.replace(LOOK_TAG, (_tag, kind: string, value: string) => {
-    if (kind.toUpperCase() === 'OUTFIT') look.outfitId = value
-    else if (kind.toUpperCase() === 'EXPRESSION') look.expression = value
+  const named: NamedLook[] = []
+  const withoutLook = reply.replace(LOOK_TAG, (_tag, kind: string, written: string) => {
+    // In a group a tag says whose it is: [EXPRESSION: Faye=happy].
+    const [, who, value] = /^([^=]*?)\s*=\s*(.*)$/.exec(written) ?? [undefined, undefined, written]
+    const field = kind.toUpperCase() === 'OUTFIT' ? 'outfitId' : kind.toUpperCase() === 'EXPRESSION' ? 'expression' : undefined
+    if (field && who) {
+      const theirs = named.find((n) => n.name.toLowerCase() === who.toLowerCase()) ?? (named[named.push({ name: who }) - 1])
+      theirs[field] = value
+    } else if (field) look[field] = value
     else look.animationId = ['none', 'off', 'stop', ''].includes(value.toLowerCase()) ? null : value
     return ''
   })
-  return { ...splitSceneEnd(withoutLook), ...look }
+  const seeded: string[] = []
+  const withoutSeeded = withoutLook.replace(SEEDED, (_tag, name: string | undefined) => {
+    seeded.push((name ?? '').trim())
+    return ''
+  })
+  // Moving and the passing of time are done with tools, so that the game is the one keeping
+  // count. A tag written for either is dropped.
+  const withoutMoves = withoutSeeded.replace(/\[\s*(?:MOVE|HOURS)\s*:[^\]]*\]/gi, '')
+  // Her reading of herself is never shown: the tag comes out whether or not it can be made sense of.
+  const comfort: NamedComfort[] = []
+  const withoutComfort = withoutMoves.replace(COMFORT_TAG, (_tag, written: string) => {
+    const [, who, level, reason] = /^(?:([^=]*?)\s*=\s*)?([1-5])(?!\d)[\s:,.\-–—]*(.*)$/s.exec(written) ?? []
+    if (level !== undefined) comfort.push({ name: (who ?? '').trim(), level: Number(level), reason: (reason ?? '').trim().slice(0, 160) })
+    return ''
+  })
+  return { ...splitSceneEnd(withoutComfort), ...look, seeded, named, comfort }
 }
 
 /**
@@ -65,7 +118,8 @@ export function validLook(
 
   const wearing =
     outfit ?? li.outfits.find((o) => o.id === (scene.outfitId ?? li.defaultOutfitId))
-  const expression = Object.keys(wearing?.sprites ?? {}).find((key) => same(key, look.expression))
+  // Any of the standard faces may be asked for, drawn or not; anything else has to be a picture the outfit has.
+  const expression = Object.keys((wearing && picturedOutfit(li.outfits, wearing).sprites) ?? {}).find((key) => same(key, look.expression)) ?? standardExpression(look.expression)
   if (expression !== undefined) valid.expression = expression
 
   const animation = li.animations.find((a) => same(a.id, look.animationId))
@@ -74,9 +128,12 @@ export function validLook(
   return valid
 }
 
-/** Applies a look to the scene. Going back to an outfit or expression ends any animation. */
+/**
+ * Applies a look to the scene. A change of outfit ends any animation. A change of face
+ * does not: every reply names one, and the animation plays on beneath it.
+ */
 export function applyLook(scene: Scene, look: SceneLook): Scene {
-  const backToSprite = look.outfitId !== undefined || look.expression !== undefined
+  const backToSprite = look.outfitId !== undefined
   return {
     ...scene,
     outfitId: look.outfitId ?? scene.outfitId,
@@ -89,7 +146,37 @@ export function applyLook(scene: Scene, look: SceneLook): Scene {
   }
 }
 
+/** Keeps what each love interest last said of how comfortable she is, for the next prompt. */
+export function applyComfort(scene: Scene, comfort: Record<string, Comfort>): Scene {
+  return Object.keys(comfort).length === 0 ? scene : { ...scene, comfort: { ...(scene.comfort ?? {}), ...comfort } }
+}
+
+/** Applies the looks chosen for the others in a scene, each kept beside the lead's. */
+export function applyLooks(scene: Scene, looks: Record<string, Pick<SceneLook, 'outfitId' | 'expression'>>): Scene {
+  const next = { ...(scene.looks ?? {}) }
+  for (const [id, look] of Object.entries(looks)) {
+    if (id === scene.loveInterestId) continue
+    const before = next[id] ?? {}
+    next[id] = {
+      outfitId: look.outfitId ?? before.outfitId,
+      expression: look.expression ?? (look.outfitId !== undefined ? undefined : before.expression)
+    }
+  }
+  return { ...scene, looks: next }
+}
+
 /** Everyone in a scene, the lead first. */
+/** Whether the player has met her: they have been in a scene together. */
+export function hasMet(state: GameState, loveInterestId: string): boolean {
+  return state.met.includes(loveInterestId)
+}
+
+/** Records that the player has met these love interests. Anyone else in a scene's cast, such as an NPC, is passed over. */
+export function meet(content: ContentPack, state: GameState, ids: string[]): GameState {
+  const fresh = ids.filter((id, i) => ids.indexOf(id) === i && !state.met.includes(id) && content.loveInterests.some((li) => li.id === id))
+  return fresh.length === 0 ? state : { ...state, met: [...state.met, ...fresh] }
+}
+
 export function sceneCast(scene: Pick<Scene, 'loveInterestId' | 'companionIds'>): string[] {
   return [scene.loveInterestId, ...scene.companionIds]
 }
@@ -140,6 +227,7 @@ export function sceneBaseline(state: GameState, loveInterestId: string, companio
     stats: state.player.stats,
     energy: state.player.energy,
     money: state.player.money,
+    time: state.time,
     relationship: state.relationships[loveInterestId] ?? NO_RELATIONSHIP,
     companions: Object.fromEntries(companionIds.map((id) => [id, state.relationships[id] ?? NO_RELATIONSHIP]))
   }
@@ -196,4 +284,49 @@ export function sceneOutcome(
     stageBefore: stageFor(content.relationships, baseline.relationship.affection).name,
     stageAfter: stageFor(content.relationships, now.affection).name
   }
+}
+
+// What walking out costs the player with the one who walked out.
+
+/** Who of those asked can leave a scene: people who are in it, never all of them. Someone has to stay. */
+export function leavers(scene: Pick<Scene, 'loveInterestId' | 'companionIds'>, askedIds: string[]): string[] {
+  const cast = sceneCast(scene)
+  const going = [...new Set(askedIds)].filter((id) => cast.includes(id))
+  return going.length >= cast.length ? [] : going
+}
+
+/**
+ * The scene after some of the love interests in it have left: it goes on with whoever
+ * remains. If the one it was led by has gone, the next takes her place. Those who left
+ * are remembered as having been there, up to the last message they heard.
+ */
+export function leaveScene<S extends Scene>(scene: S, askedIds: string[], feeling: DepartureFeeling = 'content', reason = ''): S {
+  const going = leavers(scene, askedIds)
+  if (going.length === 0) return scene
+  const [leadId, ...companionIds] = sceneCast(scene).filter((id) => !going.includes(id))
+  // Everyone's standing at the start of the scene is kept, whoever now leads it.
+  const baseline = {
+    ...scene.baseline,
+    relationship: leadId === scene.loveInterestId ? scene.baseline.relationship : (scene.baseline.companions[leadId] ?? NO_RELATIONSHIP),
+    companions: { ...scene.baseline.companions, [scene.loveInterestId]: scene.baseline.relationship }
+  }
+  const leadChanged = leadId !== scene.loveInterestId
+  return {
+    ...scene,
+    loveInterestId: leadId,
+    companionIds,
+    baseline,
+    departed: [...scene.departed, ...going.map((id) => ({ id, at: scene.messages.length, feeling, reason: reason.trim() }))],
+    // The look on the scene itself was the old lead's; the new lead brings her own.
+    ...(leadChanged && { outfitId: scene.looks?.[leadId]?.outfitId, expression: scene.looks?.[leadId]?.expression, animationId: undefined }),
+    looks: Object.fromEntries(Object.entries(scene.looks ?? {}).filter(([id]) => id !== leadId && !going.includes(id))),
+    comfort: scene.comfort && Object.fromEntries(Object.entries(scene.comfort).filter(([id]) => !going.includes(id))),
+    // If it was her room, the others are not left sitting in it without her.
+    roomOf: scene.roomOf !== undefined && going.includes(scene.roomOf) ? undefined : scene.roomOf
+  }
+}
+
+/** Everyone who has a memory of a scene to keep: those in it at the end, and those who left on the way. */
+export function sceneWitnesses(scene: Pick<Scene, 'loveInterestId' | 'companionIds' | 'departed'>): string[] {
+  return [...new Set([...sceneCast(scene), ...scene.departed.map((d) => d.id)])]
 }

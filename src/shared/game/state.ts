@@ -1,61 +1,61 @@
-import { STATS, type ContentPack, type GameState } from '../model'
-
-// What the three stats of older saves became.
-const OLD_STATS: Record<string, string> = { intellect: 'intelligence', charm: 'charisma', fitness: 'endurance' }
+import type { ContentPack, GameState } from '../model'
+import { startingCourses } from './catalogue'
+import { assignRapport } from './rapport'
 
 export function createInitialState(
   content: ContentPack,
   playerName?: string,
-  weatherSeed = 0
+  weatherSeed = 0,
+  /** The stats he rolled for himself. Left out, he has the content's own. */
+  stats?: Record<string, number>
 ): GameState {
   const { player, locationId } = content.newGame
+  // Those he knows already: met, and able to be messaged, from the first day.
+  const known = content.loveInterests.filter((li) => li.startsAt).map((li) => li.id)
   return {
     time: 0,
     weatherSeed,
     locationId,
-    player: { ...player, name: playerName?.trim() || player.name },
+    player: { ...player, name: playerName?.trim() || player.name, stats: stats ? { ...player.stats, ...stats } : player.stats },
     relationships: Object.fromEntries(
-      content.loveInterests.map((li) => [li.id, { affection: 0, trust: 0, desire: 0 }])
+      content.loveInterests.map((li) => [li.id, li.startsAt ? { ...li.startsAt } : { affection: 0, trust: 0, desire: 0 }])
     ),
     flags: {},
     unlockedCodexIds: [],
     memories: {},
     appointments: [],
-    courses: [],
+    courses: startingCourses(content),
     enrolment: null,
     attendance: {},
+    training: {},
+    trainedOn: { day: -1, points: {} },
+    coursePoints: {},
+    grades: {},
     inventory: {},
+    pregnancies: {},
+    children: [],
+    orientationStep: 0,
     bonds: [],
     ties: {},
+    rapport: assignRapport(content, weatherSeed),
+    revealed: {},
     courier: {},
+    job: null,
+    formerJobs: [],
+    met: known,
+    contacts: [...known],
     courierDay: -1,
+    feed: [],
+    feedDay: -1,
+    dramaDay: -1,
     events: []
   }
 }
 
 /**
- * Makes a loaded save usable with the current content, which may have changed since it
- * was written: love interests added later get a fresh relationship, and a location that
- * no longer exists is replaced by the starting one. A save from before the six stats
- * gets them, keeping what it had earned under the old names.
+ * Gives a loaded save a fresh relationship with any love interest it has not met: one
+ * added in the character editor since the game was started.
  */
 export function reconcileState(state: GameState, content: ContentPack): GameState {
-  const fresh = createInitialState(content)
-  const stats = { ...state.player.stats }
-  for (const [old, now] of Object.entries(OLD_STATS)) {
-    if (stats[old] === undefined) continue
-    if (stats[now] === undefined) stats[now] = (fresh.player.stats[now] ?? 0) + stats[old]
-    delete stats[old]
-  }
-  for (const stat of STATS) {
-    if (fresh.player.stats[stat] !== undefined) stats[stat] ??= fresh.player.stats[stat]
-  }
-  return {
-    ...state,
-    player: { ...state.player, stats },
-    locationId: content.locations.some((l) => l.id === state.locationId)
-      ? state.locationId
-      : fresh.locationId,
-    relationships: { ...fresh.relationships, ...state.relationships }
-  }
+  return { ...state, relationships: { ...createInitialState(content).relationships, ...state.relationships } }
 }

@@ -6,120 +6,147 @@
     "Windsday",
     "Hearthday"
   ],
-  "startHours": [
-    8,
-    10,
-    13,
-    15
-  ],
+  "dayStart": 8,
+  "dayEnd": 18,
   "locationId": "lecture-halls",
-  "hours": 2,
+  "lectureHours": 1,
+  "labHours": 3,
+  "lecturesPerWeek": 2,
+  "coursesPerMajor": 3,
   "maxCourses": 5,
-  "statGain": 2,
-  "energy": 15,
-  "affection": 1,
+  "statGain": 1,
+  "energy": 8,
   "generalEd": [
     {
       "code": "HIS",
       "subject": "History of the Bloom",
       "stats": [
         "wisdom"
-      ]
+      ],
+      "practical": false
     },
     {
-      "code": "PHY",
-      "subject": "Physical Training",
+      "code": "BPS",
+      "subject": "Bloom Psychology",
       "stats": [
-        "strength",
-        "endurance"
-      ]
-    },
-    {
-      "code": "RHE",
-      "subject": "Rhetoric and Disputation",
-      "stats": [
+        "wisdom",
         "charisma"
-      ]
+      ],
+      "practical": false
+    },
+    {
+      "code": "RBI",
+      "subject": "Reproductive Biology",
+      "stats": [
+        "intelligence",
+        "wisdom"
+      ],
+      "practical": true
+    },
+    {
+      "code": "PTH",
+      "subject": "Prenatal Thaumaturgy",
+      "stats": [
+        "intelligence",
+        "wisdom"
+      ],
+      "practical": true
+    },
+    {
+      "code": "HHS",
+      "subject": "Household Studies",
+      "stats": [
+        "charisma",
+        "wisdom"
+      ],
+      "practical": false
     },
     {
       "code": "MTH",
-      "subject": "Arithmetic and Measure",
+      "subject": "Calculus and Statistics",
       "stats": [
         "intelligence"
-      ]
+      ],
+      "practical": false
     },
     {
-      "code": "HRB",
-      "subject": "Herb Lore",
+      "code": "CSC",
+      "subject": "Computer Science",
       "stats": [
-        "wisdom"
-      ]
+        "intelligence"
+      ],
+      "practical": true
     },
     {
-      "code": "MUS",
-      "subject": "Music and Verse",
-      "stats": [
-        "charisma"
-      ]
-    },
-    {
-      "code": "ETQ",
-      "subject": "Court Custom and Etiquette",
+      "code": "RHE",
+      "subject": "Rhetoric and Debate",
       "stats": [
         "charisma"
-      ]
+      ],
+      "practical": false
     },
     {
       "code": "GEO",
-      "subject": "Geography of the Sown Expanse",
+      "subject": "Peoples and Politics of the Sown Expanse",
       "stats": [
         "intelligence"
-      ]
-    },
-    {
-      "code": "LOG",
-      "subject": "Logic",
-      "stats": [
-        "intelligence"
-      ]
+      ],
+      "practical": false
     },
     {
       "code": "ART",
-      "subject": "Drawing and Illumination",
+      "subject": "Studio Art",
       "stats": [
         "dexterity",
         "wisdom"
-      ]
+      ],
+      "practical": true
     },
     {
-      "code": "AST",
-      "subject": "The Heavens and the Seasons",
+      "code": "MUS",
+      "subject": "Music",
       "stats": [
-        "wisdom",
-        "intelligence"
-      ]
+        "charisma"
+      ],
+      "practical": true
     }
   ],
+  "grading": {
+    "points": 100,
+    "attendanceShare": 60,
+    "studyPerHour": 2,
+    "studyHours": 2,
+    "ownRoomBonus": 1,
+    "midtermWeek": 9,
+    "finalWeek": 18,
+    "passAt": 0.6,
+    "studyLocationIds": [
+      "library",
+      "spell-and-sip",
+      "commons",
+      "riverside-park"
+    ]
+  },
   "professors": [
-    "Magistra Orlena Vey",
-    "Magister Aldous Thorne",
-    "Doctor Ysolde Marrin",
-    "Magistra Corwenna Ashby",
-    "Doctor Halcyon Reed",
-    "Magistra Petra Lindqvar",
-    "Magister Benedek Hale",
-    "Doctor Sunniva Crane",
-    "Magistra Thessaly Rook",
-    "Doctor Maelis Varn",
-    "Magistra Isaura Penhallow",
-    "Magister Corin Dask",
-    "Doctor Winnow Sedge",
-    "Magistra Alba Quillon",
-    "Doctor Ferelith Moor",
-    "Magistra Hesper Lark",
-    "Magister Tobias Wren",
-    "Doctor Odalys Brine",
-    "Magistra Sabel Thorn",
-    "Doctor Ianthe Coombe"
+    "Professor Orlena Vey",
+    "Dr Ysolde Marrin",
+    "Professor Corwenna Ashby",
+    "Dr Halcyon Reed",
+    "Professor Petra Lindqvar",
+    "Dr Sunniva Crane",
+    "Professor Thessaly Rook",
+    "Dr Maelis Varn",
+    "Professor Isaura Penhallow",
+    "Dr Winnow Sedge",
+    "Professor Alba Quillon",
+    "Dr Ferelith Moor",
+    "Professor Hesper Lark",
+    "Dr Odalys Brine",
+    "Professor Sabel Thorn",
+    "Dr Ianthe Coombe",
+    "Professor Dagna Tor-Kesh",
+    "Dr Senna Ashpaw",
+    "Professor Aldous Thorne",
+    "Dr Benedek Hale"
   ]
 }

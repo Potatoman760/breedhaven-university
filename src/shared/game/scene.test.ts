@@ -1,11 +1,17 @@
+import { lookOf, spriteFor } from './looks'
 import { describe, expect, it } from 'vitest'
 import { LoveInterestSchema, type Scene } from '../model'
 import { perform } from './activities'
 import { buildCharacterPrompt } from './prompt'
 import {
+  applyComfort,
   applyLook,
+  applyLooks,
+  leaveScene,
   dialogueLines,
   firstNames,
+  hasMet,
+  meet,
   sceneCast,
   parseDirectives,
   sceneBaseline,
@@ -54,7 +60,7 @@ describe('look directives', () => {
     ],
     ai: { speechPattern: 'Plain.' }
   })
-  const scene: Scene = { loveInterestId: 'ana', companionIds: [], nsfw: false, beats: [], messages: [], gifts: [] }
+  const scene: Scene = { baseline: { stats: {}, energy: 0, money: 0, time: 0, relationship: { affection: 0, trust: 0, desire: 0 }, companions: {} }, loveInterestId: 'ana', companionIds: [], nsfw: false, beats: [], messages: [], gifts: [], conceived: [], departed: [], npc: false }
 
   it('accepts a sprite written as a bare path or with a description', () => {
     expect(li.outfits[0].sprites).toEqual({
@@ -68,20 +74,74 @@ describe('look directives', () => {
       text: 'Come in.',
       ended: false,
       outfitId: 'nude',
-      expression: 'Happy'
+      expression: 'Happy',
+      seeded: [],
+      named: [],
+      comfort: []
     })
     expect(parseDirectives('Yes.\n[ANIMATION: missionary]').animationId).toBe('missionary')
     expect(parseDirectives('Enough.\n[ANIMATION: none]\n[END SCENE]')).toEqual({
       text: 'Enough.',
       ended: true,
-      animationId: null
+      animationId: null,
+      seeded: [],
+      named: [],
+      comfort: []
     })
   })
 
-  it('accepts only what the character can show', () => {
-    expect(validLook({ outfitId: 'NUDE', expression: 'happy' }, li, scene)).toEqual({ outfitId: 'nude' })
+  it('reads how comfortable she says she is, hides it, and keeps it for the next prompt', () => {
+    const alone = parseDirectives('[EXPRESSION: embarrassed]\n[COMFORT: 2 he keeps asking about my mother]\nCan we talk about something else?')
+    expect(alone.text).toBe('Can we talk about something else?')
+    expect(alone.comfort).toEqual([{ name: '', level: 2, reason: 'he keeps asking about my mother' }])
+    // In a group each line says whose it is; however it is punctuated, and whatever cannot be read is still hidden.
+    const group = parseDirectives('[COMFORT: Ana=5: glad of the company]\n[comfort: bea = 1 - they are kissing in front of her]\n[COMFORT: very]\nAna: Stay.')
+    expect(group.text).toBe('Ana: Stay.')
+    expect(group.comfort).toEqual([
+      { name: 'Ana', level: 5, reason: 'glad of the company' },
+      { name: 'bea', level: 1, reason: 'they are kissing in front of her' }
+    ])
+    expect(parseDirectives('[COMFORT: 12 nonsense]\nHello.')).toMatchObject({ text: 'Hello.', comfort: [] })
+
+    const kept = applyComfort(scene, { ana: { level: 2, reason: 'he keeps asking about my mother' } })
+    expect(applyComfort(scene, {})).toBe(scene)
+    const prompt = buildCharacterPrompt({ content: fixture(), state: createInitialState(fixture()), loveInterestId: 'ana', sceneBeats: [{ activityName: 'Tea' }], look: kept, comfort: kept.comfort })
+    expect(prompt).toContain('## How comfortable you are')
+    expect(prompt).toContain('every reply has one more hidden line: [COMFORT: 4 a few words why]')
+    expect(prompt).toContain('You last said 2: he keeps asking about my mother.')
+    expect(prompt).toContain('At 1, or at 2 twice running with nothing better, leave')
+    // Whoever walks out takes her reading with her.
+    const both = applyComfort({ ...scene, companionIds: ['bea'] }, { ana: { level: 4, reason: '' }, bea: { level: 1, reason: 'had enough' } })
+    expect(leaveScene(both, ['bea'], 'hurt', 'had enough').comfort).toEqual({ ana: { level: 4, reason: '' } })
+  })
+
+  it('reads whose look a tag is, in a group', () => {
+    const { text, named, expression } = parseDirectives('[EXPRESSION: Ana=happy]\n[EXPRESSION: bea = Sad]\n[OUTFIT: Bea=nude]\nAna: Hello.')
+    expect(text).toBe('Ana: Hello.')
+    expect(expression).toBeUndefined()
+    expect(named).toEqual([
+      { name: 'Ana', expression: 'happy' },
+      { name: 'bea', expression: 'Sad', outfitId: 'nude' }
+    ])
+  })
+
+  it('accepts an outfit she has, any of the standard faces, and any other picture the outfit has', () => {
+    expect(validLook({ outfitId: 'NUDE', expression: 'happy' }, li, scene)).toEqual({ outfitId: 'nude', expression: 'happy' })
     expect(validLook({ outfitId: 'armor', expression: 'Happy' }, li, scene)).toEqual({ expression: 'happy' })
-    expect(validLook({ expression: 'happy' }, li, { ...scene, outfitId: 'nude' })).toEqual({})
+    // A face that has not been drawn is still hers to make; the neutral picture stands in for it.
+    expect(validLook({ expression: 'Embarassed' }, li, { ...scene, outfitId: 'nude' })).toEqual({ expression: 'embarrassed' })
+    expect(validLook({ expression: 'horny' }, li, scene)).toEqual({ expression: 'aroused' })
+    expect(validLook({ expression: 'smug' }, li, scene)).toEqual({})
+    expect(spriteFor(li, li.outfits[1], 'embarrassed')).toBe('c.png')
+    expect(spriteFor(li, li.outfits[0], 'happy')).toBe('b.png')
+    // An outfit with no pictures of its own borrows: pregnant from her usual clothes, nude-pregnant from nude.
+    const empty = (id: string) => ({ id, name: id, description: '', sprites: {}, pregnant: true })
+    const four = [li.outfits[0], empty('pregnant'), li.outfits[1], empty('nude-pregnant')]
+    expect(spriteFor({ ...li, outfits: four }, four[1], 'happy')).toBe('b.png')
+    expect(spriteFor({ ...li, outfits: four }, four[3], 'happy')).toBe('c.png')
+    // An outfit set to show another's pictures shows those, whatever it has of its own.
+    const same = [li.outfits[0], { ...li.outfits[1], fallback: li.outfits[0].id }]
+    expect(spriteFor({ ...li, outfits: same }, same[1], 'happy')).toBe('b.png')
     expect(validLook({ animationId: 'cowgirl' }, li, scene)).toEqual({})
     expect(validLook({ animationId: null }, li, scene)).toEqual({ animationId: null })
   })
@@ -105,9 +165,23 @@ describe('look directives', () => {
     expect(playing).toMatchObject({ animationId: 'missionary', expression: 'happy' })
     // It keeps playing through replies that say nothing about the look...
     expect(applyLook(playing, {}).animationId).toBe('missionary')
-    // ...and stops when told to, or when the character goes back to a sprite.
+    // ...and through a change of face, since every reply names one...
+    expect(applyLook(playing, { expression: 'neutral' }).animationId).toBe('missionary')
+    // ...and stops when told to, or when she changes what she is wearing.
     expect(applyLook(playing, { animationId: null }).animationId).toBeUndefined()
-    expect(applyLook(playing, { expression: 'neutral' }).animationId).toBeUndefined()
+    expect(applyLook(playing, { outfitId: 'nude' }).animationId).toBeUndefined()
+  })
+
+  it('keeps a look for each of the others in a group, and hands it on when one becomes the lead', () => {
+    const group: Scene = { ...scene, companionIds: ['bea'], expression: 'happy' }
+    const both = applyLooks(group, { bea: { expression: 'sad' }, ana: { expression: 'angry' } })
+    expect(both.looks).toEqual({ bea: { outfitId: undefined, expression: 'sad' } })
+    expect(lookOf(both, 'bea')).toEqual({ outfitId: undefined, expression: 'sad' })
+    expect(lookOf(both, 'ana')).toEqual({ outfitId: undefined, expression: 'happy' })
+    const changed = applyLooks(both, { bea: { outfitId: 'nude' } })
+    expect(lookOf(changed, 'bea')).toEqual({ outfitId: 'nude', expression: undefined })
+    const alone = leaveScene(changed, ['ana'], 'content', '')
+    expect(alone).toMatchObject({ loveInterestId: 'bea', outfitId: 'nude', looks: {} })
   })
 
   it('tells the LLM what it may switch to', () => {
@@ -117,12 +191,15 @@ describe('look directives', () => {
       buildCharacterPrompt({ content, state, loveInterestId: 'ana', look })
 
     const start = prompt({})
-    expect(start).toContain('you are wearing "default"')
-    expect(start).toContain(
-      '- default (Dress): a red dress\n  - neutral\n  - happy: laughing, head tilted\n' +
-        '- nude (Nude): no description\n  - neutral'
-    )
-    expect(start).toContain('- missionary (Missionary): on her back, him above')
+    expect(start).toContain('Every reply must BEGIN with one line giving the look on your face, before anything else is written: [EXPRESSION: happy]')
+    expect(start).toContain('exactly these: neutral, happy, sad, angry, surprised, embarrassed, aroused')
+    expect(start).toContain('You are wearing "default"')
+    // What she has on is described once, under who she is; the list only points to it.
+    expect(start).toContain('Wearing: a red dress')
+    expect(start).toContain('- default (Dress): what you have on now, described above\n- nude (Nude): no description')
+    expect(start.split('a red dress')).toHaveLength(2)
+    expect(start.trimEnd()).toContain('Reminder: begin with the [EXPRESSION] and [COMFORT] lines. Then ')
+    expect(start).toContain('- missionary (Missionary, loops): on her back, him above')
 
     const later = prompt({ outfitId: 'nude', animationId: 'missionary' })
     expect(later).toContain('Wearing: Nude')
@@ -194,6 +271,30 @@ describe('group scenes', () => {
     expect(sceneCast({ loveInterestId: 'ana', companionIds: ['bea'] })).toEqual(['ana', 'bea'])
     expect(firstNames(content, ['ana'])).toBe('Ana')
     expect(firstNames(content, ['ana', 'x', 'y'])).toBe('Ana, x and y')
+  })
+
+  it('counts a love interest as met once she has been in a scene', () => {
+    const content = fixture()
+    const fresh = createInitialState(content)
+    expect(hasMet(fresh, 'ana')).toBe(false)
+    // Someone in the cast who is not a love interest, such as an NPC, is not recorded.
+    const met = meet(content, fresh, ['ana', 'ana', 'a-porter'])
+    expect(met.met).toEqual(['ana'])
+    expect(hasMet(met, 'ana')).toBe(true)
+    // Nothing new to record leaves the state as it was.
+    expect(meet(content, met, ['ana'])).toBe(met)
+  })
+
+  it('starts someone the player already knows as met, reachable, and where her file says things stand', () => {
+    const base = fixture()
+    const [ana, ...rest] = base.loveInterests
+    const content = { ...base, loveInterests: [{ ...ana, startsAt: { affection: 35, trust: 45, desire: 10 } }, ...rest] }
+    const fresh = createInitialState(content)
+    expect(fresh.relationships['ana']).toEqual({ affection: 35, trust: 45, desire: 10 })
+    expect(fresh.met).toEqual(['ana'])
+    expect(fresh.contacts).toEqual(['ana'])
+    // Everyone else is a stranger still.
+    expect(createInitialState(base).met).toEqual([])
   })
 
   it('measures each companion from their own start', () => {

@@ -18,14 +18,9 @@ describe('reconcileState', () => {
     expect(reconcileState(state, content)).toEqual(state)
   })
 
-  it('repairs references to content that has since changed', () => {
-    const stale = {
-      ...createInitialState(content),
-      locationId: 'demolished',
-      relationships: { old: { affection: 50, trust: 0, desire: 0 } }
-    }
+  it('gives a love interest added since the game began a fresh relationship', () => {
+    const stale = { ...createInitialState(content), relationships: { old: { affection: 50, trust: 0, desire: 0 } } }
     const fixed = reconcileState(stale, content)
-    expect(fixed.locationId).toBe('home')
     expect(fixed.relationships.ana).toEqual({ affection: 0, trust: 0, desire: 0 })
     expect(fixed.relationships.old.affection).toBe(50)
   })

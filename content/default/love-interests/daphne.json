@@ -1,10 +1,12 @@
 {
   "id": "daphne",
   "name": "Daphne",
+  "handle": "capt_daphne",
   "age": 22,
   "pronouns": "she/her",
-  "bio": "Fourth-year student of Arms and Civic Defence, captain of the University's Cadet Watch, and three-time champion of the Great Arena's student division.",
-  "appearance": "A striking, athletic 22-year-old woman with warm tan skin, defined muscles, amber-brown eyes, full lips, and long auburn hair pulled into a high ponytail. She wears an olive-green open-faced helmet and fitted green armor decorated with layered leaf patterns. Brown leather straps and belts secure the armor, while round brass fittings mark her rank. Her uniform leaves her midriff and upper thighs exposed without restricting her movement. She carries a plain steel sword rather than an ornate or enchanted weapon.",
+  "bio": "Fourth-year Public Safety student, captain of the Campus Security cadets, and three-time unaugmented combat-sports champion of the Great Arena's student division.",
+  "appearance": "A 22-year-old woman with warm tan skin, a strong jaw, amber-brown eyes under straight dark brows, and full lips. Long, straight auburn hair pulled into a high ponytail that reaches her waist. An athletic, muscular build: defined abdominal muscles, strong shoulders and thighs, a full bust, and wide hips.",
+  "imageSeed": 60,
   "personality": "Direct, confident, and controlled, with dry humor and easy banter when she is off duty.",
   "traitIds": [
     "loyal"
@@ -12,24 +14,59 @@
   "outfits": [
     {
       "id": "default",
-      "name": "Usual clothes",
-      "description": "an olive-green open-faced helmet and fitted green armor with layered leaf patterns and brown leather straps, a plain steel sword at her hip",
+      "name": "Duty armour",
+      "description": "olive-green armour in a leaf pattern: an open-faced helmet with an engraved crest and cheek guards, her ponytail coming out through the top; shoulder guards made of layered green leaves; a cropped high-collared green top with long sleeves, open over the upper chest, and a green leaf-covered band across the bust; bare midriff; brown leather straps across the chest with a round brass medallion, brown leather armbands and bracers; a wide brown belt with a round brass buckle; and a long green loincloth-style skirt, trimmed with leaves at the hips and open at both thighs. A plain steel sword at her hip",
       "sprites": {
         "neutral": "sprites/daphne/neutral-cutout.png"
       }
     },
     {
+      "id": "pregnant",
+      "name": "Pregnant",
+      "inherits": "default",
+      "description": "She has a round, pregnant belly.",
+      "sprites": {},
+      "pregnant": true
+    },
+    {
       "id": "nude",
       "name": "Nude",
-      "description": "nothing at all",
+      "description": "nothing at all, completely nude",
       "sprites": {
         "bath": "sprites/daphne/nude-bath.png",
         "neutral": "sprites/daphne/nude-cutout.png"
       }
+    },
+    {
+      "id": "nude-pregnant",
+      "name": "Nude, pregnant",
+      "inherits": "nude",
+      "description": "She has a round, pregnant belly.",
+      "sprites": {},
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
   "schedule": [
+    {
+      "weekdays": [
+        "Tidesday",
+        "Hearthday"
+      ],
+      "periods": [
+        "evening"
+      ],
+      "locationId": "ironroot"
+    },
+    {
+      "weekdays": [
+        "Restday"
+      ],
+      "periods": [
+        "morning"
+      ],
+      "locationId": "riverside-park"
+    },
     {
       "periods": [
         "morning"
@@ -55,9 +92,14 @@
       "locationId": "dormitories"
     }
   ],
+  "room": {
+    "name": "a duty flat over the Cloister Halls gate",
+    "description": "A spare, orderly one-room flat above a gatehouse, with smooth grey walls and a polished concrete floor. A narrow bed with tightly tucked grey blankets, a steel rack holding green leaf-pattern armour, a helmet and a sheathed sword, a pair of boots lined up beneath it, a handheld radio on a charging stand on a plain desk, a wall screen showing a grid of security camera views, a pull-up bar in the doorway. A wide window looks down onto a courtyard. Cool morning light, no decoration.",
+    "locationId": "dormitories"
+  },
   "ai": {
-    "speechPattern": "Direct, confident, and controlled, with dry humor and easy banter when she is off duty.",
-    "backstory": "Studies: Fourth year, College of Arms and Civic Defence\n\nPost: Captain of the Cadet Watch, the student company that polices the campus and trains with the Seedblossom Guard\n\nWeapons: Plain steel sword and ashwood guard staff\n\nFighting Style: Patient and precise. Daphne reads an opponent's stance, waits for a committed attack, and punishes the opening it creates.\n\nDaphne grew up near Seedblossom's South Gate. Her family repaired armor and leather gear for the city guard, so she spent much of her childhood watching guards train. She enrolled at eighteen on a Guard scholarship and quickly earned a reputation as a disciplined fighter who stayed calm under pressure.\n\nShe is skilled with both the ashwood staff used for crowd control and the plain steel sword she carries on duty. She does not rely on magic or an enchanted weapon. She watches an opponent's stance, waits for them to commit, then strikes the opening they leave behind. She has won the student division of the Great Arena three years in a row, but she considers protecting people more important than winning applause.\n\nShe became captain of the Cadet Watch in her second year, after a delayed grain convoy caused a panic at the South Gate while the cadets were on gate duty. Hundreds of hungry citizens crowded around the wagons while a noble merchant ordered his drivers to force their way through. When the cadet captain froze, Daphne took command. She opened a side passage, formed the cadets into two lines, and moved the trapped citizens out of danger. When the merchant's hired swords drew steel, she defeated their leader and arrested the merchant.\n\nNo one died. During the inquiry Daphne testified against the merchant despite pressure from his noble allies, some of them the parents of her classmates. The captaincy passed to her, and the rule she set that day still holds: the Watch protects everyone, and wealth does not place anyone above the law.\n\nShe expects a commission in the Seedblossom Guard when she graduates. Until then she drills her cadets at dawn, sits lectures in the afternoon, and is at her easiest in the evening over a drink. Her discipline is tested by Kael's arrival on campus. She feels the same pull as the women around him, but she refuses to let desire interfere with her duty."
+    "speechPattern": "",
+    "backstory": "Studies: Fourth year, College of Public Safety and Athletics\n\nPost: Captain of the Campus Security cadets, the student unit that patrols the campus alongside the city police\n\nSport: Unaugmented combat sports; three-time student champion. Patient and precise: she reads a stance, waits for a committed attack, and punishes the opening.\n\nDaphne grew up by Seedblossom's South Gate, where her family repaired body armour and duty gear for the city police, and spent her childhood watching officers train. She enrolled on a police scholarship and earned a reputation as someone who stays calm when it counts. Her coach is Grushka Tor-Vael, whose good opinion she values more than the titles. She has magic like any woman and rarely bothers with it: she competes in the unaugmented division on purpose, and trusts training over tricks.\n\nShe wears the cadets' green duty armour on shift, which is most of the time."
   },
   "likes": [
     "weapons",
@@ -73,11 +115,12 @@
     "endurance"
   ],
   "studies": {
-    "subject": "Arms and Civic Defence",
-    "code": "ARM",
+    "subject": "Public Safety",
+    "code": "PSF",
     "level": 4,
     "stats": [
       "wisdom"
-    ]
+    ],
+    "practical": true
   }
 }

@@ -1,24 +1,54 @@
 import { z } from 'zod'
-import { StatSchema } from './stats'
+import { StatSchema, type Stat } from './stats'
 
-/** One view of a location: a spot within it, or the same spot at a different time of day. */
+/** The two lights a place is drawn in. Each period of the day is one or the other. */
+export const LIGHTS = [
+  { id: 'day', name: 'Day' },
+  { id: 'night', name: 'Night' }
+] as const
+export type Light = (typeof LIGHTS)[number]['id']
+
+/**
+ * Something to do at a place that works on one of the player's stats: a workout at the gym,
+ * an hour in a reading cell, a bowl of something enormous at the restaurant. These are what
+ * the day view suggests when he asks how to raise a stat.
+ */
+export const DrillSchema = z.object({
+  stat: StatSchema,
+  /** A few words, as it reads after "Raise strength:" and as the scene is named: "A workout on the racks". */
+  title: z.string(),
+  /** A line of narration that opens it. */
+  description: z.string().default('')
+})
+export type Drill = z.infer<typeof DrillSchema>
+
+/** The view every location has, and the one shown unless the player picks another: the place itself. */
+export const DEFAULT_VIEW = { id: 'default', name: 'Default' } as const
+
+/**
+ * One view of a location: a spot within it. As an outfit has a picture for each expression,
+ * a view has one by day and one by night; whichever has not been drawn shows the other.
+ */
 export const BackgroundSchema = z.object({
   id: z.string(),
   name: z.string(),
-  /** Image path inside the content pack. */
-  image: z.string(),
-  /** Period ids this view is meant for. Omitted means any time. */
-  periods: z.array(z.string()).optional()
+  /** Its pictures, by day and by night: image paths inside the content pack. */
+  images: z.partialRecord(z.enum(['day', 'night']), z.string()).default({}),
+  /** Under a roof: the weather is not drawn over it. Left out, it is as the location says. */
+  indoors: z.boolean().optional()
 })
 export type Background = z.infer<typeof BackgroundSchema>
 
 export const LocationSchema = z.object({
   id: z.string(),
   name: z.string(),
+  /** Told to the LLM in a scene there: what the place is, what goes on in it, and what a scene can draw on. */
   description: z.string().default(''),
+  /** What it looks like, for an image model: only what can be seen, with nobody in it. Pictures of it are generated from this. */
+  appearance: z.string().default(''),
   /**
-   * Views of the location. The one shown by default is the first made for the current
-   * period, or failing that the first that isn't tied to any period.
+   * Views of the location. The first is its `default` view, which every location has and
+   * which is shown unless the player picks another.
    */
   backgrounds: z.array(BackgroundSchema).default([]),
   /** Open from `fromHour` up to but not including `toHour`; may wrap past midnight. Omitted means always open. */
@@ -28,7 +58,19 @@ export const LocationSchema = z.object({
       toHour: z.number().int().min(0)
     })
     .optional(),
-  /** Stats this is a good place to work on: what a made-up activity here is likely to raise. */
-  trains: z.array(StatSchema).default([])
+  /** The place is under a roof, wherever one of its views doesn't say otherwise. */
+  indoors: z.boolean().default(false),
+  /**
+   * Nobody comes here who was not asked: a residence hall, where every room is someone's
+   * own. Everywhere else is public, and anyone may turn up.
+   */
+  private: z.boolean().default(false),
+  /** What can be done here to raise a stat. The stats these name are the ones the place is good for. */
+  drills: z.array(DrillSchema).default([])
 })
 export type Location = z.infer<typeof LocationSchema>
+
+/** The stats a place is good for working on: those it has something to do for. */
+export function trainsAt(location: Pick<Location, 'drills'>): Stat[] {
+  return [...new Set(location.drills.map((drill) => drill.stat))]
+}

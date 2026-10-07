@@ -26,6 +26,8 @@ export const ConditionSchema = z.discriminatedUnion('type', [
     min: z.string()
   }),
   z.object({ type: z.literal('flag'), flag: z.string(), value: z.boolean().default(true) }),
+  /** Passes while the love interest is (or, with `value: false`, is not) carrying the player's child. */
+  z.object({ type: z.literal('pregnant'), loveInterestId: z.string().optional(), value: z.boolean().default(true) }),
   /** Passes while the given authored calendar event is under way. */
   z.object({ type: z.literal('event'), eventId: z.string() }),
   z.object({

@@ -1,7 +1,7 @@
 import { MAX_SCENE_CAST, type Appointment, type ContentPack, type Course, type GameState, type Proposal } from '../model'
 import type { PerformCheck } from './activities'
 import { formatDate, formatTime, isGameOver, toDate } from './calendar'
-import { applyEffects } from './conditions'
+import { courseMembers, meetingNow } from './courses'
 import { firstNames } from './scene'
 import { isOpen } from './schedule'
 
@@ -11,9 +11,6 @@ const LATEST_END_HOUR = 22
 const SEARCH_DAYS = 14
 // How long a planned meeting lasts.
 const MEETING_HOURS = 2
-// What keeping a plan is worth: showing up matters more than a chance meeting.
-const KEPT_AFFECTION = 3
-const KEPT_TRUST = 2
 
 /** "Windsday, 4 Bloomtide, Year 412 at 13:00" */
 export function describeWhen(content: ContentPack, time: number): string {
@@ -26,16 +23,11 @@ function overlaps(a: { time: number; hours: number }, time: number, hours: numbe
 }
 
 /** Whether any of the courses has a class during the given hours. */
-function inClass(content: ContentPack, courses: Course[], time: number, hours: number): boolean {
-  const length = content.coursework?.hours ?? 0
+function inClass(content: ContentPack, state: GameState, courses: Course[], time: number, hours: number): boolean {
   for (let t = time; t < time + hours; t++) {
-    const date = toDate(content.calendar, t)
-    const busy = courses.some((c) =>
-      c.meetings.some(
-        (m) => m.weekday === date.weekday && date.hour >= m.startHour && date.hour < m.startHour + length
-      )
-    )
-    if (busy) return true
+    // Asked of the timetable itself, so that days without classes are free.
+    const then = { ...state, time: t }
+    if (courses.some((course) => meetingNow(content, then, course) !== undefined)) return true
   }
   return false
 }
@@ -54,9 +46,9 @@ export function allFree(
   hours: number
 ): boolean {
   const mine = state.courses.filter((c) => state.enrolment?.includes(c.id))
-  const theirs = state.courses.filter((c) => c.studentIds.some((id) => loveInterestIds.includes(id)))
+  const theirs = state.courses.filter((c) => courseMembers(c).some((id) => loveInterestIds.includes(id)))
   return (
-    !inClass(content, [...mine, ...theirs], time, hours) &&
+    !inClass(content, state, [...mine, ...theirs], time, hours) &&
     // Every plan is with the player, so any plan at that time is a clash.
     !state.appointments.some((a) => overlaps(a, time, hours))
   )
@@ -208,19 +200,8 @@ export function keepAppointment(
   const check = canKeep(content, state, appointmentId)
   if (!check.ok) throw new Error(`Cannot keep "${appointmentId}": ${check.reasons.join('; ')}`)
   const appointment = state.appointments.find((a) => a.id === appointmentId)!
-  // Everyone who turned up thinks better of the player for coming.
-  const after = attendees(appointment).reduce(
-    (current, loveInterestId) =>
-      applyEffects(
-        current,
-        [
-          { type: 'meter', meter: 'affection', amount: KEPT_AFFECTION },
-          { type: 'meter', meter: 'trust', amount: KEPT_TRUST }
-        ],
-        { content, loveInterestId }
-      ),
-    state
-  )
+  // What keeping it is worth to whoever turned up is settled by the scene itself.
+  const after = state
   return {
     appointment,
     state: {

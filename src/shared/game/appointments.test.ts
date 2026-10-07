@@ -21,16 +21,18 @@ const ana = content.loveInterests[0]
 
 /** The fixture with classes on "Two" (the day the game starts) at 08:00, which Ana takes. */
 function withClass(): { content: ContentPack; state: typeof state } {
-  const coursework = CourseworkConfigSchema.parse({ weekdays: ['Two'], startHours: [8], locationId: 'shop' })
+  const coursework = CourseworkConfigSchema.parse({ weekdays: ['Two'], locationId: 'shop' })
   const course = CourseSchema.parse({
     id: 'c1',
     number: 'RID 101',
     title: 'Riddles',
     professor: 'Prof. Q',
     subject: 'Riddles',
+    code: 'RID',
+    level: 1,
     studentIds: ['ana'],
     locationId: 'shop',
-    meetings: [{ weekday: 'Two', startHour: 8 }]
+    meetings: [{ weekday: 'Two', startHour: 8, hours: 2, kind: 'lecture' }]
   })
   return { content: { ...content, coursework }, state: { ...state, courses: [course], enrolment: [] } }
 }
@@ -117,8 +119,8 @@ describe('keeping a plan', () => {
     expect(appointment.title).toBe('Tea')
     expect(after.time).toBe(4)
     expect(after.appointments).toEqual([])
-    expect(after.relationships['ana'].affection).toBe(state.relationships['ana'].affection + 3)
-    expect(after.relationships['ana'].trust).toBe(state.relationships['ana'].trust + 2)
+    // Turning up earns nothing of itself: what she makes of the time is settled when the scene is over.
+    expect(after.relationships['ana']).toEqual(state.relationships['ana'])
   })
 
   it('puts the love interest where the plan is, whatever their usual day', () => {
@@ -160,16 +162,14 @@ describe('plans with more than one love interest', () => {
     expect(lost.message).toContain('Nobody is called "zed"')
   })
 
-  it('puts everyone at the meeting place and rewards each of them for a plan kept', () => {
+  it('puts everyone at the meeting place, and leaves what they make of it to the scene', () => {
     const plan = { loveInterestId: 'ana', companionIds: ['bea'], title: 'Tea', time: 4, hours: 2, locationId: 'home' }
     const due = { ...acceptProposal(busyBea, plan), time: 4 }
     expect(locationOf(crowd, due, cast[0])).toBe('home')
     expect(locationOf(crowd, due, cast[1])).toBe('shop')
 
     const { state: after } = keepAppointment(crowd, due, 'plan-1')
-    expect(after.relationships['ana'].affection).toBe(3)
-    expect(after.relationships['bea'].affection).toBe(3)
-    expect(after.relationships['cy'].affection).toBe(0)
+    expect(after.relationships).toEqual(due.relationships)
   })
 
   it('tells each of them about the plan, and the prompt for a group names every speaker', () => {

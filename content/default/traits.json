@@ -3,42 +3,79 @@
     "id": "promiscuous",
     "name": "Promiscuous",
     "category": "romance",
-    "definition": "Comfortable with casual intimacy and slow to tie attraction to commitment.",
-    "aiGuidance": "Flirts easily and without embarrassment; commitment has to be earned, not assumed."
+    "definition": "Comfortable with casual intimacy and slow to tie attraction to commitment. Flirts easily and without embarrassment; commitment has to be earned, not assumed.",
+    "drama": {
+      "jealousy": -10
+    }
   },
   {
     "id": "shy",
     "name": "Shy",
     "category": "social",
-    "definition": "Uneasy with attention and slow to open up to new people.",
-    "aiGuidance": "Short answers at first, trailing off or changing the subject when flustered."
+    "definition": "Uneasy with attention and slow to open up to new people. Short answers at first, trailing off or changing the subject when flustered.",
+    "drama": {
+      "jealousy": -5
+    }
   },
   {
     "id": "bookish",
     "name": "Bookish",
     "category": "interests",
-    "definition": "Happiest among books and prone to quoting them.",
-    "aiGuidance": "Reaches for references and facts; lights up when asked about what they are reading."
+    "definition": "Happiest among books and prone to quoting them. Reaches for references and facts; lights up when asked about what they are reading."
   },
   {
     "id": "flirtatious",
     "name": "Flirtatious",
     "category": "romance",
-    "definition": "Enjoys playful teasing and romantic banter.",
-    "aiGuidance": "Turns ordinary remarks into light teasing; rarely lets a compliment pass unanswered."
+    "definition": "Enjoys playful teasing and romantic banter. Turns ordinary remarks into light teasing; rarely lets a compliment pass unanswered.",
+    "drama": {
+      "sociable": 3
+    }
   },
   {
     "id": "competitive",
     "name": "Competitive",
     "category": "social",
-    "definition": "Turns everything into a contest and hates to lose.",
-    "aiGuidance": "Proposes wagers and dares; takes losing with poor grace and a demand for a rematch."
+    "definition": "Turns everything into a contest and hates to lose. Proposes wagers and dares; takes losing with poor grace and a demand for a rematch.",
+    "drama": {
+      "sociable": 3
+    }
   },
   {
     "id": "loyal",
     "name": "Loyal",
     "category": "values",
-    "definition": "Stands by the people they care about, even at a cost to themselves.",
-    "aiGuidance": "Defends friends when they are criticised and remembers promises."
+    "definition": "Stands by the people they care about, even at a cost to themselves. Defends friends when they are criticised and remembers promises.",
+    "drama": {
+      "jealousy": 5
+    }
+  },
+  {
+    "id": "jealous",
+    "name": "Jealous",
+    "category": "romance",
+    "definition": "Minds sharply when someone she cares for gives his attention to another. Notices who he looks at and who he has been with; goes quiet or sharp about it, and needs reassurance she will not ask for.",
+    "drama": {
+      "jealousy": 15
+    }
+  },
+  {
+    "id": "obsessive",
+    "name": "Obsessive",
+    "category": "romance",
+    "definition": "Fixes on one person and cannot easily let him out of her thoughts or her sight. Knows his timetable, turns up where he is, reads meaning into small things, and takes any distance hard.",
+    "drama": {
+      "jealousy": 20
+    }
+  },
+  {
+    "id": "easygoing",
+    "name": "Easygoing",
+    "category": "romance",
+    "definition": "Unpossessive; takes people as they come and does not make claims on them. Shrugs off what would make others jealous; says what she wants plainly and leaves it there.",
+    "drama": {
+      "jealousy": -15,
+      "sociable": 2
+    }
   }
 ]

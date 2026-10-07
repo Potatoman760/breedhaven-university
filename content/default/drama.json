@@ -1,0 +1,29 @@
+{
+  "divisor": 240,
+  "maxChance": 0.5,
+  "cooldownDays": 2,
+  "othersShare": 0.25,
+  "maxLinesBefore": 3,
+  "claim": {
+    "exclusive": 40,
+    "dating": 20,
+    "wanting": 8,
+    "open": 5,
+    "wantingDesire": 50
+  },
+  "romance": {
+    "date": 1,
+    "dating": 0.8,
+    "other": 0.4
+  },
+  "enemyOfLead": 15,
+  "friendOfLead": -5,
+  "perSecret": 4,
+  "maxSecrets": 16,
+  "rival": 15,
+  "friend": 12,
+  "unmet": 10,
+  "nearby": 15,
+  "unplaced": 0.5,
+  "broughtAlong": 0.5
+}

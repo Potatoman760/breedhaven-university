@@ -1,0 +1,32 @@
+{
+  "day": 1,
+  "steps": [
+    {
+      "id": "assembly",
+      "name": "the Assembly",
+      "locationId": "great-court",
+      "startHour": 9,
+      "hours": 2,
+      "description": "The bell and a notification from the University app call every new student to the Great Court. You find a place on the terrace steps as the Chancellor climbs to the lectern, and the people beside you shuffle up to make room.",
+      "direction": "It is the first morning of term. Every new and returning student has been called to the Great Court for the Chancellor's assembly: a long welcome, the University's rules, where to find the Health Centre and Bloom Counselling, and the term's notices. You have ended up next to the player in the crowd. If you have not met him, introduce yourself naturally (your name, what you study, a first impression of him), whisper under the speech, and react to what is being said from the lectern."
+    },
+    {
+      "id": "tour",
+      "name": "the Campus Tour",
+      "locationId": "great-court",
+      "startHour": 11,
+      "hours": 3,
+      "description": "The assembly breaks into groups for the tour of the grounds. A third-year in a lanyard counts heads on her tablet, puts you in with a handful of others, and sets off at a pace across the court.",
+      "direction": "After the assembly the new students are walked round the University in small groups by a student guide: the Lecture Halls, the Chained Library, the Student Commons, the Furrow Chapel, the Tiltyard, the Physic Garden, the Foundry, the Health Centre and the Bathhouse, with a wave through the gate at Lantern Row. You are in the player's group, and the two of you fall into step at the back of it. If you have not met him, introduce yourself as you walk. Point things out, say which places you like or avoid and why, and let the tour move on from one place to the next as the conversation goes."
+    },
+    {
+      "id": "dorm-meetup",
+      "name": "the Hall Supper",
+      "locationId": "dormitories",
+      "startHour": 17,
+      "hours": 2,
+      "description": "The afternoon goes on unpacking. At dusk the Cloister Halls hold their first-night supper: folding tables down the cloister, stacked pizza boxes, a keg of the Honeyed Bee's house ale, and everyone told to sit with someone they don't know.",
+      "direction": "It is the evening of the first day. The Cloister Halls, the main residence halls, hold a first-night supper in the cloister so that those who live there, and friends from Lantern Row who have wandered in, get to know each other. Everyone has been told to sit with someone they do not know, and you have sat down opposite the player. If you have not met him, introduce yourself. Talk about where you are from, your suite or flat and who you share it with, what you make of the first day and what you are hoping or dreading from the term."
+    }
+  ]
+}

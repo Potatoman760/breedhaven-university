@@ -1,4 +1,5 @@
-import { describeBeat, firstNames, sceneCast, toDate, type Growth, type SceneOutcome } from '../../../shared/game'
+import { describeBeat, firstNames, sceneCast, sceneHours, sceneWitnesses, toDate, type Growth, type SceneOutcome } from '../../../shared/game'
+import { useState } from 'react'
 import type { ContentPack, GameState, Scene } from '../../../shared/model'
 import { Backdrop } from './Backdrop'
 import { ChevronIcon, Sprig } from './icons'
@@ -11,6 +12,8 @@ export interface SceneSummary {
   companions: { id: string; outcome: SceneOutcome | undefined }[]
   /** What each love interest in the scene will remember, by id. */
   memories: Record<string, string>
+  /** Why what each love interest feels moved as it did, in her own judgement, by id. */
+  reasons: Record<string, string>
   /** Why a memory is a plain note instead of one written by the LLM, if any is. */
   memoryError?: string
 }
@@ -20,7 +23,8 @@ interface Props {
   state: GameState
   summary: SceneSummary
   backgroundId: string | undefined
-  onContinue: () => void
+  /** Called with the memories as the player leaves them, by love interest id. */
+  onContinue: (memories: Record<string, string>) => void
 }
 
 function change({ from, to }: Growth): string {
@@ -39,13 +43,23 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
   const date = toDate(content.calendar, state.time)
   const location = content.locations.find((l) => l.id === state.locationId)
   const max = content.relationships.meterMax
+  const spent = sceneHours(state, scene)
+  const left = (id: string) => {
+    const departure = scene.departed.find((d) => d.id === id)
+    return departure && departure.feeling !== 'content' ? `, ${departure.feeling}` : ''
+  }
+  // The memories as the player has reworded them. They are kept as they stand on leaving.
+  const [drafts, setDrafts] = useState<Record<string, string>>(memories)
 
   return (
     <main className="stage">
-      <Backdrop location={location} periodId={date.period.id} backgroundId={backgroundId} />
+      <Backdrop screen="summary" location={location} periodId={date.period.id} light={date.period.light} backgroundId={backgroundId} />
       <div className="summary glass framed">
         <div className="summary-head">
-          <span className="caps">{scene.beats.map(describeBeat).join(' · ')}</span>
+          <span className="caps">
+            {scene.beats.map(describeBeat).join(' · ')}
+            {spent !== undefined && spent > 0 && ` · ${spent} hour${spent === 1 ? '' : 's'}`}
+          </span>
           <h1>Your time with {name}</h1>
           <Sprig width={220} />
         </div>
@@ -65,7 +79,7 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
             ))}
           </section>
 
-          <section>
+          {!scene.npc && <section>
             <h2>{firstName}</h2>
             {outcome && (
               <div className="chips">
@@ -85,18 +99,22 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
               </div>
             ))}
             {!outcome && <p className="hint">No record of how things stood before this scene.</p>}
-            {scene.gifts.filter((gift) => (gift.recipientId ?? scene.loveInterestId) === scene.loveInterestId).map((gift, i) => (
+            {summary.reasons[scene.loveInterestId] && <p className="hint">{summary.reasons[scene.loveInterestId]}</p>}
+            {scene.gifts.filter((gift) => gift.recipientId === scene.loveInterestId).map((gift, i) => (
               <div key={i} className="growth">
                 <span>Gift</span>
                 <span>{gift.name}</span>
                 <strong className={gift.reaction === 'disliked' ? 'down' : 'up'}>{gift.reaction}</strong>
               </div>
             ))}
-          </section>
+          </section>}
 
           {summary.companions.map(({ id, outcome: theirs }) => (
             <section key={id}>
               <h2>{firstNames(content, [id])}</h2>
+              {scene.departed.some((d) => d.id === id) && (
+                <span className="hint">Left before the end{left(id)}</span>
+              )}
               {theirs && (
                 <div className="chips">
                   {theirs.stageBefore !== theirs.stageAfter && (
@@ -114,6 +132,7 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
                   <strong className={g.to >= g.from ? 'up' : 'down'}>{change(g)}</strong>
                 </div>
               ))}
+              {summary.reasons[id] && <p className="hint">{summary.reasons[id]}</p>}
               {scene.gifts
                 .filter((gift) => gift.recipientId === id)
                 .map((gift, i) => (
@@ -127,15 +146,39 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
           ))}
         </div>
 
-        {sceneCast(scene).map((id) => (
+        {scene.conceived.length > 0 && (
+          <p className="agreed">
+            The Bloom locked in: {firstNames(content, scene.conceived)} {scene.conceived.length > 1 ? 'are' : 'is'} carrying
+            your child.
+          </p>
+        )}
+
+        {sceneWitnesses(scene).map((id) => (
           <section key={id}>
             <h2>What {firstNames(content, [id])} will remember</h2>
-            <p className="memory">{memories[id] ?? 'Nothing in particular.'}</p>
+            <textarea
+              className="memory"
+              rows={3}
+              maxLength={600}
+              aria-label={`What ${firstNames(content, [id])} will remember`}
+              value={drafts[id] ?? ''}
+              placeholder="Nothing. She will not remember this."
+              onChange={(e) => setDrafts({ ...drafts, [id]: e.target.value })}
+            />
+            {(drafts[id] ?? '') !== (memories[id] ?? '') && (
+              <button type="button" className="quiet" onClick={() => setDrafts({ ...drafts, [id]: memories[id] ?? '' })}>
+                Put back what was written
+              </button>
+            )}
           </section>
         ))}
-        {memoryError && <p className="hint">Saved as a plain note: {memoryError}</p>}
+        <p className="hint">
+          This is what goes into her memory of you, and what she is told in later scenes. Reword it if it has
+          something wrong; clear it and she forgets.
+        </p>
+        {memoryError && <p className="hint">Written as a plain note: {memoryError}</p>}
 
-        <button onClick={onContinue} autoFocus>
+        <button onClick={() => onContinue(drafts)} autoFocus>
           Continue
           <ChevronIcon size={16} />
         </button>

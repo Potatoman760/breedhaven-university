@@ -1,13 +1,18 @@
 import { z } from 'zod'
+import { DramaConfigSchema } from './drama'
 import { ActivitySchema } from './activity'
 import { CalendarConfigSchema } from './calendar'
 import { CodexEntrySchema } from './codex'
 import type { Condition, Effect } from './condition'
-import { CourseworkConfigSchema } from './course'
+import { CatalogueSchema, CourseworkConfigSchema } from './course'
 import { ItemSchema, StallSchema } from './item'
+import { JobsConfigSchema } from './job'
 import { LocationSchema } from './location'
 import { LoveInterestSchema } from './loveInterest'
 import { MapSchema } from './map'
+import { NpcSchema, type Npc } from './npc'
+import { OrientationSchema } from './orientation'
+import { PregnancyConfigSchema } from './pregnancy'
 import { RelationshipConfigSchema } from './relationship'
 import { NewGameSchema } from './state'
 import { TraitSchema } from './trait'
@@ -20,9 +25,24 @@ export const ContentPackSchema = z.object({
   locations: z.array(LocationSchema),
   activities: z.array(ActivitySchema),
   codex: z.array(CodexEntrySchema),
+  /**
+   * The love interests. In a pack as it is written this holds every character, NPCs among
+   * them; once checked, the NPCs have been moved to `npcs`, so that everything to do with
+   * romance has only to look here.
+   */
   loveInterests: z.array(LoveInterestSchema),
+  /** The characters of the kind `npc`: people to talk to and work for who are not love interests. */
+  npcs: z.array(NpcSchema).default([]),
   newGame: NewGameSchema,
   coursework: CourseworkConfigSchema.optional(),
+  /** The course catalogue built in the editor. A pack with coursework needs one before a game can start. */
+  catalogue: CatalogueSchema.optional(),
+  orientation: OrientationSchema.optional(),
+  /** The jobs the player can hold, and the rules for them. Without it there are none. */
+  jobs: JobsConfigSchema.optional(),
+  pregnancy: PregnancyConfigSchema.optional(),
+  /** What the drama engine weighs things with. Without it, nobody turns up uninvited. */
+  drama: DramaConfigSchema.optional(),
   items: z.array(ItemSchema).default([]),
   stalls: z.array(StallSchema).default([]),
   /** Without a map the player can't travel, so every activity must be at the starting location. */
@@ -45,9 +65,16 @@ export function validateContentPack(raw: unknown): ContentPack {
       parsed.error.issues.map((i) => `${i.path.map(String).join('.')}: ${i.message}`)
     )
   }
-  const issues = checkReferences(parsed.data)
+  // Characters are written together and told apart by their kind.
+  const everyone = [...parsed.data.loveInterests, ...parsed.data.npcs]
+  const data: ContentPack = {
+    ...parsed.data,
+    loveInterests: everyone.filter((character) => character.kind !== 'npc'),
+    npcs: everyone.filter((character): character is Npc => character.kind === 'npc')
+  }
+  const issues = checkReferences(data)
   if (issues.length > 0) throw new ContentError(issues)
-  return parsed.data
+  return data
 }
 
 function checkReferences(pack: ContentPack): string[] {
@@ -117,6 +144,7 @@ function checkReferences(pack: ContentPack): string[] {
   const monthIds = new Set(calendar.months.map((m) => m.id))
   for (const w of calendar.weather) {
     for (const m of w.months ?? []) need(monthIds, m, `calendar.weather.${w.id}`, 'month')
+    for (const m of Object.keys(w.chance ?? {})) need(monthIds, m, `calendar.weather.${w.id}.chance`, 'month')
   }
   for (const e of calendar.events) {
     checkMonthDay(e.month, e.day, `calendar.events.${e.id}`)
@@ -127,7 +155,6 @@ function checkReferences(pack: ContentPack): string[] {
 
   for (const l of pack.locations) {
     idSet(l.backgrounds, `locations.${l.id}.backgrounds`)
-    for (const b of l.backgrounds) checkWhen(b, `locations.${l.id}.backgrounds.${b.id}`)
     checkHour(l.open?.fromHour, `locations.${l.id}.open`)
     checkHour(l.open?.toHour, `locations.${l.id}.open`)
   }
@@ -155,11 +182,17 @@ function checkReferences(pack: ContentPack): string[] {
     const outfits = idSet(li.outfits, `${where}.outfits`)
     need(outfits, li.defaultOutfitId, where, 'outfit')
     idSet(li.animations, `${where}.animations`)
+    for (const id of [...li.friends, ...li.enemies]) {
+      if (id === li.id || !pack.loveInterests.some((other) => other.id === id)) issues.push(`${where}: "${id}" among her friends or enemies is not another love interest`)
+    }
+    if (li.kind === 'student' && !li.studies) issues.push(`${where}: a student needs "studies"`)
+    if (li.kind === 'teacher' && !li.teaching) issues.push(`${where}: a teacher needs "teaching"`)
     if (li.birthday) checkMonthDay(li.birthday.month, li.birthday.day, `${where}.birthday`)
     for (const s of li.schedule) {
       need(locations, s.locationId, `${where}.schedule`, 'location')
       checkWhen(s, `${where}.schedule`)
     }
+    if (li.room) need(locations, li.room.locationId, `${where}.room`, 'location')
     for (const stageId of Object.keys(li.ai.stageNotes)) {
       need(stages, stageId, `${where}.ai.stageNotes`, 'relationship stage')
     }
@@ -168,16 +201,51 @@ function checkReferences(pack: ContentPack): string[] {
     }
   }
 
+  idSet(pack.npcs, 'npcs')
+  for (const npc of pack.npcs) {
+    const where = `npcs.${npc.id}`
+    if (loveInterests.has(npc.id)) issues.push(`${where}: a love interest already has this id`)
+    const outfits = idSet(npc.outfits, `${where}.outfits`)
+    need(outfits, npc.defaultOutfitId, where, 'outfit')
+    for (const s of npc.schedule) {
+      need(locations, s.locationId, `${where}.schedule`, 'location')
+      checkWhen(s, `${where}.schedule`)
+    }
+  }
+
   for (const pin of pack.map?.pins ?? []) need(locations, pin.locationId, 'map.pins', 'location')
 
+  pack.orientation?.steps.forEach((step, i) => {
+    need(locations, step.locationId, `orientation.steps[${i}]`, 'location')
+    checkHour(step.startHour, `orientation.steps[${i}].startHour`)
+  })
   if (pack.coursework) {
     need(locations, pack.coursework.locationId, 'coursework', 'location')
     checkWhen({ weekdays: pack.coursework.weekdays }, 'coursework')
-    for (const hour of pack.coursework.startHours) {
-      // A class has to finish on the day it starts.
-      checkHour(hour + pack.coursework.hours - 1, 'coursework.startHours')
+    for (const id of pack.coursework.grading.studyLocationIds) need(locations, id, 'coursework.grading.studyLocationIds', 'location')
+    // The teaching day has to fit in the day, and hold the longest class.
+    checkHour(pack.coursework.dayStart, 'coursework.dayStart')
+    checkHour(pack.coursework.dayEnd - 1, 'coursework.dayEnd')
+    if (pack.coursework.dayEnd - pack.coursework.dayStart < Math.max(pack.coursework.lectureHours, pack.coursework.labHours)) {
+      issues.push('coursework: the teaching day is shorter than a class')
     }
   }
+
+  const jobIds = new Set<string>()
+  pack.jobs?.jobs.forEach((job, i) => {
+    const at = `jobs[${i}] (${job.id})`
+    if (jobIds.has(job.id)) issues.push(`${at}: duplicate id`)
+    jobIds.add(job.id)
+    need(locations, job.locationId, at, 'location')
+    // The boss is usually an NPC; one who has been made a love interest keeps her job.
+    if (![...pack.npcs, ...pack.loveInterests].some((character) => character.id === job.bossId)) issues.push(`${at}: unknown character "${job.bossId}"`)
+    job.shifts.forEach((shift, n) => {
+      checkWhen({ weekdays: [shift.weekday] }, `${at}.shifts[${n}]`)
+      checkHour(shift.startHour, `${at}.shifts[${n}].startHour`)
+      // A shift is over on the day it starts.
+      checkHour(shift.startHour + shift.hours - 1, `${at}.shifts[${n}]`)
+    })
+  })
 
   const items = idSet(pack.items, 'items')
   idSet(pack.stalls, 'stalls')

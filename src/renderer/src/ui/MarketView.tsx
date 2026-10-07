@@ -11,7 +11,7 @@ interface Props {
   onLeave: () => void
 }
 
-/** A visit to the market: one tab per stall, each listing the gifts it sells. */
+/** A visit to the market or the shops of a street: one tab per stall, each listing the gifts it sells. */
 export function MarketView({ content, state, onBuy, onLeave }: Props) {
   const stalls = stallsAt(content, state.locationId)
   const [stallId, setStallId] = useState(stalls[0]?.id)
@@ -22,7 +22,7 @@ export function MarketView({ content, state, onBuy, onLeave }: Props) {
 
   return (
     <main className="stage">
-      <Backdrop location={location} periodId={date.period.id} />
+      <Backdrop screen="market" location={location} periodId={date.period.id} light={date.period.light} />
       <div className="market glass framed">
         <div className="market-head">
           <div>
