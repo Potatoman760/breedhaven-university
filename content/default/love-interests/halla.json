@@ -7,18 +7,26 @@
   "pronouns": "she/her",
   "bio": "Dr Halla Brask keeps the Foundry running, the wards charged and the evacuation counter honest.",
   "appearance": "A stocky, good-looking woman of 39 with light brown skin, quick dark eyes, strong brows and a crooked smile. Curly black hair to her jaw. A compact, sturdy, curvy figure with strong hands.",
-  "imageSeed": 60,
   "personality": "Brilliant, impatient and safety-mad. Delighted by a clever fix, scathing about a careless one.",
   "outfits": [
     {
       "id": "default",
       "name": "Work clothes",
       "description": "a grey lab coat with scorch marks over a dark turtleneck, safety goggles pushed up on her head, a tool belt, heavy gloves tucked in a pocket",
-      "sprites": {}
+      "sprites": {
+        "neutral": {
+          "image": "sprites/halla/default-neutral-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     }
   ],
   "defaultOutfitId": "default",
   "faceY": 8,
+  "imageSeed": 60,
+  "stageHeight": 100,
+  "animations": [],
   "schedule": [],
   "ai": {
     "speechPattern": "Rapid and technical, trailing off into a diagnosis. Asks \"what did you touch?\" a great deal.",

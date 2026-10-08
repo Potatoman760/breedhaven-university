@@ -3,7 +3,7 @@ import type { ContentPack, GameState } from '../model'
 import { applyEffect } from './conditions'
 import { buildCharacterPrompt } from './prompt'
 import { createInitialState } from './state'
-import { STAT_CAP, statCost, trainingToward, trainStat, abilityModifier, adjustStat, affectionGain, appeal, appealLevel, describeModifier, describeStat, pointCost, pointsLeft, pointsSpent, startingStats } from './stats'
+import { STAT_CAP, statCost, trainingToward, trainStat, abilityModifier, adjustStat, affectionGain, appeal, appealLevel, describeModifier, describeStat, pointCost, pointsLeft, pointsSpent, randomStats, startingStats } from './stats'
 import { fixture } from './testFixture'
 
 const base = fixture()
@@ -161,5 +161,23 @@ describe('training a stat', () => {
     expect(state.player.stats['strength']).toBe(STAT_CAP)
     expect(state.training['strength']).toBe(0)
     expect(trainStat(content, onDay(state, 20), 'strength', 2).player.stats['strength']).toBe(30)
+  })
+})
+
+describe('random starting stats', () => {
+  it('spend the whole pool, within the lowest and highest score, and differ from draw to draw', () => {
+    const seen = new Set<string>()
+    for (let seed = 1; seed <= 40; seed++) {
+      let x = seed
+      const random = () => ((x = (x * 16807) % 2147483647) - 1) / 2147483646
+      const stats = randomStats(random)
+      expect(pointsLeft(stats)).toBe(0)
+      for (const score of Object.values(stats)) {
+        expect(score).toBeGreaterThanOrEqual(8)
+        expect(score).toBeLessThanOrEqual(15)
+      }
+      seen.add(JSON.stringify(stats))
+    }
+    expect(seen.size).toBeGreaterThan(10)
   })
 })

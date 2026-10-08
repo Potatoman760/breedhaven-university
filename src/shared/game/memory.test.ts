@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import type { GameState, Scene } from '../model'
 import {
+  applySpending,
+  buildSpendingPrompt,
+  parseSpending,
   addMemory,
   amendMemory,
   applyFeelings,
@@ -221,5 +224,34 @@ describe('what a scene does to how she feels', () => {
     expect(full.relationships['ana'].affection).toBe(100)
     // Nobody the game keeps no feelings for.
     expect(applyFeelings(content, state, 'a-porter', PLAIN_FEELINGS)).toBe(state)
+  })
+})
+
+describe('what he spent in a scene', () => {
+  const rich = (): GameState => ({ ...start(), player: { ...start().player, money: 40 } })
+  const treat: Scene = { ...scene, messages: [{ role: 'user', content: 'The drinks are on me.' }, { role: 'assistant', content: 'Then I will have the large one.' }] }
+
+  it('is asked for from what was said, priced as dollars would be', () => {
+    const { system, user } = buildSpendingPrompt(content, rich(), treat)
+    expect(system).toContain('{"spent": number, "on": string}')
+    expect(system).toContain('a whole number of dollars')
+    expect(system).toContain('If he paid for nothing, "spent" is 0')
+    expect(user).toContain('Pat has $40.')
+    expect(user).toContain('Pat: The drinks are on me.')
+    expect(user).toContain('Where it ended: Home.')
+  })
+
+  it('is read as whole dollars, never more than he has, and nothing when nothing was spent', () => {
+    expect(parseSpending('{"spent": 12, "on": "drinks for two at Boba Blossom"}', 40)).toEqual({ amount: 12, on: 'drinks for two at Boba Blossom' })
+    expect(parseSpending('Sure: {"spent": 11.6, "on": " tea "}', 40)).toEqual({ amount: 12, on: 'tea' })
+    expect(parseSpending('{"spent": 90, "on": "dinner"}', 40)).toEqual({ amount: 40, on: 'dinner' })
+    for (const nothing of ['{"spent": 0, "on": ""}', '{"spent": -5}', '{"spent": "a lot"}', 'no json', '{"spent": 9, "on": "x"']) expect(parseSpending(nothing, 40)).toBeUndefined()
+    expect(parseSpending('{"spent": 5, "on": "tea"}', 0)).toBeUndefined()
+  })
+
+  it('comes out of his pocket when the scene is over', () => {
+    expect(applySpending(rich(), { amount: 12, on: 'drinks' }).player.money).toBe(28)
+    const state = rich()
+    expect(applySpending(state, undefined)).toBe(state)
   })
 })

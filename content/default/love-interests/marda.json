@@ -7,18 +7,26 @@
   "pronouns": "she/her",
   "bio": "Marda owns the Honeyed Bee and lets the twins believe they run it.",
   "appearance": "A big, handsome woman of 49 with olive skin, shrewd dark eyes, a strong jaw and a full red mouth. Thick black hair with a white streak at the front, worn pinned up. A generous hourglass figure with bare, capable arms.",
-  "imageSeed": 60,
   "personality": "Jovial, unshockable and iron underneath. Has thrown out bigger than you.",
   "outfits": [
     {
       "id": "default",
       "name": "Work clothes",
       "description": "a low-cut dark red blouse with the sleeves pushed up, a black bar apron, a heavy gold bee pendant, and a bar towel over one shoulder",
-      "sprites": {}
+      "sprites": {
+        "neutral": {
+          "image": "sprites/marda/default-neutral-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     }
   ],
   "defaultOutfitId": "default",
   "faceY": 8,
+  "imageSeed": 60,
+  "stageHeight": 100,
+  "animations": [],
   "schedule": [],
   "ai": {
     "speechPattern": "A bar-room voice, amused and unhurried. Hears everything and repeats what suits her.",

@@ -30,6 +30,8 @@ export interface SceneLook {
   outfitId?: string
   expression?: string
   animationId?: string | null
+  /** Whose pose it is, where the scene has more than one love interest: her name as the LLM wrote it, and once checked, her id. Left out, the scene's lead. */
+  animationOf?: string
 }
 
 export interface Directives extends SceneLook {
@@ -56,7 +58,8 @@ export interface NamedComfort extends Comfort {
 export const SEEDED_TAG = '[SEEDED]'
 const SEEDED = /\[\s*SEEDED\s*(?::\s*([^\]]*?)\s*)?\]/gi
 
-const LOOK_TAG = /\[\s*(OUTFIT|EXPRESSION|ANIMATION)\s*:\s*([^\]]*?)\s*\]/gi
+// [POSE: id] is the tag for an NSFW pose; [ANIMATION: id] is its older name, still read.
+const LOOK_TAG = /\[\s*(OUTFIT|EXPRESSION|ANIMATION|POSE)\s*:\s*([^\]]*?)\s*\]/gi
 
 // [COMFORT: 3 he keeps asking] or, in a group, [COMFORT: Anwen=2 they are kissing in front of her].
 const COMFORT_TAG = /\[\s*COMFORT\s*:\s*([^\]]*?)\s*\]/gi
@@ -69,18 +72,40 @@ export interface NamedLook {
   expression?: string
 }
 
-export function parseDirectives(reply: string): Directives {
+/**
+ * The hidden lines a reply carried about her face and her comfort, as written, one to a
+ * line: what every reply restates. Empty when it had none. A pose is left out on purpose:
+ * shown back to the LLM in its own earlier replies, it is copied into every one after.
+ */
+export function lookLines(reply: string): string {
+  const found: { at: number; tag: string }[] = []
+  for (const match of reply.matchAll(LOOK_TAG)) if (match[1].toUpperCase() === 'EXPRESSION') found.push({ at: match.index, tag: match[0] })
+  for (const match of reply.matchAll(COMFORT_TAG)) found.push({ at: match.index, tag: match[0] })
+  return found
+    .sort((a, b) => a.at - b.at)
+    .map(({ tag }) => tag)
+    .join('\n')
+}
+
+export function parseDirectives(written: string): Directives {
+  // What a reasoning model thought before answering is no part of the answer.
+  const reply = written.replace(/<think(?:ing)?>[\s\S]*?<\/think(?:ing)?>/gi, '').replace(/^[\s\S]*<\/think(?:ing)?>/i, '')
   const look: SceneLook = {}
   const named: NamedLook[] = []
   const withoutLook = reply.replace(LOOK_TAG, (_tag, kind: string, written: string) => {
     // In a group a tag says whose it is: [EXPRESSION: Faye=happy].
-    const [, who, value] = /^([^=]*?)\s*=\s*(.*)$/.exec(written) ?? [undefined, undefined, written]
+    // Whose it is comes before an equals sign, or a colon when that is what was written: [EXPRESSION: Faye:happy].
+    const [, who, value] = /^([^=:]*?)\s*[=:]\s*(.*)$/.exec(written) ?? [undefined, undefined, written]
     const field = kind.toUpperCase() === 'OUTFIT' ? 'outfitId' : kind.toUpperCase() === 'EXPRESSION' ? 'expression' : undefined
     if (field && who) {
       const theirs = named.find((n) => n.name.toLowerCase() === who.toLowerCase()) ?? (named[named.push({ name: who }) - 1])
       theirs[field] = value
     } else if (field) look[field] = value
-    else look.animationId = ['none', 'off', 'stop', ''].includes(value.toLowerCase()) ? null : value
+    else {
+      // A pose is one character's, and in a group the tag says whose: [POSE: Faye=missionary].
+      look.animationId = ['none', 'off', 'stop', ''].includes(value.toLowerCase()) ? null : value
+      look.animationOf = who && look.animationId !== null ? who : undefined
+    }
     return ''
   })
   const seeded: string[] = []
@@ -94,7 +119,7 @@ export function parseDirectives(reply: string): Directives {
   // Her reading of herself is never shown: the tag comes out whether or not it can be made sense of.
   const comfort: NamedComfort[] = []
   const withoutComfort = withoutMoves.replace(COMFORT_TAG, (_tag, written: string) => {
-    const [, who, level, reason] = /^(?:([^=]*?)\s*=\s*)?([1-5])(?!\d)[\s:,.\-–—]*(.*)$/s.exec(written) ?? []
+    const [, who, level, reason] = /^(?:([^=:\d][^=:]*?)\s*[=:]\s*)?([1-5])(?!\d)[\s:,.\-–—]*(.*)$/s.exec(written) ?? []
     if (level !== undefined) comfort.push({ name: (who ?? '').trim(), level: Number(level), reason: (reason ?? '').trim().slice(0, 160) })
     return ''
   })
@@ -129,20 +154,21 @@ export function validLook(
 }
 
 /**
- * Applies a look to the scene. A change of outfit ends any animation. A change of face
- * does not: every reply names one, and the animation plays on beneath it.
+ * Applies the look a reply chose to the scene. Her outfit and face stay as they are until
+ * a reply changes them. An NSFW pose, the layer over her picture, does not: it is up for
+ * the reply that asked for it and no longer, and stays up only if the next reply asks for
+ * it again.
  */
 export function applyLook(scene: Scene, look: SceneLook): Scene {
-  const backToSprite = look.outfitId !== undefined
+  const animationId = look.animationId ?? undefined
   return {
     ...scene,
     outfitId: look.outfitId ?? scene.outfitId,
     // An expression belongs to the outfit it was chosen for.
     expression: look.expression ?? (look.outfitId !== undefined ? undefined : scene.expression),
-    animationId:
-      look.animationId === null
-        ? undefined
-        : (look.animationId ?? (backToSprite ? undefined : scene.animationId))
+    animationId,
+    // Whose it is: the one named with it, or the lead when nobody was.
+    animationOf: animationId === undefined ? undefined : (look.animationOf ?? scene.loveInterestId)
   }
 }
 
@@ -194,14 +220,18 @@ export interface DialogueLine {
   text: string
   /** In a group scene, the id of whoever says the line, when the line names them. */
   speakerId?: string
+  /** The name of whoever says the line, when it is someone with a voice in the scene but no place in its cast: the professor of a class. */
+  speakerName?: string
 }
 
 /**
  * Splits a reply into the beats the player clicks through, one per line of text. In a
  * group scene each spoken line starts with its speaker's first name ("Ana: ..."); pass
- * the cast to have that read off the line.
+ * the cast to have that read off the line. `voices` are the names of anyone else who
+ * speaks without being one of the cast, such as the professor of a class.
  */
-export function dialogueLines(reply: string, cast: Pick<LoveInterest, 'id' | 'name'>[] = []): DialogueLine[] {
+export function dialogueLines(reply: string, cast: Pick<LoveInterest, 'id' | 'name'>[] = [], voices: string[] = []): DialogueLine[] {
+  const last = (name: string) => name.trim().split(/\s+/).at(-1)?.toLowerCase()
   return reply
     .split(/\n+/)
     .map((line) => line.trim())
@@ -213,9 +243,10 @@ export function dialogueLines(reply: string, cast: Pick<LoveInterest, 'id' | 'na
       const speaker =
         named &&
         cast.find((li) => [li.name, li.name.split(' ')[0]].some((n) => n.toLowerCase() === named[1].trim().toLowerCase()))
-      return speaker && named
-        ? { action: false, text: named[2], speakerId: speaker.id }
-        : { action: false, text: line }
+      if (speaker && named) return { action: false, text: named[2], speakerId: speaker.id }
+      // Someone with a voice and no place in the cast: named in full, or by the last word of the name ("Reed" for "Doctor Reed").
+      const voice = named && voices.find((name) => name.toLowerCase() === named[1].trim().toLowerCase() || last(name) === last(named[1]))
+      return voice && named ? { action: false, text: named[2], speakerName: voice } : { action: false, text: line }
     })
 }
 
@@ -227,6 +258,8 @@ export function sceneBaseline(state: GameState, loveInterestId: string, companio
     stats: state.player.stats,
     energy: state.player.energy,
     money: state.player.money,
+    training: state.training,
+    coursePoints: state.coursePoints,
     time: state.time,
     relationship: state.relationships[loveInterestId] ?? NO_RELATIONSHIP,
     companions: Object.fromEntries(companionIds.map((id) => [id, state.relationships[id] ?? NO_RELATIONSHIP]))
@@ -240,12 +273,41 @@ export interface Growth {
 }
 
 export interface SceneOutcome {
-  /** Player stats, coin and energy that changed over the scene. */
+  /** Player stats, money and energy that changed over the scene. */
   player: Growth[]
   /** All relationship meters, changed or not. */
   meters: Growth[]
   stageBefore: string
   stageAfter: string
+}
+
+/**
+ * What has changed for the player himself since a moment that was recorded: his stats,
+ * his money and energy, and the work he has put in that has yet to show as a point: what
+ * he has banked toward the next point of a stat, and his marks in a course.
+ */
+export function playerGains(before: Pick<SceneBaseline, 'stats' | 'energy' | 'money' | 'training' | 'coursePoints'>, state: GameState): Growth[] {
+  const { player } = state
+  const stats = [...new Set([...Object.keys(before.stats), ...Object.keys(player.stats)])]
+  const raised = (stat: string) => (before.stats[stat] ?? 0) !== (player.stats[stat] ?? 0)
+  return [
+    ...stats.map((stat) => ({ label: stat, from: before.stats[stat] ?? 0, to: player.stats[stat] ?? 0 })),
+    // Training that became a point is told by the point; the rest by what is banked toward the next.
+    ...(before.training ? Object.keys(state.training) : [])
+      .filter((stat) => !raised(stat))
+      .map((stat) => ({ label: `${stat} training`, from: before.training?.[stat] ?? 0, to: state.training[stat] ?? 0 })),
+    ...(before.coursePoints ? Object.keys(state.coursePoints) : []).map((id) => ({
+      label: `${state.courses.find((course) => course.id === id)?.number ?? id} marks`,
+      from: before.coursePoints?.[id] ?? 0,
+      to: state.coursePoints[id] ?? 0
+    })),
+    { label: 'money', from: before.money, to: player.money },
+    { label: 'energy', from: before.energy, to: player.energy }
+  ]
+    // Only whole points are told of. Training and marks are earned in parts of a point, and a part that has yet
+    // to make a whole one is kept and not shown: it shows when the next part completes it.
+    .map((g) => ({ ...g, from: Math.floor(g.from + 1e-9), to: Math.floor(g.to + 1e-9) }))
+    .filter((g) => g.from !== g.to)
 }
 
 /**
@@ -262,20 +324,10 @@ export function sceneOutcome(
   const baseline = companion
     ? { ...recorded, relationship: recorded.companions[loveInterestId] ?? NO_RELATIONSHIP }
     : recorded
-  const { player } = state
   const now = state.relationships[loveInterestId] ?? baseline.relationship
-  const stats = [...new Set([...Object.keys(baseline.stats), ...Object.keys(player.stats)])]
 
   return {
-    player: [
-      ...stats.map((stat) => ({
-        label: stat,
-        from: baseline.stats[stat] ?? 0,
-        to: player.stats[stat] ?? 0
-      })),
-      { label: 'coin', from: baseline.money, to: player.money },
-      { label: 'energy', from: baseline.energy, to: player.energy }
-    ].filter((g) => g.from !== g.to),
+    player: playerGains(baseline, state),
     meters: METERS.map((meter) => ({
       label: meter,
       from: baseline.relationship[meter],
@@ -318,7 +370,9 @@ export function leaveScene<S extends Scene>(scene: S, askedIds: string[], feelin
     baseline,
     departed: [...scene.departed, ...going.map((id) => ({ id, at: scene.messages.length, feeling, reason: reason.trim() }))],
     // The look on the scene itself was the old lead's; the new lead brings her own.
-    ...(leadChanged && { outfitId: scene.looks?.[leadId]?.outfitId, expression: scene.looks?.[leadId]?.expression, animationId: undefined }),
+    ...(leadChanged && { outfitId: scene.looks?.[leadId]?.outfitId, expression: scene.looks?.[leadId]?.expression }),
+    // A pose goes with whoever's it was.
+    ...(scene.animationId !== undefined && going.includes(scene.animationOf ?? scene.loveInterestId) && { animationId: undefined, animationOf: undefined }),
     looks: Object.fromEntries(Object.entries(scene.looks ?? {}).filter(([id]) => id !== leadId && !going.includes(id))),
     comfort: scene.comfort && Object.fromEntries(Object.entries(scene.comfort).filter(([id]) => !going.includes(id))),
     // If it was her room, the others are not left sitting in it without her.

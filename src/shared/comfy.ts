@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { outfitParts, type Location, type LoveInterest, type Npc, pronounWords } from './model'
+import { DEFAULT_VIEW, outfitParts, type Location, type LoveInterest, type Npc, pronounWords } from './model'
 
 /**
  * The art studio's link to the user's own ComfyUI. It is a tool the user calls directly to
@@ -12,13 +12,14 @@ import { outfitParts, type Location, type LoveInterest, type Npc, pronounWords }
  */
 
 /** What a picture is for. Each kind has its own default workflow, size and framing words. */
-export const ART_KINDS = ['sprite', 'background', 'photo'] as const
+export const ART_KINDS = ['sprite', 'background', 'photo', 'nsfw'] as const
 export type ArtKind = (typeof ART_KINDS)[number]
 
 export const ART_KIND_LABELS: Record<ArtKind, string> = {
   sprite: 'Sprite',
   background: 'Background',
-  photo: 'Photo'
+  photo: 'Photo',
+  nsfw: 'NSFW picture'
 }
 
 /** A place in a graph the app may write to. Nothing is written to `output`: it names whose pictures to collect. */
@@ -62,14 +63,16 @@ const SizeSchema = z.object({
 export const DEFAULT_SIZES: Record<ArtKind, { width: number; height: number }> = {
   sprite: { width: 1080, height: 1920 },
   background: { width: 1920, height: 1080 },
-  photo: { width: 1024, height: 1024 }
+  photo: { width: 1024, height: 1024 },
+  nsfw: { width: 1920, height: 1080 }
 }
 
 /** Words that close every prompt of a kind, after its subject: how the picture is framed, not what is in it. */
 export const DEFAULT_FRAMING: Record<ArtKind, string> = {
   sprite: 'three-quarter shot from knees up\n\nplain white background',
   background: 'wide establishing shot, no people',
-  photo: 'candid phone photo, natural light'
+  photo: 'candid phone photo, natural light',
+  nsfw: 'wide cinematic shot, bedroom, soft warm light'
 }
 
 export const ComfySettingsSchema = z.object({
@@ -292,15 +295,73 @@ const LIGHT_WORDS: Record<string, string> = {
 }
 
 /**
- * The prompt for a background: the place, the view of it, the time of day, and how the
+ * The prompt for a picture in a character's NSFW section: her body, that she is undressed
+ * (in the words of her own nude outfit, when she has one), what the pose shows, and how
+ * the picture is framed, each a paragraph, as a sprite's is written.
+ */
+export function nsfwPrompt(who: Pick<LoveInterest | Npc, 'appearance' | 'outfits'> & { pronouns?: string }, pose: string, framing: string): string {
+  const [bare = 'nothing at all, completely nude'] = outfitParts(who.outfits, who.outfits.find((o) => o.id === 'nude'))
+  const { subject } = pronounWords(who.pronouns)
+  return paragraphs([
+    paragraph(who.appearance),
+    paragraph(`${subject[0].toUpperCase()}${subject.slice(1)} ${subject === 'they' ? 'wear' : 'wears'} ${bare}`),
+    paragraph(pose),
+    framing.trim()
+  ])
+}
+
+/** Someone in a photo: how they look and what they have on. */
+export interface Sitter {
+  appearance: string
+  pronouns?: string
+  /** What they are wearing, as an outfit describes it. Empty leaves it unsaid. */
+  wears: string
+}
+
+/**
+ * The prompt for a selfie posted on Bloomr: that it is one, the one taking it, the friend
+ * beside them when there is one, what the picture shows, the place behind them, the light,
+ * and how it is framed, each a paragraph.
+ */
+export function selfiePrompt(
+  author: Sitter,
+  friend: Sitter | undefined,
+  shot: string,
+  place: Pick<Location, 'appearance'> | undefined,
+  light: string,
+  framing: string
+): string {
+  const clothes = (who: Sitter): string => {
+    const { subject } = pronounWords(who.pronouns)
+    return who.wears.trim() === '' ? '' : paragraph(`${subject[0].toUpperCase()}${subject.slice(1)} ${subject === 'they' ? 'wear' : 'wears'} ${who.wears}`)
+  }
+  return paragraphs([
+    friend
+      ? "A selfie of two friends close together, taken at arm's length on a phone by the one in front, both looking into the camera."
+      : "A selfie taken at arm's length on a phone, looking into the camera.",
+    paragraph(author.appearance),
+    clothes(author),
+    friend && paragraph(`Beside ${pronounWords(author.pronouns).object}, a friend: ${friend.appearance}`),
+    friend && clothes(friend),
+    paragraph(shot),
+    place && place.appearance.trim() !== '' && paragraph(`In the background: ${place.appearance}`),
+    LIGHT_WORDS[light.trim().toLowerCase()],
+    framing.trim()
+  ])
+}
+
+/**
+ * The prompt for a background: the place, the view of it (unless it is the Default one), the time of day, and how the
  * picture is framed, each a paragraph. A place given no name (a character's room, whose
  * name says whose it is and not what it looks like) is drawn from its description alone.
  */
 export function backgroundPrompt(location: Pick<Location, 'name' | 'appearance' | 'indoors'>, view: string, period: string, framing: string): string {
   const named = location.name.trim() !== ''
+  // The Default view is the place as it is: its name says nothing to draw, and is left out.
+  const shown = view.trim().toLowerCase() === DEFAULT_VIEW.name.toLowerCase() ? '' : view.trim()
   return paragraphs([
-    named && paragraph(`${location.indoors ? 'Interior of' : 'Exterior view of'} ${location.name}${view.trim() ? `: ${view.trim()}` : ''}`),
-    !named && view.trim() !== '' && paragraph(`View: ${view.trim()}`),
+    named && paragraph(`${location.indoors ? 'Interior of' : 'Exterior view of'} ${location.name}${shown ? `: ${shown}` : ''}`),
+    !named && shown !== '' && paragraph(`View: ${shown}`),
     paragraph(location.appearance),
     period.trim() && (LIGHT_WORDS[period.trim().toLowerCase()] ?? `${period.trim()} light`),
     framing.trim()

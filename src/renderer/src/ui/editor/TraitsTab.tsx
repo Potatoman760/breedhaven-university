@@ -119,7 +119,8 @@ export function TraitsTab({ content, info, draft, set, onResult }: Props) {
                   <span>{t.definition}</span>
                 </span>
               </label>
-              {info.traits[t.id] !== 'base' && <span className="chip">{info.traits[t.id] === 'addon' ? 'add-on' : 'changed'}</span>}
+              {/* Editing the game's own files, every trait is the game's own: there is no add-on to tell apart. */}
+              {!info.base && info.traits[t.id] === 'addon' && <span className="chip">add-on</span>}
               <Button variant="quiet" size="small" onClick={() => open(t, false)}>
                 Edit
               </Button>

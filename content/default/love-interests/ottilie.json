@@ -1,11 +1,11 @@
 {
   "id": "ottilie",
   "name": "Ottilie Marrow",
-  "handle": "dr.marrow",
+  "role": "",
   "age": 36,
+  "pronouns": "she/her",
   "bio": "Reader in Sire Genetics and head of the fertility lab at the Health Centre: the woman who knows more about why a True Sire is what he is than anyone alive.",
   "appearance": "A beautiful 36-year-old woman with fair skin, a refined face with sharp cheekbones, a straight nose, cool green eyes under fine arched brows, long lashes, and full lips painted a muted rose. Dark blonde hair, sleek and straight, cut to the jaw with a centre parting. Tall and long-legged, with a slim, elegant figure: a full, high bust, a very narrow waist, and curved hips.",
-  "imageSeed": 60,
   "personality": "Brilliant, exact and dry, with no small talk and very little patience for sentiment dressed up as science. Curious to the point of rudeness. Kinder than she sounds, and bad at showing it. She is not used to being surprised and rather likes it.",
   "traitIds": [
     "bookish"
@@ -24,6 +24,162 @@
     "intelligence",
     "wisdom"
   ],
+  "friends": [],
+  "enemies": [],
+  "handle": "dr.marrow",
+  "outfits": [
+    {
+      "id": "default",
+      "name": "Usual clothes",
+      "description": "rimless rectangular glasses; a white knee-length lab coat worn open over a close-fitting charcoal high-collared dress that ends above the knee, with a narrow keyhole opening at the chest; sheer black stockings; and a blue lanyard with an ID card around her neck",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/default-neutral-2-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/ottilie/default-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/ottilie/default-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/ottilie/default-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/ottilie/default-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/ottilie/default-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/ottilie/default-aroused-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "pregnant",
+      "name": "Pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "default",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/pregnant-neutral-2-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/ottilie/pregnant-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/ottilie/pregnant-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/ottilie/pregnant-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/ottilie/pregnant-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/ottilie/pregnant-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/ottilie/pregnant-aroused-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "nude",
+      "name": "Nude",
+      "description": "nothing at all, completely nude",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/nude-neutral-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/ottilie/nude-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/ottilie/nude-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/ottilie/nude-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/ottilie/nude-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/ottilie/nude-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/ottilie/nude-aroused-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "nude-pregnant",
+      "name": "Nude, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "nude",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/nude-pregnant-neutral-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/ottilie/nude-pregnant-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/ottilie/nude-pregnant-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/ottilie/nude-pregnant-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/ottilie/nude-pregnant-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/ottilie/nude-pregnant-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/ottilie/nude-pregnant-aroused-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    }
+  ],
+  "defaultOutfitId": "default",
+  "faceY": 9,
+  "imageSeed": 60,
+  "stageHeight": 100,
+  "kind": "teacher",
   "teaching": {
     "department": "the College of Life Sciences and Agriculture",
     "title": "Dr",
@@ -39,6 +195,50 @@
       }
     ]
   },
+  "animations": [
+    {
+      "id": "blowjob",
+      "name": "Blowjob",
+      "description": "",
+      "image": "sprites/ottilie/nsfw-blowjob.png",
+      "loop": true
+    },
+    {
+      "id": "missionary",
+      "name": "Missionary",
+      "description": "",
+      "image": "sprites/ottilie/nsfw-missionary.png",
+      "loop": true
+    },
+    {
+      "id": "doggy",
+      "name": "Doggy",
+      "description": "",
+      "image": "sprites/ottilie/nsfw-doggy.png",
+      "loop": true
+    },
+    {
+      "id": "cowgirl",
+      "name": "Cowgirl",
+      "description": "",
+      "image": "sprites/ottilie/nsfw-cowgirl.png",
+      "loop": true
+    },
+    {
+      "id": "creampie",
+      "name": "Creampie",
+      "description": "",
+      "image": "sprites/ottilie/nsfw-creampie.png",
+      "loop": true
+    },
+    {
+      "id": "facial",
+      "name": "Facial",
+      "description": "",
+      "image": "sprites/ottilie/nsfw-facial.png",
+      "loop": true
+    }
+  ],
   "schedule": [
     {
       "weekdays": [
@@ -94,8 +294,9 @@
   ],
   "room": {
     "name": "her flat above Petal & Pill",
-    "description": "A bare, bright modern flat with white walls and large windows. Stacks of scientific journals stand in tidy towers on a pale wooden floor, one good leather armchair sits beside a floor lamp, a gleaming chrome espresso machine stands on a steel counter, a large whiteboard covered in diagrams and equations hangs where a painting would, and a low bed with grey linen is surrounded by open books. Clean, cool daylight, almost no decoration.",
-    "locationId": "lantern-row"
+    "description": "A bare, bright flat over the pharmacy: journals in stacks on the floor, one good chair, a very expensive coffee machine, a whiteboard where a picture should be, and a bed she treats as a place to read.",
+    "locationId": "lantern-row",
+    "background": "generated/backgrounds/ottilie/view-5.png"
   },
   "ai": {
     "speechPattern": "Precise, quick and unsentimental. Short declarative sentences and exact words. Asks direct questions, often clinical ones, and waits for the answer. Dry humour delivered with no change of expression.",
@@ -105,7 +306,9 @@
       "Says \"interesting\" when she means it and nothing at all when she does not.",
       "Explains her own feelings as observations: \"My pulse is up. That will be you.\""
     ],
+    "exampleDialogue": [],
     "backstory": "Post: Reader in Sire Genetics, College of Life Sciences and Agriculture; head of the fertility lab at the Reproductive Health Centre\n\nOttilie Marrow has spent fifteen years on one question: why only one man in ten is fertile, and what Bloom-resonance actually is. Her lab runs the University's Sire Assays. She is a Freewill woman on scientific grounds: she has measured what the Bloom does to judgement and thinks anyone who calls that sacred has not looked at the data. She opposes the national Sire Registry in print and uses its figures every day, and knows what that makes her.\n\nShe grew up in a household of four mothers and a Sire father who was treated, as she puts it, like the good china. She has never formed a household of her own and says she has not had the time.\n\nHer magic is a diagnostician's: she can feel a pulse, a temperature or a hormone surge across a room, her own included, which she finds more irritating than useful.",
+    "knowledge": [],
     "secrets": [
       {
         "text": "She knows who leaked the record assay, or is nearly sure: someone on the Registry side, not the University. She has told nobody because she cannot prove it.",
@@ -117,48 +320,6 @@
         ]
       }
     ],
-    "stageNotes": {
-      "stranger": "Treats him as a student and a specimen, in that order, and is frank about the second.",
-      "friend": "Argues with him for pleasure. Starts asking what he thinks, not only what he is.",
-      "dating": "Has declared it to the Dean in a two-line email. Affection shows as attention: she remembers everything.",
-      "lover": "Still dry, entirely his. Has stopped taking notes."
-    },
     "extraInstructions": "She never pressures anyone about research and backs off at once at a no. Do not make her cold for its own sake: she is curious, honest and awkward about tenderness."
-  },
-  "pronouns": "she/her",
-  "outfits": [
-    {
-      "id": "default",
-      "name": "Usual clothes",
-      "description": "rimless rectangular glasses; a white knee-length lab coat worn open over a close-fitting charcoal high-collared dress that ends above the knee, with a narrow keyhole opening at the chest; sheer black stockings; and a blue lanyard with an ID card around her neck",
-      "sprites": {
-        "neutral": "sprites/ottilie/placeholder.png"
-      }
-    },
-    {
-      "id": "pregnant",
-      "name": "Pregnant",
-      "inherits": "default",
-      "description": "She has a round, pregnant belly.",
-      "sprites": {},
-      "pregnant": true
-    },
-    {
-      "id": "nude",
-      "name": "Nude",
-      "description": "nothing at all, completely nude",
-      "sprites": {}
-    },
-    {
-      "id": "nude-pregnant",
-      "name": "Nude, pregnant",
-      "inherits": "nude",
-      "description": "She has a round, pregnant belly.",
-      "sprites": {},
-      "pregnant": true
-    }
-  ],
-  "defaultOutfitId": "default",
-  "faceY": 9,
-  "kind": "teacher"
+  }
 }

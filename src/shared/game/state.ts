@@ -7,7 +7,9 @@ export function createInitialState(
   playerName?: string,
   weatherSeed = 0,
   /** The stats he rolled for himself. Left out, he has the content's own. */
-  stats?: Record<string, number>
+  stats?: Record<string, number>,
+  /** Who he is, as the player wrote it when the game began. Left out, the content's own. */
+  bio?: string
 ): GameState {
   const { player, locationId } = content.newGame
   // Those he knows already: met, and able to be messaged, from the first day.
@@ -16,7 +18,7 @@ export function createInitialState(
     time: 0,
     weatherSeed,
     locationId,
-    player: { ...player, name: playerName?.trim() || player.name, stats: stats ? { ...player.stats, ...stats } : player.stats },
+    player: { ...player, name: playerName?.trim() || player.name, stats: stats ? { ...player.stats, ...stats } : player.stats, bio: bio === undefined ? player.bio : bio.trim() },
     relationships: Object.fromEntries(
       content.loveInterests.map((li) => [li.id, li.startsAt ? { ...li.startsAt } : { affection: 0, trust: 0, desire: 0 }])
     ),
@@ -47,6 +49,8 @@ export function createInitialState(
     courierDay: -1,
     feed: [],
     feedDay: -1,
+    feedPlans: [],
+    feedSeen: -1,
     dramaDay: -1,
     events: []
   }

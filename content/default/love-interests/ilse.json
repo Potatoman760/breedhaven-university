@@ -7,18 +7,26 @@
   "pronouns": "she/her",
   "bio": "Ilse runs the front desk and the appointments at the Reproductive Health Centre, and guards its confidentiality like a vault.",
   "appearance": "A trim, attractive woman of 40 with fair skin, steady blue eyes, a calm oval face and soft pink lips. Ash-blonde hair in a smooth low ponytail. A slender figure with neat, upright posture.",
-  "imageSeed": 60,
   "personality": "Discreet, brisk and kind in a practical way. Never surprised, never gossips.",
   "outfits": [
     {
       "id": "default",
       "name": "Work clothes",
       "description": "pale green clinic scrubs under a crisp white jacket, a watch pinned to the lapel and a lanyard",
-      "sprites": {}
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ilse/default-neutral-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     }
   ],
   "defaultOutfitId": "default",
   "faceY": 8,
+  "imageSeed": 60,
+  "stageHeight": 100,
+  "animations": [],
   "schedule": [],
   "ai": {
     "speechPattern": "Low, clear and neutral. Says exactly as much as is needed.",

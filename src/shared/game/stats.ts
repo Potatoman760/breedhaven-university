@@ -8,6 +8,15 @@ const IMPRESSIVE = 18
 const EXCEPTIONAL = 22
 const LEGENDARY = 26
 
+/** What a score is called, lowest first, and the score each name begins at. */
+export const STAT_TIERS = [
+  { name: 'ordinary', from: 0 },
+  { name: 'good', from: GOOD },
+  { name: 'impressive', from: IMPRESSIVE },
+  { name: 'exceptional', from: EXCEPTIONAL },
+  { name: 'legendary', from: LEGENDARY }
+] as const
+
 /** As high as a stat goes. */
 export const STAT_CAP = 30
 // A day's training of one stat: this many points count in full, the next few for half, and the rest not at all.
@@ -98,6 +107,19 @@ export function adjustStat(stats: Record<Stat, number>, stat: Stat, by: 1 | -1):
   const next = { ...stats, [stat]: stats[stat] + by }
   if (next[stat] < POINT_BUY.min || next[stat] > POINT_BUY.max || pointsLeft(next) < 0) return stats
   return next
+}
+
+/**
+ * A random way of spending the whole pool: a point at a time on whichever stat the draw
+ * lands on, among those that can still go up, until nothing is left to spend.
+ */
+export function randomStats(random: () => number = Math.random): Record<Stat, number> {
+  let stats = startingStats()
+  for (;;) {
+    const open = STATS.filter((stat) => adjustStat(stats, stat, 1) !== stats)
+    if (open.length === 0) return stats
+    stats = adjustStat(stats, open[Math.floor(random() * open.length)], 1)
+  }
 }
 
 /** What a score adds to a roll made with it: nothing at 10 or 11, one more for every two above, one less for every two below. */

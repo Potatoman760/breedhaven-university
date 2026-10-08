@@ -10,17 +10,21 @@ export interface RoutedReply {
   profileId: LlmProfileId
 }
 
-/** Returns the reply, or undefined when the model declined to write one. */
+// What a model thought to itself before answering is not the answer: a refusal is looked for in what comes after it.
+const THINKING = /<think(?:ing)?>[\s\S]*?<\/think(?:ing)?>/gi
+
+/** Returns the reply, or why there is none when the model or its endpoint declined to write one. */
 async function attempt(
   complete: typeof chatCompletion,
   profile: Settings[LlmProfileId],
   input: CompletionInput
-): Promise<string | undefined> {
+): Promise<{ reply: string } | { declined: string }> {
   try {
     const reply = await complete(profile, input)
-    return looksLikeRefusal(reply) ? undefined : reply
+    const said = reply.replace(THINKING, '').replace(/^[\s\S]*<\/think(?:ing)?>/i, '').trim()
+    return looksLikeRefusal(said) ? { declined: `it answered "${said.slice(0, 120)}"` } : { reply }
   } catch (error) {
-    if (error instanceof RefusalError) return undefined
+    if (error instanceof RefusalError) return { declined: error.message }
     throw error
   }
 }
@@ -38,18 +42,18 @@ export async function completeWithFallback(
   const first = pickProfileId(settings, nsfw)
   if (!isConfigured(settings[first])) throw new Error(NOT_CONFIGURED)
 
-  const reply = await attempt(complete, settings[first], input)
-  if (reply !== undefined) return { reply, profileId: first }
+  const tried = await attempt(complete, settings[first], input)
+  if ('reply' in tried) return { reply: tried.reply, profileId: first }
 
-  if (first === 'nsfw') throw new Error('The NSFW LLM declined to continue this scene.')
+  if (first === 'nsfw') throw new Error(`The NSFW LLM declined to continue this scene (${tried.declined}).`)
   if (!isConfigured(settings.nsfw)) {
     throw new Error(
-      'The Main LLM declined to continue this scene, and no NSFW LLM is set up to take over. Add one in Settings.'
+      `The Main LLM declined to continue this scene, and no NSFW LLM is set up to take over. Add one in Settings. (${tried.declined})`
     )
   }
   const second = await attempt(complete, settings.nsfw, input)
-  if (second === undefined) {
-    throw new Error('Both the Main LLM and the NSFW LLM declined to continue this scene.')
+  if ('declined' in second) {
+    throw new Error(`Both the Main LLM and the NSFW LLM declined to continue this scene. (Main: ${tried.declined}. NSFW: ${second.declined})`)
   }
-  return { reply: second, profileId: 'nsfw' }
+  return { reply: second.reply, profileId: 'nsfw' }
 }

@@ -1,12 +1,11 @@
 {
   "id": "elowen",
   "name": "Elowen",
-  "handle": "elowen_on_tap",
+  "role": "",
   "age": 21,
   "pronouns": "she/her",
   "bio": "Runs the kitchen and the bar at the Honeyed Bee on Lantern Row, and studies Culinary Arts and Brewing when she remembers to.",
   "appearance": "Beautiful 21-year-old woman with a softly angular face, warm tan skin, and large almond-shaped gray eyes framed by dark lashes and defined liner. She has gently arched brows, a slim straight nose, and full slightly parted lips with a soft rosy tone. Her long black hair is thick, glossy, and voluminous, parted slightly off-center and flowing in loose waves past her shoulders. Her figure is highly feminine and idealized, with a slim ribcage, narrow waist, flat toned stomach, full bust, broad hips, and long shapely thighs. Her shoulders are smooth and moderately narrow, giving her an elegant hourglass silhouette. The overall look is youthful, sultry, and polished. She has a single large mole on her left breast.",
-  "imageSeed": 62,
   "personality": "Outgoing, impulsive, warm, and eager to have fun. She makes plans, decorates, and draws whoever is nearest into whatever has caught her interest. She adores her twin sister Anwen but wants a place and identity of her own.",
   "traitIds": [
     "flirtatious",
@@ -22,30 +21,87 @@
   "dislikes": [
     "ledgers"
   ],
-  "friends": [
-    "anwen"
-  ],
-  "enemies": [],
   "admires": [
     "charisma",
     "dexterity"
   ],
+  "friends": [
+    "anwen"
+  ],
+  "enemies": [],
+  "handle": "elowen_on_tap",
   "outfits": [
     {
       "id": "default",
       "name": "Usual clothes",
-      "description": "a revealing medieval peasant-inspired outfit in warm navy and cream tones. The top is a cropped navy bodice or vest with a deep scoop neckline and front lacing, worn over a cream off-shoulder blouse with short ruched sleeves and ruffled trim peeking above the neckline. The blouse sits low on the shoulders, exposing the collarbones and upper chest. Around her hips is a low-slung brown leather belt with a round metal buckle. Attached beneath it is a long draped navy skirt panel hanging at the front, while the sides remain open, revealing high-cut underlayers with lace-up side details. The outfit reads as rustic, simple, and sensual",
+      "description": "a form fitting yellow sundress, with cleavage",
       "sprites": {
-        "neutral": "sprites/elowen/neutral-cutout.png",
-        "neutral-2": "sprites/elowen/neutral-cutout-2.png"
-      }
+        "neutral": {
+          "image": "sprites/elowen/default-neutral-cutout-2.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/elowen/default-happy-2-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/elowen/default-sad-3-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/elowen/default-angry-2-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/elowen/default-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/elowen/default-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/elowen/default-aroused-5-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     },
     {
       "id": "pregnant",
       "name": "Pregnant",
-      "inherits": "default",
       "description": "She has a round, pregnant belly.",
-      "sprites": {},
+      "inherits": "default",
+      "sprites": {
+        "happy": {
+          "image": "sprites/elowen/pregnant-happy-2-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/elowen/pregnant-sad-2-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/elowen/pregnant-surprised-2-cutout.png",
+          "description": ""
+        },
+        "neutral": {
+          "image": "sprites/elowen/pregnant-neutral-3-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/elowen/pregnant-aroused-3-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/elowen/pregnant-angry-5-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/elowen/pregnant-embarrassed-cutout.png",
+          "description": ""
+        }
+      },
       "pregnant": true
     },
     {
@@ -53,21 +109,79 @@
       "name": "Nude",
       "description": "nothing at all, completely nude",
       "sprites": {
-        "bath": "sprites/elowen/nude-bath.png",
-        "neutral": "sprites/elowen/nude-cutout.png"
-      }
+        "neutral": {
+          "image": "sprites/elowen/nude-neutral-2-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/elowen/nude-happy-2-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/elowen/nude-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/elowen/nude-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/elowen/nude-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/elowen/nude-embarrassed-2-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/elowen/nude-aroused-9-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     },
     {
       "id": "nude-pregnant",
       "name": "Nude, pregnant",
-      "inherits": "nude",
       "description": "She has a round, pregnant belly.",
-      "sprites": {},
+      "inherits": "nude",
+      "sprites": {
+        "happy": {
+          "image": "sprites/elowen/nude-pregnant-happy-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/elowen/nude-pregnant-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/elowen/nude-pregnant-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/elowen/nude-pregnant-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/elowen/nude-pregnant-aroused-cutout.png",
+          "description": ""
+        },
+        "neutral": {
+          "image": "sprites/elowen/nude-pregnant-neutral-4-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/elowen/nude-pregnant-sad-5-cutout.png",
+          "description": ""
+        }
+      },
       "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
   "faceY": 11,
+  "imageSeed": 62,
+  "stageHeight": 100,
   "studies": {
     "subject": "Culinary Arts and Brewing",
     "code": "CUL",
@@ -78,6 +192,50 @@
     ],
     "practical": true
   },
+  "animations": [
+    {
+      "id": "blowjob",
+      "name": "Blowjob",
+      "description": "",
+      "image": "sprites/elowen/nsfw-blowjob.png",
+      "loop": true
+    },
+    {
+      "id": "cowgirl",
+      "name": "Cowgirl",
+      "description": "",
+      "image": "sprites/elowen/nsfw-cowgirl-8.png",
+      "loop": true
+    },
+    {
+      "id": "doggy",
+      "name": "Doggy",
+      "description": "",
+      "image": "sprites/elowen/nsfw-doggy-2.png",
+      "loop": true
+    },
+    {
+      "id": "creampie",
+      "name": "Creampie",
+      "description": "",
+      "image": "sprites/elowen/nsfw-creampie-2.png",
+      "loop": true
+    },
+    {
+      "id": "facial",
+      "name": "Facial",
+      "description": "",
+      "image": "sprites/elowen/nsfw-facial-2.png",
+      "loop": true
+    },
+    {
+      "id": "missionary",
+      "name": "Missionary",
+      "description": "",
+      "image": "sprites/elowen/nsfw-missionary-8.png",
+      "loop": true
+    }
+  ],
   "schedule": [
     {
       "weekdays": [
@@ -125,7 +283,8 @@
   "room": {
     "name": "her lantern room in the Cloister Halls",
     "description": "A bright, cluttered modern dormitory room, strung wall to wall with paper lanterns that float and glow without wires, and strings of fairy lights. Gig posters and coloured ribbons cover the smooth white walls. An unmade single bed heaped with patterned cushions, shelves crowded with collected bottles and trinkets, a row of glass fermenting jars bubbling on the windowsill, a small speaker on a stool, clothes over a desk chair, a phone on a glowing charging plate. Warm, colourful light.",
-    "locationId": "dormitories"
+    "locationId": "dormitories",
+    "background": "generated/backgrounds/elowen/view.png"
   },
   "ai": {
     "speechPattern": "Quick, bright and talkative. Runs ahead of herself, starts plans mid-sentence, laughs easily. Direct about what she wants.",
@@ -135,13 +294,10 @@
       "Gives things and people nicknames.",
       "Says what the Bloom is doing to her out loud, and laughs about it."
     ],
-    "backstory": "Studies: Second year, College of Life Sciences and Agriculture (Culinary Arts and Brewing)\n\nJob: Kitchen and bar lead at the Honeyed Bee on Lantern Row; brews its house ale\n\nElowen and her twin sister Anwen grew up in their family's guesthouse, Elowen the younger by eleven minutes and never allowed to forget it. They came to Seedblossom together and took jobs at the Honeyed Bee to pay their way through the University. Anwen keeps the bookings and the books; Elowen keeps the kitchen hot, the taps flowing and the regulars laughing. They are identical, and have been \"the twins\" to everyone since they were born, which Elowen used to think was funny and now finds a little tiresome: she loves Anwen and wants to be someone in her own right.\n\nHer magic goes into food and drink: a nudge to the yeast, heat exactly where she wants it. She decorates the bar for every festival, runs the quiz night, and has opinions about everyone's playlists.",
-    "stageNotes": {
-      "stranger": "Greets him like a regular within a minute. Flirts for the fun of it.",
-      "friend": "Ropes him into her plans: tastings, decorating, a festival stall.",
-      "dating": "Affectionate, loud about it, and full of ideas for the two of them.",
-      "lover": "Still restless, now with him in every plan. Fiercely on his side."
-    },
+    "exampleDialogue": [],
+    "backstory": "Studies: Second year, College of Life Sciences and Agriculture (Culinary Arts and Brewing)\n\nJob: Kitchen and bar lead at the Honeyed Bee on Lantern Row; brews its house ale\n\nAnwen and her twin sister Elowen grew up in their family's guesthouse, Anwen the elder by eleven minutes, and came to Seedblossom together. They took jobs at the Honeyed Bee to pay their way through the University and between them all but run the place: Anwen the  spreadsheets, Elowen the kitchen. They are identical, and have been \"the twins\" to everyone since they were born. They are willing to share everything with each other, including men.\n\nHer magic goes into food and drink: a nudge to the yeast, heat exactly where she wants it. She decorates the bar for every festival, runs the quiz night, and has opinions about everyone's playlists.",
+    "knowledge": [],
+    "secrets": [],
     "extraInstructions": "Elowen and Anwen are identical twin sisters. Elowen is direct and playful but never thoughtless, and she notices when someone treats her as her own person."
   }
 }

@@ -72,8 +72,8 @@ describe('the scene prompt', () => {
 
 describe('dialogueLines', () => {
   it('splits a reply into beats, telling actions from speech', () => {
-    expect(dialogueLines('Well, well. *The* Kael.\n\n*She tilts her head.*\n  So tell me.  \n')).toEqual([
-      { action: false, text: 'Well, well. *The* Kael.' },
+    expect(dialogueLines('Well, well. *The* Pat.\n\n*She tilts her head.*\n  So tell me.  \n')).toEqual([
+      { action: false, text: 'Well, well. *The* Pat.' },
       { action: true, text: 'She tilts her head.' },
       { action: false, text: 'So tell me.' }
     ])

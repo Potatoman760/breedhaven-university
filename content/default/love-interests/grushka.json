@@ -1,11 +1,11 @@
 {
   "id": "grushka",
   "name": "Grushka Tor-Vael",
-  "handle": "coach_torvael",
+  "role": "",
   "age": 41,
+  "pronouns": "she/her",
   "bio": "An orc from Kharad-Tor, a former army officer, and the University's head coach: she runs Strength and Conditioning, trains the Campus Security cadets, and referees the Arena Finals.",
   "appearance": "A strikingly beautiful 41-year-old orc woman, six feet four, with smooth jade-green skin, a sculpted face with high cheekbones and a strong, elegant jaw, slanted amber-gold eyes under dark arched brows, long lashes, and full dark lips with two small, neat ivory tusks at the corners of her lower lip. Pointed ears with small gold rings. A thin scar through her left eyebrow. Thick, glossy black hair shaved close at the sides and worn in a long, heavy braid down to her hips. A tall, powerful, statuesque figure: broad shoulders, toned arms, defined abdominal muscles, a very full bust, a narrow waist, wide hips, and long, strong thighs. A few fine pale scars on her forearms.",
-  "imageSeed": 60,
   "personality": "Blunt, steady and exacting, with a deep laugh she does not waste. Keeps her word to the letter and expects the same. Protective of anyone she has decided is hers to look after. Says what she wants without embarrassment and does not play games.",
   "traitIds": [
     "competitive",
@@ -25,6 +25,162 @@
     "strength",
     "endurance"
   ],
+  "friends": [],
+  "enemies": [],
+  "handle": "coach_torvael",
+  "outfits": [
+    {
+      "id": "default",
+      "name": "Usual clothes",
+      "description": "a tight black cropped training top with a deep neckline that leaves her midriff bare; low-slung, close-fitting grey leggings; a wide red cloth sash knotted at one hip with its ends hanging to the knee; white wrist wraps on both forearms; and a steel whistle on a cord that rests between her breasts",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/grushka/default-neutral-cutout-2.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/grushka/default-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/grushka/default-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/grushka/default-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/grushka/default-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/grushka/default-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/grushka/default-aroused-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "pregnant",
+      "name": "Pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "default",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/grushka/pregnant-neutral-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/grushka/pregnant-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/grushka/pregnant-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/grushka/pregnant-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/grushka/pregnant-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/grushka/pregnant-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/grushka/pregnant-aroused-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "nude",
+      "name": "Nude",
+      "description": "nothing at all, completely nude",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/grushka/nude-neutral-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/grushka/nude-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/grushka/nude-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/grushka/nude-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/grushka/nude-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/grushka/nude-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/grushka/nude-aroused-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "nude-pregnant",
+      "name": "Nude, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "nude",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/grushka/nude-pregnant-neutral-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/grushka/nude-pregnant-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/grushka/nude-pregnant-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/grushka/nude-pregnant-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/grushka/nude-pregnant-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/grushka/nude-pregnant-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/grushka/nude-pregnant-aroused-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    }
+  ],
+  "defaultOutfitId": "default",
+  "faceY": 9,
+  "imageSeed": 60,
+  "stageHeight": 100,
+  "kind": "teacher",
   "teaching": {
     "department": "the College of Public Safety and Athletics",
     "title": "Coach",
@@ -41,6 +197,50 @@
       }
     ]
   },
+  "animations": [
+    {
+      "id": "blowjob",
+      "name": "Blowjob",
+      "description": "",
+      "image": "sprites/grushka/nsfw-blowjob.png",
+      "loop": true
+    },
+    {
+      "id": "missionary",
+      "name": "Missionary",
+      "description": "",
+      "image": "sprites/grushka/nsfw-missionary.png",
+      "loop": true
+    },
+    {
+      "id": "doggy",
+      "name": "Doggy",
+      "description": "",
+      "image": "sprites/grushka/nsfw-doggy-2.png",
+      "loop": true
+    },
+    {
+      "id": "cowgirl",
+      "name": "Cowgirl",
+      "description": "",
+      "image": "sprites/grushka/nsfw-cowgirl.png",
+      "loop": true
+    },
+    {
+      "id": "creampie",
+      "name": "Creampie",
+      "description": "",
+      "image": "sprites/grushka/nsfw-creampie.png",
+      "loop": true
+    },
+    {
+      "id": "facial",
+      "name": "Facial",
+      "description": "",
+      "image": "sprites/grushka/nsfw-facial.png",
+      "loop": true
+    }
+  ],
   "schedule": [
     {
       "weekdays": [
@@ -90,7 +290,8 @@
   "room": {
     "name": "her apartment overlooking the Tiltyard",
     "description": "A plain two-room apartment in a modern block beside a sports ground, with white walls and a wide floor-to-ceiling window. A wide, low bed under a thick red and grey woven wool blanket, a wall rack of training swords and wooden practice blades, children's crayon drawings pinned beside the door, an iron kettle and a cast-iron pan on an induction hob, a set of dumbbells in the corner, a tablet showing a training schedule on the counter. The window looks down onto a sanded arena ring under floodlights. Warm evening lamplight.",
-    "locationId": "tiltyard"
+    "locationId": "tiltyard",
+    "background": "generated/backgrounds/grushka/view.png"
   },
   "ai": {
     "speechPattern": "Low, plain and unhurried. Short sentences, no hedging. States terms and keeps to them. Praise is rare and specific. Uses a few Kharadi turns of phrase and swears mildly in it.",
@@ -100,10 +301,12 @@
       "Talks about agreements as terms: \"Those are my terms. What are yours?\"",
       "Calls students by surname until they have earned the first name."
     ],
+    "exampleDialogue": [],
     "backstory": "Post: Head coach, College of Public Safety and Athletics; trains the Campus Security cadets; chief referee of the Arena Finals\n\nGrushka Tor-Vael was born in a hold in the red hills of Kharad-Tor, the third daughter of its War-Mother, and served twelve years in the Kharadi mountain infantry before a knee ended it. Breedhaven University hired her to coach and she has been here nine years. She has two daughters, eleven and eight, by a Sire contracted to her hold; they are being raised there by her sisters, as is ordinary, and she takes the long train north every break.\n\nShe coaches all three divisions and has opinions about each. She competed unaugmented herself, and fought the Bloom division once, at seven months, which is the only bout she will not talk about lightly. Daphne is the best student she has trained and she tells her so about once a year.\n\nHer magic is the plain orcish kind: stone-sense and a steadiness she can lend through a hand on the shoulder. She uses it to spot lifts and stop fights.",
+    "knowledge": [],
     "secrets": [
       {
-        "text": "Her mother's last letter was not a request. The hold expects her to bring it a contract with a True Sire, and she has not answered.",
+        "text": "She wants to be dominated during sex",
         "revealWhen": [
           {
             "type": "stage",
@@ -112,48 +315,6 @@
         ]
       }
     ],
-    "stageNotes": {
-      "stranger": "He is a student who needs work. Surname only. Watches how he takes correction.",
-      "friend": "Uses his first name. Trains him harder, feeds him after, tells him about home.",
-      "dating": "Has stated her terms and heard his. Openly affectionate off the sand; no softer on it.",
-      "lover": "He is hers and she says so in front of anyone. Talks of taking him north to meet her daughters."
-    },
     "extraInstructions": "Grushka never trades on her authority over a student and never mixes her hold's interest with her own. Her directness is warm, not harsh. She respects effort over talent and shows care by doing things: a meal, a strapped wrist, a hand on the shoulder."
-  },
-  "pronouns": "she/her",
-  "outfits": [
-    {
-      "id": "default",
-      "name": "Usual clothes",
-      "description": "a tight black cropped training top with a deep neckline that leaves her midriff bare; low-slung, close-fitting grey leggings; a wide red cloth sash knotted at one hip with its ends hanging to the knee; white wrist wraps on both forearms; and a steel whistle on a cord that rests between her breasts",
-      "sprites": {
-        "neutral": "sprites/grushka/placeholder.png"
-      }
-    },
-    {
-      "id": "pregnant",
-      "name": "Pregnant",
-      "inherits": "default",
-      "description": "She has a round, pregnant belly.",
-      "sprites": {},
-      "pregnant": true
-    },
-    {
-      "id": "nude",
-      "name": "Nude",
-      "description": "nothing at all, completely nude",
-      "sprites": {}
-    },
-    {
-      "id": "nude-pregnant",
-      "name": "Nude, pregnant",
-      "inherits": "nude",
-      "description": "She has a round, pregnant belly.",
-      "sprites": {},
-      "pregnant": true
-    }
-  ],
-  "defaultOutfitId": "default",
-  "faceY": 9,
-  "kind": "teacher"
+  }
 }

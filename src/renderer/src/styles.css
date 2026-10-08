@@ -415,6 +415,18 @@ pre {
   box-sizing: border-box;
   height: 100vh;
   padding: 24px;
+  background: #0a1817 url('../../assets/BreedhavenSplash.png') center / cover no-repeat;
+}
+
+/* The menu's music, turned on and off in a corner of it. */
+.title-music {
+  position: fixed;
+  right: 20px;
+  bottom: 16px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  color: var(--ink-soft);
 }
 
 .title-frame {
@@ -425,11 +437,15 @@ pre {
   justify-content: center;
   gap: 28px;
   box-sizing: border-box;
-  width: 100%;
-  height: 100%;
+  /* A panel in the middle of the picture, no bigger than what is on it. */
+  min-width: min(560px, 100%);
+  max-width: 100%;
+  max-height: 100%;
+  padding: 56px 72px;
   border: 1px solid var(--rule);
   border-radius: var(--radius);
-  background: var(--paper);
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
 }
 
 .wordmark {
@@ -440,8 +456,9 @@ pre {
 }
 
 .wordmark h1 {
-  font-size: clamp(3.5rem, 9vw, 6.5rem);
+  font-size: clamp(2.25rem, 5vw, 4rem);
   line-height: 1;
+  white-space: nowrap;
   letter-spacing: 0.02em;
 }
 
@@ -644,6 +661,26 @@ pre {
   font-weight: 700;
 }
 
+/* Someone he has not met: a faded green pill, with a large question mark behind the name. */
+.partner.unmet {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-color: rgba(51, 73, 42, 0.5);
+  background: rgba(76, 106, 58, 0.5);
+}
+
+.partner.unmet::before {
+  content: '?';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: grid;
+  place-items: center;
+  color: rgba(255, 255, 255, 0.55);
+  font: 700 2.75rem/1 var(--display);
+}
+
 .activities {
   display: flex;
   flex-direction: column;
@@ -666,6 +703,19 @@ pre {
   flex: 1;
   font-size: 1.375rem;
   font-weight: 700;
+}
+
+/* Something that is always on offer, and so takes little room: a thin bar, quieter than the things of the hour. */
+.featured.slim {
+  min-height: 34px;
+  padding: 4px 14px;
+  border-color: var(--moss-deep);
+  background: rgba(51, 73, 42, 0.82);
+  font-size: 0.9375rem;
+}
+
+.featured.slim .featured-title {
+  font-size: 1rem;
 }
 
 .choice {
@@ -756,7 +806,7 @@ pre {
 }
 
 .tile svg {
-  color: var(--madder);
+  color: var(--moss);
 }
 
 .corner {
@@ -856,8 +906,9 @@ pre {
   inset: 0;
   width: 100%;
   height: 100%;
+  /* Over the background and everyone standing in it, and nothing of either showing round its edges. */
   object-fit: contain;
-  background: rgba(20, 26, 16, 0.75);
+  background: #0f130c;
   pointer-events: none;
 }
 
@@ -880,23 +931,24 @@ pre {
   align-items: center;
   gap: 2px;
   box-sizing: border-box;
-  width: 112px;
-  padding: 14px 8px 12px;
-  border: 1px solid var(--madder-deep);
+  width: 184px;
+  padding: 14px 12px 12px;
+  /* The deep green of the game's own palette, as the menus and the logo are. */
+  border: 1px solid var(--wood);
   border-radius: var(--radius);
-  background: var(--madder);
+  background: var(--moss-deep);
   color: #fff;
   text-align: center;
 }
 
 .date-badge .caps {
-  color: #f6e4df;
+  color: var(--on-wood);
 }
 
 .date-badge hr {
   width: 56px;
   margin: 6px 0;
-  background: #d9afa9;
+  background: var(--leaf);
 }
 
 .badge-day {
@@ -905,6 +957,17 @@ pre {
 
 .badge-date {
   font: 600 1.25rem/1.1 var(--display);
+}
+
+.badge-place {
+  font: 600 1.125rem/1.15 var(--display);
+  overflow-wrap: anywhere;
+}
+
+.date-badge .badge-class {
+  margin-top: 4px;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
 }
 
 .badge-period {
@@ -920,7 +983,10 @@ pre {
   position: absolute;
   right: 208px;
   bottom: 24px;
-  left: 160px;
+  left: 232px;
+  /* On a wide screen the box stops growing and sits in the middle, so a line is never too long to read. */
+  max-width: 1200px;
+  margin-inline: auto;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -934,7 +1000,7 @@ pre {
   align-items: flex-end;
   /* Half on the box, half above it. */
   margin: 0 0 -26px 36px;
-  filter: drop-shadow(4px 4px 0 var(--madder-deep));
+  filter: drop-shadow(4px 4px 0 var(--wood));
 }
 
 .speaker-face {
@@ -944,10 +1010,10 @@ pre {
   width: 76px;
   height: 88px;
   border: 3px solid var(--paper-raised);
-  border-radius: 38px 38px 6px 6px;
+  border-radius: 4px;
   background-color: var(--wood);
-  /* Zoom into the top of the full-body sprite, where the face is. */
-  background-size: 300%;
+  /* The same crop as the portrait everywhere else: the top of the full-body sprite, where the face is. */
+  background-size: 260%;
   background-position: 50% 4%;
   background-repeat: no-repeat;
 }
@@ -955,10 +1021,15 @@ pre {
 .speaker-name {
   margin: 0 0 6px -10px;
   padding: 6px 26px 8px 24px;
-  background: var(--madder);
+  background: var(--moss);
   color: #fff;
   font: 700 1.75rem/1.1 var(--display);
   white-space: nowrap;
+}
+
+/* Someone who speaks without being on stage: the name alone. */
+.speaker-tab.faceless .speaker-name {
+  margin-left: 0;
 }
 
 .textbox {
@@ -987,9 +1058,99 @@ pre {
 
 .speech p,
 .narration {
-  font-size: 1.25rem;
-  line-height: 1.5;
+  font-size: 1.625rem;
+  line-height: 1.4;
   white-space: pre-wrap;
+}
+
+/* A scene being opened: the logo over everything, a fade running across it in waves, and "Loading" beneath. */
+.scene-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  /* The dark green the logo itself is drawn on, taken from its edges, so that the picture has no edge of its own. */
+  background: #0a1817;
+  color: var(--on-wood);
+  animation: loading-in 0.2s ease-out;
+}
+
+.scene-loading img {
+  width: min(320px, 40vh);
+  height: auto;
+  border-radius: 18px;
+  /* The fade: a band of the picture at full strength with dimmer picture either side, moving across it over and over. */
+  -webkit-mask-image: linear-gradient(110deg, rgba(0, 0, 0, 0.25) 0%, #000 20%, #000 30%, rgba(0, 0, 0, 0.25) 50%, #000 70%, #000 80%, rgba(0, 0, 0, 0.25) 100%);
+  mask-image: linear-gradient(110deg, rgba(0, 0, 0, 0.25) 0%, #000 20%, #000 30%, rgba(0, 0, 0, 0.25) 50%, #000 70%, #000 80%, rgba(0, 0, 0, 0.25) 100%);
+  -webkit-mask-size: 200% 100%;
+  mask-size: 200% 100%;
+  animation: loading-ripple 1.6s linear infinite;
+}
+
+.scene-loading p {
+  font: 600 1.75rem/1 var(--display);
+  letter-spacing: 0.04em;
+}
+
+.scene-loading p::after {
+  content: '.';
+  display: inline-block;
+  width: 1.2em;
+  text-align: left;
+  animation: thinking-dots 1.2s steps(1, end) infinite;
+}
+
+@keyframes loading-ripple {
+  from {
+    -webkit-mask-position: 100% 0;
+    mask-position: 100% 0;
+  }
+  to {
+    -webkit-mask-position: 0% 0;
+    mask-position: 0% 0;
+  }
+}
+
+@keyframes loading-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* While a reply is being written: "Thinking" with one, two, then three dots after it, over and over. */
+.speech p.thinking {
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.speech p.thinking::after {
+  content: '.';
+  display: inline-block;
+  width: 1.2em;
+  text-align: left;
+  animation: thinking-dots 1.2s steps(1, end) infinite;
+}
+
+@keyframes thinking-dots {
+  0% {
+    content: '.';
+  }
+  33% {
+    content: '..';
+  }
+  66% {
+    content: '...';
+  }
+}
+
+/* What is being said sits in the middle of the box's height, whatever is above or below it. */
+.textbox > .speech,
+.textbox > .narration {
+  margin-block: auto;
 }
 
 .textbox form {
@@ -999,6 +1160,16 @@ pre {
 
 .textbox form input {
   flex: 1;
+}
+
+/* Looking back at an earlier turn: a line above the input says so. */
+.textbox form.looking-back {
+  flex-wrap: wrap;
+}
+
+.textbox form .look-back {
+  flex: 0 0 100%;
+  color: var(--madder-ink);
 }
 
 .scene-utils {
@@ -1361,11 +1532,6 @@ textarea.memory {
 }
 
 /* Days with no classes. */
-.cell.free {
-  border-style: dashed;
-  background: transparent;
-}
-
 .block {
   flex: none;
   gap: 4px;
@@ -1422,6 +1588,367 @@ textarea.memory {
   border-style: dashed;
   background: transparent;
   color: var(--ink-soft);
+}
+
+/* What something done alone came to: up for a few seconds at the top of the screen, and gone at a click. */
+/* Toasts stack at the top of the screen, the newest kind of news first. */
+.toasts {
+  position: fixed;
+  top: 28px;
+  left: 50%;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 320px;
+  max-width: min(520px, calc(100vw - 48px));
+  padding: 16px 22px;
+  border: 2px solid var(--moss-deep);
+  border-radius: 10px;
+  background: var(--moss);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  color: #fff;
+  cursor: pointer;
+  animation: toast-in 0.25s ease-out;
+}
+
+/* A plain message: something he should know, in a line or two. */
+.toast.plain {
+  border-color: var(--madder-deep);
+  background: var(--madder);
+}
+
+.toast.plain > span {
+  display: block;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.toast strong {
+  font: 700 1.5rem/1.15 var(--display);
+}
+
+.toast > span {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.toast .caps {
+  color: #e6efd8;
+}
+
+.toast i {
+  margin-left: auto;
+  font-style: normal;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.toast .down {
+  opacity: 0.85;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+}
+
+/* A job laid over his week: a button, and the week it shows when pointed at. */
+.compare {
+  position: relative;
+  align-self: flex-start;
+}
+
+/* A pill like the ones beside it, that can be pointed at: the same height, the same padding. */
+.compare-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-sizing: border-box;
+  height: 30px;
+  min-height: 0;
+  padding: 0 12px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 999px;
+  background: var(--paper-raised);
+  color: var(--ink);
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.compare-button span {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #2f8f3a;
+}
+
+.compare-button.clash span {
+  color: var(--madder);
+}
+
+.compare-pop {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 20;
+  display: none;
+  width: 460px;
+  padding: 12px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 10px;
+  background: var(--paper-raised);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+
+.compare:hover .compare-pop,
+.compare:focus-within .compare-pop {
+  display: block;
+}
+
+.compare-grid {
+  display: grid;
+  gap: 2px;
+}
+
+.compare-day {
+  text-align: center;
+  font-size: 0.6875rem;
+}
+
+.compare-hour {
+  font-size: 0.6875rem;
+  line-height: 18px;
+  color: var(--ink-soft);
+}
+
+.compare-cell {
+  min-height: 18px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--track);
+  opacity: 0.45;
+  font-size: 0.625rem;
+  line-height: 18px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* What he already has on. */
+.compare-cell.mine {
+  background: #b9ad8c;
+  opacity: 1;
+  color: var(--ink);
+}
+
+/* The job, where it is clear of everything: bright green. */
+.compare-cell.shift {
+  background: #37d14f;
+  opacity: 1;
+}
+
+/* The job on top of something of his. */
+.compare-cell.clash {
+  background: var(--madder);
+  opacity: 1;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 0 0 2px #ff5a5f inset;
+}
+
+.compare-key {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+}
+
+.compare-key .compare-cell {
+  width: 18px;
+  margin-left: 8px;
+}
+
+/* A yes or no, asked over whatever it is about. */
+.overlay.confirm {
+  z-index: 60;
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+/* The epilogue: a screen of text at a time over a placeholder backdrop, each fading in over the last. */
+.epilogue {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* A placeholder until each kind of screen has a picture of its own. */
+  background: radial-gradient(ellipse at 50% 30%, #1d3a34 0%, #0a1817 70%);
+  color: var(--on-wood);
+  cursor: pointer;
+  transition: background 0.8s ease;
+}
+
+.epilogue.of-academics.failing {
+  background: radial-gradient(ellipse at 50% 30%, #3a2426 0%, #120c0d 70%);
+}
+
+.epilogue.of-academics.excelling {
+  background: radial-gradient(ellipse at 50% 30%, #3d4a1f 0%, #10160a 70%);
+}
+
+.epilogue.of-love {
+  background: radial-gradient(ellipse at 50% 30%, #4a2338 0%, #150a11 70%);
+}
+
+.epilogue.of-child {
+  background: radial-gradient(ellipse at 50% 30%, #2c3f52 0%, #0b1118 70%);
+}
+
+.epilogue.of-end {
+  cursor: default;
+}
+
+.epilogue-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  max-width: min(900px, calc(100vw - 96px));
+  text-align: center;
+  animation: epilogue-in 1.1s ease both;
+}
+
+.epilogue-heading {
+  color: var(--leaf);
+  font-size: 1rem;
+  letter-spacing: 0.28em;
+}
+
+.epilogue-text {
+  margin: 0;
+  font: 500 2.5rem/1.3 var(--display);
+  color: #fff;
+  text-wrap: balance;
+}
+
+.epilogue-details {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px 22px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 1.0625rem;
+  opacity: 0.8;
+  /* What is listed under the text comes in after it. */
+  animation: epilogue-in 1.1s ease 0.6s both;
+}
+
+.epilogue-exit {
+  margin-top: 12px;
+  min-height: 48px;
+  padding: 0 28px;
+  animation: epilogue-in 1.1s ease 0.9s both;
+}
+
+.epilogue-foot {
+  position: absolute;
+  right: 32px;
+  bottom: 24px;
+  left: 32px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  opacity: 0.6;
+}
+
+.epilogue-next {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@keyframes epilogue-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+/* Beside a field's label in the editor: what is written there goes to the LLM. */
+.llm-mark {
+  margin-left: 8px;
+  color: var(--moss);
+  font-size: 0.75rem;
+  font-weight: 400;
+  font-family: var(--ui);
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+/* A few words beside a dialog's title. */
+.dialog-note {
+  margin-left: 16px;
+  color: var(--ink-soft);
+  font: 400 1rem var(--ui);
+  letter-spacing: 0;
+}
+
+/* The menu Escape brings up: a column of choices. */
+.pause-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pause-menu button {
+  min-height: 44px;
+}
+
+/* A search picks out the courses that answer it, and lets the rest fade. */
+.block.match {
+  outline: 2px solid var(--madder);
+  outline-offset: 1px;
+  box-shadow: 0 0 0 4px var(--madder-tint);
+}
+
+.block.dim {
+  opacity: 0.25;
+}
+
+.planner-search {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.planner-search input {
+  width: 280px;
 }
 
 .course-detail {
@@ -1619,15 +2146,24 @@ textarea.memory {
   white-space: normal;
 }
 
-.map:not(.plain) .pin-head button {
-  min-height: 26px;
-  padding: 0 9px;
-  font-size: 0.8125rem;
+/* The way there, or why there is none, on a line of its own. */
+.pin-go {
+  display: flex;
 }
 
-.map:not(.plain) .pin-head .chip {
-  padding: 1px 6px;
-  font-size: 0.6875rem;
+/* Go, Closed and You are here are all one size. */
+.pin .pin-go > * {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 28px;
+  min-height: 0;
+  padding: 0 10px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  line-height: 1;
 }
 
 .map:not(.plain) .pin-note {
@@ -1701,28 +2237,39 @@ textarea.memory {
 .pin-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 10px;
 }
 
-.pin-head .caps {
+.pin .pin-name {
+  /* Takes the room between the icon and the way there. */
+  flex: 1;
   color: var(--ink);
   white-space: nowrap;
 }
 
-.pin-head .chip {
-  padding: 2px 8px;
-  font-size: 0.75rem;
+/* What kind of place it is, in a small tile at the left of its name. */
+.pin-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--moss-tint);
+  color: var(--moss-deep);
 }
 
-.pin-head button {
-  min-height: 32px;
-  padding: 0 14px;
-}
 
 .pin-note {
   font-size: 0.8125rem;
   color: var(--madder-ink);
+}
+
+/* A place that is shut: a red label above its name, and nothing to press. */
+.pin .pin-closed {
+  /* Where the Go button would be. */
+  background: var(--madder);
+  color: #fff;
 }
 
 .portraits {
@@ -1843,6 +2390,26 @@ legend {
   font-weight: 700;
 }
 
+/* The grid is a button: pressing it lays the stats out in full. */
+button.stat-grid {
+  padding: 6px 0 0;
+  border-style: solid;
+  border-color: var(--rule, rgba(42, 40, 31, 0.2));
+  border-width: 1px 0 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+button.stat-grid:hover {
+  background: var(--moss-tint);
+}
+
 .tile {
   position: relative;
 }
@@ -1860,6 +2427,17 @@ legend {
 .tile .badge {
   position: absolute;
   top: 8px;
+  right: 8px;
+}
+
+/* The count on one of the phone's apps: at the corner of its tab. */
+.phone-tab {
+  position: relative;
+}
+
+.phone-tab .badge {
+  position: absolute;
+  top: 6px;
   right: 8px;
 }
 
@@ -2037,6 +2615,42 @@ legend {
   flex-direction: column;
   gap: 4px;
   overflow-y: auto;
+  /* The same room on both sides of the rows: clear of the scrollbar on the right, and as far in on the left. */
+  padding: 2px 8px;
+  scrollbar-gutter: stable;
+}
+
+/* Each kind of character has its own colour in the list: students pink, teachers red, other love interests violet, NPCs light green. */
+/* Its corners follow the face's: the face's own 4px, let out by the 6px between them. */
+.editor-people .courier-person {
+  padding: 6px;
+  border-radius: 10px;
+}
+
+.editor-people .kind-student {
+  background: #f6d9e3;
+}
+
+.editor-people .kind-teacher {
+  background: #efbcb6;
+}
+
+.editor-people .kind-outsider {
+  background: #ddd3ef;
+}
+
+.editor-people .kind-npc {
+  background: #dcebc9;
+}
+
+/* The one being edited keeps its colour and is ringed. */
+.editor-people .courier-person.selected {
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 1px var(--ink);
+}
+
+.editor-people .courier-person .hint {
+  color: var(--ink-soft);
 }
 
 .editor-body {
@@ -2167,6 +2781,17 @@ legend {
 
 .sprite-card textarea {
   resize: vertical;
+}
+
+/* The player has no list of his own: his page takes the room the list would. */
+.editor.player-editor .editor-main {
+  grid-column: 2 / -1;
+}
+
+.room-thumb {
+  padding: 0;
+  border: 0;
+  background: none;
 }
 
 .room-art {
@@ -2640,10 +3265,10 @@ legend {
   flex: none;
   display: block;
   border: 2px solid var(--moss);
-  border-radius: 50%;
+  border-radius: 4px;
   background-color: var(--wood);
-  /* Zoom into the top of the full-body sprite, where the face is. */
-  background-size: 300%;
+  /* The same crop as the portrait everywhere else: the top of the full-body sprite, where the face is. */
+  background-size: 260%;
   background-position: 50% 4%;
   background-repeat: no-repeat;
 }
@@ -3030,9 +3655,16 @@ button.btn.friend-message {
 .post > img {
   display: block;
   width: 100%;
-  max-height: 520px;
+  aspect-ratio: 1;
   border-radius: 10px;
+  background: var(--rule-soft);
   object-fit: cover;
+}
+
+/* The end of the posts drawn so far: coming into view brings in the next few. */
+.feed-more {
+  flex: none;
+  height: 1px;
 }
 
 .post footer {
@@ -3145,8 +3777,22 @@ button.btn.friend-message {
 
 /* A picture wider than it is tall sits over its caption, not beside it. */
 .studio-result.of-background,
-.studio-result.of-photo {
+.studio-result.of-photo,
+.studio-result.of-nsfw {
   flex-direction: column;
+}
+
+/* A wide picture is fitted to the column, whole, with what can be done with it underneath. */
+.studio-result.of-background .studio-thumb,
+.studio-result.of-nsfw .studio-thumb {
+  align-self: stretch;
+}
+
+.studio-result.of-background .studio-thumb img,
+.studio-result.of-nsfw .studio-thumb img {
+  width: 100%;
+  height: auto;
+  max-height: none;
 }
 
 .studio-result img {
@@ -3627,7 +4273,54 @@ select.pill-add {
 }
 
 .post.job header > div {
+  flex: 1;
   gap: 2px;
+  min-width: 0;
+}
+
+/* The picture of the job, at the head of its card. */
+.job-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--moss-tint);
+  color: var(--moss-deep);
+}
+
+.post.job.mine .job-icon {
+  background: var(--paper-raised);
+}
+
+/* What a job asks and when it is: pills of one height on one line. */
+.job-asks {
+  align-items: center;
+}
+
+.job-asks .chip {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 30px;
+  padding: 0 12px;
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.job-asks .compare {
+  align-self: center;
+}
+
+.post.job.mine > .compare {
+  align-self: flex-start;
+}
+
+/* The title of a feed stands at the head of its cards, not at the edge of the screen, with the brush behind the words alone. */
+.feed > .phone-title {
+  width: auto;
+  margin-left: calc((100% - min(640px, 100%)) / 2);
 }
 
 .post.job.mine {
@@ -3856,5 +4549,111 @@ select.pill-add {
   height: 2px;
   max-width: 100%;
   border-radius: 1px;
+  background: var(--leaf);
+}
+
+/* His stats in full: a row each, with the way to the next point and the scale of what a score is called. */
+.stat-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.stat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-row header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.stat-name {
+  min-width: 110px;
+  text-transform: capitalize;
+}
+
+.stat-score {
+  font: 600 1.5rem/1 var(--display);
+}
+
+.stat-progress {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+.stat-scale {
+  position: relative;
+  display: flex;
+  gap: 2px;
+}
+
+.stat-scale .tier {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-basis: 0;
+  min-width: 0;
+  padding: 6px 2px;
+  border-radius: 4px;
+  background: var(--track);
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+  line-height: 1.2;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.stat-scale .tier.reached {
+  background: var(--moss-tint);
+}
+
+.stat-scale .tier.current {
+  background: var(--moss);
+  color: var(--paper);
+  font-weight: 700;
+}
+
+/* Where his score is on the scale: a line down through it. */
+.stat-mark {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: 2px;
+  background: var(--ink);
+}
+
+.stat-ruler {
+  position: relative;
+  height: 1.1em;
+  color: var(--ink-soft);
+  font-size: 0.75rem;
+}
+
+.stat-ruler span {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+.stat-ruler span:first-child {
+  transform: none;
+}
+
+.stat-ruler span:last-child {
+  transform: translateX(-100%);
+}
+
+/* The way to the next point is a lighter green than the scale under it. */
+.stat-progress .meter > div {
   background: var(--leaf);
 }

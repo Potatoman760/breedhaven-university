@@ -12,7 +12,13 @@
     "energy": 100,
     "maxEnergy": 100,
     "money": 50,
-    "traitIds": []
+    "bio": "{player} is nineteen, a first-year student, and came to Breedhaven from outside the Expanse. His assay was the strongest ever recorded, and the result did not stay private. He has a suite in the Sire wing of the Cloister Halls."
   },
-  "locationId": "dormitories"
+  "locationId": "dormitories",
+  "room": {
+    "name": "his room",
+    "description": "a standard dorm with a queen bed with cream sheets, a desk with a laptop on it, kept clean, with artwork on the walls",
+    "locationId": "dormitories",
+    "background": "generated/backgrounds/player/view-7.png"
+  }
 }

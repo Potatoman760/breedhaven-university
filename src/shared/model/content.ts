@@ -193,9 +193,6 @@ function checkReferences(pack: ContentPack): string[] {
       checkWhen(s, `${where}.schedule`)
     }
     if (li.room) need(locations, li.room.locationId, `${where}.room`, 'location')
-    for (const stageId of Object.keys(li.ai.stageNotes)) {
-      need(stages, stageId, `${where}.ai.stageNotes`, 'relationship stage')
-    }
     for (const secret of li.ai.secrets) {
       for (const r of secret.revealWhen) checkRule(r, `${where}.ai.secrets`)
     }
@@ -255,7 +252,7 @@ function checkReferences(pack: ContentPack): string[] {
   }
 
   need(locations, pack.newGame.locationId, 'newGame', 'location')
-  for (const id of pack.newGame.player.traitIds) need(traits, id, 'newGame.player', 'trait')
+  if (pack.newGame.room) need(locations, pack.newGame.room.locationId, 'newGame.room', 'location')
 
   return issues
 }

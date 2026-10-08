@@ -41,8 +41,8 @@ export class SaveStore {
     const path = this.path(slotId)
     if (!existsSync(path)) throw new Error(`${slotLabel(slotId)} is empty`)
     try {
-      const { state, scene } = this.read(path)
-      return { state, scene }
+      const { state, scene, turns } = this.read(path)
+      return { state, scene, turns }
     } catch {
       throw new Error(
         `${slotLabel(slotId)} could not be read. It may be damaged or from a different version of the game.`

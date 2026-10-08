@@ -1,5 +1,6 @@
-import { useEffect, useState, type FormEvent } from 'react'
-import { adjustStat, catalogueIsStale, createInitialState, describeModifier, describeStat, POINT_BUY, pointCost, pointsLeft, startingStats } from '../../shared/game'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
+import music from '../../assets/Magical College Days.mp3'
+import { adjustStat, catalogueIsStale, createInitialState, describeModifier, describeStat, PLAYER_TOKEN, POINT_BUY, pointCost, pointsLeft, randomStats, startingStats } from '../../shared/game'
 import { STAT_LABELS, STATS, type ContentPack, type Stat } from '../../shared/model'
 import { AUTO_SLOT_ID, latestSave, type SaveData, type SaveSummary } from '../../shared/saves'
 import { errorMessage } from './errors'
@@ -7,6 +8,10 @@ import { Overlay } from './ui/Dialog'
 import { describeSave, SavesPanel } from './SavesPanel'
 import { SettingsPanel } from './SettingsPanel'
 import { Sprig, VineCorner } from './ui/icons'
+
+// How loud the menu's music is, and where it is remembered that the player turned it off.
+const MUSIC_VOLUME = 0.4
+const MUSIC_OFF = 'breedhaven.menuMusicOff'
 
 interface Props {
   content: ContentPack
@@ -19,6 +24,8 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
   const [saves, setSaves] = useState<SaveSummary[]>([])
   const [panel, setPanel] = useState<'new' | 'load' | 'settings' | null>(null)
   const [name, setName] = useState(content.newGame.player.name)
+  // Who he is, as the characters are told it: the content's own to start from, and the player's to change.
+  const [bio, setBio] = useState(content.newGame.player.bio)
   const [notice, setNotice] = useState('')
   // His stats as he has set them so far: all at the lowest when the dialog opens, with the whole pool to spend.
   const [stats, setStats] = useState<Record<Stat, number>>(startingStats)
@@ -27,6 +34,7 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
   /** Opens the new-game dialog with nothing spent. */
   const openNew = () => {
     setStats(startingStats())
+    setBio(content.newGame.player.bio)
     setPanel('new')
   }
 
@@ -54,11 +62,26 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
     event.preventDefault()
     // A fresh seed gives each game its own run of weather.
     const seed = Math.floor(Math.random() * 0x7fffffff)
-    onStart({ state: createInitialState(content, name, seed, stats), scene: null })
+    onStart({ state: createInitialState(content, name, seed, stats, bio), scene: null })
+  }
+
+  // The menu's music: it plays round and round while the menu is up, and stops with it. Whether it is wanted is remembered.
+  const [muted, setMuted] = useState(() => window.localStorage.getItem(MUSIC_OFF) === '1')
+  const player = useRef<HTMLAudioElement>(null)
+  useEffect(() => {
+    if (player.current) player.current.volume = MUSIC_VOLUME
+  }, [])
+  const toggleMusic = () => {
+    window.localStorage.setItem(MUSIC_OFF, muted ? '0' : '1')
+    setMuted(!muted)
   }
 
   return (
     <main className="title">
+      <audio ref={player} src={music} autoPlay loop muted={muted} />
+      <button type="button" className="quiet title-music" aria-pressed={!muted} onClick={toggleMusic}>
+        Music: {muted ? 'off' : 'on'}
+      </button>
       <div className="title-frame framed">
         <VineCorner corner="tl" />
         <VineCorner corner="tr" />
@@ -66,7 +89,7 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
         <VineCorner corner="br" />
 
         <div className="wordmark">
-          <h1>Breedhaven</h1>
+          <h1>Breedhaven University</h1>
           <Sprig width={260} />
         </div>
 
@@ -100,6 +123,14 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
             <label>
               Your name
               <input value={name} onChange={(e) => setName(e.target.value)} autoFocus />
+            </label>
+            <label>
+              About you
+              <textarea rows={3} value={bio} onChange={(e) => setBio(e.target.value)} />
+              <span className="hint">
+                Who you are, as everyone you meet is told it: your age, where you are from, what is known of you. Write {PLAYER_TOKEN} for your name. People bring up
+                whatever is here.
+              </span>
             </label>
             <div className="field">
               <span className="field-label">
@@ -139,6 +170,9 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
               <div className="ability-foot">
                 <button type="button" className="secondary" disabled={left === POINT_BUY.pool} onClick={() => setStats(startingStats())}>
                   Start over
+                </button>
+                <button type="button" className="secondary" title="Spend the whole pool at random" onClick={() => setStats(randomStats())}>
+                  Randomize
                 </button>
                 <span className="hint">
                   Every stat starts at {POINT_BUY.min} and can go to {POINT_BUY.max}. A point buys a point up to 13; the two above that cost two each. Ten is ordinary.

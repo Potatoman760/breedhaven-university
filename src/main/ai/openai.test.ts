@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { LlmProfileSchema } from '../../shared/settings'
-import { chatCompletion, listModels, RefusalError } from './openai'
+import { AFTER_TOOL, chatCompletion, isRefusalResponse, listModels, RefusalError, WROTE_BESIDE_TOOL } from './openai'
 import { excuseTool, leaveTool, moveTool, revealTool, type Leaving, type Revelation } from './tools'
 import { createInitialState } from '../../shared/game/state'
 import { fixture } from '../../shared/game/testFixture'
@@ -112,6 +112,36 @@ describe('chatCompletion', () => {
     await expect(chatCompletion(profile, input, broken.impl)).rejects.not.toBeInstanceOf(RefusalError)
   })
 
+  it('knows a refusal by its code, whoever the provider is', async () => {
+    // Forbidden is a refusal, unless it says the key, the account or the region is the trouble.
+    expect(isRefusalResponse(403, '')).toBe(true)
+    expect(isRefusalResponse(403, 'Forbidden')).toBe(true)
+    expect(isRefusalResponse(451, '')).toBe(true)
+    expect(isRefusalResponse(403, '{"error":{"message":"Invalid API key"}}')).toBe(false)
+    expect(isRefusalResponse(403, 'This model is not available in your region')).toBe(false)
+    expect(isRefusalResponse(403, 'Insufficient credits')).toBe(false)
+    // What each provider calls it.
+    expect(isRefusalResponse(400, '{"error":{"code":"content_policy_violation"}}')).toBe(true)
+    expect(isRefusalResponse(400, '{"error":{"code":"content_filter","innererror":{"code":"ResponsibleAIPolicyViolation"}}}')).toBe(true)
+    expect(isRefusalResponse(400, '{"error":{"code":"1301","message":"系统检测到输入或生成内容可能包含不安全或敏感内容"}}')).toBe(true)
+    expect(isRefusalResponse(400, '{"code":"data_inspection_failed"}')).toBe(true)
+    expect(isRefusalResponse(403, '{"error":{"message":"Input flagged","metadata":{"reasons":["sexual"]}}}')).toBe(true)
+    // An ordinary failure is not one, and neither is a server that is down.
+    expect(isRefusalResponse(400, 'max_tokens is too large')).toBe(false)
+    expect(isRefusalResponse(401, 'bad key')).toBe(false)
+    expect(isRefusalResponse(429, 'slow down')).toBe(false)
+    expect(isRefusalResponse(503, 'content filter unavailable')).toBe(false)
+
+    const forbidden = fakeFetch(403, 'Forbidden')
+    await expect(chatCompletion(profile, input, forbidden.impl)).rejects.toBeInstanceOf(RefusalError)
+    for (const finish_reason of ['sensitive', 'SAFETY', 'PROHIBITED_CONTENT', 'refusal']) {
+      const stopped = fakeFetch(200, { choices: [{ finish_reason, message: { content: 'She' } }] })
+      await expect(chatCompletion(profile, input, stopped.impl)).rejects.toBeInstanceOf(RefusalError)
+    }
+    const whole = fakeFetch(200, { choices: [{ finish_reason: 'stop', message: { content: 'She smiles.' } }] })
+    expect(await chatCompletion(profile, input, whole.impl)).toBe('She smiles.')
+  })
+
   describe('with tools', () => {
     const ran: Record<string, unknown>[] = []
     const tool = {
@@ -153,8 +183,21 @@ describe('chatCompletion', () => {
       ])
       expect(bodies[1].messages.slice(-2)).toMatchObject([
         { role: 'assistant', tool_calls: [{ id: 'c1' }] },
-        { role: 'tool', tool_call_id: 'c1', content: 'Free on Twoday at 08:00.' }
+        { role: 'tool', tool_call_id: 'c1', content: `Free on Twoday at 08:00.
+
+${AFTER_TOOL}` }
       ])
+    })
+
+    it('tells the model that what it wrote beside a tool call was not shown, so that it writes the reply and not a remark on it', async () => {
+      const beside = call('{"place":"home"}') as { choices: { message: { content: string | null } }[] }
+      beside.choices[0].message.content = 'She waves and goes.'
+      const { impl, bodies } = scripted({ body: beside }, { body: { choices: [{ message: { content: 'She waves and goes. "Well," says Ana.' } }] } })
+      expect(await chatCompletion(profile, { ...input, tools: [tool] }, impl)).toBe('She waves and goes. "Well," says Ana.')
+      expect(bodies[1].messages.at(-1)?.content).toBe(`Free on Twoday at 08:00.
+
+${WROTE_BESIDE_TOOL}`)
+      expect(WROTE_BESIDE_TOOL).toContain('was not shown to anyone')
     })
 
     it('tells the model when a call fails, names no tool, or has broken arguments', async () => {
@@ -164,8 +207,12 @@ describe('chatCompletion', () => {
         { body: { choices: [{ message: { content: 'Never mind.' } }] } }
       )
       expect(await chatCompletion(profile, { ...input, tools: [tool] }, impl)).toBe('Never mind.')
-      expect(bodies[1].messages.at(-1)?.content).toBe('The tool could not be used: no such place')
-      expect(bodies[2].messages.at(-1)?.content).toBe('There is no tool called "fly".')
+      expect(bodies[1].messages.at(-1)?.content).toBe(`The tool could not be used: no such place
+
+${AFTER_TOOL}`)
+      expect(bodies[2].messages.at(-1)?.content).toBe(`There is no tool called "fly".
+
+${AFTER_TOOL}`)
       // Two rounds of tools are the limit; after that the model has to answer in words.
       expect(bodies[2].tools).toBeUndefined()
     })
@@ -207,17 +254,17 @@ describe('moveTool', () => {
 
     expect(tool.run({ place: 'the moon' })).toMatch(/^You cannot go to "the moon"\. Stay where you are/)
     expect(moves).toEqual([])
-    // The fixture's walk is two hours, from 06:00.
-    expect(tool.run({ place: 'shop' })).toMatch(/^You and Pat go to the Shop\. The walk takes 2 hours; it is 08:00 when you get there\./)
+    // Going there takes no time: it is still 06:00.
+    expect(tool.run({ place: 'shop' })).toMatch(/^You and Pat go to the Shop\. It is 06:00 when you get there\./)
     expect(moves).toEqual(['shop'])
   })
 
-  it('is the only way time passes: hours stayed on are added with the walk', () => {
+  it('is the only way time passes: the hours stayed on before going', () => {
     const moves: [string, number][] = []
     const tool = moveTool(content, state, scene, (d, hours) => moves.push([d.id, hours]))!
     expect(tool.description).toContain('the only way time passes')
-    // Three hours more here from 06:00, then the two-hour walk.
-    expect(tool.run({ place: 'shop', hours: 3 })).toMatch(/^3 more hours pass here first\. You and Pat go to the Shop\. The walk takes 2 hours; it is 11:00 when you get there\./)
+    // Three hours more here from 06:00.
+    expect(tool.run({ place: 'shop', hours: 3 })).toMatch(/^3 more hours pass here first\. You and Pat go to the Shop\. It is 09:00 when you get there\./)
     // Nonsense for the hours is no hours, and the move is still made.
     expect(tool.run({ place: 'shop', hours: 'soon' })).toMatch(/^You and Pat go to the Shop\./)
     // Never more than twelve at once.
@@ -226,7 +273,7 @@ describe('moveTool', () => {
   })
 
   it('is not offered when there is nowhere to go, or to an NPC', () => {
-    expect(moveTool(content, { ...state, time: 7 }, scene, () => undefined)).toBeUndefined()
+    expect(moveTool(content, { ...state, time: 9 }, scene, () => undefined)).toBeUndefined()
     expect(moveTool(content, state, { ...scene, npc: true }, () => undefined)).toBeUndefined()
   })
 })
@@ -312,5 +359,32 @@ describe('excuseTool', () => {
     expect(excuseTool(content, hired, 'ana', () => undefined)).toBeUndefined()
     expect(excuseTool(content, { ...hired, time: 2 }, 'bryn', () => undefined)).toBeUndefined()
     expect(excuseTool(content, createInitialState(content), 'bryn', () => undefined)).toBeUndefined()
+  })
+})
+
+describe('moving on without everyone', () => {
+  const base = fixture()
+  const [ana] = base.loveInterests
+  const content = { ...base, loveInterests: [ana, { ...ana, id: 'bea', name: 'Bea Stone' }, { ...ana, id: 'cy', name: 'Cy' }] }
+  const state = createInitialState(content)
+  const group = sceneOf({ companionIds: ['bea', 'cy'], beats: [{ activityName: 'Tea' }] })
+
+  it('lets the scene move while some of them stay behind, and never all of them', () => {
+    const moves: [string, string[]][] = []
+    const tool = moveTool(content, state, group, (d, _hours, staying) => moves.push([d.id, staying]))!
+    expect(tool.description).toContain('name who stays behind')
+    expect((tool.parameters['properties'] as { staying: { items: { enum: string[] } } }).staying.items.enum).toEqual(['ana', 'bea', 'cy'])
+
+    expect(tool.run({ place: 'shop', staying: ['Bea', 'nobody'] })).toContain('Bea stays behind and is out of the scene')
+    expect(tool.run({ place: 'shop' })).not.toContain('behind')
+    // Someone has to come along.
+    expect(tool.run({ place: 'shop', staying: ['ana', 'bea', 'cy'] })).not.toContain('behind')
+    expect(moves).toEqual([['shop', ['bea']], ['shop', []], ['shop', []]])
+  })
+
+  it('has nobody to leave behind when she is alone with him', () => {
+    const tool = moveTool(content, state, sceneOf({ beats: [{ activityName: 'Tea' }] }), () => undefined)!
+    expect(tool.parameters['properties']).not.toHaveProperty('staying')
+    expect(tool.description).not.toContain('stays behind')
   })
 })

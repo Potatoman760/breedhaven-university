@@ -7,18 +7,26 @@
   "pronouns": "she/her",
   "bio": "Sunna keeps the campus baths: the spring, the boilers, the towels and the peace.",
   "appearance": "A tall, strong-limbed, beautiful woman of 41 with golden-brown skin, calm green eyes and a serene mouth. Damp dark hair in a long braid over one shoulder. A swimmer's build: broad shoulders, a full bust, a firm waist and long legs.",
-  "imageSeed": 60,
   "personality": "Unhurried, observant and hard to embarrass. Believes hot water solves most things.",
   "outfits": [
     {
       "id": "default",
       "name": "Work clothes",
       "description": "a white linen wrap top and loose trousers rolled to the knee, and a ring of keys on a cord at her waist",
-      "sprites": {}
+      "sprites": {
+        "neutral": {
+          "image": "sprites/sunna/default-neutral-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     }
   ],
   "defaultOutfitId": "default",
   "faceY": 8,
+  "imageSeed": 60,
+  "stageHeight": 100,
+  "animations": [],
   "schedule": [],
   "ai": {
     "speechPattern": "Slow and low, with long pauses. Says little and means it.",

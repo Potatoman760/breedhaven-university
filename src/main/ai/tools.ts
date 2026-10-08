@@ -3,6 +3,8 @@ import { bondOf, canBond, describeBond, END_BOND, statusOf } from '../../shared/
 import { DEPARTURE_FEELINGS, MAX_SCENE_CAST, type BondProposal, type ContentPack, type DepartureFeeling, type GameState, type Proposal, type Scene } from '../../shared/model'
 import { describeRoll, rollDice, rollRange } from '../../shared/game/dice'
 import { hasContact } from '../../shared/game/courier'
+import { moveClash, sharedUpcoming, type Upcoming } from '../../shared/game/upcoming'
+import { handleOf } from '../../shared/game/feed'
 import { shiftLaterToday } from '../../shared/game/jobs'
 import { RELATIONS, relationBetween, type Relation } from '../../shared/game/rapport'
 import { hiddenFacts } from '../../shared/game/facts'
@@ -31,7 +33,9 @@ export function meetingTool(
   loveInterestId: string,
   onProposal: (proposal: Proposal) => void,
   /** Who is in the scene. Only they can be asked along; by message, where nobody else is there, nobody can. */
-  presentIds: string[] = []
+  presentIds: string[] = [],
+  /** The place the scene has gone to in this same reply, if it has moved: a plan for there is not made. */
+  movedTo?: () => string | undefined
 ): LlmTool {
   const player = state.player.name
   const others = presentIds.filter((id) => id !== loveInterestId && content.loveInterests.some((li) => li.id === id))
@@ -42,7 +46,9 @@ export function meetingTool(
       `up another time: to study, for a meal or a drink, on a date, or for anything else. ` +
       `It checks everyone's timetables and returns the day and time you are all free. ` +
       `Never invent a day or time yourself; call this, then suggest exactly what it returns. ` +
-      `Do not call it for something happening right now.`,
+      `It is for another time only: it books something on the calendar and nobody goes anywhere. ` +
+      `For going somewhere together right now, call move_scene and not this. They are never both called for the same thing: ` +
+      `"let's go and get a coffee" is move_scene alone, "coffee on Friday?" is this alone.`,
     parameters: {
       type: 'object',
       properties: {
@@ -80,6 +86,12 @@ export function meetingTool(
     },
     run(args) {
       const text = (value: unknown): string | undefined => (typeof value === 'string' ? value : undefined)
+      // Going there now is the move itself: a plan for the place the scene has just gone to is the same thing asked for twice.
+      const gone = movedTo?.()
+      if (gone !== undefined && gone === text(args['place'])) {
+        const where = content.locations.find((l) => l.id === gone)?.name ?? gone
+        return `You have just gone to ${where} with move_scene, and that is all it takes: you are there now. Nothing was put in the calendar. Call this only for another time.`
+      }
       const { proposal, message } = proposeMeeting(content, state, loveInterestId, {
         activity: text(args['activity']) ?? '',
         place: text(args['place']) ?? '',
@@ -199,9 +211,41 @@ export function diceTool(onRoll: (line: string) => void, random: () => number = 
 }
 
 /**
+ * Lets a character set off with the player for the next thing on his timetable when she is in it too: a class
+ * they share, or a plan she is part of. This scene ends with the two of them leaving, and the next is that class
+ * or plan itself, with her in it. Undefined when nothing of his today is also hers. `onGo` receives what they left for.
+ */
+export function eventTool(content: ContentPack, state: GameState, scene: Scene, onGo: (next: Upcoming, withIds: string[]) => void): LlmTool | undefined {
+  if (scene.npc) return undefined
+  const shared = sharedUpcoming(content, state, sceneCast(scene))
+  if (!shared) return undefined
+  const { next, sharedBy } = shared
+  const player = state.player.name
+  const where = content.locations.find((l) => l.id === next.locationId)?.name ?? next.locationId
+  const when = formatTime(toDate(content.calendar, next.time))
+  const who = firstNames(content, sharedBy)
+  return {
+    name: 'go_to_event',
+    description:
+      `${player} has ${next.title} at ${when} at ${where}, and ${who} ${sharedBy.length > 1 ? 'are' : 'is'} in it too. ` +
+      `Call this when ${player} and ${who} set off for it together: "shall we walk to class?", "come on, we'll be late", or ${player} saying he walks there with ${sharedBy.length > 1 ? 'them' : 'her'}. ` +
+      `It ends this scene as you leave, lets the time until ${when} go by, and the next scene is ${next.kind === 'class' ? 'the class' : 'the plan'} itself, with ${who} there. ` +
+      `Use this and not move_scene for going to it, and do not also call propose_meeting. It takes no arguments.`,
+    parameters: { type: 'object', properties: {} },
+    run() {
+      onGo(next, sharedBy)
+      return (
+        `You and ${player} set off for ${next.title} at ${where}. Write the two of you leaving here and the walk there, in character, and stop as you arrive: ` +
+        `this scene ends there, and ${next.kind === 'class' ? 'the class' : 'what you came for'} is the next one. Write nothing of it yet.`
+      )
+    }
+  }
+}
+
+/**
  * Lets the characters take a scene somewhere else with the player: one of the places open
  * now, or one of their own rooms. The choice is from a fixed list, so the scene can only go
- * somewhere real. It is also the only way time passes in a scene: the walk is counted, and
+ * somewhere real. It is also the only way time passes in a scene: going somewhere takes none, and
  * with it any hours the characters say they stayed on before leaving. Returns undefined when
  * there is nowhere to go. `onMove` receives where, and those hours.
  */
@@ -209,9 +253,11 @@ export function moveTool(
   content: ContentPack,
   state: GameState,
   scene: Scene,
-  onMove: (destination: Destination, hours: number) => void
+  onMove: (destination: Destination, hours: number, stayingIds: string[]) => void
 ): LlmTool | undefined {
   const destinations = sceneDestinations(content, state, scene)
+  const cast = sceneCast(scene)
+  const group = cast.length > 1
   if (destinations.length === 0) return undefined
   const player = state.player.name
   const doing = scene.beats.at(-1)?.activityName
@@ -219,11 +265,19 @@ export function moveTool(
   return {
     name: 'move_scene',
     description:
-      `Take the scene somewhere else: you and ${player} leave here together and go there. ` +
+      `Take the scene somewhere else, right now: you and ${player} leave here together and go there. ` +
+      `It is for going at once only. For meeting another time, later today or another day, call propose_meeting and not this. ` +
+      `They are never both called for the same thing: going there now is this alone, and needs no plan made for it. ` +
       `Call it when what you are doing here is finished or you both decide to leave: the class is over and ` +
       `you walk back to your room, the meal is done, you want somewhere quieter. It ends ` +
       `${doing ? `"${doing}"` : 'what you were doing'} here. It moves you and ${player} only: you cannot send ` +
-      `${player} off alone or bring anyone who is not already with you. Call it before you write the reply, ` +
+      `${player} off alone or bring anyone who is not already with you. ` +
+      (group
+        ? `Everyone in the scene comes along unless you name who stays behind in "staying": when ${player} leaves with ` +
+          `only one or some of you ("I leave with Ana"), call this and name every one of the others there. ` +
+          `Whoever stays behind is out of the scene from then on and you stop writing for her. `
+        : '') +
+      `Call it before you write the reply, ` +
       `then write the two of you leaving and arriving. Never say you have gone somewhere without calling it. ` +
       `This is also the only way time passes: the clock stands still while you stay here` +
       `${soFar === undefined ? '' : ` (${soFar} hour${soFar === 1 ? '' : 's'} counted so far)`}, and moves on when you leave.` +
@@ -241,8 +295,18 @@ export function moveTool(
           maximum: MAX_SCENE_HOURS,
           description:
             'Whole hours you stayed on here beyond the time already counted, before leaving: a meal that ran long, an afternoon of study, the night. ' +
-            'Leave out when you leave on time. The walk is counted for you.'
-        }
+            'Leave out when you leave on time.'
+        },
+        ...(group
+          ? {
+              staying: {
+                type: 'array',
+                maxItems: cast.length - 1,
+                items: { type: 'string', enum: cast },
+                description: `Who does not come along and is left behind here, out of the scene. Leave out when everyone goes. Whoever ${player} is leaving with is never named here.`
+              }
+            }
+          : {})
       },
       required: ['place']
     },
@@ -255,16 +319,34 @@ export function moveTool(
       const asHours = Math.floor(Number(args['hours'] ?? 0))
       const before = Number.isFinite(asHours) && asHours >= 1 ? passSceneTime(content, state, asHours) : state
       const stayed = before.time - state.time
-      onMove(destination, stayed)
+      // His own timetable comes first: a move that would have him elsewhere when a class, a shift or a plan of his starts is refused,
+      // and the reply is written knowing why.
+      const clash = moveClash(content, state, before.time, destination.locationId)
+      if (clash) {
+        const where = content.locations.find((l) => l.id === clash.locationId)
+        const wait = clash.time - state.time
+        const there = destinations.find((d) => d.locationId === clash.locationId && d.roomOf === undefined)
+        return (
+          `You cannot go to ${destination.name} now: ${player} has ${clash.title} at ${formatTime(toDate(content.calendar, clash.time))}` +
+          `${where ? ` at ${where.name}` : ''}, ${wait <= 1 ? 'within the hour' : `in ${wait} hours`}, and has to be there. Nothing has moved and no time has passed. ` +
+          `Stay where you are and write your reply knowing it: say that he has to go soon, and do not write the two of you leaving for anywhere else. ` +
+          (there ? `You may walk him to it instead, by calling this again with "${there.id}".` : 'Wind things up here, or part and make a plan for later.')
+        )
+      }
+      const named = Array.isArray(args['staying']) ? args['staying'].filter((id): id is string => typeof id === 'string').map((id) => id.trim().toLowerCase()) : []
+      // Someone has to come along: a list that names everyone is not acted on.
+      const behind = leavers(scene, named)
+      onMove(destination, stayed, behind)
       const there = moveState(before, destination)
       const weather = weatherOn(content, there)
       return (
         `${stayed > 0 ? `${stayed} more hour${stayed === 1 ? '' : 's'} pass${stayed === 1 ? 'es' : ''} here first. ` : ''}You and ${player} go to ${destination.name}. ` +
-        (destination.walkHours > 0 ? `The walk takes ${destination.walkHours} hour${destination.walkHours === 1 ? '' : 's'}; ` : 'It is no distance; ') +
-        `it is ${formatTime(toDate(content.calendar, there.time))} when you get there. ` +
+        `It is ${formatTime(toDate(content.calendar, there.time))} when you get there. ` +
         `It is ${destination.indoors ? 'indoors' : 'out of doors'}` +
         `${weather ? `, and the weather is: ${weather.name}` : ''}. ` +
-        `${doing ? `"${doing}" is over. ` : ''}Write leaving and arriving, in character.`
+        `${doing ? `"${doing}" is over. ` : ''}` +
+        (behind.length > 0 ? `${firstNames(content, behind)} stay${behind.length === 1 ? 's' : ''} behind and ${behind.length === 1 ? 'is' : 'are'} out of the scene: give ${behind.length === 1 ? 'her' : 'them'} a last line as you go, and no more after it. ` : '') +
+        `Write leaving and arriving, in character.`
       )
     }
   }
@@ -295,7 +377,7 @@ export function leaveTool(
   return {
     name: 'leave_scene',
     description:
-      `Have one or more of you leave, while the scene goes on with whoever stays. Use it when ${player} has ` +
+      `Have one or more of you leave, while the scene goes on here with whoever stays. (When it is ${player} who goes somewhere else with only some of you, use move_scene and name who stays behind instead.) Use it when ${player} has ` +
       `plainly turned to one of you and the others would see it and drift off or make their excuses; when ` +
       `someone has somewhere to be; or when someone is hurt or angry enough to walk out. Whoever is named is ` +
       `gone for the rest of the scene and you stop writing for her. At least one of you must stay: to end ` +
@@ -400,7 +482,7 @@ export function revealTool(
 }
 
 /**
- * Lets a character give the player her Chats, so that the two can message. Offered only
+ * Lets a character give the player her Bloomr, so that the two can message. Offered only
  * for those in the scene he doesn't have yet; undefined when he has them all. `onGive`
  * receives whose.
  */
@@ -416,15 +498,17 @@ export function contactTool(
   return {
     name: 'give_contact',
     description:
-      `Give ${player} your Chats, the messaging app, so the two of you can message when you are apart. He does ` +
+      `Give ${player} your Bloomr, your handle on the app everyone has, so the two of you can DM each other when you are apart. He does ` +
       `not have it yet and cannot write to you until you call this. Call it in the same reply in which you ` +
       `give it: when he asks and you are willing, or when you decide to offer it yourself. Whether you are ` +
       `willing is yours to decide in character, from how well you know him and how you feel about him; you ` +
-      `may refuse or put him off. Never say you have given it without calling this.`,
+      `may refuse or put him off. Never say you have given it without calling this, and never say or show ` +
+      `a handle unless you are giving it. The handle to give, written exactly: ` +
+      `${without.map((li) => `${li.name.split(' ')[0]} is ${handleOf(li)}`).join('; ')}.`,
     parameters: {
       type: 'object',
       properties: {
-        who: { type: 'string', enum: without.map((li) => li.id), description: 'Whose Chats is being given.' }
+        who: { type: 'string', enum: without.map((li) => li.id), description: 'Whose Bloomr is being given.' }
       },
       required: ['who']
     },
@@ -433,7 +517,7 @@ export function contactTool(
       const giver = without.find((li) => li.id === who) ?? (without.length === 1 ? without[0] : undefined)
       if (!giver) return 'Nobody by that id is here without having given it. Nothing was recorded; carry on with your reply.'
       onGive(giver.id)
-      return `${player} now has ${giver.name.split(' ')[0]}'s Chats. Make sure the reply shows her giving it, in character.`
+      return `${player} now has ${giver.name.split(' ')[0]}'s Bloomr. Make sure the reply shows her giving it, in character.`
     }
   }
 }

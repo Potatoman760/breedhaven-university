@@ -1,6 +1,7 @@
-import { canTravel, loveInterestsAt, whereaboutsUnknown } from '../../../shared/game'
+import { canTravel, isOpen, loveInterestsAt, toDate, whereaboutsUnknown } from '../../../shared/game'
 import type { ContentPack, GameState, LoveInterest } from '../../../shared/model'
 import { Dialog, ToBeImplemented } from './Dialog'
+import { PlaceIcon } from './icons'
 
 // Faces shown on one pin before the rest collapse into a "+2".
 const MAX_PORTRAITS = 3
@@ -49,11 +50,9 @@ export function MapPanel({ content, state, onTravel, onClose }: Props) {
   }
 
   const unknown = whereaboutsUnknown(content, state)
-  const hours = `${map.travelHours} ${map.travelHours === 1 ? 'hour' : 'hours'}`
 
   return (
     <Dialog title={map.name} onClose={onClose} wide>
-      <p className="hint">Going somewhere takes {hours}.</p>
       <div className={map.image ? 'map' : 'map plain'}>
         {map.image && <img src={`content://pack/${map.image}`} alt={`Map of ${map.name}`} />}
         {map.regions.map((region) => (
@@ -75,17 +74,27 @@ export function MapPanel({ content, state, onTravel, onClose }: Props) {
           if (!location) return null
           const here = pin.locationId === state.locationId
           const check = canTravel(content, state, pin.locationId)
+          // Shut by the time he would get there: it cannot be gone to, and says so above its name.
+          const closed = !here && !isOpen(location, toDate(content.calendar, state.time).hour)
           const people = loveInterestsAt(content, state, pin.locationId)
           return (
             <div
               key={pin.locationId}
-              className={here ? 'pin here' : 'pin'}
+              className={here ? 'pin here' : closed ? 'pin closed' : 'pin'}
               style={{ left: `${pin.x}%`, top: `${pin.y}%` }}
             >
+              {/* What kind of place it is and its name on one line; the way there on the next. */}
               <div className="pin-head">
-                <span className="caps">{location.name.replace(/^the /, '')}</span>
+                <span className="pin-icon">
+                  <PlaceIcon name={location.icon} size={22} />
+                </span>
+                <span className="caps pin-name">{location.name.replace(/^the /, '')}</span>
+              </div>
+              <div className="pin-go">
                 {here ? (
                   <span className="chip">You are here</span>
+                ) : closed ? (
+                  <span className="caps pin-closed">Closed</span>
                 ) : (
                   <button
                     disabled={!check.ok}
@@ -96,7 +105,6 @@ export function MapPanel({ content, state, onTravel, onClose }: Props) {
                   </button>
                 )}
               </div>
-              {!here && !check.ok && <span className="pin-note">{check.reasons.join(' · ')}</span>}
               {people.length > 0 && (
                 <div className="portraits">
                   {people.slice(0, MAX_PORTRAITS).map((li) => (

@@ -21,11 +21,13 @@ import {
 import { errorMessage } from "../../errors";
 import { describeShift } from "../../../../shared/game";
 import { Portrait } from "../MapPanel";
-import { EditorFoot, PickList, Group, List, Text } from "./fields";
+import { EditorFoot, PickList, Group, List, Text, LlmMark } from "./fields";
 import { ArtTool } from "../art/ArtTool";
 import { NewCharacterDialog } from "./NewCharacterDialog";
 import { CatalogueEditor } from "./CatalogueEditor";
+import { EventsEditor } from "./EventsEditor";
 import { LocationEditor } from "./LocationEditor";
+import { PlayerEditor } from "./PlayerEditor";
 import { ScheduleTab } from "./ScheduleTab";
 import { SpritesTab } from "./SpritesTab";
 import { TraitsTab } from "./TraitsTab";
@@ -37,7 +39,7 @@ interface Props {
   onClose: () => void;
 }
 
-const TABS = ["Profile", "Traits", "Sprites", "Voice", "Schedule"] as const;
+const TABS = ["Profile", "Traits", "Sprites", "Academics"] as const;
 type Tab = (typeof TABS)[number];
 
 /** A character with nothing filled in, valid enough to be edited. */
@@ -67,16 +69,24 @@ const NEW_SUBJECT: Studies = {
 const same = (a: unknown, b: unknown) =>
   JSON.stringify(a) === JSON.stringify(b);
 
-const SIDES = ["Characters", "Locations", "Courses"] as const;
+const SIDES = ["Characters", "Player", "Locations", "Events", "Courses"] as const;
 type Side = (typeof SIDES)[number];
+// The sides that change the game itself and not what a player adds to it: there only when the game's own files are being edited.
+const AUTHORING: readonly Side[] = ["Player", "Locations"];
 
 /**
  * The editor: the characters (love interests and NPCs, who are written the same way and
- * told apart by their kind), the places of the game and their pictures, and the course
- * catalogue. Each side keeps its own draft.
+ * told apart by their kind), the player as a new game starts him, the places of the game
+ * and their pictures, and the course catalogue. Each side keeps its own draft.
  */
 export function ContentEditor(props: Props) {
   const [side, setSide] = useState<Side>("Characters");
+  // Whether the game's own files are what is being edited: so it is run from source, and not in a game as a player has it.
+  const [authoring, setAuthoring] = useState(false);
+  useEffect(() => {
+    window.api.editor.info().then((info) => setAuthoring(info.base), () => undefined);
+  }, []);
+  const sides = SIDES.filter((name) => authoring || !AUTHORING.includes(name));
   /**
    * The rail down the left edge: the sides of the editor, one under another, and the way
    * out at its foot. Each asks the side being left whether it may be.
@@ -85,7 +95,7 @@ export function ContentEditor(props: Props) {
     <nav className="editor-rail">
       <span className="caps">Edit</span>
       <div className="editor-sides" role="tablist" aria-orientation="vertical">
-        {SIDES.map((name) => (
+        {sides.map((name) => (
           <button
             key={name}
             role="tab"
@@ -102,6 +112,10 @@ export function ContentEditor(props: Props) {
   );
   return side === "Courses" ? (
     <CatalogueEditor {...props} switcher={switcher} />
+  ) : side === "Events" ? (
+    <EventsEditor {...props} switcher={switcher} />
+  ) : side === "Player" ? (
+    <PlayerEditor {...props} switcher={switcher} />
   ) : side === "Locations" ? (
     <LocationEditor {...props} switcher={switcher} />
   ) : (
@@ -208,10 +222,7 @@ function LoveInterestEditor({
   }
 
   async function remove() {
-    const reset = origin === "override";
-    const question = reset
-      ? `Put ${draft.name} back as she shipped? Your changes to her will be deleted.`
-      : `Delete ${draft.name}? Saved games keep their history with her, but she will no longer appear.`;
+    const question = `Delete ${draft.name}? Saved games keep their history with her, but she will no longer appear.`;
     if (!window.confirm(question)) return;
     setBusy(true);
     try {
@@ -227,7 +238,7 @@ function LoveInterestEditor({
         null;
       setOriginal(next);
       setDraft(next ?? blank());
-      setStatus(reset ? "Put back as shipped." : "Deleted.");
+      setStatus("Deleted.");
     } catch (error) {
       setStatus(errorMessage(error));
     } finally {
@@ -285,9 +296,7 @@ function LoveInterestEditor({
             <button
               key={li.id}
               className={
-                !isNew && li.id === original?.id
-                  ? "courier-person selected"
-                  : "courier-person"
+                `courier-person kind-${kindOf(li)}${!isNew && li.id === original?.id ? " selected" : ""}`
               }
               onClick={() => open(li)}
             >
@@ -295,20 +304,15 @@ function LoveInterestEditor({
               <span>
                 <strong>{li.name}</strong>
                 <span className="hint">
-                  {li.age} ·{" "}
+                  {li.age}
+                  {kindOf(li) === "npc" && !li.role ? "" : " · "}
                   {kindOf(li) === "npc"
-                    ? li.role || "NPC"
+                    ? li.role
                     : kindOf(li) === "teacher"
                       ? `teaches ${li.teaching?.subjects[0]?.subject ?? ""}`
                       : (li.studies?.subject ?? "outsider")}
                 </span>
               </span>
-              {kindOf(li) === "npc" && <span className="chip">NPC</span>}
-              {info && info.loveInterests[li.id] !== "base" && (
-                <span className="chip">
-                  {info.loveInterests[li.id] === "addon" ? "add-on" : "changed"}
-                </span>
-              )}
             </button>
           ))}
           {shown.length === 0 && <p className="hint">Nobody by that name.</p>}
@@ -364,6 +368,7 @@ function LoveInterestEditor({
               <div className="row">
                 <Text
                   label="Name"
+                llm
                   value={draft.name}
                   onChange={(name) =>
                     set(isNew ? { name, id: slugify(name) } : { name })
@@ -424,15 +429,18 @@ function LoveInterestEditor({
               {isNpc && (
                 <Text
                   label="Role"
+                llm
                   value={draft.role}
                   onChange={(role) => set({ role })}
                   placeholder="hall manager of the Cloister Halls"
-                  hint="What they are, in a few words. Shown beside the name, and told to the LLM. Changing the kind above is all it takes to make a love interest of an NPC: everything here is kept."
                 />
               )}
               <div className="row">
                 <label>
-                  Age
+                  <span className="field-name">
+                    Age
+                    <LlmMark />
+                  </span>
                   <input
                     type="number"
                     min={18}
@@ -442,25 +450,28 @@ function LoveInterestEditor({
                 </label>
                 <Text
                   label="Pronouns"
+                llm
                   value={draft.pronouns}
                   onChange={(pronouns) => set({ pronouns })}
                 />
               </div>
               <Text
                 label="Bio"
+                llm
                 value={draft.bio}
                 onChange={(bio) => set({ bio })}
                 rows={3}
-                hint="Shown to the player, and given to the LLM."
               />
               <Text
                 label="Personality"
+                llm
                 value={draft.personality}
                 onChange={(personality) => set({ personality })}
                 rows={3}
               />
               <Text
                 label="Appearance"
+                llm
                 value={draft.appearance}
                 onChange={(appearance) => set({ appearance })}
                 rows={3}
@@ -470,27 +481,30 @@ function LoveInterestEditor({
                                 <div className="row">
                 <List
                   label="Likes"
+                llm
                   value={draft.likes}
                   onChange={(likes) => set({ likes })}
-                  hint="Separated by commas. Gifts with a matching tag are loved."
+                  hint="Separated by commas."
                 />
                 <List
                   label="Dislikes"
+                llm
                   value={draft.dislikes}
                   onChange={(dislikes) => set({ dislikes })}
                 />
               </div>
               <PickList
                 label="Admires in the player"
+                llm
                 options={STATS.map((stat) => ({ id: stat, name: stat }))}
                 value={draft.admires}
                 onChange={(admires) => set({ admires })}
                 max={3}
-                hint="High stats here make her warmer, quicker to grow fond, and likelier to write first."
               />
               <PickList
                 addLabel="Add friends"
                 label="Friends"
+                llm
                 options={content.loveInterests
                   .filter((other) => other.id !== draft.id)
                   .map((other) => ({ id: other.id, name: other.name.split(" ")[0] }))}
@@ -498,11 +512,11 @@ function LoveInterestEditor({
                 onChange={(friends) =>
                   set({ friends, enemies: draft.enemies.filter((id) => !friends.includes(id)) })
                 }
-                hint="Other love interests she is friends with in every game. A student is given more at random when a game begins, up to two to four in all, and the story can change them."
               />
               <PickList
                 addLabel="Add enemies"
                 label="Enemies"
+                llm
                 options={content.loveInterests
                   .filter((other) => other.id !== draft.id)
                   .map((other) => ({ id: other.id, name: other.name.split(" ")[0] }))}
@@ -510,228 +524,189 @@ function LoveInterestEditor({
                 onChange={(enemies) =>
                   set({ enemies, friends: draft.friends.filter((id) => !enemies.includes(id)) })
                 }
-                hint="Those she is at odds with in every game. A student is given more at random, up to one to three in all. In a scene with both of them in it, the LLM is told."
               />
                 </>
               )}
-                            {kind === "teacher" && draft.teaching && (
-                <Group
-                  title="Teaching"
-                  hint="Each subject becomes a course every game, with her as its professor. She is in the hall while it meets."
-                >
-                  <div className="row">
-                    <Text
-                      label="Department"
-                      value={draft.teaching.department}
-                      onChange={(department) =>
-                        set({ teaching: { ...draft.teaching!, department } })
-                      }
-                    />
-                    <Text
-                      label="Styled"
-                      value={draft.teaching.title}
-                      onChange={(title) =>
-                        set({ teaching: { ...draft.teaching!, title } })
-                      }
-                      hint="Before her name in the catalogue."
-                    />
-                  </div>
-                  {draft.teaching.subjects.map((subject, index) => {
-                    const change = (patch: Partial<Studies>) =>
-                      set({
-                        teaching: {
-                          ...draft.teaching!,
-                          subjects: draft.teaching!.subjects.map((s, i) =>
-                            i === index ? { ...s, ...patch } : s,
-                          ),
-                        },
-                      });
-                    return (
-                      <div key={index} className="card">
-                        <div className="row">
-                          <Text
-                            label="Subject"
-                            value={subject.subject}
-                            onChange={(value) => change({ subject: value })}
-                          />
-                          <Text
-                            label="Catalogue code"
-                            value={subject.code}
-                            onChange={(code) =>
-                              change({ code: code.toUpperCase().slice(0, 4) })
-                            }
-                          />
-                          <label>
-                            Year
-                            <select
-                              value={subject.level}
-                              onChange={(e) =>
-                                change({ level: Number(e.target.value) })
-                              }
-                            >
-                              {[1, 2, 3, 4].map((year) => (
-                                <option key={year} value={year}>
-                                  Year {year}
-                                </option>
-                              ))}
-                              <option value={5}>Graduate</option>
-                            </select>
-                          </label>
-                          <Button variant="quiet"
-                            disabled={draft.teaching!.subjects.length <= 1}
- onClick={() =>
- set({
- teaching: {
- ...draft.teaching!,
- subjects: draft.teaching!.subjects.filter(
- (_, i) => i !== index,
- ),
- },
- })
- }
-                          >
-                            Remove
-                          </Button>
-                        </div>
-                        <label className="inline">
-                          <input
-                            type="checkbox"
-                            checked={subject.practical}
-                            onChange={(e) =>
-                              change({ practical: e.target.checked })
-                            }
-                          />
-                          Has a lab: a practical subject, with a long weekly
-                          class as well as its lectures
-                        </label>
-                        <PickList
-                          label="A class in it raises"
-                          options={STATS.map((stat) => ({
-                            id: stat,
-                            name: stat,
-                          }))}
-                          value={subject.stats}
-                          onChange={(stats) =>
-                            stats.length > 0 && change({ stats })
-                          }
-                          max={2}
-                        />
-                      </div>
-                    );
-                  })}
-                  <Button
-                    onClick={() =>
- set({
- teaching: {
- ...draft.teaching!,
- subjects: [...draft.teaching!.subjects, NEW_SUBJECT],
- },
- })
- }
-                  >
-                    Add a subject
-                  </Button>
-                </Group>
-              )}
-
-              {kind === "student" && (
-                <Group
-                  title="Studies"
-                  hint="A student gets a course in her subject each game, and the LLM chooses the rest of her timetable."
-                >
-                  <div className="row">
-                    <Text
-                      label="Subject"
-                      value={draft.studies?.subject ?? ""}
-                      onChange={(subject) =>
-                        set({
-                          studies: {
-                            ...NEW_SUBJECT,
-                            ...draft.studies,
-                            subject,
-                          },
-                        })
-                      }
-                    />
-                    {draft.studies && (
-                      <>
-                        <Text
-                          label="Catalogue code"
-                          value={draft.studies.code}
-                          onChange={(code) =>
-                            set({
-                              studies: {
-                                ...draft.studies!,
-                                code: code.toUpperCase().slice(0, 4),
-                              },
-                            })
-                          }
-                        />
-                        <label>
-                          Year
-                          <select
-                            value={draft.studies.level}
-                            onChange={(e) =>
-                              set({
-                                studies: {
-                                  ...draft.studies!,
-                                  level: Number(e.target.value),
-                                },
-                              })
-                            }
-                          >
-                            {[1, 2, 3, 4].map((year) => (
-                              <option key={year} value={year}>
-                                Year {year}
-                              </option>
-                            ))}
-                            <option value={5}>Graduate</option>
-                          </select>
-                        </label>
-                      </>
-                    )}
-                  </div>
-                  {draft.studies && (
-                    <label className="inline">
-                      <input
-                        type="checkbox"
-                        checked={draft.studies.practical}
-                        onChange={(e) =>
-                          set({
-                            studies: {
-                              ...draft.studies!,
-                              practical: e.target.checked,
-                            },
-                          })
-                        }
-                      />
-                      Has a lab: a practical subject, with a long weekly class
-                      as well as its lectures
-                    </label>
-                  )}
-                  {draft.studies && (
-                    <PickList
-                      label="A class in it raises"
-                      options={STATS.map((stat) => ({ id: stat, name: stat }))}
-                      value={draft.studies.stats}
-                      onChange={(stats) =>
-                        stats.length > 0 &&
-                        set({ studies: { ...draft.studies!, stats } })
-                      }
-                      max={2}
-                    />
-                  )}
-                </Group>
+              {/* How she sounds and what she knows: all of it goes to the LLM. */}
+              <Text
+                label="How she speaks"
+                llm
+                value={draft.ai.speechPattern}
+                onChange={(speechPattern) => setAi({ speechPattern })}
+                rows={3}
+              />
+              <Text
+                label="Tone"
+                llm
+                value={draft.ai.tone}
+                onChange={(tone) => setAi({ tone })}
+              />
+              <List
+                label="Verbal quirks"
+                llm
+                value={draft.ai.verbalQuirks}
+                onChange={(verbalQuirks) => setAi({ verbalQuirks })}
+                lines
+                hint="One a line."
+              />
+              <Text
+                label="Backstory"
+                llm
+                value={draft.ai.backstory}
+                onChange={(backstory) => setAi({ backstory })}
+                rows={5}
+              />
+              {isNpc && (
+                <List
+                  label="What they know"
+                llm
+                  value={draft.ai.knowledge}
+                  onChange={(knowledge) => setAi({ knowledge })}
+                  lines
+                  hint="One a line."
+                />
               )}
 {!isNpc && (
                 <>
                                 <Group
+                title="Example dialogue"
+                llm
+              >
+                {draft.ai.exampleDialogue.map((example, index) => {
+                  const change = (patch: Partial<typeof example>) =>
+                    setAi({
+                      exampleDialogue: draft.ai.exampleDialogue.map((e, i) =>
+                        i === index ? { ...e, ...patch } : e,
+                      ),
+                    });
+                  return (
+                    <div key={index} className="row">
+                      <Text
+                        label="Them"
+                        value={example.user}
+                        onChange={(user) => change({ user })}
+                      />
+                      <Text
+                        label="Her"
+                        value={example.reply}
+                        onChange={(reply) => change({ reply })}
+                      />
+                      <Button variant="quiet"
+                        onClick={() =>
+ setAi({
+ exampleDialogue: draft.ai.exampleDialogue.filter(
+ (_, i) => i !== index,
+ ),
+ })
+ }
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  );
+                })}
+                <Button
+                  onClick={() =>
+ setAi({
+ exampleDialogue: [
+ ...draft.ai.exampleDialogue,
+ { user: "", reply: "" },
+ ],
+ })
+ }
+                >
+                  Add an example
+                </Button>
+              </Group>
+              <Group
+                title="Secrets"
+                llm
+              >
+                {draft.ai.secrets.map((secret, index) => (
+                  <div key={index} className="row">
+                    <Text
+                      label={
+                        secret.revealWhen.length > 0
+                          ? `Secret (shared once ${secret.revealWhen.length} condition${secret.revealWhen.length > 1 ? "s are" : " is"} met)`
+                          : "Secret (shared freely)"
+                      }
+                      value={secret.text}
+                      onChange={(text) =>
+                        setAi({
+                          secrets: draft.ai.secrets.map((s, i) =>
+                            i === index ? { ...s, text } : s,
+                          ),
+                        })
+                      }
+                    />
+                    <Button variant="quiet"
+                      onClick={() =>
+ setAi({
+ secrets: draft.ai.secrets.filter(
+ (_, i) => i !== index,
+ ),
+ })
+ }
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  onClick={() =>
+ setAi({
+ secrets: [
+ ...draft.ai.secrets,
+ {
+ text: "",
+ revealWhen: [
+ {
+ type: "stage",
+ min: stages.at(-2)?.id ?? stages[0].id,
+ },
+ ],
+ },
+ ],
+ })
+ }
+                >
+                  Add a secret
+                </Button>
+              </Group>
+                </>
+              )}
+                            <Text
+                label="Further instructions"
+                llm
+                value={draft.ai.extraInstructions}
+                onChange={(extraInstructions) => setAi({ extraInstructions })}
+                rows={4}
+              />
+            </>
+          )}
+
+          {tab === "Traits" && info && (
+            <TraitsTab
+              content={content}
+              info={info}
+              draft={draft}
+              set={set}
+              onResult={take}
+            />
+          )}
+
+          {tab === "Sprites" && (
+            <>
+              <SpritesTab draft={draft} set={set} assetPrefix={info?.assetPrefix} />
+{!isNpc && (
+                <>
+                                <Group
                 title="Her room"
-                hint="Where she lives. A scene can move there, and is then private and indoors. Without a picture of its own, the place it is in is shown."
               >
                 <div className="row">
                   <Text
                     label="What it is"
+                llm
                     value={draft.room?.name ?? ""}
                     placeholder="a garret at the Honeyed Bee"
                     onChange={(name) =>
@@ -775,12 +750,12 @@ function LoveInterestEditor({
                   <>
                     <Text
                       label="Description"
+                llm
                       value={draft.room.description}
                       rows={3}
                       onChange={(description) =>
                         set({ room: { ...draft.room!, description } })
                       }
-                      hint="What the room looks like, as a picture: the space, the things in it, the light, with no 'she' or 'her'. Given to the LLM when a scene is there, and sent to ComfyUI as the prompt when its picture is generated."
                     />
                     <div className="row checks">
                       {draft.room.background ? (
@@ -884,215 +859,225 @@ function LoveInterestEditor({
                   </>
                 )}
               </Group>
-              <div className="row">
-                <label>
-                  Days she carries a child
-                  <input
-                    type="number"
-                    min={1}
-                    value={draft.pregnancyDays ?? ""}
-                    placeholder={`${content.pregnancy?.lengthDays ?? ""} (the usual)`}
-                    onChange={(e) =>
-                      set({
-                        pregnancyDays: e.target.value
-                          ? Number(e.target.value)
-                          : undefined,
-                      })
-                    }
-                  />
-                </label>
-              </div>
                 </>
               )}
-                          </>
-          )}
-
-          {tab === "Traits" && info && (
-            <TraitsTab
-              content={content}
-              info={info}
-              draft={draft}
-              set={set}
-              onResult={take}
-            />
-          )}
-
-          {tab === "Sprites" && <SpritesTab draft={draft} set={set} />}
-
-          {tab === "Voice" && (
-            <>
-              <p className="hint">
-                Everything here goes to the LLM and nowhere else: it is how she
-                sounds and what she knows.
-              </p>
-              <Text
-                label="How she speaks"
-                value={draft.ai.speechPattern}
-                onChange={(speechPattern) => setAi({ speechPattern })}
-                rows={3}
-              />
-              <Text
-                label="Tone"
-                value={draft.ai.tone}
-                onChange={(tone) => setAi({ tone })}
-              />
-              <List
-                label="Verbal quirks"
-                value={draft.ai.verbalQuirks}
-                onChange={(verbalQuirks) => setAi({ verbalQuirks })}
-                lines
-                hint="One a line."
-              />
-              <Text
-                label="Backstory"
-                value={draft.ai.backstory}
-                onChange={(backstory) => setAi({ backstory })}
-                rows={5}
-              />
-              {isNpc && (
-                <List
-                  label="What they know"
-                  value={draft.ai.knowledge}
-                  onChange={(knowledge) => setAi({ knowledge })}
-                  lines
-                  hint="One a line. Things they will tell the player if asked: directions, gossip, how the place works."
-                />
-              )}
-{!isNpc && (
-                <>
-                                <Group
-                title="Example dialogue"
-                hint="A line someone says to her, and how she would answer."
-              >
-                {draft.ai.exampleDialogue.map((example, index) => {
-                  const change = (patch: Partial<typeof example>) =>
-                    setAi({
-                      exampleDialogue: draft.ai.exampleDialogue.map((e, i) =>
-                        i === index ? { ...e, ...patch } : e,
-                      ),
-                    });
-                  return (
-                    <div key={index} className="row">
-                      <Text
-                        label="Them"
-                        value={example.user}
-                        onChange={(user) => change({ user })}
-                      />
-                      <Text
-                        label="Her"
-                        value={example.reply}
-                        onChange={(reply) => change({ reply })}
-                      />
-                      <Button variant="quiet"
-                        onClick={() =>
- setAi({
- exampleDialogue: draft.ai.exampleDialogue.filter(
- (_, i) => i !== index,
- ),
- })
- }
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  );
-                })}
-                <Button
-                  onClick={() =>
- setAi({
- exampleDialogue: [
- ...draft.ai.exampleDialogue,
- { user: "", reply: "" },
- ],
- })
- }
-                >
-                  Add an example
-                </Button>
-              </Group>
-              <Group
-                title="Secrets"
-                hint="Things she keeps to herself until the conditions written in her file are met."
-              >
-                {draft.ai.secrets.map((secret, index) => (
-                  <div key={index} className="row">
-                    <Text
-                      label={
-                        secret.revealWhen.length > 0
-                          ? `Secret (shared once ${secret.revealWhen.length} condition${secret.revealWhen.length > 1 ? "s are" : " is"} met)`
-                          : "Secret (shared freely)"
-                      }
-                      value={secret.text}
-                      onChange={(text) =>
-                        setAi({
-                          secrets: draft.ai.secrets.map((s, i) =>
-                            i === index ? { ...s, text } : s,
-                          ),
-                        })
-                      }
-                    />
-                    <Button variant="quiet"
-                      onClick={() =>
- setAi({
- secrets: draft.ai.secrets.filter(
- (_, i) => i !== index,
- ),
- })
- }
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                ))}
-                <Button
-                  onClick={() =>
- setAi({
- secrets: [
- ...draft.ai.secrets,
- {
- text: "",
- revealWhen: [
- {
- type: "stage",
- min: stages.at(-2)?.id ?? stages[0].id,
- },
- ],
- },
- ],
- })
- }
-                >
-                  Add a secret
-                </Button>
-              </Group>
-              <Group title="How she treats the player at each stage">
-                {stages.map((stage) => (
-                  <Text
-                    key={stage.id}
-                    label={stage.name}
-                    value={draft.ai.stageNotes[stage.id] ?? ""}
-                    placeholder={stage.description}
-                    onChange={(note) => {
-                      const { [stage.id]: _old, ...rest } = draft.ai.stageNotes;
-                      setAi({
-                        stageNotes: note ? { ...rest, [stage.id]: note } : rest,
-                      });
-                    }}
-                  />
-                ))}
-              </Group>
-                </>
-              )}
-                            <Text
-                label="Further instructions"
-                value={draft.ai.extraInstructions}
-                onChange={(extraInstructions) => setAi({ extraInstructions })}
-                rows={4}
-              />
             </>
           )}
 
-          {tab === "Schedule" &&
+          {tab === "Academics" && (
+            <>
+                            {kind === "teacher" && draft.teaching && (
+                <Group
+                  title="Teaching"
+                >
+                  <div className="row">
+                    <Text
+                      label="Department"
+                llm
+                      value={draft.teaching.department}
+                      onChange={(department) =>
+                        set({ teaching: { ...draft.teaching!, department } })
+                      }
+                    />
+                    <Text
+                      label="Styled"
+                      value={draft.teaching.title}
+                      onChange={(title) =>
+                        set({ teaching: { ...draft.teaching!, title } })
+                      }
+                      hint="Before her name in the catalogue."
+                    />
+                  </div>
+                  {draft.teaching.subjects.map((subject, index) => {
+                    const change = (patch: Partial<Studies>) =>
+                      set({
+                        teaching: {
+                          ...draft.teaching!,
+                          subjects: draft.teaching!.subjects.map((s, i) =>
+                            i === index ? { ...s, ...patch } : s,
+                          ),
+                        },
+                      });
+                    return (
+                      <div key={index} className="card">
+                        <div className="row">
+                          <Text
+                            label="Subject"
+                llm
+                            value={subject.subject}
+                            onChange={(value) => change({ subject: value })}
+                          />
+                          <Text
+                            label="Catalogue code"
+                            value={subject.code}
+                            onChange={(code) =>
+                              change({ code: code.toUpperCase().slice(0, 4) })
+                            }
+                          />
+                          <label>
+                            Year
+                            <select
+                              value={subject.level}
+                              onChange={(e) =>
+                                change({ level: Number(e.target.value) })
+                              }
+                            >
+                              {[1, 2, 3, 4].map((year) => (
+                                <option key={year} value={year}>
+                                  Year {year}
+                                </option>
+                              ))}
+                              <option value={5}>Graduate</option>
+                            </select>
+                          </label>
+                          <Button variant="quiet"
+                            disabled={draft.teaching!.subjects.length <= 1}
+ onClick={() =>
+ set({
+ teaching: {
+ ...draft.teaching!,
+ subjects: draft.teaching!.subjects.filter(
+ (_, i) => i !== index,
+ ),
+ },
+ })
+ }
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                        <label className="inline">
+                          <input
+                            type="checkbox"
+                            checked={subject.practical}
+                            onChange={(e) =>
+                              change({ practical: e.target.checked })
+                            }
+                          />
+                          Has a lab: a practical subject, with a long weekly
+                          class as well as its lectures
+                        </label>
+                        <PickList
+                          label="A class in it raises"
+                          options={STATS.map((stat) => ({
+                            id: stat,
+                            name: stat,
+                          }))}
+                          value={subject.stats}
+                          onChange={(stats) =>
+                            stats.length > 0 && change({ stats })
+                          }
+                          max={2}
+                        />
+                      </div>
+                    );
+                  })}
+                  <Button
+                    onClick={() =>
+ set({
+ teaching: {
+ ...draft.teaching!,
+ subjects: [...draft.teaching!.subjects, NEW_SUBJECT],
+ },
+ })
+ }
+                  >
+                    Add a subject
+                  </Button>
+                </Group>
+              )}
+              {kind === "student" && (
+                <Group
+                  title="Studies"
+                >
+                  <div className="row">
+                    <Text
+                      label="Subject"
+                llm
+                      value={draft.studies?.subject ?? ""}
+                      onChange={(subject) =>
+                        set({
+                          studies: {
+                            ...NEW_SUBJECT,
+                            ...draft.studies,
+                            subject,
+                          },
+                        })
+                      }
+                    />
+                    {draft.studies && (
+                      <>
+                        <Text
+                          label="Catalogue code"
+                          value={draft.studies.code}
+                          onChange={(code) =>
+                            set({
+                              studies: {
+                                ...draft.studies!,
+                                code: code.toUpperCase().slice(0, 4),
+                              },
+                            })
+                          }
+                        />
+                        <label>
+                          Year
+                          <select
+                            value={draft.studies.level}
+                            onChange={(e) =>
+                              set({
+                                studies: {
+                                  ...draft.studies!,
+                                  level: Number(e.target.value),
+                                },
+                              })
+                            }
+                          >
+                            {[1, 2, 3, 4].map((year) => (
+                              <option key={year} value={year}>
+                                Year {year}
+                              </option>
+                            ))}
+                            <option value={5}>Graduate</option>
+                          </select>
+                        </label>
+                      </>
+                    )}
+                  </div>
+                  {draft.studies && (
+                    <label className="inline">
+                      <input
+                        type="checkbox"
+                        checked={draft.studies.practical}
+                        onChange={(e) =>
+                          set({
+                            studies: {
+                              ...draft.studies!,
+                              practical: e.target.checked,
+                            },
+                          })
+                        }
+                      />
+                      Has a lab: a practical subject, with a long weekly class
+                      as well as its lectures
+                    </label>
+                  )}
+                  {draft.studies && (
+                    <PickList
+                      label="A class in it raises"
+                      options={STATS.map((stat) => ({ id: stat, name: stat }))}
+                      value={draft.studies.stats}
+                      onChange={(stats) =>
+                        stats.length > 0 &&
+                        set({ studies: { ...draft.studies!, stats } })
+                      }
+                      max={2}
+                    />
+                  )}
+                </Group>
+              )}
+            </>
+          )}
+          {tab === "Academics" &&
             gives.map((job) => (
               <p key={job.id} className="status">
                 {draft.name || "This character"} gives the job of{" "}
@@ -1104,7 +1089,7 @@ function LoveInterestEditor({
                 from the job and are not set here.
               </p>
             ))}
-          {tab === "Schedule" && (
+          {tab === "Academics" && (
             <ScheduleTab
               content={content}
               schedule={draft.schedule}
@@ -1125,7 +1110,8 @@ function LoveInterestEditor({
             setIssues([]);
           }}
           onSave={save}
-          remove={!isNew && origin && origin !== 'base' ? { label: origin === 'override' ? 'Put back the original' : 'Delete', onClick: remove } : undefined}
+          // Only a character made here can be deleted. One of the game's own that has been changed stays changed: there is no going back to how she shipped.
+          remove={!isNew && origin === 'addon' ? { label: 'Delete', onClick: remove } : undefined}
         />
       </section>
     </main>

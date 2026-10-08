@@ -34,7 +34,7 @@ export function canBuy(content: ContentPack, state: GameState, itemId: string): 
   if (location && !isOpen(location, toDate(content.calendar, state.time).hour)) {
     reasons.push(`${location.name} is closed`)
   }
-  if (state.player.money < item.price) reasons.push('Not enough coin')
+  if (state.player.money < item.price) reasons.push('Not enough money')
   return { ok: reasons.length === 0, reasons }
 }
 

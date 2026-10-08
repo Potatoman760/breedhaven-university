@@ -37,11 +37,11 @@ describe('friends and enemies', () => {
   it('are the same for the same game and differ between games', () => {
     expect(assignRapport(content, 3)).toEqual(assignRapport(content, 3))
     expect(assignRapport(content, 3)).not.toEqual(assignRapport(content, 4))
-    expect(createInitialState(content, 'Kael', 3).rapport).toEqual(assignRapport(content, 3))
+    expect(createInitialState(content, 'Pat', 3).rapport).toEqual(assignRapport(content, 3))
   })
 
   it('change on both sides at once', () => {
-    const start = createInitialState(content, 'Kael', 1)
+    const start = createInitialState(content, 'Pat', 1)
     const fallenOut = setRelation(start, 'anwen', 'elowen', 'enemies')
     expect(relationBetween(fallenOut, 'elowen', 'anwen')).toBe('enemies')
     expect(fallenOut.rapport['anwen'].friends).not.toContain('elowen')
@@ -50,7 +50,7 @@ describe('friends and enemies', () => {
   })
 
   it('are told to the LLM only when more than one of them is in the scene', () => {
-    const state = createInitialState(content, 'Kael', 1)
+    const state = createInitialState(content, 'Pat', 1)
     expect(describeRapport(content, state, ['anwen', 'elowen'])).toEqual([expect.stringContaining('Anwen and Elowen are friends')])
     expect(describeRapport(content, state, ['seraphine', 'yelena'])[0]).toContain('Seraphine and Yelena are enemies')
     const together = buildCharacterPrompt({ content, state, loveInterestId: 'seraphine', companionIds: ['yelena'], sceneBeats: [{ activityName: 'Tea' }] })

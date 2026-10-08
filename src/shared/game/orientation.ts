@@ -21,25 +21,21 @@ export function orientationStep(content: ContentPack, state: GameState): Orienta
 }
 
 /**
- * Who the player is thrown together with at each step: one love interest, so that he is
+ * Who the player is thrown together with at each step: one student love interest, so that he is
  * introduced to people one at a time. Orientation is there for those he would not otherwise
  * run into: only someone he shares no class with is dealt out, one to a step. Classmates
  * are left for class, and whoever is left over is met some other way. A step that names
- * its own keeps her.
+ * its own keeps her, if she is a student.
  */
 export function orientationCasts(content: ContentPack, state: GameState): string[][] {
   const steps = content.orientation?.steps ?? []
   const mine = state.courses.filter((c) => state.enrolment?.includes(c.id))
   const classmate = (id: string) => mine.some((c) => courseMembers(c).includes(id))
   const named = new Set(steps.flatMap((step) => step.castIds ?? []))
-  // Orientation is a University affair: people from outside it are not there to be met.
-  const strangers = content.loveInterests
-    .filter((li) => kindOf(li) !== 'outsider')
-    .map((li) => li.id)
-    .filter((id) => !named.has(id) && !classmate(id))
-  const casts = steps.map((step) =>
-    (step.castIds ?? []).filter((id) => content.loveInterests.some((li) => li.id === id)).slice(0, MET_AT_A_STEP)
-  )
+  // Orientation is for the new intake: only fellow students are there to be met, not teachers or people from outside.
+  const students = content.loveInterests.filter((li) => kindOf(li) === 'student').map((li) => li.id)
+  const strangers = students.filter((id) => !named.has(id) && !classmate(id))
+  const casts = steps.map((step) => (step.castIds ?? []).filter((id) => students.includes(id)).slice(0, MET_AT_A_STEP))
   // One to each open step in turn. Anyone left when every step has someone is met some other way.
   const open = steps.map((_step, i) => i).filter((i) => (steps[i].castIds ?? []).length === 0)
   for (let turn = 0; strangers.length > 0 && turn < MET_AT_A_STEP; turn++) {

@@ -97,7 +97,7 @@ describe('canPerform', () => {
 
 describe('describeEffects', () => {
   it('summarises what an activity changes', () => {
-    expect(describeEffects(activity('work'))).toEqual(['+10 coin', '−20 energy'])
+    expect(describeEffects(activity('work'))).toEqual(['+$10', '−20 energy'])
     expect(describeEffects(activity('date'))).toEqual(['+5 affection'])
   })
 })

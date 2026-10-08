@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { StatsDialog } from './StatsDialog'
 import {
+  SLEEP_HOURS,
   STAT_CAP,
   trainingToward,
   coursePoints,
@@ -10,23 +12,25 @@ import {
   drillOuting,
   suggestDrills,
   type Outing,
-  canWork,
   shiftNow,
   appointmentsNow,
   attendees,
-  canAttend,
-  canKeep,
   coursesInSession,
   eventsOn,
   firstNames,
   isGameOver,
-  loveInterestsAt,
+  approachableAt,
   meetingNow,
   npcsAt,
+  isOrientationDay,
   orientationStep,
+  hasMet,
+  formatTime,
+  nextUp,
+  canGoTo,
+  type Upcoming,
   stageFor,
   toDate,
-  stallsAt,
   unreadNotes,
   weatherOn
 } from '../../../shared/game'
@@ -36,11 +40,10 @@ import { Backdrop } from './Backdrop'
 import {
   CalendarIcon,
   ChevronIcon,
-  LogIcon,
   MapIcon,
+  MenuIcon,
   MarketIcon,
-  ChatIcon,
-  SettingsIcon,
+  PhoneIcon,
   WeatherIcon
 } from './icons'
 import type { Panel } from './panels'
@@ -51,7 +54,6 @@ interface Props {
   partnerId: string | undefined
   /** The view of the current location the player picked, if any. */
   backgroundId: string | undefined
-  notice: string
   /** Waiting on the AI to work out something the player typed. */
   busy: boolean
   /** Something of the player's own devising: "invite Faye and Tink out for dinner". */
@@ -59,32 +61,37 @@ interface Props {
   /** Asks to go and do something that was suggested, such as a way of raising a stat. */
   onOuting: (outing: Outing) => void
   onActivity: (activity: Activity) => void
-  /** Turn up for a plan whose time has come. */
-  onKeep: (appointmentId: string) => void
   /** Have a word with an NPC who is here. */
   onTalkNpc: (npcId: string) => void
   /** Go to the next part of orientation. */
   onOrientation: () => void
-  /** Sit the class of a course that is meeting now. */
-  onAttend: (courseId: string) => void
-  /** Clocks in for the shift that is under way. */
-  onWork: () => void
+  /** Takes up a class, shift or plan of his: one that is on now, or the next to come today, skipping the time until it starts. He is taken to it. */
+  onGoTo: (next: Upcoming) => void
+  /** Ends the day early: the rest of it is let go, and he sleeps until morning. */
+  onEndDay: () => void
   /** Browse the shops here, or go to the market (if there are none here) and browse its stalls. */
   onMarket: () => void
   onOpen: (panel: Panel) => void
-  onExit: () => void
 }
 
 /** Between scenes: where and when you are, and the choice of what to do next. */
 export function DayView(props: Props) {
-  const { content, state, partnerId, notice, onActivity, onOpen, onExit } = props
+  const { content, state, partnerId, onActivity, onOpen } = props
   const { calendar } = content
+  const [idea, setIdea] = useState('')
+  // Whether the ways of raising each stat are laid out.
+  const [showStats, setShowStats] = useState(false)
+  // Whether his stats are laid out in full.
+  const [statSheet, setStatSheet] = useState(false)
+  // The course picked to study for; an empty string while the list of courses is open, and null with the menu shut.
+  const [studying, setStudying] = useState<string | null>(null)
   const date = toDate(calendar, state.time)
   const location = content.locations.find((l) => l.id === state.locationId)
   const today = eventsOn(content, state)
   const over = isGameOver(calendar, state.time)
   const weather = weatherOn(content, state)
-  const present = loveInterestsAt(content, state, state.locationId)
+  // Whoever is here and can be gone up to: someone in a class he does not take with her is left out.
+  const present = approachableAt(content, state, state.locationId)
   const npcsHere = npcsAt(content, state, state.locationId)
   // The player's own courses that are meeting right now.
   const classes = coursesInSession(content, state).filter((c) => state.enrolment?.includes(c.id))
@@ -95,20 +102,20 @@ export function DayView(props: Props) {
   const shift = shiftNow(content, state)
   const { player } = state
 
-  const [idea, setIdea] = useState('')
-
-  // Whether the ways of raising each stat are laid out.
-
-  const [showStats, setShowStats] = useState(false)
-
-  // The course picked to study for; an empty string while the list of courses is open, and null with the menu shut.
-
-  const [studying, setStudying] = useState<string | null>(null)
+  // Something of his that is on right now: taking it up takes him to it from wherever he is.
+  const underWay = (kind: Upcoming['kind'], id: string, locationId: string): Upcoming => ({ kind, id, title: '', time: state.time, locationId })
+  // Whether something of his is on right now that he can still take up: a class that has just begun counts from its first hour.
+  const onNow =
+    classes.some((course) => canGoTo(content, state, underWay('class', course.id, course.locationId)).ok) ||
+    (shift !== undefined && canGoTo(content, state, underWay('work', shift.job.id, shift.job.locationId)).ok) ||
+    appointmentsNow(state).some((plan) => canGoTo(content, state, underWay('plan', plan.id, plan.locationId)).ok)
+  // The next class, shift or plan of his still to come today. Only one thing is put forward at a time: with something
+  // on now, that is it, and what follows it waits its turn.
+  const upcoming = onNow ? undefined : nextUp(content, state)
   // While orientation has a part left, it is the only thing to do.
   const induction = over ? undefined : orientationStep(content, state)
   const inductionPlace = content.locations.find((l) => l.id === induction?.locationId)
 
-  const tbi = (feature: string, note: string) => () => onOpen({ kind: 'tbi', feature, note })
 
   return (
     <main className="stage">
@@ -120,11 +127,10 @@ export function DayView(props: Props) {
         </div>
         <div>
           <div className="date-line">
-            {date.weekday}, {date.day} {date.month.name} · {date.period.name}
+            {date.weekday}, {date.day} {date.month.name} · {formatTime(date)}
           </div>
           <div className="caps">
             Day {date.dayIndex + 1} of {calendar.lengthDays}
-            {weather && ` · ${weather.name}`}
             {today.map((e) => ` · ${e.name}`)}
             {location && ` · ${location.name}`}
           </div>
@@ -132,8 +138,8 @@ export function DayView(props: Props) {
       </div>
 
       <div className="plaque glass">
-        <div className="caps underline">Coin</div>
-        <div className="plaque-value">{player.money}</div>
+        <div className="caps underline">Money</div>
+        <div className="plaque-value">${player.money}</div>
         <div className="caps">
           Energy {player.energy}/{player.maxEnergy}
         </div>
@@ -143,7 +149,7 @@ export function DayView(props: Props) {
         <div className="caps">
           Gifts carried {Object.values(state.inventory).reduce((total, count) => total + count, 0)}
         </div>
-        <div className="stat-grid">
+        <button type="button" className="stat-grid" aria-label="Your stats in full" onClick={() => setStatSheet(true)}>
           {STATS.map((stat) => (
             <span
               key={stat}
@@ -159,31 +165,31 @@ export function DayView(props: Props) {
               <i style={{ width: `${(player.stats[stat] ?? 0) >= STAT_CAP ? 100 : (trainingToward(state, stat).banked / trainingToward(state, stat).needed) * 100}%` }} />
             </span>
           ))}
-        </div>
+        </button>
       </div>
+      {statSheet && <StatsDialog state={state} onClose={() => setStatSheet(false)} />}
 
       <div className="choices">
-        <h1 className="prompt glass">
-          {over ? 'The season has ended.' : 'What will you do?'}
-        </h1>
+        {over && <h1 className="prompt glass">The season has ended.</h1>}
 
+        {/* Who is here to be gone up to. With nobody, there is nothing to show. */}
+        {(present.length > 0 || npcsHere.length > 0) && (
         <div className="partners glass">
           <span className="caps">Here</span>
-          {present.length === 0 && npcsHere.length === 0 && <span>No one you know. Check the map.</span>}
           {present.map((li) => {
             const stage = stageFor(content.relationships, state.relationships[li.id].affection)
             return (
               <button
                 key={li.id}
-                className="partner"
-                title="Click to start a line about her below; right-click for what you know of her"
+                className={hasMet(state, li.id) ? 'partner' : 'partner unmet'}
+                title={`${li.name} · ${hasMet(state, li.id) ? stage.name : 'you have not met'}. Click to start a line about her below; right-click for what you know of her`}
                 onContextMenu={(event) => {
                   event.preventDefault()
                   onOpen({ kind: 'courier', id: li.id })
                 }}
                 onClick={() => setIdea(`Talk with ${li.name.split(' ')[0]}`)}
               >
-                {li.name.split(' ')[0]} · {stage.name}
+                {li.name.split(' ')[0]}
               </button>
             )
           })}
@@ -192,14 +198,15 @@ export function DayView(props: Props) {
             <button
               key={npc.id}
               className="partner npc"
-              title={`Talk to ${npc.name}`}
+              title={`Talk to ${npc.name}${npc.role ? `, ${npc.role}` : ''}`}
               disabled={induction !== undefined || over}
               onClick={() => props.onTalkNpc(npc.id)}
             >
-              {npc.name} · {npc.role}
+              {npc.name.split(' ')[0]}
             </button>
           ))}
         </div>
+        )}
 
         {induction && (
           <button className="featured" onClick={props.onOrientation}>
@@ -217,11 +224,33 @@ export function DayView(props: Props) {
           </p>
         )}
 
+        {/* The next thing on his timetable today: taking it skips the hours until it starts and takes him there. */}
+        {!induction && !over && upcoming && (
+          canGoTo(content, state, upcoming).ok ? (
+            <button className="featured" disabled={props.busy} onClick={() => props.onGoTo(upcoming)}>
+              <span className="chip outline-light">{upcoming.kind === 'class' ? 'Next class' : upcoming.kind === 'work' ? 'Next shift' : 'Next plan'}</span>
+              <span className="featured-title">{upcoming.title}</span>
+              <span>
+                skip to {formatTime(toDate(calendar, upcoming.time))} · {content.locations.find((l) => l.id === upcoming.locationId)?.name}
+              </span>
+              <ChevronIcon size={18} />
+            </button>
+          ) : (
+            <p className="glass note">
+              <strong>
+                Next: {upcoming.title} at {formatTime(toDate(calendar, upcoming.time))}.
+              </strong>{' '}
+              {canGoTo(content, state, upcoming).reasons.join(' · ')}
+            </p>
+          )
+        )}
+
         {!induction && appointmentsNow(state).map((plan) => {
-          const check = canKeep(content, state, plan.id)
+          const item = underWay('plan', plan.id, plan.locationId)
+          const check = canGoTo(content, state, item)
           const who = firstNames(content, attendees(plan))
           return check.ok ? (
-            <button key={plan.id} className="featured" onClick={() => props.onKeep(plan.id)}>
+            <button key={plan.id} className="featured" onClick={() => props.onGoTo(item)}>
               <span className="chip outline-light">Plan</span>
               <span className="featured-title">
                 {plan.title} with {who}
@@ -239,8 +268,8 @@ export function DayView(props: Props) {
         })}
 
         {!induction && shift && (
-          canWork(content, state).ok ? (
-            <button className="featured" onClick={props.onWork}>
+          canGoTo(content, state, underWay('work', shift.job.id, shift.job.locationId)).ok ? (
+            <button className="featured" onClick={() => props.onGoTo(underWay('work', shift.job.id, shift.job.locationId))}>
               <span className="chip outline-light">Work</span>
               <span className="featured-title">Start your shift: {shift.job.title}</span>
               <span>until {String(shift.shift.startHour + shift.shift.hours).padStart(2, '0')}:00</span>
@@ -248,15 +277,16 @@ export function DayView(props: Props) {
             </button>
           ) : (
             <p className="glass note">
-              <strong>Your shift as {shift.job.title.toLowerCase()} is on now.</strong> {canWork(content, state).reasons.join(' · ')}
+              <strong>Your shift as {shift.job.title.toLowerCase()} is on now.</strong> {canGoTo(content, state, underWay('work', shift.job.id, shift.job.locationId)).reasons.join(' · ')}
             </p>
           )
         )}
 
         {!induction && classes.map((course) => {
-          const check = canAttend(content, state, course.id)
+          const item = underWay('class', course.id, course.locationId)
+          const check = canGoTo(content, state, item)
           return check.ok ? (
-            <button key={course.id} className="featured" onClick={() => props.onAttend(course.id)}>
+            <button key={course.id} className="featured" onClick={() => props.onGoTo(item)}>
               <span className="chip outline-light">Class</span>
               <span className="featured-title">
                 Attend {course.number}: {course.title}
@@ -322,7 +352,11 @@ export function DayView(props: Props) {
               studyPlaces(content, state, studied).map((place) => {
                 const session = studyOuting(content, studied, place)
                 return (
-                  <button key={`${place.locationId}-${place.roomOf?.id ?? (place.own ? 'own' : '')}`} className="stat-option glass" disabled={props.busy} onClick={() => props.onOuting(session)}>
+                  <button key={`${place.locationId}-${place.roomOf?.id ?? (place.own ? 'own' : '')}`} className="stat-option glass" disabled={props.busy} onClick={() => {
+                    // Once it is chosen the bar folds away again.
+                    setStudying(null)
+                    props.onOuting(session)
+                  }}>
                     <span className="caps">+{studyPoints(content, session)} points</span>
                     <strong>{place.name}</strong>
                     <span className="hint">
@@ -345,7 +379,10 @@ export function DayView(props: Props) {
             </button>
             {showStats &&
               suggestDrills(content, state).map((suggestion) => (
-                <button key={suggestion.stat} className="stat-option glass" disabled={props.busy} onClick={() => props.onOuting(drillOuting(suggestion))}>
+                <button key={suggestion.stat} className="stat-option glass" disabled={props.busy} onClick={() => {
+                  setShowStats(false)
+                  props.onOuting(drillOuting(suggestion))
+                }}>
                   <span className="caps">
                     {STAT_LABELS[suggestion.stat]} {player.stats[suggestion.stat] ?? 0}
                   </span>
@@ -359,7 +396,15 @@ export function DayView(props: Props) {
           </div>
         )}
 
-        {notice && <p className="notice">{notice}</p>}
+        {!over && (
+          <button className="featured slim" disabled={props.busy || induction !== undefined} onClick={props.onEndDay}>
+            <span className="featured-title">End the day</span>
+            {/* Orientation has to be sat through first: the day cannot be ended while a part of it is left. */}
+            <span>{induction ? 'once orientation is done' : `until 0${SLEEP_HOURS.until}:00`}</span>
+            <ChevronIcon size={18} />
+          </button>
+        )}
+
 
         <form
           className="free-text"
@@ -389,16 +434,22 @@ export function DayView(props: Props) {
       </div>
 
       <div className="tiles">
-        <button className="tile glass" onClick={props.onMarket}>
+        {/* There is no shopping on orientation day. */}
+        <button
+          className="tile glass"
+          disabled={isOrientationDay(content, state)}
+          title={isOrientationDay(content, state) ? 'Closed to you on orientation day' : undefined}
+          onClick={props.onMarket}
+        >
           <MarketIcon size={36} />
-          {stallsAt(content, state.locationId).length > 0 ? 'Shops' : 'Market'}
+          Market
         </button>
         <button className="tile glass" onClick={() => onOpen({ kind: 'map' })}>
           <MapIcon size={36} />
           Map
         </button>
         <button className="tile glass" onClick={() => onOpen({ kind: 'courier' })}>
-          <ChatIcon size={36} />
+          <PhoneIcon size={36} />
           Phone
           {unreadNotes(state) > 0 && <span className="badge">{unreadNotes(state)}</span>}
         </button>
@@ -408,29 +459,11 @@ export function DayView(props: Props) {
         </button>
       </div>
 
+      {/* The menu, for whoever does not reach for Escape: continue, save, load, settings, and the way out. */}
       <div className="corner">
-        <button
-          className="util glass"
-          onClick={tbi('Log', 'A history of everything that has happened so far.')}
-        >
-          <LogIcon size={18} />
-          Log
-        </button>
-        <button className="util glass" onClick={() => onOpen({ kind: 'save' })}>
-          Save
-        </button>
-        <button className="util glass" onClick={() => onOpen({ kind: 'load' })}>
-          Load
-        </button>
-        <button className="util glass" onClick={onExit}>
+        <button className="util glass" title="Menu (Esc)" onClick={() => onOpen({ kind: 'menu' })}>
+          <MenuIcon size={18} />
           Menu
-        </button>
-        <button
-          className="util glass icon"
-          aria-label="Settings"
-          onClick={() => onOpen({ kind: 'settings' })}
-        >
-          <SettingsIcon size={20} />
         </button>
       </div>
     </main>

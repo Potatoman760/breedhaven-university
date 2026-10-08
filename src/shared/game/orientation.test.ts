@@ -99,3 +99,23 @@ describe('orientation day', () => {
     expect(coursesInSession(content, nextWeek).map((c) => c.id)).toEqual(['c1'])
   })
 })
+
+describe('who orientation is for', () => {
+  it('deals out students only: teachers and outsiders are met some other way', () => {
+    const mixed: ContentPack = {
+      ...content,
+      loveInterests: [
+        { ...people[0], kind: 'teacher', studies: undefined },
+        { ...people[1], kind: 'outsider', studies: undefined },
+        people[2]
+      ],
+      orientation: OrientationSchema.parse({
+        steps: [
+          { id: 'assembly', name: 'the Assembly', locationId: 'shop', startHour: 8, hours: 2, castIds: ['ana'] },
+          { id: 'supper', name: 'the Supper', locationId: 'home', startHour: 9, hours: 1 }
+        ]
+      })
+    }
+    expect(orientationCasts(mixed, { ...createInitialState(mixed), enrolment: [] })).toEqual([[], ['cy']])
+  })
+})

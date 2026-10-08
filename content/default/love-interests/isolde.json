@@ -1,54 +1,237 @@
 {
   "id": "isolde",
   "name": "Isolde Verrane",
-  "handle": "i.verrane",
+  "role": "",
   "age": 26,
   "pronouns": "she/her",
   "bio": "Graduate student in Public Administration, writing a thesis on household finance and teaching first-year statistics to pay for it.",
-  "appearance": "A strikingly beautiful adult woman aged 26, tall with elegant feminine hourglass proportions, a defined waist, softly full bust and hips, long graceful legs and refined shoulders. Warm light olive complexion, luminous almond-shaped grey eyes with long dark lashes, softly arched brows, high sculpted cheekbones, a delicate straight nose and full rose-toned lips. Glossy deep espresso-brown hair swept into a graceful low chignon with two soft face-framing tendrils. Poised, intelligent and quietly magnetic, unmistakably a mature adult woman.",
-  "imageSeed": 62,
+  "appearance": "A strikingly beautiful adult woman aged 26, tall with elegant feminine hourglass proportions, a defined waist, small bust and hips, long graceful legs and refined shoulders. Warm light olive complexion, luminous almond-shaped grey eyes with long dark lashes, softly arched brows, high sculpted cheekbones, a delicate straight nose and full rose-toned lips. Glossy deep espresso-brown hair swept into a graceful low chignon with two soft face-framing tendrils. Poised, intelligent and quietly magnetic, unmistakably a mature adult woman. Her body is slim but feminine, with alluring curves",
   "personality": "Isolde is very professional, but flirts constantly, in innuendo. Her face never betrays what she's thinking.",
   "traitIds": [
     "flirtatious"
   ],
+  "likes": [
+    "ledgers",
+    "books",
+    "maps",
+    "coffee"
+  ],
+  "dislikes": [
+    "cards",
+    "sweets"
+  ],
+  "admires": [
+    "intelligence",
+    "wisdom"
+  ],
+  "friends": [],
+  "enemies": [],
+  "handle": "i.verrane",
   "outfits": [
     {
       "id": "default",
       "name": "Usual clothes",
-      "description": "a beautifully tailored slate-green estate-manager's long coat, shaped closely at the waist with narrow lapels and small antique-brass buttons, over an ivory silk blouse with a neat modest V neckline. A long flowing charcoal skirt. Delicate thin silver oval spectacles worn on her face. A slim closed brown leather-bound account ledger with a plain unlettered cover held naturally against her outer hip. Refined fantasy-town clothing, flattering and professional rather than a bulky modern business suit",
+      "description": "a beautifully tailored slate-green estate-manager's long coat, shaped closely at the waist with narrow lapels and small antique-brass buttons, over an ivory silk blouse with a neat modest V neckline. A long flowing charcoal skirt. Delicate thin silver oval spectacles worn on her face, flattering and professional",
       "sprites": {
-        "happy-2": "sprites/isolde/happy-cutout-2.png",
-        "happy": "sprites/isolde/happy-cutout.png",
-        "neutral": "sprites/isolde/neutral-cutout-2.png"
-      }
+        "neutral": {
+          "image": "sprites/isolde/default-neutral-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/isolde/default-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/isolde/default-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/isolde/default-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/isolde/default-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/isolde/default-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/isolde/default-aroused-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     },
     {
       "id": "pregnant",
       "name": "Pregnant",
-      "inherits": "default",
       "description": "She has a round, pregnant belly.",
-      "sprites": {},
+      "inherits": "default",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/isolde/pregnant-neutral-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/isolde/pregnant-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/isolde/pregnant-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/isolde/pregnant-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/isolde/pregnant-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/isolde/pregnant-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/isolde/pregnant-aroused-cutout.png",
+          "description": ""
+        }
+      },
       "pregnant": true
     },
     {
       "id": "nude",
       "name": "Nude",
-      "description": "nothing at all, completely nude",
+      "description": "nothing at all, completely nude except Delicate thin silver oval spectacles worn on her face",
       "sprites": {
-        "bath": "sprites/isolde/nude-bath.png",
-        "neutral": "sprites/isolde/nude-cutout.png"
-      }
+        "neutral": {
+          "image": "sprites/isolde/nude-neutral-2-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/isolde/nude-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/isolde/nude-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/isolde/nude-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/isolde/nude-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/isolde/nude-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/isolde/nude-aroused-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     },
     {
       "id": "nude-pregnant",
       "name": "Nude, pregnant",
-      "inherits": "nude",
       "description": "She has a round, pregnant belly.",
-      "sprites": {},
+      "inherits": "nude",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/isolde/nude-pregnant-neutral-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/isolde/nude-pregnant-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/isolde/nude-pregnant-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/isolde/nude-pregnant-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/isolde/nude-pregnant-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/isolde/nude-pregnant-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/isolde/nude-pregnant-aroused-cutout.png",
+          "description": ""
+        }
+      },
       "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
+  "faceY": 4,
+  "imageSeed": 62,
+  "stageHeight": 100,
+  "studies": {
+    "subject": "Public Administration",
+    "code": "ADM",
+    "level": 5,
+    "stats": [
+      "intelligence"
+    ],
+    "practical": false
+  },
+  "animations": [
+    {
+      "id": "blowjob",
+      "name": "Blowjob",
+      "description": "",
+      "image": "sprites/isolde/nsfw-blowjob.png",
+      "loop": true
+    },
+    {
+      "id": "missionary",
+      "name": "Missionary",
+      "description": "",
+      "image": "sprites/isolde/nsfw-missionary-4.png",
+      "loop": true
+    },
+    {
+      "id": "doggy",
+      "name": "Doggy",
+      "description": "",
+      "image": "sprites/isolde/nsfw-doggy.png",
+      "loop": true
+    },
+    {
+      "id": "cowgirl",
+      "name": "Cowgirl",
+      "description": "",
+      "image": "sprites/isolde/nsfw-cowgirl.png",
+      "loop": true
+    },
+    {
+      "id": "creampie",
+      "name": "Creampie",
+      "description": "",
+      "image": "sprites/isolde/nsfw-creampie.png",
+      "loop": true
+    },
+    {
+      "id": "facial",
+      "name": "Facial",
+      "description": "",
+      "image": "sprites/isolde/nsfw-facial.png",
+      "loop": true
+    }
+  ],
   "schedule": [
     {
       "periods": [
@@ -77,34 +260,18 @@
   ],
   "room": {
     "name": "a study-bedroom on Lantern Row",
-    "description": "A rented room that is mostly a study: a wide wooden desk under two computer monitors, a wall covered in colour-coded charts and pinned sheets of figures, tall bookshelves with files in strict order, a brass desk lamp, a teacup on a saucer. A narrow single bed is pushed against the far wall beneath a small window. Dark green walls, wooden floorboards, tidy and precise, cool evening light.",
-    "locationId": "lantern-row"
+    "description": "A rented room that is more study than bedroom: a wide desk under two screens and a wall of modern art, shelves in strict order, and a posh modern bed",
+    "locationId": "lantern-row",
+    "background": "generated/backgrounds/isolde/view-4.png"
   },
   "ai": {
     "speechPattern": "Professional and composed, with frequent innuendo that also makes sense as work talk.",
-    "backstory": "Studies: Graduate student, College of Government and Law (Public Administration); thesis on household finance\n\nPost: Teaching assistant for first-year statistics\n\nIsolde Verrane was the best student of her year and stayed on to write a thesis on how households of four and five adults actually share money. She is rarely seen without a leather folio under one arm, with a tablet inside it and a spreadsheet open on that. She pays her rent by teaching first-years statistics and marking their problem sets, and can tell from one look at a set of accounts who in a household is carrying whom. She explains everything through real cases.\n\nShe is professional to a fault and flirts in innuendo so dry that half of it is missed. Being listened to matters to her as much as being admired.\n\nHer magic is small and orderly: tea that stays hot, ink that dries when told, and a knack for feeling that a column of figures is wrong before she has found the error."
-  },
-  "likes": [
-    "ledgers",
-    "books",
-    "maps",
-    "coffee"
-  ],
-  "dislikes": [
-    "cards",
-    "sweets"
-  ],
-  "admires": [
-    "intelligence",
-    "wisdom"
-  ],
-  "studies": {
-    "subject": "Public Administration",
-    "code": "ADM",
-    "level": 5,
-    "stats": [
-      "intelligence"
-    ],
-    "practical": false
+    "tone": "",
+    "verbalQuirks": [],
+    "exampleDialogue": [],
+    "backstory": "Studies: Graduate student, College of Government and Law (Public Administration); thesis on household finance\n\nPost: Teaching assistant for first-year statistics\n\nIsolde Verrane was the best student of her year and stayed on to write a thesis on how households of four and five adults actually share money. She is rarely seen without a leather folio under one arm, with a tablet inside it and a spreadsheet open on that. She pays her rent by teaching first-years statistics and marking their problem sets, and can tell from one look at a set of accounts who in a household is carrying whom. She explains everything through real cases.\n\nShe is professional to a fault and flirts in innuendo so dry that half of it is missed. Being listened to matters to her as much as being admired.\n\nHer magic is small and orderly: tea that stays hot, ink that dries when told, and a knack for feeling that a column of figures is wrong before she has found the error.",
+    "knowledge": [],
+    "secrets": [],
+    "extraInstructions": ""
   }
 }

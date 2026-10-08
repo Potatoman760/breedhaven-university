@@ -75,11 +75,11 @@ function toPng(image: Raster): Buffer {
  * beside it: `default-neutral.png` becomes `default-neutral-cutout.png`. The original is
  * deleted once the cut-out is safely written, so the caller repoints whatever used it.
  */
-export function cutoutArt(addonDir: string, request: CutoutRequest): CutoutResult {
+export function cutoutArt(addonDir: string, request: CutoutRequest, prefix: string = ADDON_PREFIX): CutoutResult {
   const nothing = { ok: false, path: null, colour: null, cleared: 0, feathered: 0, enclosed: 0 }
-  if (!request.path.startsWith(ADDON_PREFIX)) return { ...nothing, message: 'Only pictures in your add-on folder can be cut out.' }
+  if (!request.path.startsWith(prefix)) return { ...nothing, message: 'Only pictures in your add-on folder can be cut out.' }
   const root = resolve(addonDir)
-  const source = resolve(root, request.path.slice(ADDON_PREFIX.length))
+  const source = resolve(root, request.path.slice(prefix.length))
   if (!source.startsWith(root + sep) || !existsSync(source)) return { ...nothing, message: 'That picture is no longer there.' }
   if (extname(source).toLowerCase() !== '.png') return { ...nothing, message: 'Only a PNG can be cut out.' }
 

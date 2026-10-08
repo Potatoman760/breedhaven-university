@@ -14,6 +14,8 @@ export interface SceneSummary {
   memories: Record<string, string>
   /** Why what each love interest feels moved as it did, in her own judgement, by id. */
   reasons: Record<string, string>
+  /** What he paid for in the scene, and what it came to. */
+  spending?: { amount: number; on: string }
   /** Why a memory is a plain note instead of one written by the LLM, if any is. */
   memoryError?: string
 }
@@ -28,7 +30,8 @@ interface Props {
 }
 
 function change({ from, to }: Growth): string {
-  const delta = to - from
+  // To a tenth: training comes in fractions, and a difference of two of them is not a round number as the machine holds it.
+  const delta = Math.round((to - from) * 10) / 10
   return delta > 0 ? `+${delta}` : delta < 0 ? `−${-delta}` : 'no change'
 }
 
@@ -72,11 +75,19 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
               <div key={g.label} className="growth">
                 <span>{g.label}</span>
                 <span className="hint">
-                  {g.from} → {g.to}
+                  {g.label === 'money' && '$'}
+                  {g.from} → {g.label === 'money' && '$'}
+                  {g.to}
                 </span>
                 <strong className={g.to >= g.from ? 'up' : 'down'}>{change(g)}</strong>
               </div>
             ))}
+            {summary.spending && (
+              <p className="hint spent">
+                You paid ${summary.spending.amount}
+                {summary.spending.on ? `: ${summary.spending.on}` : ''}.
+              </p>
+            )}
           </section>
 
           {!scene.npc && <section>

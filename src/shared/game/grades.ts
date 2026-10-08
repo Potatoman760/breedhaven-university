@@ -24,13 +24,14 @@ export function addCoursePoints(content: ContentPack, state: GameState, courseId
 /**
  * What an hour of class is worth in a course. Sitting every class of the term comes to the
  * share of the marks that attendance carries, whatever the course's hours: a course with a
- * lab asks more hours for the same marks.
+ * lab asks more hours for the same marks. The weeks of the examinations have no classes to
+ * sit, and are not counted.
  */
 export function pointsPerClassHour(content: ContentPack, course: Course): number {
   const grading = gradingOf(content)
   const hoursAWeek = course.meetings.reduce((sum, meeting) => sum + meeting.hours, 0)
   if (!grading || hoursAWeek === 0) return 0
-  return grading.attendanceShare / (hoursAWeek * grading.finalWeek)
+  return grading.attendanceShare / (hoursAWeek * Math.max(1, grading.finalWeek - EXAM_KINDS.length))
 }
 
 /** What a session of study is worth: by the hour, and a little more in his own room, where nothing interrupts. */
@@ -74,6 +75,17 @@ export function examSlot(content: ContentPack, course: Course, kind: ExamKind): 
 /** The examination a course is sitting right now, if its slot is on. */
 export function examNow(content: ContentPack, state: GameState, course: Course): ExamSlot | undefined {
   return EXAM_KINDS.map((kind) => examSlot(content, course, kind)).find((slot) => slot !== undefined && state.time >= slot.begins && state.time < slot.ends)
+}
+
+/**
+ * Which examinations a day falls in the week of, if either. In those weeks the lectures and
+ * labs are off: a course meets only in the one slot in which its examination is sat.
+ */
+export function examWeek(content: ContentPack, dayIndex: number): ExamKind | undefined {
+  const grading = gradingOf(content)
+  if (!grading) return undefined
+  const week = Math.floor(dayIndex / 7) + 1
+  return week === grading.midtermWeek ? 'midterm' : week === grading.finalWeek ? 'final' : undefined
 }
 
 /** The examination, if any, that takes the place of a course's meeting on a given day at a given hour. */

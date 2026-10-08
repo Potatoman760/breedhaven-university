@@ -41,6 +41,25 @@ export function loveInterestsAt(
   return content.loveInterests.filter((li) => locationOf(content, state, li) === locationId)
 }
 
+/**
+ * Whether someone is sitting in a class the player is not taking: she is at the place, but
+ * in a room he has no business in, and not to be walked up to. Someone waiting for him by
+ * arrangement is not in class.
+ */
+export function inClassApart(content: ContentPack, state: GameState, li: Pick<LoveInterest, 'id'>): boolean {
+  if (appointmentsNow(state).some((a) => attendees(a).includes(li.id))) return false
+  const course = coursesInSession(content, state).find((c) => courseMembers(c).includes(li.id))
+  return course !== undefined && !state.enrolment?.includes(course.id)
+}
+
+/**
+ * The love interests at a place whom the player can go up to: everyone there but those
+ * in a class he does not take with them.
+ */
+export function approachableAt(content: ContentPack, state: GameState, locationId: string): LoveInterest[] {
+  return loveInterestsAt(content, state, locationId).filter((li) => !inClassApart(content, state, li))
+}
+
 /** Love interests who aren't anywhere the player can find them right now. */
 export function whereaboutsUnknown(content: ContentPack, state: GameState): LoveInterest[] {
   return content.loveInterests.filter((li) => locationOf(content, state, li) === undefined)
@@ -53,15 +72,13 @@ export function canTravel(content: ContentPack, state: GameState, locationId: st
 
   if (isGameOver(content.calendar, state.time)) reasons.push('The game is over')
   if (locationId === state.locationId) reasons.push('You are already here')
-  // Judged on the hour of arrival, not departure.
-  const arrival = toDate(content.calendar, state.time + content.map.travelHours)
-  if (!isOpen(location, arrival.hour)) reasons.push(`${location.name} will be closed`)
+  if (!isOpen(location, toDate(content.calendar, state.time).hour)) reasons.push(`${location.name} is closed`)
   return { ok: reasons.length === 0, reasons }
 }
 
-/** Moves the player to another location, which takes the map's travel time. */
+/** Moves the player to another location. Going there takes no time. */
 export function travel(content: ContentPack, state: GameState, locationId: string): GameState {
   const check = canTravel(content, state, locationId)
   if (!check.ok) throw new Error(`Cannot travel to "${locationId}": ${check.reasons.join('; ')}`)
-  return { ...state, locationId, time: state.time + content.map!.travelHours }
+  return { ...state, locationId }
 }

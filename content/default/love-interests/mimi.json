@@ -7,18 +7,26 @@
   "pronouns": "she/her",
   "bio": "Mimi opened Boba Blossom with a loan, a pink neon sign and a recipe for colour-changing tea she will not write down.",
   "appearance": "A slim, cute woman of 27 with light skin, bright dark eyes, a small nose, and pastel pink hair in two low buns with a blunt fringe. Petite with a narrow waist.",
-  "imageSeed": 60,
   "personality": "Bubbly, sharp at business and a perfectionist about tapioca. Sweet until a queue forms.",
   "outfits": [
     {
       "id": "default",
       "name": "Work clothes",
       "description": "a white cropped blouse under a pastel green pinafore apron with a blossom logo and a pleated pink skirt",
-      "sprites": {}
+      "sprites": {
+        "neutral": {
+          "image": "sprites/mimi/default-neutral-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     }
   ],
   "defaultOutfitId": "default",
   "faceY": 8,
+  "imageSeed": 60,
+  "stageHeight": 100,
+  "animations": [],
   "schedule": [],
   "ai": {
     "speechPattern": "Fast and cheerful with customer-voice sparkle; drops it at once when giving staff instructions.",

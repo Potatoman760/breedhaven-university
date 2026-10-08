@@ -1,14 +1,16 @@
-import { picturedOutfit, EXPRESSIONS, kindOf, outfitDescription, type ContentPack, type LoveInterest, type Departure, type GameState, type Npc, type Scene, type SceneBeat, type SceneGift } from '../model'
+import { picturedOutfit, EXPRESSIONS, poseDescription, kindOf, outfitDescription, type ChatMessage, type ContentPack, type LoveInterest, type Departure, type GameState, type Lesson, type Npc, type Scene, type SceneBeat, type SceneGift } from '../model'
 import { describeGift } from './market'
 import { attendees, describeWhen, upcomingAppointments } from './appointments'
 import { bondOf, describeBonds, statusOf } from './bonds'
 import { formatDate, formatTime, toDate } from './calendar'
 import { codexExcerpt, selectCodexEntries } from './codex'
-import { courierExcerpt, hasContact, offersContact } from './courier'
+import { DM_CLOSE, DM_OPEN, courierExcerpt, hasContact, offersContact } from './courier'
 import { recentPostsBy } from './feed'
 import { describeRapport } from './rapport'
 import { locationOf } from './map'
 import { classSoon } from './courses'
+import { PLAYER_TOKEN } from './personalise'
+import { nextUp } from './upcoming'
 import { jobFacts } from './jobs'
 import { describeAppeal } from './stats'
 import { evaluateAll } from './conditions'
@@ -17,7 +19,7 @@ import { describeAge, describeBeat, selectMemories } from './memory'
 import { stageFor } from './relationships'
 import { describePregnancy, canConceive, pregnancyStage, wearableOutfits, wornOutfit } from './pregnancy'
 import { firstNames, SCENE_END_TAG, SEEDED_TAG } from './scene'
-import { describePlace, describeRoom, describeWeather, roomOwner, sceneView } from './sceneMoves'
+import { describePlayerRoom, playerRoom, describePlace, describeRoom, describeWeather, roomOwner, sceneView } from './sceneMoves'
 import { backgroundFor, isIndoors } from './schedule'
 import { weatherOn } from './weather'
 
@@ -31,11 +33,19 @@ const CLASS_SOON_HOURS = 2
 const REPLY_LINES = '2 to 4'
 const LINE_WORDS = 25
 const REPLY_WORDS = 60
+// The reply a class opens with is a stretch of the lecture, and runs longer than any other.
+const LESSON_LINES = '5 to 8'
+const LESSON_LINE_WORDS = 30
+const LESSON_WORDS = 180
 
 export interface PromptInput {
   content: ContentPack
   state: GameState
   loveInterestId: string
+  /** The class the scene is set in, if it is one. */
+  lesson?: Lesson
+  /** Nothing has been said yet: this reply opens the scene. */
+  opening?: boolean
   /**
    * Other love interests in the scene. The LLM writes their lines too, each line named
    * for its speaker.
@@ -46,7 +56,7 @@ export interface PromptInput {
    * line spoken face to face. `invite` is a note the character sends unprompted, to ask
    * the player to something.
    */
-  mode?: 'scene' | 'courier' | 'invite' | 'news'
+  mode?: 'scene' | 'courier' | 'invite' | 'news' | 'note'
   /** For `news`: what the character has to tell. */
   news?: string
   /**
@@ -73,7 +83,7 @@ export interface PromptInput {
    * How the character appears in the current scene. When given, the prompt lists the
    * outfits, sprites and animations the LLM may switch to.
    */
-  look?: Pick<Scene, 'outfitId' | 'animationId'>
+  look?: Pick<Scene, 'outfitId' | 'animationId' | 'animationOf'>
   /** How the others in the scene appear, by id. */
   looks?: Scene['looks']
   /** How comfortable each love interest in the scene last said she was, by id. */
@@ -109,7 +119,10 @@ export function buildCharacterPrompt(input: PromptInput): string {
     (c) => c.id !== li.id && (input.companionIds ?? []).includes(c.id)
   )
   const group = companions.length > 0
-  const named = group || (input.extras ?? []).length > 0
+  // In a class the teacher has a voice of their own, so every spoken line says whose it is.
+  const named = group || (input.extras ?? []).length > 0 || input.lesson !== undefined
+  // The reply that opens a class is the lecture, and is written to its own length.
+  const lecture = input.lesson !== undefined && input.opening === true
   const others = firstNames(content, companions.map((c) => c.id))
   const firstName = li.name.split(' ')[0]
   const isNpc = input.npc !== undefined
@@ -130,7 +143,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
           : `You are not part of the University: you do not study or teach there, and know it from outside.`
   const extras = input.extras ?? []
   // With anyone else to write for, every spoken line says whose it is.
-  const byCourier = input.mode === 'courier' || input.mode === 'invite' || input.mode === 'news'
+  const byCourier = input.mode === 'courier' || input.mode === 'invite' || input.mode === 'news' || input.mode === 'note'
   const notes = courierExcerpt(content, state, li.id)
   const whereabouts = content.locations.find((l) => l.id === locationOf(content, state, li))
   const herView = whereabouts && backgroundFor(whereabouts)
@@ -143,6 +156,12 @@ export function buildCharacterPrompt(input: PromptInput): string {
   // Exactly where the character is: with the player in a scene, wherever her day has her when writing a note.
   const view = sceneView(content, state, input.backgroundId)
   const owner = roomOwner(content, { roomOf: input.roomOf })
+  // Or the player's own room, which is nobody's in the scene.
+  const his = playerRoom(content, { roomOf: input.roomOf })
+  // The next thing on his own timetable, when it is close enough to matter to where the scene goes.
+  const coming = byCourier ? undefined : nextUp(content, state)
+  const due = coming && coming.time - state.time <= CLASS_SOON_HOURS ? coming : undefined
+  const duePlace = content.locations.find((l) => l.id === due?.locationId)
   const done = sceneBeats.filter((beat) => beat.finished)
   const current = sceneBeats.filter((beat) => !beat.finished)
   const outfit = wornOutfit(content, state, li, look?.outfitId)
@@ -154,7 +173,9 @@ export function buildCharacterPrompt(input: PromptInput): string {
   const outfits = wearableOutfits(content, state, li)
   const cast = [li, ...companions]
   const fertile = cast.filter((c) => canConceive(content, state, c.id))
-  const { animations } = li
+  // Only a pose with something to show can be asked for.
+  const posesOf = (who: LoveInterest) => who.animations.filter((a) => a.image !== undefined || a.clip !== undefined)
+  const animations = li.animations.filter((a) => a.image !== undefined || a.clip !== undefined)
   const traitsOf = (ids: string[]) => content.traits.filter((t) => ids.includes(t.id))
   const isBirthday = li.birthday?.month === date.month.id && li.birthday.day === date.day
 
@@ -182,14 +203,25 @@ export function buildCharacterPrompt(input: PromptInput): string {
 
     byCourier &&
       section('How to write your message', [
-        `You and ${player.name} are apart. You are messaging ${player.name} on Chats, the messaging ` +
-          `app everyone at the University has on their phone. People message back and forth all day, ` +
+        `You and ${player.name} are apart. You are sending ${player.name} a DM on Bloomr, the photo ` +
+          `app everyone at the University has on their phone. People DM back and forth all day, ` +
           `a line or two at a time.`,
         '- Write only the message itself: one to three short sentences, under 50 words, in your own voice, typed the way you would type on your phone.',
         '- No actions, no asterisks, no description, no greeting line or signature unless it is in character.',
-        !isNpc && `- To meet ${player.name}, call the propose_meeting tool and suggest exactly the day, time and place it gives.`,
+        `- Put the message between ${DM_OPEN} and ${DM_CLOSE}, and write nothing else: no thinking aloud, no note on what he said or what you would say. Anything outside the tags is thrown away.`,
+        !isNpc &&
+          `- When ${player.name} asks to meet or to do something together and you are willing, call the propose_meeting tool in this ` +
+            `same message: that is what puts it in his calendar, and saying yes without calling it arranges nothing. Choose the place ` +
+            `yourself, somewhere that suits what was asked; never ask him to name one. If he means now or today, ask for "today". ` +
+            `Then say yes and name exactly the day, time and place the tool gives.`,
+        !isNpc && `- To ask ${player.name} to meet, call propose_meeting the same way and suggest exactly what it gives.`,
         input.mode === 'news' &&
           `- Nobody has written to you just now. You are writing first, because you have news: ${input.news ?? ''}`,
+        input.mode === 'note' &&
+          `- Nobody has written to you just now. ${player.name} is on your mind, so you are writing first, about whatever you would: ` +
+            `something from your day or from the last time you saw him, a tease, a question, a thought you want him to have. ` +
+            `What you say and how warm it is follows how you feel about him and what the two of you are to each other. ` +
+            `Do not repeat what you have already sent him. You need not ask to meet.`,
         input.mode === 'invite' &&
           `- Nobody has written to you just now. You have been thinking about ${player.name} and want ` +
             `to see him, so you are writing first. Call propose_meeting for something you would ` +
@@ -218,8 +250,18 @@ export function buildCharacterPrompt(input: PromptInput): string {
     !byCourier && section('How to write your reply', [
       `Your reply appears in a small text box, one line at a time, and ${player.name} clicks ` +
         `through it. Write for that:`,
-      `- Write ${REPLY_LINES} short lines, each on its own line. Each line is one beat.`,
-      `- Keep every line under ${LINE_WORDS} words, and the whole reply under ${REPLY_WORDS}.`,
+      lecture
+        ? `- This reply opens the class with the lecture: write ${LESSON_LINES} lines, each on its own line. Each line is one beat.`
+        : `- Write ${REPLY_LINES} short lines, each on its own line. Each line is one beat.`,
+      lecture
+        ? `- Keep every line under ${LESSON_LINE_WORDS} words, and the whole reply about ${LESSON_WORDS}.`
+        : `- Keep every line under ${LINE_WORDS} words, and the whole reply under ${REPLY_WORDS}.`,
+      input.lesson &&
+        `- ${input.lesson.speaker} is teaching the class and has a voice in the scene: a line of theirs starts with "${input.lesson.speaker}:".`,
+      input.lesson &&
+        `- ${input.lesson.speaker} teaches the room and does not call on ${player.name}, put a question to him or single him out. A question asked of the class is answered by ` +
+          `another student: one of you, or someone unnamed in a line of narration. Only when ${player.name} himself speaks to ${input.lesson.speaker}, or puts his hand up, does ` +
+          `${input.lesson.speaker} answer him directly.`,
       named
         ? `- Most lines are speech. Start every spoken line with the speaker's first name ` +
           `and a colon, then what they say, with no quotation marks: ${firstName}: Sit down, then.`
@@ -227,14 +269,20 @@ export function buildCharacterPrompt(input: PromptInput): string {
       group &&
         `- Not everyone speaks every time. Let whoever would naturally answer speak; ` +
           `${others} should each get a line now and then, and may talk to each other.`,
-      named
+      lecture
+        ? '- A line of narration is written in the third person and present tense, between asterisks: *The room settles.*'
+        : named
         ? '- At most one line may be a small action by one of you, naming them, in the third ' +
           'person and present tense, between asterisks: *Ana glances at the door.*'
         : '- At most one line may be a small action or expression of your own, in the third ' +
           'person and present tense, between asterisks: *She glances at the door.*',
-      `- Never describe the scenery, and never write what ${player.name} says, does or feels.`,
-      `- Say one thing and stop. End on something ${player.name} can answer. This is a ` +
-        `conversation, not a speech: short turns, back and forth.`,
+      lecture
+        ? `- Never write what ${player.name} says, does or feels.`
+        : `- Never describe the scenery, and never write what ${player.name} says, does or feels.`,
+      lecture
+        ? `- End on something ${player.name} can answer.`
+        : `- Say one thing and stop. End on something ${player.name} can answer. This is a ` +
+          `conversation, not a speech: short turns, back and forth.`,
       '- No lists, headings or summaries.'
     ]),
 
@@ -264,12 +312,13 @@ export function buildCharacterPrompt(input: PromptInput): string {
       ...li.ai.exampleDialogue.map((ex) => `Example - them: "${ex.user}" you: "${ex.reply}"`)
     ]),
 
+    // Who he is, as anyone who has heard of him knows it.
+    section(`About ${player.name}`, [player.bio.split(PLAYER_TOKEN).join(player.name)]),
+
     !isNpc && section(`Your relationship with ${player.name}`, [
       `Stage: ${stage.name}. ${stage.description}`.trim(),
-      li.ai.stageNotes[stage.id],
       `Affection ${rel.affection}, trust ${rel.trust}, desire ${rel.desire} ` +
         `(each out of ${content.relationships.meterMax}).`,
-      ...traitsOf(player.traitIds).map((t) => `${player.name} is ${t.name}: ${t.definition}`),
       ...describeAppeal(state, li)
     ]),
 
@@ -289,7 +338,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
         ...traitsOf(c.traitIds).map((t) => `- ${t.name}: ${t.definition}`),
         labelled('How they speak', [c.ai.speechPattern, c.ai.tone].filter((s) => s.length > 0).join(' ')),
         ...c.ai.verbalQuirks.map((q) => `- ${q}`),
-        `With ${player.name}: ${theirStage.name}. ${c.ai.stageNotes[theirStage.id] ?? theirStage.description}`.trim(),
+        `With ${player.name}: ${theirStage.name}. ${theirStage.description}`.trim(),
         statusOf(content, bondOf(state, c.id)) &&
           `She and ${player.name} are in a relationship: ${statusOf(content, bondOf(state, c.id))?.name}.`,
         last && `Their last time with ${player.name}: ${last.summary}`,
@@ -315,7 +364,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
     section('The scene', [
       `It is ${formatTime(date)} (${date.period.name}) on ${formatDate(date)}.`,
       weather &&
-        describeWeather(weather, byCourier ? (whereabouts ? isIndoors(whereabouts, herView) : true) : owner !== undefined || isIndoors(location, view)),
+        describeWeather(weather, byCourier ? (whereabouts ? isIndoors(whereabouts, herView) : true) : owner !== undefined || his !== undefined || isIndoors(location, view)),
       ...eventsOn(content, state).map((e) => `Today is ${e.name}. ${e.description}`.trim()),
       ...upcomingEvents(content, state, UPCOMING_EVENT_DAYS).map(({ event, inDays }) =>
         `${event.name} is ${inDays === 1 ? 'tomorrow' : `in ${inDays} days`}. ${event.description}`.trim()
@@ -323,7 +372,9 @@ export function buildCharacterPrompt(input: PromptInput): string {
       isBirthday && 'Today is your birthday.',
       byCourier
         ? `You are ${whereabouts ? `at ${whereabouts.name}` : 'in your own rooms'}; ${player.name} is elsewhere.`
-        : owner
+        : his
+          ? `You${group ? `, ${others}` : ''} and ${player.name} are in ${describePlayerRoom(his, location, player.name)}`
+          : owner
           ? `You${group ? `, ${others}` : ''} and ${player.name} are in ${describeRoom(owner, location, li.id)}`
           : location && `You${group ? `, ${others}` : ''} and ${player.name} are at ${describePlace(location, view)}`,
       sceneBeats.length > 0 &&
@@ -368,7 +419,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
       )
     ),
 
-    section(`Messages you and ${player.name} have sent each other on Chats, oldest first`, notes),
+    section(`Messages you and ${player.name} have sent each other in Bloomr DMs, oldest first`, notes),
 
     section(
       `Your latest posts on Bloomr, the feed app, which anyone can read`,
@@ -422,7 +473,19 @@ export function buildCharacterPrompt(input: PromptInput): string {
                 const has = wearableOutfits(content, state, c).map((o) => `${o.id} (${o.name})`).join(', ')
                 const first = c.name.split(' ')[0]
                 return `- ${first} is wearing "${worn?.id ?? c.defaultOutfitId}". She has: ${has}.${pregnantNote(c, first, 'is') ? ` ${pregnantNote(c, first, 'is')}` : ''}`
-              })
+              }),
+              // Poses belong to one of them each, and one is shown at a time, over everyone.
+              ...(cast.some((c) => posesOf(c).length > 0)
+                ? [
+                    'During sex, an explicit pose of ONE of you at a time can be shown over the whole scene, on top of everyone\'s pictures.' +
+                      (look.animationId ? ` "${look.animationId}" of ${cast.find((c) => c.id === (look.animationOf ?? li.id))?.name.split(' ')[0] ?? firstName} was up for the last reply.` : ''),
+                    ...cast.filter((c) => posesOf(c).length > 0).map((c) => `- ${c.name.split(' ')[0]}: ${posesOf(c).map((a) => `${a.id} (${poseDescription(a) || a.name})`).join('; ')}`),
+                    'A pose is chosen in addition to the faces and outfits, never in their place. When the scene reaches what a pose shows, add a line saying whose and which: [POSE: Name=id]. ' +
+                      'Choose the one of you the moment is most about. Most replies have no [POSE] line at all: write one only in a reply whose own lines show that act happening at that moment, ' +
+                      'and never for talk, kissing or anything afterwards. A pose is up for the one reply that asks for it and comes down with the next, so do not carry it on out of habit. ' +
+                      'creampie and facial are a single moment and are never shown twice running.'
+                  ]
+                : [])
             ]
           : [
               pregnantNote(li, 'You', 'are'),
@@ -438,11 +501,14 @@ export function buildCharacterPrompt(input: PromptInput): string {
               ...(animations.length > 0
                 ? [
                     look.animationId
-                      ? `Animations replace your picture with a video. "${look.animationId}" is playing now:`
-                      : 'Animations replace your picture with a video:',
-                    ...animations.map((a) => `- ${a.id} (${a.name}, ${a.loop ? 'loops' : 'plays once'}): ${a.description || 'no description'}`),
-                    'Write [ANIMATION: id] when the scene reaches what an animation shows. One that loops plays until you ' +
-                      'write [ANIMATION: none], which you do as soon as it no longer matches; one that plays once ends by itself.'
+                      ? `During sex, one of these explicit poses can be shown over the whole scene, on top of your picture. "${look.animationId}" was up for your last reply:`
+                      : 'During sex, one of these explicit poses can be shown over the whole scene, on top of your picture:',
+                    ...animations.map((a) => `- ${a.id} (${a.name}, ${!a.clip ? 'a picture' : a.loop ? 'a clip that loops' : 'a clip that plays once'}): ${poseDescription(a) || 'no description'}`),
+                    'A pose is chosen in addition to your face and outfit, never in their place: go on writing the [EXPRESSION] line every reply, and [OUTFIT] when what you wear changes, ' +
+                      'and add [POSE: id] on a line of its own when the scene reaches what a pose shows: for example [OUTFIT: nude], [EXPRESSION: aroused], [POSE: missionary]. ' +
+                      'Most replies have no [POSE] line at all. Write one only in a reply whose own lines show that act happening at that moment; a reply of talk, kissing, undressing, ' +
+                      'lying together or anything afterwards has none. A pose is up for the one reply that asks for it and comes down with the next, so do not carry it on out of habit: ' +
+                      'ask for it again only while the same act is still going on in what you write. creampie and facial are a single moment and are never shown twice running.'
                   ]
                 : [])
             ]),
@@ -488,14 +554,14 @@ export function buildCharacterPrompt(input: PromptInput): string {
       !isNpc &&
       cast.some((c) => !hasContact(state, c.id)) &&
       section(
-        'Chats',
+        'Bloomr',
         cast
           .filter((c) => !hasContact(state, c.id))
           .map((c) => {
             const who = group ? c.name.split(' ')[0] : 'You'
             return offersContact(content, state, c.id)
-              ? `${who} ${group ? 'is' : 'are'} taken enough with ${player.name} to want him to have ${group ? 'her' : 'your'} Chats: offer it unasked at a natural moment in this scene.`
-              : `${who} ${group ? 'does' : 'do'} not offer ${player.name} ${group ? 'her' : 'your'} Chats unasked.`
+              ? `${who} ${group ? 'is' : 'are'} taken enough with ${player.name} to want him to have ${group ? 'her' : 'your'} Bloomr: offer it unasked at a natural moment in this scene.`
+              : `${who} ${group ? 'does' : 'do'} not offer ${player.name} ${group ? 'her' : 'your'} Bloomr unasked.`
           })
       ),
 
@@ -517,7 +583,15 @@ export function buildCharacterPrompt(input: PromptInput): string {
       sceneBeats.length > 0 &&
       section('Moving on, and time passing', [
         `Where you are and what time it is are kept by the game, and time moves only when the scene does. Never write that ` +
-          `you and ${player.name} have gone somewhere else, or that hours have gone by, without calling move_scene for it.`
+          `you and ${player.name} have gone somewhere else, or that hours have gone by, without calling move_scene for it.`,
+        `Going somewhere now and planning to meet later are two different things, each with its own tool, and you call one or the other, never both for the same thing. ` +
+          `move_scene is for now: the two of you get up and go, and the scene carries on there. propose_meeting is for later: it puts a time on the calendar and you stay where you are.`,
+        // What he has to be at soon, so that she does not try to carry him off somewhere else.
+        due &&
+          `${player.name} has ${due.title} at ${formatTime(toDate(content.calendar, due.time))}` +
+            `${duePlace ? ` at ${duePlace.name}` : ''}, ${due.time - state.time <= 1 ? 'within the hour' : `in ${due.time - state.time} hours`}, and has to be there. ` +
+            `Do not take the scene anywhere that would make him late for it: the game will refuse. You may walk him to it, or let him go. ` +
+            `If you are in it too and the two of you go to it together, call go_to_event: that ends this scene and begins it.`
       ]),
 
     sceneBeats.length > 0 &&
@@ -531,11 +605,60 @@ export function buildCharacterPrompt(input: PromptInput): string {
 
     // Repeated last, where it is least likely to be forgotten.
     byCourier
-      ? 'Reminder: write only the message, one to three short sentences.'
+      ? `Reminder: write only the message, one to three short sentences, between ${DM_OPEN} and ${DM_CLOSE}.`
       : (look && !isNpc ? `Reminder: begin with the [EXPRESSION] and [COMFORT] lines${group ? ', one of each for each of you' : ''}. Then ` : 'Reminder: ') +
-        `${REPLY_LINES} short lines, one beat per line, under ${REPLY_WORDS} words in all.` +
+        (lecture
+          ? `${LESSON_LINES} lines of the lecture, one beat per line, about ${LESSON_WORDS} words in all.`
+          : `${REPLY_LINES} short lines, one beat per line, under ${REPLY_WORDS} words in all.`) +
       (named ? ` Every spoken line starts with the speaker's first name and a colon.` : '')
   ]
 
   return sections.filter((s): s is string => typeof s === 'string' && s.length > 0).join('\n\n')
+}
+
+/**
+ * What stands in for the player's first line when a scene begins: the character opens it,
+ * with a little narration to set the scene and then what she says. It is sent to the LLM
+ * and never kept in the scene or shown.
+ */
+export function openingCue(playerName: string): string {
+  return (
+    `[The scene begins here, and you open it. First a sentence or two of narration between asterisks that sets the scene: ` +
+    `where this is, what is going on, and ${playerName} arriving or already there. Then the first thing said to him, in character. ` +
+    `Keep it short, do not speak or act for ${playerName}, and follow every rule above.]`
+  )
+}
+
+/**
+ * The conversation as it is sent: the scene's own lines, with the opening cue in front
+ * when the character spoke first, so that the exchange always starts with the player's side,
+ * and with the hidden lines each of her replies began with put back in front of it.
+ */
+export function sceneTurns(messages: ChatMessage[], playerName: string, lesson?: Lesson): ChatMessage[] {
+  // Each of her replies goes back as she wrote it, hidden lines and all: one sent without them would teach her to leave them out.
+  const turns = messages.map(({ role, content, tags }): ChatMessage => ({ role, content: role === 'assistant' && tags ? `${tags}\n${content}` : content }))
+  return turns[0]?.role === 'user' ? turns : [{ role: 'user', content: lesson ? lessonCue(playerName, lesson) : openingCue(playerName) }, ...turns]
+}
+
+/**
+ * What stands in for the player's first line when a class begins: the lecture's opening.
+ * Whoever teaches it does the talking, and teaches something, for several beats; the
+ * usual limit on a reply's length is lifted for this one reply.
+ */
+export function lessonCue(playerName: string, lesson: Lesson): string {
+  return (
+    `[The class begins here, and you open it with the start of the lecture. This one reply is longer than any other: ` +
+    `${LESSON_LINES} lines, each a beat of its own and under ${LESSON_LINE_WORDS} words, about ${LESSON_WORDS} words in all.\n` +
+    `- ${lesson.speaker} is teaching ${lesson.course}.${lesson.about ? ` The course: ${lesson.about}` : ''}\n` +
+    `- Most of the lines are ${lesson.speaker} speaking to the room, and each of those starts with "${lesson.speaker}:". ` +
+    `They teach: today's topic named, an idea explained in plain words, a concrete example or a demonstration, ` +
+    `and perhaps a question put to the room. Real content that belongs to this subject and this world, said the way this teacher would say it.\n` +
+    `- ${playerName} is never called on. He could not know the answer to something made up for this lesson, so a question is put to the room and ` +
+    `answered by another student: one of you sitting near him, or someone unnamed, told in a line of narration (*A girl in the front row answers that...*). ` +
+    `${lesson.speaker} does not speak to ${playerName} or single him out.\n` +
+    `- The first line is a sentence of narration between asterisks as the room settles. One or two of the other lines may be ` +
+    `narration, or a short aside to ${playerName} from someone sitting beside him, named as usual.\n` +
+    `- End on something ${playerName} can answer without knowing the subject: a neighbour's whisper or aside to him, or a lull while the room takes notes. Never on a question from ${lesson.speaker}.\n` +
+    `- Do not speak or act for ${playerName}, and begin with the hidden lines as every reply does.]`
+  )
 }

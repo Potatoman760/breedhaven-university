@@ -12,7 +12,7 @@ const content = loadContentPack(join(process.cwd(), 'content', 'default'))
 
 /** A game in which nobody is anybody's friend or enemy yet, and the player is somewhere public, so that each test sets up only what it is about. */
 function fresh(seed = 1): GameState {
-  const state = createInitialState(content, 'Kael', seed)
+  const state = createInitialState(content, 'Pat', seed)
   return { ...state, locationId: 'lumen', rapport: Object.fromEntries(Object.keys(state.rapport).map((id) => [id, { friends: [], enemies: [] }])) }
 }
 const feels = (state: GameState, id: string, affection: number, desire = 0): GameState => ({
@@ -191,7 +191,7 @@ describe('planning and firing', () => {
 
     const direction = arrived.scene.beats.at(-1)!.direction!
     expect(direction).toBe(describeDrama(content, state, said, drama))
-    expect(direction).toContain('has just walked in and found Kael here with Faye')
+    expect(direction).toContain('has just walked in and found Pat here with Faye')
     expect(direction).toContain('on what is plainly a date')
     expect(direction).toContain('arrival first')
     // It reaches whoever writes the scene, which is now one with two of them in it.

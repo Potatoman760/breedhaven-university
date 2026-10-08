@@ -45,10 +45,10 @@ export class ComfyStore {
 }
 
 // Where each kind of picture is filed in the add-on folder. Sprites sit with the ones imported by hand.
-const FOLDERS: Record<ArtKind, string> = { sprite: 'sprites', background: 'generated/backgrounds', photo: 'generated/photos' }
+const FOLDERS: Record<ArtKind, string> = { sprite: 'sprites', background: 'generated/backgrounds', photo: 'generated/photos', nsfw: 'sprites' }
 
 /** Writes a picture into the add-on folder under a name nothing else has, and returns its content path. */
-export function fileArt(addonDir: string, kind: ArtKind, subjectId: string, name: string, bytes: Buffer): string {
+export function fileArt(addonDir: string, kind: ArtKind, subjectId: string, name: string, bytes: Buffer, prefix: string = ADDON_PREFIX): string {
   const subject = isSafeId(subjectId) ? subjectId : 'misc'
   const folder = `${FOLDERS[kind]}/${subject}`
   mkdirSync(join(addonDir, folder), { recursive: true })
@@ -57,7 +57,7 @@ export function fileArt(addonDir: string, kind: ArtKind, subjectId: string, name
   let file = `${stem}.png`
   for (let n = 2; existsSync(join(addonDir, folder, file)); n++) file = `${stem}-${n}.png`
   writeFileSync(join(addonDir, folder, file), bytes)
-  return `${ADDON_PREFIX}${folder}/${file}`
+  return `${prefix}${folder}/${file}`
 }
 
 export interface StudioRequest {
@@ -73,7 +73,7 @@ export interface StudioRequest {
 }
 
 /** One picture: the prompt written into a workflow, run on ComfyUI, and filed in the add-on folder. Never throws. */
-export async function generateArt(settings: ComfySettings, addonDir: string, request: StudioRequest, cancel?: AbortSignal): Promise<GenerateArtResult> {
+export async function generateArt(settings: ComfySettings, addonDir: string, request: StudioRequest, cancel?: AbortSignal, prefix: string = ADDON_PREFIX): Promise<GenerateArtResult> {
   const failed = (message: string): GenerateArtResult => ({ ok: false, message, path: null, seed: null, workflow: null, positive: null, skipped: [] })
 
   const { url, problem } = normaliseComfyUrl(settings.baseUrl)
@@ -109,7 +109,7 @@ export async function generateArt(settings: ComfySettings, addonDir: string, req
   if (!made.ok || !made.bytes) return failed(made.message)
 
   try {
-    const path = fileArt(addonDir, request.kind, request.subjectId, request.name, made.bytes)
+    const path = fileArt(addonDir, request.kind, request.subjectId, request.name, made.bytes, prefix)
     return { ok: true, message: '', path, seed, workflow: workflow.file, positive, skipped }
   } catch (cause) {
     return failed(`The picture was made but could not be saved: ${(cause as Error).message}`)

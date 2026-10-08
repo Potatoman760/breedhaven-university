@@ -1,34 +1,107 @@
 {
   "id": "yelena",
   "name": "Yelena Goldvine",
-  "handle": "yelenagoldvine",
+  "role": "",
   "age": 18,
   "pronouns": "she/her",
-  "bio": "First-year Law student, only daughter of Doran Goldvine, raised as her family's answer to the queen.",
+  "bio": "First-year Law student, only daughter of Doran Goldvine, raised as her family's answer to the queen. ",
   "appearance": "A striking young woman of eighteen with gold-flecked amber eyes, sun-warmed olive skin, and a mane of deep auburn hair streaked with copper that falls past her shoulder blades. Her figure is lush and deliberately unhidden: full breasts, a narrow waist, and broad hips. Her lips are full and often curved in a knowing half-smile, and her gaze is sharp and appraising beneath heavy lashes.",
-  "imageSeed": 60,
-  "personality": "Raised to be the perfect noble, but young at heart. Polished manners hide a longing to choose her own clothes, friends, pleasures, and future.",
+  "personality": "Raised to be the perfect noble, but young at heart. Polished manners hide a longing to choose her own clothes, friends, pleasures, and future. Starts as a virgin.",
   "traitIds": [
-    "jealous"
+    "jealous",
+    "loyal"
   ],
+  "likes": [
+    "art",
+    "ribbons",
+    "flowers",
+    "finery"
+  ],
+  "dislikes": [
+    "ale",
+    "salt"
+  ],
+  "admires": [
+    "strength",
+    "charisma"
+  ],
+  "friends": [],
+  "enemies": [
+    "seraphine"
+  ],
+  "handle": "yelenagoldvine",
   "outfits": [
     {
       "id": "default",
       "name": "Usual clothes",
       "description": "a fitted aristocratic gown of pale ivory silk with deep Goldvine-green panels and restrained antique-gold vine embroidery. Structured square neckline, long fitted sleeves, narrow waist, and layered floor-length skirt. Small gold vine brooch, single green gemstone pendant, delicate earrings, and immaculate cream gloves. Expensive, youthful, formal, and controlled; no crown, armor, or excessive ornament",
       "sprites": {
-        "angry": "sprites/yelena/angry-cutout.png",
-        "happy": "sprites/yelena/happy-cutout.png",
-        "neutral": "sprites/yelena/neutral-cutout.png",
-        "sad": "sprites/yelena/sad-cutout.png"
-      }
+        "angry": {
+          "image": "sprites/yelena/angry-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/yelena/happy-cutout.png",
+          "description": ""
+        },
+        "neutral": {
+          "image": "sprites/yelena/neutral-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/yelena/default-surprised-cutout-2.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/yelena/default-sad-cutout-2.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/yelena/default-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/yelena/default-aroused-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     },
     {
       "id": "pregnant",
       "name": "Pregnant",
-      "inherits": "default",
       "description": "She has a round, pregnant belly.",
-      "sprites": {},
+      "inherits": "default",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yelena/pregnant-neutral-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/yelena/pregnant-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/yelena/pregnant-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/yelena/pregnant-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/yelena/pregnant-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/yelena/pregnant-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/yelena/pregnant-aroused-cutout.png",
+          "description": ""
+        }
+      },
       "pregnant": true
     },
     {
@@ -36,20 +109,133 @@
       "name": "Nude",
       "description": "nothing at all, completely nude",
       "sprites": {
-        "bath": "sprites/yelena/nude-bath.png",
-        "neutral": "sprites/yelena/nude-cutout.png"
-      }
+        "neutral": {
+          "image": "sprites/yelena/nude-neutral-2-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/yelena/nude-happy-2-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/yelena/nude-sad-2-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/yelena/nude-angry-2-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/yelena/nude-surprised-2-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/yelena/nude-embarrassed-2-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/yelena/nude-aroused-2-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     },
     {
       "id": "nude-pregnant",
       "name": "Nude, pregnant",
-      "inherits": "nude",
       "description": "She has a round, pregnant belly.",
-      "sprites": {},
+      "inherits": "nude",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yelena/nude-pregnant-neutral-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/yelena/nude-pregnant-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/yelena/nude-pregnant-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/yelena/nude-pregnant-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/yelena/nude-pregnant-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/yelena/nude-pregnant-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/yelena/nude-pregnant-aroused-cutout.png",
+          "description": ""
+        }
+      },
       "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
+  "faceY": 4,
+  "imageSeed": 60,
+  "stageHeight": 100,
+  "studies": {
+    "subject": "Law",
+    "code": "LAW",
+    "level": 1,
+    "stats": [
+      "charisma",
+      "intelligence"
+    ],
+    "practical": false
+  },
+  "animations": [
+    {
+      "id": "blowjob",
+      "name": "Blowjob",
+      "description": "",
+      "image": "sprites/yelena/nsfw-blowjob.png",
+      "loop": true
+    },
+    {
+      "id": "doggy",
+      "name": "Doggy",
+      "description": "",
+      "image": "sprites/yelena/nsfw-doggy.png",
+      "loop": true
+    },
+    {
+      "id": "cowgirl",
+      "name": "Cowgirl",
+      "description": "",
+      "image": "sprites/yelena/nsfw-cowgirl.png",
+      "loop": true
+    },
+    {
+      "id": "facial",
+      "name": "Facial",
+      "description": "",
+      "image": "sprites/yelena/nsfw-facial.png",
+      "loop": true
+    },
+    {
+      "id": "missionary",
+      "name": "Missionary",
+      "description": "",
+      "image": "sprites/yelena/nsfw-missionary-2.png",
+      "loop": true
+    },
+    {
+      "id": "creampie",
+      "name": "Creampie",
+      "description": "",
+      "image": "sprites/yelena/nsfw-creampie-2.png",
+      "loop": true
+    }
+  ],
   "schedule": [
     {
       "weekdays": [
@@ -100,40 +286,18 @@
   ],
   "room": {
     "name": "a first-floor room in the Cloister Halls",
-    "description": "A modern student dormitory room dressed with expensive things from home. Smooth white walls and a flat ceiling with a strip of soft ward-light, a simple single bed made with fine embroidered linen and silk pillows, a large open travelling trunk spilling ivory and green gowns, charcoal sketches pinned to the wall over a framed crest of a golden vine, silk ribbons tied to the frame of a standing mirror, a phone lying face down on a built-in desk beside a vase of flowers. Warm late-afternoon light through a tall window.",
-    "locationId": "dormitories"
+    "description": "A room furnished from home and slowly being undone: fine linen on a student bed, a trunk of gowns, sketches pinned over the Goldvine crest, ribbons on the mirror, and a family phone she keeps face down.",
+    "locationId": "dormitories",
+    "background": "generated/backgrounds/yelena/view-2.png"
   },
   "ai": {
-    "speechPattern": "",
+    "speechPattern": "Raised to be the perfect noble, but young at heart. Polished manners hide a longing to choose her own clothes, friends, pleasures, and future.",
+    "tone": "",
+    "verbalQuirks": [],
+    "exampleDialogue": [],
     "backstory": "Studies: First year, College of Government and Law (Law)\n\nYelena Goldvine, eighteen, is the only daughter of Doran Goldvine, head of the second family in Breedhaven and one of the few men at the top of its politics. She was raised not in seclusion like the Dawnbloom princess but in the open: Highreache's terraces, campaign events, Assembly galleries. She was briefed in business, politics and the theology of the Bloom from the moment she could read, and groomed to be everything Seraphine V is not: confident where the queen is shy, composed where the queen falters, and in charge of her own choices rather than waiting for a council to make them.\n\nShe has had no lovers, and that is as deliberate a statement as the queen's seclusion: the Goldvines hold that a woman chooses her own Sire, on her own terms, in the open. Her family expects her to choose brilliantly. She is in the same year as the queen, and nobody at home thinks that is an accident.\n\nShe insisted on an ordinary room in halls. It is the first decision she has made that was not in a briefing.\n\nGoldvine magic is green magic. She was tutored in it like everything else and can bring a cutting to flower in her palm, a party trick she is tired of being asked for.",
+    "knowledge": [],
+    "secrets": [],
     "extraInstructions": "She knows the correct greeting and uses it before she has time to think. With someone she trusts, she wants to take off the formal shoes, laugh, explore, and make an ordinary choice without asking her family. Her wish for freedom should show up in specific things she wants to do. Pride and court skill remain, but she is more than a rival claimant."
-  },
-  "likes": [
-    "art",
-    "ribbons",
-    "flowers",
-    "finery"
-  ],
-  "dislikes": [
-    "ale",
-    "salt"
-  ],
-  "friends": [],
-  "enemies": [
-    "seraphine"
-  ],
-  "admires": [
-    "strength",
-    "charisma"
-  ],
-  "studies": {
-    "subject": "Law",
-    "code": "LAW",
-    "level": 1,
-    "stats": [
-      "charisma",
-      "intelligence"
-    ],
-    "practical": false
   }
 }

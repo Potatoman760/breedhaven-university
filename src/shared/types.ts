@@ -3,6 +3,7 @@ import type { LoveInterest } from './model'
 import type { ComfySettings, ComfyTestResult, CutoutRequest, CutoutResult, GenerateArtRequest, GenerateArtResult, WorkflowListResult } from './comfy'
 import {
   GameStateSchema,
+  PostPlanSchema,
   SceneSchema,
   type CalendarEvent,
   type ChatMessage,
@@ -13,6 +14,7 @@ import {
   type Proposal
 } from './model'
 import type { EditorInfo, EditorResult, ImportAssetRequest } from './editor'
+import type { PostDraft } from './game/feed'
 import type { Outing } from './game/outing'
 import type { SceneLook } from './game/scene'
 import type { SaveData, SaveRequest, SaveSummary, SlotId } from './saves'
@@ -47,17 +49,19 @@ export interface ChatResponse {
   proposal?: Proposal
   /** Where the character took the scene with the move tool: a location id, or `room-of-<love interest id>`. */
   moveTo?: string
+  /** The characters set off with the player for the next thing on his timetable, which they are in too: the scene ends, and that is what comes next. */
+  walkTo?: { withIds: string[] }
   /** What the player found out about the love interests in this reply. */
   revealed: { loveInterestId: string; factId: string }[]
   /** Pairs of love interests who became friends, enemies or neither in this reply. */
   rapport: { a: string; b: string; relation: 'friends' | 'enemies' | 'neither' }[]
   /** How comfortable each love interest said she was in this reply, by id. Kept on the scene for the LLM; never shown. */
   comfort: Record<string, { level: number; reason: string }>
-  /** Love interests who gave the player their Chats in this reply. */
+  /** Love interests who gave the player their Bloomr in this reply. */
   contacts: string[]
   /** Love interests who left the scene in this reply, with how they felt and why. The scene goes on without them. */
   left?: { ids: string[]; feeling: DepartureFeeling; reason: string }
-  /** Whole hours the character added with the time tool, beyond the walk of a move. */
+  /** Whole hours the character added with the time tool. */
   hours?: number
   /** Dice the character rolled while writing the reply, each as a line to show the player. */
   rolls: string[]
@@ -72,6 +76,8 @@ export interface SummarizeResponse {
   memories: Record<string, string>
   /** How the scene changed what each love interest feels for the player, by id, and why. None for an NPC. */
   feelings: Record<string, { affection: number; trust: number; desire: number; reason: string }>
+  /** What the player paid for in the scene and what it came to, when he paid for anything. */
+  spending?: { amount: number; on: string }
   /** Set when the LLM could not be used for at least one of them, which then got the plain fallback note. */
   error?: string
 }
@@ -93,6 +99,8 @@ export const CourierRequestSchema = z.object({
   loveInterestId: z.string(),
   /** True for a note the love interest sends unprompted, inviting the player to something. */
   invite: z.boolean().default(false),
+  /** True for a message she sends unprompted about whatever is on her mind, with no invitation needed. */
+  note: z.boolean().default(false),
   /** News the love interest writes to tell, unprompted. Takes the place of an invitation. */
   news: z.string().max(600).optional()
 })
@@ -112,14 +120,29 @@ export interface CourierResponse {
 
 export const FeedRequestSchema = z.object({
   state: GameStateSchema,
-  /** The love interests who post today. */
-  authorIds: z.array(z.string()).min(1).max(8)
+  /** The posts planned for today. */
+  plans: z.array(PostPlanSchema).min(1).max(12)
 })
 export type FeedRequest = z.input<typeof FeedRequestSchema>
 
 export interface FeedResponse {
-  posts: { authorId: string; text: string }[]
-  /** Set when the LLM could not be used and the posts are plain ones. */
+  /** The day's posts with their captions written, earliest first, each still to have its selfie drawn. */
+  drafts: PostDraft[]
+  /** Why there are none: the Main LLM or ComfyUI is not set up, or the LLM could not be reached. */
+  error?: string
+}
+
+export const FeedPictureRequestSchema = z.object({
+  authorId: z.string(),
+  /** What the file is called, before a number is added to keep it from replacing another. */
+  name: z.string().max(64),
+  prompt: z.string().max(8000)
+})
+export type FeedPictureRequest = z.input<typeof FeedPictureRequestSchema>
+
+export interface FeedPictureResponse {
+  /** The selfie's path in the content, or null when it could not be drawn. */
+  image: string | null
   error?: string
 }
 
@@ -146,12 +169,14 @@ export interface RendererApi {
   /** Works out what the player means by something they typed to do. Never rejects. */
   planOuting(request: PlanOutingRequest): Promise<PlanOutingResponse>
   /**
-   * Has a love interest write a message on Chats: an answer to the player's latest (rejects
+   * Has a love interest write a message in Bloomr DMs: an answer to the player's latest (rejects
    * if the LLM can't be reached), or an unprompted invitation (never rejects).
    */
   courier(request: CourierRequest): Promise<CourierResponse>
-  /** Writes today's Bloomr posts for the given love interests. Never rejects; without an LLM they are plain. */
+  /** Writes the captions of today's planned Bloomr posts. Never rejects; without both the Main LLM and ComfyUI set up there are none. */
   feed(request: FeedRequest): Promise<FeedResponse>
+  /** Draws the selfie for one Bloomr post on ComfyUI. Never rejects. */
+  feedPicture(request: FeedPictureRequest): Promise<FeedPictureResponse>
   getSettings(): Promise<SettingsView>
   saveSettings(update: SettingsUpdate): Promise<SettingsView>
   /** Sends a tiny request through the saved settings of the given profile. */
@@ -179,6 +204,16 @@ export interface RendererApi {
     saveLocation(location: unknown): Promise<EditorResult>
     /** Puts a changed location back as it shipped. */
     deleteLocation(id: string): Promise<EditorResult>
+    /** Adds an event or holiday to the calendar, or changes one. */
+    saveEvent(event: unknown): Promise<EditorResult>
+    /** Takes an event off the calendar. */
+    deleteEvent(id: string): Promise<EditorResult>
+    /** Has the Main LLM think of events for the calendar. They are not saved: the editor adds the ones it is given. Never rejects. */
+    draftEvents(): Promise<{ events?: CalendarEvent[]; error?: string }>
+    /** Writes the player a new game starts with: his default name, what he starts with, and his room. */
+    savePlayer(newGame: unknown): Promise<EditorResult>
+    /** Puts the player back as the game shipped him. */
+    resetPlayer(): Promise<EditorResult>
     /** Saves the course catalogue every new game starts with. */
     saveCatalogue(catalogue: unknown): Promise<EditorResult>
     /**

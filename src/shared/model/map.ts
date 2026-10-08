@@ -23,8 +23,6 @@ export const MapSchema = z.object({
   /** Image path inside the content pack. Without one the map is drawn as a plain chart. */
   image: z.string().optional(),
   regions: z.array(MapRegionSchema).default([]),
-  /** How long it takes to go from any location to any other. */
-  travelHours: z.number().int().min(1).default(1),
   pins: z.array(MapPinSchema)
 })
 export type GameMap = z.infer<typeof MapSchema>

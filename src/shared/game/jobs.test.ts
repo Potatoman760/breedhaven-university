@@ -72,7 +72,7 @@ describe('getting a job', () => {
     expect(hoursPerWeek(jobs.jobs[0])).toBe(5)
   })
 
-  it('puts his boss in his Chats, with a word from her on when he starts', () => {
+  it('puts his boss in his DMs, with a word from her on when he starts', () => {
     expect(currentJob(content, hired)?.id).toBe('clerk')
     expect(hired.job).toEqual({ jobId: 'clerk', hiredAt: 0, strikes: 0, settledTo: 0, worked: [], excused: [] })
     expect(hasContact(strong, 'bryn')).toBe(false)
@@ -189,7 +189,7 @@ describe('jobs elsewhere in the game', () => {
     ])
     expect(dayAgenda(content, strong, 0).filter((item) => item.kind === 'work')).toEqual([])
     const facts = jobFacts(content, hired, 'bryn')
-    expect(facts[0]).toContain('Pat works for you as shop clerk, paid 4 an hour')
+    expect(facts[0]).toContain('Pat works for you as shop clerk, paid $4 an hour')
     expect(facts[1]).toContain('He has 0 of 3 strikes')
     expect(facts[2]).toBe('He has a shift today at 08:00 that has not started yet.')
     expect(jobFacts(content, excuseShift(hired, '0:8'), 'bryn')[2]).toBe("He has already told you he will miss today's 08:00 shift.")

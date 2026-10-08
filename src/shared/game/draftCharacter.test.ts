@@ -33,7 +33,6 @@ const written = (patch: Record<string, unknown> = {}) => ({
     goals: ['Break a real story.', 'Be trusted.'],
     secret: 'She already knows who leaked it.',
     avoidTopics: [],
-    stageNotes: { [stages[0].id]: 'Interviews him.' },
     extraInstructions: 'Never cruel.'
   },
   ...patch
@@ -62,7 +61,6 @@ describe('writing a new love interest', () => {
     expect(li.studies?.code).toBe('JRN')
     expect(li.teaching).toBeUndefined()
     expect(li.ai.secrets).toEqual([{ text: 'She already knows who leaked it.', revealWhen: [{ type: 'stage', min: stages.at(-2)!.id }] }])
-    expect(li.ai.stageNotes).toEqual({ [stages[0].id]: 'Interviews him.' })
   })
 
   it('gives her an id nobody has, and refuses a reply that does not fit', () => {

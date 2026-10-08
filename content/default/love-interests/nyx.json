@@ -7,18 +7,26 @@
   "pronouns": "she/her",
   "bio": "Nyx runs the Undergrowth: the door, the bar, the vines, and the quiet room at the back.",
   "appearance": "A tall, striking woman of 36 with pale skin, kohl-lined violet eyes, sharp cheekbones, and long black hair with an undercut on one side. Lean and long-legged.",
-  "imageSeed": 60,
   "personality": "Cool, watchful and protective of her crowd. Has no patience for anyone who makes the floor unsafe.",
   "outfits": [
     {
       "id": "default",
       "name": "Work clothes",
-      "description": "a black leather corset top, slim black trousers, silver rings on every finger and an earpiece",
-      "sprites": {}
+      "description": "a black leather corset top, slim black trousers, and an earpiece",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/nyx/default-neutral-2-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     }
   ],
   "defaultOutfitId": "default",
   "faceY": 8,
+  "imageSeed": 60,
+  "stageHeight": 100,
+  "animations": [],
   "schedule": [],
   "ai": {
     "speechPattern": "Quiet enough that people lean in. Dry, unhurried, final.",

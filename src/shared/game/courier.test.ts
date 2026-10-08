@@ -1,9 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import type { ContentPack, GameState } from '../model'
 import {
+  contactsSaid,
   addNote,
   answerInvite,
+  DM_CLOSE,
+  DM_OPEN,
+  messageText,
+  canGoToInvite,
+  planFor,
+  chanceOfDm,
   chanceOfWriting,
+  sceneEndWriter,
   courierExcerpt,
   courierRound,
   courierRoundDue,
@@ -25,7 +33,7 @@ const content: ContentPack = {
   loveInterests: [{ ...base.loveInterests[0], admires: ['strength'] }]
 }
 const fresh = createInitialState(content)
-// She has given him her Chats already, except where a test says otherwise.
+// She has given him her Bloomr already, except where a test says otherwise.
 const start: GameState = { ...fresh, contacts: ['ana'] }
 const strong: GameState = { ...start, player: { ...start.player, stats: { strength: 19 } } }
 const tea = { loveInterestId: 'ana', companionIds: [], title: 'Tea', time: 4, hours: 2, locationId: 'home' }
@@ -78,8 +86,8 @@ describe('notes', () => {
     expect(kept.length).toBeLessThan(30)
 
     const scene = buildCharacterPrompt({ content, state: chatted, loveInterestId: 'ana', sceneBeats: [{ activityName: 'Tea' }] })
-    expect(scene).toContain('## Messages you and Pat have sent each other on Chats, oldest first\nPat: Lunch?')
-    expect(buildCharacterPrompt({ content, state: start, loveInterestId: 'ana' })).not.toContain('on Chats')
+    expect(scene).toContain('## Messages you and Pat have sent each other in Bloomr DMs, oldest first\nPat: Lunch?')
+    expect(buildCharacterPrompt({ content, state: start, loveInterestId: 'ana' })).not.toContain('in Bloomr DMs')
   })
 
   it('are written with a prompt of their own', () => {
@@ -137,7 +145,7 @@ describe('writing unprompted', () => {
   })
 })
 
-describe('her Chats', () => {
+describe('her Bloomr', () => {
   it('has to be given before he can message her or she writes to him', () => {
     expect(hasContact(fresh, 'ana')).toBe(false)
     expect(chanceOfWriting(content, { ...strong, contacts: [] }, 'ana')).toBe(0)
@@ -155,9 +163,122 @@ describe('her Chats', () => {
     expect(offersContact(content, giveContact(feeling(60, 0), 'ana'), 'ana')).toBe(false)
 
     const asked = buildCharacterPrompt({ content, state: fresh, loveInterestId: 'ana', sceneBeats: [{ activityName: 'Tea' }] })
-    expect(asked).toContain('## Chats')
-    expect(asked).toContain('You do not offer Pat your Chats unasked.')
+    expect(asked).toContain('## Bloomr')
+    expect(asked).toContain('You do not offer Pat your Bloomr unasked.')
     expect(buildCharacterPrompt({ content, state: feeling(60, 0), loveInterestId: 'ana', sceneBeats: [{ activityName: 'Tea' }] })).toContain('offer it unasked')
-    expect(buildCharacterPrompt({ content, state: start, loveInterestId: 'ana', sceneBeats: [{ activityName: 'Tea' }] })).not.toContain('## Chats')
+    expect(buildCharacterPrompt({ content, state: start, loveInterestId: 'ana', sceneBeats: [{ activityName: 'Tea' }] })).not.toContain('## Bloomr')
+  })
+})
+
+describe('a handle said aloud', () => {
+  it('counts as her Bloomr given, for someone in the scene whose contact he does not have', () => {
+    const pack = fixture()
+    const ana = pack.loveInterests[0]
+    const fresh = { ...createInitialState(pack), contacts: [] }
+    expect(contactsSaid(pack, fresh, [ana.id], 'Here. I am @ANA in Bloomr DMs.')).toEqual([ana.id])
+    expect(contactsSaid(pack, fresh, [ana.id], 'Maybe when I know you better.')).toEqual([])
+    expect(contactsSaid(pack, fresh, [], 'I am @ana.')).toEqual([])
+    expect(contactsSaid(pack, { ...fresh, contacts: [ana.id] }, [ana.id], 'I am @ana.')).toEqual([])
+  })
+})
+
+describe('going straight to what an invitation is for', () => {
+  const asked = addNote(start, 'ana', { from: 'them', text: 'Tea at four?', proposal: tea, read: true })
+  const note = (state: GameState) => state.courier['ana'][0]
+
+  it('can be done for one today that stands, answered or not, and never for one turned down or over', () => {
+    expect(canGoToInvite(content, asked, note(asked))).toBe(true)
+    const accepted = answerInvite(content, asked, 'ana', 0, true)
+    expect(canGoToInvite(content, accepted, note(accepted))).toBe(true)
+    expect(planFor(accepted, tea)).toMatchObject({ title: 'Tea', time: 4, locationId: 'home' })
+    // Under way, it can still be walked in on; once over, it cannot.
+    expect(canGoToInvite(content, { ...accepted, time: 5 }, note(accepted))).toBe(true)
+    expect(canGoToInvite(content, { ...accepted, time: 6 }, note(accepted))).toBe(false)
+
+    const declined = answerInvite(content, asked, 'ana', 0, false)
+    expect(canGoToInvite(content, declined, note(declined))).toBe(false)
+    expect(planFor(declined, tea)).toBeUndefined()
+    // One for another day is waited for like any other plan.
+    const tomorrow = addNote(start, 'ana', { from: 'them', text: 'Tomorrow?', proposal: { ...tea, time: 24 }, read: true })
+    expect(canGoToInvite(content, tomorrow, note(tomorrow))).toBe(false)
+    expect(canGoToInvite(content, start, { proposal: undefined })).toBe(false)
+  })
+
+  it('has her book it herself when he asks and she is willing', () => {
+    const prompt = buildCharacterPrompt({ content, state: start, loveInterestId: 'ana', mode: 'courier' })
+    expect(prompt).toContain('call the propose_meeting tool in this same message')
+    expect(prompt).toContain('never ask him to name one')
+  })
+})
+
+describe('what she sends', () => {
+  const thinking =
+    'Looking at the conversation, Pat\'s last message was "No problem, see you then Morwenna" — a simple, slightly flat sign-off. Morwenna would respond with something teasing but brief.\n\nSee you then, darling. Try not to miss me too terribly before Windsday.'
+  const message = 'See you then, darling. Try not to miss me too terribly before Windsday.'
+
+  it('is what is between the tags, and nothing she said to herself around it', () => {
+    expect(messageText(`Let me think.\n\n${DM_OPEN}${message}${DM_CLOSE}\n\nThat fits her.`, 'Morwenna Thriceborn')).toBe(message)
+    expect(messageText(`${DM_OPEN} ${message}`, 'Morwenna Thriceborn')).toBe(message)
+    expect(messageText(`First try: ${DM_OPEN}no${DM_CLOSE} Better: <DM>${message}</DM>`, 'Morwenna')).toBe(message)
+  })
+
+  it('is the last paragraph when the tags were left off and the rest is working-out', () => {
+    expect(messageText(thinking, 'Morwenna Thriceborn')).toBe(message)
+    expect(messageText(`I should keep this short.\n\n${message}`, 'Ana')).toBe(message)
+    // A message of her own in two paragraphs is left alone, and so is a plain one.
+    expect(messageText('Running late.\n\nSave me a seat?', 'Ana')).toBe('Running late.\n\nSave me a seat?')
+    expect(messageText(message, 'Morwenna')).toBe(message)
+    expect(messageText(`${DM_OPEN}${DM_CLOSE}`, 'Ana')).toBe('')
+  })
+
+  it('is asked for between the tags', () => {
+    expect(buildCharacterPrompt({ content, state: start, loveInterestId: 'ana', mode: 'courier' })).toContain(`between ${DM_OPEN} and ${DM_CLOSE}`)
+  })
+})
+
+describe('writing as a scene ends', () => {
+  const feels = (affection: number, desire = 0): GameState => ({ ...start, relationships: { ana: { affection, trust: 0, desire } } })
+
+  it('is likelier the more she feels, the more they are to each other, and when she has just been with him', () => {
+    expect(chanceOfDm(content, fresh, 'ana')).toBe(0)
+    expect(chanceOfDm(content, feels(0), 'ana')).toBeCloseTo(0.03)
+    expect(chanceOfDm(content, feels(50), 'ana')).toBeCloseTo(0.03 + 0.125)
+    expect(chanceOfDm(content, feels(50, 100), 'ana')).toBeCloseTo(0.03 + 0.125 + 0.1)
+    expect(chanceOfDm(content, feels(50), 'ana', ['ana'])).toBeCloseTo(0.03 + 0.125 + 0.1)
+    const status = content.relationships.statuses[0]
+    if (status) {
+      const together = { ...feels(50), bonds: [{ statusId: status.id, memberIds: ['ana'], since: 0 }] }
+      expect(chanceOfDm(content, together, 'ana')).toBeCloseTo(0.03 + 0.125 + (status.committed ? 0.15 : 0.08))
+    }
+    expect(chanceOfDm(content, { ...feels(100, 100), player: strong.player, bonds: [] }, 'ana', ['ana'])).toBeLessThanOrEqual(0.6)
+  })
+
+  it('waits on a message of hers he has not read, and is slower after one he never answered', () => {
+    const unread = addNote(feels(50), 'ana', { from: 'them', text: 'Hey.', read: false })
+    expect(chanceOfDm(content, unread, 'ana')).toBe(0)
+    expect(chanceOfDm(content, markRead(unread, 'ana'), 'ana')).toBeCloseTo((0.03 + 0.125) / 2)
+    const answered = addNote(markRead(unread, 'ana'), 'ana', { from: 'player', text: 'Hey yourself.', read: true })
+    expect(chanceOfDm(content, answered, 'ana')).toBeCloseTo(0.03 + 0.125)
+  })
+
+  it('names one writer at most, the same every time, and nobody whose Bloomr he does not have', () => {
+    const fond = feels(100, 100)
+    let wrote = 0
+    for (let time = 0; time < 200; time++) {
+      const now = { ...fond, time }
+      const writer = sceneEndWriter(content, now, ['ana'])
+      expect(sceneEndWriter(content, now, ['ana'])).toBe(writer)
+      expect(sceneEndWriter(content, { ...now, contacts: [] }, ['ana'])).toBeUndefined()
+      if (writer) wrote++
+    }
+    // 0.03 + 0.25 + 0.1 + 0.1 = 0.48 of the time, give or take.
+    expect(wrote).toBeGreaterThan(60)
+    expect(wrote).toBeLessThan(135)
+  })
+
+  it('is asked for as a message of her own, with no invitation needed', () => {
+    const prompt = buildCharacterPrompt({ content, state: feels(50), loveInterestId: 'ana', mode: 'note' })
+    expect(prompt).toContain('How to write your message')
+    expect(prompt).toContain('You need not ask to meet')
   })
 })

@@ -202,7 +202,6 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
                     {location.private ? ' · private' : ''}
                   </span>
                 </span>
-                {info && info.locations[location.id] !== 'base' && <span className="chip">changed</span>}
               </button>
             )
           })}

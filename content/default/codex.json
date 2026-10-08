@@ -12,7 +12,7 @@
     "id": "primordial-bloom",
     "title": "Primordial Bloom",
     "category": "Lore",
-    "content": "The Primordial Bloom is the living magic of the world: an active force in soil, water and blood, not a distant god. Its rules are known and studied. Seven girls are born for every boy. Only women can work magic. Only about one man in ten is fertile, and those men are called True Sires. Pregnancy greatly amplifies a woman's magic.\n\nIn women the Bloom is felt as a drive toward generativity: to create, nurture, grow and protect life. Pregnancy is its strongest expression and its strongest pull. A woman near a True Sire feels it as warmth, attention and want, strongest in the young and in those who have never carried a child, and absent after menopause. It is an instinct, not a command. She chooses what to do about it, and many satisfy the same drive through teaching, medicine, gardens, art or the people they look after. Bloom suppressants (\"dampers\") are cheap, legal and ordinary, and turn the pull down to a background hum.\n\nWhether the Bloom's wants are a woman's own is the oldest argument there is. Bloomists hold that they are sacred and fighting them is fighting nature. Freewill advocates answer that the Bloom may influence a woman but does not own her.",
+    "content": "The Primordial Bloom is the living magic of the world: an active force in soil, water and blood, not a distant god. Its rules are known and studied. Seven girls are born for every boy. Only women can work magic. Only about one man in ten is fertile, and those men are called True Sires. Pregnancy greatly amplifies a woman's magic.\n\nIn women the Bloom is felt as a drive toward generativity: to create, nurture, grow and protect life. Pregnancy is its strongest expression and its strongest pull. A woman near a True Sire feels it as warmth, attention and want, strongest in the young and in those who have never carried a child, and absent after menopause. It is an instinct, not a command. She chooses what to do about it. Bloom suppressants (\"dampers\") are cheap, legal and ordinary, and turn the pull down to a background hum.\n\nWhether the Bloom's wants are a woman's own is the oldest argument there is. Bloomists hold that they are sacred and fighting them is fighting nature. Freewill advocates answer that the Bloom may influence a woman but does not own her. The bloom causes women to instinctually crave breeding.",
     "keywords": [
       "The Bloom",
       "Bloomist",
@@ -29,7 +29,7 @@
     "id": "sires",
     "title": "True Sires",
     "category": "Lore",
-    "content": "Women outnumber men seven to one across the Sown Expanse, and most men cannot father children. Roughly one in ten can. They are True Sires, and civilization has organised itself around how few of them there are.\n\nA True Sire is not powerful; he is valuable. The law protects him heavily: assault, kidnapping and reproductive coercion of a Sire carry the gravest penalties, and paternity, inheritance and reproductive contracts have whole courts of their own. Fertility is established by a clinical assay and recorded in the national Sire Registry. The record is private by law and a Sire's status is his to disclose. Asking someone's fertility on a first date is very rude. In practice it leaks, and a known Sire lives with constant attention, some of it flattering and much of it wearying: he is treated as a prospect before he is treated as a person.\n\nMen who are not fertile have the opposite trouble. They are a small minority in every room and of no interest to the Bloom, and many feel invisible.\n\nKael is nineteen, a first-year student, and came to Breedhaven from outside the Expanse. His assay was the strongest ever recorded, and the result did not stay private.",
+    "content": "Women outnumber men seven to one across the Sown Expanse, and most men cannot father children. Roughly one in ten can. They are True Sires, and civilization has organised itself around how few of them there are.\n\nA True Sire is not powerful; he is valuable. The law protects him heavily: assault, kidnapping and reproductive coercion of a Sire carry the gravest penalties, and paternity, inheritance and reproductive contracts have whole courts of their own. Fertility is established by a clinical assay and recorded in the national Sire Registry. The record is private by law and a Sire's status is his to disclose. Asking someone's fertility on a first date is very rude. In practice it leaks, and a known Sire lives with constant attention, some of it flattering and much of it wearying: he is treated as a prospect before he is treated as a person.\n\nMen who are not fertile have the opposite trouble. They are a small minority in every room and of no interest to the Bloom, and many feel invisible.",
     "keywords": [
       "Sire",
       "True Sire",
@@ -45,7 +45,7 @@
     "id": "breedhaven-university",
     "title": "Breedhaven University",
     "category": "Places",
-    "content": "Breedhaven University stands in Seedblossom, on a campus whose oldest stone is seven centuries old and whose newest building is the Foundry, a magical engineering lab. It is a modern university of some thirty thousand students: lectures, labs, residence halls, a dining commons, clubs, a student government and too little parking. Every student is an adult; undergraduates are eighteen to twenty-two and graduate students run into their mid-twenties. About one student in eight is a man.\n\nIts colleges: Government and Law (which by custom educates the heir to the throne), Business, Bloom Studies and Divinity, Engineering, Life Sciences and Agriculture, Public Safety and Athletics (whose cadets staff Campus Security), and Arts and Humanities. Classes meet Solday to Hearthday; Marketday and Restday are free.\n\nThe Bloom shapes its institutions. The Reproductive Health Centre provides contraception, suppressants, fertility counselling and prenatal care. Bloom Counselling is free. The Sire Relations Office looks after the few registered True Sires, who are offered secure housing. Pregnant students get accommodations and, because pregnancy multiplies their magic, extra safety rules in the labs.\n\nKael has a suite in the Sire wing of the Cloister Halls.",
+    "content": "Breedhaven University stands in Seedblossom, on a campus whose oldest stone is seven centuries old and whose newest building is the Foundry, a magical engineering lab. It is a modern university of some thirty thousand students: lectures, labs, residence halls, a dining commons, clubs, a student government and too little parking. Every student is an adult; undergraduates are eighteen to twenty-two and graduate students run into their mid-twenties. About one student in eight is a man.\n\nIts colleges: Government and Law (which by custom educates the heir to the throne), Business, Bloom Studies and Divinity, Engineering, Life Sciences and Agriculture, Public Safety and Athletics (whose cadets staff Campus Security), and Arts and Humanities. Classes meet Solday to Hearthday; Marketday and Restday are free.\n\nThe Bloom shapes its institutions. The Reproductive Health Centre provides contraception, suppressants, fertility counselling and prenatal care. Bloom Counselling is free. The Sire Relations Office looks after the few registered True Sires, who are offered secure housing. Pregnant students get accommodations and, because pregnancy multiplies their magic, extra safety rules in the labs.",
     "keywords": [
       "university",
       "campus",
@@ -287,7 +287,7 @@
     "id": "the-sown-expanse",
     "title": "The Sown Expanse",
     "category": "Places",
-    "content": "The known world. The Bloom reaches all of it, and in every nation women outnumber men seven to one. Breedhaven is one prosperous state among several, linked to the rest by rail, sea, the net and a few long-range portal lines.\n\nIts neighbours: Kharad-Tor, the orc federation of the northern hills. Veyra, the beastkin democracy to the east. Iscara, where mages govern and the portal network is run. The Vesperan League, a maritime trading power. The Starkelands, the frozen north, most of whose people live in one great heated city.\n\nA True Sire of record assay is international news. Each of them has an interest in where Kael ends up.",
+    "content": "The known world. The Bloom reaches all of it, and in every nation women outnumber men seven to one. Breedhaven is one prosperous state among several, linked to the rest by rail, sea, the net and a few long-range portal lines.\n\nIts neighbours: Kharad-Tor, the orc federation of the northern hills. Veyra, the beastkin democracy to the east. Iscara, where mages govern and the portal network is run. The Vesperan League, a maritime trading power. The Starkelands, the frozen north, most of whose people live in one great heated city.\n\nA True Sire of record assay is international news.",
     "keywords": ["the Expanse", "abroad", "foreign"],
     "priority": 5
   },
@@ -295,7 +295,7 @@
     "id": "iscara",
     "title": "Iscara",
     "category": "Nations",
-    "content": "Iscara is governed by its mages. Office is earned by demonstrated ability, and the head of state, the Sorceress Queen, wins her title in open demonstration. It has the best-organised magic in the Expanse: it built and operates the long-range portal network, its wards protect half the world's ports, and its disaster teams are the ones other countries call.\n\nBecause pregnancy multiplies power, Iscara's great workings are led by pregnant mages, and its state takes a frank, clinical interest in strong Sires. It has already asked, courteously and in writing, whether Kael might care to visit.",
+    "content": "Iscara is governed by its mages. Office is earned by demonstrated ability, and the head of state, the Sorceress Queen, wins her title in open demonstration. It has the best-organised magic in the Expanse: it built and operates the long-range portal network, its wards protect half the world's ports, and its disaster teams are the ones other countries call.\n\nBecause pregnancy multiplies power, Iscara's great workings are led by pregnant mages, and its state takes a frank, clinical interest in strong Sires.",
     "keywords": [
       "the Iscaran Conclave",
       "Iscaran",
@@ -344,12 +344,13 @@
   },
   {
     "id": "courier-app",
-    "title": "Chats and Bloomr",
+    "title": "Bloomr",
     "category": "Lore",
-    "content": "Two apps are on every phone at the University. Chats is for messages: plans are made there, classes complained about and people asked out, a line or two at a time. Its icon is still a running courier, for the runners who carried notes between the colleges before there were phones, and older staff still say \"send me a courier\".\n\nBloomr is the feed: short public posts about your day, with a photo if you have one, that anyone at the University can read and like. Everyone has a handle. What goes on Bloomr is public and people post accordingly; anything that matters is said on Chats or in person. A like from someone you have your eye on gets noticed.",
+    "content": "Bloomr is the app on every phone at the University. Its feed is photos: selfies mostly, alone or with a friend, with a line about your day, that anyone at the University can see and like. Everyone has a handle, and giving someone your Bloomr means giving them your handle.\n\nIts DMs are where people actually talk: plans are made there, classes complained about and people asked out, a line or two at a time. What goes on the feed is public and people post accordingly; anything that matters is said in a DM or in person. A like from someone you have your eye on gets noticed.\n\nThe DM icon is still a running courier, for the runners who carried notes between the colleges before there were phones, and older staff still say \"send me a courier\".",
     "keywords": [
-      "Chats",
       "Bloomr",
+      "DM",
+      "DMs",
       "message",
       "messaged",
       "text",
@@ -358,6 +359,7 @@
       "posted",
       "feed",
       "handle",
+      "selfie",
       "courier"
     ],
     "priority": 4

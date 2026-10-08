@@ -10,6 +10,7 @@ import {
   type SlotId
 } from '../../shared/saves'
 import { errorMessage } from './errors'
+import { useConfirm } from './ui/Confirm'
 import { Overlay } from './ui/Dialog'
 
 export function describeSave(content: ContentPack, save: SaveSummary): string {
@@ -39,6 +40,9 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
     refresh()
   }, [])
 
+  // Overwriting and deleting are asked about first, in the game's own dialog.
+  const { ask, dialog } = useConfirm()
+
   if (!saves) return null
 
   async function run(action: () => Promise<void>) {
@@ -53,7 +57,7 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
   const save = (slotId: SlotId, occupied: boolean) =>
     run(async () => {
       if (!current) return
-      if (occupied && !window.confirm(`Overwrite ${slotLabel(slotId)}?`)) return
+      if (occupied && !(await ask({ title: `Overwrite ${slotLabel(slotId)}?`, detail: 'The game saved there is replaced by this one.', confirm: 'Overwrite' }))) return
       await window.api.saveGame({ slotId, ...current })
       await refresh()
       setNotice(`Saved to ${slotLabel(slotId)}.`)
@@ -63,7 +67,7 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
 
   const remove = (slotId: SlotId) =>
     run(async () => {
-      if (!window.confirm(`Delete ${slotLabel(slotId)}? This cannot be undone.`)) return
+      if (!(await ask({ title: `Delete ${slotLabel(slotId)}?`, detail: 'This cannot be undone.', confirm: 'Delete', grave: true }))) return
       await window.api.deleteSave(slotId)
       await refresh()
     })
@@ -101,6 +105,7 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
           </button>
         </div>
       </div>
+      {dialog}
     </Overlay>
   )
 }

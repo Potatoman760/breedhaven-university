@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import { CourseworkConfigSchema, type ContentPack, type Course, type GameState } from '../model'
 import { dayAgenda } from './agenda'
-import { attend, canAttend } from './courses'
-import { coursePoints, describeGrade, examNow, examSlot, gradeFor, pointsPerClassHour, settleExams, studyOuting, studyPlaces, studyPoints } from './grades'
+import { attend, canAttend, meetingNow } from './courses'
+import { coursePoints, describeGrade, examNow, examSlot, examWeek, gradeFor, pointsPerClassHour, settleExams, studyOuting, studyPlaces, studyPoints } from './grades'
 import { checkOuting, startOuting } from './outing'
 import { meet } from './scene'
 import { createInitialState } from './state'
@@ -11,7 +11,7 @@ import { fixture } from './testFixture'
 // The fixture's week of names is One, Two, Three on a 20-hour day, and the game starts on a
 // Two at 06:00. A term here is four weeks of seven days: the midterm is in the second and
 // the final in the fourth. The course has an hour's lecture on Twos at 06:00 and on Threes
-// at 08:00, so an hour of class is worth 60 / (2 x 4) = 7.5 of its hundred points.
+// at 08:00, and two of the four weeks are examination weeks with no classes, so an hour of class is worth 60 / (2 x 2) = 15 of its hundred points.
 const base = fixture()
 const ana = base.loveInterests[0]
 const content: ContentPack = {
@@ -52,12 +52,12 @@ const withPoints = (points: number, time: number): GameState => ({ ...start, tim
 
 describe("a course's points", () => {
   it('are earned by sitting its classes, so that the whole term of them comes to the share attendance carries', () => {
-    expect(pointsPerClassHour(content, course)).toBe(7.5)
+    expect(pointsPerClassHour(content, course)).toBe(15)
     expect(coursePoints(start, 'rid')).toBe(0)
-    expect(coursePoints(attend(content, start, 'rid'), 'rid')).toBe(7.5)
+    expect(coursePoints(attend(content, start, 'rid'), 'rid')).toBe(15)
     // A lab of three hours a week as well would make each hour worth less: the same marks for more hours.
     const withLab = { ...course, meetings: [...course.meetings, { weekday: 'One', startHour: 6, hours: 3, kind: 'lab' as const }] }
-    expect(pointsPerClassHour(content, withLab)).toBe(3)
+    expect(pointsPerClassHour(content, withLab)).toBe(6)
   })
 
   it('are earned by study, and a point more in his own room', () => {
@@ -137,5 +137,33 @@ describe('examinations', () => {
     expect(done.state.grades['rid']).toMatchObject({ midterm: { letter: 'B' }, final: { letter: 'F', passed: false } })
     // A course he is not taking is not marked.
     expect(settleExams(content, { ...withPoints(40, 600), enrolment: [] }).graded).toEqual([])
+  })
+})
+
+describe('the weeks of the examinations', () => {
+  // Week two is the midterms: days 7 to 13. The course meets on every Two at 06:00 and every Three at 08:00, and its midterm is the last of those, on day 13.
+  const at = (dayIndex: number, hour: number): GameState => ({ ...start, time: dayIndex * 20 + (hour - 6) })
+
+  it('have no lectures: a course meets only in the slot its examination is sat in', () => {
+    expect(examWeek(content, 6)).toBeUndefined()
+    expect(examWeek(content, 7)).toBe('midterm')
+    expect(examWeek(content, 13)).toBe('midterm')
+    expect(examWeek(content, 14)).toBeUndefined()
+    expect(examWeek(content, 27)).toBe('final')
+    expect(examWeek(base, 7)).toBeUndefined()
+
+    // The week before, it meets as usual.
+    expect(meetingNow(content, at(3, 6), course)).toBeDefined()
+    expect(meetingNow(content, at(4, 8), course)).toBeDefined()
+    // In the week of the midterms its lectures are off...
+    expect(meetingNow(content, at(9, 6), course)).toBeUndefined()
+    expect(meetingNow(content, at(10, 8), course)).toBeUndefined()
+    expect(meetingNow(content, at(12, 6), course)).toBeUndefined()
+    // ...and the examination is sat in its last slot.
+    expect(meetingNow(content, at(13, 8), course)).toBeDefined()
+    expect(examNow(content, at(13, 8), course)?.kind).toBe('midterm')
+    // Nothing of it is on his calendar that week but the midterm.
+    const classes = [7, 8, 9, 10, 11, 12, 13].flatMap((day) => dayAgenda(content, at(7, 6), day).filter((item) => item.kind === 'class').map((item) => item.title))
+    expect(classes).toEqual(['Midterm: RID 101 Riddles'])
   })
 })

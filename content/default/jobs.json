@@ -7,6 +7,7 @@
     {
       "id": "market-stallhand",
       "title": "Stallhand",
+      "icon": "crate",
       "description": "Haul crates, mind the card reader and haggle for a stallholder.",
       "locationId": "market",
       "bossId": "odile",
@@ -34,6 +35,7 @@
     {
       "id": "commons-kitchen",
       "title": "Kitchen hand",
+      "icon": "pot",
       "description": "Wash up, carry trays and serve at the hot counter through the rush.",
       "locationId": "commons",
       "bossId": "dorrit",
@@ -61,6 +63,7 @@
     {
       "id": "halls-desk",
       "title": "Front desk",
+      "icon": "bell",
       "description": "Sit the front desk of the Cloister Halls: sign for parcels, let in the locked-out, keep the peace.",
       "locationId": "dormitories",
       "bossId": "helga",
@@ -88,6 +91,7 @@
     {
       "id": "store-tills",
       "title": "Till assistant",
+      "icon": "bag",
       "description": "Work the tills and tidy the shelves under the slogan.",
       "locationId": "bloom-and-co",
       "bossId": "pernille",
@@ -120,6 +124,7 @@
     {
       "id": "lumen-usher",
       "title": "Usher",
+      "icon": "ticket",
       "description": "Tear tickets, show people to their seats and sweep up popcorn between screenings.",
       "locationId": "lumen",
       "bossId": "coralie",
@@ -147,6 +152,7 @@
     {
       "id": "bathhouse-attendant",
       "title": "Bath attendant",
+      "icon": "droplet",
       "description": "Hand out towels, mop the tiles and keep an eye on the hot end of the pool.",
       "locationId": "bathhouse",
       "bossId": "sunna",
@@ -176,6 +182,7 @@
     {
       "id": "boba-maker",
       "title": "Tea maker",
+      "icon": "boba",
       "description": "Shake, seal and serve bubble tea, and smile at the queue.",
       "locationId": "boba-blossom",
       "bossId": "mimi",
@@ -205,6 +212,7 @@
     {
       "id": "garden-hand",
       "title": "Garden hand",
+      "icon": "leaf",
       "description": "Dig, weed, water and carry in the teaching garden, in all weathers.",
       "locationId": "physic-garden",
       "bossId": "rowena",
@@ -234,6 +242,7 @@
     {
       "id": "library-page",
       "title": "Library page",
+      "icon": "book",
       "description": "Shelve returns, fetch from the stacks and keep the reading cells quiet.",
       "locationId": "library",
       "bossId": "agnes",
@@ -263,6 +272,7 @@
     {
       "id": "arcade-floor",
       "title": "Floor staff",
+      "icon": "gamepad",
       "description": "Give change, clear jams, reset cabinets and referee the air hockey.",
       "locationId": "pixel-and-rune",
       "bossId": "jax",
@@ -297,6 +307,7 @@
     {
       "id": "barista",
       "title": "Barista",
+      "icon": "coffee",
       "description": "Pull espresso, serve pastries and keep the study booths from being hexed.",
       "locationId": "spell-and-sip",
       "bossId": "wren",
@@ -332,6 +343,7 @@
     {
       "id": "armoury-assistant",
       "title": "Armoury assistant",
+      "icon": "sword",
       "description": "Carry kit, rack blades and work the bellows in the Tiltyard workshop.",
       "locationId": "tiltyard",
       "bossId": "bryn",
@@ -361,6 +373,7 @@
     {
       "id": "bar-staff",
       "title": "Bar staff",
+      "icon": "glass",
       "description": "Pull pints, collect glasses and run the quiz-night scoreboard.",
       "locationId": "honeyed-bee-inn",
       "bossId": "marda",
@@ -396,6 +409,7 @@
     {
       "id": "clinic-reception",
       "title": "Clinic receptionist",
+      "icon": "cross",
       "description": "Book appointments, hand out prescriptions and say nothing to anyone.",
       "locationId": "health-centre",
       "bossId": "ilse",
@@ -426,6 +440,7 @@
     {
       "id": "gym-floor",
       "title": "Gym floor staff",
+      "icon": "dumbbell",
       "description": "Spot lifters, rack weights and run the beginners' circuit.",
       "locationId": "ironroot",
       "bossId": "kessa",
@@ -461,6 +476,7 @@
     {
       "id": "club-door",
       "title": "Door and floor staff",
+      "icon": "door",
       "description": "Work the door and the floor of the club, and walk people to the quiet room.",
       "locationId": "undergrowth",
       "bossId": "nyx",
@@ -491,6 +507,7 @@
     {
       "id": "waiter",
       "title": "Waiter",
+      "icon": "cloche",
       "description": "Serve dishes that are on fire, below freezing or humming, without dropping any of them.",
       "locationId": "cauldron",
       "bossId": "yann",
@@ -526,6 +543,7 @@
     {
       "id": "foundry-technician",
       "title": "Lab technician",
+      "icon": "flask",
       "description": "Calibrate the benches, recharge the wards and stop first-years blowing up the test cell.",
       "locationId": "foundry",
       "bossId": "halla",
@@ -556,6 +574,7 @@
     {
       "id": "research-assistant",
       "title": "Research assistant",
+      "icon": "scroll",
       "description": "Read, sort and summarise archive boxes for a professor's book on the Sire Registry.",
       "locationId": "lecture-halls",
       "bossId": "edda",

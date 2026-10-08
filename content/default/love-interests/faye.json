@@ -1,34 +1,105 @@
 {
   "id": "faye",
   "name": "Faye Fertillay",
-  "handle": "fayefertillay",
+  "role": "",
   "age": 22,
   "pronouns": "she/her",
   "bio": "Final-year Economics student, a gifted mage, a Broodmarket intern, and the most dangerous negotiator in the College of Business.",
   "appearance": "A striking woman of twenty-two with raven-black hair worn long and loose, red eyes. Her skin is pale and flawless, her lips full and painted. She has a lush hourglass figure.",
-  "imageSeed": 60,
   "personality": "Calculating, yet always sultry and seductive. Knows she is desirable and uses that confidence to her advantage, even while discussing business.",
   "traitIds": [
-    "flirtatious"
+    "flirtatious",
+    "promiscuous"
   ],
+  "likes": [
+    "potions",
+    "trade",
+    "finery",
+    "coffee"
+  ],
+  "dislikes": [
+    "devotional",
+    "salt"
+  ],
+  "admires": [
+    "charisma",
+    "intelligence"
+  ],
+  "friends": [],
+  "enemies": [],
+  "handle": "fayefertillay",
   "outfits": [
     {
       "id": "default",
       "name": "Usual clothes",
       "description": "a dark midnight-blue satin fantasy gown with a sleek, sensual, draped silhouette. The bodice has an extremely deep plunging V-neckline, descending to her navel, with narrow fabric panels wrapping around the bust. Two thin halter-like shoulder straps rise from the bodice and are secured near the collarbones with matching round antique-gold brooches set with red gemstones. The shoulders remain bare. Long loose draped sleeves begin below the shoulders and hang fluidly around the arms, creating a soft off-shoulder appearance. The skirt is asymmetrically gathered at one hip with a third gold-and-red jeweled brooch. A very high thigh slit opens along one side. The fabric is smooth, glossy, lightweight silk, with dramatic folds and subtle blue highlights against an almost-black navy base. Fixed design rules: midnight-blue satin, plunging V bodice, bare shoulders, thin shoulder straps, two gold/red collarbone brooches, long detached draped sleeves, matching hip brooch, single high thigh slit, floor-length asymmetric skirt",
       "sprites": {
-        "angry": "sprites/faye/angry-cutout.png",
-        "happy": "sprites/faye/happy-2-cutout.png",
-        "neutral": "sprites/faye/neutral-cutout.png",
-        "sad": "sprites/faye/sad-cutout.png"
-      }
+        "happy": {
+          "image": "sprites/faye/default-happy-2-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/faye/default-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/faye/default-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/faye/default-surprised-2-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/faye/default-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/faye/default-aroused-cutout.png",
+          "description": ""
+        },
+        "neutral": {
+          "image": "sprites/faye/default-neutral-cutout-2.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     },
     {
       "id": "pregnant",
       "name": "Pregnant",
-      "inherits": "default",
       "description": "She has a round, pregnant belly.",
-      "sprites": {},
+      "inherits": "default",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/faye/pregnant-neutral-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/faye/pregnant-happy-2-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/faye/pregnant-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/faye/pregnant-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/faye/pregnant-surprised-2-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/faye/pregnant-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/faye/pregnant-aroused-cutout.png",
+          "description": ""
+        }
+      },
       "pregnant": true
     },
     {
@@ -36,29 +107,132 @@
       "name": "Nude",
       "description": "nothing at all, completely nude",
       "sprites": {
-        "bath": "sprites/faye/nude-bath.png",
-        "neutral-2": "sprites/faye/nude-cutout-2.png",
-        "neutral": "sprites/faye/nude-cutout.png"
-      }
+        "neutral": {
+          "image": "sprites/faye/nude-neutral-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/faye/nude-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/faye/nude-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/faye/nude-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/faye/nude-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/faye/nude-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/faye/nude-aroused-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     },
     {
       "id": "nude-pregnant",
       "name": "Nude, pregnant",
-      "inherits": "nude",
       "description": "She has a round, pregnant belly.",
-      "sprites": {},
-      "pregnant": true
-    },
-    {
-      "id": "lingerie",
-      "name": "Lingerie",
-      "description": "expensive lace lingerie",
+      "inherits": "nude",
       "sprites": {
-        "neutral": "sprites/faye/lingerie-cutout.png"
-      }
+        "neutral": {
+          "image": "sprites/faye/nude-pregnant-neutral-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/faye/nude-pregnant-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/faye/nude-pregnant-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/faye/nude-pregnant-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/faye/nude-pregnant-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/faye/nude-pregnant-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/faye/nude-pregnant-aroused-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
+  "faceY": 4,
+  "imageSeed": 60,
+  "stageHeight": 100,
+  "studies": {
+    "subject": "Economics",
+    "code": "ECO",
+    "level": 4,
+    "stats": [
+      "intelligence"
+    ],
+    "practical": false
+  },
+  "animations": [
+    {
+      "id": "blowjob",
+      "name": "Blowjob",
+      "description": "",
+      "image": "sprites/faye/nsfw-blowjob.png",
+      "loop": true
+    },
+    {
+      "id": "missionary",
+      "name": "Missionary",
+      "description": "",
+      "image": "sprites/faye/nsfw-missionary.png",
+      "loop": true
+    },
+    {
+      "id": "doggy",
+      "name": "Doggy",
+      "description": "",
+      "image": "sprites/faye/nsfw-doggy.png",
+      "loop": true
+    },
+    {
+      "id": "cowgirl",
+      "name": "Cowgirl",
+      "description": "",
+      "image": "sprites/faye/nsfw-cowgirl.png",
+      "loop": true
+    },
+    {
+      "id": "creampie",
+      "name": "Creampie",
+      "description": "",
+      "image": "sprites/faye/nsfw-creampie.png",
+      "loop": true
+    },
+    {
+      "id": "facial",
+      "name": "Facial",
+      "description": "",
+      "image": "sprites/faye/nsfw-facial.png",
+      "loop": true
+    }
+  ],
   "schedule": [
     {
       "weekdays": [
@@ -106,35 +280,18 @@
   ],
   "room": {
     "name": "a flat over a boutique on Lantern Row",
-    "description": "A luxurious two-room flat above a shop, with dark panelled walls draped in midnight-blue and crimson silk hangings. A large bed with satin sheets, a mirrored dressing table crowded with perfume and tonic bottles, a writing desk with two glowing monitors showing market charts, a small copper still with glass tubing on a side table, a velvet chaise, a heavy door with an ornate brass lock. Low, warm lamplight.",
-    "locationId": "lantern-row"
+    "description": "a bedroom with silk hangings, a dressing table crowded with bottles, a computer with a second monitor running market feeds, a small licensed still for her tonics, a small cauldron, and gold on market scales. The bed is lavish and feminine",
+    "locationId": "lantern-row",
+    "background": "generated/backgrounds/faye/view.png"
   },
   "ai": {
-    "speechPattern": "",
-    "backstory": "Studies: Final year, College of Business (Economics)\n\nPost: Analyst intern at the Broodmarket Group; runs a small licensed tonic business from her flat\n\nFaye Fertillay is twenty-two, sharp-tongued, and entirely aware of her own appeal. She runs her life the way she means to run the Broodmarket one day: find what people want, become the best way to get it, and take her cut.\n\nShe was not born to money. The Fertillays had a tonic shop in Goldport and a delivery van. She won a Broodmarket scholarship, took over the shop's accounts at eighteen, and has grown it from her student flat ever since: she is a real talent with potion-work, and half of Lantern Row buys her study tonics and her own-label suppressants, which undercut the Broodmarket's and work better. Her professors say she understands leverage better than they do. She intends to be the youngest Guildmaster the Group has had.",
+    "speechPattern": "Calculating, yet always sultry and seductive. Knows she is desirable and uses that confidence to her advantage, even while discussing business.",
+    "tone": "",
+    "verbalQuirks": [],
+    "exampleDialogue": [],
+    "backstory": "Studies: Final year, College of Business (Economics)\n\nPost: Analyst intern at the Broodmarket Group; runs a small licensed tonic business from her flat\n\nFaye Fertillay is twenty-two, sharp-tongued, and entirely aware of her own appeal.",
+    "knowledge": [],
+    "secrets": [],
     "extraInstructions": "Her voice stays warm and unhurried when she is weighing an offer. She holds a look, chooses when to move closer, and enjoys seeing someone react. She flirts on purpose and usually knows what she wants from the exchange. Affection can become sincere without making her suddenly timid or stripping away her confidence. Give her real questions and desires; do not make every line a contract metaphor."
-  },
-  "likes": [
-    "potions",
-    "trade",
-    "finery",
-    "coffee"
-  ],
-  "dislikes": [
-    "devotional",
-    "salt"
-  ],
-  "admires": [
-    "charisma",
-    "intelligence"
-  ],
-  "studies": {
-    "subject": "Economics",
-    "code": "ECO",
-    "level": 4,
-    "stats": [
-      "intelligence"
-    ],
-    "practical": false
   }
 }

@@ -65,6 +65,25 @@ export async function listModels(
   return [...new Set(ids)].sort((a, b) => a.localeCompare(b))
 }
 
+// How an endpoint says it will not write what was asked. Each provider has its own way, so each is looked for by name.
+// A request turned away outright: Forbidden, and Unavailable For Legal Reasons.
+const REFUSAL_STATUSES = [403, 451]
+// ...unless what it says is that the key, the account or the region is the trouble, which no other LLM's being asked would mend.
+const NOT_A_REFUSAL = /api[ _-]?key|unauthori[sz]ed|authenticat|permission|not allowed to access|quota|billing|credit|balance|region|country|rate[ _-]?limit/i
+// The codes and words the body of a failed request names the reason with: OpenAI and Azure (content_filter, content_policy_violation,
+// ResponsibleAIPolicyViolation), OpenRouter (moderation, flagged), Zhipu's GLM (1301, sensitive), Alibaba (data_inspection_failed), Google (safety, prohibited).
+const REFUSAL_CODES =
+  /moderation|content[ _-]?(?:policy|filter|management)|policy[ _-]?violation|responsibleai|data_inspection_failed|sensitive|safety|unsafe|flagged|prohibited|blocklist|\b1301\b|敏感|不安全/i
+// Why a reply that did come back stopped, when it stopped for what was in it.
+const REFUSAL_FINISHES = ['content_filter', 'sensitive', 'safety', 'prohibited_content', 'blocklist', 'refusal', 'recitation', 'spii']
+
+/** Whether a failed request was the endpoint declining what was asked, as against something being wrong with the request or the account. */
+export function isRefusalResponse(status: number, body: string): boolean {
+  if (status < 400 || status >= 500) return false
+  if (REFUSAL_CODES.test(body)) return true
+  return REFUSAL_STATUSES.includes(status) && !NOT_A_REFUSAL.test(body)
+}
+
 /** The endpoint declined to produce the reply: a content filter, moderation block or refusal. */
 export class RefusalError extends Error {
   constructor(detail: string) {
@@ -117,9 +136,9 @@ export async function chatCompletion(
 
     if (!response.ok) {
       const body = (await response.text()).slice(0, 300)
-      // Providers that block a request outright answer 4xx and name the reason.
-      if (response.status < 500 && /moderation|content[ _-]?(policy|filter)|safety|flagged/i.test(body)) {
-        throw new RefusalError(body)
+      // Providers that block a request outright answer 4xx: with a code that says so, or by naming the reason.
+      if (isRefusalResponse(response.status, body)) {
+        throw new RefusalError(`${response.status} ${response.statusText}: ${body}`.trim())
       }
       // Not every endpoint or model accepts tools. Carry on without them rather than fail.
       if (tools && response.status < 500 && /tool|function/i.test(body)) {
@@ -131,7 +150,8 @@ export async function chatCompletion(
 
     const data = (await response.json()) as { choices?: { finish_reason?: string; message?: AssistantMessage }[] }
     const choice = data.choices?.[0]
-    if (choice?.finish_reason === 'content_filter') throw new RefusalError('content filter')
+    const finish = typeof choice?.finish_reason === 'string' ? choice.finish_reason.toLowerCase() : ''
+    if (REFUSAL_FINISHES.includes(finish)) throw new RefusalError(`the reply was stopped (${finish})`)
     if (typeof choice?.message?.refusal === 'string' && choice.message.refusal.length > 0) {
       throw new RefusalError(choice.message.refusal)
     }
@@ -149,13 +169,25 @@ export async function chatCompletion(
     }
 
     messages.push({ role: 'assistant', content: message.content ?? null, tool_calls: calls })
-    for (const call of calls) {
-      messages.push({ role: 'tool', tool_call_id: call.id, content: await runTool(tools, call) })
+    // Only the last message is the reply: whatever the model wrote beside a tool call is never shown. It is told so, or it takes
+    // that writing as done and answers with a remark on it ("she has already been written leaving above") in place of the scene.
+    const wrote = typeof message.content === 'string' && message.content.trim().length > 0
+    for (const [n, call] of calls.entries()) {
+      const result = await runTool(tools, call)
+      messages.push({ role: 'tool', tool_call_id: call.id, content: n === calls.length - 1 ? `${result}
+
+${wrote ? WROTE_BESIDE_TOOL : AFTER_TOOL}` : result })
     }
     // After the last allowed round the model has to answer in words.
     if (round + 1 >= MAX_TOOL_ROUNDS) tools = undefined
   }
 }
+
+// Said to the model after its tools have run, so that what comes next is the reply itself and nothing about how it was made.
+export const AFTER_TOOL = '(Now write your reply, in character. Say nothing about tools, these notes, or what has or has not been written.)'
+export const WROTE_BESIDE_TOOL =
+  '(What you wrote before calling the tool was not shown to anyone and is gone. Write your whole reply now, from the start, in character, ' +
+  'including anything from it that still holds. Say nothing about tools, these notes, or what has or has not been written.)'
 
 interface ToolCall {
   id: string

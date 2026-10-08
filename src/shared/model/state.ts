@@ -1,11 +1,12 @@
 import { z } from 'zod'
+import { RoomSchema } from './loveInterest'
 import { AppointmentSchema } from './appointment'
 import { CalendarEventSchema } from './calendar'
 import { AttendanceSchema, CourseSchema, GradeSchema } from './course'
 import { ChildSchema, PregnancySchema } from './pregnancy'
 import { EmploymentSchema } from './job'
 import { BondSchema } from './relationship'
-import { PostSchema } from './feed'
+import { PostPlanSchema, PostSchema } from './feed'
 import { CourierNoteSchema } from './stats'
 
 export const PlayerSchema = z.object({
@@ -14,7 +15,12 @@ export const PlayerSchema = z.object({
   energy: z.number(),
   maxEnergy: z.number().positive(),
   money: z.number(),
-  traitIds: z.array(z.string()).default([])
+  /**
+   * Who he is, as every character is told it: his age, where he is from, what is known of
+   * him. The content has one to start from, and the player may write his own when a game
+   * begins; a game keeps the one it began with. `{player}` in it stands for his name.
+   */
+  bio: z.string().default('')
 })
 export type Player = z.infer<typeof PlayerSchema>
 
@@ -86,7 +92,7 @@ export const GameStateSchema = z.object({
   rapport: z.record(z.string(), RapportSchema),
   /** What the player has found out about each love interest: fact ids, by love interest id. */
   revealed: z.record(z.string(), z.array(z.string())),
-  /** Messages exchanged on Chats, by love interest id, oldest first. */
+  /** Messages exchanged in Bloomr DMs, by love interest id, oldest first. */
   courier: z.record(z.string(), z.array(CourierNoteSchema)),
   /** The love interests the player has met, by id: everyone he has been in a scene with. */
   met: z.array(z.string()),
@@ -94,7 +100,7 @@ export const GameStateSchema = z.object({
   job: EmploymentSchema.nullable(),
   /** Jobs he has quit or been let go from. None of them will have him back. */
   formerJobs: z.array(z.string()),
-  /** Those who can be messaged, by id: love interests who have given the player their Chats, and the boss of any job he has held. */
+  /** Those who can be messaged, by id: love interests who have given the player their Bloomr, and the boss of any job he has held. */
   contacts: z.array(z.string()),
   /** The last day on which love interests had their chance to write unprompted. */
   courierDay: z.number().int(),
@@ -102,6 +108,10 @@ export const GameStateSchema = z.object({
   feed: z.array(PostSchema),
   /** The last day on which love interests posted. */
   feedDay: z.number().int(),
+  /** The day's posts still to be written and drawn. Kept with the game, so that one saved or closed while they were being made takes them up again. */
+  feedPlans: z.array(PostPlanSchema).default([]),
+  /** The game time up to which he has looked at the feed: a post that went up after it is new to him. */
+  feedSeen: z.number().int().default(-1),
   /** The last day on which the drama engine had someone turn up in a scene. */
   dramaDay: z.number().int(),
   /** Calendar events generated during this playthrough, on top of the authored ones. */
@@ -112,6 +122,8 @@ export type GameState = z.infer<typeof GameStateSchema>
 /** The starting player and location for a new game. */
 export const NewGameSchema = z.object({
   player: PlayerSchema,
-  locationId: z.string()
+  locationId: z.string(),
+  /** His own room: somewhere private a scene can go, with artwork of its own, as a love interest's is. */
+  room: RoomSchema.optional()
 })
 export type NewGame = z.infer<typeof NewGameSchema>

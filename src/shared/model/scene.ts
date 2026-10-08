@@ -8,9 +8,26 @@ import { RelationshipStateSchema } from './state'
 
 export const ChatMessageSchema = z.object({
   role: z.enum(['user', 'assistant']),
-  content: z.string()
+  content: z.string(),
+  /**
+   * The hidden lines a reply began with (the look on her face, how comfortable she is), as
+   * she wrote them. Never shown, but sent back with the reply in later turns, so that what
+   * she has written before keeps showing her how a reply begins.
+   */
+  tags: z.string().optional()
 })
 export type ChatMessage = z.infer<typeof ChatMessageSchema>
+
+/** A class the scene is set in. */
+export const LessonSchema = z.object({
+  /** The name the teacher's lines are written under: a love interest's first name when she is in the scene, the professor's name otherwise. */
+  speaker: z.string(),
+  /** The course, as it is spoken of: "Riddles (RID 101)". */
+  course: z.string(),
+  /** What the course is about, from its description. */
+  about: z.string().default('')
+})
+export type Lesson = z.infer<typeof LessonSchema>
 
 /** One thing the player and a love interest did together during a scene. */
 export const SceneBeatSchema = z.object({
@@ -40,6 +57,9 @@ export const SceneBaselineSchema = z.object({
   stats: z.record(z.string(), z.number()),
   energy: z.number(),
   money: z.number(),
+  /** What he had banked toward the next point of each stat, and his marks in each course, so that work done in the scene can be told. */
+  training: z.record(z.string(), z.number()).optional(),
+  coursePoints: z.record(z.string(), z.number()).optional(),
   /** The game time just before the scene began, so that how long it has taken can be told. */
   time: z.number().int().min(0),
   relationship: RelationshipStateSchema,
@@ -59,7 +79,9 @@ export const DepartureSchema = z.object({
   at: z.number().int().min(0),
   feeling: z.enum(DEPARTURE_FEELINGS),
   /** Why she went, in a few words. */
-  reason: z.string()
+  reason: z.string(),
+  /** She did not walk out: the scene went somewhere else and she stayed where it had been. She is not seen in the new place. */
+  behind: z.boolean().optional()
 })
 export type Departure = z.infer<typeof DepartureSchema>
 
@@ -99,6 +121,8 @@ export const SceneSchema = z.object({
   looks: z.record(z.string(), z.object({ outfitId: z.string().optional(), expression: z.string().optional() })).optional(),
   /** The scene is a shift at the player's job: he is paid for it when it ends. */
   shift: SceneShiftSchema.optional(),
+  /** The scene is a class: who teaches it and what, for the lecture it opens with. */
+  lesson: LessonSchema.optional(),
   /** How comfortable each love interest in the scene last said she was, by id. For the LLM only. */
   comfort: z.record(z.string(), ComfortSchema).optional(),
   /** The scene is in this love interest's own room. */
@@ -107,6 +131,8 @@ export const SceneSchema = z.object({
   backgroundId: z.string().optional(),
   /** When set, this animation plays in place of the sprite. */
   animationId: z.string().optional(),
+  /** Whose pose that is, by love interest id: one of those in the scene. Only one is shown at a time. */
+  animationOf: z.string().optional(),
   /** A plan to meet that the love interest has suggested and the player hasn't answered yet. */
   proposal: ProposalSchema.optional(),
   /** Love interests who were in the scene and have left it, in the order they went. */

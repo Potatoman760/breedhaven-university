@@ -50,8 +50,8 @@ npm run dev
   require an authored event with an `event` condition.
 - **The map** (`map.json`) has a pin per location, placed over an `image` or, without one,
   on a plain chart with labelled `regions` (the default pack's campus and city). It shows which love
-  interests their schedules place at each location right now, and going to a location
-  costs the map's travel time. Activities tied to a location can only be done there, and
+  interests their schedules place at each location right now. Going to a location takes
+  no time. Activities tied to a location can only be done there, and
   shared activities only with someone who is at the player's location.
 - **The market and the shops** (`stalls.json`, `items.json`) sell gifts. A stall belongs to
   a location: where the player is has stalls, the Market tile reads Shops and opens them;
@@ -95,7 +95,22 @@ npm run dev
 - **Conditions and effects** are a shared vocabulary used by activity requirements, secrets
   and codex unlocks (`stat`, `money`, `energy`, `meter`, `stage`, `flag`, `event`, `day`).
 - **Love interests** carry profile, outfits with sprites per expression, a schedule, and an
-  `ai` block (speech pattern, quirks, example dialogue, secrets, per-stage notes).
+  `ai` block (speech pattern, quirks, example dialogue, secrets).
+- **The player** as a new game starts him is `new-game.json`: his default name and bio, money
+  and energy, where he wakes on the first day, and optionally `room` (a name, a
+  description, the location it is in and a picture), written as a love interest's room is.
+  His room is somewhere private a scene can move to (`room-of-player`), shown with its own
+  picture. The editor's Player tab edits all of it; a change is kept as `new-game.json` in
+  the add-on folder and can be put back as shipped. His stats are not there: the player
+  spends a pool of points on them when a game begins. The name and the bio are only what a
+  new game offers: the player may change both in the New game dialog, and the game keeps
+  what it began with (`state.player.name`, `state.player.bio`). The bio is told to every
+  character under "About <name>", with `{player}` in it standing for his name.
+- **The player's name** is chosen when a game starts, so no content may spell one out:
+  write `{player}` wherever text has to name him ("`{player}`'s best friend from when they
+  were children"). The game and every prompt read the content with the name filled in
+  (`personalise` in `src/shared/game/personalise.ts`); the editor shows it as written. The
+  only name in the content is the default in `new-game.json`, and a test keeps it so.
 - **Traits** are a shared library of name + definition, referenced by id.
 - **Codex** entries reach the AI only when unlocked and relevant: always-on, tied to the
   current location or character, or mentioned in the recent conversation, within a budget.
@@ -111,6 +126,26 @@ npm run dev
   than hidden. Loading tolerates content changes such as a newly added love interest.
 
 ## Content editor and add-ons
+
+**Where the editor writes.** Run from source (`npm run dev`), the game is being written: the
+editor changes the base game itself. No add-ons are read, every save goes into
+`content/default/` (a character to `love-interests/<id>.json`, a location into
+`locations.json`, traits to `traits.json`, the catalogue to `catalogue.json`, the player to
+`new-game.json`), and pictures are filed under `content/default/sprites/` and
+`content/default/generated/` with no `addons/` prefix on their paths (`loadBase` in
+`src/main/content/addons.ts`). Any character or trait can be deleted. Set
+`BREEDHAVEN_ADDONS=1` to run from source the way a player has it instead. A packaged game
+keeps what the user makes apart, as add-ons laid over the base pack, as described below.
+What the game makes while it is played (the selfies on the feed) always goes to the
+user's own folder, whichever way it is run.
+
+**Events.** The editor's Events tab lists the calendar's events and holidays in the order
+they fall: a name, a description, the month and day, how many days it lasts, where it is,
+and whether classes stop for it. "Ask the AI for events" has the Main LLM think of five
+more for the setting and adds them, to be read over and changed or deleted like any other.
+Run from source they are written into `calendar.json`; in a packaged game they are kept
+as `events.json` in the add-on folder and laid over the game's own, where one with the id
+of one of the game's own takes its place and only the add-on's can be deleted.
 
 "Edit game content" on the title screen opens the editor. For now it edits love interests
 and the trait library.
@@ -128,7 +163,7 @@ and the trait library.
   Schedule. Saving checks the whole game would still load with the change and says what is
   wrong if not. An id can't be changed once saved, because saved games refer to it.
 - **Sprites**: outfits and their pictures with a name and description each, the default
-  outfit, the pregnant flag, the portrait crop, and animations. Adding a picture or video
+  outfit, the pregnant flag, the portrait crop, and the NSFW pictures and clips. Adding a picture or video
   copies the chosen file into the character's add-on folder; content paths that start
   with `addons/` are served from there.
 - **Traits**: toggle a character's traits, and add, change or remove traits in the shared
@@ -184,8 +219,10 @@ and the trait library.
   - **Where they come from**: a shared activity is done with everyone picked in the day
     view's "Here" row. By default that is everyone at the location, up to three; click a
     name to leave them out or bring them along. The first picked leads. Attending a class
-    is a scene with up to three love interests who take it: anyone picked, then those the
-    player is closest to. A plan made with several people opens a scene with all of them.
+    is a scene with a love interest who teaches it, who is always there and leads it, and
+    the students he sits next to (`classmates`): all of them when the class has two or
+    fewer, and otherwise two, the one who likes him most and one of the others at random,
+    or two at random when they all like him the same. A plan made with several people opens a scene with all of them.
   - **Gifts**: with more than one person in the scene the gift dialog has a button per
     person. The prompt says who received what and how it suits them.
   - **Memories**: when the scene ends each love interest gets a memory of their own,
@@ -209,8 +246,8 @@ and the trait library.
   subject becoming a course with her as its professor; an **outsider** has neither and
   nothing to do with classes. Only students are given timetables. A teacher is in the
   hall while her course meets, is busy then for plans and invitations, and leads the
-  class scene when the player attends. Orientation introduces students and teachers, not
-  outsiders. Left out, the kind is read off which of `studies` and `teaching` is present.
+  class scene when the player attends. Orientation introduces students only, not
+  teachers or outsiders. Left out, the kind is read off which of `studies` and `teaching` is present.
 - **NPCs** are people to talk to and work for who are not love interests. They are
   characters like any other, written the same way in the same folder
   (`love-interests/<id>.json`) and told apart by `"kind": "npc"`; only an id, a name,
@@ -219,7 +256,7 @@ and the trait library.
   NPCs are held apart in `content.npcs`, so that everything to do with romance (meters,
   gifts, messages she starts, drama, Bloomr, orientation) has only love interests to look
   at. Changing an NPC's kind is all it takes to make a love interest of her: her look,
-  voice, memories, Chats and job all carry over.
+  voice, memories, DMs and job all carry over.
   Whoever is at the player's location appears in the day view's "Here" row with a dashed
   outline; clicking one takes an hour and opens a scene. The scene is an ordinary one
   marked `npc`, written with the NPC's voice and knowledge and told to stay out of
@@ -271,7 +308,10 @@ and the trait library.
 - **Pregnancy**: `pregnancy.json` (optional) sets the rules: the `chance` of conceiving,
   `lengthDays`, `recoveryDays` after a birth, `daughterChance`, and the `stages` (each from
   a fraction of the way through, with a description for the character and whether it
-  shows). A love interest can carry for a different time (`pregnancyDays`).
+  shows). The length is the same for everyone.
+  - **Conception by pose**: choosing the `creampie` pose (`isSeeding` in
+    `src/shared/model/loveInterest.ts`) counts as the `[SEEDED]` tag for whoever the pose is
+    of, whether or not the tag was written.
   - **Conception**: in a scene the LLM writes a hidden `[SEEDED]` tag (`[SEEDED: name]` in
     a group) when sex ends in a way that could leave her with child. The game then throws
     the dice: one throw a day for each woman. If it takes, she knows at once, the next
@@ -289,10 +329,10 @@ and the trait library.
   goes to its week. What each day holds comes from `dayAgenda` in
   `src/shared/game/agenda.ts`.
 - **The phone** (the tile that was People) holds the player's apps, down its left edge:
-  Chats (the conversations, most recent first, with the open thread beside them), Friends
+  DMs (his Bloomr conversations, most recent first, with the open thread beside them), Friends
   (a card for everyone he is getting to know, with her handle, what she studies, where
   she is and how things stand, and behind it her record: stage, meters, arrangement,
-  pregnancy, memories, and what has been found out about her) and Updates (Bloomr).
+  pregnancy, memories, and what has been found out about her) and Feed (the Bloomr feed).
   A further app is one entry in `APPS` in `PhonePanel.tsx`. A love interest's `handle`
   is her name on both; left out, one is made from her name.
   - **What there is to know** is drawn from her file (`src/shared/game/facts.ts`): each
@@ -304,11 +344,12 @@ and the trait library.
     (`revealed` in the save), with a "Learned:" line under the reply. A secret is only on
     the list once its conditions let her share it. A gift she loves or dislikes reveals
     the like or dislike it matched.
-- **Chats** (`courier` in the code and the save): messaging. There is a thread
-  per love interest who has given the player her Chats (`contacts` in the save). She gives
+- **Bloomr DMs** (`courier` in the code and the save): messaging, inside Bloomr as DMs
+  are inside a photo app. There is a thread
+  per love interest who has given the player her Bloomr (`contacts` in the save). She gives
   it in a scene with the `give_contact` tool: when he asks and she is willing, or unasked
   once she is taken with him (`offersContact` in `src/shared/game/courier.ts`), and failing
-  that as they part. Until then she is not in Chats and never writes first. A message gets
+  that as they part. Until then she is not in his DMs and never writes first. A message gets
   an answer at once, written by the LLM with a prompt of
   its own (`mode: 'courier'`), and the answer may carry an invitation made with the
   `propose_meeting` tool, to accept onto the calendar or decline. Once a day, from 09:00,
@@ -316,12 +357,22 @@ and the trait library.
   with no reason, and grows with appeal and affection (`chanceOfWriting` in
   `src/shared/game/courier.ts`). The last 2,400 characters (about 600 tokens) of the
   exchange are put into the prompt of every scene with that love interest.
-- **Bloomr** (`src/shared/game/feed.ts`) is the feed. Once a day, from 08:00, up to three
-  love interests post (always at least one), and the Main LLM writes all of that day's
-  posts in one request, each in her voice and about her own day; without it a post only
-  says where she is. A post is text, with an optional `image` path that the feed shows
-  when present (nothing sets one yet). The player can like a post or message its author.
-  Her two latest posts, and whether he liked them, are put into her prompt.
+- **Bloomr** (`src/shared/game/feed.ts`) is the photo feed: selfies with a caption. It needs
+  both the Main LLM (captions) and ComfyUI (pictures) set up; without both there are no
+  posts. As each day begins the day is planned by rule (`feedRound`): one to three of the
+  love interests whose contact the player has, one or two posts each, at hours of their
+  own between 08:00 and 22:00, where each of them will be at that hour, and, four times in
+  ten when another love interest will be there too, that friend in the picture. One LLM
+  request then writes every caption and a line of what each selfie shows, and each selfie
+  is drawn in the background on ComfyUI, one at a time, with the Photo workflow, size and
+  framing (`selfiePrompt` in `src/shared/comfy.ts`: her appearance and what she is wearing,
+  the friend's, the LLM's line, the place's appearance and the light at that hour). The
+  pictures are filed under `generated/photos/<id>/` in the add-on folder. A post is saved
+  as soon as its picture arrives but is not on the feed until its hour has passed; one
+  whose picture could not be drawn is not made. The feed shows five posts and brings in
+  five more each time the reader scrolls to the end. The player can like a post or
+  message its author. Her two latest posts that have gone up, and whether he liked them,
+  are put into her prompt.
 - **Your own activity**: the "Something else?" box on the day view takes anything the
   player types ("invite Seraphine and Faye out for dinner"). The Main LLM turns it into an
   outing: a title, an opening line, who is invited (up to three), where, and for how long
@@ -359,12 +410,12 @@ and the trait library.
   the characters and the player somewhere else together. Its one argument is chosen from
   a fixed list: the rooms of the love interests in the scene, then every place that will
   be open on arrival, so the scene can only go somewhere real. The game moves everyone,
-  adds the walk to the clock, marks what was being done as over (a class, a meal), and
+  marks what was being done as over (a class, a meal), and
   the next prompt describes the new place. NPC scenes stay put.
 - **Time in a scene** is kept by the game. A scene starts with a base: the time its
   opening activity takes (a class's length, an outing's hours), counted before anyone
-  speaks. After that the clock moves only when the scene does: `move_scene` adds the walk,
-  and takes an optional `hours` (whole, up to twelve) for time the characters stayed on
+  speaks. After that the clock moves only when the scene does: `move_scene`
+  takes an optional `hours` (whole, up to twelve) for time the characters stayed on
   before leaving: a meal that ran long, an afternoon's study, a night. There is no
   separate tool for passing time. The summary screen shows how long the scene took.
 - **Marks and grades** (`grading` in `coursework.json`, `src/shared/game/grades.ts`): every
@@ -376,8 +427,10 @@ and the trait library.
   session is two hours for energy and `studyPerHour` points an hour, one more in his own
   room; somewhere public it is a scene with whoever is there, in a classmate's room a scene
   with her, and in his own room no scene. The midterm and the final fall in `midtermWeek`
-  and `finalWeek` and each takes the place of the course's last class of that week: there
-  is nothing to attend and no scene, and when the hour is over he is graded on the points
+  and `finalWeek` and each takes the place of the course's last class of that week. Those
+  two weeks have no lectures or labs at all: every course meets only in that one slot, for
+  the player and for everyone else, and the weeks are left out when an hour of class is
+  valued. In the slot itself there is nothing to attend and no scene, and when the hour is over he is graded on the points
   he has, the midterm against the part of the term gone by and the final against the whole.
   `passAt` (0.6) of those is a pass and a D; C, B and A come at seven, eight and nine
   tenths. Grades are kept in the save under `grades`, by course, for later systems to use.
@@ -386,8 +439,10 @@ and the trait library.
   view's **Stats** option opens into one suggestion for each of the six stats, picked from
   every place that has one for it, preferring those open when he would arrive, and
   changing from hour to hour. Taking one is a two-hour outing that is always two hours of work on that
-  stat, for energy, and is a scene with whoever is there when he arrives: love interests
-  at the place, or failing them an NPC who works there, or nobody. The confirmation says
+  stat, for energy. With love interests at the place when he arrives it is a scene: he
+  runs into one or two of them, picked at random, and the scene's summary lists what the
+  work did. With none there he is alone, whoever works at the place: no scene, and a toast
+  says what it did. Studying for a course works the same way. The confirmation says
   first what he would miss by going, a class he is taking or a shift at his job, as it now
   does for anything the player sets out to do. The stats a place has drills for are also
   what it counts as a good place to work on.
@@ -395,7 +450,7 @@ and the trait library.
   hourly rate, the stats it asks for and its weekly shifts, 8 to 20 hours of them, which are
   written in the content so that a job is the same in every game. The phone has a Jobs
   board: whoever meets a job's requirements is taken on at once, one job at a time, and
-  better-paid jobs ask more. Being taken on puts the boss in his Chats. A shift is clocked
+  better-paid jobs ask more. Being taken on puts the boss in his DMs. A shift is clocked
   in for at the place while it is on, like a class, and is a scene: the boss is there, and
   so is any love interest who happens to be at the place. It keeps him until the shift
   ends, costs energy by the hour, and pays when the scene is over. A shift that ends
@@ -403,6 +458,39 @@ and the trait library.
   (she records it with the `excuse_shift` tool); at three he is let go. He may quit at any
   time. A job he has quit or lost will not have him back. Shifts may overlap his classes;
   the board says where they do.
+- **The lecture**: a class scene opens with the teacher teaching. The first reply of a
+  class is asked for with a prompt of its own (`lessonCue` in `src/shared/game/prompt.ts`):
+  five to eight beats, most of them the teacher speaking to the room about the course's
+  subject, with a line of narration and perhaps an aside from whoever sits beside the
+  player, ending on something he can answer. The teacher speaks under her own name when
+  she is a love interest sitting in the scene, and under the course's professor otherwise,
+  shown as a name on the text box with no face. After it, replies are their usual length.
+- **What is next** (`src/shared/game/upcoming.ts`): the day screen puts the next thing on
+  the player's timetable today at the head of what he can do: the soonest of the classes
+  he takes, his shift, and the plans he has made (`nextUp`). Taking it skips the hours
+  until it starts, puts him at the place, and begins it as if he had turned up on time.
+  When he could not go through with it (too tired for the class, say) it is a note with
+  the reason and not a button. An examination is not offered: it is sat without him.
+- **The epilogue** (`src/shared/game/epilogue.ts`, `EpilogueView.tsx`): when the last day of
+  the calendar is over, the day screen gives way to the epilogue, a screen of text at a time
+  that fades in over a placeholder backdrop. Nothing in it is written by the LLM. First his
+  studies: failing, getting by or excelling, from the final grade in each course he took
+  (the final he sat, or what his marks would earn if the year ended first), with the grades
+  listed. Then a screen for each arrangement whose status is `committed` in
+  `relationships.json` (every one but lovers without promises). Then a screen for each love
+  interest who carried his child during the year: the children she bore, and for one still
+  to be born, a daughter or a son by `daughterChance`; she was overjoyed if they are
+  together or she is at least as fond of him as a friend, and raised the child by herself
+  otherwise. A click, Space, Enter or the right arrow goes on; the left arrow goes back.
+- **Sleep and ending the day** (`src/shared/game/sleep.ts`): midnight to 06:00 is for
+  sleep and nothing else. Nothing the player sets out on may start in those hours or run
+  into them (rest aside), and whenever the clock stands in them with no scene open, he
+  sleeps until 06:00. **End the day** on the day screen does the same from any hour: it
+  lists the classes, shift and plans still to come that he would miss, asks, and then
+  skips straight to 06:00 the next morning. Either way he wakes with full energy, at home:
+  the place his room is in, or where a new game starts him. What
+  was skipped is settled as usual: a missed shift is a strike, a missed exam is graded
+  on the points he has.
 - **How she feels afterwards** (`src/shared/game/memory.ts`): affection, trust and desire
   are not earned by the hour. When a scene ends, the same request that writes each love
   interest's memory of it asks how the scene changed what she feels for the player: a
@@ -415,6 +503,23 @@ and the trait library.
   which keeps its own effect: sitting a class together, keeping a plan, an invitation,
   orientation and the activities that are scenes no longer hand out fixed amounts. An NPC
   is asked for a memory only. Without an LLM she comes away a point fonder and no more.
+- **Going back a turn**: in a scene the player can look back over the conversation and say
+  something else. Stepping back past the first beat of a reply (wheel up or the left arrow
+  over the text box) shows the end of the reply before it, where his turn was, with the
+  line he said then in the input; further back goes to the turn before that, and the
+  wheel down comes forward again. Looking undoes nothing. Only when he sends a line from
+  there is everything from that turn on erased: the scene and the game go back to how
+  they stood before he spoke (time, place, who is there, what was learned or given) and
+  the scene goes on from the new line. Up to thirty turns back can be redone. The turns
+  are kept in the save with the scene (`turns`, `src/shared/game/turns.ts`), each as only
+  what it changed in the game and the scene and how long the conversation was before it,
+  so a scene loaded from a save can be gone back over just the same.
+- **What he spent**: nothing in a scene takes the player's money as it happens. When the
+  scene ends, a request alongside the memories asks what he himself paid for, from what
+  was said ("the drinks are on me"), and what it came to, priced as US dollars would be
+  (`buildSpendingPrompt` in `src/shared/game/memory.ts`). It is taken from his money, in dollars, never
+  more than he has, and shown on the summary with what it went on. Gifts are left out,
+  having been paid for when bought; no answer, or one that cannot be read, costs nothing.
 - **Comfort**: every reply carries a hidden line for each love interest in the scene,
   `[COMFORT: 3 a few words why]` (or `[COMFORT: Name=3 ...]` in a group): how much she
   wants to be there, from 5 down to 1, and her reason. It is kept on the scene and given
@@ -441,14 +546,21 @@ and the trait library.
 - **Appearance**: during a scene the prompt lists the character's outfits, each outfit's
   sprites, and their animations, with every name and description. The LLM decides when
   each fits and switches with hidden tags at the end of a reply: `[OUTFIT: id]`,
-  `[EXPRESSION: name]`, `[ANIMATION: id]` and `[ANIMATION: none]`. An animation is a
+  `[EXPRESSION: name]`, `[POSE: id]` and `[POSE: none]` (`[ANIMATION: ...]` is still read). A pose is chosen on top of the face and
+  outfit, not in their place, and is drawn as a layer over the background and the sprites. It lasts one reply: the next
+  reply takes it down unless it asks for it again. An animation is a
   looping video that takes the sprite's place until it is stopped or the character goes
   back to a sprite. There is no NSFW switch on any of this; the descriptions are all the
   LLM has to go on, so write them specifically.
   - A sprite is either a path, `"happy": "sprites/x/happy.png"`, or
     `"happy": { "image": "sprites/x/happy.png", "description": "laughing, head tilted" }`.
   - An animation is
-    `{ "id": "...", "name": "...", "description": "...", "video": "animations/....mp4" }`
+    `{ "id": "...", "name": "...", "description": "...", "image": "...png", "clip": "...mp4" }`:
+    a picture first, and optionally a clip played in its place. The editor calls this
+    section NSFW and lays it out as an outfit's faces are, with a slot for each standard
+    pose (`NSFW_POSES` in `src/shared/model/loveInterest.ts`) and the same Generate and
+    "Generate missing" buttons; the pictures are drawn at 1920×1080 with the NSFW picture
+    workflow, size and framing set under ComfyUI setup (`nsfwPrompt` in `src/shared/comfy.ts`)
     in the love interest's `animations` list.
 - **Memories**: ending a scene asks the LLM for a one- or two-sentence summary (what they
   did, in order, and what the character remembered most). Only that summary is kept; the
@@ -483,7 +595,7 @@ LLM only if it has a description.
 the left: **Characters**, **Locations** and **Courses**. Characters lists love interests
 and NPCs together. A character's **Kind** is one of student, teacher, another love
 interest, or NPC; an NPC is shown fewer fields (a role and what she knows, and no traits,
-likes, friends, room, secrets or stage notes). Everyone is saved to the add-on folder as
+likes, friends, room or secrets). Everyone is saved to the add-on folder as
 `love-interests/<id>.json`; one with a built-in character's id takes that character's
 place, and deleting the add-on puts the original back.
 

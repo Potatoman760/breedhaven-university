@@ -25,10 +25,10 @@ describe('tracking love interests', () => {
 })
 
 describe('travel', () => {
-  it('moves the player and takes the map\'s travel time', () => {
+  it('moves the player, and takes no time', () => {
     const after = travel(content, start(), 'shop')
     expect(after.locationId).toBe('shop')
-    expect(after.time).toBe(2)
+    expect(after.time).toBe(0)
     expect(start().locationId).toBe('home')
   })
 
@@ -37,11 +37,11 @@ describe('travel', () => {
     expect(() => travel(content, start(), 'home')).toThrow(/already here/)
   })
 
-  it('refuses a place that will be closed on arrival', () => {
-    // Leaving at 13:00 arrives at 15:00, when the shop shuts.
-    expect(canTravel(content, { ...start(), time: 6 }, 'shop').ok).toBe(true)
-    expect(canTravel(content, { ...start(), time: 7 }, 'shop').reasons).toEqual([
-      'the Shop will be closed'
+  it('refuses a place that is closed', () => {
+    // The shop shuts at 15:00.
+    expect(canTravel(content, { ...start(), time: 8 }, 'shop').ok).toBe(true)
+    expect(canTravel(content, { ...start(), time: 9 }, 'shop').reasons).toEqual([
+      'the Shop is closed'
     ])
   })
 

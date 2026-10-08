@@ -25,7 +25,7 @@ export function draftSchema(content: ContentPack) {
     name: z.string().min(1).describe('Her full name, unlike any existing character\'s.'),
     age: z.number().int().min(18).describe('18 or over, always. Undergraduates are 18 to 22, graduate students up to the mid-twenties, staff older.'),
     pronouns: z.string().default('she/her'),
-    handle: z.string().describe('Her name on the Chats and Bloomr apps, without the @: lower case, in character.'),
+    handle: z.string().describe('Her name on the Bloomr apps, without the @: lower case, in character.'),
     bio: z.string().describe('One or two sentences shown to the player: who she is and what she does.'),
     appearance: z
       .string()
@@ -79,10 +79,6 @@ export function draftSchema(content: ContentPack) {
           'Several short paragraphs: her studies or post, where she comes from, her own magic, and how she lives with the Bloom. Her life as it is before she meets the player: he is not in it.'
         ),
       secret: z.string().describe('One thing about herself that she keeps from everyone but those closest to her.'),
-      stageNotes: z
-        .object(Object.fromEntries(content.relationships.stages.map((stage) => [stage.id, z.string()])))
-        .partial()
-        .describe('One sentence for each relationship stage on how she treats the player at it.'),
       extraInstructions: z.string().describe('Two or three sentences of direction to whoever writes her lines.')
     })
   })
@@ -101,7 +97,7 @@ export function buildDraftPrompt(content: ContentPack, idea: string): { system: 
     JSON.stringify(schema),
     'Each field\'s "description" in the schema says what belongs in it. Write every text field in full; leave nothing as a placeholder.',
     'Make her a distinct person who fits the setting and does not repeat an existing character: her own background, voice, wants and flaws.',
-    'Write her as she is before she has met the player. Apart from the notes on each relationship stage, nothing in the file names him, says how she feels about him, or gives the two of them any history, tie or plan: what they become is played out in the game.'
+    'Write her as she is before she has met the player. Nothing in the file names him, says how she feels about him, or gives the two of them any history, tie or plan: what they become is played out in the game.'
   ].join('\n\n')
 
   const user = [
@@ -113,7 +109,6 @@ export function buildDraftPrompt(content: ContentPack, idea: string): { system: 
     ...content.traits.map((t) => `- ${t.id}: ${t.definition}`),
     '',
     `Gift tags in the game: ${tags.join(', ')}.`,
-    `Relationship stages, in order: ${content.relationships.stages.map((s) => `${s.id} (${s.name})`).join(', ')}.`,
     '',
     'Characters who already exist; she must not share a name, a catalogue code or a concept with any of them:',
     ...content.loveInterests.map((li) => `- ${li.name}, ${li.age}: ${li.bio}${li.studies ? ` [${li.studies.code}]` : ''}${li.teaching ? ` [${li.teaching.subjects.map((s) => s.code).join(', ')}]` : ''}`),
@@ -147,7 +142,7 @@ export function parseDraft(content: ContentPack, reply: string): LoveInterest {
     throw new Error(`The character that came back did not fit: ${first?.path.join('.') || 'it'}: ${first?.message}`)
   }
   const { usualClothes, ai, studies, teaching, kind, ...rest } = parsed.data
-  const { secret, stageNotes, ...voice } = ai
+  const { secret, ...voice } = ai
 
   const taken = new Set([...content.loveInterests, ...content.npcs].map((c) => c.id))
   const base = slugify(rest.name.split(' ')[0]) || 'new-character'
@@ -168,7 +163,6 @@ export function parseDraft(content: ContentPack, reply: string): LoveInterest {
     imageSeed: DEFAULT_IMAGE_SEED,
     ai: {
       ...voice,
-      stageNotes: Object.fromEntries(Object.entries(stageNotes).filter(([, note]) => typeof note === 'string' && note.trim() !== '')),
       secrets: secret.trim() ? [{ text: secret.trim(), revealWhen: [{ type: 'stage', min: stages.at(-2)?.id ?? stages[0].id }] }] : []
     }
   })

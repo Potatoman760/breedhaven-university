@@ -1,21 +1,35 @@
-import type { ContentPack, GameState, LoveInterest, Post } from '../model'
-import { formatDate, toDate } from './calendar'
+import { selfiePrompt } from '../comfy'
+import { outfitDescription, type ContentPack, type GameState, type LoveInterest, type Post, type PostPlan } from '../model'
+import { formatDate, formatTime, periodAt, toDate } from './calendar'
 import { eventsOn } from './events'
-import { locationOf } from './map'
+import { locationOf, loveInterestsAt } from './map'
+import { wornOutfit } from './pregnancy'
 import { weatherOn } from './weather'
 
-// Nobody posts before breakfast.
-const FIRST_POST_HOUR = 8
-// The chance each love interest posts on a given day, and the most who do.
-const POST_CHANCE = 0.3
-const MAX_POSTS_PER_DAY = 3
+// Nobody posts before breakfast, or once the evening is over.
+const POST_HOURS = { from: 8, until: 22 } as const
+// The most who post on a given day, and the most each of them does.
+const MAX_AUTHORS = 3
+const MAX_POSTS_EACH = 2
+// How often someone who is there with her is in the selfie too.
+const FRIEND_CHANCE = 0.4
+// How many posts the feed shows at a time: more are brought in as the reader scrolls down.
+export const FEED_PAGE = 5
 // Older posts fall off the end of the feed.
 const MAX_FEED_POSTS = 200
 const MAX_POST_CHARS = 280
+// Room for the reply that writes a day's posts: some to think in, and a caption and a picture for each. The profile's own limit is set
+// for a line of dialogue, and a day of five posts does not fit in it.
+const FEED_TOKENS = { base: 600, each: 250 } as const
+
+/** How many tokens the reply writing these posts is given. */
+export function feedReplyTokens(plans: PostPlan[]): number {
+  return FEED_TOKENS.base + FEED_TOKENS.each * plans.length
+}
 
 const YEAR_NAMES = ['First-year', 'Second-year', 'Third-year', 'Fourth-year', 'Graduate']
 
-/** Her name on Bloomr and Chats: the one written for her, or one made from her name. */
+/** Her name on Bloomr: the one written for her, or one made from her name. */
 export function handleOf(li: LoveInterest): string {
   return `@${li.handle?.replace(/^@/, '') || li.name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '')}`
 }
@@ -27,9 +41,19 @@ export function describeStudies(li: LoveInterest): string | undefined {
   return undefined
 }
 
-/** The feed, newest first. */
+/** The feed, newest first: what has gone up so far. A post made ahead of its hour is not on it yet. */
 export function feedOf(state: GameState): Post[] {
-  return [...state.feed].reverse()
+  return state.feed.filter((post) => post.time <= state.time).reverse()
+}
+
+/** How many posts have gone up since he last looked at the feed. */
+export function unreadPosts(state: GameState): number {
+  return state.feed.filter((post) => post.time <= state.time && post.time > state.feedSeen).length
+}
+
+/** Records that he has looked at the feed: everything up so far has been seen. */
+export function markFeedSeen(state: GameState): GameState {
+  return unreadPosts(state) === 0 ? state : { ...state, feedSeen: state.time }
 }
 
 /** Her latest posts, newest first. */
@@ -39,14 +63,29 @@ export function recentPostsBy(state: GameState, authorId: string, count = 2): Po
     .slice(0, count)
 }
 
-/** Puts new posts on the feed at the current game time. One with no text is left out. */
-export function addPosts(state: GameState, posts: { authorId: string; text: string; image?: string }[]): GameState {
+/** Files posts on the feed, each to go up at its own time. One with no text is left out, and so is one already there. */
+export function addPosts(state: GameState, posts: { authorId: string; time: number; text: string; image?: string; withId?: string }[]): GameState {
   const added: Post[] = posts
     .filter((post) => post.text.trim() !== '')
-    .map((post) => ({ ...post, text: post.text.trim(), id: `post-${state.time}-${post.authorId}`, time: state.time, liked: false }))
-    .filter((post) => !state.feed.some((old) => old.id === post.id))
+    .map(({ authorId, time, text, image, withId }) => ({ id: `post-${time}-${authorId}`, authorId, time, text: text.trim(), image, withId, liked: false }))
+    .filter((post, i, all) => !state.feed.some((old) => old.id === post.id) && all.findIndex((other) => other.id === post.id) === i)
   if (added.length === 0) return state
-  return { ...state, feed: [...state.feed, ...added].slice(-MAX_FEED_POSTS) }
+  return { ...state, feed: [...state.feed, ...added].sort((a, b) => a.time - b.time).slice(-MAX_FEED_POSTS) }
+}
+
+/** One planned post, told from every other: nobody posts twice in an hour. */
+export function planKey(plan: { authorId: string; time: number }): string {
+  return `${plan.time}:${plan.authorId}`
+}
+
+/**
+ * Files a planned post now that it has been written and drawn, and takes it off the list of
+ * those still to make. One that is no longer planned in this game, because a different one
+ * has been loaded since or a new day's round has taken its place, is not filed.
+ */
+export function postMade(state: GameState, post: { authorId: string; time: number; text: string; image?: string; withId?: string }): GameState {
+  if (!state.feedPlans.some((plan) => planKey(plan) === planKey(post))) return state
+  return { ...addPosts(state, [post]), feedPlans: state.feedPlans.filter((plan) => planKey(plan) !== planKey(post)) }
 }
 
 /** Likes a post, or takes the like back. */
@@ -54,7 +93,7 @@ export function toggleLike(state: GameState, postId: string): GameState {
   return { ...state, feed: state.feed.map((post) => (post.id === postId ? { ...post, liked: !post.liked } : post)) }
 }
 
-/** A repeatable number in [0, 1) for one love interest on one day of one game. */
+/** A repeatable number in [0, 1) for one draw on one day of one game. */
 function roll(seed: number, dayIndex: number, index: number): number {
   let x = (seed ^ Math.imul(dayIndex + 1, 0x51ed270b) ^ Math.imul(index + 1, 0x2545f491)) >>> 0
   x = Math.imul(x ^ (x >>> 15), 0x2c1b3c6d) >>> 0
@@ -62,70 +101,97 @@ function roll(seed: number, dayIndex: number, index: number): number {
   return ((x ^ (x >>> 15)) >>> 0) / 0x100000000
 }
 
-/** Whether today's posts are still to be written. */
+/** Whether today's posts are still to be planned: once a day, as soon as the day begins. */
 export function feedRoundDue(content: ContentPack, state: GameState): boolean {
-  const date = toDate(content.calendar, state.time)
-  return date.dayIndex > state.feedDay && date.hour >= FIRST_POST_HOUR
+  return toDate(content.calendar, state.time).dayIndex > state.feedDay
 }
 
 /**
- * Today's round: marks it made, and names the love interests who post today. A few at
- * most, and always someone, so the feed is never dead.
+ * Today's round: marks it made, and plans the day's posts. One to three of the love
+ * interests whose contact he has post, once or twice each, at hours of their own still to
+ * come. Where each will be at that hour is worked out now, and now and then someone who
+ * will be there with her is in the picture too. With nobody's contact there are none.
+ * The plans are kept in the game until each is made; any left over from the day before are let go.
  */
-export function feedRound(content: ContentPack, state: GameState): { state: GameState; authorIds: string[] } {
-  const { dayIndex } = toDate(content.calendar, state.time)
-  const rolled = content.loveInterests
-    .map((li, index) => ({ id: li.id, luck: roll(state.weatherSeed, dayIndex, index) }))
+export function feedRound(content: ContentPack, state: GameState): { state: GameState; plans: PostPlan[] } {
+  const date = toDate(content.calendar, state.time)
+  const seed = state.weatherSeed
+  const draw = (index: number) => roll(seed, date.dayIndex, index)
+  const known = content.loveInterests
+    .map((li, index) => ({ li, luck: draw(index) }))
+    .filter(({ li }) => state.contacts.includes(li.id))
     .sort((a, b) => a.luck - b.luck)
-  const keen = rolled.filter(({ luck }) => luck < POST_CHANCE).slice(0, MAX_POSTS_PER_DAY)
-  const authors = keen.length > 0 ? keen : rolled.slice(0, 1)
-  return { state: { ...state, feedDay: dayIndex }, authorIds: authors.map(({ id }) => id) }
+  const authors = known.slice(0, 1 + Math.floor(draw(1000) * MAX_AUTHORS)).map(({ li }) => li)
+
+  const hours: number[] = []
+  for (let hour = Math.max(POST_HOURS.from, date.hour + 1); hour < Math.min(POST_HOURS.until, content.calendar.hoursPerDay); hour++) hours.push(hour)
+
+  const plans: PostPlan[] = []
+  authors.forEach((li, a) => {
+    const count = 1 + Math.floor(draw(2000 + a) * MAX_POSTS_EACH)
+    const mine = hours
+      .map((hour) => ({ hour, luck: draw(3000 + a * 100 + hour) }))
+      .sort((x, y) => x.luck - y.luck)
+      .slice(0, count)
+    for (const { hour } of mine) {
+      const time = state.time - date.hour + hour
+      const then = { ...state, time }
+      const locationId = locationOf(content, then, li)
+      const there = locationId ? loveInterestsAt(content, then, locationId).filter((other) => other.id !== li.id) : []
+      const friend = draw(4000 + a * 100 + hour) < FRIEND_CHANCE ? there[Math.floor(draw(5000 + a * 100 + hour) * there.length)] : undefined
+      plans.push({ authorId: li.id, time, locationId, withId: friend?.id })
+    }
+  })
+  plans.sort((x, y) => x.time - y.time)
+  return { state: { ...state, feedDay: date.dayIndex, feedPlans: plans }, plans }
 }
 
-/** A plain post made without the LLM: where she is. */
-export function fallbackPost(content: ContentPack, state: GameState, authorId: string): string {
-  const li = content.loveInterests.find((c) => c.id === authorId)
-  const where = li && content.locations.find((l) => l.id === locationOf(content, state, li))
-  return where ? `At ${where.name} today.` : 'Quiet day.'
-}
-
-/** The prompt asking the LLM to write today's posts for the given love interests, as a JSON array. */
-export function buildFeedPrompt(content: ContentPack, state: GameState, authorIds: string[]): { system: string; user: string } {
+/** The prompt asking the LLM to write the day's planned posts: a caption and what the selfie shows, as a JSON array. */
+export function buildFeedPrompt(content: ContentPack, state: GameState, plans: PostPlan[]): { system: string; user: string } {
   const player = state.player.name
   const system = [
     'You write social media posts for the characters of a dating sim set at a modern university in a ' +
       'magitech fantasy city, where everyday magic and modern technology exist side by side. Bloomr is the ' +
-      'feed app every student has on their phone; these are public posts anyone at the University can read.',
-    'Reply with only a JSON array and nothing else, with one object per character, in the order given. Each object has:',
-    '- "id": the character id given',
-    '- "text": the post',
-    'Rules:',
-    '- One or two short sentences, under 40 words, in that character\'s own voice, typed the way she would type on her phone.',
-    '- About her own day: where she is, what she is doing, studying, eating, complaining about or looking forward to. ' +
-      'Use the place, the weather and the events given where they fit.',
+      'photo feed app every student has on their phone; these are public posts anyone at the University can see. ' +
+      'Every post is a selfie with a caption: of the character alone, or with the friend named.',
+    'Reply with only a JSON array and nothing else, with one object per post, in the order given. Each object has:',
+    '- "n": the number of the post',
+    '- "text": the caption',
+    '- "picture": what the selfie shows',
+    'Rules for the caption:',
+    "- One or two short sentences, under 40 words, in that character's own voice, typed the way they would type on their phone.",
+    '- About that moment of their own day: where they are, what they are doing, eating, complaining about or looking forward to. ' +
+      'Use the place, the hour, the weather and the events given where they fit. When a friend is in the picture, say so in passing.',
     `- Public: nothing private, nothing intimate, and never name ${player} or hint at what the two of them have done.`,
-    '- No hashtags or emoji unless they suit her, and then one at most. Do not repeat her last post.'
+    '- No hashtags or emoji unless they suit the character, and then one at most. Do not repeat a last post, and when one character posts twice make the two different.',
+    'Rules for the picture:',
+    '- One sentence, under 30 words, for an image model: the pose, the look on the face, what is held or being done, and anything of the moment in view.',
+    '- Only what can be seen. Name nobody: write "she", "he" or "they", and "her friend" for the friend.',
+    '- Do not describe bodies, faces, hair, clothes or the place itself: those are added for you.'
   ].join('\n')
 
   const weather = weatherOn(content, state)
   const events = eventsOn(content, state)
+  const everyone = [...content.loveInterests, ...content.npcs]
   const user = [
     `Today is ${formatDate(toDate(content.calendar, state.time))}.`,
     weather && `Weather: ${weather.name}. ${weather.description}`,
     ...events.map((e) => `Today is ${e.name}. ${e.description}`.trim()),
     '',
-    `Write ${authorIds.length} posts:`,
-    ...authorIds.flatMap((id, i) => {
-      const li = content.loveInterests.find((c) => c.id === id)
+    `Write ${plans.length} posts:`,
+    ...plans.flatMap((plan, i) => {
+      const li = everyone.find((c) => c.id === plan.authorId)
       if (!li) return []
-      const where = content.locations.find((l) => l.id === locationOf(content, state, li))
-      const last = recentPostsBy(state, id, 1)[0]
+      const where = content.locations.find((l) => l.id === plan.locationId)
+      const friend = everyone.find((c) => c.id === plan.withId)
+      const last = recentPostsBy(state, li.id, 1)[0]
       return [
-        `${i + 1}. id "${li.id}": ${li.name}, ${li.age}. ${li.bio}`,
+        `${i + 1}. ${li.name}, ${li.age}, at ${formatTime(toDate(content.calendar, plan.time))}. ${li.bio}`,
         `   Personality: ${li.personality}`,
         li.ai.speechPattern && `   Voice: ${li.ai.speechPattern}`,
-        `   Right now: ${where ? `at ${where.name}. ${where.description}` : 'at home.'}`,
-        last && `   Her last post: ${last.text}`
+        `   Where: ${where ? `${where.name}. ${where.description}` : 'at home.'}`,
+        friend ? `   A selfie with a friend: ${friend.name}. ${friend.bio}` : '   A selfie alone.',
+        last && `   Last post: ${last.text}`
       ]
     })
   ]
@@ -134,29 +200,77 @@ export function buildFeedPrompt(content: ContentPack, state: GameState, authorId
   return { system, user }
 }
 
+/** What the LLM wrote for one planned post. */
+export interface WrittenPost {
+  /** Which of the plans it is for, counting from 0. */
+  index: number
+  text: string
+  /** What the selfie shows, in words for an image model. */
+  picture: string
+}
+
 /**
- * Reads the LLM's reply into posts for the authors asked for. Anything malformed, empty
- * or for someone else is dropped; a reply with no JSON array gives none.
+ * Reads the LLM's reply into what it wrote for each plan. Anything malformed, without a
+ * caption, numbered for no plan or written twice is dropped; a reply with no JSON array gives none.
+ * A reply cut off part-way still gives the posts it finished.
  */
-export function parseFeedReply(reply: string, authorIds: string[]): { authorId: string; text: string }[] {
+export function parseFeedReply(reply: string, plans: PostPlan[]): WrittenPost[] {
   const start = reply.indexOf('[')
+  if (start < 0) return []
   const end = reply.lastIndexOf(']')
-  if (start < 0 || end < start) return []
   let parsed: unknown
   try {
     parsed = JSON.parse(reply.slice(start, end + 1))
   } catch {
-    return []
+    // Not a whole array: it ran out of room, or has something stray in it. Each object that is whole is still read.
+    parsed = (reply.slice(start).match(/{[^{}]*}/g) ?? []).flatMap((object) => {
+      try {
+        return [JSON.parse(object) as unknown]
+      } catch {
+        return []
+      }
+    })
   }
   if (!Array.isArray(parsed)) return []
-  const posts: { authorId: string; text: string }[] = []
+  const written: WrittenPost[] = []
   for (const entry of parsed) {
-    const { id, text } = (entry ?? {}) as { id?: unknown; text?: unknown }
-    if (typeof id !== 'string' || typeof text !== 'string') continue
+    const { n, text, picture } = (entry ?? {}) as { n?: unknown; text?: unknown; picture?: unknown }
+    const index = Number(n) - 1
+    if (!Number.isInteger(index) || index < 0 || index >= plans.length || typeof text !== 'string') continue
     const wording = text.trim().replace(/^["“]|["”]$/g, '').slice(0, MAX_POST_CHARS)
-    if (wording && authorIds.includes(id) && !posts.some((post) => post.authorId === id)) {
-      posts.push({ authorId: id, text: wording })
+    if (wording && !written.some((post) => post.index === index)) {
+      written.push({ index, text: wording, picture: typeof picture === 'string' ? picture.trim().slice(0, MAX_POST_CHARS) : '' })
     }
   }
-  return posts
+  return written
+}
+
+/** A planned post with its caption written and the prompt its selfie is drawn from: all but the picture. */
+export interface PostDraft extends PostPlan {
+  text: string
+  prompt: string
+}
+
+/**
+ * The posts ready to be drawn, earliest first: each written plan with the prompt for its
+ * selfie, made from how she and her friend look, what they will be wearing, what the LLM
+ * said the picture shows, and the place and the light at that hour.
+ */
+export function draftPosts(content: ContentPack, state: GameState, plans: PostPlan[], written: WrittenPost[], framing: string): PostDraft[] {
+  const everyone = [...content.loveInterests, ...content.npcs]
+  const sitter = (id: string | undefined, then: GameState) => {
+    const who = everyone.find((c) => c.id === id)
+    return who && { appearance: who.appearance, pronouns: who.pronouns, wears: outfitDescription(who.outfits, wornOutfit(content, then, who)) }
+  }
+  return written
+    .flatMap(({ index, text, picture }) => {
+      const plan = plans[index]
+      const then = { ...state, time: plan.time }
+      const author = sitter(plan.authorId, then)
+      if (!author) return []
+      const place = content.locations.find((l) => l.id === plan.locationId)
+      const light = periodAt(content.calendar, toDate(content.calendar, plan.time).hour).light
+      return [{ ...plan, text, prompt: selfiePrompt(author, sitter(plan.withId, then), picture, place, light, framing) }]
+    })
+    .sort((a, b) => a.time - b.time)
 }

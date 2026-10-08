@@ -38,12 +38,12 @@ describe('buying', () => {
     expect(after.time).toBe(0)
   })
 
-  it('refuses without enough coin, away from the stall, or when the place is shut', () => {
-    expect(canBuy(content, atShop(4), 'posy').reasons).toEqual(['Not enough coin'])
+  it('refuses without enough money, away from the stall, or when the place is shut', () => {
+    expect(canBuy(content, atShop(4), 'posy').reasons).toEqual(['Not enough money'])
     expect(canBuy(content, { ...atShop(20), locationId: 'home' }, 'posy').reasons).toEqual(['Not sold here'])
     expect(canBuy(content, atShop(20), 'salted-rose').reasons).toEqual(['Not sold here'])
     expect(canBuy(content, { ...atShop(20), time: 10 }, 'posy').reasons).toEqual(['the Shop is closed'])
-    expect(() => buy(content, atShop(0), 'posy')).toThrow(/Not enough coin/)
+    expect(() => buy(content, atShop(0), 'posy')).toThrow(/Not enough money/)
   })
 })
 

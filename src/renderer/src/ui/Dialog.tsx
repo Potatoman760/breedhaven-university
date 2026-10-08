@@ -2,9 +2,13 @@ import { useEffect, type ReactNode } from 'react'
 
 interface DialogProps {
   title: string
+  /** A few words beside the title, small: where things stand, such as the day of the season. */
+  note?: string
   onClose: () => void
   narrow?: boolean
   wide?: boolean
+  /** Leaves out the Close button in its heading, for a dialog whose own buttons include the way out. Escape and a press outside still close it. */
+  noClose?: boolean
   children: ReactNode
 }
 
@@ -31,15 +35,20 @@ export function Overlay({ onClose, children }: { onClose: () => void; children: 
 }
 
 /** A framed parchment dialog over a dimmed screen. */
-export function Dialog({ title, onClose, narrow, wide, children }: DialogProps) {
+export function Dialog({ title, note, onClose, narrow, wide, noClose, children }: DialogProps) {
   return (
     <Overlay onClose={onClose}>
       <div className={narrow ? 'dialog narrow' : wide ? 'dialog wide' : 'dialog'}>
         <div className="dialog-head">
-          <h1>{title}</h1>
-          <button className="secondary" onClick={onClose}>
-            Close
-          </button>
+          <h1>
+            {title}
+            {note && <span className="dialog-note">{note}</span>}
+          </h1>
+          {!noClose && (
+            <button className="secondary" onClick={onClose}>
+              Close
+            </button>
+          )}
         </div>
         {children}
       </div>

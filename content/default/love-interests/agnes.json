@@ -7,18 +7,26 @@
   "pronouns": "she/her",
   "bio": "Agnes is the librarian who decides who gets a reading cell, who gets into the restricted stacks, and who gets shushed.",
   "appearance": "A slender, elegant woman of 44 with pale skin, dark watchful eyes behind round gold spectacles, fine arched brows, a long graceful neck and full lips. Chestnut hair in a tight chignon. A slim waist and a quietly shapely figure.",
-  "imageSeed": 60,
   "personality": "Quiet, precise and formidable. Kinder than she looks to anyone who loves books.",
   "outfits": [
     {
       "id": "default",
       "name": "Work clothes",
       "description": "a high-collared dark green blouse, a long fitted grey wool skirt, a cardigan, round gold spectacles, a brass key on a chain round her neck, a pencil through her chignon",
-      "sprites": {}
+      "sprites": {
+        "neutral": {
+          "image": "sprites/agnes/default-neutral-2-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     }
   ],
   "defaultOutfitId": "default",
   "faceY": 8,
+  "imageSeed": 60,
+  "stageHeight": 100,
+  "animations": [],
   "schedule": [],
   "ai": {
     "speechPattern": "A library whisper that carries. Economical, formal, faintly amused.",

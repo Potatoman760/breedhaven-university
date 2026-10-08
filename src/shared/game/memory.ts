@@ -258,3 +258,78 @@ export function describeAge(content: ContentPack, memory: Memory, now: number): 
   if (days <= 0) return 'earlier today'
   return days === 1 ? 'yesterday' : `${days} days ago`
 }
+
+/** What the player paid out of his own pocket in the course of a scene. */
+export interface Spending {
+  /** Whole dollars, never more than he had. */
+  amount: number
+  /** What it went on, in a few words: "the drinks at Boba Blossom". */
+  on: string
+}
+
+/**
+ * The prompt asking the LLM what the player spent in a scene. Nothing in a scene takes
+ * his money as it happens: he says the drinks are on him, and what that came to is
+ * settled here, when the scene is over.
+ */
+export function buildSpendingPrompt(content: ContentPack, state: GameState, scene: Scene): { system: string; user: string } {
+  const player = state.player.name
+  const system = [
+    `You keep the accounts of a dating sim. Given what was said in one scene, work out what ${player} himself paid for in it, and what it came to.`,
+    'Reply with only a JSON object and nothing else: {"spent": number, "on": string}',
+    `- Count only what ${player} plainly paid for or said he would: "the drinks are on me", buying a round, paying for dinner, tickets, a cab, something bought for someone. ` +
+      `What someone else paid for, what was free, what was only talked about, and what he was given are not his.`,
+    '- "spent" is a whole number of dollars, with no $ sign. Price it as it would be priced in the United States: a coffee or a tea $4 to $6, a drink at a bar $8 to $12, ' +
+      'a casual meal for one $15 to $25, a good dinner for two $80 to $150. Count each person he paid for.',
+    '- If he paid for nothing, "spent" is 0 and "on" is empty. Most scenes cost nothing; do not look for a reason to charge him.',
+    '- "on" says what it went on in a few words, with the place when there is one: "drinks for two at Boba Blossom".',
+    scene.gifts.length > 0 && `- Gifts he handed over were paid for when he bought them: leave them out (${scene.gifts.map((gift) => gift.name).join(', ')}).`,
+    scene.shift && '- He is at work in this scene: what he serves or sells as part of the job is not his money.'
+  ]
+    .filter((line): line is string => typeof line === 'string')
+    .join('\n')
+
+  const place = content.locations.find((l) => l.id === state.locationId)
+  let transcript = scene.messages.map((m) => (m.role === 'user' ? `${player}: ${m.content}` : m.content)).join('\n')
+  if (transcript.length > MAX_TRANSCRIPT_CHARS) transcript = `[earlier conversation omitted]\n${transcript.slice(-MAX_TRANSCRIPT_CHARS)}`
+  const user = [
+    `${player} has $${state.player.money}.`,
+    `What they did: ${scene.beats.map(describeBeat).join('; then ')}.`,
+    place && `Where it ended: ${place.name}.`,
+    '',
+    'What was said:',
+    transcript
+  ]
+    .filter((line): line is string => typeof line === 'string')
+    .join('\n')
+  return { system, user }
+}
+
+/**
+ * Reads the LLM's answer on what he spent: a whole number of dollars, no more than he has.
+ * Nothing spent, or an answer that cannot be read, is no spending at all.
+ */
+export function parseSpending(reply: string, purse: number): Spending | undefined {
+  const start = reply.indexOf('{')
+  const end = reply.lastIndexOf('}')
+  if (start < 0 || end < start) return undefined
+  let read: unknown
+  try {
+    read = JSON.parse(reply.slice(start, end + 1))
+  } catch {
+    return undefined
+  }
+  if (typeof read !== 'object' || read === null) return undefined
+  const given = read as Record<string, unknown>
+  const asked = Math.round(Number(given['spent']))
+  if (!Number.isFinite(asked) || asked <= 0) return undefined
+  // He cannot pay out more than he has on him.
+  const amount = Math.min(asked, Math.max(0, Math.floor(purse)))
+  return amount > 0 ? { amount, on: typeof given['on'] === 'string' ? given['on'].trim().slice(0, 120) : '' } : undefined
+}
+
+/** Takes what he spent in a scene out of his pocket. */
+export function applySpending(state: GameState, spending: Spending | undefined): GameState {
+  if (!spending) return state
+  return { ...state, player: { ...state.player, money: Math.max(0, state.player.money - spending.amount) } }
+}

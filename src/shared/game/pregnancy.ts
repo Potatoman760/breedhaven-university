@@ -17,11 +17,6 @@ export function childrenOf(state: GameState, loveInterestId: string): Child[] {
   return state.children.filter((child) => child.motherId === loveInterestId)
 }
 
-/** How long this love interest carries a child, in days: her own length if she has one, else the usual. */
-export function pregnancyLength(content: ContentPack, li: Pick<LoveInterest, 'pregnancyDays'>): number {
-  return li.pregnancyDays ?? content.pregnancy?.lengthDays ?? 0
-}
-
 /** How far along a pregnancy is, from 0 at conception to 1 when due. */
 export function pregnancyProgress(pregnancy: Pregnancy, time: number): number {
   const length = Math.max(1, pregnancy.dueAt - pregnancy.conceivedAt)
@@ -62,7 +57,7 @@ export function conceive(content: ContentPack, state: GameState, loveInterestId:
   if (!config || index < 0 || !canConceive(content, state, loveInterestId)) return state
   const { dayIndex } = toDate(content.calendar, state.time)
   if (roll(state.weatherSeed, dayIndex, index, 1) >= config.chance) return state
-  const days = pregnancyLength(content, content.loveInterests[index])
+  const days = config.lengthDays
   return {
     ...state,
     pregnancies: {

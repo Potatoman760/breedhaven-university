@@ -3,14 +3,15 @@ import { MAX_SCENE_CAST, STATS, StatSchema, trainsAt, type ContentPack, type Dri
 import { formatTime, isGameOver, toDate } from './calendar'
 import { applyEffects } from './conditions'
 import { courseMembers, meetingNow } from './courses'
-import { locationOf, loveInterestsAt } from './map'
-import { npcsAt } from './npcs'
+import { locationOf, approachableAt } from './map'
 import { shiftKey } from './jobs'
 import { timeOn } from './agenda'
 import { addCoursePoints, studyPoints } from './grades'
 import { firstNames, sceneBaseline } from './scene'
 import { isOpen } from './schedule'
 
+// The hour he wakes: from midnight until then is for sleep (`SLEEP_HOURS` in sleep.ts).
+const SLEEP_UNTIL = 6
 // What the player may ask for, when they don't say.
 const DEFAULT_HOURS = 2
 const MAX_HOURS = 4
@@ -33,6 +34,8 @@ const STAT_WORDS: Record<Stat | 'rest', RegExp> = {
 // Waiting for people to be free only looks this far ahead; beyond it, a plan is the thing.
 const MAX_WAIT_DAYS = 1
 const TITLE_CHARS = 60
+// The most love interests he runs into when he goes somewhere alone to work on himself.
+const MAX_RUN_INTO = 2
 
 /** Something the player made up to do: what, where, how long, and with whom. */
 export const OutingSchema = z.object({
@@ -160,11 +163,6 @@ export function outingEffects(outing: Outing): Effect[] {
   ]
 }
 
-/** How long the walk to the outing takes: nothing when it is where the player already is. */
-function walkHours(content: ContentPack, state: GameState, outing: Outing): number {
-  return outing.locationId === state.locationId ? 0 : (content.map?.travelHours ?? 0)
-}
-
 /** Why a love interest can't come to something that runs over the given hours, if they can't. */
 function busyReason(content: ContentPack, state: GameState, id: string, from: number, hours: number): string | undefined {
   const li = content.loveInterests.find((c) => c.id === id)
@@ -199,7 +197,7 @@ export interface OutingCheck {
 /** Everything in the way of an outing that starts at `time`: people who are busy, plans, closed doors. */
 function blockersAt(content: ContentPack, state: GameState, outing: Outing, time: number): { people: Map<string, string>; other: string[] } {
   const place = content.locations.find((l) => l.id === outing.locationId)
-  const start = time + walkHours(content, state, outing)
+  const start = time
   const other: string[] = []
   const arrive = toDate(content.calendar, start)
   const leave = toDate(content.calendar, start + outing.hours - 1)
@@ -209,6 +207,9 @@ function blockersAt(content: ContentPack, state: GameState, outing: Outing, time
   const plan = state.appointments.find((a) => a.time < start + outing.hours && time < a.time + a.hours)
   if (plan) other.push(`You have a plan at ${formatTime(toDate(content.calendar, plan.time))}: ${plan.title}`)
   if (isGameOver(content.calendar, start + outing.hours - 1)) other.push('There is not enough of the season left')
+  // The small hours are for sleep: nothing starts in them or runs into them, but sleep itself.
+  const last = toDate(content.calendar, start + outing.hours - 1)
+  if (outing.trains !== 'rest' && (arrive.hour < SLEEP_UNTIL || last.hour < SLEEP_UNTIL || last.dayIndex !== arrive.dayIndex)) other.push('It would run past midnight, and the night is for sleeping')
   if (((outing.trains && outing.trains !== 'rest') || outing.studyCourseId) && state.player.energy < ENERGY_PER_HOUR * outing.hours) {
     other.push('You are too tired for that. Rest first')
   }
@@ -243,7 +244,7 @@ export function checkOuting(content: ContentPack, state: GameState, outing: Outi
 }
 
 /**
- * Goes on the outing after waiting the given hours: the wait and the walk pass, the
+ * Goes on the outing after waiting the given hours: the wait passes, the
  * player ends up at the place, and the time it takes is spent. With company it opens a
  * scene with them, and what they make of it is settled when the scene is over.
  */
@@ -258,7 +259,7 @@ export function startOuting(
   const problems = [...people.values(), ...other]
   if (problems.length > 0) throw new Error(`Cannot do "${outing.title}": ${problems.join('; ')}`)
 
-  const there = { ...waited, time: waited.time + walkHours(content, state, outing), locationId: outing.locationId }
+  const there = { ...waited, locationId: outing.locationId }
   const worked = applyEffects(there, outingEffects(outing), { content })
   // Study is work like any other, and what it earns goes on the course.
   const arrived = outing.studyCourseId
@@ -267,17 +268,21 @@ export function startOuting(
   const after = arrived
   const place = content.locations.find((l) => l.id === outing.locationId)
   // Whoever he asked along; or, for something he drops in on alone, whoever is there when he arrives:
-  // love interests first, and failing them someone who works at the place.
-  const found = outing.dropIn && outing.withIds.length === 0 ? loveInterestsAt(content, there, outing.locationId).map((li) => li.id).slice(0, MAX_SCENE_CAST) : []
-  const staff = outing.dropIn && outing.withIds.length === 0 && found.length === 0 ? npcsAt(content, there, outing.locationId)[0] : undefined
-  const [leadId, ...companionIds] = outing.withIds.length > 0 ? outing.withIds : staff ? [staff.id] : found
+  // Of the love interests there, he runs into one or two, whoever the day throws his way.
+  const around = outing.dropIn && outing.withIds.length === 0 ? approachableAt(content, there, outing.locationId).map((li) => li.id) : []
+  const met = pick(state.weatherSeed, there.time, 900) < 0.5 ? 1 : MAX_RUN_INTO
+  const found = around
+    .map((id, index) => ({ id, luck: pick(state.weatherSeed, there.time, 901 + index) }))
+    .sort((a, b) => a.luck - b.luck)
+    .slice(0, met)
+    .map(({ id }) => id)
+  // With no love interest about he is alone, whoever works at the place: there is no scene, only what the work did.
+  const [leadId, ...companionIds] = outing.withIds.length > 0 ? outing.withIds : found
   const what = outing.studyCourseId ? 'to study' : outing.trains && outing.trains !== 'rest' ? `to work on his ${outing.trains}` : 'on his own'
   const direction = !outing.dropIn
     ? undefined
     : `${state.player.name} has come here ${what}: ${outing.title.toLowerCase()}. ${outing.description} ` +
-      (staff
-        ? `You are at your work here, and he is one of the people about the place. Let him get on with it; talk when he talks, and say what you make of how he is doing.`
-        : `Nobody arranged this: you happen to be here while he is at it. You may watch, join in, tease him, help or get in his way, as you would.`) +
+      `Nobody arranged this: you happen to be here, and run into him while he is at it. Open with him at his work, and then the running into each other. You may watch, join in, tease him, help or get in his way, as you would.` +
       ` By the end of the scene the two hours are up and he is the better for it.`
   return {
     state: { ...after, time: after.time + outing.hours },
@@ -288,7 +293,7 @@ export function startOuting(
           nsfw: false,
           beats: [{ activityName: outing.title, locationName: place?.name, description: outing.description || undefined, direction }],
           messages: [],
-          gifts: [], conceived: [], departed: [], npc: staff !== undefined,
+          gifts: [], conceived: [], departed: [], npc: false,
           roomOf: outing.roomOf,
           baseline: sceneBaseline(state, leadId, companionIds)
         }
@@ -352,12 +357,12 @@ export function drillOuting(suggestion: StatSuggestion): Outing {
 
 /**
  * What the player would miss by going on an outing now, after the given wait: a class he
- * is taking, or a shift at his job, that falls in the hours it takes, the walk included.
+ * is taking, or a shift at his job, that falls in the hours it takes.
  * Each as a line. He may still go; it is for him to be told first.
  */
 export function outingMisses(content: ContentPack, state: GameState, outing: Outing, waitHours = 0): string[] {
   const from = state.time + waitHours
-  const until = from + walkHours(content, state, outing) + outing.hours
+  const until = from + outing.hours
   const clock = (hour: number) => `${String(hour).padStart(2, '0')}:00`
   const missed: string[] = []
   for (let time = from; time < until; time++) {

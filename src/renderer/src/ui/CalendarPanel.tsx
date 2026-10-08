@@ -1,7 +1,6 @@
 import { useState } from 'react'
-import { addEvents, dayAgenda, dayIndexOf, removeEvent, toDate, upcomingEvents, type AgendaItem } from '../../../shared/game'
+import { dayAgenda, dayIndexOf, removeEvent, toDate, upcomingEvents, type AgendaItem } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
-import { errorMessage } from '../errors'
 import { Dialog } from './Dialog'
 import { ChevronIcon } from './icons'
 
@@ -51,26 +50,11 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
   const [mode, setMode] = useState<'week' | 'month'>('week')
   // Weeks, or months, away from the current one.
   const [offset, setOffset] = useState(0)
-  const [busy, setBusy] = useState(false)
-  const [notice, setNotice] = useState('')
 
   const week = calendar.weekdays.length
   const weekdayOf = (dayIndex: number) => (((calendar.startWeekday + dayIndex) % week) + week) % week
   const label = (dayIndex: number) => toDate(calendar, Math.max(0, dayIndex) * calendar.hoursPerDay)
 
-  async function generate() {
-    setBusy(true)
-    setNotice('')
-    try {
-      const events = await window.api.generateEvents({ state })
-      onChange(addEvents(state, events))
-      if (events.length === 0) setNotice('The AI did not come up with any usable events.')
-    } catch (error) {
-      setNotice(errorMessage(error))
-    } finally {
-      setBusy(false)
-    }
-  }
 
   const switchTo = (next: 'week' | 'month', nextOffset = 0) => {
     setMode(next)
@@ -101,6 +85,10 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
   const firstDay = dayIndexOf(calendar, year, month.id, 1)
   const lead = weekdayOf(firstDay)
 
+  // The calendar goes no further than the game does: the week, or the month, that holds its last day is the last that can be turned to.
+  const lastDay = calendar.lengthDays - 1
+  const atEnd = mode === 'week' ? weekStart + week > lastDay : firstDay + month.days > lastDay
+
   const title =
     mode === 'month'
       ? `${month.name}, Year ${year}`
@@ -111,7 +99,7 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
         : 'Before term'
 
   return (
-    <Dialog title="Calendar" onClose={onClose} wide>
+    <Dialog title="Calendar" note={`Day ${today.dayIndex + 1} of ${calendar.lengthDays}`} onClose={onClose} wide>
       <div className="calendar">
         <div className="calendar-main">
           <div className="month-nav">
@@ -120,11 +108,8 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
             </button>
             <div>
               <h2>{title}</h2>
-              <span className="hint">
-                Day {today.dayIndex + 1} of {calendar.lengthDays}
-              </span>
             </div>
-            <button className="secondary icon" aria-label={mode === 'week' ? 'Next week' : 'Next month'} onClick={() => setOffset(offset + 1)}>
+            <button className="secondary icon" disabled={atEnd} aria-label={mode === 'week' ? 'Next week' : 'Next month'} onClick={() => setOffset(offset + 1)}>
               <ChevronIcon size={16} />
             </button>
             <button className="quiet" disabled={offset === 0} onClick={() => setOffset(0)}>
@@ -272,10 +257,6 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
           {upcomingEvents(content, state, UPCOMING_DAYS).length === 0 && (
             <p className="hint">Nothing in the next {UPCOMING_DAYS} days.</p>
           )}
-          <button className="secondary" disabled={busy} onClick={generate}>
-            {busy ? 'Asking...' : 'Ask the AI for events'}
-          </button>
-          {notice && <p className="notice">{notice}</p>}
         </div>
       </div>
     </Dialog>

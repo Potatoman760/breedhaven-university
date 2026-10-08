@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { resolveContentPath } from './assets'
-import { deleteLocation, deleteLoveInterest, deleteTrait, importAsset, loadWithAddons, removeUnusedAssets, saveLocation, saveLoveInterest, saveTrait } from './addons'
+import { deleteLocation, deleteLoveInterest, deleteTrait, importAsset, loadWithAddons, removeUnusedAssets, resetPlayer, saveLocation, saveLoveInterest, savePlayer, saveTrait } from './addons'
 
 // The game's own pack is the base; each test gets an empty add-on folder of its own.
 const packDir = join(process.cwd(), 'content', 'default')
@@ -181,7 +181,7 @@ describe('tidying up on save', () => {
     const saved = {
       id: 'mira',
       outfits: [{ id: 'default', name: 'Usual', description: '', pregnant: false, sprites: { neutral: { image: 'addons/sprites/mira/neutral.png', description: '' } } }],
-      animations: [{ id: 'dance', name: 'Dance', description: '', video: 'addons/sprites/mira/dance.mp4', loop: true }],
+      animations: [{ id: 'dance', name: 'Dance', description: '', clip: 'addons/sprites/mira/dance.mp4', loop: true }],
       room: { background: 'addons/generated/backgrounds/mira/kept.png' }
     }
     expect(removeUnusedAssets(dir, saved).sort()).toEqual(['neutral-old.png', 'room.png', 'try-1.png'])
@@ -221,5 +221,30 @@ describe('location add-ons', () => {
     // A picture is for the day or for the night, and nothing else.
     expect(saveLocation(dir, base.content, { ...cafe, backgrounds: [{ id: 'a', name: 'A', images: { teatime: 'x.png' } }] }).length).toBeGreaterThan(0)
     expect(existsSync(join(dir, 'locations'))).toBe(false)
+  })
+})
+
+describe('the player as an add-on', () => {
+  it('changes how a new game starts him, room and all, and puts him back', () => {
+    const dir = addons()
+    expect(base.info.playerChanged).toBe(false)
+    const room = { name: 'a single room on the third floor', description: 'A narrow bed under a round window.', locationId: base.content.newGame.locationId, background: 'addons/sprites/player/room.png' }
+    expect(savePlayer(dir, base.content, { ...base.content.newGame, player: { ...base.content.newGame.player, name: 'Wren', money: 75 }, room })).toEqual([])
+    const { content, info } = loadWithAddons(packDir, dir)
+    expect(info.playerChanged).toBe(true)
+    expect(content.newGame).toMatchObject({ player: { name: 'Wren', money: 75 }, room })
+    // Everyone else is as they were.
+    expect(content.loveInterests.length).toBe(base.content.loveInterests.length)
+    expect(content.npcs.length).toBe(base.content.npcs.length)
+
+    // What the game could not start with is refused, and nothing is written.
+    expect(savePlayer(dir, base.content, { ...base.content.newGame, player: { ...base.content.newGame.player, name: '  ' } })).toEqual(['He needs a name to start with.'])
+    expect(savePlayer(dir, base.content, { ...base.content.newGame, locationId: 'nowhere' })[0]).toMatch(/nowhere/)
+    expect(savePlayer(dir, base.content, { ...base.content.newGame, room: { ...room, locationId: 'nowhere' } })[0]).toMatch(/nowhere/)
+    expect(loadWithAddons(packDir, dir).content.newGame.player.name).toBe('Wren')
+
+    expect(resetPlayer(dir)).toEqual([])
+    expect(loadWithAddons(packDir, dir).content.newGame).toEqual(base.content.newGame)
+    expect(resetPlayer(dir)).toEqual(['The player has not been changed.'])
   })
 })

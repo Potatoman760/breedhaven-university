@@ -2,8 +2,8 @@ import { mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { backgroundPrompt, ComfySettingsSchema, normaliseComfyUrl, prependPrompt, spritePrompt } from '../../shared/comfy'
-import { outfitDescription } from '../../shared/model'
+import { backgroundPrompt, ComfySettingsSchema, DEFAULT_SIZES, normaliseComfyUrl, nsfwPrompt, prependPrompt, spritePrompt } from '../../shared/comfy'
+import { NSFW_POSES, outfitDescription, poseDescription } from '../../shared/model'
 import { analyse, applyBindings, effectiveBindings, parseGraph } from './graph'
 import { ComfyStore, fileArt } from './studio'
 import { listWorkflows, loadWorkflows, resolveWorkflow } from './workflows'
@@ -172,6 +172,11 @@ describe('the studio', () => {
     expect(backgroundPrompt({ name: 'the Lumen', appearance: 'A cinema in an old music hall.', indoors: true }, 'Balcony', 'evening', 'no people')).toBe(
       'Interior of the Lumen: Balcony.\n\nA cinema in an old music hall.\n\nevening light\n\nno people'
     )
+    // The Default view is the place as it is: its name is not sent.
+    expect(backgroundPrompt({ name: 'the Lumen', appearance: 'A cinema in an old music hall.', indoors: true }, 'Default', 'day', 'no people')).toBe(
+      'Interior of the Lumen.\n\nA cinema in an old music hall.\n\ndaytime, bright natural daylight\n\nno people'
+    )
+    expect(backgroundPrompt({ name: '', appearance: 'A sunny room', indoors: true }, 'default', '', '')).toBe('A sunny room.')
     // A character's room has no name worth drawing: only what it looks like is sent.
     expect(backgroundPrompt({ name: '', appearance: 'A sunny attic room under sloping eaves', indoors: true }, '', '', 'no people')).toBe(
       'A sunny attic room under sloping eaves.\n\nno people'
@@ -185,5 +190,31 @@ describe('a man\'s sprite', () => {
   it('is asked for as "he"', () => {
     const who = { pronouns: 'he/him', appearance: 'A lean man of 43 with a short beard.', outfits: [{ id: 'default', name: 'Whites', description: "a black chef's jacket", sprites: {}, pregnant: false }] }
     expect(spritePrompt(who, 'default', 'happy', '')).toBe("A lean man of 43 with a short beard.\n\nHe wears a black chef's jacket.\n\nhe has a happy expression")
+  })
+})
+
+describe('the NSFW section', () => {
+  const nude = { id: 'nude', name: 'Nude', description: 'nothing at all, her hair loose', sprites: {}, pregnant: false }
+  const who = { pronouns: 'she/her', appearance: 'A woman with brown skin and long black hair', outfits: [nude] }
+
+  it('has a slot for each standard pose, each with what the LLM is told and what it is drawn from', () => {
+    expect(NSFW_POSES.map((pose) => pose.id)).toEqual(['blowjob', 'missionary', 'doggy', 'cowgirl', 'creampie', 'facial'])
+    for (const pose of NSFW_POSES) {
+      expect(pose.description).not.toBe('')
+      expect(pose.draws).not.toBe('')
+    }
+    // Her own words for a pose come before the standard ones.
+    expect(poseDescription({ id: 'doggy', description: '' })).toBe(NSFW_POSES[2].description)
+    expect(poseDescription({ id: 'doggy', description: ' On the desk. ' })).toBe('On the desk.')
+    expect(poseDescription({ id: 'her-own', description: '' })).toBe('')
+  })
+
+  it('is drawn wide, from her body, her own nude outfit, the pose and the framing', () => {
+    expect(DEFAULT_SIZES.nsfw).toEqual({ width: 1920, height: 1080 })
+    expect(nsfwPrompt(who, 'she lies back on a bed', 'wide cinematic shot')).toBe(
+      'A woman with brown skin and long black hair.\n\nShe wears nothing at all, her hair loose.\n\nshe lies back on a bed.\n\nwide cinematic shot'
+    )
+    // Without a nude outfit of her own, the usual words for it.
+    expect(nsfwPrompt({ ...who, outfits: [] }, 'x', '')).toContain('She wears nothing at all, completely nude.')
   })
 })

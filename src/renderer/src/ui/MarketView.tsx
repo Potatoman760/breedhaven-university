@@ -32,8 +32,8 @@ export function MarketView({ content, state, onBuy, onLeave }: Props) {
             </span>
           </div>
           <div className="purse">
-            <span className="caps">Coin</span>
-            <strong>{state.player.money}</strong>
+            <span className="caps">Money</span>
+            <strong>${state.player.money}</strong>
           </div>
           <button className="secondary" onClick={onLeave}>
             Leave
@@ -78,7 +78,7 @@ export function MarketView({ content, state, onBuy, onLeave }: Props) {
                     title={check.reasons.join(' · ')}
                     onClick={() => onBuy(item.id)}
                   >
-                    Buy · {item.price}
+                    Buy · ${item.price}
                   </button>
                 </div>
               )

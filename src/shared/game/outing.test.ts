@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { CourseSchema, CourseworkConfigSchema, NpcSchema, type ContentPack } from '../model'
 import { buildOutingPrompt, checkOuting, describeOuting, drillOuting, fallbackOuting, outingMisses, parseOuting, startOuting, suggestDrills } from './outing'
+import { playerGains } from './scene'
 import { createInitialState } from './state'
 import { fixture } from './testFixture'
 
@@ -74,20 +75,20 @@ describe('checkOuting', () => {
     })
     // A class that starts partway through is in the way too.
     const early = { ...state, time: -1 }
-    expect(checkOuting(content, early, { ...tea, withIds: ['bea'] }).blockers).toEqual(['Bea has RID 101 at 06:00'])
+    expect(checkOuting(content, early, { ...tea, withIds: ['bea'] }).blockers).toContain('Bea has RID 101 at 06:00')
   })
 
-  it('counts the walk, closing time, people who are not around, and plans already made', () => {
-    // A two-hour walk to the shop: Bea's class is still on at 08:00, and over by 09:00.
+  it('counts closing time, people who are not around, and plans already made', () => {
+    // Bea's class is on now, and over by 09:00.
     const atShop = { ...tea, withIds: ['bea'], locationId: 'shop' }
-    expect(checkOuting(content, state, atShop).waitHours).toBe(1)
+    expect(checkOuting(content, state, atShop).waitHours).toBe(3)
 
-    const evening = { ...state, time: 8 } // 14:00, the shop shuts at 15:00
+    const evening = { ...state, time: 9 } // 15:00, when the shop shuts
     expect(checkOuting(content, evening, { ...tea, locationId: 'shop' }).blockers).toContain('the Shop is closed')
-    const night = { ...state, time: 10 } // 16:00: Ana has gone
+    const night = { ...state, time: 10 } // 16:00: Ana has gone, and is back at 05:00, but nothing starts before 06:00
     const lonely = checkOuting(content, night, tea)
     expect(lonely.blockers).toEqual(['Ana is not around'])
-    expect(lonely.waitHours).toBe(9)
+    expect(lonely.waitHours).toBe(10)
 
     const booked = { ...state, appointments: [{ id: 'plan-1', loveInterestId: 'bea', companionIds: [], title: 'Study', time: 1, hours: 2, locationId: 'home' }] }
     const clash = checkOuting(content, booked, tea)
@@ -97,12 +98,12 @@ describe('checkOuting', () => {
 })
 
 describe('startOuting', () => {
-  it('waits, walks, spends the time and opens a scene with everyone who came', () => {
+  it('waits, spends the time and opens a scene with everyone who came', () => {
     const outing = { ...tea, withIds: ['bea', 'ana'], locationId: 'shop' }
     expect(() => startOuting(content, state, outing)).toThrow(/Bea is in RID 101/)
 
-    const { state: after, scene } = startOuting(content, state, outing, 1)
-    expect(after.time).toBe(1 + 2 + 2)
+    const { state: after, scene } = startOuting(content, state, outing, 3)
+    expect(after.time).toBe(3 + 2)
     expect(after.locationId).toBe('shop')
     // An invitation earns nothing of itself: the scene decides what they make of it.
     expect(after.relationships).toEqual(state.relationships)
@@ -197,7 +198,7 @@ describe('raising a stat', () => {
     expect(scene?.beats[0].direction).toContain('you happen to be here')
   })
 
-  it('still raises it with nobody about, and is a scene with whoever works there when only she is', () => {
+  it('still raises it with nobody about, and someone who only works there is nobody', () => {
     const empty: ContentPack = { ...town, loveInterests: town.loveInterests.map((li) => ({ ...li, schedule: [] })) }
     const quiet = { ...state, courses: [] }
     const [workout] = suggestDrills(empty, quiet)
@@ -207,8 +208,8 @@ describe('raising a stat', () => {
 
     const smith = NpcSchema.parse({ id: 'bryn', name: 'Bryn', age: 34, outfits: [{ id: 'default', name: 'Apron' }], defaultOutfitId: 'default', schedule: [{ locationId: 'shop' }] })
     const staffed = startOuting({ ...empty, npcs: [smith] }, quiet, drillOuting(workout))
-    expect(staffed.scene).toMatchObject({ loveInterestId: 'bryn', npc: true })
-    expect(staffed.scene?.beats[0].direction).toContain('You are at your work here')
+    expect(staffed.scene).toBeNull()
+    expect(staffed.state.player.stats['strength']).toBe(alone.state.player.stats['strength'])
   })
 
   it('says beforehand what he would miss by going: a class he is taking', () => {
@@ -220,5 +221,53 @@ describe('raising a stat', () => {
     expect(outingMisses(town, state, drillOuting(workout))).toEqual([])
     expect(outingMisses(town, { ...enrolled, attendance: { c1: { count: 1, last: '0:6' } } }, drillOuting(workout))).toEqual([])
     expect(outingMisses(town, { ...enrolled, time: 3 }, drillOuting(workout))).toEqual([])
+  })
+})
+
+describe('something done alone', () => {
+  // Four love interests who are always at home, for him to run into.
+  const crowd: ContentPack = { ...base, loveInterests: ['bea', 'cy', 'dee', 'eve'].map((id) => ({ ...bea, id, name: id })) }
+  const alone = { title: 'Lift weights', description: 'You load the bar.', withIds: [], locationId: 'home', hours: 2, trains: 'strength' as const, dropIn: true }
+
+  it('is a scene with one or two of the love interests who are there, whoever the day throws his way', () => {
+    const sizes = new Set<number>()
+    const leads = new Set<string>()
+    for (let seed = 0; seed < 60; seed++) {
+      const { scene } = startOuting(crowd, { ...createInitialState(crowd), weatherSeed: seed }, alone)
+      const cast = [scene!.loveInterestId, ...scene!.companionIds]
+      expect(new Set(cast).size).toBe(cast.length)
+      sizes.add(cast.length)
+      leads.add(cast[0])
+      expect(scene!.beats[0].direction).toContain('run into him while he is at it')
+    }
+    expect([...sizes].sort()).toEqual([1, 2])
+    expect(leads.size).toBeGreaterThan(2)
+  })
+
+  it('is no scene with nobody there, and what it did is told from what changed', () => {
+    const empty: ContentPack = { ...base, loveInterests: [] }
+    const before = createInitialState(empty)
+    const { state: after, scene } = startOuting(empty, before, alone)
+    expect(scene).toBeNull()
+    const gains = playerGains({ stats: before.player.stats, energy: before.player.energy, money: before.player.money, training: before.training, coursePoints: before.coursePoints }, after)
+    // Two hours of it: a point of strength or training banked toward one, for the energy it took.
+    expect(gains.some((g) => (g.label === 'strength' || g.label === 'strength training') && g.to > g.from)).toBe(true)
+    expect(gains.find((g) => g.label === 'energy')).toMatchObject({ from: before.player.energy, to: before.player.energy - 16 })
+    expect(playerGains({ stats: after.player.stats, energy: after.player.energy, money: after.player.money, training: after.training, coursePoints: after.coursePoints }, after)).toEqual([])
+  })
+
+  it('tells of marks earned in a course by its number', () => {
+    const studied = { ...state, coursePoints: { c1: 6 } }
+    expect(playerGains({ stats: state.player.stats, energy: state.player.energy, money: state.player.money, training: {}, coursePoints: { c1: 2 } }, studied)).toEqual([{ label: 'RID 101 marks', from: 2, to: 6 }])
+  })
+})
+
+describe('what is told of his training', () => {
+  it('is whole points only: a part of one is kept, and shows when the next part completes it', () => {
+    const before = { stats: state.player.stats, energy: state.player.energy, money: state.player.money, training: { dexterity: 0.5 }, coursePoints: { c1: 2.4 } }
+    expect(playerGains(before, { ...state, training: { dexterity: 2.3 }, coursePoints: { c1: 2.9 } })).toEqual([{ label: 'dexterity training', from: 0, to: 2 }])
+    // Half a point more, with no whole one made, is not told of.
+    expect(playerGains(before, { ...state, training: { dexterity: 0.9 }, coursePoints: { c1: 2.4 } })).toEqual([])
+    expect(playerGains(before, { ...state, training: { dexterity: 0.5 }, coursePoints: { c1: 3.1 } })).toEqual([{ label: 'RID 101 marks', from: 2, to: 3 }])
   })
 })

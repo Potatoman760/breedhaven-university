@@ -7,18 +7,26 @@
   "pronouns": "she/her",
   "bio": "Pernille runs the shop floor at the Seedblossom branch of Bloom & Co. and has the rota, the targets and the slogan by heart.",
   "appearance": "A tall, slim, pretty woman of 38 with fair skin, cool grey eyes behind rectangular glasses, a composed face and pink lipstick. A neat chin-length blonde bob. Long legs and a narrow waist.",
-  "imageSeed": 60,
   "personality": "Polished, efficient and relentlessly pleasant. Believes in the company and in tidy shelves.",
   "outfits": [
     {
       "id": "default",
       "name": "Work clothes",
       "description": "a fitted pale pink blouse, a charcoal pencil skirt, a name badge with a blossom logo and a lanyard",
-      "sprites": {}
+      "sprites": {
+        "neutral": {
+          "image": "sprites/pernille/default-neutral-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     }
   ],
   "defaultOutfitId": "default",
   "faceY": 8,
+  "imageSeed": 60,
+  "stageHeight": 100,
+  "animations": [],
   "schedule": [],
   "ai": {
     "speechPattern": "Customer-service calm, even when annoyed. Speaks in complete, careful sentences and company phrases.",

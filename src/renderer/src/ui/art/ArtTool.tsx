@@ -4,6 +4,7 @@ import {
   ART_KIND_LABELS,
   backgroundPrompt,
   framingFor,
+  nsfwPrompt,
   sizeFor,
   spritePrompt,
   type ComfySettings,
@@ -41,6 +42,15 @@ export type ArtTarget =
       period?: string
       /** Called with the view's name, the picture, and the period id it was drawn for (empty for none in particular). */
       onUse: (view: string, path: string, period: string) => void | Promise<void>
+    }
+  | {
+      kind: 'nsfw'
+      who: Pick<LoveInterest | Npc, 'id' | 'name' | 'pronouns' | 'appearance' | 'outfits' | 'imageSeed'>
+      /** The poses a picture can be made for: what each is called, and what it is drawn from. */
+      poses: { id: string; name: string; draws: string }[]
+      /** The pose it is opened on. It can be changed in the tool. */
+      pose: string
+      onUse: (poseId: string, path: string) => void | Promise<void>
     }
   | { kind: 'photo' }
 
@@ -95,7 +105,7 @@ export function ArtTool({ target, onClose }: Props) {
     }
   }
 
-  const subject = target.kind === 'sprite' ? target.who.name : target.kind === 'background' ? (target.title ?? target.location.name) : ''
+  const subject = target.kind === 'sprite' || target.kind === 'nsfw' ? target.who.name : target.kind === 'background' ? (target.title ?? target.location.name) : ''
   return (
     <Overlay onClose={onClose}>
       <div className="dialog art-tool">
@@ -140,7 +150,8 @@ interface GenerateProps {
 function Generate({ target, settings, list }: GenerateProps) {
   const { kind } = target
   const [outfitId, setOutfitId] = useState(target.kind === 'sprite' ? target.outfitId : '')
-  const [expression, setExpression] = useState(target.kind === 'sprite' ? target.expression : '')
+  // For a sprite, the face; for an NSFW picture, the pose.
+  const [expression, setExpression] = useState(target.kind === 'sprite' ? target.expression : target.kind === 'nsfw' ? target.pose : '')
   const [view, setView] = useState(target.kind === 'background' ? (target.view ?? '') : '')
   const [period, setPeriod] = useState(target.kind === 'background' ? (target.period ?? '') : '')
   const [subject, setSubject] = useState('')
@@ -149,7 +160,7 @@ function Generate({ target, settings, list }: GenerateProps) {
   const [workflow, setWorkflow] = useState('')
   const [size, setSize] = useState(sizeFor(settings, kind))
   // Her preferred seed, when she has one, so that a new picture matches the ones she has.
-  const [seed, setSeed] = useState(target.kind === 'sprite' && target.who.imageSeed !== undefined ? String(target.who.imageSeed) : '')
+  const [seed, setSeed] = useState((target.kind === 'sprite' || target.kind === 'nsfw') && target.who.imageSeed !== undefined ? String(target.who.imageSeed) : '')
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState('')
   const [made, setMade] = useState<Made[]>([])
@@ -164,6 +175,7 @@ function Generate({ target, settings, list }: GenerateProps) {
     const framing = framingFor(settings, kind)
     if (target.kind === 'sprite') return spritePrompt(target.who, outfitId, expression, framing)
     if (target.kind === 'background') return backgroundPrompt(target.location, view, period, framing)
+    if (target.kind === 'nsfw') return nsfwPrompt(target.who, target.poses.find((pose) => pose.id === expression)?.draws ?? '', framing)
     return [subject.trim(), framing].filter(Boolean).join('\n\n')
   }
   // The prompt follows the choices until it is edited by hand; "Rewrite" puts it back.
@@ -176,8 +188,8 @@ function Generate({ target, settings, list }: GenerateProps) {
   async function generate() {
     setBusy(true)
     setNotice('')
-    const subjectId = target.kind === 'sprite' ? target.who.id : target.kind === 'background' ? target.location.id : ''
-    const name = kind === 'sprite' ? `${outfitId}-${expression || 'neutral'}` : kind === 'background' ? [view, period].filter(Boolean).join('-') || 'view' : subject.slice(0, 40) || 'photo'
+    const subjectId = target.kind === 'sprite' || target.kind === 'nsfw' ? target.who.id : target.kind === 'background' ? target.location.id : ''
+    const name = kind === 'nsfw' ? `nsfw-${expression}` : kind === 'sprite' ? `${outfitId}-${expression || 'neutral'}` : kind === 'background' ? [view, period].filter(Boolean).join('-') || 'view' : subject.slice(0, 40) || 'photo'
     try {
       const result = await window.api.comfy.generate({
         kind,
@@ -208,7 +220,13 @@ function Generate({ target, settings, list }: GenerateProps) {
     try {
       if (target.kind === 'sprite') await target.onUse(m.outfitId, m.expression, m.result.path)
       else if (target.kind === 'background') await target.onUse(m.view, m.result.path, m.period)
-      const used = target.kind === 'sprite' ? `Set as the “${m.expression}” sprite. Save the character to keep it.` : 'Set as the picture. Save to keep it.'
+      else if (target.kind === 'nsfw') await target.onUse(m.expression, m.result.path)
+      const used =
+        target.kind === 'sprite'
+          ? `Set as the “${m.expression}” sprite. Save the character to keep it.`
+          : target.kind === 'nsfw'
+            ? `Set as the “${m.expression}” picture. Save the character to keep it.`
+            : 'Set as the picture. Save to keep it.'
       setMade((before) => before.map((one) => (one.result.path === m.result.path ? { ...one, used } : one)))
     } catch (error) {
       setNotice(errorMessage(error))
@@ -264,6 +282,21 @@ function Generate({ target, settings, list }: GenerateProps) {
           </div>
         )}
 
+        {target.kind === 'nsfw' && (
+          <div className="row">
+            <label>
+              Pose
+              <select value={expression} onChange={(e) => (setExpression(e.target.value), setEdited(false))}>
+                {target.poses.map((pose) => (
+                  <option key={pose.id} value={pose.id}>
+                    {pose.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        )}
+
         {target.kind === 'background' && (
           <div className="row">
             <label>
@@ -290,7 +323,7 @@ function Generate({ target, settings, list }: GenerateProps) {
           Prompt
           <textarea rows={9} value={positive} onChange={(e) => (setPositive(e.target.value), setEdited(true))} />
           <span className="hint">
-            {target.kind === 'sprite' ? "Written from her appearance and the outfit's description. " : 'Written from the content. '}
+            {target.kind === 'sprite' ? "Written from her appearance and the outfit's description. " : target.kind === 'nsfw' ? 'Written from her appearance and the pose. ' : 'Written from the content. '}
             Edit it freely.{' '}
             {chosen && settings.promptPrefixes[chosen.file]?.trim() && <>“{settings.promptPrefixes[chosen.file]}” is put in front of it by {chosen.name}. </>}
             {edited && (
@@ -362,7 +395,7 @@ function Generate({ target, settings, list }: GenerateProps) {
                 {m.result.workflow?.replace(/\.json$/i, '')} · seed {m.result.seed}
               </span>
               <code>{m.result.path}</code>
-              {kind !== 'background' && (
+              {kind !== 'background' && kind !== 'nsfw' && (
                 <div className="row">
                   <Button
                     disabled={busy}
@@ -380,6 +413,11 @@ function Generate({ target, settings, list }: GenerateProps) {
                   {target.kind === 'sprite' && (
                     <Button variant="primary" onClick={() => use(m)}>
                       Use as the “{m.expression}” sprite
+                    </Button>
+                  )}
+                  {target.kind === 'nsfw' && (
+                    <Button variant="primary" onClick={() => use(m)}>
+                      Use for “{target.poses.find((pose) => pose.id === m.expression)?.name ?? m.expression}”
                     </Button>
                   )}
                   {target.kind === 'background' && (

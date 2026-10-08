@@ -1,8 +1,8 @@
 {
-  "chance": 0.6,
+  "chance": 0.9,
   "lengthDays": 56,
   "recoveryDays": 7,
-  "daughterChance": 0.857,
+  "daughterChance": 0.875,
   "stages": [
     {
       "id": "early",

@@ -2,18 +2,18 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import {
   addNote,
   answerInvite,
+  canGoToInvite,
   applyForJob,
   attendees,
   bondOf,
   bossOf,
   canApply,
   currentJob,
-  describeShift,
   excuseShift,
   hoursPerWeek,
   npcAsCharacter,
   quitJob,
-  shiftClashes,
+  weekAgainst,
   childrenOf,
   courierThread,
   daysUntilDue,
@@ -25,6 +25,7 @@ import {
   FACT_GROUP_NAMES,
   FACT_GROUPS,
   factsOf,
+  FEED_PAGE,
   feedOf,
   firstNames,
   handleOf,
@@ -42,12 +43,16 @@ import {
   tieOf,
   toDate,
   toggleLike,
-  unreadNotes
+  unreadNotes,
+  unreadPosts,
+  markFeedSeen
 } from '../../../shared/game'
-import { METERS, STATS, type ContentPack, type GameState, type LoveInterest } from '../../../shared/model'
+import { METERS, STATS, type ContentPack, type GameState, type Job, type LoveInterest } from '../../../shared/model'
 import { errorMessage } from '../errors'
 import { Button } from './Button'
 import { Overlay } from './Dialog'
+import { useConfirm } from './Confirm'
+import { JobIcon } from './icons'
 import { BackIcon, ChatIcon, ChevronIcon, FeedIcon, FriendsIcon, HeartIcon, WorkIcon } from './icons'
 
 interface Props {
@@ -56,8 +61,10 @@ interface Props {
   /** Applied to the newest state, since a reply can arrive after other things have changed. */
   onChange: (update: (state: GameState) => GameState) => void
   onClose: () => void
-  /** Who to open on, in Friends. Left out, the phone opens on Chats. */
+  /** Who to open on, in Friends. Left out, the phone opens on his DMs. */
   initialId?: string
+  /** Goes straight to the plan an invitation is for, accepting it first if it is still to be answered. Left out when he cannot leave: in a scene. */
+  onGoToInvite?: (loveInterestId: string, noteIndex: number) => void
 }
 
 /**
@@ -65,14 +72,17 @@ interface Props {
  * apps are drawn.
  */
 const APPS = [
-  { id: 'chats', label: 'Chats', Icon: ChatIcon },
+  { id: 'chats', label: 'DMs', Icon: ChatIcon },
   { id: 'friends', label: 'Friends', Icon: FriendsIcon },
-  { id: 'updates', label: 'Updates', Icon: FeedIcon },
+  { id: 'updates', label: 'Feed', Icon: FeedIcon },
   { id: 'jobs', label: 'Jobs', Icon: WorkIcon }
 ] as const
 type App = (typeof APPS)[number]['id']
 
-/** A round crop of the character's face, from her neutral sprite. */
+/**
+ * Her face, from her neutral sprite: the same upright portrait as everywhere else, six wide
+ * to seven tall, so that where the editor puts her face is where it is here. `size` is its height.
+ */
 function Avatar({ li, size = 56 }: { li: LoveInterest; size?: number }) {
   const outfit = li.outfits.find((o) => o.id === li.defaultOutfitId)
   const sprite = (outfit?.sprites['neutral'] ?? Object.values(outfit?.sprites ?? {})[0])?.image
@@ -82,7 +92,7 @@ function Avatar({ li, size = 56 }: { li: LoveInterest; size?: number }) {
       role="img"
       aria-label={li.name}
       style={{
-        width: size,
+        width: Math.round((size * 6) / 7),
         height: size,
         ...(sprite ? { backgroundImage: `url("content://pack/${sprite}")`, backgroundPosition: `50% ${li.faceY}%` } : {})
       }}
@@ -107,16 +117,21 @@ function Presence({ content, state, li }: { content: ContentPack; state: GameSta
 }
 
 /**
- * The player's phone: Chats for messages, Friends to keep track of everyone he is getting
- * to know, Updates for what they post on Bloomr, and Jobs for work.
+ * The player's phone: his Bloomr DMs for messages, Friends to keep track of everyone he is
+ * getting to know, the Bloomr feed for what they post, and Jobs for work.
  */
-export function PhonePanel({ content, state, onChange, onClose, initialId }: Props) {
-  // Everyone who can be in his Chats: the love interests, and any NPC he has worked for.
+export function PhonePanel({ content, state, onChange, onClose, initialId, onGoToInvite }: Props) {
+  // Everyone who can be in his DMs: the love interests, and any NPC he has worked for.
   const people = messageable(content)
   const [app, setApp] = useState<App>(initialId === undefined ? 'chats' : 'friends')
+  // Looking at the feed is seeing what is on it: its count is cleared while it is open, and whatever goes up meanwhile with it.
+  const newPosts = unreadPosts(state)
+  useEffect(() => {
+    if (app === 'updates' && newPosts > 0) onChange(markFeedSeen)
+  }, [app, newPosts, onChange])
   // Who the open chat is with, and whose page is open in Friends.
   const [chatId, setChatId] = useState<string | undefined>(() => people.find((li) => unreadNotes(state, li.id) > 0)?.id)
-  // Only someone who has given him her Chats can be messaged.
+  // Only someone who has given him her Bloomr can be messaged.
   const canMessage = (id: string) => hasContact(state, id)
   const [friendId, setFriendId] = useState<string | undefined>(initialId)
   const message = (id: string) => {
@@ -142,12 +157,13 @@ export function PhonePanel({ content, state, onChange, onClose, initialId }: Pro
               <Icon size={26} />
               {label}
               {id === 'chats' && unreadNotes(state) > 0 && <span className="badge">{unreadNotes(state)}</span>}
+              {id === 'updates' && unreadPosts(state) > 0 && <span className="badge">{unreadPosts(state)}</span>}
             </button>
           ))}
         </nav>
 
         <div className={`phone-screen ${app}`}>
-          {app === 'chats' && <Chats content={content} state={state} onChange={onChange} selectedId={chatId} onSelect={setChatId} />}
+          {app === 'chats' && <Chats content={content} state={state} onChange={onChange} selectedId={chatId} onSelect={setChatId} onGoToInvite={onGoToInvite} />}
           {app === 'friends' && <Friends content={content} state={state} selectedId={friendId} onSelect={setFriendId} onMessage={message} canMessage={canMessage} />}
           {app === 'updates' && <Updates content={content} state={state} onChange={onChange} onMessage={message} canMessage={canMessage} />}
           {app === 'jobs' && <Jobs content={content} state={state} onChange={onChange} onMessage={message} />}
@@ -163,17 +179,18 @@ interface ChatsProps {
   onChange: (update: (state: GameState) => GameState) => void
   selectedId: string | undefined
   onSelect: (id: string) => void
+  onGoToInvite?: (loveInterestId: string, noteIndex: number) => void
 }
 
-/** Chats: every conversation on the left, the open one on the right. */
-function Chats({ content, state, onChange, selectedId, onSelect }: ChatsProps) {
+/** His Bloomr DMs: every conversation on the left, the open one on the right. */
+function Chats({ content, state, onChange, selectedId, onSelect, onGoToInvite }: ChatsProps) {
   const today = toDate(content.calendar, state.time).dayIndex
   const stamp = (time: number) => {
     if (time === state.time) return 'Now'
     const date = toDate(content.calendar, time)
     return date.dayIndex === today ? `${String(date.hour).padStart(2, '0')}:00` : `${date.day} ${date.month.name.slice(0, 3)}`
   }
-  // Only those who have given him their Chats. Whoever wrote or was written to last comes first; those never written to, after.
+  // Only those who have given him their Bloomr. Whoever wrote or was written to last comes first; those never written to, after.
   const last = (li: LoveInterest) => courierThread(state, li.id).at(-1)
   const listed = messageable(content).filter((li) => hasContact(state, li.id)).sort((a, b) => (last(b)?.time ?? -1) - (last(a)?.time ?? -1))
   const selected = listed.find((li) => li.id === selectedId)
@@ -181,9 +198,9 @@ function Chats({ content, state, onChange, selectedId, onSelect }: ChatsProps) {
   return (
     <>
       <div className="chat-list">
-        <h1 className="phone-title">Chats</h1>
+        <h1 className="phone-title">Bloomr DMs</h1>
         <div className="chat-rows">
-          {listed.length === 0 && <p className="hint">Nobody has given you their Chats yet. Ask someone for it when you are with them.</p>}
+          {listed.length === 0 && <p className="hint">Nobody has given you their Bloomr yet. Ask someone for it when you are with them.</p>}
           {listed.map((li) => {
             const note = last(li)
             const unread = unreadNotes(state, li.id)
@@ -214,7 +231,7 @@ function Chats({ content, state, onChange, selectedId, onSelect }: ChatsProps) {
               </div>
               <Presence content={content} state={state} li={selected} />
             </div>
-            <Thread key={selected.id} content={content} state={state} li={selected} onChange={onChange} />
+            <Thread key={selected.id} content={content} state={state} li={selected} onChange={onChange} onGoToInvite={onGoToInvite} />
           </>
         ) : (
           <p className="hint phone-empty">{listed.length === 0 ? 'No conversations yet.' : 'Pick a conversation on the left to view it.'}</p>
@@ -229,10 +246,11 @@ interface ThreadProps {
   state: GameState
   li: LoveInterest
   onChange: (update: (state: GameState) => GameState) => void
+  onGoToInvite?: (loveInterestId: string, noteIndex: number) => void
 }
 
 /** The messages that have gone between the player and one love interest. */
-function Thread({ content, state, li, onChange }: ThreadProps) {
+function Thread({ content, state, li, onChange, onGoToInvite }: ThreadProps) {
   const [draft, setDraft] = useState('')
   const [waiting, setWaiting] = useState(false)
   const [notice, setNotice] = useState('')
@@ -297,11 +315,15 @@ function Thread({ content, state, li, onChange }: ThreadProps) {
                       {describeWhen(content, plan.time)} · {content.locations.find((l) => l.id === plan.locationId)?.name}
                     </span>
                   </div>
+                  {/* One for today can be gone to at once: the hours until it starts are skipped, and it begins. */}
+                  {onGoToInvite && canGoToInvite(content, state, note) && <button onClick={() => onGoToInvite(id, i)}>Go now</button>}
                   {note.answer ? (
                     <span className="chip">{note.answer}</span>
                   ) : inviteStands(content, state, plan) ? (
                     <>
-                      <button onClick={() => onChange((s) => answerInvite(content, s, id, i, true))}>Accept</button>
+                      <button className={onGoToInvite && canGoToInvite(content, state, note) ? 'secondary' : undefined} onClick={() => onChange((s) => answerInvite(content, s, id, i, true))}>
+                        {onGoToInvite && canGoToInvite(content, state, note) ? 'Later' : 'Accept'}
+                      </button>
                       <button className="secondary" onClick={() => onChange((s) => answerInvite(content, s, id, i, false))}>
                         Decline
                       </button>
@@ -374,7 +396,7 @@ function Friends({ content, state, selectedId, onSelect, onMessage, canMessage }
               Message
             </button>
           ) : (
-            <span className="hint">She has not given you her Chats yet.</span>
+            <span className="hint">She has not given you her Bloomr yet.</span>
           )}
         </div>
         <div className="friend-banner">
@@ -436,16 +458,36 @@ interface UpdatesProps {
   canMessage: (id: string) => boolean
 }
 
-/** Updates: Bloomr, the feed of what everyone has been posting, newest first. */
+/** The feed: Bloomr, the selfies everyone has been posting, newest first, a few at a time. */
 function Updates({ content, state, onChange, onMessage, canMessage }: UpdatesProps) {
   const posts = feedOf(state)
+  // Only a page of posts is drawn; reaching the bottom brings in the next.
+  const [shown, setShown] = useState(FEED_PAGE)
+  const list = useRef<HTMLDivElement>(null)
+  const more = useRef<HTMLDivElement>(null)
+  const rest = posts.length > shown
+  useEffect(() => {
+    if (!rest || !more.current) return
+    const watcher = new IntersectionObserver((entries) => entries.some((entry) => entry.isIntersecting) && setShown((count) => count + FEED_PAGE), {
+      root: list.current,
+      rootMargin: '200px'
+    })
+    watcher.observe(more.current)
+    return () => watcher.disconnect()
+  }, [rest, shown])
+  const everyone = [...content.loveInterests, ...content.npcs]
   return (
-    <div className="feed">
+    <div className="feed" ref={list}>
       <h1 className="phone-title">Bloomr</h1>
-      {posts.length === 0 && <p className="hint phone-empty">Nobody has posted yet. Look again tomorrow.</p>}
-      {posts.map((post) => {
+      {posts.length === 0 && (
+        <p className="hint phone-empty">
+          Nobody has posted yet. Posts come from people whose contact you have, through the day, and need both the Main LLM and ComfyUI set up.
+        </p>
+      )}
+      {posts.slice(0, shown).map((post) => {
         const author = content.loveInterests.find((li) => li.id === post.authorId)
         if (!author) return null
+        const friend = everyone.find((other) => other.id === post.withId)
         return (
           <article key={post.id} className="post">
             <header>
@@ -454,10 +496,11 @@ function Updates({ content, state, onChange, onMessage, canMessage }: UpdatesPro
                 <strong>{author.name}</strong>
                 <span className="handle">
                   {handleOf(author)} · {describeAge(content, { time: post.time, summary: '' }, state.time)}
+                  {friend && ` · with ${friend.name.split(' ')[0]}`}
                 </span>
               </div>
             </header>
-            {post.image && <img src={`content://pack/${post.image}`} alt="" />}
+            {post.image && <img src={`content://pack/${post.image}`} alt="" loading="lazy" />}
             <p>{post.text}</p>
             <footer>
               <button
@@ -478,6 +521,7 @@ function Updates({ content, state, onChange, onMessage, canMessage }: UpdatesPro
           </article>
         )
       })}
+      {rest && <div ref={more} className="feed-more" aria-hidden="true" />}
     </div>
   )
 }
@@ -489,11 +533,58 @@ interface JobsProps {
   onMessage: (id: string) => void
 }
 
+/**
+ * A job's shifts beside his week. Pointing at the button (or tabbing to it) lays the job
+ * over the calendar he already has: his classes and any job he holds in grey, the job's
+ * shifts in bright green where they are clear, and in red where they fall on something of his.
+ */
+function CalendarCompare({ content, state, job }: { content: ContentPack; state: GameState; job: Job }) {
+  const week = weekAgainst(content, state, job)
+  return (
+    <span className="compare">
+      <button type="button" className={week.clashes > 0 ? 'compare-button clash' : 'compare-button'} aria-describedby={`compare-${job.id}`}>
+        Calendar compare
+        <span>{week.clashes === 0 ? 'no conflicts' : `${week.clashes} conflict${week.clashes === 1 ? '' : 's'}`}</span>
+      </button>
+      <div className="compare-pop" role="tooltip" id={`compare-${job.id}`}>
+        <div className="compare-grid" style={{ gridTemplateColumns: `44px repeat(${week.days.length}, minmax(0, 1fr))` }}>
+          <span />
+          {week.days.map((day) => (
+            <span key={day} className="caps compare-day">
+              {day.slice(0, 3)}
+            </span>
+          ))}
+          {week.hours.map((hour) => [
+            <span key={`h-${hour}`} className="compare-hour">
+              {String(hour).padStart(2, '0')}:00
+            </span>,
+            ...week.days.map((day) => {
+              const { mine, shift } = week.at(day, hour)
+              const kind = shift && mine ? 'clash' : shift ? 'shift' : mine ? 'mine' : ''
+              return (
+                <span key={`${day}-${hour}`} className={`compare-cell ${kind}`} title={shift && mine ? `Clashes with ${mine}` : (mine ?? (shift ? job.title : undefined))}>
+                  {mine ?? ''}
+                </span>
+              )
+            })
+          ])}
+        </div>
+        <div className="compare-key">
+          <span className="compare-cell mine" /> yours
+          <span className="compare-cell shift" /> this job
+          <span className="compare-cell clash" /> conflict
+        </div>
+      </div>
+    </span>
+  )
+}
+
 /** Jobs: the board of work going around the University and the town, and the job he holds. */
 function Jobs({ content, state, onChange, onMessage }: JobsProps) {
   const config = content.jobs
   const held = currentJob(content, state)
   const place = (id: string) => content.locations.find((l) => l.id === id)?.name ?? id
+  const { ask, dialog } = useConfirm()
   // What he can be taken on for first, then by pay; a job he has left goes to the bottom.
   const openings = [...(config?.jobs ?? [])]
     .filter((job) => job.id !== held?.id)
@@ -501,30 +592,28 @@ function Jobs({ content, state, onChange, onMessage }: JobsProps) {
 
   return (
     <div className="feed jobs">
+      {dialog}
       <h1 className="phone-title">Jobs</h1>
       {held && state.job && config && (
         <article className="post job mine">
           <header>
+            <span className="job-icon">
+              <JobIcon name={held.icon} size={26} />
+            </span>
             <div>
               <span className="caps">Your job</span>
               <strong>
                 {held.title} · {place(held.locationId)}
               </strong>
               <span className="handle">
-                {held.hourlyRate} an hour · {hoursPerWeek(held)} hours a week{held.trains ? ` · builds ${held.trains}` : ''} · {bossOf(content, held)?.name ?? 'the boss'}
+                ${held.hourlyRate} an hour · {hoursPerWeek(held)} hours a week{held.trains ? ` · builds ${held.trains}` : ''} · {bossOf(content, held)?.name ?? 'the boss'}
               </span>
             </div>
             <span className={state.job.strikes > 0 ? 'chip madder' : 'chip'}>
               {state.job.strikes} of {config.strikes} strikes
             </span>
           </header>
-          <div className="chips">
-            {held.shifts.map((shift) => (
-              <span key={describeShift(shift)} className="chip">
-                {describeShift(shift)}
-              </span>
-            ))}
-          </div>
+          <CalendarCompare content={content} state={state} job={held} />
           <p className="hint">
             Go to {place(held.locationId)} during a shift to clock in. A shift missed without a word is a strike. If you can't make one, message{' '}
             {bossOf(content, held)?.name.split(' ')[0] ?? 'your boss'} that day before it starts and it counts for half.
@@ -536,7 +625,10 @@ function Jobs({ content, state, onChange, onMessage }: JobsProps) {
             </button>
             <button
               className="quiet"
-              onClick={() => window.confirm(`Quit as ${held.title.toLowerCase()} at ${place(held.locationId)}? They will not take you back.`) && onChange((current) => quitJob(content, current))}
+              onClick={async () =>
+                (await ask({ title: `Quit as ${held.title.toLowerCase()}?`, detail: `${place(held.locationId)} will not take you back.`, confirm: 'Quit', cancel: 'Stay', grave: true })) &&
+                onChange((current) => quitJob(content, current))
+              }
             >
               Quit
             </button>
@@ -547,17 +639,19 @@ function Jobs({ content, state, onChange, onMessage }: JobsProps) {
       {openings.map((job) => {
         const check = canApply(content, state, job.id)
         const gone = state.formerJobs.includes(job.id)
-        const clashes = shiftClashes(state, job)
         const needs = STATS.filter((stat) => job.requirements[stat] !== undefined)
         return (
           <article key={job.id} className={gone ? 'post job gone' : 'post job'}>
             <header>
+              <span className="job-icon">
+                <JobIcon name={job.icon} size={26} />
+              </span>
               <div>
                 <strong>
                   {job.title} · {place(job.locationId)}
                 </strong>
                 <span className="handle">
-                  {job.hourlyRate} an hour · {hoursPerWeek(job)} hours a week{job.trains ? ` · builds ${job.trains}` : ''}
+                  ${job.hourlyRate} an hour · {hoursPerWeek(job)} hours a week{job.trains ? ` · builds ${job.trains}` : ''}
                 </span>
               </div>
               <button disabled={!check.ok} onClick={() => onChange((current) => (canApply(content, current, job.id).ok ? applyForJob(content, current, job.id) : current))}>
@@ -565,21 +659,16 @@ function Jobs({ content, state, onChange, onMessage }: JobsProps) {
               </button>
             </header>
             <p>{job.description}</p>
-            <div className="chips">
+            <div className="chips job-asks">
               {needs.length === 0 && <span className="chip">No requirements</span>}
               {needs.map((stat) => (
                 <span key={stat} className={(state.player.stats[stat] ?? 0) >= (job.requirements[stat] ?? 0) ? 'chip' : 'chip madder'}>
                   {stat} {job.requirements[stat]}
                 </span>
               ))}
-              {job.shifts.map((shift) => (
-                <span key={describeShift(shift)} className="chip unknown">
-                  {describeShift(shift)}
-                </span>
-              ))}
+              <CalendarCompare content={content} state={state} job={job} />
             </div>
             {!check.ok && <span className="pin-note">{check.reasons.join(' · ')}</span>}
-            {check.ok && clashes.length > 0 && <span className="pin-note">You can still take it, but: {clashes.join('; ')}.</span>}
           </article>
         )
       })}

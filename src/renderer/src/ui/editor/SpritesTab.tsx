@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
-import { framingFor, sizeFor, spritePrompt } from '../../../../shared/comfy'
+import { framingFor, nsfwPrompt, sizeFor, spritePrompt } from '../../../../shared/comfy'
 import { ADDON_PREFIX, isSafeId, slugify } from '../../../../shared/editor'
-import { EXPRESSIONS, outfitDescription, STANDARD_OUTFITS, type LoveInterest, type Outfit } from '../../../../shared/model'
+import { EXPRESSIONS, NSFW_POSES, outfitDescription, STANDARD_OUTFITS, type Animation, type LoveInterest, type Outfit } from '../../../../shared/model'
 import { errorMessage } from '../../errors'
 import { ArtTool } from '../art/ArtTool'
 import { BatchProgress, useBatch } from '../art/batch'
@@ -19,7 +19,12 @@ interface Props {
   set: (patch: Partial<SpriteOwner>) => void
   /** Leaves out what only a love interest has: an outfit drawn pregnant. */
   plain?: boolean
+  /** What the path of a picture the editor can change starts with: `addons/` for an add-on, nothing when the game's own files are being edited. */
+  assetPrefix?: string
 }
+
+// What the run that draws her missing NSFW poses is filed under, beside the runs of her outfits.
+const NSFW_BATCH = '(nsfw)'
 
 /** A name not already taken in the list, made from the wanted one: "happy", "happy-2"... */
 function unique(wanted: string, taken: string[]): string {
@@ -52,8 +57,8 @@ function PercentBox({ value, min, max, onChange }: { value: number; min: number;
   )
 }
 
-/** Outfits and their sprites, the portrait crop, and animations. */
-export function SpritesTab({ draft, set, plain }: Props) {
+/** Outfits and their sprites, the portrait crop, and the NSFW pictures and clips. */
+export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Props) {
   const [notice, setNotice] = useState('')
   // The outfit and expression the art tool is open on, while it is.
   const [drawing, setDrawing] = useState<{ outfitId: string; expression: string } | null>(null)
@@ -62,6 +67,9 @@ export function SpritesTab({ draft, set, plain }: Props) {
   const { batch, run, stop } = useBatch()
   // The picture opened to be looked at whole, while one is.
   const [viewing, setViewing] = useState<{ outfitId: string; name: string } | null>(null)
+  // The NSFW pose the art tool is open on, and the one opened to be looked at whole, while either is.
+  const [posing, setPosing] = useState<string | null>(null)
+  const [poseViewing, setPoseViewing] = useState<string | null>(null)
   // A seed typed for an outfit's run of missing faces, by outfit id, in place of her preferred one.
   const [batchSeeds, setBatchSeeds] = useState<Record<string, string>>({})
   // The draft as it stands now, for a run that outlives the render it was started from.
@@ -106,7 +114,7 @@ export function SpritesTab({ draft, set, plain }: Props) {
   }
 
   /** Whether a sprite still has its flat background: a PNG of hers in the add-on folder that is not already a cut-out. */
-  const uncut = (image: string) => image.startsWith(ADDON_PREFIX) && /\.png$/i.test(image) && !/-cutout(-\d+)?\.png$/i.test(image)
+  const uncut = (image: string) => image.startsWith(assetPrefix) && /\.png$/i.test(image) && !/-cutout(-\d+)?\.png$/i.test(image)
 
   /** Takes the background out from behind every sprite of an outfit that still has one, one after another. */
   async function cutOutAll(outfitId: string) {
@@ -138,7 +146,7 @@ export function SpritesTab({ draft, set, plain }: Props) {
     set({ outfits: draft.outfits.map((outfit, i) => (i === index ? { ...outfit, ...patch } : outfit)) })
 
   /** Has the user pick a file, which is copied into this character's add-on folder. */
-  async function pick(kind: 'image' | 'video'): Promise<string | null> {
+  async function pick(kind: 'image' | 'video' | 'media'): Promise<string | null> {
     setNotice('')
     try {
       return await window.api.editor.importAsset({ loveInterestId: draft.id, kind })
@@ -228,12 +236,71 @@ export function SpritesTab({ draft, set, plain }: Props) {
     set({ outfits: freed, defaultOutfitId: draft.defaultOutfitId === gone ? (freed[0]?.id ?? '') : draft.defaultOutfitId })
   }
 
-  async function addAnimation() {
-    const video = await pick('video')
-    if (!video) return
-    const stem = video.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'animation'
-    const id = unique(slugify(stem), draft.animations.map((a) => a.id))
-    set({ animations: [...draft.animations, { id, name: stem, description: '', video, loop: true }] })
+  // The poses that have a picture, in the order they are shown, for stepping through them.
+  const withPictures = draft.animations.filter((a) => a.image !== undefined)
+  /** The pose of that id as she has it, if she has anything for it yet. */
+  const poseOf = (id: string) => draft.animations.find((a) => a.id === id)
+  // Every slot of the NSFW section: the standard poses in their usual order, with or without a picture, then any of her own.
+  const poses = [
+    ...NSFW_POSES.map((pose) => poseOf(pose.id) ?? { id: pose.id, name: pose.name, description: '', image: undefined, clip: undefined, loop: true }),
+    ...draft.animations.filter((a) => !NSFW_POSES.some((pose) => pose.id === a.id))
+  ]
+  /** What a pose is drawn from: the standard wording, or for one of her own, what its description says. */
+  const drawsOf = (id: string) => NSFW_POSES.find((pose) => pose.id === id)?.draws ?? poseOf(id)?.description ?? ''
+
+  /** Changes a pose, making its entry if she has none for it yet. Written onto the draft as it is now. */
+  function setPose(id: string, patch: Partial<Animation>) {
+    const have = latest.current.animations
+    const standard = NSFW_POSES.find((pose) => pose.id === id)
+    set({
+      animations: have.some((a) => a.id === id)
+        ? have.map((a) => (a.id === id ? { ...a, ...patch } : a))
+        : [...have, { id, name: standard?.name ?? id, description: '', loop: true, ...patch }]
+    })
+  }
+
+  function removePose(id: string) {
+    set({ animations: draft.animations.filter((a) => a.id !== id) })
+  }
+
+  /** Renames a pose of her own. A standard one keeps its name, which is how the game knows it. */
+  function renamePose(from: string, to: string) {
+    if (to === from || draft.animations.some((a) => a.id === to)) return
+    set({ animations: draft.animations.map((a) => (a.id === from ? { ...a, id: to, name: to } : a)) })
+  }
+
+  /** Has the user pick a picture for a pose of her own, beyond the standard ones. */
+  async function addPose() {
+    const image = await pick('image')
+    if (!image) return
+    const stem = image.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'pose'
+    const id = unique(slugify(stem), [...NSFW_POSES.map((pose) => pose.id), ...draft.animations.map((a) => a.id)])
+    set({ animations: [...draft.animations, { id, name: id, description: '', image, loop: true }] })
+  }
+
+  /** Draws every standard pose that has no picture yet, one after another, and puts each in its slot as it arrives. */
+  async function generateMissingPoses() {
+    const missing = NSFW_POSES.filter((pose) => !latest.current.animations.find((a) => a.id === pose.id)?.image)
+    setNotice('')
+    const settings = await window.api.comfy.getSettings()
+    const size = sizeFor(settings, 'nsfw')
+    const { failed } = await run(NSFW_BATCH, 'Drawing', missing, (pose) => pose.name, async (pose) => {
+      const who = latest.current
+      const result = await window.api.comfy.generate({
+        kind: 'nsfw',
+        subjectId: who.id,
+        name: `nsfw-${pose.id}`,
+        positive: nsfwPrompt(who, pose.draws, framingFor(settings, 'nsfw')),
+        width: size.width,
+        height: size.height,
+        seed: who.imageSeed
+      })
+      // Without a working ComfyUI the rest would fail the same way.
+      if (!result.ok || !result.path) return { ok: false, message: result.message, fatal: true }
+      setPose(pose.id, { image: result.path })
+      return { ok: true }
+    })
+    if (failed.length > 0) setNotice(`Stopped at ${failed[0]}`)
   }
 
   // The picture being looked at, among the others of its outfit, in the order they are shown.
@@ -255,6 +322,31 @@ export function SpritesTab({ draft, set, plain }: Props) {
           onClose={() => setViewing(null)}
           position={viewedAll.length > 1 ? `${viewedAt + 1} of ${viewedAll.length}` : undefined}
           onStep={viewedAll.length > 1 ? step : undefined}
+        />
+      )}
+      {posing && (
+        <ArtTool
+          target={{
+            kind: 'nsfw',
+            who: draft,
+            poses: poses.map((pose) => ({ id: pose.id, name: pose.name, draws: drawsOf(pose.id) })),
+            pose: posing,
+            onUse: (poseId, image) => setPose(poseId, { image })
+          }}
+          onClose={() => setPosing(null)}
+        />
+      )}
+      {poseViewing && poseOf(poseViewing)?.image && (
+        <Lightbox
+          image={poseOf(poseViewing)!.image!}
+          name={poseOf(poseViewing)!.name}
+          onClose={() => setPoseViewing(null)}
+          position={`${withPictures.findIndex((pose) => pose.id === poseViewing) + 1} of ${withPictures.length}`}
+          onStep={
+            withPictures.length > 1
+              ? (by) => setPoseViewing(withPictures[(withPictures.findIndex((pose) => pose.id === poseViewing) + by + withPictures.length) % withPictures.length].id)
+              : undefined
+          }
         />
       )}
       {drawing && (
@@ -455,7 +547,7 @@ export function SpritesTab({ draft, set, plain }: Props) {
                       <Button disabled={!ready} title="Draw this sprite again with ComfyUI" onClick={() => setDrawing({ outfitId: outfit.id, expression: name })}>
                         Generate
                       </Button>
-                      {sprite.image.startsWith(ADDON_PREFIX) && sprite.image.toLowerCase().endsWith('.png') && (
+                      {sprite.image.startsWith(assetPrefix) && sprite.image.toLowerCase().endsWith('.png') && (
                         <Button title="Make its flat background transparent" onClick={() => cutOut(index, name)}>
                           Cut out
                         </Button>
@@ -508,33 +600,113 @@ export function SpritesTab({ draft, set, plain }: Props) {
         </Button>
       </Group>
 
-      <Group title="Animations" hint="Videos that take the sprite's place. The LLM plays one when the scene reaches what its description says. One that loops plays until the LLM ends it; one that plays once gives way to the sprite when it finishes.">
-        {draft.animations.map((animation, index) => {
-          const setAnimation = (patch: Partial<typeof animation>) =>
-            set({ animations: draft.animations.map((a, i) => (i === index ? { ...a, ...patch } : a)) })
-          return (
-            <div key={index} className="card">
-              <div className="row">
-                <Text label="Id" value={animation.id} onChange={(id) => setAnimation({ id: slugify(id) })} />
-                <Text label="Name" value={animation.name} onChange={(name) => setAnimation({ name })} />
-              </div>
-              <Text label="Description" value={animation.description} onChange={(description) => setAnimation({ description })} />
-              <div className="row checks">
-                <label className="inline">
-                  <input type="checkbox" checked={!animation.loop} onChange={(e) => setAnimation({ loop: !e.target.checked })} />
-                  Play once
-                </label>
-                <span className="hint">{animation.video}</span>
-                <Button variant="quiet" onClick={() => set({ animations: draft.animations.filter((_, i) => i !== index) })}>
-                  Remove
-                </Button>
-              </div>
-            </div>
-          )
-        })}
-        <Button disabled={!ready} onClick={addAnimation}>
-          Add an animation
-        </Button>
+      <Group
+        title="NSFW"
+        hint="Explicit pictures that take the sprite's place, one to a pose, as an outfit has one to a face. The LLM shows one when the scene reaches what its description says, and takes it down when it no longer fits. A pose can have a clip (.mp4) as well: where it has one the clip is played, and the picture is what it falls back on."
+      >
+        <div className="outfit-actions">
+          {NSFW_POSES.some((pose) => !poseOf(pose.id)?.image) && (
+            <Button
+              variant="primary"
+              disabled={!ready || batch !== null}
+              title="Draw every pose that has no picture yet with your own ComfyUI, one after another"
+              onClick={generateMissingPoses}
+            >
+              Generate missing poses ({NSFW_POSES.filter((pose) => !poseOf(pose.id)?.image).length})
+            </Button>
+          )}
+          <Button disabled={!ready} title="Draw a pose with your own ComfyUI" onClick={() => setPosing(NSFW_POSES.find((pose) => !poseOf(pose.id)?.image)?.id ?? NSFW_POSES[0].id)}>
+            Generate a picture
+          </Button>
+          <Button disabled={!ready} onClick={addPose}>
+            Add another picture
+          </Button>
+        </div>
+        <BatchProgress batch={batch} at={NSFW_BATCH} onStop={stop} />
+
+        <SlotGrid wide>
+          {poses.map((pose) => {
+            const image = pose.image
+            const standard = NSFW_POSES.find((known) => known.id === pose.id)
+            return image ? (
+              <PictureSlot
+                key={pose.id}
+                image={image}
+                name={pose.name}
+                onView={() => setPoseViewing(pose.id)}
+                actions={
+                  <>
+                    <Button
+                      disabled={!ready}
+                      onClick={async () => {
+                        const picked = await pick('image')
+                        if (picked) setPose(pose.id, { image: picked })
+                      }}
+                    >
+                      Replace
+                    </Button>
+                    <Button disabled={!ready} title="Draw this pose again with ComfyUI" onClick={() => setPosing(pose.id)}>
+                      Generate
+                    </Button>
+                    <Button onClick={() => removePose(pose.id)}>Remove</Button>
+                  </>
+                }
+              >
+                <input
+                  aria-label="Pose name"
+                  defaultValue={pose.id}
+                  key={pose.id}
+                  disabled={standard !== undefined}
+                  onBlur={(e) => renamePose(pose.id, slugify(e.target.value) || pose.id)}
+                />
+                <textarea
+                  aria-label="Pose description"
+                  rows={2}
+                  value={pose.description}
+                  placeholder={standard?.description ?? 'what it shows, so the LLM knows when it fits'}
+                  onChange={(e) => setPose(pose.id, { description: e.target.value })}
+                />
+                {/* The clip is an extra on top of the picture. */}
+                {pose.clip ? (
+                  <div className="row checks">
+                    <span className="hint" title={pose.clip}>
+                      Clip: {pose.clip.split('/').pop()}
+                    </span>
+                    <label className="inline">
+                      <input type="checkbox" checked={!pose.loop} onChange={(e) => setPose(pose.id, { loop: !e.target.checked })} />
+                      Play once
+                    </label>
+                    <Button variant="quiet" onClick={() => setPose(pose.id, { clip: undefined })}>
+                      Remove clip
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    variant="quiet"
+                    disabled={!ready}
+                    onClick={async () => {
+                      const clip = await pick('video')
+                      if (clip) setPose(pose.id, { clip })
+                    }}
+                  >
+                    Add a clip
+                  </Button>
+                )}
+              </PictureSlot>
+            ) : (
+              <EmptySlot
+                key={pose.id}
+                name={pose.name}
+                disabled={!ready}
+                onAdd={async () => {
+                  const picked = await pick('image')
+                  if (picked) setPose(pose.id, { image: picked })
+                }}
+                onGenerate={() => setPosing(pose.id)}
+              />
+            )
+          })}
+        </SlotGrid>
       </Group>
     </>
   )

@@ -7,20 +7,21 @@ interface Props {
   courses: Course[]
   /** The course whose meetings are picked out wherever they fall. */
   focusId?: string | null
-  /** Extra class names for a course's blocks: "on" for one that is taken, "blocked" for one that can't be. */
+  /** Extra class names for a course's blocks: "on" for one that is taken, "blocked" for one that can't be, "match" and "dim" for one a search found or did not. */
   mark?: (course: Course) => string
   onFocus?: (course: Course) => void
   onPick?: (course: Course) => void
 }
 
 /**
- * The teaching week as a grid: a column for each day and a row for each hour, with every
+ * The teaching week as a grid: a column for each day classes meet and a row for each hour, with every
  * course that is meeting in an hour shown there by its number. A lab fills each of its hours.
  */
 export function WeekPlanner({ content, courses, focusId, mark, onFocus, onPick }: Props) {
   const config = content.coursework
   if (!config) return null
-  const { weekdays } = content.calendar
+  // Only the days classes meet on, in the week's own order: a day with none would be an empty column.
+  const weekdays = content.calendar.weekdays.filter((day) => config.weekdays.includes(day))
   const hours = Array.from({ length: config.dayEnd - config.dayStart }, (_, i) => config.dayStart + i)
   return (
     <div className="planner" style={{ gridTemplateColumns: `52px repeat(${weekdays.length}, minmax(0, 1fr))` }}>
@@ -39,7 +40,7 @@ export function WeekPlanner({ content, courses, focusId, mark, onFocus, onPick }
             course.meetings.filter((m) => m.weekday === day && hour >= m.startHour && hour < m.startHour + m.hours).map((meeting) => ({ course, meeting }))
           )
           return (
-            <div key={`${day}-${hour}`} className={config.weekdays.includes(day) ? 'cell' : 'cell free'}>
+            <div key={`${day}-${hour}`} className="cell">
               {here.map(({ course, meeting }) => (
                 <button
                   key={course.id}

@@ -1,4 +1,4 @@
-import { type Background, type ContentPack, type GameState, type Location, type LoveInterest, type Scene, type WeatherType } from '../model'
+import { type Background, type ContentPack, type GameState, type Location, type LoveInterest, type Room, type Scene, type WeatherType } from '../model'
 import { isGameOver, toDate } from './calendar'
 import { sceneCast } from './scene'
 import { eventsOn } from './events'
@@ -8,6 +8,8 @@ import { backgroundFor, isIndoors, isOpen } from './schedule'
 const MAX_HOURS_PER_REPLY = 12
 // How a love interest's own room is named among the places a scene can go.
 const ROOM_PREFIX = 'room-of-'
+/** Whose room a scene is in when it is in the player's own: no love interest has this id. */
+export const PLAYER_ROOM = 'player'
 
 /** Somewhere a scene can move to: a location, or the room of one of the love interests in it. */
 export interface Destination {
@@ -18,13 +20,16 @@ export interface Destination {
   indoors: boolean
   /** Set when it is someone's own room: whose. */
   roomOf?: string
-  /** How long it takes to get there. Nothing for a room in the building the scene is already in. */
-  walkHours: number
 }
 
 /** The love interest whose room the scene is in, if it is in one. */
 export function roomOwner(content: ContentPack, scene: Pick<Scene, 'roomOf'>): LoveInterest | undefined {
   return scene.roomOf === undefined ? undefined : content.loveInterests.find((li) => li.id === scene.roomOf && li.room)
+}
+
+/** The player's own room, if the scene is in it. */
+export function playerRoom(content: ContentPack, scene: Pick<Scene, 'roomOf'>): Room | undefined {
+  return scene.roomOf === PLAYER_ROOM ? content.newGame.room : undefined
 }
 
 /**
@@ -38,8 +43,7 @@ export function sceneDestinations(
   scene: Pick<Scene, 'loveInterestId' | 'companionIds' | 'roomOf' | 'npc'>
 ): Destination[] {
   if (scene.npc) return []
-  const walk = (locationId: string) => (locationId === state.locationId ? 0 : (content.map?.travelHours ?? 0))
-  const open = (location: Location) => isOpen(location, toDate(content.calendar, state.time + walk(location.id)).hour)
+  const open = (location: Location) => isOpen(location, toDate(content.calendar, state.time).hour)
   // Without a map there is no walking anywhere, though a room in this building can still be gone up to.
   const reachable = (locationId: string) => locationId === state.locationId || content.map !== undefined
 
@@ -53,11 +57,22 @@ export function sceneDestinations(
         name: `${li.name.split(' ')[0]}'s own room: ${li.room.name}, at ${location.name}`,
         locationId: location.id,
         indoors: true,
-        roomOf: id,
-        walkHours: walk(location.id)
+        roomOf: id
       }
     ]
   })
+  // His own room, when he has one, is somewhere he can take anyone.
+  const own = content.newGame.room
+  const ownPlace = own && content.locations.find((l) => l.id === own.locationId)
+  if (own && ownPlace && scene.roomOf !== PLAYER_ROOM && reachable(ownPlace.id) && open(ownPlace)) {
+    rooms.push({
+      id: `${ROOM_PREFIX}${PLAYER_ROOM}`,
+      name: `${state.player.name}'s own room: ${own.name}, at ${ownPlace.name}`,
+      locationId: ownPlace.id,
+      indoors: true,
+      roomOf: PLAYER_ROOM
+    })
+  }
   const places = content.locations
     // The place a room is in can be gone back down to from the room.
     .filter((l) => (l.id !== state.locationId || scene.roomOf !== undefined) && reachable(l.id) && open(l))
@@ -66,8 +81,7 @@ export function sceneDestinations(
         id: l.id,
         name: l.name,
         locationId: l.id,
-        indoors: isIndoors(l, backgroundFor(l)),
-        walkHours: walk(l.id)
+        indoors: isIndoors(l, backgroundFor(l))
       })
     )
   return [...rooms, ...places]
@@ -79,9 +93,9 @@ export function findDestination(destinations: Destination[], asked: string): Des
   return destinations.find((d) => d.id.toLowerCase() === wanted)
 }
 
-/** The state after a scene has moved: the player is there with everyone in it, and the walk has taken its time. */
+/** The state after a scene has moved: the player is there with everyone in it. Going there takes no time. */
 export function moveState(state: GameState, destination: Destination): GameState {
-  return { ...state, locationId: destination.locationId, time: state.time + destination.walkHours }
+  return { ...state, locationId: destination.locationId }
 }
 
 /**
@@ -142,6 +156,11 @@ export function describePlace(location: Location, view: Background | undefined):
   const spot = view && view.name.toLowerCase() !== location.name.toLowerCase() ? `, ${view.name.toLowerCase()}` : ''
   const shelter = isIndoors(location, view) ? 'You are indoors, under a roof.' : 'You are out of doors, under the open sky.'
   return `${location.name}${spot}. ${shelter} ${location.description}`.trim()
+}
+
+/** Told to the characters in a scene that is in the player's own room. */
+export function describePlayerRoom(room: Room, location: Location | undefined, playerName: string): string {
+  return `${playerName}'s own room: ${room.name}${location ? `, at ${location.name}` : ''}. You are indoors, in private, with the door shut. ${room.description}`.trim()
 }
 
 /** Told to the characters in a scene that is in one of their own rooms. */

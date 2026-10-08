@@ -7,18 +7,26 @@
   "pronouns": "she/her",
   "bio": "Odile has sold fruit, flowers and whatever came off the morning train from the same pitch in the Market Square for twenty years.",
   "appearance": "A sturdy, handsome woman of 47 with a weathered tan face, laugh lines, sharp hazel eyes and a broad smile. Thick grey-streaked brown hair tied up. Strong forearms and a full, curvy figure.",
-  "imageSeed": 60,
   "personality": "Loud, shrewd and warm once she has decided someone is not a fool. Counts everything twice.",
   "outfits": [
     {
       "id": "default",
       "name": "Work clothes",
       "description": "a patterned headscarf, a faded blue canvas apron with deep pockets over a rolled-sleeve checked shirt, a money belt",
-      "sprites": {}
+      "sprites": {
+        "neutral": {
+          "image": "sprites/odile/default-neutral-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     }
   ],
   "defaultOutfitId": "default",
   "faceY": 8,
+  "imageSeed": 60,
+  "stageHeight": 100,
+  "animations": [],
   "schedule": [],
   "ai": {
     "speechPattern": "A market voice: carrying, quick, full of prices. Calls everyone \"love\" and means it about half the time.",

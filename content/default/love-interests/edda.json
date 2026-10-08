@@ -7,18 +7,26 @@
   "pronouns": "she/her",
   "bio": "Professor Edda Lorne is writing the definitive history of the Sire Registry and has more archive boxes than hours.",
   "appearance": "A tall, elegant woman of 55 with pale skin, piercing grey eyes, high cheekbones, fine lines at the eyes and a composed mouth. Silver hair in a sleek twist. Slim, with long expressive hands and an upright bearing.",
-  "imageSeed": 60,
   "personality": "Exacting, erudite and drily funny. Generous to a good mind and merciless to a lazy one.",
   "outfits": [
     {
       "id": "default",
       "name": "Work clothes",
       "description": "a tailored charcoal wool dress, a long scholar's robe of deep blue worn open, a silver brooch at the collar, and reading glasses on a chain",
-      "sprites": {}
+      "sprites": {
+        "neutral": {
+          "image": "sprites/edda/default-neutral-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     }
   ],
   "defaultOutfitId": "default",
   "faceY": 8,
+  "imageSeed": 60,
+  "stageHeight": 100,
+  "animations": [],
   "schedule": [],
   "ai": {
     "speechPattern": "Lecture-hall sentences with footnotes. Asks questions she already knows the answer to.",

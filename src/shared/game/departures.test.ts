@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import type { ContentPack, Scene } from '../model'
+import { isMoment, isSeeding, type ContentPack, type Scene } from '../model'
 import { buildSummaryPrompt } from './memory'
 import { buildCharacterPrompt } from './prompt'
-import { leavers, leaveScene, sceneBaseline, sceneCast, sceneWitnesses } from './scene'
+import { applyLook, leavers, leaveScene, lookLines, parseDirectives, sceneBaseline, sceneCast, sceneWitnesses } from './scene'
 import { createInitialState } from './state'
 import { fixture } from './testFixture'
 
@@ -104,5 +104,60 @@ describe('after someone has left', () => {
     const anas = buildSummaryPrompt({ content, state, scene: later, forId: 'ana' })
     expect(anas.system).toContain('Bea left part-way through (saw she was not wanted).')
     expect(anas.user).toContain('Just us, then.')
+  })
+})
+
+describe('a pose in a scene with several of them', () => {
+  it('is one of theirs at a time, named with it, and goes when she does', () => {
+    expect(parseDirectives('[POSE: Bea=missionary]\nBea: Come here.')).toMatchObject({ text: 'Bea: Come here.', animationId: 'missionary', animationOf: 'Bea' })
+    expect(parseDirectives('[POSE: missionary]').animationOf).toBeUndefined()
+    expect(parseDirectives('[POSE: Bea=none]')).toMatchObject({ animationId: null })
+
+    // Named for Bea, it is hers; with nobody named, the lead's.
+    const hers = applyLook(scene, { animationId: 'missionary', animationOf: 'bea' })
+    expect(hers).toMatchObject({ animationId: 'missionary', animationOf: 'bea' })
+    expect(applyLook(scene, { animationId: 'missionary' }).animationOf).toBe('ana')
+    // It is up for that reply alone: the next has to ask again, for her or for another.
+    expect(applyLook(hers, { expression: 'happy' }).animationId).toBeUndefined()
+    expect(applyLook(hers, { expression: 'happy' }).animationOf).toBeUndefined()
+    expect(applyLook(hers, { animationId: 'missionary', animationOf: 'bea' })).toMatchObject({ animationId: 'missionary', animationOf: 'bea' })
+    expect(applyLook(hers, { animationId: 'cowgirl', animationOf: 'cy' })).toMatchObject({ animationId: 'cowgirl', animationOf: 'cy' })
+    const down = applyLook(hers, { animationId: null })
+    expect(down.animationId).toBeUndefined()
+    expect(down.animationOf).toBeUndefined()
+
+    // When the one it shows leaves, it comes down; when someone else does, it stays.
+    expect(leaveScene(hers, ['bea'])).toMatchObject({ companionIds: ['cy'] })
+    expect(leaveScene(hers, ['bea']).animationId).toBeUndefined()
+    expect(leaveScene(hers, ['cy'])).toMatchObject({ animationId: 'missionary', animationOf: 'bea' })
+    expect(leaveScene(applyLook(scene, { animationId: 'missionary' }), ['ana']).animationId).toBeUndefined()
+  })
+})
+
+describe('the hidden lines as the LLM really writes them', () => {
+  it('reads whose a tag is whether it is written with an equals sign or a colon', () => {
+    const reply = '[EXPRESSION: Lira:aroused]\n[COMFORT: Lira:5 he is warm and bare against her]\n[POSE: Lira:cowgirl]\nLira: Stay.'
+    const read = parseDirectives(reply)
+    expect(read.text).toBe('Lira: Stay.')
+    expect(read.named).toEqual([{ name: 'Lira', expression: 'aroused' }])
+    expect(read.comfort).toEqual([{ name: 'Lira', level: 5, reason: 'he is warm and bare against her' }])
+    expect(read).toMatchObject({ animationId: 'cowgirl', animationOf: 'Lira' })
+    // With nobody named, a colon in the reason is only a colon.
+    expect(parseDirectives('[COMFORT: 3 he said: later]').comfort).toEqual([{ name: '', level: 3, reason: 'he said: later' }])
+    expect(parseDirectives('[EXPRESSION: happy]').expression).toBe('happy')
+  })
+
+  it('does not show a pose back to her in her own earlier replies, where she would copy it', () => {
+    expect(lookLines('[EXPRESSION: Lira=happy]\n[COMFORT: Lira=5 content]\n[POSE: creampie]\nLira: Mm.')).toBe('[EXPRESSION: Lira=happy]\n[COMFORT: Lira=5 content]')
+  })
+
+  it('knows which pose is him finishing inside her, and counts as the tag for it', () => {
+    expect(isSeeding('creampie')).toBe(true)
+    expect(['facial', 'blowjob', 'missionary', 'doggy', 'cowgirl', 'her-own'].some(isSeeding)).toBe(false)
+  })
+
+  it('knows which poses are a single moment', () => {
+    expect(['creampie', 'facial'].every(isMoment)).toBe(true)
+    expect(['blowjob', 'missionary', 'doggy', 'cowgirl', 'her-own'].some(isMoment)).toBe(false)
   })
 })

@@ -56,7 +56,7 @@ describe('look directives', () => {
     ],
     defaultOutfitId: 'default',
     animations: [
-      { id: 'missionary', name: 'Missionary', description: 'on her back, him above', video: 'm.mp4' }
+      { id: 'missionary', name: 'Missionary', description: 'on her back, him above', clip: 'm.mp4' }
     ],
     ai: { speechPattern: 'Plain.' }
   })
@@ -80,6 +80,9 @@ describe('look directives', () => {
       comfort: []
     })
     expect(parseDirectives('Yes.\n[ANIMATION: missionary]').animationId).toBe('missionary')
+    // A pose goes on top of a face and an outfit, and is asked for beside them.
+    expect(parseDirectives('[OUTFIT: nude]\n[EXPRESSION: aroused]\n[POSE: missionary]\nYes.')).toMatchObject({ text: 'Yes.', outfitId: 'nude', expression: 'aroused', animationId: 'missionary' })
+    expect(parseDirectives('Enough.\n[POSE: none]').animationId).toBeNull()
     expect(parseDirectives('Enough.\n[ANIMATION: none]\n[END SCENE]')).toEqual({
       text: 'Enough.',
       ended: true,
@@ -163,13 +166,13 @@ describe('look directives', () => {
 
     const playing = applyLook(dressed, { animationId: 'missionary' })
     expect(playing).toMatchObject({ animationId: 'missionary', expression: 'happy' })
-    // It keeps playing through replies that say nothing about the look...
-    expect(applyLook(playing, {}).animationId).toBe('missionary')
-    // ...and through a change of face, since every reply names one...
-    expect(applyLook(playing, { expression: 'neutral' }).animationId).toBe('missionary')
-    // ...and stops when told to, or when she changes what she is wearing.
+    // A pose is up for the reply that asked for it and no longer: the next reply takes it down by leaving it out...
+    expect(applyLook(playing, {}).animationId).toBeUndefined()
+    expect(applyLook(playing, { expression: 'neutral' })).toMatchObject({ expression: 'neutral', animationId: undefined })
     expect(applyLook(playing, { animationId: null }).animationId).toBeUndefined()
-    expect(applyLook(playing, { outfitId: 'nude' }).animationId).toBeUndefined()
+    // ...and keeps it up only by asking for it again, or changes it by asking for another.
+    expect(applyLook(playing, { expression: 'aroused', animationId: 'missionary' })).toMatchObject({ expression: 'aroused', animationId: 'missionary' })
+    expect(applyLook(playing, { animationId: 'cowgirl' }).animationId).toBe('cowgirl')
   })
 
   it('keeps a look for each of the others in a group, and hands it on when one becomes the lead', () => {
@@ -199,11 +202,11 @@ describe('look directives', () => {
     expect(start).toContain('- default (Dress): what you have on now, described above\n- nude (Nude): no description')
     expect(start.split('a red dress')).toHaveLength(2)
     expect(start.trimEnd()).toContain('Reminder: begin with the [EXPRESSION] and [COMFORT] lines. Then ')
-    expect(start).toContain('- missionary (Missionary, loops): on her back, him above')
+    expect(start).toContain('- missionary (Missionary, a clip that loops): on her back, him above')
 
     const later = prompt({ outfitId: 'nude', animationId: 'missionary' })
     expect(later).toContain('Wearing: Nude')
-    expect(later).toContain('"missionary" is playing now')
+    expect(later).toContain('"missionary" was up for your last reply')
 
     expect(prompt(undefined)).not.toContain('## How you appear')
   })
@@ -220,7 +223,7 @@ describe('sceneOutcome', () => {
 
   it('reports what the scene changed for the player and the relationship', () => {
     const baseline = sceneBaseline(friends, 'ana')
-    // Work pays coin and costs energy; the date (forced past its stage requirement) adds affection.
+    // Work pays money and costs energy; the date (forced past its stage requirement) adds affection.
     const worked = perform(activity('work'), friends, content)
     const after = {
       ...worked,
@@ -228,7 +231,7 @@ describe('sceneOutcome', () => {
     }
     expect(sceneOutcome(content, baseline, after, 'ana')).toEqual({
       player: [
-        { label: 'coin', from: 0, to: 10 },
+        { label: 'money', from: 0, to: 10 },
         { label: 'energy', from: 50, to: 30 }
       ],
       meters: [
@@ -322,5 +325,14 @@ describe('gifts in a group', () => {
     })
     expect(prompt).toContain('- To Bea: Rose. Bea dislikes this kind of thing')
     expect(prompt).toContain('whoever received it reacts')
+  })
+})
+
+describe('what a reasoning model thought first', () => {
+  it('is no part of the reply', () => {
+    expect(parseDirectives('<think>She would tease him.</think>\n[EXPRESSION: happy]\nAna: You came.')).toMatchObject({ text: 'Ana: You came.', expression: 'happy' })
+    // A block whose opening was cut off is dropped up to where it closes.
+    expect(parseDirectives('she would tease him.</think>\nAna: You came.').text).toBe('Ana: You came.')
+    expect(parseDirectives('Ana: I think so.').text).toBe('Ana: I think so.')
   })
 })

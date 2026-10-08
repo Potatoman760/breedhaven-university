@@ -47,6 +47,18 @@ describe('completeWithFallback', () => {
     expect(asked).toEqual(['m', 'n'])
   })
 
+  it('looks for a refusal after what the model thought to itself, and says why when nobody will write it', async () => {
+    const thought = `<think>${'The user wants a love scene. '.repeat(12)}</think>I'm sorry, but I can't continue.`
+    const { complete, asked } = fake({ m: thought, n: 'Come here.' })
+    expect((await completeWithFallback(settings(), false, input, complete)).profileId).toBe('nsfw')
+    expect(asked).toEqual(['m', 'n'])
+    // A character who thinks about refusing and then plays the scene has not refused.
+    const played = fake({ m: "<think>I'm sorry, but should I? Yes.</think>She laughs." })
+    expect((await completeWithFallback(settings(), false, input, played.complete)).profileId).toBe('main')
+    const both = fake({ m: new RefusalError('403 Forbidden'), n: 'I cannot write that.' })
+    await expect(completeWithFallback(settings(), false, input, both.complete)).rejects.toThrow(/Main: The LLM declined to reply: 403 Forbidden\. NSFW: it answered "I cannot write that\."/)
+  })
+
   it('switches when the endpoint itself blocks the request', async () => {
     const { complete } = fake({ m: new RefusalError('content filter'), n: 'Come here.' })
     expect((await completeWithFallback(settings(), false, input, complete)).profileId).toBe('nsfw')

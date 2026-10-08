@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { PackedTurnSchema } from './game/turns'
 import { GameStateSchema, SceneSchema } from './model'
 
 /** Bump when the save format changes in a way older code can't read. */
@@ -13,7 +14,9 @@ export type SlotId = z.infer<typeof SlotIdSchema>
 /** Everything needed to resume play, including a scene that was still open. */
 export const SaveDataSchema = z.object({
   state: GameStateSchema,
-  scene: SceneSchema.nullable()
+  scene: SceneSchema.nullable(),
+  /** The lines he has said in the open scene that can still be taken back, oldest first, each as what it changed. */
+  turns: z.array(PackedTurnSchema).optional()
 })
 export type SaveData = z.infer<typeof SaveDataSchema>
 

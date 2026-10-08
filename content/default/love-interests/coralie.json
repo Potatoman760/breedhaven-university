@@ -7,18 +7,26 @@
   "pronouns": "she/her",
   "bio": "Coralie runs the front of house at the Lumen cinema: tickets, ushers, the popcorn machine and the illusions on Hearthday nights.",
   "appearance": "A petite, pretty woman of 33 with warm brown skin, big dark eyes with long lashes, a beauty mark beside red-painted lips, and glossy black hair set in a 1940s victory roll. A neat hourglass figure.",
-  "imageSeed": 60,
   "personality": "Theatrical, quick and fond of a good story. Runs a tight house and loves the films more than the business.",
   "outfits": [
     {
       "id": "default",
       "name": "Work clothes",
-      "description": "a fitted burgundy usher's jacket with gold buttons, a black pencil skirt, sheer tights, and a small torch on her belt",
-      "sprites": {}
+      "description": "a fitted burgundy usher's jacket with gold buttons, a black pencil skirt, sheer tights, and a small flashlight on her belt",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/coralie/default-neutral-3-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     }
   ],
   "defaultOutfitId": "default",
   "faceY": 8,
+  "imageSeed": 60,
+  "stageHeight": 100,
+  "animations": [],
   "schedule": [],
   "ai": {
     "speechPattern": "A stage whisper by habit. Quotes films. Dramatic about small things and calm about big ones.",

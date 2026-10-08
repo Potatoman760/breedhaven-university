@@ -13,6 +13,8 @@ import {
   roomOwner,
   sceneHours,
   sceneDestinations,
+  PLAYER_ROOM,
+  playerRoom,
   sceneView
 } from './sceneMoves'
 import { createInitialState } from './state'
@@ -57,25 +59,22 @@ const scene: Scene = {
 const ids = (at = state, of: Scene = scene) => sceneDestinations(content, at, of).map((d) => d.id)
 
 describe('where a scene can go', () => {
-  it('is the rooms of those in it, then anywhere else that will be open on arrival', () => {
+  it('is the rooms of those in it, then anywhere else that is open', () => {
     expect(ids()).toEqual(['room-of-ana', 'shop'])
     expect(sceneDestinations(content, state, scene)[0]).toMatchObject({
       name: "Ana's own room: a loft over the shop, at the Shop",
       locationId: 'shop',
       roomOf: 'ana',
-      indoors: true,
-      walkHours: 2
+      indoors: true
     })
-    // Leaving at 13:00 arrives at 15:00, as the shop shuts, and her room is in it.
-    expect(ids({ ...state, time: 7 })).toEqual([])
+    // At 15:00 the shop has shut, and her room is in it.
+    expect(ids({ ...state, time: 8 })).toEqual(['room-of-ana', 'shop'])
+    expect(ids({ ...state, time: 9 })).toEqual([])
   })
 
-  it('counts no walk for a room in the building the scene is already in', () => {
+  it('offers her room from the building it is in, and the way back down from it', () => {
     const atShop = { ...state, locationId: 'shop' }
-    expect(sceneDestinations(content, atShop, scene).map((d) => [d.id, d.walkHours])).toEqual([
-      ['room-of-ana', 0],
-      ['home', 2]
-    ])
+    expect(ids(atShop)).toEqual(['room-of-ana', 'home'])
     // From her room the scene can go back down to the shop itself.
     expect(ids(atShop, { ...scene, roomOf: 'ana' })).toEqual(['home', 'shop'])
   })
@@ -92,9 +91,9 @@ describe('where a scene can go', () => {
     expect(findDestination(open, 'the moon')).toBeUndefined()
   })
 
-  it('takes everyone there, counts the walk, and closes what was being done', () => {
+  it('takes everyone there, in no time, and closes what was being done', () => {
     const [room, shop] = sceneDestinations(content, state, scene)
-    expect(moveState(state, shop)).toMatchObject({ locationId: 'shop', time: 2 })
+    expect(moveState(state, shop)).toMatchObject({ locationId: 'shop', time: 0 })
 
     const upstairs = movedScene({ ...scene, backgroundId: 'yard' }, room)
     expect(upstairs.roomOf).toBe('ana')
@@ -126,9 +125,9 @@ describe('where a scene can go', () => {
   it('knows how long a scene has taken: its opening activity, and everything since', () => {
     const began = { ...scene, baseline: sceneBaseline(state, 'ana') }
     expect(sceneHours(state, began)).toBe(0)
-    // Two hours of tea, a two-hour walk, three hours more.
+    // Two hours of tea, a move that takes no time, three hours more.
     const later = passSceneTime(content, moveState({ ...state, time: 2 }, sceneDestinations(content, { ...state, time: 2 }, scene)[1]), 3)
-    expect(sceneHours(later, began)).toBe(7)
+    expect(sceneHours(later, began)).toBe(5)
   })
 })
 
@@ -191,5 +190,30 @@ describe('what the character is told of where she is', () => {
     expect(buildCharacterPrompt({ ...input, hoursSoFar: 2 })).not.toContain('hours so far')
     expect(buildCharacterPrompt({ ...input, mode: 'courier' })).not.toContain('Moving on')
     expect(buildCharacterPrompt({ ...input, npc: { role: 'a smith', knowledge: [] } })).not.toContain('Moving on')
+  })
+})
+
+describe("the player's own room", () => {
+  const roomed: ContentPack = { ...content, newGame: { ...content.newGame, room: { name: 'a small room under the eaves', description: 'A narrow bed and a desk.', locationId: 'home', background: 'addons/sprites/player/room.png' } } }
+
+  it('is somewhere a scene can go, and is his while it is there', () => {
+    const offered = sceneDestinations(roomed, state, scene)
+    expect(offered.map((d) => d.id)).toEqual(['room-of-ana', 'room-of-player', 'shop'])
+    const his = offered.find((d) => d.id === 'room-of-player')!
+    expect(his).toMatchObject({ name: "Pat's own room: a small room under the eaves, at Home", locationId: 'home', roomOf: PLAYER_ROOM, indoors: true })
+
+    const there = movedScene(scene, his)
+    expect(there.roomOf).toBe(PLAYER_ROOM)
+    expect(playerRoom(roomed, there)?.background).toBe('addons/sprites/player/room.png')
+    expect(playerRoom(roomed, scene)).toBeUndefined()
+    // Once there it is not offered again, and the place it is in can be gone back down to.
+    expect(sceneDestinations(roomed, state, there).map((d) => d.id)).toEqual(['room-of-ana', 'home', 'shop'])
+
+    const prompt = buildCharacterPrompt({ content: roomed, state, loveInterestId: 'ana', roomOf: PLAYER_ROOM, sceneBeats: there.beats })
+    expect(prompt).toContain("You and Pat are in Pat's own room: a small room under the eaves, at Home. You are indoors, in private, with the door shut. A narrow bed and a desk.")
+  })
+
+  it('is nowhere without one', () => {
+    expect(ids()).not.toContain('room-of-player')
   })
 })

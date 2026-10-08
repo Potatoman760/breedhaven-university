@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { canEnrol, describeMeetings, toDate } from '../../../shared/game'
+import { canEnrol, courseMatches, describeMeetings, toDate } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { Backdrop } from './Backdrop'
 import { Portrait } from './MapPanel'
@@ -21,6 +21,10 @@ export function CoursesView({ content, state, onEnrol }: Props) {
   const [selected, setSelected] = useState<string[]>([])
   // The course whose details are shown beside the planner.
   const [focusId, setFocusId] = useState<string | null>(null)
+  // What is being looked for: a person's name, a course code, a word of a title. Courses that answer it are picked out and the rest fade.
+  const [search, setSearch] = useState('')
+  const searching = search.trim() !== ''
+  const found = searching ? state.courses.filter((course) => courseMatches(content, course, search)) : []
 
   const location = content.locations.find((l) => l.id === config?.locationId)
   const date = toDate(content.calendar, state.time)
@@ -40,6 +44,14 @@ export function CoursesView({ content, state, onEnrol }: Props) {
             <span className="caps">Start of term</span>
             <h1>Plan your week</h1>
           </div>
+          <label className="planner-search">
+            <input type="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search a name or a code: Tamsin, ADM" aria-label="Search courses" />
+            {searching && (
+              <span className="hint">
+                {found.length === 0 ? 'No course matches' : `${found.length} course${found.length === 1 ? '' : 's'}`}
+              </span>
+            )}
+          </label>
           <span className="hint">
             {selected.length} of {config?.maxCourses} courses chosen
           </span>
@@ -56,7 +68,11 @@ export function CoursesView({ content, state, onEnrol }: Props) {
               content={content}
               courses={state.courses}
               focusId={focusId}
-              mark={(course) => (selected.includes(course.id) ? 'on' : canEnrol(content, state, selected, course.id).ok ? '' : 'blocked')}
+              mark={(course) =>
+                [selected.includes(course.id) ? 'on' : canEnrol(content, state, selected, course.id).ok ? '' : 'blocked', searching && (found.includes(course) ? 'match' : 'dim')]
+                  .filter(Boolean)
+                  .join(' ')
+              }
               onFocus={(course) => setFocusId(course.id)}
               onPick={(course) => {
                 setFocusId(course.id)

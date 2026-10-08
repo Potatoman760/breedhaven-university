@@ -7,18 +7,26 @@
   "pronouns": "she/her",
   "bio": "Rowena has kept the Physic Garden for thirty years and regards the College that owns it as a tenant.",
   "appearance": "A wiry, upright, striking woman of 58 with sun-browned skin, pale blue eyes, strong cheekbones and fine weathered lines. Silver hair in a loose knot. Lean and strong, with long limbs.",
-  "imageSeed": 60,
   "personality": "Patient with plants and brisk with people. Dry, exact, quietly proud.",
   "outfits": [
     {
       "id": "default",
       "name": "Work clothes",
       "description": "a straw hat, a moss-green waxed gilet over a linen shirt, patched canvas trousers, and leather gardening gloves tucked in her belt",
-      "sprites": {}
+      "sprites": {
+        "neutral": {
+          "image": "sprites/rowena/default-neutral-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     }
   ],
   "defaultOutfitId": "default",
   "faceY": 8,
+  "imageSeed": 60,
+  "stageHeight": 100,
+  "animations": [],
   "schedule": [],
   "ai": {
     "speechPattern": "Measured and plain, in the names of plants. Corrects Latin.",

@@ -4,30 +4,37 @@ import { join } from 'node:path'
 import { z } from 'zod'
 import { chatCompletion, listModels } from './ai/openai'
 import { completeWithFallback, NOT_CONFIGURED } from './ai/router'
-import { parseDirectives, sceneCast, sceneWitnesses, validLook } from '../shared/game/scene'
+import { lookLines, parseDirectives, sceneCast, sceneWitnesses, validLook } from '../shared/game/scene'
 import { CONTENT_SCHEME, serveContent } from './content/assets'
 import { deleteLoveInterest,
   removeUnusedAssets,
-  deleteTrait, importAsset, loadWithAddons, saveCatalogue, saveLocation, deleteLocation, saveLoveInterest, saveTrait } from './content/addons'
+  deleteTrait, deleteEvent, importAsset, loadBase, saveEvent, loadWithAddons, saveCatalogue, saveLocation, deleteLocation, saveLoveInterest, saveTrait,
+  resetPlayer,
+  savePlayer
+} from './content/addons'
 import { isSafeId, type EditorInfo, type EditorResult } from '../shared/editor'
 import { SaveStore } from './saves/store'
 import { SettingsStore, type KeyCipher } from './settings/store'
 import { SaveRequestSchema, SlotIdSchema } from '../shared/saves'
 import { buildCourseWordingPrompt, parseCourseWording, WORDING_BATCH } from '../shared/game/catalogue'
 import { CourseSchema } from '../shared/model'
-import { fallbackInvite } from '../shared/game/courier'
-import { buildFeedPrompt, fallbackPost, parseFeedReply } from '../shared/game/feed'
+import { contactsSaid, DM_CLOSE, DM_OPEN, fallbackInvite, messageText } from '../shared/game/courier'
+import { buildFeedPrompt, draftPosts, feedReplyTokens, parseFeedReply } from '../shared/game/feed'
 import { buildEventPrompt, parseGeneratedEvents } from '../shared/game/events'
-import { buildSummaryPrompt, fallbackSummary, parseSummary, PLAIN_FEELINGS, type Summary } from '../shared/game/memory'
+import { buildSpendingPrompt, buildSummaryPrompt, fallbackSummary, parseSpending, parseSummary, PLAIN_FEELINGS, type Spending, type Summary } from '../shared/game/memory'
 import { npcOf, sceneExtras, withNpc } from '../shared/game/npcs'
 import { sceneHours } from '../shared/game/sceneMoves'
 import { buildOutingPrompt, fallbackOuting, parseOuting } from '../shared/game/outing'
-import { buildCharacterPrompt } from '../shared/game/prompt'
+import { personalise } from '../shared/game/personalise'
+import { createInitialState } from '../shared/game/state'
+import { buildCharacterPrompt, sceneTurns } from '../shared/game/prompt'
 import { IPC } from '../shared/ipc'
 import {
   CutoutRequestSchema,
   GenerateArtRequestSchema,
+  framingFor,
   normaliseComfyUrl,
+  sizeFor,
   type ComfyTestResult,
   type CutoutResult,
   type GenerateArtResult
@@ -36,11 +43,12 @@ import { testComfy } from './comfy/client'
 import { cutoutArt } from './comfy/cutout'
 import { ComfyStore, generateArt } from './comfy/studio'
 import { listWorkflows } from './comfy/workflows'
-import type { BondProposal, ContentPack, LoveInterest, Proposal } from '../shared/model'
+import { isMoment, isSeeding, type CalendarEvent, type BondProposal, type ContentPack, type LoveInterest, type Proposal } from '../shared/model'
 import { wornOutfit } from '../shared/game/pregnancy'
 import { buildDraftPrompt, DRAFT_MAX_IDEA_CHARS, DRAFT_MIN_TOKENS, parseDraft } from '../shared/game/draftCharacter'
 import {
   excuseTool,
+  eventTool,
   leaveTool,
   meetingTool,
   moveTool,
@@ -62,6 +70,8 @@ import {
 import {
   CourierRequestSchema,
   type CourierResponse,
+  FeedPictureRequestSchema,
+  type FeedPictureResponse,
   FeedRequestSchema,
   type FeedResponse,
   type CourseWordingResponse,
@@ -80,7 +90,11 @@ const CODEX_SCAN_MESSAGES = 4
 const SUMMARY_TEMPERATURE = 0.3
 
 // A list of events as JSON needs more room than a line of dialogue.
+// Room enough for the lecture a class opens with, whatever the profile allows an ordinary reply.
+const LESSON_MIN_TOKENS = 900
 const EVENT_MIN_TOKENS = 800
+// How many events the editor asks the LLM for at a time.
+const DRAFTED_EVENTS = 5
 // A whole catalogue needs more still.
 const COURSE_MIN_TOKENS = 2500
 // The player is looking at a waiting screen while the catalogue is written, so don't wait long.
@@ -146,10 +160,14 @@ function registerIpc(
   packDir: string,
   settings: SettingsStore,
   saves: SaveStore,
-  comfy: ComfyStore
+  comfy: ComfyStore,
+  /** The user's own add-on folder, where what the game makes as it is played (the selfies on the feed) is always filed. */
+  userDir: string
 ): void {
   // Replaced whenever the editor changes an add-on; every handler below reads the current one.
   let { content, info } = loaded
+  /** The content as the game with this state reads it: the player's name filled in wherever the content wrote the token. */
+  const readBy = (state: { player: { name: string } }): ContentPack => personalise(content, state.player.name)
   const baseTraitIds = () => Object.keys(info.traits).filter((id) => info.traits[id] !== 'addon')
 
   ipcMain.handle(IPC.getContent, () => content)
@@ -157,7 +175,8 @@ function registerIpc(
   /** Makes a change to the add-ons, then loads the content afresh so the game and the editor agree. */
   const change = (apply: () => string[]): EditorResult => {
     const issues = apply()
-    if (issues.length === 0) ({ content, info } = loadWithAddons(packDir, info.addonDir))
+    // Read afresh the way it was first read: the game's own files when they are what is being edited, and otherwise with the add-ons over them.
+    if (issues.length === 0) ({ content, info } = info.base ? loadBase(packDir) : loadWithAddons(packDir, info.addonDir))
     return { issues, content, info }
   }
   ipcMain.handle(IPC.editorInfo, () => info)
@@ -165,7 +184,7 @@ function registerIpc(
   const saveAndTidy = (raw: unknown, save: () => string[], find: (id: string) => Parameters<typeof removeUnusedAssets>[1] | undefined): EditorResult => {
     const result = change(save)
     const saved = result.issues.length === 0 ? find(String((raw as { id?: unknown } | null)?.id ?? '')) : undefined
-    return saved ? { ...result, removed: removeUnusedAssets(info.addonDir, saved).length } : result
+    return saved ? { ...result, removed: removeUnusedAssets(info.addonDir, saved, info.assetPrefix).length } : result
   }
   ipcMain.handle(IPC.editorSaveLoveInterest, (_event, raw: unknown) =>
     saveAndTidy(raw, () => saveLoveInterest(info.addonDir, content, raw), (id) => [...content.loveInterests, ...content.npcs].find((li) => li.id === id))
@@ -196,8 +215,25 @@ function registerIpc(
   ipcMain.handle(IPC.editorDeleteTrait, (_event, raw: unknown) =>
     change(() => deleteTrait(info.addonDir, content, baseTraitIds(), z.string().parse(raw)))
   )
-  ipcMain.handle(IPC.editorSaveLocation, (_event, raw: unknown) => change(() => saveLocation(info.addonDir, content, raw)))
+  ipcMain.handle(IPC.editorSaveLocation, (_event, raw: unknown) => change(() => saveLocation(info.addonDir, content, raw, info.base)))
   ipcMain.handle(IPC.editorDeleteLocation, (_event, raw: unknown) => change(() => deleteLocation(info.addonDir, z.string().parse(raw))))
+  ipcMain.handle(IPC.editorSaveEvent, (_event, raw: unknown) => change(() => saveEvent(info.addonDir, content, raw, info.base)))
+  ipcMain.handle(IPC.editorDeleteEvent, (_event, raw: unknown) => change(() => deleteEvent(info.addonDir, z.string().parse(raw), info.base)))
+  // Never fails: the LLM thinks of events for the whole of the calendar, as it stands at the start of a game. Nothing is saved here.
+  ipcMain.handle(IPC.editorDraftEvents, async (): Promise<{ events?: CalendarEvent[]; error?: string }> => {
+    const profile = settings.get().main
+    if (!isConfigured(profile)) return { error: NOT_CONFIGURED }
+    try {
+      const state = createInitialState(content)
+      const { system, user } = buildEventPrompt({ content, state, count: DRAFTED_EVENTS, windowDays: content.calendar.lengthDays })
+      const reply = await chatCompletion(profile, { system, messages: [{ role: 'user', content: user }], maxTokens: Math.max(profile.maxTokens, EVENT_MIN_TOKENS) })
+      return { events: parseGeneratedEvents(reply, { content, state }) }
+    } catch (error) {
+      return { error: (error as Error).message }
+    }
+  })
+  ipcMain.handle(IPC.editorSavePlayer, (_event, raw: unknown) => change(() => savePlayer(info.addonDir, content, raw)))
+  ipcMain.handle(IPC.editorResetPlayer, () => change(() => resetPlayer(info.addonDir)))
   ipcMain.handle(IPC.editorSaveCatalogue, (_event, raw: unknown) => change(() => saveCatalogue(info.addonDir, raw)))
   // Never fails: without an LLM the courses keep the wording they came with.
   ipcMain.handle(IPC.editorWriteCourseWording, async (_event, raw: unknown): Promise<CourseWordingResponse> => {
@@ -219,23 +255,25 @@ function registerIpc(
     }
   })
   ipcMain.handle(IPC.editorImportAsset, async (event, raw: unknown): Promise<string | null> => {
-    const { loveInterestId, kind } = z.object({ loveInterestId: z.string(), kind: z.enum(['image', 'video']) }).parse(raw)
+    const { loveInterestId, kind } = z.object({ loveInterestId: z.string(), kind: z.enum(['image', 'video', 'media']) }).parse(raw)
     if (!isSafeId(loveInterestId)) throw new Error('Give the character a usable id first.')
     const window = BrowserWindow.fromWebContents(event.sender)
     const options = {
-      title: kind === 'image' ? 'Choose a picture' : 'Choose a video',
+      title: kind === 'image' ? 'Choose a picture' : kind === 'video' ? 'Choose a video' : 'Choose a picture or a clip',
       properties: ['openFile' as const],
       filters: [
         kind === 'image'
           ? { name: 'Pictures', extensions: ['png', 'webp', 'jpg', 'jpeg', 'gif'] }
-          : { name: 'Videos', extensions: ['mp4', 'webm'] }
+          : kind === 'video'
+            ? { name: 'Videos', extensions: ['mp4', 'webm'] }
+            : { name: 'Pictures and clips', extensions: ['png', 'webp', 'jpg', 'jpeg', 'gif', 'mp4', 'webm'] }
       ]
     }
     // A test or a script can name the file outright instead of going through the dialog.
     const forced = app.isPackaged ? undefined : process.env['BREEDHAVEN_IMPORT_FILE']
     const picked = forced ? { canceled: false, filePaths: [forced] } : await (window ? dialog.showOpenDialog(window, options) : dialog.showOpenDialog(options))
     if (picked.canceled || !picked.filePaths[0]) return null
-    return importAsset(info.addonDir, loveInterestId, picked.filePaths[0])
+    return importAsset(info.addonDir, loveInterestId, picked.filePaths[0], info.assetPrefix)
   })
   // The art studio. Nothing in a scene reaches these: they run only when the studio asks.
   ipcMain.handle(IPC.comfyGetSettings, () => comfy.get())
@@ -258,7 +296,7 @@ function registerIpc(
     const mine = new AbortController()
     drawing = mine
     try {
-      return await generateArt(comfy.get(), info.addonDir, request, mine.signal)
+      return await generateArt(comfy.get(), info.addonDir, request, mine.signal, info.assetPrefix)
     } finally {
       if (drawing === mine) drawing = null
     }
@@ -266,7 +304,7 @@ function registerIpc(
   ipcMain.handle(IPC.comfyCancel, () => drawing?.abort())
   ipcMain.handle(IPC.comfyCutout, (_event, raw: unknown): CutoutResult => {
     try {
-      return cutoutArt(info.addonDir, CutoutRequestSchema.parse(raw))
+      return cutoutArt(info.addonDir, CutoutRequestSchema.parse(raw), info.assetPrefix)
     } catch (error) {
       return { ok: false, message: (error as Error).message, path: null, colour: null, cleared: 0, feathered: 0, enclosed: 0 }
     }
@@ -323,7 +361,8 @@ function registerIpc(
 
   ipcMain.handle(IPC.chat, async (_event, raw: unknown): Promise<ChatResponse> => {
     const { state, scene } = SceneRequestSchema.parse(raw)
-    const group = scene.companionIds.length > 0
+    // The content as this game reads it, with the player's name where the content wrote the token.
+    const content = readBy(state)
     // A scene with an NPC is built the same way, with the NPC standing among the characters.
     const npc = scene.npc ? npcOf(content, scene.loveInterestId) : undefined
     const cast = npc ? withNpc(content, npc.id) : content
@@ -339,6 +378,8 @@ function registerIpc(
       loveInterestId: scene.loveInterestId,
       companionIds: scene.companionIds,
       sceneBeats: scene.beats,
+      lesson: scene.lesson,
+      opening: scene.messages.length === 0,
       look: scene,
       looks: scene.looks,
       comfort: scene.comfort,
@@ -353,9 +394,14 @@ function registerIpc(
     let bondProposal: BondProposal | undefined
     const rolls: string[] = []
     let movedTo: string | undefined
+    // The place the scene has gone to in this reply, so that going there is not also booked as a plan.
+    let movedPlace: string | undefined
     let hoursPassed = 0
     let left: Leaving | undefined
     const leave = leaveTool(content, state, scene, (leaving) => (left = leaving))
+    // Set when they leave together for something of his that is theirs too: the scene ends with the going.
+    let walkTo: { withIds: string[] } | undefined
+    const goToEvent = eventTool(content, state, scene, (_next, withIds) => (walkTo = { withIds }))
     const revealed: Revelation[] = []
     const reveal = npc ? undefined : revealTool(content, state, sceneCast(scene), (revelation) => revealed.push(revelation))
     const contacts: string[] = []
@@ -364,22 +410,31 @@ function registerIpc(
     const rapport = npc ? undefined : rapportTool(content, state, sceneCast(scene), (change) => rapportChanges.push(change))
     const move = npc
       ? undefined
-      : moveTool(content, state, scene, (destination, hours) => {
+      : moveTool(content, state, scene, (destination, hours, stayingIds) => {
           movedTo = destination.id
+          movedPlace = destination.locationId
+          // A plan made a moment ago for the place they are now going to is the same thing asked for twice: the going is kept.
+          if (proposal?.locationId === destination.locationId) proposal = undefined
           hoursPassed = hours
+          // Whoever is left behind when the scene moves on is out of it, with no hard feelings unless she said otherwise.
+          if (stayingIds.length > 0 && !left) left = { ids: stayingIds, feeling: 'content', reason: 'stayed behind when the others left' }
         })
     const { reply, profileId } = await completeWithFallback(settings.get(), scene.nsfw, {
       system: systemPrompt,
-      messages: scene.messages,
+      // With nothing said yet, the character opens the scene.
+      messages: sceneTurns(scene.messages, state.player.name, scene.lesson),
+      // The lecture a class opens with is several times the length of an ordinary reply.
+      ...(scene.lesson && scene.messages.length === 0 ? { maxTokens: Math.max(settings.get().main.maxTokens, LESSON_MIN_TOKENS) } : {}),
       // An NPC makes no plans and no promises with the player.
       tools: [
         ...(npc
           ? []
           : [
-              meetingTool(content, state, scene.loveInterestId, (p) => (proposal = p), sceneCast(scene)),
+              meetingTool(content, state, scene.loveInterestId, (p) => (proposal = p), sceneCast(scene), () => movedPlace),
               relationshipTool(content, state, scene.loveInterestId, (p) => (bondProposal = p), sceneCast(scene))
             ]),
         ...(move ? [move] : []),
+        ...(goToEvent ? [goToEvent] : []),
         ...(leave ? [leave] : []),
         ...(reveal ? [reveal] : []),
         ...(contact ? [contact] : []),
@@ -419,31 +474,41 @@ function registerIpc(
     }
     const fitted = (valid: ReturnType<typeof validLook>, who: LoveInterest): ReturnType<typeof validLook> =>
       valid.outfitId === undefined || npc ? valid : { ...valid, outfitId: wornOutfit(content, state, who, valid.outfitId)?.id }
-    // An animation takes the whole stage, so it is only played when she is alone with him.
-    if (group) look = { outfitId: look.outfitId, expression: look.expression }
+    // A pose is one character's and is shown over everyone: the one named with it, or the scene's lead. It has to be one she has something to show for.
+    const poser = cast.loveInterests.find((c) => c.id === (look.animationOf ? idOf(look.animationOf) : scene.loveInterestId))
+    const pose = poser?.animations.find((a) => a.id.toLowerCase() === look.animationId?.toLowerCase() && (a.image !== undefined || a.clip !== undefined))
+    // A moment is shown once: asked for again in the very next reply, it is not put up a second time.
+    const again = pose !== undefined && isMoment(pose.id) && scene.animationId === pose.id && (scene.animationOf ?? scene.loveInterestId) === poser?.id
+    const posed = look.animationId === null ? { animationId: null } : pose && poser && !npc && !again ? { animationId: pose.id, animationOf: poser.id } : {}
     return {
-      message: { role: 'assistant', content: text || '...' },
+      message: { role: 'assistant', content: text || '...', tags: lookLines(reply) || undefined },
       systemPrompt,
       profileId,
-      sceneEnded: ended,
+      sceneEnded: ended || walkTo !== undefined,
+      walkTo,
       proposal,
       bondProposal,
-      seededIds: npc ? [] : [...new Set(seededIds)],
+      // A pose that shows him finishing inside her says what the tag says, whether or not the tag was written. The game still decides what comes of it.
+      seededIds: npc ? [] : [...new Set([...seededIds, ...(pose && poser && isSeeding(pose.id) ? [poser.id] : [])])],
       rolls,
-      moveTo: movedTo,
+      // Setting off for his class or plan is the going: the scene is not also taken somewhere.
+      moveTo: walkTo ? undefined : movedTo,
       left,
       revealed,
-      contacts: [...new Set(contacts)],
+      // A handle written out in the reply is a handle given, whether or not the tool was called for it.
+      contacts: [...new Set([...contacts, ...(npc ? [] : contactsSaid(content, state, sceneCast(scene), text))])],
       rapport: rapportChanges,
       comfort,
       hours: hoursPassed > 0 ? hoursPassed : undefined,
-      look: li ? fitted(validLook(look, li, scene), li) : {},
+      look: li ? { ...fitted(validLook({ outfitId: look.outfitId, expression: look.expression }, li, scene), li), ...posed } : {},
       looks
     }
   })
 
   ipcMain.handle(IPC.generateEvents, async (_event, raw: unknown) => {
     const { state } = GenerateEventsRequestSchema.parse(raw)
+    // The content as this game reads it, with the player's name where the content wrote the token.
+    const content = readBy(state)
     const profile = settings.get().main
     if (!isConfigured(profile)) throw new Error(NOT_CONFIGURED)
 
@@ -457,12 +522,14 @@ function registerIpc(
   })
 
   ipcMain.handle(IPC.courier, async (_event, raw: unknown): Promise<CourierResponse> => {
-    const { state, loveInterestId, invite, news } = CourierRequestSchema.parse(raw)
-    const unprompted = invite || news !== undefined
+    const { state, loveInterestId, invite, note, news } = CourierRequestSchema.parse(raw)
+    // The content as this game reads it, with the player's name where the content wrote the token.
+    const content = readBy(state)
+    const unprompted = invite || note || news !== undefined
     const thread = state.courier[loveInterestId] ?? []
     let proposal: Proposal | undefined
     const told: string[] = []
-    // An NPC in his Chats is his boss, and makes no plans with him. Whoever his boss is, NPC or not, can be told he will miss a shift.
+    // An NPC in his DMs is his boss, and makes no plans with him. Whoever his boss is, NPC or not, can be told he will miss a shift.
     const npc = npcOf(content, loveInterestId)
     let excused: string | undefined
     const excuse = excuseTool(content, state, loveInterestId, (key) => (excused = key))
@@ -473,7 +540,7 @@ function registerIpc(
         npc: npc && { role: npc.role, knowledge: npc.ai.knowledge },
         state,
         loveInterestId,
-        mode: news !== undefined ? 'news' : invite ? 'invite' : 'courier',
+        mode: news !== undefined ? 'news' : invite ? 'invite' : note ? 'note' : 'courier',
         news,
         recentText: thread
           .slice(-CODEX_SCAN_MESSAGES)
@@ -482,45 +549,60 @@ function registerIpc(
       })
       // The exchange so far is in the prompt; this only says whose turn it is.
       const cue = unprompted
-        ? '(Write your message now.)'
-        : `(${state.player.name} has just messaged you. Write your answer.)`
+        ? `(Write your message now, between ${DM_OPEN} and ${DM_CLOSE}.)`
+        : `(${state.player.name} has just messaged you. Write your answer, between ${DM_OPEN} and ${DM_CLOSE}.)`
       const { reply } = await completeWithFallback(settings.get(), false, {
         system,
         messages: [{ role: 'user', content: cue }],
         tools: [...(npc ? [] : [meetingTool(content, state, loveInterestId, (p) => (proposal = p)), ...(reveal ? [reveal] : [])]), ...(excuse ? [excuse] : [])]
       })
-      const { text } = parseDirectives(reply)
+      // Only the message is kept: whatever the LLM said to itself around it is dropped.
+      const who = [...content.loveInterests, ...content.npcs].find((c) => c.id === loveInterestId)
+      const text = messageText(parseDirectives(reply).text, who?.name ?? '')
       // An invitation has to name a time the game has checked.
       if (invite && news === undefined && !proposal) throw new Error('The note did not settle on a time.')
       return { text: text || '...', proposal, revealed: told, excused }
     } catch (error) {
       if (!unprompted) throw error
       // An unprompted note is never worth an error: send a plain one, or none.
-      const plain = news === undefined ? fallbackInvite(content, state, loveInterestId) : undefined
+      const plain = invite && news === undefined ? fallbackInvite(content, state, loveInterestId) : undefined
       return { text: plain?.text ?? '', proposal: plain?.proposal, error: (error as Error).message }
     }
   })
 
-  // Never fails: without an LLM, or for anyone it leaves out, the post is a plain one.
+  // Bloomr is selfies: it needs the Main LLM for the captions and ComfyUI for the pictures, and without both there are no posts.
+  const comfyReady = (): boolean => normaliseComfyUrl(comfy.get().baseUrl).url !== null && comfy.get().workflowDir !== null
+  // Never fails: writes the captions of the day's planned posts, and the prompt each selfie is drawn from.
   ipcMain.handle(IPC.feed, async (_event, raw: unknown): Promise<FeedResponse> => {
-    const { state, authorIds } = FeedRequestSchema.parse(raw)
-    const known = authorIds.filter((id) => content.loveInterests.some((li) => li.id === id))
-    const plain = (written: { authorId: string; text: string }[]) =>
-      known.map((id) => written.find((post) => post.authorId === id) ?? { authorId: id, text: fallbackPost(content, state, id) })
+    const { state, plans } = FeedRequestSchema.parse(raw)
+    // The content as this game reads it, with the player's name where the content wrote the token.
+    const content = readBy(state)
+    const planned = plans.filter((plan) => content.loveInterests.some((li) => li.id === plan.authorId))
     const profile = settings.get().main
-    if (!isConfigured(profile)) return { posts: plain([]), error: NOT_CONFIGURED }
+    if (!isConfigured(profile)) return { drafts: [], error: NOT_CONFIGURED }
+    if (!comfyReady()) return { drafts: [], error: 'ComfyUI is not set up.' }
+    if (planned.length === 0) return { drafts: [] }
     try {
-      const { system, user } = buildFeedPrompt(content, state, known)
-      const reply = await chatCompletion(profile, { system, messages: [{ role: 'user', content: user }] })
-      return { posts: plain(parseFeedReply(reply, known)) }
+      const { system, user } = buildFeedPrompt(content, state, planned)
+      const reply = await chatCompletion(profile, { system, messages: [{ role: 'user', content: user }], maxTokens: Math.max(profile.maxTokens, feedReplyTokens(planned)) })
+      return { drafts: draftPosts(content, state, planned, parseFeedReply(reply, planned), framingFor(comfy.get(), 'photo')) }
     } catch (error) {
-      return { posts: plain([]), error: (error as Error).message }
+      return { drafts: [], error: (error as Error).message }
     }
+  })
+  // Never fails: one selfie, drawn on ComfyUI with the photo workflow and filed with the author's photos.
+  ipcMain.handle(IPC.feedPicture, async (_event, raw: unknown): Promise<FeedPictureResponse> => {
+    const { authorId, name, prompt } = FeedPictureRequestSchema.parse(raw)
+    // Made by the game as it is played, not by the editor: it goes with the player's own files whatever is being edited.
+    const made = await generateArt(comfy.get(), userDir, { kind: 'photo', subjectId: authorId, name, workflow: '', positive: prompt, negative: '', ...sizeFor(comfy.get(), 'photo') })
+    return made.ok ? { image: made.path } : { image: null, error: made.message }
   })
 
   // Never fails: without an LLM the plan is read off the names and places in the player's words.
   ipcMain.handle(IPC.planOuting, async (_event, raw: unknown): Promise<PlanOutingResponse> => {
     const { state, text } = PlanOutingRequestSchema.parse(raw)
+    // The content as this game reads it, with the player's name where the content wrote the token.
+    const content = readBy(state)
     try {
       const { system, user } = buildOutingPrompt(content, state, text)
       const { reply } = await completeWithFallback(settings.get(), false, {
@@ -537,7 +619,20 @@ function registerIpc(
   // Never fails: a scene that can't be summarised by the LLM still leaves a plain memory.
   ipcMain.handle(IPC.summarize, async (_event, raw: unknown): Promise<SummarizeResponse> => {
     const request = SceneRequestSchema.parse(raw)
+    // The content as this game reads it, with the player's name where the content wrote the token.
+    const content = readBy(request.state)
     let failure: string | undefined
+    // What he paid for is worked out alongside, from what was said. No answer is no spending: he is never charged on a guess.
+    const spending = (async (): Promise<Spending | undefined> => {
+      if (!request.scene.messages.some((m) => m.role === 'user')) return undefined
+      try {
+        const { system, user } = buildSpendingPrompt(content, request.state, request.scene)
+        const { reply } = await completeWithFallback(settings.get(), request.scene.nsfw, { system, messages: [{ role: 'user', content: user }], temperature: SUMMARY_TEMPERATURE })
+        return parseSpending(reply, request.state.player.money)
+      } catch {
+        return undefined
+      }
+    })()
     // Everyone in the scene keeps their own memory of it, written from their side.
     const written = await Promise.all(
       sceneWitnesses(request.scene).map(async (forId): Promise<[string, Summary]> => {
@@ -563,6 +658,7 @@ function registerIpc(
     return {
       memories: Object.fromEntries(written.map(([id, summary]) => [id, summary.memory])),
       feelings: Object.fromEntries(written.flatMap(([id, summary]) => (summary.feelings ? [[id, summary.feelings]] : []))),
+      spending: await spending,
       error: failure
     }
   })
@@ -572,7 +668,10 @@ app.whenReady().then(() => {
   const addonDir = join(app.getPath('userData'), 'addons')
   let loaded: { content: ContentPack; info: EditorInfo }
   try {
-    loaded = loadWithAddons(contentDir(), addonDir)
+    // Run from its source, the game is being written: the editor changes the base game itself, and add-ons are left out of it.
+    // (BREEDHAVEN_ADDONS=1 runs it as a player has it, add-ons and all.) A packaged game keeps what the user makes apart, as add-ons.
+    const authoring = !app.isPackaged && process.env['BREEDHAVEN_ADDONS'] !== '1'
+    loaded = authoring ? loadBase(contentDir()) : loadWithAddons(contentDir(), addonDir)
   } catch (error) {
     dialog.showErrorBox('Could not load game content', (error as Error).message)
     app.quit()
@@ -583,7 +682,7 @@ app.whenReady().then(() => {
   const settings = new SettingsStore(join(app.getPath('userData'), 'settings.json'), keyCipher())
   const saves = new SaveStore(join(app.getPath('userData'), 'saves'))
   const comfy = new ComfyStore(join(app.getPath('userData'), 'comfy.json'))
-  registerIpc(loaded, contentDir(), settings, saves, comfy)
+  registerIpc(loaded, contentDir(), settings, saves, comfy, addonDir)
   createWindow()
 
   app.on('activate', () => {

@@ -1,7 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { createInitialState, giveContact, meet, sceneBaseline, sceneCast } from '../../shared/game'
+import { PLAYER_TOKEN, createInitialState, giveContact, meet, personalise, sceneBaseline, sceneCast } from '../../shared/game'
 import { sceneExtras } from '../../shared/game/npcs'
 import { buildCharacterPrompt } from '../../shared/game/prompt'
 import { sceneHours } from '../../shared/game/sceneMoves'
@@ -60,7 +60,9 @@ function sample(content: ContentPack, state: GameState, scene: Scene): string {
 }
 
 describe('what a scene sends to the LLM', () => {
-  const content = loadContentPack(join(process.cwd(), 'content', 'default'))
+  const written = loadContentPack(join(process.cwd(), 'content', 'default'))
+  // As a game reads it: under the name a new game starts with.
+  const content = personalise(written, written.newGame.player.name)
   mkdirSync(OUT, { recursive: true })
   const placeName = (id: string) => content.locations.find((l) => l.id === id)?.name
 
@@ -72,7 +74,7 @@ describe('what a scene sends to the LLM', () => {
       state = {
         ...state,
         relationships: { ...state.relationships, [id]: { ...state.relationships[id], ...meters } },
-        memories: { ...state.memories, [id]: memories.map((summary, i) => ({ time: state.time - 24 * (memories.length - i), summary })) }
+        memories: { ...state.memories, [id]: memories.map((summary, i) => ({ time: state.time - 24 * (memories.length - i), summary: summary.split(PLAYER_TOKEN).join(state.player.name) })) }
       }
     }
     return state
@@ -81,7 +83,7 @@ describe('what a scene sends to the LLM', () => {
   it('alone with one love interest, on a date', () => {
     const state = giveContact(
       midGame('great-court', {
-        faye: { affection: 45, trust: 30, desire: 55, memories: ['Kael and Faye shared lunch in the Commons and she teased him about his handwriting.', 'Faye kissed Kael goodnight outside the dormitories.'] }
+        faye: { affection: 45, trust: 30, desire: 55, memories: ['{player} and Faye shared lunch in the Commons and she teased him about his handwriting.', 'Faye kissed {player} goodnight outside the dormitories.'] }
       }),
       'faye'
     )
@@ -110,8 +112,8 @@ describe('what a scene sends to the LLM', () => {
 
   it('with two love interests at once', () => {
     const state = midGame('spell-and-sip', {
-      anwen: { affection: 35, trust: 40, desire: 20, memories: ['Anwen helped Kael find a book in the library and stayed to talk.'] },
-      elowen: { affection: 50, trust: 25, desire: 60, memories: ['Elowen dared Kael to race her across the tiltyard and lost on purpose.'] }
+      anwen: { affection: 35, trust: 40, desire: 20, memories: ['Anwen helped {player} find a book in the library and stayed to talk.'] },
+      elowen: { affection: 50, trust: 25, desire: 60, memories: ['Elowen dared {player} to race her across the tiltyard and lost on purpose.'] }
     })
     const scene: Scene = {
       loveInterestId: 'elowen',

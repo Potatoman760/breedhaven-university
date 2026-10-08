@@ -1,6 +1,8 @@
-import type { ContentPack, CourierNote, GameState, Proposal } from '../model'
+import type { Appointment, ContentPack, CourierNote, GameState, Proposal } from '../model'
 import { acceptProposal, allFree, attendees, describeWhen, proposeMeeting, upcomingAppointments } from './appointments'
 import { toDate } from './calendar'
+import { handleOf } from './feed'
+import { bondOf, statusOf } from './bonds'
 import { appealLevel } from './stats'
 
 // About 600 tokens of the exchange are shown to a character, at four characters a token.
@@ -15,22 +17,34 @@ const MAX_CHANCE = 0.5
 // Not before anyone is up.
 const FIRST_ROUND_HOUR = 9
 
-// How strongly she has to feel before she offers her Chats without being asked.
+// How strongly she has to feel before she offers her Bloomr without being asked.
 const OFFERS_AT_AFFECTION = 60
 const OFFERS_AT_DESIRE = 50
 
-/** Whether the player can message her: she has given him her Chats. */
+/** Whether the player can message her: she has given him her Bloomr. */
 export function hasContact(state: GameState, loveInterestId: string): boolean {
   return state.contacts.includes(loveInterestId)
 }
 
-/** Records that she has given the player her Chats. */
+/** Records that she has given the player her Bloomr. */
 export function giveContact(state: GameState, loveInterestId: string): GameState {
   return state.contacts.includes(loveInterestId) ? state : { ...state, contacts: [...state.contacts, loveInterestId] }
 }
 
 /**
- * Whether she is taken enough with the player to give him her Chats unasked: he is just
+ * Those of the given love interests whose Bloomr the player does not have and whose handle
+ * is written out in what was said. A handle is only ever said in giving it, so one that
+ * turns up in a reply counts as given even if nothing else recorded it.
+ */
+export function contactsSaid(content: ContentPack, state: GameState, loveInterestIds: string[], text: string): string[] {
+  const said = text.toLowerCase()
+  return content.loveInterests
+    .filter((li) => loveInterestIds.includes(li.id) && !hasContact(state, li.id) && said.includes(handleOf(li).toLowerCase()))
+    .map((li) => li.id)
+}
+
+/**
+ * Whether she is taken enough with the player to give him her Bloomr unasked: he is just
  * what she admires, or she already wants him or is fond of him.
  */
 export function offersContact(content: ContentPack, state: GameState, loveInterestId: string): boolean {
@@ -72,6 +86,22 @@ export function markRead(state: GameState, loveInterestId: string): GameState {
 /** Whether an invitation sent earlier can still be taken up: its time ahead, and everyone still free. */
 export function inviteStands(content: ContentPack, state: GameState, proposal: Proposal): boolean {
   return proposal.time > state.time && allFree(content, state, attendees(proposal), proposal.time, proposal.hours)
+}
+
+/**
+ * Whether an invitation can be gone to straight away: it is for today, it has not been
+ * turned down or lapsed, and it is not over. One still to be answered must also still stand.
+ */
+export function canGoToInvite(content: ContentPack, state: GameState, note: Pick<CourierNote, 'proposal' | 'answer'>): boolean {
+  const plan = note.proposal
+  if (!plan || (note.answer !== undefined && note.answer !== 'accepted')) return false
+  if (plan.time + plan.hours <= state.time || toDate(content.calendar, plan.time).dayIndex !== toDate(content.calendar, state.time).dayIndex) return false
+  return note.answer === 'accepted' ? planFor(state, plan) !== undefined : inviteStands(content, state, plan)
+}
+
+/** The plan on the calendar that an accepted invitation became. */
+export function planFor(state: GameState, proposal: Proposal): Appointment | undefined {
+  return state.appointments.find((a) => a.loveInterestId === proposal.loveInterestId && a.time === proposal.time && a.locationId === proposal.locationId)
 }
 
 /**
@@ -136,7 +166,7 @@ function roll(seed: number, dayIndex: number, index: number): number {
 export function chanceOfWriting(content: ContentPack, state: GameState, loveInterestId: string): number {
   const li = content.loveInterests.find((c) => c.id === loveInterestId)
   const rel = state.relationships[loveInterestId]
-  // She can't write to someone she hasn't given her Chats to.
+  // She can't write to someone she hasn't given her Bloomr to.
   if (!li || !rel || !hasContact(state, loveInterestId)) return 0
   const level = appealLevel(state, li)
   if (level === 0 && rel.affection < WRITES_AT_AFFECTION) return 0
@@ -146,6 +176,58 @@ export function chanceOfWriting(content: ContentPack, state: GameState, loveInte
   if (waiting || planned) return 0
   const closeness = rel.affection / content.relationships.meterMax
   return Math.min(MAX_CHANCE, BASE_CHANCE + CHANCE_PER_APPEAL * level + CHANCE_AT_FULL_AFFECTION * closeness)
+}
+
+// The chance someone whose Bloomr he has writes to him when a scene ends: a little always, more for how she feels and what they are to each other.
+const DM_BASE_CHANCE = 0.03
+const DM_AT_FULL_AFFECTION = 0.25
+const DM_AT_FULL_DESIRE = 0.1
+const DM_PER_APPEAL = 0.03
+// Lovers who owe each other nothing write more; a girlfriend and up, more again.
+const DM_IN_BOND = 0.08
+const DM_COMMITTED = 0.15
+// Someone who has just been with him has it fresh in mind.
+const DM_JUST_SEEN = 0.1
+const DM_MAX_CHANCE = 0.6
+// Someone whose last message he never answered is slower to write another.
+const DM_UNANSWERED = 0.5
+
+/**
+ * The chance someone writes to the player as a scene ends, whether or not she was in it.
+ * It grows with her affection and her desire, with what he has that she admires, with the
+ * arrangement the two of them have, and with having just been with him. Zero for someone
+ * whose Bloomr he does not have, and for someone with a message of hers still unread or an
+ * invitation still unanswered; halved for someone he left without a reply.
+ */
+export function chanceOfDm(content: ContentPack, state: GameState, loveInterestId: string, justSeen: string[] = []): number {
+  const li = content.loveInterests.find((c) => c.id === loveInterestId)
+  const rel = state.relationships[loveInterestId]
+  if (!li || !rel || !hasContact(state, loveInterestId)) return 0
+  const thread = courierThread(state, loveInterestId)
+  if (thread.some((n) => n.from === 'them' && (!n.read || (n.proposal && !n.answer)))) return 0
+  const max = content.relationships.meterMax
+  const status = statusOf(content, bondOf(state, loveInterestId))
+  const chance =
+    DM_BASE_CHANCE +
+    DM_AT_FULL_AFFECTION * Math.max(0, rel.affection / max) +
+    DM_AT_FULL_DESIRE * Math.max(0, rel.desire / max) +
+    DM_PER_APPEAL * appealLevel(state, li) +
+    (status ? (status.committed ? DM_COMMITTED : DM_IN_BOND) : 0) +
+    (justSeen.includes(loveInterestId) ? DM_JUST_SEEN : 0)
+  const unanswered = thread.length > 0 && thread[thread.length - 1].from === 'them'
+  return Math.min(DM_MAX_CHANCE, chance) * (unanswered ? DM_UNANSWERED : 1)
+}
+
+/**
+ * Who writes to the player as a scene ends, if anyone does. Everyone whose Bloomr he has
+ * takes her own chance; of those it comes up for, the one it came up for most surely
+ * writes. One message at most, and the same answer every time for the same moment of the same game.
+ */
+export function sceneEndWriter(content: ContentPack, state: GameState, justSeen: string[] = []): string | undefined {
+  return content.loveInterests
+    .map((li, index) => ({ id: li.id, luck: roll(state.weatherSeed, 100000 + state.time, index), chance: chanceOfDm(content, state, li.id, justSeen) }))
+    .filter(({ luck, chance }) => luck < chance)
+    .sort((a, b) => a.luck / a.chance - b.luck / b.chance)[0]?.id
 }
 
 /** Whether today's round of unprompted notes is still to be made. */
@@ -188,4 +270,33 @@ export function fallbackInvite(
     proposal,
     text: `${state.player.name}, come and find me at ${where}: ${describeWhen(content, proposal.time)}. Let me know?`
   }
+}
+
+// A DM is written between these, so that anything the LLM says to itself around it can be told from the message and dropped.
+export const DM_OPEN = '<dm>'
+export const DM_CLOSE = '</dm>'
+// How a paragraph of working-out reads, as against something she would send.
+const PLANNING = /\b(last message|the conversation|the exchange|would (?:respond|reply|say|answer)|should (?:respond|reply|say|answer)|i (?:should|need to|will|'ll) (?:respond|reply|write|keep|call)|let me|in character)\b/i
+
+/**
+ * The message itself out of what the LLM wrote for a DM. What is between the tags is the
+ * message. Where the tags were left off, a reply in several paragraphs whose earlier ones
+ * are the LLM working out what to say (they talk about her by name, or about the
+ * conversation) is cut down to its last paragraph, which is what she sends.
+ */
+export function messageText(reply: string, ownName: string): string {
+  const open = reply.toLowerCase().lastIndexOf(DM_OPEN)
+  if (open >= 0) {
+    const rest = reply.slice(open + DM_OPEN.length)
+    const close = rest.toLowerCase().indexOf(DM_CLOSE)
+    const inside = (close >= 0 ? rest.slice(0, close) : rest).trim()
+    if (inside !== '') return inside
+  }
+  const untagged = reply.replace(/<\/?dm>/gi, '').trim()
+  const paragraphs = untagged.split(/\n\s*\n/).map((p) => p.trim()).filter((p) => p !== '')
+  if (paragraphs.length < 2) return untagged
+  const first = ownName.trim().split(/\s+/)[0]
+  const named = first ? new RegExp(`\\b${first.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i') : undefined
+  const planning = paragraphs.slice(0, -1).some((p) => PLANNING.test(p) || named?.test(p))
+  return planning ? paragraphs[paragraphs.length - 1] : untagged
 }

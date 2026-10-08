@@ -96,15 +96,13 @@ export function rawFixture() {
         schedule: [{ periods: ['day'], locationId: 'shop' }],
         ai: {
           speechPattern: 'Speaks in riddles.',
-          secrets: [{ text: 'Is secretly a dragon.', revealWhen: [{ type: 'stage', min: 'friend' }] }],
-          stageNotes: { friend: 'Jokes freely.' }
+          secrets: [{ text: 'Is secretly a dragon.', revealWhen: [{ type: 'stage', min: 'friend' }] }]
         }
       }
     ],
     map: {
       name: 'Town',
       image: 'maps/town.png',
-      travelHours: 2,
       pins: [
         { locationId: 'home', x: 20, y: 50 },
         { locationId: 'shop', x: 80, y: 50 }

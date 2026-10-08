@@ -18,10 +18,12 @@ export const JobSchema = z.object({
   id: z.string(),
   /** What he is there: "Barista". */
   title: z.string(),
+  /** The picture beside it on the job board, by name: "coffee", "book", "dumbbell". Left out, a briefcase. */
+  icon: z.string().optional(),
   /** A line or two for the job board: what the work is. */
   description: z.string().default(''),
   locationId: z.string(),
-  /** The NPC he answers to. She is at work for every shift, and is in his Chats from the day he is taken on. */
+  /** The NPC he answers to. She is at work for every shift, and is in his DMs from the day he is taken on. */
   bossId: z.string(),
   /** Money for each hour worked. Better-paid jobs ask more of him. */
   hourlyRate: z.number().min(0),

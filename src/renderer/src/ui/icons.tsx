@@ -92,11 +92,10 @@ export const CalendarIcon = (p: IconProps) => (
   </Icon>
 )
 
-export const SettingsIcon = (p: IconProps) => (
+/** Three bars: the game's menu. */
+export const MenuIcon = (p: IconProps) => (
   <Icon viewBox="0 0 20 18" strokeWidth={1.8} {...p}>
-    <path d="M1 4h9M15 4h4M1 14h4M10 14h9" />
-    <circle cx="12.5" cy="4" r="2.5" />
-    <circle cx="7.5" cy="14" r="2.5" />
+    <path d="M2 3h16M2 9h16M2 15h16" />
   </Icon>
 )
 
@@ -249,6 +248,14 @@ export function VineCorner({ corner }: { corner: 'tl' | 'tr' | 'bl' | 'br' }) {
 
 // The phone's own icons, drawn on a 24-unit grid.
 
+/** A cell phone: the player's own, with his DMs, Friends, the Bloomr feed and Jobs on it. */
+export const PhoneIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 24 24" {...p}>
+    <rect x="6.5" y="2.5" width="11" height="19" rx="2.5" />
+    <path d="M10.5 5.500h3M11 18.500h2" />
+  </Icon>
+)
+
 export const ChatIcon = (p: IconProps) => (
   <Icon viewBox="0 0 24 24" {...p}>
     <path d="M21 11.500a8.400 8.400 0 01-12.300 7.400L3 21l2.100-5.700A8.400 8.400 0 1121 11.500z" />
@@ -287,3 +294,62 @@ export const BackIcon = (p: IconProps) => (
     <path d="M19 12H5M11 6l-6 6 6 6" />
   </Icon>
 )
+
+/**
+ * The pictures a job can have beside it on the board, by the name its data gives: a cup for
+ * the barista, a book for the library page. A job that names none, or one not drawn here,
+ * gets the briefcase.
+ */
+const JOB_ICON_PATHS: Record<string, string> = {
+  crate: 'M3 8h18v12H3z M3 13h18 M9 8v12 M15 8v12',
+  pot: 'M5 10h14v6a4 4 0 01-4 4H9a4 4 0 01-4-4z M3 10h18 M9 6c0-1 1-1 1-2 M14 6c0-1 1-1 1-2',
+  bell: 'M5 17a7 7 0 0114 0z M3 19.500h18 M12 10V7 M10 7h4',
+  bag: 'M5 8h14l-1 12H6z M9 8V6a3 3 0 016 0v2',
+  ticket: 'M3 8h18v3a2 2 0 000 4v3H3v-3a2 2 0 000-4z M14 8v2 M14 12v2 M14 16v2',
+  droplet: 'M12 3s6 6.500 6 11a6 6 0 01-12 0c0-4.500 6-11 6-11z',
+  boba: 'M7 8h10l-1.500 12h-7z M5 8h14 M13 8l2-5 M10 16h.010 M13 17h.010 M11.500 14h.010',
+  leaf: 'M5 19c0-9 5-14 14-14 0 9-5 14-14 14z M5 19l8-8',
+  book: 'M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z M4 21V5 M9 7h6',
+  gamepad: 'M7 8h10a4 4 0 014 4v2a3 3 0 01-5.500 1.500l-1-1.500h-5l-1 1.500A3 3 0 013 14v-2a4 4 0 014-4z M8 10v3 M6.500 11.500h3 M16 11h.010 M17.500 12.500h.010',
+  coffee: 'M4 9h13v5a5 5 0 01-5 5H9a5 5 0 01-5-5z M17 10h1.500a2.500 2.500 0 010 5H17 M8 3c0 1.500 1 1.500 1 3 M12 3c0 1.500 1 1.500 1 3',
+  sword: 'M20 4L10 14 M20 4h-5 M20 4v5 M7 13l4 4 M5 19l4-4 M4 20l1-1',
+  glass: 'M6 4h12l-1 8a5 5 0 01-10 0z M12 17v4 M8 21h8',
+  cross: 'M9 3h6v6h6v6h-6v6H9v-6H3V9h6z',
+  dumbbell: 'M3 9v6 M6 6v12 M18 6v12 M21 9v6 M6 12h12',
+  door: 'M6 21V4a1 1 0 011-1h10a1 1 0 011 1v17 M4 21h16 M14.500 12h.010',
+  cloche: 'M4 17a8 8 0 0116 0z M2 19.500h20 M12 9V7.500 M12 6h.010',
+  flask: 'M9 3h6 M10 3v6L5 19a1.500 1.500 0 001.300 2h11.400a1.500 1.500 0 001.300-2L14 9V3 M7.500 15h9',
+  scroll: 'M7 4h11a2 2 0 010 4H7 M7 4a2 2 0 00-2 2v12a2 2 0 002 2h11a2 2 0 002-2V8 M9 12h7 M9 15h5',
+  // Places.
+  columns: 'M3 9l9-5 9 5 M5 9v9 M9.500 9v9 M14.500 9v9 M19 9v9 M3 20h18',
+  cap: 'M2 9l10-5 10 5-10 5z M6 11.500V16c2 2 10 2 12 0v-4.500 M22 9v5',
+  chapel: 'M12 3v4 M10 5h4 M6 21V12l6-5 6 5v9z M10 21v-4a2 2 0 014 0v4',
+  bed: 'M3 18V7 M3 11h14a4 4 0 014 4v3 M3 15h18 M7 11V9.500a1.500 1.500 0 013 0V11',
+  lantern: 'M9 3h6 M12 3v2 M8 5h8l1 3H7z M8 8v9a4 4 0 008 0V8 M12 11v4',
+  house: 'M4 11l8-7 8 7 M6 10v10h12V10 M10 20v-5h4v5',
+  music: 'M9 18V5l11-2v13 M9 18a3 3 0 11-6 0 3 3 0 016 0z M20 16a3 3 0 11-6 0 3 3 0 016 0z',
+  tree: 'M12 21v-6 M12 15c-4 0-6-2.500-6-5a4 4 0 012.500-3.700A4 4 0 0116 5.500 4 4 0 0118 10c0 2.500-2 5-6 5z',
+  pin: 'M12 21s7-6.500 7-12a7 7 0 10-14 0c0 5.500 7 12 7 12z M12 11.500a2.500 2.500 0 100-5 2.500 2.500 0 000 5z'
+}
+
+/** The names a job's data may give its picture. */
+export const JOB_ICONS = Object.keys(JOB_ICON_PATHS)
+
+export function JobIcon({ name, ...p }: IconProps & { name?: string }) {
+  const path = name ? JOB_ICON_PATHS[name] : undefined
+  if (!path) return <WorkIcon {...p} />
+  return (
+    <Icon viewBox="0 0 24 24" {...p}>
+      <path d={path} />
+    </Icon>
+  )
+}
+
+/** The picture of a place on the map, by the name its data gives. One that names none, or one not drawn here, gets a map pin. */
+export function PlaceIcon({ name, ...p }: IconProps & { name?: string }) {
+  return (
+    <Icon viewBox="0 0 24 24" {...p}>
+      <path d={(name && JOB_ICON_PATHS[name]) || JOB_ICON_PATHS['pin']} />
+    </Icon>
+  )
+}

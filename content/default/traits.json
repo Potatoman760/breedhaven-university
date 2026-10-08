@@ -2,10 +2,12 @@
   {
     "id": "promiscuous",
     "name": "Promiscuous",
+    "definition": "Comfortable with casual sex and slow to tie attraction to commitment.",
     "category": "romance",
-    "definition": "Comfortable with casual intimacy and slow to tie attraction to commitment. Flirts easily and without embarrassment; commitment has to be earned, not assumed.",
+    "aiGuidance": "Flirts easily and without embarrassment; commitment has to be earned, not assumed.",
     "drama": {
-      "jealousy": -10
+      "jealousy": -10,
+      "sociable": 0
     }
   },
   {

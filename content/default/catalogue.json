@@ -1,0 +1,2043 @@
+{
+  "seed": 1,
+  "basis": "[[\"Solday\",\"Moonday\",\"Tidesday\",\"Windsday\",\"Hearthday\"],8,18,\"lecture-halls\",1,3,2,3,5,[{\"code\":\"HIS\",\"subject\":\"History of the Bloom\",\"stats\":[\"wisdom\"],\"practical\":false},{\"code\":\"BPS\",\"subject\":\"Bloom Psychology\",\"stats\":[\"wisdom\",\"charisma\"],\"practical\":false},{\"code\":\"RBI\",\"subject\":\"Reproductive Biology\",\"stats\":[\"intelligence\",\"wisdom\"],\"practical\":true},{\"code\":\"PTH\",\"subject\":\"Prenatal Thaumaturgy\",\"stats\":[\"intelligence\",\"wisdom\"],\"practical\":true},{\"code\":\"HHS\",\"subject\":\"Household Studies\",\"stats\":[\"charisma\",\"wisdom\"],\"practical\":false},{\"code\":\"MTH\",\"subject\":\"Calculus and Statistics\",\"stats\":[\"intelligence\"],\"practical\":false},{\"code\":\"CSC\",\"subject\":\"Computer Science\",\"stats\":[\"intelligence\"],\"practical\":true},{\"code\":\"RHE\",\"subject\":\"Rhetoric and Debate\",\"stats\":[\"charisma\"],\"practical\":false},{\"code\":\"GEO\",\"subject\":\"Peoples and Politics of the Sown Expanse\",\"stats\":[\"intelligence\"],\"practical\":false},{\"code\":\"ART\",\"subject\":\"Studio Art\",\"stats\":[\"dexterity\",\"wisdom\"],\"practical\":true},{\"code\":\"MUS\",\"subject\":\"Music\",\"stats\":[\"charisma\"],\"practical\":true}],[\"Professor Orlena Vey\",\"Dr Ysolde Marrin\",\"Professor Corwenna Ashby\",\"Dr Halcyon Reed\",\"Professor Petra Lindqvar\",\"Dr Sunniva Crane\",\"Professor Thessaly Rook\",\"Dr Maelis Varn\",\"Professor Isaura Penhallow\",\"Dr Winnow Sedge\",\"Professor Alba Quillon\",\"Dr Ferelith Moor\",\"Professor Hesper Lark\",\"Dr Odalys Brine\",\"Professor Sabel Thorn\",\"Dr Ianthe Coombe\",\"Professor Dagna Tor-Kesh\",\"Dr Senna Ashpaw\",\"Professor Aldous Thorne\",\"Dr Benedek Hale\"],[[\"anwen\",\"Anwen\",\"student\",{\"subject\":\"Hospitality Management\",\"code\":\"HSP\",\"level\":2,\"stats\":[\"intelligence\"],\"practical\":false},null],[\"caelwen\",\"Caelwen Ashgrove\",\"teacher\",null,{\"department\":\"the College of Arts and Humanities\",\"title\":\"Professor\",\"subjects\":[{\"subject\":\"Magical Ethics\",\"code\":\"ETH\",\"level\":1,\"stats\":[\"wisdom\"],\"practical\":false}]}],[\"daphne\",\"Daphne\",\"student\",{\"subject\":\"Public Safety\",\"code\":\"PSF\",\"level\":4,\"stats\":[\"wisdom\"],\"practical\":true},null],[\"dinah\",\"Dinah Silverith\",\"student\",{\"subject\":\"Bloom Theology\",\"code\":\"THE\",\"level\":5,\"stats\":[\"wisdom\"],\"practical\":false},null],[\"elowen\",\"Elowen\",\"student\",{\"subject\":\"Culinary Arts and Brewing\",\"code\":\"CUL\",\"level\":2,\"stats\":[\"charisma\",\"dexterity\"],\"practical\":true},null],[\"faye\",\"Faye Fertillay\",\"student\",{\"subject\":\"Economics\",\"code\":\"ECO\",\"level\":4,\"stats\":[\"intelligence\"],\"practical\":false},null],[\"grushka\",\"Grushka Tor-Vael\",\"teacher\",null,{\"department\":\"the College of Public Safety and Athletics\",\"title\":\"Coach\",\"subjects\":[{\"subject\":\"Strength and Conditioning\",\"code\":\"KIN\",\"level\":1,\"stats\":[\"strength\",\"endurance\"],\"practical\":true}]}],[\"isolde\",\"Isolde Verrane\",\"student\",{\"subject\":\"Public Administration\",\"code\":\"ADM\",\"level\":5,\"stats\":[\"intelligence\"],\"practical\":false},null],[\"lira\",\"Lira\",\"student\",{\"subject\":\"Bloomology\",\"code\":\"BLM\",\"level\":1,\"stats\":[\"intelligence\",\"wisdom\"],\"practical\":true},null],[\"maren\",\"Maren\",\"student\",{\"subject\":\"Foreign Languages\",\"code\":\"LNG\",\"level\":2,\"stats\":[\"charisma\",\"intelligence\"],\"practical\":false},null],[\"ottilie\",\"Ottilie Marrow\",\"teacher\",null,{\"department\":\"the College of Life Sciences and Agriculture\",\"title\":\"Dr\",\"subjects\":[{\"subject\":\"Sire Genetics\",\"code\":\"SGN\",\"level\":1,\"stats\":[\"intelligence\"],\"practical\":true}]}],[\"seraphine\",\"Seraphine V\",\"student\",{\"subject\":\"Government\",\"code\":\"POL\",\"level\":1,\"stats\":[\"charisma\",\"intelligence\"],\"practical\":false},null],[\"tamsin\",\"Tamsin\",\"student\",{\"subject\":\"Agricultural Sciences\",\"code\":\"AGR\",\"level\":2,\"stats\":[\"wisdom\"],\"practical\":true},null],[\"tink\",\"Tink Lightfoot\",\"student\",{\"subject\":\"Magical Engineering\",\"code\":\"MEN\",\"level\":1,\"stats\":[\"intelligence\",\"dexterity\"],\"practical\":true},null],[\"yelena\",\"Yelena Goldvine\",\"student\",{\"subject\":\"Law\",\"code\":\"LAW\",\"level\":1,\"stats\":[\"charisma\",\"intelligence\"],\"practical\":false},null],[\"morwenna\",\"Morwenna Thriceborn\",\"student\",{\"subject\":\"Women's Studies\",\"code\":\"WST\",\"level\":4,\"stats\":[\"charisma\",\"wisdom\"],\"practical\":false},null]]]",
+  "courses": [
+    {
+      "id": "course-hsp-101",
+      "number": "HSP 101",
+      "title": "Foundations of Hospitality",
+      "professor": "Dr Ysolde Marrin",
+      "description": "Introduction to lodging, food service, and event management in venues ranging from rural inns to enchanted conference centres. Covers guest reception, ward-enhanced room maintenance, and basic service standards expected across the Sown Expanse.",
+      "subject": "Hospitality Management",
+      "code": "HSP",
+      "level": 1,
+      "general": false,
+      "stats": [
+        "intelligence"
+      ],
+      "studentIds": [
+        "daphne"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 11,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-hsp-201",
+      "number": "HSP 201",
+      "title": "Service Operations and Guest Experience",
+      "professor": "Dr Ysolde Marrin",
+      "description": "Operational systems for hotels, banquet halls, and tourist sites, including staff scheduling, enchanted inventory tracking, and complaint resolution. Students learn to design guest experiences that accommodate diverse populations, including travelling True Sires and their security needs.",
+      "subject": "Hospitality Management",
+      "code": "HSP",
+      "level": 2,
+      "general": false,
+      "stats": [
+        "intelligence"
+      ],
+      "studentIds": [
+        "anwen"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Windsday",
+          "startHour": 15,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 15,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-hsp-301",
+      "number": "HSP 301",
+      "title": "Strategic Hospitality Management",
+      "professor": "Dr Ysolde Marrin",
+      "description": "Advanced management of hospitality enterprises, covering financial modelling, brand positioning, and regulatory compliance under Breedhaven's commercial ward standards. Includes case studies of resorts, university dining, and diplomatic lodging during state visits.",
+      "subject": "Hospitality Management",
+      "code": "HSP",
+      "level": 3,
+      "general": false,
+      "stats": [
+        "intelligence"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-eth-101",
+      "number": "ETH 101",
+      "title": "Ethics of Everyday Magic",
+      "professor": "Professor Caelwen Ashgrove",
+      "description": "Introduction to moral reasoning about common magical practices: household wards, Bloom suppressants, fertility assays, and enchantments embedded in consumer goods. Students examine consent, privacy, and the line between personal magic and public harm.",
+      "subject": "Magical Ethics",
+      "code": "ETH",
+      "level": 1,
+      "general": false,
+      "stats": [
+        "wisdom"
+      ],
+      "teacherId": "caelwen",
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Windsday",
+          "startHour": 12,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 12,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-eth-201",
+      "number": "ETH 201",
+      "title": "Consent and Magical Agency",
+      "professor": "Professor Caelwen Ashgrove",
+      "description": "Examines the ethics of magical influence on autonomy, focusing on the Bloom's pull, reproductive contracts, and warding practices that affect others without explicit agreement. Contrasts Bloomist and Freewill frameworks through case law and philosophical argument.",
+      "subject": "Magical Ethics",
+      "code": "ETH",
+      "level": 2,
+      "general": false,
+      "stats": [
+        "wisdom"
+      ],
+      "teacherId": "caelwen",
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Tidesday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-eth-301",
+      "number": "ETH 301",
+      "title": "Advanced Topics in Magical Ethics",
+      "professor": "Professor Caelwen Ashgrove",
+      "description": "Seminar on contested ethical frontiers: mandatory dampers in safety-critical professions, disclosure of Sire status, magical enhancement during pregnancy, and the state's interest in reproduction. Students produce a research paper on a self-selected regulatory dispute.",
+      "subject": "Magical Ethics",
+      "code": "ETH",
+      "level": 3,
+      "general": false,
+      "stats": [
+        "wisdom"
+      ],
+      "teacherId": "caelwen",
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 15,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-psf-101",
+      "number": "PSF 101",
+      "title": "Introduction to Public Safety",
+      "professor": "Professor Alba Quillon",
+      "description": "Foundations of protective services in a magitech society, including patrol procedure, incident reporting, and basic ward-based security systems. Weekly lab practises situational awareness, radio protocol, and non-magical restraint techniques suitable for campus enforcement.",
+      "subject": "Public Safety",
+      "code": "PSF",
+      "level": 1,
+      "general": false,
+      "stats": [
+        "wisdom"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 17,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 15,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 13,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-psf-201",
+      "number": "PSF 201",
+      "title": "Ward Security and Threat Response",
+      "professor": "Professor Alba Quillon",
+      "description": "Design and operation of layered ward systems for public buildings, events, and protected-person details. Weekly lab covers ward-bridge diagnostics, counter-enchantment field response, and evacuation procedures for magical incidents in crowded spaces.",
+      "subject": "Public Safety",
+      "code": "PSF",
+      "level": 2,
+      "general": false,
+      "stats": [
+        "wisdom"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 10,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 10,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 8,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-psf-401",
+      "number": "PSF 401",
+      "title": "Protective Operations and Sire Security",
+      "professor": "Professor Alba Quillon",
+      "description": "Capstone course in executive and high-value protective operations, emphasising True Sire escort detail, threat assessment, and coordination with national Sire Registry enforcement. Weekly lab runs simulated protection scenarios under graduated magical and physical pressure.",
+      "subject": "Public Safety",
+      "code": "PSF",
+      "level": 4,
+      "general": false,
+      "stats": [
+        "wisdom"
+      ],
+      "studentIds": [
+        "daphne"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 12,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 12,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 14,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-the-101",
+      "number": "THE 101",
+      "title": "The Living Bloom",
+      "professor": "Professor Thessaly Rook",
+      "description": "Introduction to the Primordial Bloom as an active presence in soil, water, and blood. Covers the foundational texts, the Seven-to-One ratio, and the theological distinction between the Bloom's generative pull and a woman's sovereign will.",
+      "subject": "Bloom Theology",
+      "code": "THE",
+      "level": 1,
+      "general": false,
+      "stats": [
+        "wisdom"
+      ],
+      "studentIds": [
+        "isolde"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Tidesday",
+          "startHour": 10,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 10,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-the-201",
+      "number": "THE 201",
+      "title": "Bloom and Civilization",
+      "professor": "Professor Thessaly Rook",
+      "description": "Examines how the Bloom's influence has shaped law, agriculture, and family structure across the Sown Expanse. Compares Breedhaven's constitutional traditions with neighbouring states' approaches to the Bloom's role in public life.",
+      "subject": "Bloom Theology",
+      "code": "THE",
+      "level": 2,
+      "general": false,
+      "stats": [
+        "wisdom"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-the-501",
+      "number": "THE 501",
+      "title": "Seminar in Bloom Theology",
+      "professor": "Professor Thessaly Rook",
+      "description": "Graduate seminar on contemporary theological debates: the nature of the Bloom's want, post-menopausal magic, and the ethics of magical augmentation through pregnancy. Students engage with current scholarship and produce an original paper.",
+      "subject": "Bloom Theology",
+      "code": "THE",
+      "level": 5,
+      "general": false,
+      "stats": [
+        "wisdom"
+      ],
+      "studentIds": [
+        "dinah"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 13,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 13,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-cul-101",
+      "number": "CUL 101",
+      "title": "Kitchen Fundamentals",
+      "professor": "Professor Sabel Thorn",
+      "description": "Introduction to professional kitchen practice: knife skills, stock production, and food safety in both conventional and enchanted kitchens. Weekly lab covers basic cookery, yeast cultivation, and the principles of heat transfer in warded ovens.",
+      "subject": "Culinary Arts and Brewing",
+      "code": "CUL",
+      "level": 1,
+      "general": false,
+      "stats": [
+        "charisma",
+        "dexterity"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Windsday",
+          "startHour": 14,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 14,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Solday",
+          "startHour": 9,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-cul-201",
+      "number": "CUL 201",
+      "title": "Brewing and Fermentation Science",
+      "professor": "Professor Sabel Thorn",
+      "description": "The biochemistry and magical theory of fermentation, covering beer, cider, mead, and Bloom-infused cordials. Weekly lab practises batch brewing, yeast management, and quality control, with attention to Breedhaven's orchard-based brewing traditions.",
+      "subject": "Culinary Arts and Brewing",
+      "code": "CUL",
+      "level": 2,
+      "general": false,
+      "stats": [
+        "charisma",
+        "dexterity"
+      ],
+      "studentIds": [
+        "elowen"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 11,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 10,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-cul-301",
+      "number": "CUL 301",
+      "title": "Enchanted Cuisine and Menu Design",
+      "professor": "Professor Sabel Thorn",
+      "description": "Advanced cookery integrating culinary technique with deliberate magical effect, including Bloom-resonant dishes for seasonal festivals and restorative meals for pregnant women. Weekly lab develops tasting menus that balance flavour, nutrition, and magical coherence.",
+      "subject": "Culinary Arts and Brewing",
+      "code": "CUL",
+      "level": 3,
+      "general": false,
+      "stats": [
+        "charisma",
+        "dexterity"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 14,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 14,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 9,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-eco-101",
+      "number": "ECO 101",
+      "title": "Principles of Economy",
+      "professor": "Professor Hesper Lark",
+      "description": "Introduction to supply, demand, and market structure in a magitech economy where enchanted infrastructure and reproductive demographics shape production. Covers currency, trade, and the economic role of True Sires within Breedhaven's tax and contract framework.",
+      "subject": "Economics",
+      "code": "ECO",
+      "level": 1,
+      "general": false,
+      "stats": [
+        "intelligence"
+      ],
+      "studentIds": [
+        "maren",
+        "tamsin"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Windsday",
+          "startHour": 9,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 9,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-eco-201",
+      "number": "ECO 201",
+      "title": "Labour and Demographic Economics",
+      "professor": "Professor Hesper Lark",
+      "description": "Examines how the Seven-to-One ratio and Sire scarcity affect labour markets, household formation, and public spending. Students analyse damper markets, reproductive contract valuation, and the economics of wards as public goods.",
+      "subject": "Economics",
+      "code": "ECO",
+      "level": 2,
+      "general": false,
+      "stats": [
+        "intelligence"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 17,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 17,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-eco-401",
+      "number": "ECO 401",
+      "title": "Regulation and the Magitech Economy",
+      "professor": "Professor Hesper Lark",
+      "description": "Advanced seminar on economic regulation in Breedhaven and the wider Sown Expanse: ward standards, Sire Registry policy, agricultural enchantment subsidies, and competition among magitech firms. Students model policy outcomes using current national data.",
+      "subject": "Economics",
+      "code": "ECO",
+      "level": 4,
+      "general": false,
+      "stats": [
+        "intelligence"
+      ],
+      "studentIds": [
+        "faye"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Windsday",
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-kin-101",
+      "number": "KIN 101",
+      "title": "Foundations of Strength Training",
+      "professor": "Coach Grushka Tor-Vael",
+      "description": "Introduction to resistance training, conditioning, and movement mechanics for students of all body types and Bloom states. Weekly lab covers proper lifting technique, programme design, and safe training practices for pregnant and non-pregnant students alike.",
+      "subject": "Strength and Conditioning",
+      "code": "KIN",
+      "level": 1,
+      "general": false,
+      "stats": [
+        "strength",
+        "endurance"
+      ],
+      "teacherId": "grushka",
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 10,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 10,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 8,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-kin-201",
+      "number": "KIN 201",
+      "title": "Programme Design and Athletic Performance",
+      "professor": "Coach Grushka Tor-Vael",
+      "description": "Intermediate strength and conditioning theory, including periodisation, sport-specific training, and recovery protocols that account for the Bloom's physical demands. Weekly lab practises programme assessment, load management, and coaching cues for mixed-ability groups.",
+      "subject": "Strength and Conditioning",
+      "code": "KIN",
+      "level": 2,
+      "general": false,
+      "stats": [
+        "strength",
+        "endurance"
+      ],
+      "teacherId": "grushka",
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 11,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-kin-301",
+      "number": "KIN 301",
+      "title": "Advanced Strength and Conditioning",
+      "professor": "Coach Grushka Tor-Vael",
+      "description": "Theory and practice of physical training for peak performance, integrating exercise physiology with Bloom-enhanced recovery techniques. Weekly lab involves supervised programming, load testing, and performance assessment in the Foundry's kinematics bay. Taught by Coach Grushka Tor-Vael.",
+      "subject": "Strength and Conditioning",
+      "code": "KIN",
+      "level": 3,
+      "general": false,
+      "stats": [
+        "strength",
+        "endurance"
+      ],
+      "teacherId": "grushka",
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 17,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 10,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 15,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-adm-101",
+      "number": "ADM 101",
+      "title": "Foundations of Public Administration",
+      "professor": "Professor Corwenna Ashby",
+      "description": "Introduction to the structures and functions of government in Breedhaven, from the Crown and Assembly to municipal wards and Bloom-ward offices. Covers the history of civil service, the role of women in governance, and the basic frameworks of public budgeting and regulatory oversight. Taught by Professor Corwenna Ashby.",
+      "subject": "Public Administration",
+      "code": "ADM",
+      "level": 1,
+      "general": false,
+      "stats": [
+        "intelligence"
+      ],
+      "studentIds": [
+        "seraphine",
+        "tink",
+        "yelena"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 15,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 11,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-adm-201",
+      "number": "ADM 201",
+      "title": "Public Policy and Implementation",
+      "professor": "Professor Corwenna Ashby",
+      "description": "Examines how policy moves from Assembly debate to enacted regulation, including the role of the civil service, enforcement agencies, and the courts that govern reproductive and paternity law. Students analyse case studies from recent legislation affecting Sire protections, damper regulation, and agricultural subsidy. Taught by Professor Corwenna Ashby.",
+      "subject": "Public Administration",
+      "code": "ADM",
+      "level": 2,
+      "general": false,
+      "stats": [
+        "intelligence"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Windsday",
+          "startHour": 9,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 9,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-adm-501",
+      "number": "ADM 501",
+      "title": "Seminar in Governance and Reform",
+      "professor": "Professor Corwenna Ashby",
+      "description": "Graduate seminar on contemporary challenges in Breedhaven public administration, including the management of the Sire Registry, cross-border policy in the Sown Expanse, and the capacity constraints of governing a state where seven in eight citizens are women. Taught by Professor Corwenna Ashby.",
+      "subject": "Public Administration",
+      "code": "ADM",
+      "level": 5,
+      "general": false,
+      "stats": [
+        "intelligence"
+      ],
+      "studentIds": [
+        "isolde"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Tidesday",
+          "startHour": 15,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 12,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-blm-101",
+      "number": "BLM 101",
+      "title": "Introduction to Bloomology",
+      "professor": "Dr Maelis Varn",
+      "description": "Foundational study of the Primordial Bloom as a natural force: its presence in soil, water, and blood, its observed effects on living things, and the basic principles by which women channel it. Weekly lab introduces measurement of Bloom fields and basic exercises in directed enchantment. Taught by Dr Maelis Varn.",
+      "subject": "Bloomology",
+      "code": "BLM",
+      "level": 1,
+      "general": false,
+      "stats": [
+        "intelligence",
+        "wisdom"
+      ],
+      "studentIds": [
+        "elowen",
+        "faye",
+        "lira"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Tidesday",
+          "startHour": 14,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 9,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 15,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-blm-201",
+      "number": "BLM 201",
+      "title": "Bloom Dynamics and Field Theory",
+      "professor": "Dr Maelis Varn",
+      "description": "Intermediate study of how the Bloom behaves as a field, including resonance, attenuation, and the well-documented amplification that occurs during pregnancy. Weekly lab involves field mapping, controlled resonance experiments, and safety protocols for working with amplified Bloom states. Taught by Dr Maelis Varn.",
+      "subject": "Bloomology",
+      "code": "BLM",
+      "level": 2,
+      "general": false,
+      "stats": [
+        "intelligence",
+        "wisdom"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 9,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 9,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Solday",
+          "startHour": 15,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-blm-301",
+      "number": "BLM 301",
+      "title": "Applied Bloomology and Enchantment Design",
+      "professor": "Dr Maelis Varn",
+      "description": "Advanced study of the Bloom as an engineering material: how wards and enchantments are structured in everyday objects, and how Bloom principles are integrated into modern infrastructure. Weekly lab involves designing, testing, and calibrating original enchantments in the Foundry. Taught by Dr Maelis Varn.",
+      "subject": "Bloomology",
+      "code": "BLM",
+      "level": 3,
+      "general": false,
+      "stats": [
+        "intelligence",
+        "wisdom"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 10,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 10,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 12,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-lng-101",
+      "number": "LNG 101",
+      "title": "First-Year Expanse Languages",
+      "professor": "Dr Halcyon Reed",
+      "description": "Introduction to the major languages of the Sown Expanse beyond Breedhaven, with emphasis on practical communication, reading, and the cultural context of neighbouring states. Students choose a primary language track and may sample a second. Taught by Dr Halcyon Reed.",
+      "subject": "Foreign Languages",
+      "code": "LNG",
+      "level": 1,
+      "general": false,
+      "stats": [
+        "charisma",
+        "intelligence"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 15,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 15,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-lng-201",
+      "number": "LNG 201",
+      "title": "Intermediate Language and Translation",
+      "professor": "Dr Halcyon Reed",
+      "description": "Continued development of reading, writing, and conversational fluency in the student's chosen language track, with introduction to translation theory and the particular challenges of rendering magical and legal terminology across Expanse cultures. Taught by Dr Halcyon Reed.",
+      "subject": "Foreign Languages",
+      "code": "LNG",
+      "level": 2,
+      "general": false,
+      "stats": [
+        "charisma",
+        "intelligence"
+      ],
+      "studentIds": [
+        "maren"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 17,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 17,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-lng-301",
+      "number": "LNG 301",
+      "title": "Advanced Language and Cross-Cultural Discourse",
+      "professor": "Dr Halcyon Reed",
+      "description": "Advanced study of the student's chosen language, engaging with primary sources in literature, law, and natural philosophy from across the Sown Expanse. Particular attention is paid to how different states describe the Bloom, gender, and inheritance in their own traditions. Taught by Dr Halcyon Reed.",
+      "subject": "Foreign Languages",
+      "code": "LNG",
+      "level": 3,
+      "general": false,
+      "stats": [
+        "charisma",
+        "intelligence"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 12,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 12,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-sgn-101",
+      "number": "SGN 101",
+      "title": "Foundations of Sire Genetics",
+      "professor": "Dr Ottilie Marrow",
+      "description": "Introduction to the genetics of the sex ratio and True Sire fertility, covering the Bloom's role in sex determination, the clinical assay that establishes Sire status, and the basic biology of inheritance in the Sown Expanse. Weekly lab involves microscopy, assay demonstration, and basic genetic analysis. Taught by Dr Ottilie Marrow.",
+      "subject": "Sire Genetics",
+      "code": "SGN",
+      "level": 1,
+      "general": false,
+      "stats": [
+        "intelligence"
+      ],
+      "teacherId": "ottilie",
+      "studentIds": [
+        "daphne",
+        "lira"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Tidesday",
+          "startHour": 17,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 17,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 10,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-sgn-201",
+      "number": "SGN 201",
+      "title": "Inheritance and Population Genetics",
+      "professor": "Dr Ottilie Marrow",
+      "description": "Intermediate study of inheritance patterns in populations with extreme sex ratios, including the mathematics of Sire frequency, genetic drift in small populations, and the legal and social frameworks that manage paternity and lineage. Weekly lab involves population modelling and paternity-case analysis. Taught by Dr Ottilie Marrow.",
+      "subject": "Sire Genetics",
+      "code": "SGN",
+      "level": 2,
+      "general": false,
+      "stats": [
+        "intelligence"
+      ],
+      "teacherId": "ottilie",
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 13,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 8,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-sgn-301",
+      "number": "SGN 301",
+      "title": "Advanced Topics in Sire Biology",
+      "professor": "Dr Ottilie Marrow",
+      "description": "Advanced seminar on the frontiers of Sire genetics, including unusual assay profiles, the interaction between Sire fertility and Bloom field strength, and the ethics of genetic counselling in a society organised around reproductive scarcity. Weekly lab involves independent research projects. Taught by Dr Ottilie Marrow.",
+      "subject": "Sire Genetics",
+      "code": "SGN",
+      "level": 3,
+      "general": false,
+      "stats": [
+        "intelligence"
+      ],
+      "teacherId": "ottilie",
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 9,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 9,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Solday",
+          "startHour": 12,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-pol-101",
+      "number": "POL 101",
+      "title": "Government and the Breedhaven State",
+      "professor": "Professor Isaura Penhallow",
+      "description": "Introduction to the constitutional structure of Breedhaven: the Crown, the elected Assembly, the courts, and the conventions that have shaped government since the founding of House Dawnbloom. Covers the role of the heir's education and the relationship between custom and statute. Taught by Professor Isaura Penhallow.",
+      "subject": "Government",
+      "code": "POL",
+      "level": 1,
+      "general": false,
+      "stats": [
+        "charisma",
+        "intelligence"
+      ],
+      "studentIds": [
+        "faye",
+        "seraphine"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Windsday",
+          "startHour": 17,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 17,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-pol-201",
+      "number": "POL 201",
+      "title": "Political Theory and the Bloom",
+      "professor": "Professor Isaura Penhallow",
+      "description": "Surveys the major political traditions of the Sown Expanse, with particular attention to the Bloomist and Freewill schools and their competing claims about the relationship between the Bloom's influence and legitimate authority. Students read primary sources from both traditions and contemporary critics. Taught by Professor Isaura Penhallow.",
+      "subject": "Government",
+      "code": "POL",
+      "level": 2,
+      "general": false,
+      "stats": [
+        "charisma",
+        "intelligence"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 9,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 9,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-pol-301",
+      "number": "POL 301",
+      "title": "Comparative Governance in the Sown Expanse",
+      "professor": "Professor Isaura Penhallow",
+      "description": "Comparative study of the political systems of the Sown Expanse, examining how different states have organised government, law, and reproductive policy around the same biological and magical realities. Case studies include Breedhaven, its neighbours, and states outside the Expanse. Taught by Professor Isaura Penhallow.",
+      "subject": "Government",
+      "code": "POL",
+      "level": 3,
+      "general": false,
+      "stats": [
+        "charisma",
+        "intelligence"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 13,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-agr-101",
+      "number": "AGR 101",
+      "title": "Agricultural Systems and the Bloom",
+      "professor": "Professor Petra Lindqvar",
+      "description": "Introduction to modern agriculture in Breedhaven, covering soil science, riverine irrigation, and the role of the Bloom in crop growth and soil health. Weekly lab involves field sampling, soil Bloom measurement, and basic crop assessment at the university's experimental orchards. Taught by Professor Petra Lindqvar.",
+      "subject": "Agricultural Sciences",
+      "code": "AGR",
+      "level": 1,
+      "general": false,
+      "stats": [
+        "wisdom"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 13,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 11,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 14,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-agr-201",
+      "number": "AGR 201",
+      "title": "Crop Science and Enchantment Integration",
+      "professor": "Professor Petra Lindqvar",
+      "description": "Intermediate study of crop management in a Bloom-saturated environment, including the use of wards against blight, growth enchantments in orchard systems, and the interaction between conventional fertilisation and Bloom-mediated nutrient cycling. Weekly lab involves enchantment trials and yield analysis. Taught by Professor Petra Lindqvar.",
+      "subject": "Agricultural Sciences",
+      "code": "AGR",
+      "level": 2,
+      "general": false,
+      "stats": [
+        "wisdom"
+      ],
+      "studentIds": [
+        "tamsin"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 15,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-agr-301",
+      "number": "AGR 301",
+      "title": "Advanced Agriculture and Land Stewardship",
+      "professor": "Professor Petra Lindqvar",
+      "description": "Advanced study of agricultural management at scale, including river-system governance, orchard economics, and the long-term sustainability of Bloom-intensive farming in Breedhaven's lowland ecology. Weekly lab involves independent research and a field project with a working orchard. Taught by Professor Petra Lindqvar.",
+      "subject": "Agricultural Sciences",
+      "code": "AGR",
+      "level": 3,
+      "general": false,
+      "stats": [
+        "wisdom"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 10,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-men-101",
+      "number": "MEN 101",
+      "title": "Introduction to Magical Engineering",
+      "professor": "Dr Benedek Hale",
+      "description": "Foundations of engineering with the Bloom, covering the principles by which enchantments are structured into materials, circuits, and devices, and the safety standards that govern magical engineering in Breedhaven. Weekly lab in the Foundry introduces basic enchantment construction, measurement, and calibration. Taught by Dr Benedek Hale.",
+      "subject": "Magical Engineering",
+      "code": "MEN",
+      "level": 1,
+      "general": false,
+      "stats": [
+        "intelligence",
+        "dexterity"
+      ],
+      "studentIds": [
+        "tink"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 13,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 10,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Solday",
+          "startHour": 10,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-men-201",
+      "number": "MEN 201",
+      "title": "Enchantment Circuits and Resonance",
+      "professor": "Dr Benedek Hale",
+      "description": "Introduction to the design and fabrication of embedded enchantment systems in everyday devices. Weekly laboratory covers inscription techniques, resonance tuning, and safe handling of charged components. Prerequisite: MEN 101 or permission of instructor.",
+      "subject": "Magical Engineering",
+      "code": "MEN",
+      "level": 2,
+      "general": false,
+      "stats": [
+        "intelligence",
+        "dexterity"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 14,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 14,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 13,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-men-301",
+      "number": "MEN 301",
+      "title": "Ward Architecture and Power Systems",
+      "professor": "Dr Benedek Hale",
+      "description": "Advanced theory of structural wards, grid-scale enchantment distribution, and the integration of Bloom-derived power with mechanical and electrical systems. Weekly laboratory involves design, testing, and failure analysis of ward networks under load. Prerequisite: MEN 201.",
+      "subject": "Magical Engineering",
+      "code": "MEN",
+      "level": 3,
+      "general": false,
+      "stats": [
+        "intelligence",
+        "dexterity"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 11,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 11,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 11,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-law-101",
+      "number": "LAW 101",
+      "title": "Foundations of Breedhaven Law",
+      "professor": "Dr Sunniva Crane",
+      "description": "Survey of the Breedhaven legal system: constitutional structure under House Dawnbloom, the Assembly, courts, and the hierarchy of statute and custom. Introduces legal reasoning, case analysis, and the basics of civil and criminal procedure.",
+      "subject": "Law",
+      "code": "LAW",
+      "level": 1,
+      "general": false,
+      "stats": [
+        "charisma",
+        "intelligence"
+      ],
+      "studentIds": [
+        "maren",
+        "yelena"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Tidesday",
+          "startHour": 11,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 11,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-law-201",
+      "number": "LAW 201",
+      "title": "Reproductive and Sire Law",
+      "professor": "Dr Sunniva Crane",
+      "description": "The law of paternity, inheritance, reproductive contracts, and the protections surrounding True Sires. Covers the Sire Registry, consent and coercion statutes, and the reproductive courts. Case method throughout.",
+      "subject": "Law",
+      "code": "LAW",
+      "level": 2,
+      "general": false,
+      "stats": [
+        "charisma",
+        "intelligence"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Windsday",
+          "startHour": 17,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 17,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-law-301",
+      "number": "LAW 301",
+      "title": "Constitutional Law and the Crown",
+      "professor": "Dr Sunniva Crane",
+      "description": "The constitution of Breedhaven, the powers and limits of the monarchy, the prerogatives of the Assembly, and the legal position of the heir. Examines the custom of royal education, succession, and the relationship between custom and statute. Prerequisite: LAW 101.",
+      "subject": "Law",
+      "code": "LAW",
+      "level": 3,
+      "general": false,
+      "stats": [
+        "charisma",
+        "intelligence"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-wst-101",
+      "number": "WST 101",
+      "title": "Women, Magic, and Society",
+      "professor": "Dr Ferelith Moor",
+      "description": "Introduction to the study of women's lives under the Bloom: magic, generativity, labor, and power. Covers the Bloomist and Freewill traditions, the history of damper use, and the social organization of reproduction.",
+      "subject": "Women's Studies",
+      "code": "WST",
+      "level": 1,
+      "general": false,
+      "stats": [
+        "charisma",
+        "wisdom"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-wst-201",
+      "number": "WST 201",
+      "title": "The Bloom and the Self",
+      "professor": "Dr Ferelith Moor",
+      "description": "Examines the lived experience of the Bloom's pull: instinct, identity, and the question of choice. Topics include damper culture, maternal and non-maternal generativity, and feminist critiques of Bloom determinism. Prerequisite: WST 101 or permission of instructor.",
+      "subject": "Women's Studies",
+      "code": "WST",
+      "level": 2,
+      "general": false,
+      "stats": [
+        "charisma",
+        "wisdom"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 9,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 14,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-wst-401",
+      "number": "WST 401",
+      "title": "Advanced Seminar: Freewill and Bloomism",
+      "professor": "Dr Ferelith Moor",
+      "description": "Capstone seminar on the central debate of women's studies: whether the Bloom's wants are a woman's own. Students engage primary philosophical and political texts, produce a substantial research paper, and present to the colloquium. Prerequisite: WST 201 and one additional WST course.",
+      "subject": "Women's Studies",
+      "code": "WST",
+      "level": 4,
+      "general": false,
+      "stats": [
+        "charisma",
+        "wisdom"
+      ],
+      "studentIds": [
+        "morwenna"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Windsday",
+          "startHour": 13,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 13,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-his-101",
+      "number": "HIS 101",
+      "title": "The Bloom in History",
+      "professor": "Dr Senna Ashpaw",
+      "description": "A general-education survey of the Primordial Bloom as a historical force, from oral traditions and early natural philosophy to its role in the founding of the Sown Expanse's modern states. No prerequisites.",
+      "subject": "History of the Bloom",
+      "code": "HIS",
+      "level": 1,
+      "general": true,
+      "stats": [
+        "wisdom"
+      ],
+      "studentIds": [
+        "anwen",
+        "lira"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Tidesday",
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 11,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-bps-101",
+      "number": "BPS 101",
+      "title": "Psychology of the Bloom",
+      "professor": "Professor Orlena Vey",
+      "description": "Introduction to the psychological dimensions of the Bloom in women: the generative drive, its developmental trajectory, its intensification in pregnancy, and its absence after menopause. Covers damper effects and the psychology of True Sire proximity. No prerequisites.",
+      "subject": "Bloom Psychology",
+      "code": "BPS",
+      "level": 1,
+      "general": true,
+      "stats": [
+        "wisdom",
+        "charisma"
+      ],
+      "studentIds": [
+        "seraphine",
+        "tink"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-rbi-101",
+      "number": "RBI 101",
+      "title": "Reproductive Biology of the Sown Expanse",
+      "professor": "Dr Winnow Sedge",
+      "description": "The biology of the seven-to-one sex ratio, True Sire fertility, and the mechanisms by which pregnancy amplifies a woman's magic. Weekly laboratory introduces assay techniques, basic histology, and statistical analysis of fertility data. No prerequisites.",
+      "subject": "Reproductive Biology",
+      "code": "RBI",
+      "level": 1,
+      "general": true,
+      "stats": [
+        "intelligence",
+        "wisdom"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 9,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 9,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 12,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-pth-101",
+      "number": "PTH 101",
+      "title": "Prenatal Thaumaturgy",
+      "professor": "Professor Dagna Tor-Kesh",
+      "description": "Survey of the magical changes of pregnancy and their practical applications and risks. Weekly laboratory covers measurement of gestational thaumic output, prenatal warding, and safety protocols for pregnant practitioners. No prerequisites.",
+      "subject": "Prenatal Thaumaturgy",
+      "code": "PTH",
+      "level": 1,
+      "general": true,
+      "stats": [
+        "intelligence",
+        "wisdom"
+      ],
+      "studentIds": [
+        "morwenna"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 17,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 17,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Solday",
+          "startHour": 13,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-hhs-101",
+      "number": "HHS 101",
+      "title": "Household Enchantment and Management",
+      "professor": "Dr Ysolde Marrin",
+      "description": "Practical and theoretical introduction to the enchanted household: built-in wards, preservation charms, heating and lighting systems, garden magic, and the domestic economy of a magitech home. No prerequisites.",
+      "subject": "Household Studies",
+      "code": "HHS",
+      "level": 1,
+      "general": true,
+      "stats": [
+        "charisma",
+        "wisdom"
+      ],
+      "studentIds": [
+        "anwen"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 12,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 12,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-mth-101",
+      "number": "MTH 101",
+      "title": "Calculus and Statistics",
+      "professor": "Professor Aldous Thorne",
+      "description": "Differential and integral calculus with an introduction to probability and statistics, emphasizing applications in magical engineering, thaumic measurement, and biological assay. No prerequisites.",
+      "subject": "Calculus and Statistics",
+      "code": "MTH",
+      "level": 1,
+      "general": true,
+      "stats": [
+        "intelligence"
+      ],
+      "studentIds": [
+        "elowen",
+        "faye",
+        "tamsin"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 13,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 13,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-csc-101",
+      "number": "CSC 101",
+      "title": "Introduction to Computing",
+      "professor": "Professor Alba Quillon",
+      "description": "Fundamentals of programming, data structures, and algorithms, with applications to enchantment modeling, ward simulation, and Registry database systems. Weekly laboratory covers hands-on coding and debugging. No prerequisites.",
+      "subject": "Computer Science",
+      "code": "CSC",
+      "level": 1,
+      "general": true,
+      "stats": [
+        "intelligence"
+      ],
+      "studentIds": [
+        "daphne",
+        "dinah"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Windsday",
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Solday",
+          "startHour": 13,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-rhe-101",
+      "number": "RHE 101",
+      "title": "Rhetoric and Debate",
+      "professor": "Professor Thessaly Rook",
+      "description": "Principles of argumentation, persuasion, and public speaking. Students analyze and construct arguments on topics of public controversy, including Bloom policy, Sire regulation, and royal prerogative. No prerequisites.",
+      "subject": "Rhetoric and Debate",
+      "code": "RHE",
+      "level": 1,
+      "general": true,
+      "stats": [
+        "charisma"
+      ],
+      "studentIds": [
+        "elowen",
+        "isolde",
+        "tamsin"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 17,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 17,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-geo-101",
+      "number": "GEO 101",
+      "title": "Peoples and Politics of the Sown Expanse",
+      "professor": "Professor Sabel Thorn",
+      "description": "Comparative survey of the nations and peoples of the Sown Expanse: their governments, economies, magical traditions, and relations with Breedhaven. Covers the regions beyond the Expanse and the status of migrants and outsiders. No prerequisites.",
+      "subject": "Peoples and Politics of the Sown Expanse",
+      "code": "GEO",
+      "level": 1,
+      "general": true,
+      "stats": [
+        "intelligence"
+      ],
+      "studentIds": [
+        "anwen",
+        "dinah",
+        "tink",
+        "morwenna"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-art-101",
+      "number": "ART 101",
+      "title": "Studio Art Foundations",
+      "professor": "Professor Hesper Lark",
+      "description": "Introduction to drawing, painting, and sculptural practice, with attention to the use of Bloom-infused pigments and materials. Weekly laboratory provides guided studio time and critique. No prerequisites.",
+      "subject": "Studio Art",
+      "code": "ART",
+      "level": 1,
+      "general": true,
+      "stats": [
+        "dexterity",
+        "wisdom"
+      ],
+      "studentIds": [
+        "yelena",
+        "morwenna"
+      ],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 14,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 14,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 13,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-mus-101",
+      "number": "MUS 101",
+      "title": "Music Theory and Practice",
+      "professor": "Dr Odalys Brine",
+      "description": "Foundations of melody, harmony, rhythm, and form, with an introduction to resonant and thaumically enhanced instruments. Weekly laboratory includes ensemble performance and ear training. No prerequisites.",
+      "subject": "Music",
+      "code": "MUS",
+      "level": 1,
+      "general": true,
+      "stats": [
+        "charisma"
+      ],
+      "studentIds": [],
+      "locationId": "lecture-halls",
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 11,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 11,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 8,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    }
+  ]
+}

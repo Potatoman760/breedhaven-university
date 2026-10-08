@@ -19,7 +19,7 @@ import { parseDirectives } from './scene'
 import { createInitialState } from './state'
 import { fixture } from './testFixture'
 
-// A 20-hour day. Pregnancies last 10 days here, and show from the third; Bea's last 2.
+// A 20-hour day. Pregnancies last 10 days here, and show from the third.
 const base = fixture()
 const [ana] = base.loveInterests
 const content: ContentPack = {
@@ -29,7 +29,7 @@ const content: ContentPack = {
       ...ana,
       outfits: [...ana.outfits, { id: 'round', name: 'Round', description: 'visibly pregnant', sprites: {}, pregnant: true }]
     },
-    { ...ana, id: 'bea', name: 'Bea Stone', pregnancyDays: 2 }
+    { ...ana, id: 'bea', name: 'Bea Stone' }
   ],
   pregnancy: PregnancyConfigSchema.parse({
     chance: 0.5,
@@ -61,9 +61,9 @@ describe('conception', () => {
     expect(Array.from({ length: 30 }, (_, day) => conceive(content, at(state, day), 'ana')).some((s) => s.pregnancies['ana'])).toBe(true)
   })
 
-  it('sets the day the child is due, by her own length when she has one', () => {
+  it('sets the day the child is due, the same length for everyone', () => {
     expect(pregnant.pregnancies['ana']).toEqual({ conceivedAt: 0, dueAt: 200 })
-    expect(conceive(certain, { ...start, time: 7 }, 'bea').pregnancies['bea']).toEqual({ conceivedAt: 7, dueAt: 47 })
+    expect(conceive(certain, { ...start, time: 7 }, 'bea').pregnancies['bea']).toEqual({ conceivedAt: 7, dueAt: 207 })
     expect(daysUntilDue(content, at(pregnant, 4), 'ana')).toBe(6)
   })
 
@@ -114,7 +114,7 @@ describe('carrying', () => {
     )
     // Someone with no pregnant outfit keeps what she has.
     const bea = conceive(certain, start, 'bea')
-    expect(wornOutfit(content, { ...bea, time: 30 }, content.loveInterests[1])?.id).toBe('default')
+    expect(wornOutfit(content, { ...bea, time: 150 }, content.loveInterests[1])?.id).toBe('default')
   })
 
   it('is told to her, and to the others once anyone could see it', () => {

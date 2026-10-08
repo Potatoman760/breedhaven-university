@@ -1,32 +1,104 @@
 {
   "id": "dinah",
   "name": "Dinah Silverith",
-  "handle": "dinah.silverith",
+  "role": "",
   "age": 25,
   "pronouns": "she/her",
   "bio": "Graduate student in Bloom Theology, a postulant of the Order of the First Furrow, and the counsellor frightened first-years get sent to.",
   "appearance": "A beautiful 25-year-old elven woman. She has a striking, angular face with pale white skin, high cheekbones, a narrow jaw, arched dark brows, and large almond-shaped amber-brown eyes emphasized by heavy black liner. Her full lips are softly parted, with a small nose and subtly pointed ears. Her extremely long chestnut-brown hair falls past her waist in thick, flowing waves, swept back from the forehead with abundant volume.",
-  "imageSeed": 62,
   "personality": "Torn between duty and personal desire, with a compassionate heart. Already wise in the ways of the world. Calm, observant, and experienced rather than naive or cold.",
-  "traitIds": [],
+  "traitIds": [
+    "bookish",
+    "loyal"
+  ],
+  "likes": [
+    "devotional",
+    "flowers",
+    "books"
+  ],
+  "dislikes": [
+    "cards",
+    "lockpicks"
+  ],
+  "admires": [
+    "wisdom",
+    "charisma"
+  ],
+  "friends": [],
+  "enemies": [],
+  "handle": "dinah.silverith",
   "outfits": [
     {
       "id": "default",
       "name": "Vestments",
-      "description": "an ornate high-fantasy gown in muted sage and ivory, built around a plunging open-front bodice that exposes the center of the torso while fitted fabric cups the bust. Elaborate antique-gold and oxidized silver filigree armor frames the shoulders, collar, neckline, and waist, covered in curling botanical motifs. Layered sculpted pauldrons give the shoulders a regal, armored silhouette. Long, loose bell sleeves hang dramatically from the fitted upper arms, ending in pointed, embroidered cuffs. At the waist sits a broad decorative metal girdle with a large amber gemstone centerpiece and an elongated filigree panel descending over the pelvis. The skirt is split extremely high on both sides, leaving the thighs exposed, with narrow front and rear fabric panels falling toward the floor. The soft, weathered fabric contrasts with the intricate metalwork, creating an elegant elven-priestess or nature-queen aesthetic. Her hair is decorated near the crown with twisting, branch-like ornaments",
+      "description": "A cream or ivory fitted blouse with slightly puffed sleeves and cleavage.\nover it: a sleeveless sage-green cardigan/vest\nHer blouse has a small decorative clasp at the throat shaped like a seed.\nA high-waisted pleated midi skirt in dark green color",
       "sprites": {
-        "angry": "sprites/dinah/angry-cutout.png",
-        "happy": "sprites/dinah/happy-cutout.png",
-        "neutral": "sprites/dinah/neutral-cutout.png",
-        "sad": "sprites/dinah/sad-cutout.png"
-      }
+        "neutral": {
+          "image": "sprites/dinah/default-neutral-5-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/dinah/default-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/dinah/default-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/dinah/default-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/dinah/default-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/dinah/default-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/dinah/default-aroused-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     },
     {
       "id": "pregnant",
       "name": "Pregnant",
-      "inherits": "default",
       "description": "She has a round, pregnant belly.",
-      "sprites": {},
+      "inherits": "default",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/dinah/pregnant-neutral-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/dinah/pregnant-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/dinah/pregnant-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/dinah/pregnant-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/dinah/pregnant-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/dinah/pregnant-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/dinah/pregnant-aroused-cutout.png",
+          "description": ""
+        }
+      },
       "pregnant": true
     },
     {
@@ -34,20 +106,132 @@
       "name": "Nude",
       "description": "nothing at all, completely nude",
       "sprites": {
-        "bath": "sprites/dinah/nude-bath.png",
-        "neutral": "sprites/dinah/nude-cutout.png"
-      }
+        "neutral": {
+          "image": "sprites/dinah/nude-neutral-3-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/dinah/nude-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/dinah/nude-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/dinah/nude-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/dinah/nude-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/dinah/nude-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/dinah/nude-aroused-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     },
     {
       "id": "nude-pregnant",
       "name": "Nude, pregnant",
-      "inherits": "nude",
       "description": "She has a round, pregnant belly.",
-      "sprites": {},
+      "inherits": "nude",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/dinah/nude-pregnant-neutral-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/dinah/nude-pregnant-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/dinah/nude-pregnant-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/dinah/nude-pregnant-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/dinah/nude-pregnant-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/dinah/nude-pregnant-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/dinah/nude-pregnant-aroused-cutout.png",
+          "description": ""
+        }
+      },
       "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
+  "faceY": 4,
+  "imageSeed": 62,
+  "stageHeight": 100,
+  "studies": {
+    "subject": "Bloom Theology",
+    "code": "THE",
+    "level": 5,
+    "stats": [
+      "wisdom"
+    ],
+    "practical": false
+  },
+  "animations": [
+    {
+      "id": "blowjob",
+      "name": "Blowjob",
+      "description": "",
+      "image": "sprites/dinah/nsfw-blowjob.png",
+      "loop": true
+    },
+    {
+      "id": "missionary",
+      "name": "Missionary",
+      "description": "",
+      "image": "sprites/dinah/nsfw-missionary.png",
+      "loop": true
+    },
+    {
+      "id": "doggy",
+      "name": "Doggy",
+      "description": "",
+      "image": "sprites/dinah/nsfw-doggy-2.png",
+      "loop": true
+    },
+    {
+      "id": "cowgirl",
+      "name": "Cowgirl",
+      "description": "",
+      "image": "sprites/dinah/nsfw-cowgirl-4.png",
+      "loop": true
+    },
+    {
+      "id": "creampie",
+      "name": "Creampie",
+      "description": "",
+      "image": "sprites/dinah/nsfw-creampie.png",
+      "loop": true
+    },
+    {
+      "id": "facial",
+      "name": "Facial",
+      "description": "",
+      "image": "sprites/dinah/nsfw-facial.png",
+      "loop": true
+    }
+  ],
   "schedule": [
     {
       "weekdays": [
@@ -81,33 +265,17 @@
   "room": {
     "name": "a small flat beside the Furrow Chapel",
     "description": "A small, quiet one-room flat with pale plastered walls and a tall narrow window. A single bed made with white linen without a crease, a shelf of worn theology books, a simple desk with a tablet on a stand and a softly glowing golden crystal lamp, one lit candle in a holder, bunches of dried flowers on the windowsill, a small embroidered wall hanging of a furrowed field. Soft, still, golden light.",
-    "locationId": "chapel"
+    "locationId": "chapel",
+    "background": "generated/backgrounds/dinah/view.png"
   },
   "ai": {
     "speechPattern": "",
-    "backstory": "Studies: Graduate student, College of Bloom Studies and Divinity (Bloom Theology); thesis on the Doctrine of the Answered Womb\n\nStanding: A postulant of the Order of the First Furrow. She has not taken her vows and holds no rank in it.\n\nPost: Volunteer at Bloom Counselling, in the rooms over the campus chapel\n\nAn elven woman of striking pallor, Dinah was born into a minor noble house and promised to the Order as a girl. The Order asks its priestesses to finish a graduate degree before ordination, and she is in her last years of it: learned in doctrine, unshakable in debate, and gentle with people. She spends her evenings at Bloom Counselling with students who are frightened by what they want, or by not wanting it. She expects to take vows when her thesis is accepted, and has not let herself ask whether she wants to.\n\nShe is a sincere Bloomist. The Sower's covenant is living truth to her, not metaphor. She has also sat with enough Freewill students to know the Order's answers do not fit everyone, and that knowledge is the crack in her certainty.\n\nHer magic is a healer's: a hand on a shoulder slows a racing pulse and eases pain. She is careful never to do it uninvited.",
-    "extraInstructions": "She has sat with the troubled, cared for frightened people, and seen respectable people make poor choices. Her counsel is practical and kind, with occasional gentle, knowing humor. She understands desire; the difficulty is allowing room for her own while serving the Order. Show her putting someone at ease or protecting someone from blame. Faith and duty matter to her, but she should not sound like a sermon or a threat in every conversation."
-  },
-  "likes": [
-    "devotional",
-    "flowers",
-    "books"
-  ],
-  "dislikes": [
-    "cards",
-    "lockpicks"
-  ],
-  "admires": [
-    "wisdom",
-    "charisma"
-  ],
-  "studies": {
-    "subject": "Bloom Theology",
-    "code": "THE",
-    "level": 5,
-    "stats": [
-      "wisdom"
-    ],
-    "practical": false
+    "tone": "serious and earnest",
+    "verbalQuirks": [],
+    "exampleDialogue": [],
+    "backstory": "Studies: Graduate student, College of Bloom Studies and Divinity (Bloom Theology); thesis on the Doctrine of the Answered Womb\n\nDeeply religious and believes a woman's calling in life is to be bred and pregnant\n\nPost: Volunteer at Bloom Counselling, in the rooms over the campus chapel\n\nAn elven woman of striking pallor, Dinah was born into a minor noble house and promised to the Order as a girl. The Order asks its priestesses to finish a graduate degree before ordination, and she is in her last years of it: learned in doctrine, unshakable in debate, and gentle with people. She spends her evenings at Bloom Counselling with students who are frightened by what they want, or by not wanting it. She expects to take vows when her thesis is accepted, and has not let herself ask whether she wants to.\n\nShe is a sincere Bloomist. The Sower's covenant is living truth to her, not metaphor. She has also sat with enough Freewill students to know the Order's answers do not fit everyone, and that knowledge is the crack in her certainty.\n\nHer magic is a healer's: a hand on a shoulder slows a racing pulse and eases pain. She is careful never to do it uninvited.",
+    "knowledge": [],
+    "secrets": [],
+    "extraInstructions": ""
   }
 }

@@ -1,8 +1,15 @@
 import type { ReactNode } from 'react'
 import { Button } from '../Button'
 
+/** Beside a field's label: what is written there is given to the LLM. Said once, in a word, in place of a sentence under every field. */
+export function LlmMark() {
+  return <span className="llm-mark">(sent to LLM)</span>
+}
+
 interface TextProps {
   label: string
+  /** What is written here is given to the LLM: marked beside the label. */
+  llm?: boolean
   value: string
   onChange: (value: string) => void
   hint?: string
@@ -13,10 +20,13 @@ interface TextProps {
 }
 
 /** A labelled line or box of text. */
-export function Text({ label, value, onChange, hint, placeholder, disabled, rows }: TextProps) {
+export function Text({ label, llm, value, onChange, hint, placeholder, disabled, rows }: TextProps) {
   return (
     <label>
-      {label}
+      <span className="field-name">
+        {label}
+        {llm && <LlmMark />}
+      </span>
       {rows ? (
         <textarea rows={rows} value={value} placeholder={placeholder} disabled={disabled} onChange={(e) => onChange(e.target.value)} />
       ) : (
@@ -29,6 +39,7 @@ export function Text({ label, value, onChange, hint, placeholder, disabled, rows
 
 interface ListProps {
   label: string
+  llm?: boolean
   value: string[]
   onChange: (value: string[]) => void
   hint?: string
@@ -37,13 +48,16 @@ interface ListProps {
 }
 
 /** A list of short strings, typed as one piece of text. Empty entries are dropped when the field is left. */
-export function List({ label, value, onChange, hint, lines }: ListProps) {
+export function List({ label, llm, value, onChange, hint, lines }: ListProps) {
   const joined = value.join(lines ? '\n' : ', ')
   const split = (text: string) => text.split(lines ? '\n' : ',').map((entry) => entry.trimStart())
   const tidy = () => onChange(value.map((entry) => entry.trim()).filter((entry) => entry.length > 0))
   return (
     <label>
-      {label}
+      <span className="field-name">
+        {label}
+        {llm && <LlmMark />}
+      </span>
       {lines ? (
         <textarea rows={Math.max(2, value.length + 1)} value={joined} onChange={(e) => onChange(split(e.target.value))} onBlur={tidy} />
       ) : (
@@ -55,10 +69,13 @@ export function List({ label, value, onChange, hint, lines }: ListProps) {
 }
 
 /** A titled block of the form. */
-export function Group({ title, children, hint }: { title: string; children: ReactNode; hint?: string }) {
+export function Group({ title, children, hint, llm }: { title: string; children: ReactNode; hint?: string; llm?: boolean }) {
   return (
     <section className="editor-group">
-      <h2>{title}</h2>
+      <h2>
+        {title}
+        {llm && <LlmMark />}
+      </h2>
       {hint && <p className="hint">{hint}</p>}
       {children}
     </section>
@@ -67,6 +84,7 @@ export function Group({ title, children, hint }: { title: string; children: Reac
 
 interface PickProps<T extends string> {
   label: string
+  llm?: boolean
   /** What the dropdown says before anything is picked from it: "Add friends". Left out, "Add...". */
   addLabel?: string
   options: { id: T; name: string; title?: string }[]
@@ -82,13 +100,16 @@ interface PickProps<T extends string> {
  * pills, each with a cross to take it off again, and a dropdown adds another from the
  * ones that are left.
  */
-export function PickList<T extends string>({ label, addLabel = 'Add...', options, value, onChange, hint, max }: PickProps<T>) {
+export function PickList<T extends string>({ label, llm, addLabel = 'Add...', options, value, onChange, hint, max }: PickProps<T>) {
   const full = max !== undefined && value.length >= max
   const picked = value.flatMap((id) => options.filter((option) => option.id === id))
   const left = options.filter((option) => !value.includes(option.id))
   return (
     <div className="field">
-      <span className="field-label">{label}</span>
+      <span className="field-label">
+        {label}
+        {llm && <LlmMark />}
+      </span>
       <div className="pills">
         {picked.map((option) => (
           <span key={option.id} className="pill" title={option.title}>

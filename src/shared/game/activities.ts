@@ -79,7 +79,7 @@ export function describeEffects(activity: Activity): string[] {
       case 'stat':
         return [`${signed(e.amount)} ${e.stat}`]
       case 'money':
-        return [`${signed(e.amount)} coin`]
+        return [`${e.amount < 0 ? '−' : '+'}$${Math.abs(e.amount)}`]
       case 'energy':
         return [`${signed(e.amount)} energy`]
       case 'meter':

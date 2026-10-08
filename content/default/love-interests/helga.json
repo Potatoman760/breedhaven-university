@@ -14,12 +14,18 @@
       "name": "Working clothes",
       "description": "a brown sleeveless bodice buttoned down the front, over a pale blue shirt with the sleeves rolled above the elbow; a long brown skirt; a long grey-white apron tied at the waist; and a small leather pouch at her hip",
       "sprites": {
-        "neutral": "sprites/helga/neutral-cutout.png"
-      }
+        "neutral": {
+          "image": "sprites/helga/default-neutral-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     }
   ],
   "defaultOutfitId": "default",
   "faceY": 12,
+  "stageHeight": 100,
+  "animations": [],
   "schedule": [],
   "ai": {
     "speechPattern": "Short, plain sentences. Dry. Calls students \"lad\" or \"girl\" whatever their rank. Never hurries and never flatters.",
@@ -39,6 +45,6 @@
       "Seven Petals on the corner of Lantern Row never closes, and Petal & Pill next to it is cheaper than it looks with a student card.",
       "That she takes on a student to sit the front desk of the Halls in the evenings, and what she expects of them."
     ],
-    "extraInstructions": "Helga is fond of Kael in the way she is fond of any student who says thank you. She gives advice freely, gossip sparingly, and lets him know when he is being a fool."
+    "extraInstructions": "Helga is fond of {player} in the way she is fond of any student who says thank you. She gives advice freely, gossip sparingly, and lets him know when he is being a fool."
   }
 }

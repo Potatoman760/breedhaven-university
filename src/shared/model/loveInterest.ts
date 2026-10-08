@@ -1,34 +1,64 @@
-import { z } from 'zod'
-import { ConditionSchema } from './condition'
-import { StudiesSchema, TeachingSchema } from './course'
-import { StatSchema } from './stats'
+import { z } from "zod";
+import { ConditionSchema } from "./condition";
+import { StudiesSchema, TeachingSchema } from "./course";
+import { StatSchema } from "./stats";
 
 /**
  * One picture of the character. Written in content either as just the image path, or as
  * an object that also describes it so the LLM can tell when it fits.
  */
 export const SpriteSchema = z
-  .union([z.string(), z.object({ image: z.string(), description: z.string().default('') })])
-  .transform((sprite) => (typeof sprite === 'string' ? { image: sprite, description: '' } : sprite))
-export type Sprite = z.infer<typeof SpriteSchema>
+  .union([
+    z.string(),
+    z.object({ image: z.string(), description: z.string().default("") }),
+  ])
+  .transform((sprite) =>
+    typeof sprite === "string" ? { image: sprite, description: "" } : sprite,
+  );
+export type Sprite = z.infer<typeof SpriteSchema>;
 
 /** The faces every outfit can be drawn with. In a scene the LLM picks one of these for each love interest in every reply. */
-export const EXPRESSIONS = ['neutral', 'happy', 'sad', 'angry', 'surprised', 'embarrassed', 'aroused'] as const
-export type Expression = (typeof EXPRESSIONS)[number]
+export const EXPRESSIONS = [
+  "neutral",
+  "happy",
+  "sad",
+  "angry",
+  "surprised",
+  "embarrassed",
+  "aroused",
+] as const;
+export type Expression = (typeof EXPRESSIONS)[number];
 
 /** The seed a love interest's pictures are generated with unless she is given one of her own. */
-export const DEFAULT_IMAGE_SEED = 60
+export const DEFAULT_IMAGE_SEED = 60;
 
 /**
  * The four outfits every love interest has. The pregnant two are worn once a pregnancy
  * shows, in place of the other two. A character may have more besides.
  */
 export const STANDARD_OUTFITS = [
-  { id: 'default', name: 'Usual clothes', description: '', pregnant: false },
-  { id: 'pregnant', name: 'Pregnant', inherits: 'default', description: 'She has a round, pregnant belly.', pregnant: true },
-  { id: 'nude', name: 'Nude', description: 'nothing at all, completely nude', pregnant: false },
-  { id: 'nude-pregnant', name: 'Nude, pregnant', inherits: 'nude', description: 'She has a round, pregnant belly.', pregnant: true }
-] as const
+  { id: "default", name: "Usual clothes", description: "", pregnant: false },
+  {
+    id: "pregnant",
+    name: "Pregnant",
+    inherits: "default",
+    description: "She has a round, pregnant belly.",
+    pregnant: true,
+  },
+  {
+    id: "nude",
+    name: "Nude",
+    description: "nothing at all, completely nude",
+    pregnant: false,
+  },
+  {
+    id: "nude-pregnant",
+    name: "Nude, pregnant",
+    inherits: "nude",
+    description: "She has a round, pregnant belly.",
+    pregnant: true,
+  },
+] as const;
 
 export const OutfitSchema = z.object({
   id: z.string(),
@@ -37,7 +67,7 @@ export const OutfitSchema = z.object({
    * What the character is wearing, told to the AI and to an image model. For an outfit
    * that inherits, only what it adds to the one it builds on.
    */
-  description: z.string().default(''),
+  description: z.string().default(""),
   /**
    * The id of another of her outfits whose description this one builds on. Hers is then
    * that description with this outfit's own added to it: `pregnant` is `default` plus
@@ -52,19 +82,23 @@ export const OutfitSchema = z.object({
   /** Sprites keyed by their title: one of `EXPRESSIONS`, or any other name for a picture of some other kind. */
   sprites: z.record(z.string(), SpriteSchema).default({}),
   /** Drawn pregnant. Worn once a pregnancy shows, and not before. */
-  pregnant: z.boolean().default(false)
-})
-export type Outfit = z.infer<typeof OutfitSchema>
+  pregnant: z.boolean().default(false),
+});
+export type Outfit = z.infer<typeof OutfitSchema>;
 
 /** The outfit whose pictures are shown for this one: itself, or the one it falls back on (and the one that falls back on, and so on). */
 export function picturedOutfit(outfits: Outfit[], outfit: Outfit): Outfit {
-  const seen = new Set<string>()
-  let at = outfit
-  for (let next: Outfit | undefined = outfit; next && !seen.has(next.id); next = outfits.find((o) => o.id === at.fallback)) {
-    seen.add(next.id)
-    at = next
+  const seen = new Set<string>();
+  let at = outfit;
+  for (
+    let next: Outfit | undefined = outfit;
+    next && !seen.has(next.id);
+    next = outfits.find((o) => o.id === at.fallback)
+  ) {
+    seen.add(next.id);
+    at = next;
   }
-  return at
+  return at;
 }
 
 /**
@@ -72,91 +106,196 @@ export function picturedOutfit(outfits: Outfit[], outfit: Outfit): Outfit {
  * of the one that builds on, and so on), then what it adds itself. One part for an outfit
  * that inherits nothing.
  */
-export function outfitParts(outfits: Outfit[], outfit: Outfit | undefined): string[] {
-  const parts: string[] = []
-  const seen = new Set<string>()
+export function outfitParts(
+  outfits: Outfit[],
+  outfit: Outfit | undefined,
+): string[] {
+  const parts: string[] = [];
+  const seen = new Set<string>();
   // Followed from the outfit back to where its description starts, however the content is written.
-  for (let at = outfit; at && !seen.has(at.id); at = outfits.find((o) => o.id === at?.inherits)) {
-    seen.add(at.id)
-    if (at.description.trim() !== '') parts.unshift(at.description.trim())
+  for (
+    let at = outfit;
+    at && !seen.has(at.id);
+    at = outfits.find((o) => o.id === at?.inherits)
+  ) {
+    seen.add(at.id);
+    if (at.description.trim() !== "") parts.unshift(at.description.trim());
   }
-  return parts
+  return parts;
 }
 
 /** An outfit's whole description, with whatever it inherits in front of what it adds. */
-export function outfitDescription(outfits: Outfit[], outfit: Outfit | undefined): string {
+export function outfitDescription(
+  outfits: Outfit[],
+  outfit: Outfit | undefined,
+): string {
   return outfitParts(outfits, outfit)
-    .map((part, i, all) => (i < all.length - 1 && !/[.!?]$/.test(part) ? `${part}.` : part))
-    .join(' ')
+    .map((part, i, all) =>
+      i < all.length - 1 && !/[.!?]$/.test(part) ? `${part}.` : part,
+    )
+    .join(" ");
 }
 
 /**
- * A video that takes the place of the character's sprite. The LLM decides when
- * to play one from its name and description.
+ * An explicit pose that takes the place of the character's sprite: a picture, and on top
+ * of it, if she has one, a clip that is played in the picture's place. The LLM decides
+ * when to show one from its name and description. In the editor these are the NSFW
+ * section, laid out as an outfit's faces are; in the content and the tags they are still
+ * called animations.
  */
 export const AnimationSchema = z.object({
   id: z.string(),
   name: z.string(),
-  /** Tells the LLM what the animation shows, so it knows when it fits. */
-  description: z.string().default(''),
-  /** Video path inside the content pack, e.g. an .mp4 file. */
-  video: z.string(),
-  /** Plays round and round until something ends it. When false it plays once, and the sprite comes back. */
-  loop: z.boolean().default(true)
-})
-export type Animation = z.infer<typeof AnimationSchema>
+  /** Tells the LLM what it shows, so it knows when it fits. */
+  description: z.string().default(""),
+  /** Path inside the content pack of the picture. A pose is a picture first. */
+  image: z.string().optional(),
+  /** Path inside the content pack of a clip (.mp4, .webm) of the same thing, played in the picture's place when she has one. */
+  clip: z.string().optional(),
+  /** For the clip: plays round and round until something ends it. When false it plays once, and the sprite comes back. A picture stays until something ends it. */
+  loop: z.boolean().default(true),
+});
+export type Animation = z.infer<typeof AnimationSchema>;
+
+/**
+ * The poses every character has a slot for in the NSFW section, as she has a slot for every
+ * face in an outfit. `description` is what the LLM is told of one whose own is left empty,
+ * and `draws` is what the picture is asked for with.
+ */
+export const NSFW_POSES = [
+  {
+    id: "blowjob",
+    name: "Blowjob",
+    description: "she takes him in her mouth",
+    draws:
+      "POV from above: she kneels in front of a man and performs oral sex on him, penis in her mouth, looking up at the camera",
+  },
+  {
+    id: "missionary",
+    name: "Missionary",
+    description: "on her back, him above her",
+    draws:
+      "POV: she lies on her back on a bed, head on a pillow, having sex in the missionary position, legs apart, looking up at the camera. a mans penis is penetrating her pussy",
+  },
+  {
+    id: "doggy",
+    name: "Doggy",
+    description: "on her hands and knees, him behind her",
+    draws:
+      "she is on her hands and knees on a bed having sex from behind, seen from the side, looking back over her shoulder. a mans penis is penetrating her pussy from behind",
+  },
+  {
+    id: "cowgirl",
+    name: "Cowgirl",
+    description: "astride him, on top",
+    draws:
+      "POV from below: she sits astride a man having sex in the cowgirl position, her hands on his chest, looking down at the camera",
+  },
+  {
+    id: "creampie",
+    name: "Creampie",
+    description: "the moment he finishes inside her",
+    draws:
+      "she lies back on a bed after sex, legs apart, lots of white semen leaking from her vagina, flushed and out of breath",
+  },
+  {
+    id: "facial",
+    name: "Facial",
+    description: "the moment he finishes on her face",
+    draws:
+      "close on her face and shoulders after sex, semen on her face, eyes half closed, lips parted",
+  },
+] as const;
+
+// The poses that are what follows the act and not the act: each is a single moment.
+const MOMENTS: readonly string[] = ["creampie", "facial"];
+
+/**
+ * Whether a pose is a moment: shown for the one reply it happens in, and never for the
+ * next as well, however the LLM asks.
+ */
+export function isMoment(poseId: string): boolean {
+  return MOMENTS.includes(poseId);
+}
+
+// The poses that show him finishing inside her: choosing one says what the [SEEDED] tag says.
+const SEEDING: readonly string[] = ["creampie"];
+
+/**
+ * Whether a pose shows the moment that can leave her with child. Asking for one counts as
+ * the [SEEDED] tag does, so that conception does not hang on the LLM remembering both.
+ */
+export function isSeeding(poseId: string): boolean {
+  return SEEDING.includes(poseId);
+}
+
+/** What a pose shows, as the LLM is told it: her own words for it, or the standard ones. */
+export function poseDescription(
+  pose: Pick<Animation, "id" | "description">,
+): string {
+  return (
+    pose.description.trim() ||
+    NSFW_POSES.find((known) => known.id === pose.id)?.description ||
+    ""
+  );
+}
 
 /** Where the character is at a given time. The first matching entry wins. */
 export const ScheduleEntrySchema = z.object({
   weekdays: z.array(z.string()).optional(),
   periods: z.array(z.string()).optional(),
-  locationId: z.string()
-})
-export type ScheduleEntry = z.infer<typeof ScheduleEntrySchema>
+  locationId: z.string(),
+});
+export type ScheduleEntry = z.infer<typeof ScheduleEntrySchema>;
 
 /** A love interest's own room: somewhere private a scene can go, with artwork of its own. */
 export const RoomSchema = z.object({
   /** What it is, in a few words: "a garret at the Honeyed Bee". */
   name: z.string(),
   /** Told to the LLM when a scene is there. */
-  description: z.string().default(''),
+  description: z.string().default(""),
   /** The location it is in. Going there from that location takes no time. */
   locationId: z.string(),
   /** Image path inside the content pack. Left out, the location's own artwork is shown. */
-  background: z.string().optional()
-})
-export type Room = z.infer<typeof RoomSchema>
+  background: z.string().optional(),
+});
+export type Room = z.infer<typeof RoomSchema>;
 
 export const SecretSchema = z.object({
   text: z.string(),
   /** Until these pass, the character keeps the secret to themselves. */
-  revealWhen: z.array(ConditionSchema).default([])
-})
-export type Secret = z.infer<typeof SecretSchema>
+  revealWhen: z.array(ConditionSchema).default([]),
+});
+export type Secret = z.infer<typeof SecretSchema>;
 
 /** Fields that exist only to steer the AI when this character speaks. */
 export const LoveInterestAiSchema = z.object({
-  speechPattern: z.string().default(''),
-  tone: z.string().default(''),
+  speechPattern: z.string().default(""),
+  tone: z.string().default(""),
   verbalQuirks: z.array(z.string()).default([]),
-  exampleDialogue: z.array(z.object({ user: z.string(), reply: z.string() })).default([]),
-  backstory: z.string().default(''),
+  exampleDialogue: z
+    .array(z.object({ user: z.string(), reply: z.string() }))
+    .default([]),
+  backstory: z.string().default(""),
   /** Things they know and will tell the player if asked: directions, gossip, how the place works. */
   knowledge: z.array(z.string()).default([]),
   secrets: z.array(SecretSchema).default([]),
-  /** How the character treats the player at each relationship stage, keyed by stage id. */
-  stageNotes: z.record(z.string(), z.string()).default({}),
-  extraInstructions: z.string().default('')
-})
-export type LoveInterestAi = z.infer<typeof LoveInterestAiSchema>
+  extraInstructions: z.string().default(""),
+});
+export type LoveInterestAi = z.infer<typeof LoveInterestAiSchema>;
 
 /**
  * What a character is. The first three are love interests; an `npc` is someone to talk to
  * and work for, with a look, a voice and a place to be found, and no relationship to build.
  * Changing an NPC's kind is all it takes to make a love interest of her.
  */
-export const LOVE_INTEREST_KINDS = ['student', 'teacher', 'outsider', 'npc'] as const
-export type LoveInterestKind = (typeof LOVE_INTEREST_KINDS)[number]
+export const LOVE_INTEREST_KINDS = [
+  "student",
+  "teacher",
+  "outsider",
+  "npc",
+] as const;
+export type LoveInterestKind = (typeof LOVE_INTEREST_KINDS)[number];
 
 /**
  * A character: a love interest, or an NPC. Both are written the same way, in the same
@@ -167,12 +306,12 @@ export const LoveInterestSchema = z.object({
   id: z.string(),
   name: z.string(),
   /** What they are, in a few words: "hall manager of the Cloister Halls". Shown beside an NPC's name. */
-  role: z.string().default(''),
+  role: z.string().default(""),
   age: z.number().int().min(18),
-  pronouns: z.string().default('she/her'),
-  bio: z.string().default(''),
-  appearance: z.string().default(''),
-  personality: z.string().default(''),
+  pronouns: z.string().default("she/her"),
+  bio: z.string().default(""),
+  appearance: z.string().default(""),
+  personality: z.string().default(""),
   traitIds: z.array(z.string()).default([]),
   likes: z.array(z.string()).default([]),
   dislikes: z.array(z.string()).default([]),
@@ -187,8 +326,10 @@ export const LoveInterestSchema = z.object({
    */
   friends: z.array(z.string()).default([]),
   enemies: z.array(z.string()).default([]),
-  birthday: z.object({ month: z.string(), day: z.number().int().min(1) }).optional(),
-  /** Their name on Chats and Bloomr, without the @. Left out, one is made from their name. */
+  birthday: z
+    .object({ month: z.string(), day: z.number().int().min(1) })
+    .optional(),
+  /** Their name on Bloomr, without the @. Left out, one is made from their name. */
   handle: z.string().optional(),
   outfits: z.array(OutfitSchema).min(1),
   defaultOutfitId: z.string(),
@@ -210,12 +351,16 @@ export const LoveInterestSchema = z.object({
   stageHeight: z.number().min(30).max(120).default(100),
   /**
    * Where things stand with the player when a game begins, for someone he already knows: an
-   * old friend. She has been met and he has her Chats from the first day. Left out, they
+   * old friend. She has been met and he has her Bloomr from the first day. Left out, they
    * are strangers.
    */
-  startsAt: z.object({ affection: z.number().min(0), trust: z.number().min(0), desire: z.number().min(0) }).optional(),
-  /** How long she carries a child, in days, when it differs from the usual. */
-  pregnancyDays: z.number().int().min(1).optional(),
+  startsAt: z
+    .object({
+      affection: z.number().min(0),
+      trust: z.number().min(0),
+      desire: z.number().min(0),
+    })
+    .optional(),
   /**
    * What they are. A student has `studies` and takes courses; a teacher has `teaching` and
    * gives them; an outsider is a love interest with nothing to do with classes; an `npc` is
@@ -230,11 +375,15 @@ export const LoveInterestSchema = z.object({
   schedule: z.array(ScheduleEntrySchema).default([]),
   /** Where she lives. A scene can move there. */
   room: RoomSchema.optional(),
-  ai: LoveInterestAiSchema.prefault({})
-})
-export type LoveInterest = z.infer<typeof LoveInterestSchema>
+  ai: LoveInterestAiSchema.prefault({}),
+});
+export type LoveInterest = z.infer<typeof LoveInterestSchema>;
 
 /** Whether a character is a student, a teacher, a love interest from outside the University, or an NPC. */
-export function kindOf(li: Pick<LoveInterest, 'kind' | 'studies' | 'teaching'>): LoveInterestKind {
-  return li.kind ?? (li.teaching ? 'teacher' : li.studies ? 'student' : 'outsider')
+export function kindOf(
+  li: Pick<LoveInterest, "kind" | "studies" | "teaching">,
+): LoveInterestKind {
+  return (
+    li.kind ?? (li.teaching ? "teacher" : li.studies ? "student" : "outsider")
+  );
 }

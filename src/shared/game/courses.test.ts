@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { CourseworkConfigSchema, type ContentPack, type Course, type CourseMeeting, type GameState } from '../model'
 import { canPerform } from './activities'
-import { attend, canAttend, canEnrol, classmates, classSoon, coursesClash, coursesInSession, describeMeetings, enrolledCourses } from './courses'
+import { attend, canAttend, canEnrol, classmates, classSoon, courseMatches, coursesClash, coursesInSession, describeMeetings, enrolledCourses } from './courses'
 import { buildCharacterPrompt } from './prompt'
-import { locationOf, loveInterestsAt } from './map'
+import { approachableAt, inClassApart, locationOf, loveInterestsAt } from './map'
 import { createInitialState } from './state'
 import { fixture } from './testFixture'
 
@@ -151,12 +151,59 @@ describe('attending', () => {
 })
 
 describe('classmates', () => {
-  it('seats the player with the love interests they are closest to, three at most', () => {
-    const state = createInitialState(fixture())
-    const rel = (affection: number) => ({ affection, trust: 0, desire: 0 })
-    const known = { ...state, relationships: { a: rel(1), b: rel(9), c: rel(5), d: rel(7) } }
-    expect(classmates(known, { studentIds: ['a', 'b', 'c', 'd', 'stranger'] } as Course)).toEqual(['b', 'd', 'c'])
+  const state = createInitialState(fixture())
+  const rel = (affection: number) => ({ affection, trust: 0, desire: 0 })
+  // Draws that run through every choice in turn, so each outcome is seen.
+  const cycling = (n: number) => () => (n++ % 10) / 10
+
+  it('is everyone when no more than two love interests are in the class', () => {
+    const known = { ...state, relationships: { a: rel(1), b: rel(9) } }
+    expect(classmates(known, { studentIds: ['a', 'b', 'stranger'] } as Course)).toEqual(['b', 'a'])
+    expect(classmates(known, { studentIds: ['a'], teacherId: 'b' } as Course)).toEqual(['b', 'a'])
     expect(classmates(known, { studentIds: [] } as unknown as Course)).toEqual([])
+  })
+
+  it('seats him by the one who likes him most and one other at random when there are more', () => {
+    const known = { ...state, relationships: { a: rel(1), b: rel(9), c: rel(5), d: rel(7) } }
+    const course = { studentIds: ['a', 'b', 'c', 'd'] } as Course
+    const seconds = new Set<string>()
+    for (let n = 0; n < 20; n++) {
+      const seated = classmates(known, course, cycling(n))
+      expect(seated).toHaveLength(2)
+      expect(seated[0]).toBe('b')
+      expect(seated[1]).not.toBe('b')
+      seconds.add(seated[1])
+    }
+    expect([...seconds].sort()).toEqual(['a', 'c', 'd'])
+    // The same sitting of the same game seats the same two.
+    expect(classmates(known, course)).toEqual(classmates(known, course))
+  })
+
+  it('always has a love interest who teaches the class, in front of whoever he sits by', () => {
+    const known = { ...state, relationships: { a: rel(1), b: rel(9), c: rel(5), t: rel(0) } }
+    const course = { studentIds: ['a', 'b', 'c'], teacherId: 't' } as Course
+    for (let n = 0; n < 20; n++) {
+      const there = classmates(known, course, cycling(n))
+      // She leads, however little she thinks of him, and two of the three students sit by him.
+      expect(there).toHaveLength(3)
+      expect(there[0]).toBe('t')
+      expect(there[1]).toBe('b')
+      expect(['a', 'c']).toContain(there[2])
+    }
+    expect(classmates(known, { studentIds: [], teacherId: 't' } as unknown as Course)).toEqual(['t'])
+    // A professor who is nobody he can know is not in the scene.
+    expect(classmates(known, { studentIds: ['a'], teacherId: 'stranger' } as Course)).toEqual(['a'])
+  })
+
+  it('seats him by two at random when they all like him the same', () => {
+    const known = { ...state, relationships: { a: rel(4), b: rel(4), c: rel(4) } }
+    const firsts = new Set<string>()
+    for (let n = 0; n < 20; n++) {
+      const seated = classmates(known, { studentIds: ['a', 'b', 'c'] } as Course, cycling(n))
+      expect(new Set(seated).size).toBe(2)
+      firsts.add(seated[0])
+    }
+    expect([...firsts].sort()).toEqual(['a', 'b', 'c'])
   })
 })
 
@@ -188,5 +235,53 @@ describe('a class she will have to leave for', () => {
     expect(classSoon(content, { ...start(), time: 1 }, 'ana', 2)).toBeUndefined()
     const prompt = buildCharacterPrompt({ content, state: { ...start(), time: 1 }, loveInterestId: 'bea', sceneBeats: [{ activityName: 'Tea' }], look: {} })
     expect(prompt).toContain('You have POL 101 at 08:00, within the hour, and will have to go to it')
+  })
+})
+
+describe('searching the catalogue', () => {
+  it('finds a course by its code, its words, or someone in it, whatever the case', () => {
+    const bea = content.loveInterests[1].name
+    expect(courseMatches(content, pol, 'pol')).toBe(true)
+    expect(courseMatches(content, pol, 'POL 101')).toBe(true)
+    expect(courseMatches(content, his, 'pol')).toBe(false)
+    expect(courseMatches(content, pol, bea.toUpperCase())).toBe(true)
+    expect(courseMatches(content, his, bea)).toBe(false)
+    expect(courseMatches(content, his, 'reed his')).toBe(true)
+    expect(courseMatches(content, { ...his, teacherId: 'bea' }, bea)).toBe(true)
+    expect(courseMatches(content, pol, '   ')).toBe(false)
+  })
+})
+
+describe('someone in a class he does not take', () => {
+  it('is at the place but not to be gone up to, unless he takes it with her or she is waiting for him', () => {
+    const bea = content.loveInterests[1]
+    // POL 101 is on, and Bea is in it at the shop.
+    expect(inClassApart(content, start(['pol']), bea)).toBe(false)
+    expect(approachableAt(content, start(['pol']), 'shop').map((li) => li.id)).toEqual(['bea'])
+
+    const elsewhere = start(['his'])
+    expect(loveInterestsAt(content, elsewhere, 'shop').map((li) => li.id)).toEqual(['bea'])
+    expect(inClassApart(content, elsewhere, bea)).toBe(true)
+    expect(approachableAt(content, elsewhere, 'shop')).toEqual([])
+    expect(approachableAt(content, start([]), 'shop')).toEqual([])
+
+    // A plan with him comes before her class: she is there for him.
+    const waiting = { ...elsewhere, appointments: [{ id: 'plan-1', loveInterestId: 'bea', companionIds: [], title: 'Tea', time: 0, hours: 1, locationId: 'shop' }] }
+    expect(approachableAt(content, waiting, 'shop').map((li) => li.id)).toEqual(['bea'])
+    // Once the class is over she is like anyone else.
+    expect(inClassApart(content, { ...elsewhere, time: 1 }, bea)).toBe(false)
+  })
+})
+
+describe('walking into class with someone', () => {
+  it('seats her by him before anyone else', () => {
+    const state = { relationships: { a: { affection: 1 }, b: { affection: 50 }, c: { affection: 30 }, t: { affection: 0 } }, weatherSeed: 1, time: 0 } as unknown as GameState
+    const room = { studentIds: ['a', 'b', 'c'], teacherId: 't' } as Course
+    // Left to the rule, the one who likes him most has the first seat.
+    expect(classmates(state, room, () => 0)[1]).toBe('b')
+    expect(classmates(state, room, () => 0, ['a'])).toEqual(['t', 'a', 'b'])
+    expect(classmates(state, room, () => 0, ['a', 'c'])).toEqual(['t', 'a', 'c'])
+    // Someone who is not in the class changes nothing.
+    expect(classmates(state, room, () => 0, ['z'])).toEqual(classmates(state, room, () => 0))
   })
 })

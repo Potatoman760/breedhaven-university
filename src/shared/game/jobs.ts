@@ -69,7 +69,7 @@ export function shiftClashes(state: GameState, job: Job): string[] {
 }
 
 /**
- * Takes the job. Whoever qualifies is taken on at once: his boss goes into his Chats and
+ * Takes the job. Whoever qualifies is taken on at once: his boss goes into his DMs and
  * writes to say when he starts.
  */
 export function applyForJob(content: ContentPack, state: GameState, jobId: string): GameState {
@@ -274,8 +274,44 @@ export function jobFacts(content: ContentPack, state: GameState, npcId: string):
   const { dayIndex } = toDate(content.calendar, state.time)
   const told = shiftsOn(content, job, dayIndex).find((shift) => state.job!.excused.includes(shiftKey(dayIndex, shift)))
   return [
-    `${state.player.name} works for you as ${job.title.toLowerCase()}, paid ${job.hourlyRate} an hour. His shifts are ${job.shifts.map(describeShift).join(', ')}.`,
+    `${state.player.name} works for you as ${job.title.toLowerCase()}, paid $${job.hourlyRate} an hour. His shifts are ${job.shifts.map(describeShift).join(', ')}.`,
     `He has ${state.job.strikes} of ${config.strikes} strikes. A shift missed without a word is a full strike, and one he warned you of that day is half. At ${config.strikes} he is out.`,
     today ? `He has a shift today at ${clock(today.shift.startHour)} that has not started yet.` : told ? `He has already told you he will miss today's ${clock(told.startHour)} shift.` : 'He has no shift still to come today.'
   ]
+}
+
+/** One hour of one day in a week laid side by side with a job: what he already has on then, and whether the job has a shift then. */
+export interface WeekHour {
+  /** What he already does in that hour: the number of a class he takes, or the job he holds. */
+  mine?: string
+  /** The job being looked at has a shift then. */
+  shift: boolean
+}
+
+/**
+ * A job's shifts laid over the player's week as it stands: the classes he takes and the
+ * shifts of any other job he holds. Where a shift falls on something of his, the two
+ * clash. The hours run from the first thing in the week to the last.
+ */
+export function weekAgainst(content: ContentPack, state: GameState, job: Job): { days: string[]; hours: number[]; at: (day: string, hour: number) => WeekHour; clashes: number } {
+  const days = content.calendar.weekdays
+  const held = currentJob(content, state)
+  const mine = [
+    ...state.courses
+      .filter((course) => state.enrolment?.includes(course.id))
+      .flatMap((course) => course.meetings.map((m) => ({ weekday: m.weekday, startHour: m.startHour, hours: m.hours, label: course.number }))),
+    ...(held && held.id !== job.id ? held.shifts.map((shift) => ({ ...shift, label: held.title })) : [])
+  ]
+  const spans = [...mine, ...job.shifts]
+  const from = Math.min(content.coursework?.dayStart ?? 8, ...spans.map((s) => s.startHour))
+  const until = Math.max(content.coursework?.dayEnd ?? 18, ...spans.map((s) => s.startHour + s.hours))
+  const during = (span: { weekday: string; startHour: number; hours: number }, day: string, hour: number) => span.weekday === day && hour >= span.startHour && hour < span.startHour + span.hours
+  const at = (day: string, hour: number): WeekHour => ({
+    mine: mine.find((span) => during(span, day, hour))?.label,
+    shift: job.shifts.some((shift) => during(shift, day, hour))
+  })
+  const hours = Array.from({ length: until - from }, (_, i) => from + i)
+  // A clash is counted once for each shift that falls on something of his, however many hours of it do.
+  const clashes = job.shifts.filter((shift) => mine.some((span) => span.weekday === shift.weekday && span.startHour < shift.startHour + shift.hours && shift.startHour < span.startHour + span.hours)).length
+  return { days, hours, at, clashes }
 }

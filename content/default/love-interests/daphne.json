@@ -1,31 +1,103 @@
 {
   "id": "daphne",
   "name": "Daphne",
-  "handle": "capt_daphne",
+  "role": "",
   "age": 22,
   "pronouns": "she/her",
-  "bio": "Fourth-year Public Safety student, captain of the Campus Security cadets, and three-time unaugmented combat-sports champion of the Great Arena's student division.",
+  "bio": "Fourth-year Athletic student, captain of the Volleyball team",
   "appearance": "A 22-year-old woman with warm tan skin, a strong jaw, amber-brown eyes under straight dark brows, and full lips. Long, straight auburn hair pulled into a high ponytail that reaches her waist. An athletic, muscular build: defined abdominal muscles, strong shoulders and thighs, a full bust, and wide hips.",
-  "imageSeed": 60,
-  "personality": "Direct, confident, and controlled, with dry humor and easy banter when she is off duty.",
+  "personality": "Direct, confident, and controlled, with dry humor and easy banter ",
   "traitIds": [
     "loyal"
   ],
+  "likes": [
+    "weapons",
+    "leatherwork",
+    "ale"
+  ],
+  "dislikes": [
+    "finery",
+    "ribbons"
+  ],
+  "admires": [
+    "strength",
+    "endurance"
+  ],
+  "friends": [],
+  "enemies": [],
+  "handle": "capt_daphne",
   "outfits": [
     {
       "id": "default",
-      "name": "Duty armour",
-      "description": "olive-green armour in a leaf pattern: an open-faced helmet with an engraved crest and cheek guards, her ponytail coming out through the top; shoulder guards made of layered green leaves; a cropped high-collared green top with long sleeves, open over the upper chest, and a green leaf-covered band across the bust; bare midriff; brown leather straps across the chest with a round brass medallion, brown leather armbands and bracers; a wide brown belt with a round brass buckle; and a long green loincloth-style skirt, trimmed with leaves at the hips and open at both thighs. A plain steel sword at her hip",
+      "name": "Sporty outfit",
+      "description": "she wears a white crop top jersey with the number 69 in red, baring her midriff. She has on tight blue athletic shorts. Her hair is in a ponytail.",
       "sprites": {
-        "neutral": "sprites/daphne/neutral-cutout.png"
-      }
+        "neutral": {
+          "image": "sprites/daphne/default-neutral-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/daphne/default-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/daphne/default-sad-cutout-2.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/daphne/default-angry-cutout-2.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/daphne/default-surprised-cutout-2.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/daphne/default-embarrassed-cutout-2.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/daphne/default-aroused-cutout-2.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     },
     {
       "id": "pregnant",
       "name": "Pregnant",
-      "inherits": "default",
       "description": "She has a round, pregnant belly.",
-      "sprites": {},
+      "inherits": "default",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/daphne/pregnant-neutral-2-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/daphne/pregnant-happy-2-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/daphne/pregnant-sad-2-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/daphne/pregnant-angry-2-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/daphne/pregnant-surprised-2-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/daphne/pregnant-embarrassed-2-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/daphne/pregnant-aroused-2-cutout.png",
+          "description": ""
+        }
+      },
       "pregnant": true
     },
     {
@@ -33,20 +105,132 @@
       "name": "Nude",
       "description": "nothing at all, completely nude",
       "sprites": {
-        "bath": "sprites/daphne/nude-bath.png",
-        "neutral": "sprites/daphne/nude-cutout.png"
-      }
+        "happy": {
+          "image": "sprites/daphne/nude-happy-cutout.png",
+          "description": ""
+        },
+        "neutral": {
+          "image": "sprites/daphne/nude-neutral-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/daphne/nude-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/daphne/nude-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/daphne/nude-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/daphne/nude-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/daphne/nude-aroused-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false
     },
     {
       "id": "nude-pregnant",
       "name": "Nude, pregnant",
-      "inherits": "nude",
       "description": "She has a round, pregnant belly.",
-      "sprites": {},
+      "inherits": "nude",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/daphne/nude-pregnant-neutral-cutout.png",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/daphne/nude-pregnant-happy-cutout.png",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/daphne/nude-pregnant-sad-cutout.png",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/daphne/nude-pregnant-angry-cutout.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/daphne/nude-pregnant-surprised-cutout.png",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/daphne/nude-pregnant-embarrassed-cutout.png",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/daphne/nude-pregnant-aroused-cutout.png",
+          "description": ""
+        }
+      },
       "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
+  "faceY": 4,
+  "imageSeed": 60,
+  "stageHeight": 100,
+  "studies": {
+    "subject": "Public Safety",
+    "code": "PSF",
+    "level": 4,
+    "stats": [
+      "wisdom"
+    ],
+    "practical": true
+  },
+  "animations": [
+    {
+      "id": "blowjob",
+      "name": "Blowjob",
+      "description": "",
+      "image": "sprites/daphne/nsfw-blowjob.png",
+      "loop": true
+    },
+    {
+      "id": "missionary",
+      "name": "Missionary",
+      "description": "",
+      "image": "sprites/daphne/nsfw-missionary.png",
+      "loop": true
+    },
+    {
+      "id": "doggy",
+      "name": "Doggy",
+      "description": "",
+      "image": "sprites/daphne/nsfw-doggy.png",
+      "loop": true
+    },
+    {
+      "id": "cowgirl",
+      "name": "Cowgirl",
+      "description": "",
+      "image": "sprites/daphne/nsfw-cowgirl.png",
+      "loop": true
+    },
+    {
+      "id": "creampie",
+      "name": "Creampie",
+      "description": "",
+      "image": "sprites/daphne/nsfw-creampie.png",
+      "loop": true
+    },
+    {
+      "id": "facial",
+      "name": "Facial",
+      "description": "",
+      "image": "sprites/daphne/nsfw-facial.png",
+      "loop": true
+    }
+  ],
   "schedule": [
     {
       "weekdays": [
@@ -94,33 +278,18 @@
   ],
   "room": {
     "name": "a duty flat over the Cloister Halls gate",
-    "description": "A spare, orderly one-room flat above a gatehouse, with smooth grey walls and a polished concrete floor. A narrow bed with tightly tucked grey blankets, a steel rack holding green leaf-pattern armour, a helmet and a sheathed sword, a pair of boots lined up beneath it, a handheld radio on a charging stand on a plain desk, a wall screen showing a grid of security camera views, a pull-up bar in the doorway. A wide window looks down onto a courtyard. Cool morning light, no decoration.",
-    "locationId": "dormitories"
+    "description": "A modern Breedhaven university apartment bedroom belonging to a fourth-year female volleyball captain: spacious and stylish, with magitech touches, a large bed, university volleyball trophies and medals, framed team photos, volleyball gear, athletic shoes, and a captain’s jacket. Warm wood furniture, soft ambient magical lighting, subtle Bloom-inspired decorations, laptop and textbooks on a desk, lived-in but tidy, confident sporty atmosphere.",
+    "locationId": "dormitories",
+    "background": "generated/backgrounds/daphne/view.png"
   },
   "ai": {
     "speechPattern": "",
-    "backstory": "Studies: Fourth year, College of Public Safety and Athletics\n\nPost: Captain of the Campus Security cadets, the student unit that patrols the campus alongside the city police\n\nSport: Unaugmented combat sports; three-time student champion. Patient and precise: she reads a stance, waits for a committed attack, and punishes the opening.\n\nDaphne grew up by Seedblossom's South Gate, where her family repaired body armour and duty gear for the city police, and spent her childhood watching officers train. She enrolled on a police scholarship and earned a reputation as someone who stays calm when it counts. Her coach is Grushka Tor-Vael, whose good opinion she values more than the titles. She has magic like any woman and rarely bothers with it: she competes in the unaugmented division on purpose, and trusts training over tricks.\n\nShe wears the cadets' green duty armour on shift, which is most of the time."
-  },
-  "likes": [
-    "weapons",
-    "leatherwork",
-    "ale"
-  ],
-  "dislikes": [
-    "finery",
-    "ribbons"
-  ],
-  "admires": [
-    "strength",
-    "endurance"
-  ],
-  "studies": {
-    "subject": "Public Safety",
-    "code": "PSF",
-    "level": 4,
-    "stats": [
-      "wisdom"
-    ],
-    "practical": true
+    "tone": "",
+    "verbalQuirks": [],
+    "exampleDialogue": [],
+    "backstory": "Studies: Fourth year, College ofdAthletics\n\nCaptain of the Campus volleyball team\n\nDaphne grew up by Seedblossom's South Gate, where her family repaired body armour and duty gear for the city police, and spent her childhood watching officers train. Her coach is Grushka Tor-Vael, whose good opinion she values more than the titles. She has magic like any woman and rarely bothers with it: she competes in the unaugmented division on purpose, and trusts training over tricks.",
+    "knowledge": [],
+    "secrets": [],
+    "extraInstructions": ""
   }
 }

@@ -39,6 +39,8 @@ export const RelationshipStatusSchema = z.object({
   mutual: z.boolean().default(false),
   /** Everyone in it has promised to see nobody outside it. */
   exclusive: z.boolean().default(false),
+  /** It makes them a couple, or more than one: a girlfriend and up, as against lovers who owe each other nothing. Counted as love found when the year ends. */
+  committed: z.boolean().default(false),
   /** The stage each love interest must have reached with the player. */
   minStage: z.string().optional(),
   /** For a mutual arrangement, how close each pair of love interests must be to each other. */
