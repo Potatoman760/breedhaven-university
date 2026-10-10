@@ -276,6 +276,8 @@
       "day": 20,
       "durationDays": 2,
       "locationId": "great-court",
+      "startHour": 10,
+      "hours": 6,
       "description": "Every club and society in the University sets up a table in the Great Court: sports in all three divisions, the debating union, Bloomist and Freewill student groups a careful distance apart, and free pens."
     },
     {
@@ -285,6 +287,8 @@
       "day": 20,
       "durationDays": 3,
       "locationId": "market",
+      "startHour": 12,
+      "hours": 10,
       "description": "The harvest is in. Traders, food vans, fairground rides, cider and dancing fill the market square until late."
     },
     {
@@ -293,6 +297,8 @@
       "month": "harvestwane",
       "day": 31,
       "locationId": "physic-garden",
+      "startHour": 18,
+      "hours": 4,
       "description": "On the last night of Harvestwane the University floats paper lanterns on the Physic Garden pond at dusk, each carrying a wish for the dark half of the year."
     },
     {
@@ -302,6 +308,8 @@
       "day": 6,
       "durationDays": 2,
       "locationId": "tiltyard",
+      "startHour": 13,
+      "hours": 5,
       "description": "The student combat-sports finals at the Tiltyard, in all three divisions: unaugmented, mage and Bloom. The stands are full, the wards on the ring are doubled for the Bloom bouts, and the argument about whether pregnancy is an unfair advantage starts up again on schedule."
     },
     {
@@ -310,6 +318,8 @@
       "month": "mistmoon",
       "day": 22,
       "locationId": "commons",
+      "startHour": 18,
+      "hours": 3,
       "description": "The Commons lays on a hot supper to mark the turn of the weather: roast roots, spiced wine, and every hearth lit."
     },
     {

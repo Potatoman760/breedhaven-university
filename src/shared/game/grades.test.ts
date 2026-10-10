@@ -66,6 +66,8 @@ describe("a course's points", () => {
       ['the Shop', 'shop', false],
       ['My own room', 'home', true]
     ])
+    // A place that is shut, or shuts before the two hours are up, is not offered.
+    expect(studyPlaces(content, { ...start, time: start.time + 8 }, course).map((p) => p.locationId)).toEqual(['home'])
     const [shop, own] = places.map((place) => studyOuting(content, course, place))
     expect(shop).toMatchObject({ title: 'Study for RID 101', hours: 2, studyCourseId: 'rid', dropIn: true, withIds: [] })
     expect(own).toMatchObject({ locationId: 'home', ownRoom: true, dropIn: false })

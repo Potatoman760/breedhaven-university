@@ -1,6 +1,8 @@
 // Kept free of runtime imports: the sandboxed preload script bundles this file.
 export const IPC = {
   chat: 'ai:chat',
+  /** Sent to the window while a reply is still being written: the scene is going somewhere, and where. */
+  chatMoving: 'ai:chatMoving',
   summarize: 'ai:summarize',
   generateEvents: 'ai:generateEvents',
   planOuting: 'ai:planOuting',
@@ -16,6 +18,7 @@ export const IPC = {
   saveGame: 'saves:save',
   loadGame: 'saves:load',
   deleteSave: 'saves:delete',
+  renameSave: 'saves:rename',
   editorInfo: 'editor:info',
   editorSaveLoveInterest: 'editor:saveLoveInterest',
   editorDeleteLoveInterest: 'editor:deleteLoveInterest',
@@ -38,6 +41,9 @@ export const IPC = {
   comfyTest: 'comfy:test',
   comfyChooseFolder: 'comfy:chooseFolder',
   comfyWorkflows: 'comfy:workflows',
+  comfyBundle: 'comfy:bundle',
+  comfyBundleInstall: 'comfy:bundleInstall',
+  comfyBundleCheck: 'comfy:bundleCheck',
   comfyGenerate: 'comfy:generate',
   comfyCancel: 'comfy:cancel',
   comfyCutout: 'comfy:cutout'

@@ -1,7 +1,8 @@
 import { useRef, useState, type FormEvent, type CSSProperties, type KeyboardEvent } from 'react'
-import { attendees, describeBond, describeWhen, statusOf, dialogueLines, firstNames, sceneCast, formatTime, toDate, weatherOn, wornOutfit, lookOf, spriteFor, npcAsCharacter, playerRoom, roomOwner, sceneExtras, unreadNotes } from '../../../shared/game'
+import { attendees, bondLifts, describeBond, describeWhen, statusOf, dialogueLines, firstNames, sceneCast, sceneClock, toDate, weatherOn, wornOutfit, lookOf, spriteFor, npcAsCharacter, playerRoom, roomOwner, sceneExtras, unreadNotes } from '../../../shared/game'
 import { type ContentPack, type GameState, type LoveInterest, type Scene } from '../../../shared/model'
 import logo from '../../../assets/logo.png'
+import { Wisps } from '../fx/Wisps'
 import { Backdrop } from './Backdrop'
 import {
   CalendarIcon,
@@ -10,10 +11,14 @@ import {
   ItemIcon,
   LogIcon,
   PhoneIcon,
+  MapIcon,
   MenuIcon,
   WeatherIcon
 } from './icons'
 import type { Panel } from './panels'
+
+// What he is taken to say when he ends a shift with the button: enough for the scene to be closed on.
+const END_SHIFT_LINE = '*My shift is over. I finish what I am doing, say goodbye and clock out.*'
 
 interface Props {
   content: ContentPack
@@ -22,6 +27,8 @@ interface Props {
   /** The view of the current location the player picked, if any. */
   backgroundId: string | undefined
   busy: boolean
+  /** Where the scene is going, while the reply that takes it there is being written. */
+  movingTo: string | null
   notice: string
   /** The character has closed the scene; all that is left is to move on. */
   ended: boolean
@@ -71,12 +78,20 @@ function standing(li: Pick<LoveInterest, 'stageHeight'>, before = ''): CSSProper
 /** A scene with a love interest, or up to three: background, sprites, and the text box. */
 export function SceneView(props: Props) {
   const { content, state, scene, busy, notice, ended, onSend, onContinue, onOpen } = props
+  // One tip for each time the loading screen comes up: picked when the scene is first shown, and kept while it loads.
+  const [tip] = useState(() => {
+    const tips = content.tips.map((line) => line.trim()).filter((line) => line !== '')
+    return tips.length > 0 ? tips[Math.floor(Math.random() * tips.length)] : ''
+  })
   const [input, setInput] = useState('')
   const [hidden, setHidden] = useState(false)
   // The sprite or video file that last failed to load, so it isn't retried every render.
   const [missing, setMissing] = useState<string | null>(null)
 
   const date = toDate(content.calendar, state.time)
+  // What the date card shows: the middle of the scene, since the clock already stands at the hour it ends.
+  const shownAt = sceneClock(state, scene)
+  const cardDate = toDate(content.calendar, shownAt.time)
   const location = content.locations.find((l) => l.id === state.locationId)
   const partner = content.loveInterests.find((li) => li.id === scene.loveInterestId)!
   // In a group everyone stands side by side and each line carries its speaker's name.
@@ -276,14 +291,14 @@ export function SceneView(props: Props) {
         <>
           <div className="date-badge">
             <div className="caps">Day</div>
-            <div className="badge-day">{date.dayIndex + 1}</div>
+            <div className="badge-day">{cardDate.dayIndex + 1}</div>
             <hr />
             <div className="badge-date">
-              {date.day} {date.month.name}
+              {cardDate.day} {cardDate.month.name}
             </div>
-            <div className="caps">{date.weekday}</div>
+            <div className="caps">{cardDate.weekday}</div>
             <div className="caps badge-period" title={weather?.name}>
-              {formatTime(date)}
+              {String(cardDate.hour).padStart(2, '0')}:{String(shownAt.minute).padStart(2, '0')}
               <WeatherIcon kind={weather?.icon} size={20} />
             </div>
             {/* Where the scene is, and the class it is when it is one. */}
@@ -399,6 +414,12 @@ export function SceneView(props: Props) {
                   <span className="caps">{firstNames(content, [scene.bondProposal.memberIds[0]])} asks</span>
                   <strong>{describeBond(content, scene.bondProposal)}</strong>
                   <span>{statusOf(content, scene.bondProposal)?.description}</span>
+                  {/* Agreeing brings anyone not yet that far along with him up to the stage the arrangement is for. */}
+                  {bondLifts(content, state, scene.bondProposal).map(({ id, stage }) => (
+                    <span key={id} className="hint">
+                      Agreeing brings you and {firstNames(content, [id])} to {stage.name}.
+                    </span>
+                  ))}
                 </div>
                 <button disabled={busy} onClick={() => props.onAnswerBond(true)}>
                   Yes
@@ -458,6 +479,12 @@ export function SceneView(props: Props) {
                 <button type="submit" disabled={busy} aria-label="Send" className="icon">
                   <ChevronIcon size={18} />
                 </button>
+                {/* At work, the shift can be brought to its end in a press: he says he is done, and whoever he works for sees him off. */}
+                {scene.shift && back === 0 && (
+                  <button type="button" className="secondary end-shift" disabled={busy} onClick={() => onSend(END_SHIFT_LINE)}>
+                    End shift
+                  </button>
+                )}
               </form>
             )}
           </div>
@@ -490,17 +517,24 @@ export function SceneView(props: Props) {
             <button className="tile glass" aria-label="Calendar" onClick={() => onOpen({ kind: 'calendar' })}>
               <CalendarIcon size={28} />
             </button>
+            {/* The map, to see where everyone is: nothing on it can be gone to from inside a scene. */}
+            <button className="tile glass" aria-label="Map" title="Map" onClick={() => onOpen({ kind: 'map' })}>
+              <MapIcon size={28} />
+            </button>
             <button className="tile glass" aria-label="Menu" title="Menu (Esc)" onClick={() => onOpen({ kind: 'menu' })}>
               <MenuIcon size={26} />
             </button>
           </div>
         </>
       )}
-      {/* While the scene's opening is being written there is nothing to read yet: the logo stands over it, and goes when the first line is in. */}
-      {busy && scene.messages.length === 0 && (
+      {/* While the scene's opening is being written there is nothing to read yet: the logo stands over it, and goes when the first line is in.
+          The same while the scene is on its way somewhere else: the old place is covered until the new one is ready. */}
+      {busy && (scene.messages.length === 0 || props.movingTo !== null) && (
         <div className="scene-loading" role="status" aria-label="Loading">
+          <Wisps />
           <img src={logo} alt="" />
-          <p>Loading</p>
+          <p>{props.movingTo !== null && scene.messages.length > 0 ? props.movingTo : 'Loading'}</p>
+          {tip && <span className="loading-tip">{tip}</span>}
         </div>
       )}
     </main>

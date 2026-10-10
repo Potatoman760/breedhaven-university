@@ -4,11 +4,14 @@ import { canPerform } from './activities'
 import {
   addEvents,
   buildEventPrompt,
+  describeEvent,
+  eventHours,
   eventsOn,
   parseGeneratedEvents,
   removeEvent,
   upcomingEvents
 } from './events'
+import { dayAgenda } from './agenda'
 import { buildCharacterPrompt } from './prompt'
 import { createInitialState } from './state'
 import { fixture } from './testFixture'
@@ -173,5 +176,39 @@ describe('parseGeneratedEvents', () => {
       /did not return a list of events/
     )
     expect(() => parseGeneratedEvents('[{"name": "cut off', { content, state: start() })).toThrow()
+  })
+})
+
+describe('an event with a place and hours, and a holiday with neither', () => {
+  const content = fixture()
+  const state = createInitialState(content)
+  const fair: CalendarEvent = { id: 'fair', name: 'the Fair', description: 'Stalls and cider.', month: 'a', day: 1, durationDays: 2, locationId: 'shop', startHour: 10, hours: 4, noClasses: false, generated: false }
+  const holiday: CalendarEvent = { id: 'rest', name: 'Rest Day', description: 'Nobody works.', month: 'a', day: 2, durationDays: 1, noClasses: true, generated: false }
+  const both = { ...content, calendar: { ...content.calendar, events: [fair, holiday] } }
+
+  it('are told apart wherever they are told: to a character, and on the calendar', () => {
+    expect(eventHours(fair)).toBe('10:00 to 14:00')
+    expect(eventHours(holiday)).toBeUndefined()
+    expect(describeEvent(both, fair)).toBe('Stalls and cider. It is at the Shop, from 10:00 to 14:00 each day.')
+    expect(describeEvent(both, holiday)).toBe('Nobody works.')
+    expect(buildCharacterPrompt({ content: both, state, loveInterestId: 'ana' })).toContain('Today is the Fair. Stalls and cider. It is at the Shop, from 10:00 to 14:00 each day.')
+
+    const agenda = dayAgenda(both, state, 0).filter((item) => item.kind === 'event')
+    expect(agenda).toEqual([
+      { kind: 'event', id: 'event-rest', title: 'Rest Day', detail: undefined, description: 'Nobody works.', startHour: undefined, hours: undefined },
+      { kind: 'event', id: 'event-fair', title: 'the Fair', detail: 'the Shop', description: 'Stalls and cider.', startHour: 10, hours: 4 }
+    ])
+  })
+
+  it('can be invented with hours, which are kept only when they fit in a day', () => {
+    const reply = JSON.stringify([
+      { name: 'Night Market', description: 'Lanterns.', month: 'b', day: 1, durationDays: 1, locationId: 'shop', startHour: 18, hours: 9 },
+      { name: 'Quiet Day', description: 'Nothing.', month: 'b', day: 2, durationDays: 1, locationId: null, startHour: null, hours: null }
+    ])
+    const made = parseGeneratedEvents(reply, { content, state })
+    expect(made.map((e) => [e.name, e.startHour, e.hours])).toEqual([
+      ['Night Market', 18, 2],
+      ['Quiet Day', undefined, undefined]
+    ])
   })
 })

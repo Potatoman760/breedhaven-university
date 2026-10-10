@@ -139,6 +139,36 @@ export function PickList<T extends string>({ label, llm, addLabel = 'Add...', op
   )
 }
 
+interface CheckPillsProps<T extends string> {
+  label: string
+  options: { id: T; name: string; title?: string }[]
+  value: T[]
+  onChange: (value: T[]) => void
+  hint?: string
+}
+
+/**
+ * Picks any number from a short, fixed set: every choice is a pill, lit when it is picked, and a press turns it on or off.
+ * For a handful of things that never change, such as the days of the week, where a dropdown would only hide them.
+ * What is picked is kept in the order the choices are listed in.
+ */
+export function CheckPills<T extends string>({ label, options, value, onChange, hint }: CheckPillsProps<T>) {
+  const toggle = (id: T) => onChange(options.map((option) => option.id).filter((each) => (each === id ? !value.includes(id) : value.includes(each))))
+  return (
+    <div className="field">
+      <span className="field-label">{label}</span>
+      <div className="pills" role="group" aria-label={label}>
+        {options.map((option) => (
+          <button key={option.id} type="button" className={value.includes(option.id) ? 'pill check on' : 'pill check'} aria-pressed={value.includes(option.id)} title={option.title} onClick={() => toggle(option.id)}>
+            {option.name}
+          </button>
+        ))}
+      </div>
+      {hint && <span className="hint">{hint}</span>}
+    </div>
+  )
+}
+
 interface FootProps {
   /** Why the last save was refused. */
   issues: string[]

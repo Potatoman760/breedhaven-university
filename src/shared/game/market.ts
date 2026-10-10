@@ -24,14 +24,18 @@ export function carried(content: ContentPack, state: GameState): { item: Item; c
     .filter((entry) => entry.count > 0)
 }
 
-export function canBuy(content: ContentPack, state: GameState, itemId: string): PerformCheck {
+/**
+ * Whether he can buy something. At a stall he has to be where it is sold, while the place is open. Ordered from his phone,
+ * anything any stall sells can be had, from wherever he is and at any hour.
+ */
+export function canBuy(content: ContentPack, state: GameState, itemId: string, byPhone = false): PerformCheck {
   const item = content.items.find((i) => i.id === itemId)
-  const sold = stallsAt(content, state.locationId).some((stall) => stall.itemIds.includes(itemId))
-  if (!item || !sold) return { ok: false, reasons: ['Not sold here'] }
+  const sold = (byPhone ? content.stalls : stallsAt(content, state.locationId)).some((stall) => stall.itemIds.includes(itemId))
+  if (!item || !sold) return { ok: false, reasons: [byPhone ? 'Not sold anywhere' : 'Not sold here'] }
 
   const reasons: string[] = []
   const location = content.locations.find((l) => l.id === state.locationId)
-  if (location && !isOpen(location, toDate(content.calendar, state.time).hour)) {
+  if (!byPhone && location && !isOpen(location, toDate(content.calendar, state.time).hour)) {
     reasons.push(`${location.name} is closed`)
   }
   if (state.player.money < item.price) reasons.push('Not enough money')
@@ -39,8 +43,8 @@ export function canBuy(content: ContentPack, state: GameState, itemId: string): 
 }
 
 /** Pays for the item and adds it to what the player is carrying. Takes no time. */
-export function buy(content: ContentPack, state: GameState, itemId: string): GameState {
-  const check = canBuy(content, state, itemId)
+export function buy(content: ContentPack, state: GameState, itemId: string, byPhone = false): GameState {
+  const check = canBuy(content, state, itemId, byPhone)
   if (!check.ok) throw new Error(`Cannot buy "${itemId}": ${check.reasons.join('; ')}`)
   const item = content.items.find((i) => i.id === itemId)!
   return {

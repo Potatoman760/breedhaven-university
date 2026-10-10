@@ -4,7 +4,8 @@ import { join } from 'node:path'
 import { z } from 'zod'
 import { chatCompletion, listModels } from './ai/openai'
 import { completeWithFallback, NOT_CONFIGURED } from './ai/router'
-import { lookLines, parseDirectives, sceneCast, sceneWitnesses, validLook } from '../shared/game/scene'
+import { leavers, lookLines, parseDirectives, sceneCast, sceneWitnesses, validLook } from '../shared/game/scene'
+import { canSleepOver } from '../shared/game/sleep'
 import { CONTENT_SCHEME, serveContent } from './content/assets'
 import { deleteLoveInterest,
   removeUnusedAssets,
@@ -15,16 +16,16 @@ import { deleteLoveInterest,
 import { isSafeId, type EditorInfo, type EditorResult } from '../shared/editor'
 import { SaveStore } from './saves/store'
 import { SettingsStore, type KeyCipher } from './settings/store'
-import { SaveRequestSchema, SlotIdSchema } from '../shared/saves'
+import { RenameSaveRequestSchema, SaveRequestSchema, SlotIdSchema } from '../shared/saves'
 import { buildCourseWordingPrompt, parseCourseWording, WORDING_BATCH } from '../shared/game/catalogue'
 import { CourseSchema } from '../shared/model'
 import { contactsSaid, DM_CLOSE, DM_OPEN, fallbackInvite, messageText } from '../shared/game/courier'
 import { buildFeedPrompt, draftPosts, feedReplyTokens, parseFeedReply } from '../shared/game/feed'
-import { buildEventPrompt, parseGeneratedEvents } from '../shared/game/events'
-import { buildSpendingPrompt, buildSummaryPrompt, fallbackSummary, parseSpending, parseSummary, PLAIN_FEELINGS, type Spending, type Summary } from '../shared/game/memory'
+import { attendableEvents, buildEventPrompt, parseGeneratedEvents } from '../shared/game/events'
+import { buildSpendingPrompt, buildSummaryPrompt, fallbackSummary, parseSpending, parseSummary, PLAIN_FEELINGS, sceneRapport, sceneRevelations, type Spending, type Summary } from '../shared/game/memory'
 import { npcOf, sceneExtras, withNpc } from '../shared/game/npcs'
 import { sceneHours } from '../shared/game/sceneMoves'
-import { buildOutingPrompt, fallbackOuting, parseOuting } from '../shared/game/outing'
+import { asEventOuting, buildOutingPrompt, fallbackOuting, parseOuting } from '../shared/game/outing'
 import { personalise } from '../shared/game/personalise'
 import { createInitialState } from '../shared/game/state'
 import { buildCharacterPrompt, sceneTurns } from '../shared/game/prompt'
@@ -35,6 +36,9 @@ import {
   framingFor,
   normaliseComfyUrl,
   sizeFor,
+  type ComfyBundle,
+  type ComfyBundleCheck,
+  type ComfyBundleInstall,
   type ComfyTestResult,
   type CutoutResult,
   type GenerateArtResult
@@ -43,22 +47,11 @@ import { testComfy } from './comfy/client'
 import { cutoutArt } from './comfy/cutout'
 import { ComfyStore, generateArt } from './comfy/studio'
 import { listWorkflows } from './comfy/workflows'
-import { isMoment, isSeeding, type CalendarEvent, type BondProposal, type ContentPack, type LoveInterest, type Proposal } from '../shared/model'
-import { wornOutfit } from '../shared/game/pregnancy'
+import { checkBundle, installBundle, readBundle } from './comfy/bundle'
+import { basePoseId, isMoment, isSeeding, pregnantPoseId, type CalendarEvent, type BondProposal, type ContentPack, type LoveInterest, type Proposal } from '../shared/model'
+import { pregnancyStage, wornOutfit } from '../shared/game/pregnancy'
 import { buildDraftPrompt, DRAFT_MAX_IDEA_CHARS, DRAFT_MIN_TOKENS, parseDraft } from '../shared/game/draftCharacter'
-import {
-  excuseTool,
-  eventTool,
-  leaveTool,
-  meetingTool,
-  moveTool,
-  relationshipTool,
-  contactTool,
-  rapportTool,
-  revealTool,
-  type Leaving,
-  type Revelation
-} from './ai/tools'
+import { excuseTool, meetingTool, moveTool, relationshipTool, revealTool, type Leaving } from './ai/tools'
 import {
   isConfigured,
   ListModelsRequestSchema,
@@ -289,6 +282,23 @@ function registerIpc(
     return picked.canceled ? null : (picked.filePaths[0] ?? null)
   })
   ipcMain.handle(IPC.comfyWorkflows, () => listWorkflows(comfy.get().workflowDir, comfy.get().overrides))
+  // The workflows the game ships with, which anyone can have written out for their own ComfyUI.
+  ipcMain.handle(IPC.comfyBundle, (): ComfyBundle => readBundle(packDir))
+  ipcMain.handle(IPC.comfyBundleInstall, async (event): Promise<ComfyBundleInstall> => {
+    const window = BrowserWindow.fromWebContents(event.sender)
+    const options = { title: 'Choose your ComfyUI folder: the workflows are put in a folder of their own inside it', properties: ['openDirectory' as const, 'createDirectory' as const] }
+    const picked = await (window ? dialog.showOpenDialog(window, options) : dialog.showOpenDialog(options))
+    const into = picked.canceled ? undefined : picked.filePaths[0]
+    if (!into) return { ok: false, message: '', settings: null }
+    try {
+      const installed = installBundle(packDir, into, comfy.get())
+      const settings = comfy.update(installed.settings)
+      return { ok: true, message: `${installed.files.length} workflow${installed.files.length === 1 ? '' : 's'} written to ${installed.dir}, and the game now uses that folder.`, settings }
+    } catch (error) {
+      return { ok: false, message: (error as Error).message, settings: null }
+    }
+  })
+  ipcMain.handle(IPC.comfyBundleCheck, (): Promise<ComfyBundleCheck> => checkBundle(comfy.get().baseUrl, readBundle(packDir)))
   // One picture at a time: a second request while one is being drawn takes its place in the queue behind it.
   let drawing: AbortController | null = null
   ipcMain.handle(IPC.comfyGenerate, async (_event, raw: unknown): Promise<GenerateArtResult> => {
@@ -317,8 +327,13 @@ function registerIpc(
   ipcMain.handle(IPC.listSaves, () => saves.list())
 
   ipcMain.handle(IPC.saveGame, (_event, raw: unknown) => {
-    const { slotId, ...data } = SaveRequestSchema.parse(raw)
-    return saves.save(slotId, data)
+    const { slotId, name, ...data } = SaveRequestSchema.parse(raw)
+    return saves.save(slotId, data, new Date(), name)
+  })
+
+  ipcMain.handle(IPC.renameSave, (_event, raw: unknown) => {
+    const { slotId, name } = RenameSaveRequestSchema.parse(raw)
+    return saves.rename(slotId, name)
   })
 
   ipcMain.handle(IPC.loadGame, (_event, raw: unknown) => saves.load(SlotIdSchema.parse(raw)))
@@ -359,8 +374,10 @@ function registerIpc(
     }
   )
 
-  ipcMain.handle(IPC.chat, async (_event, raw: unknown): Promise<ChatResponse> => {
+  ipcMain.handle(IPC.chat, async (event, raw: unknown): Promise<ChatResponse> => {
     const { state, scene } = SceneRequestSchema.parse(raw)
+    // Said to the window the moment a move is called for, while the leaving and arriving are still to be written: it has something to show meanwhile.
+    const moving = (where: string) => !event.sender.isDestroyed() && event.sender.send(IPC.chatMoving, where)
     // The content as this game reads it, with the player's name where the content wrote the token.
     const content = readBy(state)
     // A scene with an NPC is built the same way, with the NPC standing among the characters.
@@ -384,6 +401,7 @@ function registerIpc(
       looks: scene.looks,
       comfort: scene.comfort,
       gifts: scene.gifts,
+      pendingProposal: scene.proposal && scene.proposal.time > state.time ? scene.proposal : undefined,
       recentText: scene.messages
         .slice(-CODEX_SCAN_MESSAGES)
         .map((m) => m.content)
@@ -398,26 +416,23 @@ function registerIpc(
     let movedPlace: string | undefined
     let hoursPassed = 0
     let left: Leaving | undefined
-    const leave = leaveTool(content, state, scene, (leaving) => (left = leaving))
     // Set when they leave together for something of his that is theirs too: the scene ends with the going.
     let walkTo: { withIds: string[] } | undefined
-    const goToEvent = eventTool(content, state, scene, (_next, withIds) => (walkTo = { withIds }))
-    const revealed: Revelation[] = []
-    const reveal = npc ? undefined : revealTool(content, state, sceneCast(scene), (revelation) => revealed.push(revelation))
-    const contacts: string[] = []
-    const contact = npc ? undefined : contactTool(content, state, sceneCast(scene), (id) => contacts.push(id))
-    const rapportChanges: ChatResponse['rapport'] = []
-    const rapport = npc ? undefined : rapportTool(content, state, sceneCast(scene), (change) => rapportChanges.push(change))
     const move = npc
       ? undefined
       : moveTool(content, state, scene, (destination, hours, stayingIds) => {
           movedTo = destination.id
           movedPlace = destination.locationId
+          // A room is named with what it is like after a colon: only its name is said.
+          moving(`Going to ${destination.name.split(':')[0]}`)
           // A plan made a moment ago for the place they are now going to is the same thing asked for twice: the going is kept.
           if (proposal?.locationId === destination.locationId) proposal = undefined
           hoursPassed = hours
           // Whoever is left behind when the scene moves on is out of it, with no hard feelings unless she said otherwise.
           if (stayingIds.length > 0 && !left) left = { ids: stayingIds, feeling: 'content', reason: 'stayed behind when the others left' }
+        }, (next, withIds) => {
+          walkTo = { withIds }
+          moving(`Going to ${content.locations.find((l) => l.id === next.locationId)?.name ?? next.title}`)
         })
     const { reply, profileId } = await completeWithFallback(settings.get(), scene.nsfw, {
       system: systemPrompt,
@@ -433,15 +448,10 @@ function registerIpc(
               meetingTool(content, state, scene.loveInterestId, (p) => (proposal = p), sceneCast(scene), () => movedPlace),
               relationshipTool(content, state, scene.loveInterestId, (p) => (bondProposal = p), sceneCast(scene))
             ]),
-        ...(move ? [move] : []),
-        ...(goToEvent ? [goToEvent] : []),
-        ...(leave ? [leave] : []),
-        ...(reveal ? [reveal] : []),
-        ...(contact ? [contact] : []),
-        ...(rapport ? [rapport] : [])
+        ...(move ? [move] : [])
       ]
     })
-    const { text, ended, seeded, named, comfort: readings, ...asked } = parseDirectives(reply)
+    const { text, ended, seeded, named, comfort: readings, leaving, attending: saidGoing, agreed, slept, ...asked } = parseDirectives(reply)
     const li = cast.loveInterests.find((c) => c.id === scene.loveInterestId)
     // A tag without a name means the scene's love interest; with one, whoever in the scene it names.
     const present = sceneCast(scene)
@@ -453,6 +463,25 @@ function registerIpc(
             return [id, full, full.split(' ')[0]].includes(name.toLowerCase())
           })
     const seededIds = seeded.map(idOf).filter((id): id is string => id !== undefined)
+    // Who the reply says leaves: at least one has to stay, and whoever was left behind by a move has already gone.
+    const goers = leavers(scene, leaving.map((one) => idOf(one.name)).filter((id): id is string => id !== undefined))
+    if (!npc && goers.length > 0 && !left) {
+      const said = leaving.find((one) => idOf(one.name) === goers[0])
+      left = { ids: goers, feeling: said?.feeling ?? 'content', reason: said?.reason ?? '' }
+    }
+    // Who the reply says will be at an event: only events that can be gone to, by people who are here.
+    const goable = attendableEvents(content, state)
+    const attending = npc
+      ? []
+      : saidGoing.flatMap((one) => {
+          const id = idOf(one.name)
+          const event = goable.find((e) => e.id.toLowerCase() === one.eventId || e.name.toLowerCase().replace(/^the /, '') === one.eventId.replace(/^the /, ''))
+          return id && event ? [{ eventId: event.id, ids: [id] }] : []
+        })
+    // The plan she suggested earlier, agreed to in words: booked, unless a new one was suggested in its place.
+    const proposalAccepted = !npc && agreed && scene.proposal !== undefined && scene.proposal.time > state.time && !proposal
+    // They go to sleep for the night where they are, when it is late enough for that.
+    const sleptOver = !npc && slept && canSleepOver(content, state) && !walkTo && !movedTo
     // How comfortable each of them says she is, kept for the next prompt and for nothing else.
     const comfort: ChatResponse['comfort'] = {}
     for (const { name, level, reason } of readings) {
@@ -476,28 +505,35 @@ function registerIpc(
       valid.outfitId === undefined || npc ? valid : { ...valid, outfitId: wornOutfit(content, state, who, valid.outfitId)?.id }
     // A pose is one character's and is shown over everyone: the one named with it, or the scene's lead. It has to be one she has something to show for.
     const poser = cast.loveInterests.find((c) => c.id === (look.animationOf ? idOf(look.animationOf) : scene.loveInterestId))
-    const pose = poser?.animations.find((a) => a.id.toLowerCase() === look.animationId?.toLowerCase() && (a.image !== undefined || a.clip !== undefined))
+    const drawn = (a: { image?: string; clip?: string }) => a.image !== undefined || a.clip !== undefined
+    // The pose asked for, by its own name: a plain one, or one drawn pregnant.
+    const pose = poser?.animations.find((a) => a.id.toLowerCase() === look.animationId?.toLowerCase() && drawn(a))
+    // Asked for plain while her pregnancy shows, it is put up as the same pose drawn pregnant, where she has that picture.
+    const showing = poser !== undefined && !npc && pregnancyStage(content, state, poser.id)?.showing === true
+    const shown = (showing && pose && poser?.animations.find((a) => a.id === pregnantPoseId(pose.id) && drawn(a))) || pose
     // A moment is shown once: asked for again in the very next reply, it is not put up a second time.
-    const again = pose !== undefined && isMoment(pose.id) && scene.animationId === pose.id && (scene.animationOf ?? scene.loveInterestId) === poser?.id
-    const posed = look.animationId === null ? { animationId: null } : pose && poser && !npc && !again ? { animationId: pose.id, animationOf: poser.id } : {}
+    const again = pose !== undefined && shown !== undefined && isMoment(basePoseId(pose.id)) && scene.animationId === shown.id && (scene.animationOf ?? scene.loveInterestId) === poser?.id
+    const posed = look.animationId === null ? { animationId: null } : pose && shown && poser && !npc && !again ? { animationId: shown.id, animationOf: poser.id } : {}
     return {
       message: { role: 'assistant', content: text || '...', tags: lookLines(reply) || undefined },
       systemPrompt,
       profileId,
-      sceneEnded: ended || walkTo !== undefined,
+      // Setting off together for his class, and going to sleep for the night, both close the scene.
+      sceneEnded: ended || walkTo !== undefined || sleptOver,
       walkTo,
       proposal,
       bondProposal,
       // A pose that shows him finishing inside her says what the tag says, whether or not the tag was written. The game still decides what comes of it.
-      seededIds: npc ? [] : [...new Set([...seededIds, ...(pose && poser && isSeeding(pose.id) ? [poser.id] : [])])],
+      seededIds: npc ? [] : [...new Set([...seededIds, ...(pose && poser && isSeeding(basePoseId(pose.id)) ? [poser.id] : [])])],
       rolls,
       // Setting off for his class or plan is the going: the scene is not also taken somewhere.
-      moveTo: walkTo ? undefined : movedTo,
+      moveTo: walkTo || sleptOver ? undefined : movedTo,
+      sleptOver: sleptOver || undefined,
+      proposalAccepted: proposalAccepted || undefined,
+      attending: attending.length > 0 ? attending : undefined,
       left,
-      revealed,
-      // A handle written out in the reply is a handle given, whether or not the tool was called for it.
-      contacts: [...new Set([...contacts, ...(npc ? [] : contactsSaid(content, state, sceneCast(scene), text))])],
-      rapport: rapportChanges,
+      // A handle written out in the reply is a handle given.
+      contacts: npc ? [] : contactsSaid(content, state, sceneCast(scene), text),
       comfort,
       hours: hoursPassed > 0 ? hoursPassed : undefined,
       look: li ? { ...fitted(validLook({ outfitId: look.outfitId, expression: look.expression }, li, scene), li), ...posed } : {},
@@ -558,10 +594,14 @@ function registerIpc(
       })
       // Only the message is kept: whatever the LLM said to itself around it is dropped.
       const who = [...content.loveInterests, ...content.npcs].find((c) => c.id === loveInterestId)
-      const text = messageText(parseDirectives(reply).text, who?.name ?? '')
+      const read = parseDirectives(reply)
+      const text = messageText(read.text, who?.name ?? '')
+      // Saying she will be at an event puts her down for it, as it does face to face.
+      const goable = attendableEvents(content, state)
+      const attending = npc ? [] : read.attending.flatMap((one) => (goable.some((e) => e.id.toLowerCase() === one.eventId) ? [{ eventId: goable.find((e) => e.id.toLowerCase() === one.eventId)!.id, ids: [loveInterestId] }] : []))
       // An invitation has to name a time the game has checked.
       if (invite && news === undefined && !proposal) throw new Error('The note did not settle on a time.')
-      return { text: text || '...', proposal, revealed: told, excused }
+      return { text: text || '...', proposal, revealed: told, excused, attending: attending.length > 0 ? attending : undefined }
     } catch (error) {
       if (!unprompted) throw error
       // An unprompted note is never worth an error: send a plain one, or none.
@@ -610,9 +650,10 @@ function registerIpc(
         messages: [{ role: 'user', content: user }],
         temperature: SUMMARY_TEMPERATURE
       })
-      return { outing: parseOuting(reply, content, state, text) }
+      // Something typed that is going to an event on today keeps the event's hours.
+      return { outing: asEventOuting(content, state, parseOuting(reply, content, state, text)) }
     } catch (error) {
-      return { outing: fallbackOuting(content, state, text), error: (error as Error).message }
+      return { outing: asEventOuting(content, state, fallbackOuting(content, state, text)), error: (error as Error).message }
     }
   })
 
@@ -627,19 +668,21 @@ function registerIpc(
       if (!request.scene.messages.some((m) => m.role === 'user')) return undefined
       try {
         const { system, user } = buildSpendingPrompt(content, request.state, request.scene)
-        const { reply } = await completeWithFallback(settings.get(), request.scene.nsfw, { system, messages: [{ role: 'user', content: user }], temperature: SUMMARY_TEMPERATURE })
+        // Once the scene is over the Main LLM is asked again, whichever wrote the scene: the NSFW one only if it declines.
+        const { reply } = await completeWithFallback(settings.get(), false, { system, messages: [{ role: 'user', content: user }], temperature: SUMMARY_TEMPERATURE })
         return parseSpending(reply, request.state.player.money)
       } catch {
         return undefined
       }
     })()
-    // Everyone in the scene keeps their own memory of it, written from their side.
+    // Every love interest in the scene keeps her own memory of it, written from her side. An NPC keeps none: nothing is asked of the LLM for one.
     const written = await Promise.all(
-      sceneWitnesses(request.scene).map(async (forId): Promise<[string, Summary]> => {
+      (request.scene.npc ? [] : sceneWitnesses(request.scene)).map(async (forId): Promise<[string, Summary]> => {
         const input = { content: request.scene.npc ? withNpc(content, request.scene.loveInterestId) : content, ...request, forId }
         try {
           const { system, user } = buildSummaryPrompt(input)
-          const { reply } = await completeWithFallback(settings.get(), input.scene.nsfw, {
+          // The same for the memories: the Main LLM first, and the NSFW one for a scene it will not go over.
+          const { reply } = await completeWithFallback(settings.get(), false, {
             system,
             messages: [{ role: 'user', content: user }],
             temperature: SUMMARY_TEMPERATURE
@@ -647,7 +690,9 @@ function registerIpc(
           const read = parseSummary(reply)
           const feels = !input.scene.npc && request.state.relationships[forId] !== undefined
           // A memory is always kept, and a love interest always comes away feeling something.
-          return [forId, { memory: read.memory || fallbackSummary(input), feelings: feels ? (read.feelings ?? PLAIN_FEELINGS) : undefined }]
+          // Sex is counted when she says it happened, or when she conceived in the scene.
+          const intimate = feels && (read.intimate === true || input.scene.conceived.includes(forId))
+          return [forId, { memory: read.memory || fallbackSummary(input), feelings: feels ? (read.feelings ?? PLAIN_FEELINGS) : undefined, intimate, learned: feels ? read.learned : undefined, rapport: feels ? read.rapport : undefined }]
         } catch (error) {
           failure = (error as Error).message
           const feels = !input.scene.npc && request.state.relationships[forId] !== undefined
@@ -658,6 +703,9 @@ function registerIpc(
     return {
       memories: Object.fromEntries(written.map(([id, summary]) => [id, summary.memory])),
       feelings: Object.fromEntries(written.flatMap(([id, summary]) => (summary.feelings ? [[id, summary.feelings]] : []))),
+      intimate: written.filter(([, summary]) => summary.intimate === true).map(([id]) => id),
+      revealed: sceneRevelations(content, request.state, written.map(([id, summary]) => ({ id, learned: summary.learned ?? [] }))),
+      rapport: sceneRapport(request.state, sceneWitnesses(request.scene), written.map(([id, summary]) => ({ id, rapport: summary.rapport ?? [] }))),
       spending: await spending,
       error: failure
     }

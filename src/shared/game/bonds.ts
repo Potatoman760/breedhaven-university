@@ -1,4 +1,4 @@
-import type { Bond, BondProposal, ContentPack, GameState, RelationshipStatus, TieLevel } from '../model'
+import type { Bond, BondProposal, ContentPack, GameState, RelationshipStage, RelationshipStatus, TieLevel } from '../model'
 import type { PerformCheck } from './activities'
 import { stageFor, stageRank } from './relationships'
 import { firstNames } from './scene'
@@ -48,8 +48,9 @@ export function statusOf(content: ContentPack, bond: Pick<Bond, 'statusId'> | un
 
 /**
  * Whether the player and these love interests can enter an arrangement: the right number
- * of people, each far enough along with the player, close enough to each other where the
- * arrangement joins them too, and nobody left outside a promise of exclusivity.
+ * of people, close enough to each other where the arrangement joins them too, and nobody
+ * left outside a promise of exclusivity. How far along each is with the player does not
+ * stand in the way: someone who asks for it means it, and is brought up to it when it is agreed.
  */
 export function canBond(content: ContentPack, state: GameState, proposal: BondProposal): PerformCheck {
   const status = statusOf(content, proposal)
@@ -62,16 +63,6 @@ export function canBond(content: ContentPack, state: GameState, proposal: BondPr
   if (ids.length < status.minMembers || ids.length > status.maxMembers) {
     const wanted = status.minMembers === status.maxMembers ? `${status.minMembers}` : `${status.minMembers} to ${status.maxMembers}`
     reasons.push(`${status.name} is between ${state.player.name} and ${wanted} other${status.maxMembers === 1 ? '' : 's'}`)
-  }
-  const needed = status.minStage
-  if (needed) {
-    const stage = content.relationships.stages.find((s) => s.id === needed)
-    for (const id of ids) {
-      const now = stageFor(content.relationships, state.relationships[id]?.affection ?? 0)
-      if (stageRank(content.relationships, now.id) < stageRank(content.relationships, needed)) {
-        reasons.push(`It is too soon for ${name(id)}: ${name(id)} and ${state.player.name} are only ${now.name}, not yet ${stage?.name ?? needed}`)
-      }
-    }
   }
   if (status.mutual) {
     for (let i = 0; i < ids.length; i++) {
@@ -94,13 +85,32 @@ export function canBond(content: ContentPack, state: GameState, proposal: BondPr
   return { ok: reasons.length === 0, reasons }
 }
 
-/** Enters the arrangement. Whatever any of its members had with the player before is replaced by it. */
+/**
+ * Those an arrangement would bring further along with the player than they are, and the stage it brings them to: the
+ * one the arrangement is for. Someone already there, or past it, is not named.
+ */
+export function bondLifts(content: ContentPack, state: GameState, proposal: BondProposal): { id: string; stage: RelationshipStage }[] {
+  const needed = content.relationships.stages.find((s) => s.id === statusOf(content, proposal)?.minStage)
+  if (!needed) return []
+  return [...new Set(proposal.memberIds)].flatMap((id) => {
+    const now = stageFor(content.relationships, state.relationships[id]?.affection ?? 0)
+    return state.relationships[id] !== undefined && stageRank(content.relationships, now.id) < stageRank(content.relationships, needed.id) ? [{ id, stage: needed }] : []
+  })
+}
+
+/**
+ * Enters the arrangement. Whatever any of its members had with the player before is replaced by it, and anyone not
+ * yet as far along with him as the arrangement is for is brought up to it: her affection is raised to where that stage begins.
+ */
 export function formBond(content: ContentPack, state: GameState, proposal: BondProposal): GameState {
   const check = canBond(content, state, proposal)
   if (!check.ok) throw new Error(`Cannot become "${proposal.statusId}": ${check.reasons.join('; ')}`)
   const memberIds = [...new Set(proposal.memberIds)]
+  const relationships = { ...state.relationships }
+  for (const { id, stage } of bondLifts(content, state, proposal)) relationships[id] = { ...relationships[id], affection: Math.max(relationships[id].affection, stage.minAffection) }
   return {
     ...state,
+    relationships,
     bonds: [
       ...state.bonds
         .map((bond) => ({ ...bond, memberIds: bond.memberIds.filter((id) => !memberIds.includes(id)) }))

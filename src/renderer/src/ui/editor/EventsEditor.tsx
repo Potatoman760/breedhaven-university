@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { isSafeId, slugify, type EditorInfo, type EditorResult } from '../../../../shared/editor'
 import type { CalendarEvent, ContentPack } from '../../../../shared/model'
+import { eventHours } from '../../../../shared/game'
 import { errorMessage } from '../../errors'
 import { Button } from '../Button'
 import { useConfirm } from '../Confirm'
@@ -143,6 +144,7 @@ export function EventsEditor({ content, onContent, switcher }: Props) {
                 <strong>{event.name}</strong>
                 <span className="hint">
                   {when(event)}
+                  {eventHours(event) ? ` · ${eventHours(event)}` : ''}
                   {event.noClasses ? ' · no classes' : ''}
                 </span>
               </span>
@@ -203,6 +205,29 @@ export function EventsEditor({ content, onContent, switcher }: Props) {
                   ))}
                 </select>
               </label>
+            </div>
+            {/* An event is somewhere between certain hours; a holiday is the whole day, and has none. */}
+            <div className="row">
+              <label className="inline">
+                <input
+                  type="checkbox"
+                  checked={draft.startHour !== undefined}
+                  onChange={(e) => set(e.target.checked ? { startHour: 10, hours: 6 } : { startHour: undefined, hours: undefined })}
+                />
+                It keeps hours
+              </label>
+              {draft.startHour !== undefined && (
+                <>
+                  <label>
+                    Opens at (hour)
+                    <input type="number" min={0} max={calendar.hoursPerDay - 1} value={draft.startHour} onChange={(e) => set({ startHour: Math.min(calendar.hoursPerDay - 1, Math.max(0, Math.floor(Number(e.target.value)) || 0)) })} />
+                  </label>
+                  <label>
+                    Runs for (hours)
+                    <input type="number" min={1} max={calendar.hoursPerDay} value={draft.hours ?? 1} onChange={(e) => set({ hours: Math.max(1, Math.floor(Number(e.target.value)) || 1) })} />
+                  </label>
+                </>
+              )}
             </div>
             <div className="row checks">
               <label className="inline">

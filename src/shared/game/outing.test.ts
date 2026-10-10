@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { CourseSchema, CourseworkConfigSchema, NpcSchema, type ContentPack } from '../model'
-import { buildOutingPrompt, checkOuting, describeOuting, drillOuting, fallbackOuting, outingMisses, parseOuting, startOuting, suggestDrills } from './outing'
+import { buildOutingPrompt, checkOuting, describeOuting, asEventOuting, drillOuting, eventOutings, outingHourRange, outingRooms, fallbackOuting, outingMisses, parseOuting, startOuting, suggestDrills } from './outing'
 import { playerGains } from './scene'
 import { createInitialState } from './state'
+import { addEventGoers, attendableEvents, eventGoers } from './events'
+import { locationOf } from './map'
 import { fixture } from './testFixture'
 
 // The fixture starts at 06:00 at home on a 20-hour day; the shop is open 05:00 to 15:00
@@ -78,22 +80,26 @@ describe('checkOuting', () => {
     expect(checkOuting(content, early, { ...tea, withIds: ['bea'] }).blockers).toContain('Bea has RID 101 at 06:00')
   })
 
-  it('counts closing time, people who are not around, and plans already made', () => {
+  it('counts closing time, asks out someone with nothing on her schedule, and warns of a plan without waiting for it', () => {
     // Bea's class is on now, and over by 09:00.
     const atShop = { ...tea, withIds: ['bea'], locationId: 'shop' }
     expect(checkOuting(content, state, atShop).waitHours).toBe(3)
 
     const evening = { ...state, time: 9 } // 15:00, when the shop shuts
     expect(checkOuting(content, evening, { ...tea, locationId: 'shop' }).blockers).toContain('the Shop is closed')
-    const night = { ...state, time: 10 } // 16:00: Ana has gone, and is back at 05:00, but nothing starts before 06:00
+    // At 16:00 Ana has nothing on her schedule. She has not vanished: she is at home, and can be asked out.
+    const night = { ...state, time: 10 }
     const lonely = checkOuting(content, night, tea)
-    expect(lonely.blockers).toEqual(['Ana is not around'])
-    expect(lonely.waitHours).toBe(10)
+    expect(lonely.blockers).toEqual([])
+    expect(lonely.waitHours).toBe(0)
 
     const booked = { ...state, appointments: [{ id: 'plan-1', loveInterestId: 'bea', companionIds: [], title: 'Study', time: 1, hours: 2, locationId: 'home' }] }
     const clash = checkOuting(content, booked, tea)
-    expect(clash.blockers).toEqual(['You have a plan at 07:00: Study'])
-    expect(clash.waitHours).toBe(3)
+    // A plan of his own does not hold him back: he may go now, knowing what he will miss.
+    expect(clash.blockers).toEqual([])
+    expect(clash.waitHours).toBe(0)
+    expect(outingMisses(content, booked, tea)).toEqual(['your plan at 07:00: Study'])
+    expect(outingMisses(content, { ...booked, time: 3 }, tea)).toEqual([])
   })
 })
 
@@ -182,6 +188,10 @@ describe('raising a stat', () => {
     ])
     expect(suggestDrills(town, state)).toEqual(suggested)
     expect(suggestDrills(content, state)).toEqual([])
+    // The shop shuts at 15:00: with less than the two hours left, or after, it is not offered.
+    expect(suggestDrills(town, { ...state, time: 7 }).map((s) => s.location.id)).toEqual(['shop', 'home'])
+    expect(suggestDrills(town, { ...state, time: 8 }).map((s) => s.location.id)).toEqual(['home'])
+    expect(suggestDrills(town, { ...state, time: 9 }).map((s) => s.location.id)).toEqual(['home'])
     expect(drillOuting(suggested[0])).toEqual({ title: 'A workout', description: 'You load a bar.', withIds: [], locationId: 'shop', hours: 2, trains: 'strength', dropIn: true })
   })
 
@@ -269,5 +279,143 @@ describe('what is told of his training', () => {
     // Half a point more, with no whole one made, is not told of.
     expect(playerGains(before, { ...state, training: { dexterity: 0.9 }, coursePoints: { c1: 2.4 } })).toEqual([])
     expect(playerGains(before, { ...state, training: { dexterity: 0.5 }, coursePoints: { c1: 3.1 } })).toEqual([{ label: 'RID 101 marks', from: 2, to: 3 }])
+  })
+})
+
+describe('going to an event', () => {
+  // The fixture's game starts at 06:00 on 2 a. A fair at home from 08:00 for six hours, on that day and the next.
+  const fair = { id: 'fair', name: 'the Fair', description: 'Stalls and cider.', month: 'a', day: 2, durationDays: 2, locationId: 'home', startHour: 8, hours: 6, noClasses: false, generated: false }
+  const holiday = { id: 'rest', name: 'Rest Day', description: '', month: 'a', day: 2, durationDays: 1, noClasses: true, generated: false }
+  const fairground = { ...content, calendar: { ...content.calendar, events: [fair, holiday] } }
+  const at = (time: number) => ({ ...state, time })
+
+  it('is offered while some of it is left today, for an hour or for as long as is left, and never for a holiday', () => {
+    const [early] = eventOutings(fairground, state)
+    expect(eventOutings(fairground, state)).toHaveLength(1)
+    expect(early.outing).toMatchObject({ title: 'the Fair', locationId: 'home', hours: 2, dropIn: true, withIds: [], window: { from: 2, until: 8 } })
+    expect(early.maxHours).toBe(6)
+    // Half-way through, what is left is what can be had; in its last hour, an hour; once it has shut, nothing.
+    expect(eventOutings(fairground, at(5))[0]).toMatchObject({ maxHours: 3, outing: { hours: 2 } })
+    expect(eventOutings(fairground, at(7))[0]).toMatchObject({ maxHours: 1, outing: { hours: 1 } })
+    expect(eventOutings(fairground, at(8))).toEqual([])
+    // The next day it is on again, at its hours of that day.
+    expect(eventOutings(fairground, at(20))[0].outing.window).toEqual({ from: 22, until: 28 })
+  })
+
+  it('is waited for until it opens, and cannot be stayed at past its close', () => {
+    const [{ outing }] = eventOutings(fairground, state)
+    const before = checkOuting(fairground, state, outing)
+    expect(before.blockers).toEqual(['the Fair opens at 08:00'])
+    expect(before.waitHours).toBe(2)
+    expect(checkOuting(fairground, at(2), { ...outing, hours: 6 }).blockers).toEqual([])
+    expect(checkOuting(fairground, at(4), { ...outing, hours: 6 }).blockers).toEqual(['the Fair is over at 14:00'])
+    expect(checkOuting(fairground, at(4), { ...outing, hours: 1 }).waitHours).toBe(0)
+    expect(startOuting(fairground, at(4), { ...outing, hours: 3 }).state).toMatchObject({ time: 7, locationId: 'home' })
+  })
+})
+
+describe('being in his own room', () => {
+  it('lasts from going there to do something until he goes somewhere else', () => {
+    const own = { title: 'Study', description: '', withIds: [], locationId: 'home', hours: 2, ownRoom: true }
+    const inRoom = startOuting(content, state, own).state
+    expect(inRoom.inOwnRoom).toBe(true)
+    // Doing something else, even in the same building, is no longer in it.
+    expect(startOuting(content, inRoom, { ...own, ownRoom: undefined }).state.inOwnRoom).toBe(false)
+    expect(state.inOwnRoom).toBe(false)
+  })
+})
+
+describe('someone who said she would be at an event', () => {
+  // A fair at the shop from 08:00 for six hours, on the day the game starts.
+  const fair = { id: 'fair', name: 'the Fair', description: 'Stalls and cider.', month: 'a', day: 2, durationDays: 1, locationId: 'shop', startHour: 8, hours: 6, noClasses: false, generated: false }
+  const fairground = { ...content, calendar: { ...content.calendar, events: [fair] } }
+  const open = { ...state, time: 3 }
+
+  it('is put down for it once, and is there when he goes, whoever else the day throws his way', () => {
+    expect(attendableEvents(fairground, state).map((e) => e.id)).toEqual(['fair'])
+    const promised = addEventGoers(open, 'fair', ['bea'])
+    expect(eventGoers(promised, 'fair')).toEqual(['bea'])
+    expect(addEventGoers(promised, 'fair', ['bea'])).toBe(promised)
+
+    const [{ outing }] = eventOutings(fairground, promised)
+    expect(outing.eventId).toBe('fair')
+    for (let seed = 0; seed < 20; seed++) {
+      const { scene } = startOuting(fairground, { ...promised, weatherSeed: seed }, outing)
+      expect(scene?.loveInterestId).toBe('bea')
+      expect(scene?.beats[0].direction).toContain('Bea said she would be here, and is')
+    }
+    // With nobody having said so, it is as any other place he drops in on.
+    const { scene } = startOuting(fairground, open, outing)
+    expect(scene?.beats[0].direction ?? 'Nobody arranged this').toContain('Nobody arranged this')
+  })
+
+  it('is at the event while it is open, unless something of her own keeps her', () => {
+    const li = fairground.loveInterests.find((c) => c.id === 'bea')!
+    const promised = addEventGoers(open, 'fair', ['bea'])
+    const usual = locationOf(fairground, open, li)
+    // Bea's class runs until 09:00: until then she is in it, and after it at the fair.
+    expect(locationOf(fairground, { ...promised, time: 2 }, li)).toBe(locationOf(fairground, { ...open, time: 2 }, li))
+    expect(locationOf(fairground, promised, li)).toBe('shop')
+    // Once it has shut she is wherever her day has her.
+    expect(locationOf(fairground, { ...promised, time: 9 }, li)).toBe(locationOf(fairground, { ...open, time: 9 }, li))
+    expect(usual === 'shop' || usual !== 'shop').toBe(true)
+  })
+})
+
+describe('something typed that is going to an event', () => {
+  const fair = { id: 'fair', name: 'the Fair', description: 'Stalls.', month: 'a', day: 2, durationDays: 1, locationId: 'shop', startHour: 8, hours: 6, noClasses: false, generated: false }
+  const fairground = { ...content, calendar: { ...content.calendar, events: [fair] } }
+
+  it('keeps the hours of the event, and is told once who it is with', () => {
+    const typed = { title: 'Fair with Bea', description: '', withIds: ['bea'], locationId: 'shop', hours: 4 }
+    const linked = asEventOuting(fairground, { ...state, time: 5 }, typed)
+    expect(linked).toMatchObject({ eventId: 'fair', window: { from: 2, until: 8 }, hours: 3 })
+    // Somewhere else, or about something else, it is left as it was.
+    expect(asEventOuting(fairground, state, { ...typed, locationId: 'home' })).toEqual({ ...typed, locationId: 'home' })
+    expect(asEventOuting(fairground, state, { ...typed, title: 'Tea with Bea' })).toEqual({ ...typed, title: 'Tea with Bea' })
+    expect(describeOuting(fairground, typed)).toBe('Fair with Bea at the Shop, 4 hours')
+    expect(describeOuting(fairground, { ...typed, title: 'Tea' })).toBe('Tea with Bea at the Shop, 4 hours')
+  })
+})
+
+describe('how long something takes', () => {
+  it('is an hour for going to talk to someone, and his to change where it can be: an hour at the least', () => {
+    expect(fallbackOuting(content, state, 'talk to Ana').hours).toBe(1)
+    expect(fallbackOuting(content, state, 'go for a wander').hours).toBe(2)
+    const talk = { title: 'Talk', description: '', withIds: ['ana'], locationId: 'home', hours: 2 }
+    expect(outingHourRange(state, talk)).toEqual({ min: 1, max: 4 })
+    expect(outingHourRange(state, { ...talk, trains: 'rest' as const })).toEqual({ min: 1, max: 8 })
+    // A session of study and a drill are as long as they are.
+    expect(outingHourRange(state, { ...talk, studyCourseId: 'c1' })).toBeUndefined()
+    expect(outingHourRange(state, { ...talk, withIds: [], dropIn: true, trains: 'strength' as const })).toBeUndefined()
+  })
+})
+
+describe('something typed that is in a room', () => {
+  // Ana has a room over the shop, and he has met her; he has a room of his own at home.
+  const roomed: ContentPack = {
+    ...content,
+    newGame: { ...content.newGame, room: { name: 'a small room', description: '', locationId: 'home' } },
+    loveInterests: content.loveInterests.map((li) => (li.id === 'ana' ? { ...li, room: { name: 'a loft', description: '', locationId: 'shop' } } : li))
+  }
+  const met = { ...state, met: ['ana', 'bea'] }
+
+  it('is set there, with whoever the room belongs to along', () => {
+    expect(outingRooms(roomed, met).map((room) => room.id)).toEqual(['room-of-player', 'room-of-ana'])
+    expect(outingRooms(roomed, { ...met, met: [] }).map((room) => room.id)).toEqual(['room-of-player'])
+
+    const hers = fallbackOuting(roomed, met, 'talk to Ana in her room')
+    expect(hers).toMatchObject({ locationId: 'shop', roomOf: 'ana', withIds: ['ana'], hours: 1 })
+    expect(describeOuting(roomed, hers)).toBe("talk to Ana in her room with Ana in Ana's room, 1 hour")
+    expect(fallbackOuting(roomed, met, 'read in my room')).toMatchObject({ locationId: 'home', roomOf: 'player', ownRoom: true })
+    // Someone with no room of her own is met wherever he said, or where he is.
+    expect(fallbackOuting(roomed, met, 'talk to Bea in her room').roomOf).toBeUndefined()
+
+    const { user } = buildOutingPrompt(roomed, met, 'talk to Ana in her room')
+    expect(user).toContain("- room-of-ana: Ana's own room, at the Shop")
+    const reply = '{"title": "A private talk", "description": "", "with": [], "place": "room-of-ana", "hours": 1, "trains": "none"}'
+    expect(parseOuting(reply, roomed, met, 'talk in her room')).toMatchObject({ locationId: 'shop', roomOf: 'ana', withIds: ['ana'] })
+    // The scene it opens is in her room.
+    expect(startOuting(roomed, met, hers).scene).toMatchObject({ loveInterestId: 'ana', roomOf: 'ana' })
   })
 })

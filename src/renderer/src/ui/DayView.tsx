@@ -10,6 +10,7 @@ import {
   studyPoints,
   DRILL_HOURS,
   drillOuting,
+  eventOutings,
   suggestDrills,
   type Outing,
   shiftNow,
@@ -22,7 +23,6 @@ import {
   approachableAt,
   meetingNow,
   npcsAt,
-  isOrientationDay,
   orientationStep,
   hasMet,
   formatTime,
@@ -42,7 +42,6 @@ import {
   ChevronIcon,
   MapIcon,
   MenuIcon,
-  MarketIcon,
   PhoneIcon,
   WeatherIcon
 } from './icons'
@@ -70,7 +69,6 @@ interface Props {
   /** Ends the day early: the rest of it is let go, and he sleeps until morning. */
   onEndDay: () => void
   /** Browse the shops here, or go to the market (if there are none here) and browse its stalls. */
-  onMarket: () => void
   onOpen: (panel: Panel) => void
 }
 
@@ -119,7 +117,16 @@ export function DayView(props: Props) {
 
   return (
     <main className="stage">
-      <Backdrop screen="day" weather={weather?.effect} location={location} periodId={date.period.id} light={date.period.light} backgroundId={props.backgroundId} />
+      {/* In his own room, the room is what is behind him, and not the building it is in. */}
+      <Backdrop
+        screen="day"
+        weather={weather?.effect}
+        location={location}
+        periodId={date.period.id}
+        light={date.period.light}
+        backgroundId={props.backgroundId}
+        room={state.inOwnRoom && content.newGame.room ? { image: content.newGame.room.background, key: 'room-of-player' } : undefined}
+      />
 
       <div className="date-banner glass framed">
         <div className="weather" title={weather?.name}>
@@ -244,6 +251,23 @@ export function DayView(props: Props) {
             </p>
           )
         )}
+
+        {/* What is on today that he could go to: an event that keeps hours, for as much of it as he likes. */}
+        {!induction &&
+          !over &&
+          eventOutings(content, state).map(({ event, outing }) => (
+            <button key={event.id} className="featured" disabled={props.busy} onClick={() => props.onOuting(outing)}>
+              <span className="chip outline-light">Event</span>
+              <span className="featured-title">{event.name}</span>
+              <span>
+                {content.locations.find((l) => l.id === outing.locationId)?.name} ·{' '}
+                {outing.window && state.time < outing.window.from
+                  ? `opens ${formatTime(toDate(calendar, outing.window.from))}`
+                  : `until ${formatTime(toDate(calendar, outing.window?.until ?? state.time))}`}
+              </span>
+              <ChevronIcon size={18} />
+            </button>
+          ))}
 
         {!induction && appointmentsNow(state).map((plan) => {
           const item = underWay('plan', plan.id, plan.locationId)
@@ -434,16 +458,6 @@ export function DayView(props: Props) {
       </div>
 
       <div className="tiles">
-        {/* There is no shopping on orientation day. */}
-        <button
-          className="tile glass"
-          disabled={isOrientationDay(content, state)}
-          title={isOrientationDay(content, state) ? 'Closed to you on orientation day' : undefined}
-          onClick={props.onMarket}
-        >
-          <MarketIcon size={36} />
-          Market
-        </button>
         <button className="tile glass" onClick={() => onOpen({ kind: 'map' })}>
           <MapIcon size={36} />
           Map
@@ -457,15 +471,13 @@ export function DayView(props: Props) {
           <CalendarIcon size={36} />
           Calendar
         </button>
-      </div>
-
-      {/* The menu, for whoever does not reach for Escape: continue, save, load, settings, and the way out. */}
-      <div className="corner">
-        <button className="util glass" title="Menu (Esc)" onClick={() => onOpen({ kind: 'menu' })}>
-          <MenuIcon size={18} />
+        {/* The menu, for whoever does not reach for Escape: continue, save, load, settings, and the way out. Last, so that it sits in the corner. */}
+        <button className="tile glass" title="Menu (Esc)" onClick={() => onOpen({ kind: 'menu' })}>
+          <MenuIcon size={36} />
           Menu
         </button>
       </div>
+
     </main>
   )
 }

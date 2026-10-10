@@ -2,8 +2,11 @@ import { useEffect, useState } from 'react'
 import { formatDate, toDate } from '../../shared/game'
 import type { ContentPack } from '../../shared/model'
 import {
+  AUTO_SLOT_ID,
   MANUAL_SLOT_IDS,
+  SAVE_NAME_CHARS,
   SLOT_IDS,
+  saveLabel,
   slotLabel,
   type SaveData,
   type SaveSummary,
@@ -34,6 +37,8 @@ interface Props {
 export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
   const [saves, setSaves] = useState<SaveSummary[] | null>(null)
   const [notice, setNotice] = useState('')
+  // The names as they are being typed, by slot: one for an empty slot is what the save made there will be called.
+  const [names, setNames] = useState<Partial<Record<SlotId, string>>>({})
 
   const refresh = () => window.api.listSaves().then(setSaves)
   useEffect(() => {
@@ -54,21 +59,42 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
     }
   }
 
+  const summaryOf = (slotId: SlotId) => saves.find((s) => s.slotId === slotId)
+  /** The name a slot is shown with: what is being typed, or failing that what its save is called. */
+  const nameOf = (slotId: SlotId): string => {
+    const summary = summaryOf(slotId)
+    return names[slotId] ?? (summary && !summary.unreadable ? (summary.name ?? '') : '')
+  }
+
   const save = (slotId: SlotId, occupied: boolean) =>
     run(async () => {
       if (!current) return
-      if (occupied && !(await ask({ title: `Overwrite ${slotLabel(slotId)}?`, detail: 'The game saved there is replaced by this one.', confirm: 'Overwrite' }))) return
-      await window.api.saveGame({ slotId, ...current })
+      if (occupied && !(await ask({ title: `Overwrite ${saveLabel(slotId, summaryOf(slotId))}?`, detail: 'The game saved there is replaced by this one.', confirm: 'Overwrite' }))) return
+      // Whatever is in the name box goes with it: typed afresh, or the name the slot already had.
+      const saved = await window.api.saveGame({ slotId, name: nameOf(slotId), ...current })
+      setNames(({ [slotId]: _typed, ...rest }) => rest)
       await refresh()
-      setNotice(`Saved to ${slotLabel(slotId)}.`)
+      setNotice(`Saved to ${saveLabel(slotId, saved)}.`)
+    })
+
+  /** Keeps a name typed for a save that is already there. For an empty slot it waits for the save. */
+  const rename = (slotId: SlotId) =>
+    run(async () => {
+      const summary = summaryOf(slotId)
+      const typed = names[slotId]
+      if (typed === undefined || !summary || summary.unreadable) return
+      if (typed.trim() !== (summary.name ?? '')) await window.api.renameSave({ slotId, name: typed })
+      setNames(({ [slotId]: _typed, ...rest }) => rest)
+      await refresh()
     })
 
   const load = (slotId: SlotId) => run(async () => onLoad(await window.api.loadGame(slotId)))
 
   const remove = (slotId: SlotId) =>
     run(async () => {
-      if (!(await ask({ title: `Delete ${slotLabel(slotId)}?`, detail: 'This cannot be undone.', confirm: 'Delete', grave: true }))) return
+      if (!(await ask({ title: `Delete ${saveLabel(slotId, summaryOf(slotId))}?`, detail: 'This cannot be undone.', confirm: 'Delete', grave: true }))) return
       await window.api.deleteSave(slotId)
+      setNames(({ [slotId]: _typed, ...rest }) => rest)
       await refresh()
     })
 
@@ -81,7 +107,21 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
           return (
             <div key={slotId} className="slot">
               <div>
-                <strong>{slotLabel(slotId)}</strong>
+                {/* A save can be given a name of its own, and called something else at any time. The autosave is the game's, and keeps its own. */}
+                {slotId === AUTO_SLOT_ID || summary?.unreadable || (mode === 'load' && !summary) ? (
+                  <strong>{slotLabel(slotId)}</strong>
+                ) : (
+                  <input
+                    className="slot-name"
+                    value={nameOf(slotId)}
+                    maxLength={SAVE_NAME_CHARS}
+                    placeholder={slotLabel(slotId)}
+                    aria-label={`Name of ${slotLabel(slotId)}`}
+                    onChange={(e) => setNames({ ...names, [slotId]: e.target.value })}
+                    onBlur={() => rename(slotId)}
+                    onKeyDown={(e) => e.key === 'Enter' && e.currentTarget.blur()}
+                  />
+                )}
                 <span>{summary ? describeSave(content, summary) : 'Empty'}</span>
                 {summary && <span>Saved {new Date(summary.savedAt).toLocaleString()}</span>}
               </div>

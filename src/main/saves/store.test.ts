@@ -71,3 +71,30 @@ describe('SaveStore', () => {
     expect(() => store.load('slot1')).toThrow(/Slot 1 could not be read/)
   })
 })
+
+describe('a save with a name', () => {
+  it('is called what it is given, keeps its name when written over, and can be called something else or nothing', async () => {
+    const { saveLabel, RenameSaveRequestSchema } = await import('../../shared/saves')
+    const store = new SaveStore(tempDir())
+    const first = new Date('2026-01-01T10:00:00Z')
+    expect(store.save('slot1', { state, scene: null }, first, 'Before the fair')).toMatchObject({ name: 'Before the fair' })
+    expect(saveLabel('slot1', store.list()[0])).toBe('Before the fair')
+
+    // Written over with no name given, it keeps the one it had.
+    const again = store.save('slot1', { state: { ...state, time: 20 }, scene: null }, new Date('2026-01-02T10:00:00Z'))
+    expect(again).toMatchObject({ name: 'Before the fair', time: 20 })
+
+    // Renamed, it is the same save: only what it is called changes.
+    const renamed = store.rename('slot1', 'After the fair')
+    expect(renamed).toMatchObject({ name: 'After the fair', time: 20, savedAt: again.savedAt })
+    expect(store.load('slot1').state.time).toBe(20)
+
+    // With its name taken away it goes by its slot again.
+    expect(store.rename('slot1', '').unreadable === false && store.list()[0]).toMatchObject({ slotId: 'slot1' })
+    expect(saveLabel('slot1', store.list()[0])).toBe('Slot 1')
+    expect(() => store.rename('slot2', 'Nothing here')).toThrow(/Slot 2 is empty/)
+
+    // A name is trimmed, and no longer than fits.
+    expect(RenameSaveRequestSchema.parse({ slotId: 'slot1', name: `  ${'x'.repeat(60)}  ` }).name).toHaveLength(40)
+  })
+})

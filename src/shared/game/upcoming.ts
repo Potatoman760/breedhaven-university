@@ -57,9 +57,18 @@ export function nextUp(content: ContentPack, state: GameState): Upcoming | undef
   return found.reduce<Upcoming | undefined>((first, next) => (first === undefined || next.time < first.time ? next : first), undefined)
 }
 
+/**
+ * Whether his day is clear from now until a given time: nothing of his own, a class, a shift or another plan, starts
+ * before it. Skipping ahead to something is only offered when it is, so that the skip does not carry him past a class.
+ */
+export function clearUntil(content: ContentPack, state: GameState, time: number): boolean {
+  const next = nextUp(content, state)
+  return next === undefined || next.time >= time
+}
+
 /** The player as he would be on turning up for it: the hours until it starts gone by, and he at the place. */
 export function arriveFor(state: GameState, next: Upcoming): GameState {
-  return { ...state, time: next.time, locationId: next.locationId }
+  return { ...state, time: next.time, locationId: next.locationId, inOwnRoom: false }
 }
 
 /** Whether he could go through with it on turning up: enough energy for the class, and so on. */

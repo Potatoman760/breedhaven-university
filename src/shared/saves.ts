@@ -20,24 +20,43 @@ export const SaveDataSchema = z.object({
 })
 export type SaveData = z.infer<typeof SaveDataSchema>
 
+// As long as a name given to a save can be.
+export const SAVE_NAME_CHARS = 40
+/** A name the player gives a save, as it is kept: trimmed, and no longer than fits. Empty for none. */
+export const SaveNameSchema = z.string().transform((name) => name.trim().slice(0, SAVE_NAME_CHARS))
+
 export const SaveFileSchema = SaveDataSchema.extend({
   version: z.literal(SAVE_VERSION),
+  /** What the player has called it. Left out, it goes by the name of its slot. */
+  name: z.string().optional(),
   /** Real-world time of the save, ISO 8601. */
   savedAt: z.string()
 })
 export type SaveFile = z.infer<typeof SaveFileSchema>
 
-export const SaveRequestSchema = SaveDataSchema.extend({ slotId: SlotIdSchema })
-export type SaveRequest = z.infer<typeof SaveRequestSchema>
+export const SaveRequestSchema = SaveDataSchema.extend({
+  slotId: SlotIdSchema,
+  /** What to call it. Left out, a save written over another keeps the name the other had. */
+  name: SaveNameSchema.optional()
+})
+
+export const RenameSaveRequestSchema = z.object({ slotId: SlotIdSchema, name: SaveNameSchema })
+export type RenameSaveRequest = z.input<typeof RenameSaveRequestSchema>
+export type SaveRequest = z.input<typeof SaveRequestSchema>
 
 /** What the slot list shows. Unreadable saves are listed so they aren't overwritten unknowingly. */
 export type SaveSummary = { slotId: SlotId; savedAt: string } & (
-  | { unreadable: false; time: number; playerName: string; inScene: boolean }
+  | { unreadable: false; time: number; playerName: string; inScene: boolean; /** What the player has called it, if anything. */ name?: string }
   | { unreadable: true }
 )
 
 export function slotLabel(slotId: SlotId): string {
   return slotId === AUTO_SLOT_ID ? 'Autosave' : `Slot ${slotId.slice(4)}`
+}
+
+/** What a save goes by: the name the player gave it, or failing one, the name of its slot. */
+export function saveLabel(slotId: SlotId, summary?: SaveSummary): string {
+  return (summary && !summary.unreadable && summary.name) || slotLabel(slotId)
 }
 
 /** The save "Continue" resumes: the most recently written readable one. */

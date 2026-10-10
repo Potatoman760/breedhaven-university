@@ -1,5 +1,5 @@
 import type { Background, Light, Location, LoveInterest } from '../model'
-import type { GameDate } from './calendar'
+import { toDate, type GameDate } from './calendar'
 
 /** Whether a weekday/period filter matches the given date. Omitted filters match anything. */
 export function matchesWhen(
@@ -42,6 +42,11 @@ export function viewImage(view: Pick<Background, 'images'> | undefined, light: L
 /** Whether a view of a location is under a roof: as the view says, or failing that the location. */
 export function isIndoors(location: Location | undefined, view: Background | undefined): boolean {
   return view?.indoors ?? location?.indoors ?? false
+}
+
+/** Whether a place is open now and stays open for the hours something there takes. */
+export function isOpenFor(calendar: Parameters<typeof toDate>[0], location: Location, time: number, hours: number): boolean {
+  return isOpen(location, toDate(calendar, time).hour) && isOpen(location, toDate(calendar, time + Math.max(1, hours) - 1).hour)
 }
 
 export function isOpen(location: Location, hour: number): boolean {

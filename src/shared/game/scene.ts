@@ -47,12 +47,29 @@ export interface Directives extends SceneLook {
   named: NamedLook[]
   /** How comfortable each love interest says she is, by the name written in the tag. An empty name means the scene's love interest. */
   comfort: NamedComfort[]
+  /** Who the reply says leaves the scene, by the name written, with how she feels and why. */
+  leaving: { name: string; feeling: DepartureFeeling; reason: string }[]
+  /** Who the reply says will be at an event, by the name written (empty for the scene's love interest), and the event's id as written. */
+  attending: { name: string; eventId: string }[]
+  /** The reply says the plan suggested earlier has been agreed to. */
+  agreed: boolean
+  /** The reply says they go to sleep for the night where they are. */
+  slept: boolean
 }
 
 /** A love interest's own reading of how much she wants to be here, as written in a reply. */
 export interface NamedComfort extends Comfort {
   name: string
 }
+
+/** The LLM writes this when the player has agreed in words to a plan it suggested earlier: the plan is booked. */
+export const AGREED_TAG = '[AGREED]'
+/** The LLM writes this when those in the scene go to sleep for the night where they are: the clock goes on to morning. */
+export const SLEEP_TAG = '[SLEEP]'
+// [LEAVES: Bea=hurt saw she was not wanted]: who goes, how she feels, and a few words why.
+const LEAVES_TAG = /\[\s*LEAVES?\s*:\s*([^\]]*?)\s*\]/gi
+// [ATTENDING: societies-fair] or, in a group, [ATTENDING: Bea=societies-fair].
+const ATTENDING_TAG = /\[\s*ATTENDING\s*:\s*([^\]]*?)\s*\]/gi
 
 /** The LLM writes this when sex in the scene ends in a way that could leave her with child. */
 export const SEEDED_TAG = '[SEEDED]'
@@ -123,7 +140,26 @@ export function parseDirectives(written: string): Directives {
     if (level !== undefined) comfort.push({ name: (who ?? '').trim(), level: Number(level), reason: (reason ?? '').trim().slice(0, 160) })
     return ''
   })
-  return { ...splitSceneEnd(withoutComfort), ...look, seeded, named, comfort }
+  // What a character declares in passing: that she leaves, that she will be at something, that a plan is agreed, that the night is slept through.
+  // Each is a line the game acts on and nobody reads.
+  const leaving: Directives['leaving'] = []
+  const withoutLeaving = withoutComfort.replace(LEAVES_TAG, (_tag, written: string) => {
+    const [, who, feeling, reason] = /^([^=:]+?)\s*(?:[=:]\s*(content|hurt|angry)\b[\s:,.\-–—]*(.*))?$/is.exec(written) ?? []
+    if (who) leaving.push({ name: who.trim(), feeling: (feeling?.toLowerCase() as DepartureFeeling | undefined) ?? 'content', reason: (reason ?? '').trim().slice(0, 160) })
+    return ''
+  })
+  const attending: Directives['attending'] = []
+  const withoutAttending = withoutLeaving.replace(ATTENDING_TAG, (_tag, written: string) => {
+    const [, who, eventId] = /^(?:([^=:]*?)\s*[=:]\s*)?(\S.*)$/.exec(written) ?? []
+    if (eventId) attending.push({ name: (who ?? '').trim(), eventId: eventId.trim().toLowerCase() })
+    return ''
+  })
+  const agreedTag = /\[\s*AGREED\s*\]/gi
+  const sleepTag = /\[\s*SLEEP\s*\]/gi
+  const agreed = agreedTag.test(withoutAttending)
+  const slept = sleepTag.test(withoutAttending)
+  const plain = withoutAttending.replace(/\[\s*(?:AGREED|SLEEP)\s*\]/gi, '')
+  return { ...splitSceneEnd(plain), ...look, seeded, named, comfort, leaving, attending, agreed, slept }
 }
 
 /**

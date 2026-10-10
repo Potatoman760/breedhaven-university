@@ -3,6 +3,7 @@ import { timeOn } from './agenda'
 import { toDate } from './calendar'
 import type { Outing } from './outing'
 import { hasMet } from './scene'
+import { isOpenFor } from './schedule'
 
 /** The rules for marks, where the game has coursework. */
 function gradingOf(content: ContentPack): Grading | undefined {
@@ -167,7 +168,12 @@ export function studyPlaces(content: ContentPack, state: GameState, course: Cour
   const classmates = content.loveInterests
     .filter((li) => course.studentIds.includes(li.id) && li.room && hasMet(state, li.id))
     .map((li) => ({ name: `${li.name.split(' ')[0]}'s room`, locationId: li.room!.locationId, roomOf: li }))
-  return [...fixed, { name: 'My own room', locationId: content.newGame.locationId, own: true }, ...classmates]
+  // Only somewhere that is open now, and stays open for as long as the session takes.
+  const open = (place: StudyPlace) => {
+    const location = content.locations.find((l) => l.id === place.locationId)
+    return !location || isOpenFor(content.calendar, location, state.time, grading.studyHours)
+  }
+  return [...fixed, { name: 'My own room', locationId: content.newGame.locationId, own: true }, ...classmates].filter(open)
 }
 
 /** The outing a session of study is: a couple of hours on one course at one place. */

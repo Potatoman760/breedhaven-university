@@ -2,7 +2,7 @@ import type { ContentPack, GameState } from '../model'
 import { attendees } from './appointments'
 import { toDate } from './calendar'
 import { meetingNow } from './courses'
-import { eventsOn } from './events'
+import { eventGoers, eventsOn } from './events'
 import { examOn } from './grades'
 import { firstNames } from './scene'
 
@@ -17,6 +17,8 @@ export interface AgendaItem {
   /** The hour of the day it begins. Left out for something that takes the whole day. */
   startHour?: number
   hours?: number
+  /** What it is, at length, for when it is looked at: an event's description. */
+  description?: string
 }
 
 /** The game time at a given hour of a given day of the game, where day 0 is the day it starts. */
@@ -38,16 +40,26 @@ export function dayAgenda(content: ContentPack, state: GameState, dayIndex: numb
   const morning = timeOn(content, dayIndex, calendar.start.hour)
   const whole: AgendaItem[] = eventsOn(content, state, Math.max(morning, 0))
     .filter(() => morning >= 0)
-    .map((event) => ({ kind: 'event', id: `event-${event.id}`, title: event.name, detail: event.description }))
+    // An event with hours of its own is drawn at them, with where it is; a holiday is the whole day.
+    .map((event) => ({
+      kind: 'event' as const,
+      id: `event-${event.id}`,
+      title: event.name,
+      detail: content.locations.find((l) => l.id === event.locationId)?.name,
+      // Who has said she will be there is part of what there is to read of it.
+      description: [event.description, eventGoers(state, event.id).length > 0 && `${firstNames(content, eventGoers(state, event.id))} said ${eventGoers(state, event.id).length > 1 ? 'they' : 'she'} will be there.`].filter(Boolean).join(' '),
+      startHour: event.startHour,
+      hours: event.startHour === undefined ? undefined : (event.hours ?? 1)
+    }))
 
   for (const [motherId, pregnancy] of Object.entries(state.pregnancies)) {
     if (toDate(calendar, pregnancy.dueAt).dayIndex === dayIndex) {
       whole.push({ kind: 'birth', id: `birth-${motherId}`, title: `${firstNames(content, [motherId])} is due` })
     }
   }
-  if (!inGame) return whole
+  if (!inGame) return whole.filter((item) => item.startHour === undefined)
 
-  const timed: AgendaItem[] = []
+  const timed: AgendaItem[] = whole.filter((item) => item.startHour !== undefined)
   if (content.orientation && content.orientation.day - 1 === dayIndex) {
     for (const step of content.orientation.steps) {
       const place = content.locations.find((l) => l.id === step.locationId)?.name
@@ -93,5 +105,5 @@ export function dayAgenda(content: ContentPack, state: GameState, dayIndex: numb
       hours: plan.hours
     })
   }
-  return [...whole, ...timed.sort((a, b) => (a.startHour ?? 0) - (b.startHour ?? 0))]
+  return [...whole.filter((item) => item.startHour === undefined), ...timed.sort((a, b) => (a.startHour ?? 0) - (b.startHour ?? 0))]
 }

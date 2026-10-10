@@ -19,7 +19,9 @@ export type Period = z.infer<typeof PeriodSchema>
 
 /**
  * A holiday, festival or other dated happening. Authored ones live in the calendar
- * config; ones the LLM invents during a playthrough live in the game state.
+ * config; ones the LLM invents during a playthrough live in the game state. An event is
+ * somewhere, between certain hours of each day it lasts: a fair, a match, a supper. A
+ * holiday is the whole day and nowhere in particular, and has neither.
  */
 export const CalendarEventSchema = z.object({
   id: z.string(),
@@ -32,6 +34,10 @@ export const CalendarEventSchema = z.object({
   year: z.number().int().optional(),
   durationDays: z.number().int().min(1).default(1),
   locationId: z.string().optional(),
+  /** The hour of the day it opens, on each day it lasts. Left out for something that is the whole day. */
+  startHour: z.number().int().min(0).optional(),
+  /** How many hours it runs from then. */
+  hours: z.number().int().min(1).optional(),
   /** No classes meet while it lasts: a holiday, or a break between terms. */
   noClasses: z.boolean().default(false),
   /** True for events invented by the LLM. */

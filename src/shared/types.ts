@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import type { LoveInterest } from './model'
-import type { ComfySettings, ComfyTestResult, CutoutRequest, CutoutResult, GenerateArtRequest, GenerateArtResult, WorkflowListResult } from './comfy'
+import type { ComfyBundle, ComfyBundleCheck, ComfyBundleInstall, ComfySettings, ComfyTestResult, CutoutRequest, CutoutResult, GenerateArtRequest, GenerateArtResult, WorkflowListResult } from './comfy'
 import {
   GameStateSchema,
   PostPlanSchema,
@@ -17,7 +17,7 @@ import type { EditorInfo, EditorResult, ImportAssetRequest } from './editor'
 import type { PostDraft } from './game/feed'
 import type { Outing } from './game/outing'
 import type { SceneLook } from './game/scene'
-import type { SaveData, SaveRequest, SaveSummary, SlotId } from './saves'
+import type { RenameSaveRequest, SaveData, SaveRequest, SaveSummary, SlotId } from './saves'
 import type {
   ListModelsRequest,
   ListModelsResponse,
@@ -47,14 +47,16 @@ export interface ChatResponse {
   looks: Record<string, { outfitId?: string; expression?: string }>
   /** A plan to meet later that the character has just suggested, for the player to accept or decline. */
   proposal?: Proposal
+  /** The plan suggested earlier in the scene was agreed to in words, and is to be put in the calendar. */
+  proposalAccepted?: boolean
   /** Where the character took the scene with the move tool: a location id, or `room-of-<love interest id>`. */
   moveTo?: string
   /** The characters set off with the player for the next thing on his timetable, which they are in too: the scene ends, and that is what comes next. */
   walkTo?: { withIds: string[] }
-  /** What the player found out about the love interests in this reply. */
-  revealed: { loveInterestId: string; factId: string }[]
-  /** Pairs of love interests who became friends, enemies or neither in this reply. */
-  rapport: { a: string; b: string; relation: 'friends' | 'enemies' | 'neither' }[]
+  /** Who said in this reply that she would be at an event, and which. */
+  attending?: { eventId: string; ids: string[] }[]
+  /** They went to sleep for the night where they were: the scene ends there, and once it is settled he wakes in the morning in the same place. */
+  sleptOver?: boolean
   /** How comfortable each love interest said she was in this reply, by id. Kept on the scene for the LLM; never shown. */
   comfort: Record<string, { level: number; reason: string }>
   /** Love interests who gave the player their Bloomr in this reply. */
@@ -76,6 +78,12 @@ export interface SummarizeResponse {
   memories: Record<string, string>
   /** How the scene changed what each love interest feels for the player, by id, and why. None for an NPC. */
   feelings: Record<string, { affection: number; trust: number; desire: number; reason: string }>
+  /** The love interests who had sex with the player in the scene, by id. */
+  intimate: string[]
+  /** What the player found out about the love interests in the scene, as each one's summary told it. */
+  revealed: { loveInterestId: string; factId: string }[]
+  /** Pairs of love interests who became friends, enemies or neither over the scene. */
+  rapport: { a: string; b: string; relation: 'friends' | 'enemies' | 'neither' }[]
   /** What the player paid for in the scene and what it came to, when he paid for anything. */
   spending?: { amount: number; on: string }
   /** Set when the LLM could not be used for at least one of them, which then got the plain fallback note. */
@@ -111,6 +119,8 @@ export interface CourierResponse {
   text: string
   /** A plan the note suggests, for the player to accept or decline. */
   proposal?: Proposal
+  /** Events she said in the note that she would be at. */
+  attending?: { eventId: string; ids: string[] }[]
   /** Ids of the facts about herself that the note let out. */
   revealed?: string[]
   /** The shift the player's boss has accepted he will miss, when the note was to her and said so. */
@@ -162,6 +172,11 @@ export interface TestConnectionResponse {
 export interface RendererApi {
   getContent(): Promise<ContentPack>
   chat(request: SceneRequest): Promise<ChatResponse>
+  /**
+   * Hears, while a reply is still being written, that the scene is going somewhere: the character has called for the move and
+   * the leaving and arriving are being written. Given what to say of it: "Going to the Library". Returns what stops the listening.
+   */
+  onSceneMoving(listener: (where: string) => void): () => void
   summarize(request: SceneRequest): Promise<SummarizeResponse>
   /** Asks the Main LLM to invent upcoming calendar events. May return fewer than asked, or none. */
   generateEvents(request: GenerateEventsRequest): Promise<CalendarEvent[]>
@@ -187,6 +202,8 @@ export interface RendererApi {
   saveGame(request: SaveRequest): Promise<SaveSummary>
   loadGame(slotId: SlotId): Promise<SaveData>
   deleteSave(slotId: SlotId): Promise<void>
+  /** Gives a save a name, or with an empty one takes its name away. Rejects for a slot with nothing in it. */
+  renameSave(request: RenameSaveRequest): Promise<SaveSummary>
   /** The content editor. Changes are written to the user's add-on folder, never to the game's own files. */
   editor: {
     info(): Promise<EditorInfo>
@@ -236,6 +253,12 @@ export interface RendererApi {
     chooseFolder(): Promise<string | null>
     /** Reads the workflow folder as the saved settings have it. */
     workflows(): Promise<WorkflowListResult>
+    /** The workflows the game ships with, and what each calls for. */
+    bundle(): Promise<ComfyBundle>
+    /** Has the player pick a folder, writes the game's workflows into it and points the settings at them. Never rejects. */
+    installBundle(): Promise<ComfyBundleInstall>
+    /** Asks the ComfyUI in the settings which of the models and nodes the game's workflows call for it lacks. Never rejects. */
+    checkBundle(): Promise<ComfyBundleCheck>
     /** Draws one picture and files it in the add-on folder. Never rejects; a failure comes back as `message`. */
     generate(request: GenerateArtRequest): Promise<GenerateArtResult>
     /** Gives up on the picture being drawn, if one is. */

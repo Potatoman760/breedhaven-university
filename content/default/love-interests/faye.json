@@ -231,6 +231,48 @@
       "description": "",
       "image": "sprites/faye/nsfw-facial.png",
       "loop": true
+    },
+    {
+      "id": "pregnant-blowjob",
+      "name": "Blowjob, pregnant",
+      "description": "",
+      "image": "sprites/faye/nsfw-pregnant-blowjob.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-missionary",
+      "name": "Missionary, pregnant",
+      "description": "",
+      "image": "sprites/faye/nsfw-pregnant-missionary.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-doggy",
+      "name": "Doggy, pregnant",
+      "description": "",
+      "image": "sprites/faye/nsfw-pregnant-doggy.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-cowgirl",
+      "name": "Cowgirl, pregnant",
+      "description": "",
+      "image": "sprites/faye/nsfw-pregnant-cowgirl.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-creampie",
+      "name": "Creampie, pregnant",
+      "description": "",
+      "image": "sprites/faye/nsfw-pregnant-creampie.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-facial",
+      "name": "Facial, pregnant",
+      "description": "",
+      "image": "sprites/faye/nsfw-pregnant-facial.png",
+      "loop": true
     }
   ],
   "schedule": [
@@ -286,8 +328,11 @@
   },
   "ai": {
     "speechPattern": "Calculating, yet always sultry and seductive. Knows she is desirable and uses that confidence to her advantage, even while discussing business.",
-    "tone": "",
-    "verbalQuirks": [],
+    "tone": "sultry, sharp, amused",
+    "verbalQuirks": [
+      "Lets a pause hang after a suggestive line, to see what it is worth.",
+      "Calls someone  \"sweetheart\" when she has the upper hand."
+    ],
     "exampleDialogue": [],
     "backstory": "Studies: Final year, College of Business (Economics)\n\nPost: Analyst intern at the Broodmarket Group; runs a small licensed tonic business from her flat\n\nFaye Fertillay is twenty-two, sharp-tongued, and entirely aware of her own appeal.",
     "knowledge": [],

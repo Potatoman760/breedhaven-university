@@ -77,7 +77,11 @@ describe('look directives', () => {
       expression: 'Happy',
       seeded: [],
       named: [],
-      comfort: []
+      comfort: [],
+      leaving: [],
+      attending: [],
+      agreed: false,
+      slept: false
     })
     expect(parseDirectives('Yes.\n[ANIMATION: missionary]').animationId).toBe('missionary')
     // A pose goes on top of a face and an outfit, and is asked for beside them.
@@ -89,7 +93,11 @@ describe('look directives', () => {
       animationId: null,
       seeded: [],
       named: [],
-      comfort: []
+      comfort: [],
+      leaving: [],
+      attending: [],
+      agreed: false,
+      slept: false
     })
   })
 
@@ -334,5 +342,20 @@ describe('what a reasoning model thought first', () => {
     // A block whose opening was cut off is dropped up to where it closes.
     expect(parseDirectives('she would tease him.</think>\nAna: You came.').text).toBe('Ana: You came.')
     expect(parseDirectives('Ana: I think so.').text).toBe('Ana: I think so.')
+  })
+})
+
+describe('what a character declares in a reply', () => {
+  it('is read from lines of its own and never shown: leaving, being at an event, a plan agreed, the night slept through', () => {
+    const read = parseDirectives('She gathers her things.\n[LEAVES: Bea=hurt saw she was not wanted]\n[ATTENDING: Societies-Fair]\n[AGREED]\n[SLEEP]')
+    expect(read.text).toBe('She gathers her things.')
+    expect(read.leaving).toEqual([{ name: 'Bea', feeling: 'hurt', reason: 'saw she was not wanted' }])
+    expect(read.attending).toEqual([{ name: '', eventId: 'societies-fair' }])
+    expect(read.agreed).toBe(true)
+    expect(read.slept).toBe(true)
+    // Who it is, in a group; and a leaving with no feeling given is simply a going.
+    expect(parseDirectives('[ATTENDING: Bea=fair]\n[LEAVES: Cy]').attending).toEqual([{ name: 'Bea', eventId: 'fair' }])
+    expect(parseDirectives('[LEAVES: Cy]\nOff she goes.')).toMatchObject({ text: 'Off she goes.', leaving: [{ name: 'Cy', feeling: 'content', reason: '' }] })
+    expect(parseDirectives('Good night.')).toMatchObject({ leaving: [], attending: [], agreed: false, slept: false })
   })
 })

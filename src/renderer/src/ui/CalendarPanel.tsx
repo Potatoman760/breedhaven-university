@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { dayAgenda, dayIndexOf, removeEvent, toDate, upcomingEvents, type AgendaItem } from '../../../shared/game'
+import { dayAgenda, dayIndexOf, eventHours, eventsOn, removeEvent, toDate, upcomingEvents, type AgendaItem } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { Dialog } from './Dialog'
 import { ChevronIcon } from './icons'
@@ -50,6 +50,10 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
   const [mode, setMode] = useState<'week' | 'month'>('week')
   // Weeks, or months, away from the current one.
   const [offset, setOffset] = useState(0)
+  // What has been picked out of the calendar to be read about, and the day it was picked on.
+  const [picked, setPicked] = useState<{ item: AgendaItem; dayIndex: number } | null>(null)
+  const placeName = (locationId: string | undefined) => content.locations.find((l) => l.id === locationId)?.name
+  const onNow = eventsOn(content, state)
 
   const week = calendar.weekdays.length
   const weekdayOf = (dayIndex: number) => (((calendar.startWeekday + dayIndex) % week) + week) % week
@@ -144,9 +148,9 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
               {weekDays.map((d) => (
                 <div key={d.dayIndex} className="week-whole">
                   {d.whole.map((item) => (
-                    <span key={item.id} className={`entry ${item.kind}`} title={item.detail}>
+                    <button key={item.id} type="button" className={`entry ${item.kind}`} title={item.detail} onClick={() => setPicked({ item, dayIndex: d.dayIndex })}>
                       {item.title}
-                    </span>
+                    </button>
                   ))}
                 </div>
               ))}
@@ -174,6 +178,10 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
                     return (
                       <div
                         key={item.id}
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => setPicked({ item, dayIndex: d.dayIndex })}
+                        onKeyDown={(e) => e.key === 'Enter' && setPicked({ item, dayIndex: d.dayIndex })}
                         className={`entry timed ${item.kind}`}
                         title={[`${clock(item.startHour ?? 0)} to ${clock((item.startHour ?? 0) + (item.hours ?? 1))}`, item.title, item.detail].filter(Boolean).join(' · ')}
                         style={{
@@ -237,12 +245,40 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
         </div>
 
         <div className="upcoming">
+          {/* Whatever was last pressed in the calendar, in full: when, where, and what it is. */}
+          {picked && (
+            <div className={`card picked ${picked.item.kind}`}>
+              <span className="hint">
+                {(() => {
+                  const date = label(picked.dayIndex)
+                  const { startHour, hours: length } = picked.item
+                  return `${calendar.weekdays[weekdayOf(picked.dayIndex)]} ${date.day} ${date.month.name}${startHour === undefined ? ' · all day' : ` · ${clock(startHour)} to ${clock(startHour + (length ?? 1))}`}`
+                })()}
+              </span>
+              <strong>{picked.item.title}</strong>
+              {picked.item.detail && <span className="caps">{picked.item.detail}</span>}
+              {picked.item.description && <span>{picked.item.description}</span>}
+              <button className="quiet" onClick={() => setPicked(null)}>
+                Close
+              </button>
+            </div>
+          )}
+          {onNow.length > 0 && <h2>On today</h2>}
+          {onNow.map((event) => (
+            <div key={event.id} className="card">
+              <span className="hint">{[eventHours(event) ?? 'All day', placeName(event.locationId)].filter(Boolean).join(' · ')}</span>
+              <strong>{event.name}</strong>
+              {event.description && <span>{event.description}</span>}
+            </div>
+          ))}
           <h2>Coming up</h2>
           {upcomingEvents(content, state, UPCOMING_DAYS).map(({ event, inDays }) => (
             <div key={event.id} className="card">
               <span className="hint">
                 {inDays === 1 ? 'Tomorrow' : `In ${inDays} days`}
                 {event.durationDays > 1 && ` · ${event.durationDays} days long`}
+                {eventHours(event) && ` · ${eventHours(event)}`}
+                {placeName(event.locationId) && ` · ${placeName(event.locationId)}`}
                 {event.generated && ' · invented by the AI'}
               </span>
               <strong>{event.name}</strong>

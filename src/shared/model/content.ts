@@ -35,6 +35,8 @@ export const ContentPackSchema = z.object({
   npcs: z.array(NpcSchema).default([]),
   newGame: NewGameSchema,
   coursework: CourseworkConfigSchema.optional(),
+  /** Lines shown under the logo while a scene loads, one at a time. An empty one is never shown. */
+  tips: z.array(z.string()).default([]),
   /** The course catalogue built in the editor. A pack with coursework needs one before a game can start. */
   catalogue: CatalogueSchema.optional(),
   orientation: OrientationSchema.optional(),

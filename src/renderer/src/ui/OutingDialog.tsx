@@ -1,4 +1,5 @@
-import { checkOuting, describeOuting, describeWhen, firstNames, outingMisses, studyPoints, type Outing } from '../../../shared/game'
+import { useState } from 'react'
+import { checkOuting, describeOuting, describeWhen, firstNames, formatTime, outingHourRange, outingMisses, studyPoints, toDate, type Outing } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { Dialog } from './Dialog'
 
@@ -14,10 +15,16 @@ interface Props {
 const hours = (n: number) => `${n} hour${n === 1 ? '' : 's'}`
 
 /** Confirms something the player typed to do, and says what is in the way if it can't happen yet. */
-export function OutingDialog({ content, state, outing, onGo, onClose }: Props) {
+export function OutingDialog({ content, state, outing: asked, onGo, onClose }: Props) {
+  // How long it takes is his to choose, where it can be chosen: an hour at the least, and for an event no longer than is left of it.
+  const window = asked.window
+  const range = outingHourRange(state, asked)
+  const mostHours = range?.max ?? asked.hours
+  const [stay, setStay] = useState(asked.hours)
+  const outing = range ? { ...asked, hours: Math.min(Math.max(range.min, stay), range.max) } : asked
   const check = checkOuting(content, state, outing)
   const wait = check.waitHours
-  // What going would cost him: a class or a shift that falls in those hours.
+  // What going would cost him: a class, a shift or a plan that falls in those hours.
   const missed = wait === undefined ? [] : outingMisses(content, state, outing, wait)
 
   return (
@@ -25,6 +32,22 @@ export function OutingDialog({ content, state, outing, onGo, onClose }: Props) {
       <p>
         {describeOuting(content, outing)}.
       </p>
+      {range && range.max > range.min && (
+        <div className="outing-hours">
+          <span className="hint">
+            {window ? `It runs from ${formatTime(toDate(content.calendar, window.from))} to ${formatTime(toDate(content.calendar, window.until))}. How long will you stay?` : 'How long?'}
+          </span>
+          <div className="stepper">
+            <button type="button" className="secondary" aria-label="An hour less" disabled={outing.hours <= 1} onClick={() => setStay(outing.hours - 1)}>
+              −
+            </button>
+            <strong>{hours(outing.hours)}</strong>
+            <button type="button" className="secondary" aria-label="An hour more" disabled={outing.hours >= mostHours} onClick={() => setStay(outing.hours + 1)}>
+              +
+            </button>
+          </div>
+        </div>
+      )}
       {outing.studyCourseId && (
         <p className="hint">
           It is worth {studyPoints(content, outing)} points in the course{outing.ownRoom ? ', one of them for the quiet of your own room' : ''}.

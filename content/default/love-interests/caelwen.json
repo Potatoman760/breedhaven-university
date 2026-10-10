@@ -238,6 +238,48 @@
       "description": "",
       "image": "sprites/caelwen/nsfw-facial.png",
       "loop": true
+    },
+    {
+      "id": "pregnant-blowjob",
+      "name": "Blowjob, pregnant",
+      "description": "",
+      "image": "sprites/caelwen/nsfw-pregnant-blowjob.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-missionary",
+      "name": "Missionary, pregnant",
+      "description": "",
+      "image": "sprites/caelwen/nsfw-pregnant-missionary.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-doggy",
+      "name": "Doggy, pregnant",
+      "description": "",
+      "image": "sprites/caelwen/nsfw-pregnant-doggy.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-cowgirl",
+      "name": "Cowgirl, pregnant",
+      "description": "",
+      "image": "sprites/caelwen/nsfw-pregnant-cowgirl.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-creampie",
+      "name": "Creampie, pregnant",
+      "description": "",
+      "image": "sprites/caelwen/nsfw-pregnant-creampie.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-facial",
+      "name": "Facial, pregnant",
+      "description": "",
+      "image": "sprites/caelwen/nsfw-pregnant-facial.png",
+      "loop": true
     }
   ],
   "schedule": [

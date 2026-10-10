@@ -9,7 +9,8 @@
   "personality": "Torn between duty and personal desire, with a compassionate heart. Already wise in the ways of the world. Calm, observant, and experienced rather than naive or cold.",
   "traitIds": [
     "bookish",
-    "loyal"
+    "loyal",
+    "dirty-talk"
   ],
   "likes": [
     "devotional",
@@ -230,6 +231,48 @@
       "description": "",
       "image": "sprites/dinah/nsfw-facial.png",
       "loop": true
+    },
+    {
+      "id": "pregnant-blowjob",
+      "name": "Blowjob, pregnant",
+      "description": "",
+      "image": "sprites/dinah/nsfw-pregnant-blowjob.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-missionary",
+      "name": "Missionary, pregnant",
+      "description": "",
+      "image": "sprites/dinah/nsfw-pregnant-missionary.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-doggy",
+      "name": "Doggy, pregnant",
+      "description": "",
+      "image": "sprites/dinah/nsfw-pregnant-doggy.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-cowgirl",
+      "name": "Cowgirl, pregnant",
+      "description": "",
+      "image": "sprites/dinah/nsfw-pregnant-cowgirl.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-creampie",
+      "name": "Creampie, pregnant",
+      "description": "",
+      "image": "sprites/dinah/nsfw-pregnant-creampie.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-facial",
+      "name": "Facial, pregnant",
+      "description": "",
+      "image": "sprites/dinah/nsfw-pregnant-facial.png",
+      "loop": true
     }
   ],
   "schedule": [
@@ -269,9 +312,13 @@
     "background": "generated/backgrounds/dinah/view.png"
   },
   "ai": {
-    "speechPattern": "",
+    "speechPattern": "Soft, unhurried and exact, in whole sentences, the way someone speaks who is used to being listened to in a quiet room. She reaches for the language of the Order without preaching, and asks gentle questions that go straight to the point. When her own wants come near the surface she grows more formal, not less.",
     "tone": "serious and earnest",
-    "verbalQuirks": [],
+    "verbalQuirks": [
+      "Asks a quiet question back instead of answering one about herself.",
+      "Folds a phrase of doctrine into ordinary talk: the Furrow, the Bloom's will, an answered womb.",
+      "Pauses and lowers her eyes before saying anything she is not sure she should want."
+    ],
     "exampleDialogue": [],
     "backstory": "Studies: Graduate student, College of Bloom Studies and Divinity (Bloom Theology); thesis on the Doctrine of the Answered Womb\n\nDeeply religious and believes a woman's calling in life is to be bred and pregnant\n\nPost: Volunteer at Bloom Counselling, in the rooms over the campus chapel\n\nAn elven woman of striking pallor, Dinah was born into a minor noble house and promised to the Order as a girl. The Order asks its priestesses to finish a graduate degree before ordination, and she is in her last years of it: learned in doctrine, unshakable in debate, and gentle with people. She spends her evenings at Bloom Counselling with students who are frightened by what they want, or by not wanting it. She expects to take vows when her thesis is accepted, and has not let herself ask whether she wants to.\n\nShe is a sincere Bloomist. The Sower's covenant is living truth to her, not metaphor. She has also sat with enough Freewill students to know the Order's answers do not fit everyone, and that knowledge is the crack in her certainty.\n\nHer magic is a healer's: a hand on a shoulder slows a racing pulse and eases pain. She is careful never to do it uninvited.",
     "knowledge": [],

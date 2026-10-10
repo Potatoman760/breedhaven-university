@@ -98,6 +98,14 @@ export const GameStateSchema = z.object({
   met: z.array(z.string()),
   /** The job the player holds, or null when he has none. */
   job: EmploymentSchema.nullable(),
+  /** How many scenes each love interest has had sex with the player in, by id. Counted once a scene, when it ends. */
+  timesIntimate: z.record(z.string(), z.number().int().min(0)).default({}),
+  /** How many scenes he has had sex in with two or more love interests at once. Kept, and shown nowhere yet. */
+  threesomes: z.number().int().min(0).default(0),
+  /** Who has said she will be at an event, by the event's id: she is there when he goes to it. */
+  eventGoers: z.record(z.string(), z.array(z.string())).default({}),
+  /** He is in his own room, in the place it is in, and not merely somewhere in that place: what is shown behind him is the room. */
+  inOwnRoom: z.boolean().default(false),
   /** Jobs he has quit or been let go from. None of them will have him back. */
   formerJobs: z.array(z.string()),
   /** Those who can be messaged, by id: love interests who have given the player their Bloomr, and the boss of any job he has held. */

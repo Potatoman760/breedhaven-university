@@ -217,3 +217,17 @@ describe("the player's own room", () => {
     expect(ids()).not.toContain('room-of-player')
   })
 })
+
+describe('the time shown while a scene is under way', () => {
+  it('is the middle of it, fixed for as long as it lasts, and only for showing', async () => {
+    const { sceneClock } = await import('./sceneMoves')
+    const began = (time: number) => ({ baseline: { ...sceneBaseline(state, 'ana'), time } })
+    // An hour from 14:00 (time 8) to 15:00 (time 9) is shown as half past.
+    expect(sceneClock({ ...state, time: 9 }, began(8))).toEqual({ time: 8, minute: 30 })
+    // Two hours are shown at the hour between; three, at half past the second.
+    expect(sceneClock({ ...state, time: 10 }, began(8))).toEqual({ time: 9, minute: 0 })
+    expect(sceneClock({ ...state, time: 11 }, began(8))).toEqual({ time: 9, minute: 30 })
+    // One that has taken no time is shown at the hour it is.
+    expect(sceneClock({ ...state, time: 8 }, began(8))).toEqual({ time: 8, minute: 0 })
+  })
+})

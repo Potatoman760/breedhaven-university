@@ -79,3 +79,16 @@ describe('giving', () => {
     expect(buildCharacterPrompt({ content, state, loveInterestId: 'ana' })).not.toContain('## Gifts')
   })
 })
+
+describe('ordering from his phone', () => {
+  it('buys from any stall, wherever he is and whatever the hour, for the same money', () => {
+    const away = { ...atShop(20), locationId: 'home', time: 10 }
+    expect(canBuy(content, away, 'posy').ok).toBe(false)
+    expect(canBuy(content, away, 'posy', true).ok).toBe(true)
+    const after = buy(content, away, 'posy', true)
+    expect(after.inventory['posy']).toBe(1)
+    expect(after.player.money).toBeLessThan(20)
+    expect(canBuy(content, { ...away, player: { ...away.player, money: 0 } }, 'posy', true).reasons).toEqual(['Not enough money'])
+    expect(canBuy(content, away, 'no-such-thing', true).reasons).toEqual(['Not sold anywhere'])
+  })
+})

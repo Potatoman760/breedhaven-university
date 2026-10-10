@@ -3,6 +3,7 @@ import { acceptProposal, allFree, attendees, describeWhen, proposeMeeting, upcom
 import { toDate } from './calendar'
 import { handleOf } from './feed'
 import { bondOf, statusOf } from './bonds'
+import { addMemory } from './memory'
 import { appealLevel } from './stats'
 
 // About 600 tokens of the exchange are shown to a character, at four characters a token.
@@ -104,6 +105,62 @@ export function planFor(state: GameState, proposal: Proposal): Appointment | und
   return state.appointments.find((a) => a.loveInterestId === proposal.loveInterestId && a.time === proposal.time && a.locationId === proposal.locationId)
 }
 
+// What not turning up for a plan, with no word sent, costs him with each of those who were waiting.
+export const STOOD_UP = { affection: -8, trust: -10 } as const
+
+/**
+ * Counts up the plans whose time has gone by without his keeping them. Each comes off the
+ * calendar, and everyone who was waiting thinks the less of him for it and remembers it.
+ * A plan he kept was taken off the calendar when he turned up, and one he cancelled when
+ * he said so, so neither is here to be counted.
+ */
+export function settleAppointments(content: ContentPack, state: GameState): { state: GameState; missed: Appointment[] } {
+  const missed = state.appointments.filter((plan) => plan.time + plan.hours <= state.time)
+  if (missed.length === 0) return { state, missed }
+  const within = (value: number) => Math.max(0, Math.min(content.relationships.meterMax, value))
+  let next: GameState = { ...state, appointments: state.appointments.filter((plan) => !missed.includes(plan)) }
+  for (const plan of missed) {
+    const where = content.locations.find((l) => l.id === plan.locationId)?.name ?? plan.locationId
+    for (const id of attendees(plan)) {
+      const rel = next.relationships[id]
+      if (!rel) continue
+      next = { ...next, relationships: { ...next.relationships, [id]: { ...rel, affection: within(rel.affection + STOOD_UP.affection), trust: within(rel.trust + STOOD_UP.trust) } } }
+      next = addMemory(next, id, `${state.player.name} never turned up for "${plan.title}" at ${where}, ${describeWhen(content, plan.time)}, and sent no word. You waited for him.`)
+    }
+  }
+  return { state: next, missed }
+}
+
+/** The plans still to come that a love interest is part of, soonest first: what he could call off by writing to her. */
+export function plansWith(state: GameState, loveInterestId: string): Appointment[] {
+  return upcomingAppointments(state).filter((plan) => plan.time > state.time && attendees(plan).includes(loveInterestId))
+}
+
+/** What he writes to call a plan off. */
+export function cancelText(content: ContentPack, plan: Appointment): string {
+  return `I'm sorry, I can't make ${plan.title} on ${describeWhen(content, plan.time)}. Something has come up.`
+}
+
+/**
+ * Calls a plan off by DM, before it starts. It comes off the calendar, so there is nothing to
+ * miss and nothing held against him for missing it; what is left of it is the message saying so,
+ * in the thread of everyone in it whose Bloomr he has. The invitation it came from is marked cancelled.
+ */
+export function cancelAppointment(content: ContentPack, state: GameState, appointmentId: string): GameState {
+  const plan = state.appointments.find((a) => a.id === appointmentId)
+  if (!plan || plan.time <= state.time) return state
+  let next: GameState = { ...state, appointments: state.appointments.filter((a) => a.id !== appointmentId) }
+  for (const id of attendees(plan).filter((who) => hasContact(state, who))) {
+    const thread = courierThread(next, id).map((note) =>
+      note.answer === 'accepted' && note.proposal && note.proposal.loveInterestId === plan.loveInterestId && note.proposal.time === plan.time && note.proposal.locationId === plan.locationId
+        ? { ...note, answer: 'cancelled' as const }
+        : note
+    )
+    next = addNote({ ...next, courier: { ...next.courier, [id]: thread } }, id, { from: 'player', text: cancelText(content, plan), read: true })
+  }
+  return next
+}
+
 /**
  * Answers the invitation in the given note of a thread. Accepting puts it on the calendar,
  * unless its time has passed or been taken since, in which case it lapses.
@@ -144,7 +201,7 @@ export function courierExcerpt(
   for (let i = thread.length - 1; i >= 0; i--) {
     const note = thread[i]
     const plan = note.proposal
-      ? ` [invitation: ${note.proposal.title}, ${describeWhen(content, note.proposal.time)}; ${note.answer ?? 'not yet answered'}]`
+      ? ` [invitation: ${note.proposal.title}, ${describeWhen(content, note.proposal.time)}; ${note.answer === 'cancelled' ? `accepted, then called off by ${state.player.name}` : (note.answer ?? 'not yet answered')}]`
       : ''
     const line = `${note.from === 'player' ? state.player.name : them}: ${note.text}${plan}`
     used += line.length

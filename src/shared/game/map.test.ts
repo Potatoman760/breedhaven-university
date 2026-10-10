@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { GameState } from '../model'
-import { canTravel, loveInterestsAt, travel, whereaboutsUnknown } from './map'
+import { canTravel, locationOf, loveInterestsAt, travel, whereaboutsUnknown } from './map'
 import { createInitialState } from './state'
 import { fixture } from './testFixture'
 
@@ -49,5 +49,16 @@ describe('travel', () => {
     expect(canTravel(content, start(), 'nowhere').ok).toBe(false)
     expect(canTravel(content, { ...start(), time: 134 }, 'shop').reasons).toContain('The game is over')
     expect(canTravel({ ...content, map: undefined }, start(), 'shop').ok).toBe(false)
+  })
+})
+
+describe('someone with nothing on her schedule', () => {
+  it('is in her own room: nowhere on the map, and listed as such', () => {
+    const [ana] = content.loveInterests
+    const idle = { ...ana, schedule: [], room: { name: 'a loft', description: '', locationId: 'shop' } }
+    const quiet = { ...content, loveInterests: [idle] }
+    expect(locationOf(quiet, start(), idle)).toBeUndefined()
+    expect(whereaboutsUnknown(quiet, start()).map((li) => li.id)).toEqual([idle.id])
+    expect(loveInterestsAt(quiet, start(), 'shop')).toEqual([])
   })
 })

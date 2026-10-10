@@ -1,24 +1,25 @@
-import { picturedOutfit, EXPRESSIONS, poseDescription, kindOf, outfitDescription, type ChatMessage, type ContentPack, type LoveInterest, type Departure, type GameState, type Lesson, type Npc, type Scene, type SceneBeat, type SceneGift } from '../model'
+import { picturedOutfit, EXPRESSIONS, isPregnantPose, poseDescription, kindOf, outfitDescription, type ChatMessage, type ContentPack, type LoveInterest, type Departure, type GameState, type Lesson, type Npc, type Proposal, type Scene, type SceneBeat, type SceneGift } from '../model'
 import { describeGift } from './market'
 import { attendees, describeWhen, upcomingAppointments } from './appointments'
 import { bondOf, describeBonds, statusOf } from './bonds'
 import { formatDate, formatTime, toDate } from './calendar'
 import { codexExcerpt, selectCodexEntries } from './codex'
 import { DM_CLOSE, DM_OPEN, courierExcerpt, hasContact, offersContact } from './courier'
-import { recentPostsBy } from './feed'
+import { handleOf, recentPostsBy } from './feed'
 import { describeRapport } from './rapport'
 import { locationOf } from './map'
 import { classSoon } from './courses'
 import { PLAYER_TOKEN } from './personalise'
 import { nextUp } from './upcoming'
+import { canSleepOver } from './sleep'
 import { jobFacts } from './jobs'
 import { describeAppeal } from './stats'
 import { evaluateAll } from './conditions'
-import { eventsOn, upcomingEvents } from './events'
-import { describeAge, describeBeat, selectMemories } from './memory'
+import { attendableEvents, describeEvent, eventGoers, eventsOn, upcomingEvents } from './events'
+import { describeAge, describeBeat, describeIntimacy, selectMemories } from './memory'
 import { stageFor } from './relationships'
-import { describePregnancy, canConceive, pregnancyStage, wearableOutfits, wornOutfit } from './pregnancy'
-import { firstNames, SCENE_END_TAG, SEEDED_TAG } from './scene'
+import { describePregnancy, canConceive, ordinaryOutfit, pregnancyStage, wearableOutfits, wornOutfit } from './pregnancy'
+import { AGREED_TAG, firstNames, SCENE_END_TAG, SEEDED_TAG, SLEEP_TAG } from './scene'
 import { describePlayerRoom, playerRoom, describePlace, describeRoom, describeWeather, roomOwner, sceneView } from './sceneMoves'
 import { backgroundFor, isIndoors } from './schedule'
 import { weatherOn } from './weather'
@@ -90,6 +91,8 @@ export interface PromptInput {
   comfort?: Scene['comfort']
   /** Gifts the player has handed over in the current scene. */
   gifts?: SceneGift[]
+  /** A plan a character has suggested in this scene that the player has not yet put in his calendar. */
+  pendingProposal?: Proposal
   memoryBudgetChars?: number
   /** Recent conversation text, used to pick relevant codex entries. */
   recentText?: string
@@ -165,24 +168,28 @@ export function buildCharacterPrompt(input: PromptInput): string {
   const done = sceneBeats.filter((beat) => beat.finished)
   const current = sceneBeats.filter((beat) => !beat.finished)
   const outfit = wornOutfit(content, state, li, look?.outfitId)
-  /** Said of anyone far enough along to show: which outfits are hers to wear now. */
+  /** Said of anyone far enough along to show: that it shows in every picture of her, with nothing for the writer to do about it. */
   const pregnantNote = (c: LoveInterest, who: string, is: string): string | false => {
     const stage = pregnancyStage(content, state, c.id)
-    return stage?.showing === true && `${who} ${is} ${stage.name} and showing, so ${who === 'You' ? 'you wear only your' : 'she wears only her'} pregnant outfits: "pregnant" dressed, "nude-pregnant" undressed.`
+    return stage?.showing === true && `${who} ${is} ${stage.name} and showing. Every picture of ${who === 'You' ? 'you' : 'her'} is drawn pregnant by the game: choose outfits and poses as you would at any other time.`
   }
-  const outfits = wearableOutfits(content, state, li)
+  // What she is asked to wear is always one of her ordinary outfits: the game puts her in its pregnant form itself.
+  const outfits = wearableOutfits(li)
+  const wearing = (c: LoveInterest, worn: ReturnType<typeof wornOutfit>): string => (worn ? ordinaryOutfit(c, worn).id : c.defaultOutfitId)
   const cast = [li, ...companions]
   const fertile = cast.filter((c) => canConceive(content, state, c.id))
   // Only a pose with something to show can be asked for.
-  const posesOf = (who: LoveInterest) => who.animations.filter((a) => a.image !== undefined || a.clip !== undefined)
-  const animations = li.animations.filter((a) => a.image !== undefined || a.clip !== undefined)
+  // The poses that can be asked for are the ordinary ones. One drawn pregnant is put up in its place by the game, once she shows.
+  const posesOf = (who: LoveInterest) => who.animations.filter((a) => (a.image !== undefined || a.clip !== undefined) && !isPregnantPose(a.id))
+  const animations = posesOf(li)
   const traitsOf = (ids: string[]) => content.traits.filter((t) => ids.includes(t.id))
   const isBirthday = li.birthday?.month === date.month.id && li.birthday.day === date.day
 
   const ctx = { state, content, loveInterestId: li.id }
   const shareable = li.ai.secrets.filter((s) => evaluateAll(s.revealWhen, ctx))
   const guarded = li.ai.secrets.filter((s) => !shareable.includes(s))
-  const memories = selectMemories(state.memories[li.id] ?? [], input.memoryBudgetChars)
+  // An NPC keeps no memory of him: each time is the first, as far as she is told.
+  const memories = input.npc ? [] : selectMemories(state.memories[li.id] ?? [], input.memoryBudgetChars)
   const lore = selectCodexEntries({
     content,
     state,
@@ -319,6 +326,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
       `Stage: ${stage.name}. ${stage.description}`.trim(),
       `Affection ${rel.affection}, trust ${rel.trust}, desire ${rel.desire} ` +
         `(each out of ${content.relationships.meterMax}).`,
+      `${describeIntimacy(state, li.id)}.`,
       ...describeAppeal(state, li)
     ]),
 
@@ -350,7 +358,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
     group &&
       section('How the women here stand with each other', [
         ...describeRapport(content, state, cast.map((c) => c.id)),
-        'Play this between them as well as toward ' + player.name + '. If something in this scene truly changes it (a falling-out, a peace made, a friendship struck), call set_rapport.'
+        'Play this between them as well as toward ' + player.name + '. If something in this scene truly changes it (a falling-out, a peace made, a friendship struck), let it show: it is noted when the scene is over.'
       ]),
 
     section(
@@ -365,9 +373,9 @@ export function buildCharacterPrompt(input: PromptInput): string {
       `It is ${formatTime(date)} (${date.period.name}) on ${formatDate(date)}.`,
       weather &&
         describeWeather(weather, byCourier ? (whereabouts ? isIndoors(whereabouts, herView) : true) : owner !== undefined || his !== undefined || isIndoors(location, view)),
-      ...eventsOn(content, state).map((e) => `Today is ${e.name}. ${e.description}`.trim()),
+      ...eventsOn(content, state).map((e) => `Today is ${e.name}. ${describeEvent(content, e)}${eventGoers(state, e.id).includes(li.id) ? ` You told ${player.name} you would be there.` : ''}`.trim()),
       ...upcomingEvents(content, state, UPCOMING_EVENT_DAYS).map(({ event, inDays }) =>
-        `${event.name} is ${inDays === 1 ? 'tomorrow' : `in ${inDays} days`}. ${event.description}`.trim()
+        `${event.name} is ${inDays === 1 ? 'tomorrow' : `in ${inDays} days`}. ${describeEvent(content, event)}${eventGoers(state, event.id).includes(li.id) ? ` You told ${player.name} you would be there.` : ''}`.trim()
       ),
       isBirthday && 'Today is your birthday.',
       byCourier
@@ -470,9 +478,9 @@ export function buildCharacterPrompt(input: PromptInput): string {
               'When what one of you is wearing changes in the story, write [OUTFIT: Name=id] on a line after the faces:',
               ...cast.map((c) => {
                 const worn = wornOutfit(content, state, c, c.id === li.id ? look.outfitId : input.looks?.[c.id]?.outfitId)
-                const has = wearableOutfits(content, state, c).map((o) => `${o.id} (${o.name})`).join(', ')
+                const has = wearableOutfits(c).map((o) => `${o.id} (${o.name})`).join(', ')
                 const first = c.name.split(' ')[0]
-                return `- ${first} is wearing "${worn?.id ?? c.defaultOutfitId}". She has: ${has}.${pregnantNote(c, first, 'is') ? ` ${pregnantNote(c, first, 'is')}` : ''}`
+                return `- ${first} is wearing "${wearing(c, worn)}". She has: ${has}.${pregnantNote(c, first, 'is') ? ` ${pregnantNote(c, first, 'is')}` : ''}`
               }),
               // Poses belong to one of them each, and one is shown at a time, over everyone.
               ...(cast.some((c) => posesOf(c).length > 0)
@@ -489,12 +497,12 @@ export function buildCharacterPrompt(input: PromptInput): string {
             ]
           : [
               pregnantNote(li, 'You', 'are'),
-              `You are wearing "${outfit?.id ?? li.defaultOutfitId}". When what you are wearing changes in the story, write [OUTFIT: id] on a line after your face:`,
+              `You are wearing "${wearing(li, outfit)}". When what you are wearing changes in the story, write [OUTFIT: id] on a line after your face:`,
               ...outfits.flatMap((o) => {
                 // Pictures that are not one of the faces: something particular, to be asked for by name.
                 const others = Object.entries(picturedOutfit(li.outfits, o).sprites).filter(([name, sprite]) => !(EXPRESSIONS as readonly string[]).includes(name) && sprite.description)
                 return [
-                  `- ${o.id} (${o.name}): ${o.id === outfit?.id ? 'what you have on now, described above' : outfitDescription(li.outfits, o) || 'no description'}`,
+                  `- ${o.id} (${o.name}): ${o.id === wearing(li, outfit) ? 'what you have on now, described above' : outfitDescription(li.outfits, o) || 'no description'}`,
                   ...others.map(([name, sprite]) => `  - in place of a face, [EXPRESSION: ${name}] shows: ${sprite.description}`)
                 ]
               }),
@@ -543,7 +551,8 @@ export function buildCharacterPrompt(input: PromptInput): string {
         }),
         group
           ? `Act on it. At 3 she lets it show. At 2 she says so or changes the subject, and looks for a way to go. At 1, or at 2 twice running with nothing better, she leaves: ` +
-            `call leave_scene for her, with how she feels, and write her going in her own way; the scene goes on with whoever stays. If it is all of you, end the scene instead. ` +
+            `write her going in her own way, and on a line of its own at the end of the reply write [LEAVES: Name=feeling a few words why], the feeling being content, hurt or angry: ` +
+            `[LEAVES: ${cast[1]?.name.split(' ')[0] ?? 'Name'}=hurt saw she was not wanted]. The scene goes on with whoever stays, and you stop writing for her. If it is all of you, end the scene instead. ` +
             `Leaving is hers to decide: she does not need ${player.name}'s leave for it, and she may go gladly, tactfully, hurt or angry.`
           : `Act on it. At 3, let it show. At 2, say so or change the subject, and look for a way to go. At 1, or at 2 twice running with nothing better, leave: ` +
             `make your excuse in your own way and end the scene. Leaving is yours to decide: you do not need ${player.name}'s leave for it, and having somewhere to be is reason enough to go warmly.`,
@@ -555,14 +564,21 @@ export function buildCharacterPrompt(input: PromptInput): string {
       cast.some((c) => !hasContact(state, c.id)) &&
       section(
         'Bloomr',
-        cast
-          .filter((c) => !hasContact(state, c.id))
-          .map((c) => {
-            const who = group ? c.name.split(' ')[0] : 'You'
-            return offersContact(content, state, c.id)
-              ? `${who} ${group ? 'is' : 'are'} taken enough with ${player.name} to want him to have ${group ? 'her' : 'your'} Bloomr: offer it unasked at a natural moment in this scene.`
-              : `${who} ${group ? 'does' : 'do'} not offer ${player.name} ${group ? 'her' : 'your'} Bloomr unasked.`
-          })
+        [
+          ...cast
+            .filter((c) => !hasContact(state, c.id))
+            .map((c) => {
+              const who = group ? c.name.split(' ')[0] : 'You'
+              return (
+                `${group ? `${who}'s` : 'Your'} Bloomr handle is ${handleOf(c)}, and ${player.name} does not have it yet. ` +
+                (offersContact(content, state, c.id)
+                  ? `${who} ${group ? 'is' : 'are'} taken enough with ${player.name} to want him to have it: offer it unasked at a natural moment in this scene.`
+                  : `${who} ${group ? 'does' : 'do'} not offer it unasked. Whether to give it when he asks is ${group ? 'hers' : 'yours'} to decide in character, from how well ${group ? 'she knows' : 'you know'} him: ${group ? 'she' : 'you'} may refuse or put him off.`)
+              )
+            }),
+          // Writing the handle out is the giving: the game reads it in the reply and puts it in his phone.
+          `Giving it is saying or showing the handle in the reply, written out exactly: that is what puts it in his phone, and he cannot write to ${group ? 'her' : 'you'} without it. Never write a handle unless it is being given.`
+        ]
       ),
 
     !byCourier &&
@@ -580,18 +596,39 @@ export function buildCharacterPrompt(input: PromptInput): string {
 
     !byCourier &&
       !isNpc &&
+      section('Making plans to meet again', [
+        `When you and ${player.name} settle on meeting another time, call propose_meeting in that same reply: when he asks to see you again and you are willing, when he names a day ` +
+          `("I'm free Windsday evening") and you agree, or when you suggest one yourself. Saying "see you then" without calling it arranges nothing: it is the call that puts it on his calendar.`,
+        `Give it what was said: the day of the week in "weekday", the part of the day in "time_of_day", "next week" in "earliest". Then say exactly the day, time and place it gives you, and no other.`,
+        input.pendingProposal &&
+          `You have already suggested "${input.pendingProposal.title}" on ${describeWhen(content, input.pendingProposal.time)} at ` +
+            `${content.locations.find((l) => l.id === input.pendingProposal?.locationId)?.name ?? input.pendingProposal.locationId}, and ${player.name} has not yet put it in his calendar. ` +
+            `If what he says now agrees to it ("Windsday it is", "I'll be there", "yes"), write ${AGREED_TAG} on a line of its own at the end of your reply, which books it. If he wants another day or time, call propose_meeting again with what he asked for. ` +
+            `If he turns it down, let it go. Do not call propose_meeting again for the same thing.`,
+        attendableEvents(content, state).length > 0 &&
+          `Telling ${player.name} you will be at an event is not a plan and needs no tool: when you say you are going, or agree when he asks whether you will be there, write [ATTENDING: id]` +
+            `${group ? ' (in a group, [ATTENDING: Name=id])' : ''} on a line of its own at the end of the reply, and you will be there when he goes. The ids: ` +
+            `${attendableEvents(content, state).map((event) => `${event.id} is ${event.name}`).join('; ')}.`
+      ]),
+
+    !byCourier &&
+      !isNpc &&
       sceneBeats.length > 0 &&
       section('Moving on, and time passing', [
         `Where you are and what time it is are kept by the game, and time moves only when the scene does. Never write that ` +
           `you and ${player.name} have gone somewhere else, or that hours have gone by, without calling move_scene for it.`,
         `Going somewhere now and planning to meet later are two different things, each with its own tool, and you call one or the other, never both for the same thing. ` +
           `move_scene is for now: the two of you get up and go, and the scene carries on there. propose_meeting is for later: it puts a time on the calendar and you stay where you are.`,
+        canSleepOver(content, state) &&
+          `It is late. If the night ends with you and ${player.name} going to sleep here together, after being intimate or because one of you asks the other to stay, ` +
+            `write the two of you falling asleep, end the reply there, and put ${SLEEP_TAG} on a line of its own at its end: that closes the scene, and ${player.name} wakes here in the morning. ` +
+            `Not for a nap or for lying down a while. Do not write the morning: the scene is over when you fall asleep.`,
         // What he has to be at soon, so that she does not try to carry him off somewhere else.
         due &&
           `${player.name} has ${due.title} at ${formatTime(toDate(content.calendar, due.time))}` +
             `${duePlace ? ` at ${duePlace.name}` : ''}, ${due.time - state.time <= 1 ? 'within the hour' : `in ${due.time - state.time} hours`}, and has to be there. ` +
             `Do not take the scene anywhere that would make him late for it: the game will refuse. You may walk him to it, or let him go. ` +
-            `If you are in it too and the two of you go to it together, call go_to_event: that ends this scene and begins it.`
+            `If you are in it too and the two of you go to it together, call move_scene with the place "next-event": that ends this scene and begins it.`
       ]),
 
     sceneBeats.length > 0 &&

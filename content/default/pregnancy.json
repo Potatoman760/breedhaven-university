@@ -1,5 +1,5 @@
 {
-  "chance": 0.9,
+  "chance": 1,
   "lengthDays": 56,
   "recoveryDays": 7,
   "daughterChance": 0.875,

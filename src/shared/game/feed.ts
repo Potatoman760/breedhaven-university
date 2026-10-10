@@ -1,7 +1,7 @@
 import { selfiePrompt } from '../comfy'
 import { outfitDescription, type ContentPack, type GameState, type LoveInterest, type Post, type PostPlan } from '../model'
 import { formatDate, formatTime, periodAt, toDate } from './calendar'
-import { eventsOn } from './events'
+import { describeEvent, eventsOn } from './events'
 import { locationOf, loveInterestsAt } from './map'
 import { wornOutfit } from './pregnancy'
 import { weatherOn } from './weather'
@@ -176,7 +176,7 @@ export function buildFeedPrompt(content: ContentPack, state: GameState, plans: P
   const user = [
     `Today is ${formatDate(toDate(content.calendar, state.time))}.`,
     weather && `Weather: ${weather.name}. ${weather.description}`,
-    ...events.map((e) => `Today is ${e.name}. ${e.description}`.trim()),
+    ...events.map((e) => `Today is ${e.name}. ${describeEvent(content, e)}`.trim()),
     '',
     `Write ${plans.length} posts:`,
     ...plans.flatMap((plan, i) => {

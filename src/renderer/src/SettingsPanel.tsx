@@ -3,6 +3,11 @@ import { LLM_PROFILE_IDS, type LlmProfileId, type LlmProfileView } from '../../s
 import { errorMessage } from './errors'
 import { Overlay } from './ui/Dialog'
 import { ModelField } from './ModelField'
+import { ComfySetupPanel } from './ui/art/ComfySetup'
+
+// What the settings are for, a tab each.
+const TABS = ['LLMs', 'ComfyUI'] as const
+type Tab = (typeof TABS)[number]
 
 const LABELS: Record<LlmProfileId, { title: string; hint: string }> = {
   main: { title: 'Main LLM', hint: 'Used for all scenes and memory summaries by default.' },
@@ -31,6 +36,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const [form, setForm] = useState<Form | null>(null)
   const [status, setStatus] = useState<Partial<Record<LlmProfileId, string>>>({})
   const [busy, setBusy] = useState(false)
+  const [tab, setTab] = useState<Tab>('LLMs')
 
   useEffect(() => {
     window.api.getSettings().then((view) => setForm(toForm(view)))
@@ -81,8 +87,28 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
 
   return (
     <Overlay onClose={onClose}>
-      <form className="settings" onSubmit={onSave}>
+      <div className="settings wide">
         <h1>Settings</h1>
+        <div className="tabs" role="tablist">
+          {TABS.map((name) => (
+            <button key={name} type="button" role="tab" aria-selected={tab === name} className={tab === name ? 'tab selected' : 'tab'} onClick={() => setTab(name)}>
+              {name}
+            </button>
+          ))}
+        </div>
+        {/* ComfyUI draws the pictures: Bloomr's selfies in play, and everything made in the editor's art tool. Each change there is saved as it is made. */}
+        {tab === 'ComfyUI' && (
+          <>
+            <ComfySetupPanel />
+            <div className="actions">
+              <button type="button" className="secondary" onClick={onClose}>
+                Close
+              </button>
+            </div>
+          </>
+        )}
+        {tab === 'LLMs' && (
+      <form className="settings-form" onSubmit={onSave}>
         <p className="hint">
           Each LLM is an OpenAI-compatible endpoint. The base URL is everything before
           /chat/completions, for example https://api.openai.com/v1.
@@ -176,6 +202,8 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
           </button>
         </div>
       </form>
+        )}
+      </div>
     </Overlay>
   )
 }

@@ -9,7 +9,11 @@ import {
   messageText,
   canGoToInvite,
   planFor,
+  cancelAppointment,
   chanceOfDm,
+  plansWith,
+  settleAppointments,
+  STOOD_UP,
   chanceOfWriting,
   sceneEndWriter,
   courierExcerpt,
@@ -164,7 +168,9 @@ describe('her Bloomr', () => {
 
     const asked = buildCharacterPrompt({ content, state: fresh, loveInterestId: 'ana', sceneBeats: [{ activityName: 'Tea' }] })
     expect(asked).toContain('## Bloomr')
-    expect(asked).toContain('You do not offer Pat your Bloomr unasked.')
+    expect(asked).toContain('Your Bloomr handle is @ana')
+    expect(asked).toContain('You do not offer it unasked.')
+    expect(asked).toContain('Giving it is saying or showing the handle in the reply')
     expect(buildCharacterPrompt({ content, state: feeling(60, 0), loveInterestId: 'ana', sceneBeats: [{ activityName: 'Tea' }] })).toContain('offer it unasked')
     expect(buildCharacterPrompt({ content, state: start, loveInterestId: 'ana', sceneBeats: [{ activityName: 'Tea' }] })).not.toContain('## Bloomr')
   })
@@ -280,5 +286,46 @@ describe('writing as a scene ends', () => {
     const prompt = buildCharacterPrompt({ content, state: feels(50), loveInterestId: 'ana', mode: 'note' })
     expect(prompt).toContain('How to write your message')
     expect(prompt).toContain('You need not ask to meet')
+  })
+})
+
+describe('a plan he does not keep', () => {
+  const liked: GameState = { ...start, relationships: { ana: { affection: 40, trust: 30, desire: 5 } } }
+  const invited = addNote(liked, 'ana', { from: 'them', text: 'Tea?', proposal: tea, read: true })
+  const booked = answerInvite(content, invited, 'ana', 0, true)
+
+  it('is held against him once its hours have gone by, and remembered', () => {
+    expect(booked.appointments).toHaveLength(1)
+    // Still to come, or under way, nothing is settled: he may yet turn up.
+    expect(settleAppointments(content, booked)).toEqual({ state: booked, missed: [] })
+    expect(settleAppointments(content, { ...booked, time: tea.time + 1 }).missed).toEqual([])
+    const after = settleAppointments(content, { ...booked, time: tea.time + tea.hours })
+    expect(after.missed.map((plan) => plan.title)).toEqual(['Tea'])
+    expect(after.state.appointments).toEqual([])
+    expect(after.state.relationships['ana']).toEqual({ affection: 40 + STOOD_UP.affection, trust: 30 + STOOD_UP.trust, desire: 5 })
+    expect(after.state.memories['ana'].at(-1)?.summary).toMatch(/never turned up for "Tea" at Home.*and sent no word/)
+    // Once counted, it is not counted again.
+    expect(settleAppointments(content, after.state).missed).toEqual([])
+  })
+
+  it('can be called off by DM first: it comes off the calendar, nothing is held against him, and the message is what is left of it', () => {
+    expect(plansWith(booked, 'ana').map((plan) => plan.title)).toEqual(['Tea'])
+    expect(plansWith(booked, 'nobody')).toEqual([])
+    const plan = booked.appointments[0]
+    const called = cancelAppointment(content, booked, plan.id)
+    expect(called.appointments).toEqual([])
+    expect(plansWith(called, 'ana')).toEqual([])
+    const thread = called.courier['ana']
+    expect(thread[0].answer).toBe('cancelled')
+    expect(thread.at(-1)).toMatchObject({ from: 'player', read: true })
+    expect(thread.at(-1)?.text).toMatch(/^I'm sorry, I can't make Tea on /)
+    // Nothing is left to miss.
+    const later = settleAppointments(content, { ...called, time: tea.time + tea.hours })
+    expect(later.missed).toEqual([])
+    expect(later.state.relationships['ana']).toEqual(liked.relationships['ana'])
+    // She is told what became of it when she next writes.
+    expect(buildCharacterPrompt({ content, state: called, loveInterestId: 'ana', mode: 'courier' })).toContain('accepted, then called off by')
+    // One that has begun cannot be called off, only missed.
+    expect(cancelAppointment(content, { ...booked, time: tea.time }, plan.id).appointments).toHaveLength(1)
   })
 })

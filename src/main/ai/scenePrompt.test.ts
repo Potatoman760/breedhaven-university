@@ -8,7 +8,7 @@ import { sceneHours } from '../../shared/game/sceneMoves'
 import type { ContentPack, GameState, Scene } from '../../shared/model'
 import { loadContentPack } from '../content/loader'
 import type { LlmTool } from './openai'
-import { contactTool, leaveTool, meetingTool, moveTool, rapportTool, relationshipTool, revealTool } from './tools'
+import { meetingTool, moveTool, relationshipTool } from './tools'
 
 /**
  * Writes out, for reading, everything a scene sends to the LLM: the system prompt, the
@@ -42,11 +42,7 @@ function sample(content: ContentPack, state: GameState, scene: Scene): string {
   const tools = [
     meetingTool(content, state, scene.loveInterestId, nothing, cast),
     relationshipTool(content, state, scene.loveInterestId, nothing, cast),
-    moveTool(content, state, scene, nothing),
-    leaveTool(content, state, scene, nothing),
-    revealTool(content, state, cast, nothing),
-    contactTool(content, state, cast, nothing),
-    rapportTool(content, state, cast, nothing)
+    moveTool(content, state, scene, nothing, nothing)
   ].filter((tool): tool is LlmTool => tool !== undefined)
   const rule = (title: string) => `\n\n${'='.repeat(100)}\n${title}\n${'='.repeat(100)}\n\n`
   return [

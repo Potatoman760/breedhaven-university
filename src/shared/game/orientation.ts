@@ -62,7 +62,7 @@ export function attendOrientation(content: ContentPack, state: GameState): { sta
   const begins = state.time + Math.max(0, step.startHour - date.hour)
   const place = content.locations.find((l) => l.id === step.locationId)
 
-  const there = { ...state, time: begins + step.hours, locationId: step.locationId, orientationStep: index + 1 }
+  const there = { ...state, time: begins + step.hours, locationId: step.locationId, inOwnRoom: false, orientationStep: index + 1 }
   const after = there
   return {
     state: after,

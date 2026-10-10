@@ -2,6 +2,8 @@ import { z } from 'zod'
 import type { CalendarEvent, ContentPack, GameState } from '../model'
 import { dayIndexOf, formatDate, toDate } from './calendar'
 
+const clock = (hour: number): string => `${String(hour).padStart(2, '0')}:00`
+
 // Generated events may not run longer than this.
 const MAX_GENERATED_DURATION_DAYS = 7
 
@@ -25,6 +27,54 @@ export function eventsOn(content: ContentPack, state: GameState, time = state.ti
     startDays(content, event, [year - 1, year]).some(
       (start) => start <= dayIndex && dayIndex < start + event.durationDays
     )
+  )
+}
+
+/** The hours an event keeps, when it keeps any: "10:00 to 16:00". */
+export function eventHours(event: Pick<CalendarEvent, 'startHour' | 'hours'>): string | undefined {
+  return event.startHour === undefined ? undefined : `${clock(event.startHour)} to ${clock(event.startHour + (event.hours ?? 1))}`
+}
+
+/** Where an event is and when it is on, as a sentence for a prompt: "It is at the Great Court, from 10:00 to 16:00 each day." Nothing for a holiday. */
+export function describeEventPlace(content: ContentPack, event: CalendarEvent): string {
+  const where = content.locations.find((l) => l.id === event.locationId)?.name
+  const when = eventHours(event)
+  if (!where && !when) return ''
+  return `It is${where ? ` at ${where}` : ' on'}${when ? `, from ${when}${event.durationDays > 1 ? ' each day' : ''}` : ''}.`
+}
+
+/** An event as it is told to a character: what it is, then where and when. */
+export function describeEvent(content: ContentPack, event: CalendarEvent): string {
+  return [event.description, describeEventPlace(content, event)].filter(Boolean).join(' ')
+}
+
+// How far ahead someone can say she will be at something.
+const ATTEND_WITHIN_DAYS = 14
+
+/** Those who have said they will be at an event. */
+export function eventGoers(state: GameState, eventId: string): string[] {
+  return state.eventGoers[eventId] ?? []
+}
+
+/** Records that these people have said they will be at an event. */
+export function addEventGoers(state: GameState, eventId: string, ids: string[]): GameState {
+  const going = [...new Set([...eventGoers(state, eventId), ...ids])]
+  return going.length === eventGoers(state, eventId).length ? state : { ...state, eventGoers: { ...state.eventGoers, [eventId]: going } }
+}
+
+/** The events someone could say she will be at: those somewhere, keeping hours, that are on today or begin within a fortnight. */
+export function attendableEvents(content: ContentPack, state: GameState): CalendarEvent[] {
+  const goable = (event: CalendarEvent) => event.startHour !== undefined && content.locations.some((l) => l.id === event.locationId)
+  const all = [...eventsOn(content, state), ...upcomingEvents(content, state, ATTEND_WITHIN_DAYS).map(({ event }) => event)]
+  // One that is on today and comes round again soon is still one event.
+  return all.filter((event, i) => goable(event) && all.findIndex((other) => other.id === event.id) === i)
+}
+
+/** The event someone has said she will be at that is open at this hour, if there is one: where she is, unless something of her own keeps her. */
+export function eventKeeping(content: ContentPack, state: GameState, loveInterestId: string): CalendarEvent | undefined {
+  const { hour } = toDate(content.calendar, state.time)
+  return eventsOn(content, state).find(
+    (event) => event.startHour !== undefined && event.locationId !== undefined && hour >= event.startHour && hour < event.startHour + (event.hours ?? 1) && eventGoers(state, event.id).includes(loveInterestId)
   )
 }
 
@@ -88,7 +138,9 @@ export function buildEventPrompt(input: EventGenerationInput): { system: string;
     '- "month": one of the month ids given',
     '- "day": day of that month, as a number',
     `- "durationDays": how many days it lasts, 1 to ${MAX_GENERATED_DURATION_DAYS}`,
-    '- "locationId": one of the location ids given, or null if it is not tied to a place'
+    '- "locationId": one of the location ids given, or null if it is not tied to a place',
+    '- "startHour": the hour of the day it opens, 0 to 23, or null for a holiday or anything that is the whole day',
+    '- "hours": how many hours it runs from then each day, or null'
   ].join('\n')
 
   const lore = content.codex.filter((entry) => entry.alwaysInclude && entry.startsUnlocked)
@@ -116,7 +168,9 @@ const GeneratedEventSchema = z.object({
   month: z.string(),
   day: z.coerce.number().int().min(1),
   durationDays: z.coerce.number().int().min(1).catch(1),
-  locationId: z.string().nullish()
+  locationId: z.string().nullish(),
+  startHour: z.coerce.number().int().min(0).nullish().catch(undefined),
+  hours: z.coerce.number().int().min(1).nullish().catch(undefined)
 })
 
 /**
@@ -151,7 +205,9 @@ export function parseGeneratedEvents(
   for (const item of raw) {
     const parsed = GeneratedEventSchema.safeParse(item)
     if (!parsed.success) continue
-    const { name, description, day, durationDays, locationId } = parsed.data
+    const { name, description, day, durationDays, locationId, startHour, hours } = parsed.data
+    // Hours that fit in a day, or none.
+    const opens = typeof startHour === 'number' && startHour < calendar.hoursPerDay ? startHour : undefined
 
     const wanted = parsed.data.month.trim().toLowerCase()
     const month = calendar.months.find(
@@ -185,6 +241,8 @@ export function parseGeneratedEvents(
       noClasses: false,
       durationDays: Math.min(durationDays, MAX_GENERATED_DURATION_DAYS),
       locationId: content.locations.some((l) => l.id === locationId) ? locationId! : undefined,
+      startHour: opens,
+      hours: opens === undefined ? undefined : Math.min(hours ?? 2, calendar.hoursPerDay - opens),
       generated: true
     })
   }

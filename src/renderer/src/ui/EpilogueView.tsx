@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { buildEpilogue } from '../../../shared/game'
-import type { ContentPack, GameState } from '../../../shared/model'
+import { buildEpilogue, spriteFor, wornOutfit } from '../../../shared/game'
+import type { ContentPack, GameState, LoveInterest } from '../../../shared/model'
 import { ChevronIcon } from './icons'
 
 interface Props {
@@ -12,8 +12,8 @@ interface Props {
 
 /**
  * The epilogue: what became of him, a screen at a time, once the last day of the calendar
- * is over. Each screen fades in over a placeholder backdrop for its kind (pictures come
- * later); a click, Space, Enter or the right arrow goes on to the next, and the left arrow
+ * is over. Each screen fades in over the picture the title screen has, tinted for its kind,
+ * with whoever it is about standing in it; a click, Space, Enter or the right arrow goes on to the next, and the left arrow
  * goes back.
  */
 export function EpilogueView({ content, state, onExit }: Props) {
@@ -22,6 +22,15 @@ export function EpilogueView({ content, state, onExit }: Props) {
   const index = Math.min(at, screens.length - 1)
   const screen = screens[index]
   const last = index === screens.length - 1
+  // Whoever the screen is about, as she looks when the year ends, smiling if she has a smile drawn.
+  const about = (screen.loveInterestIds ?? []).flatMap((id) => {
+    const li = content.loveInterests.find((c) => c.id === id)
+    const sprite = li && spriteFor(li, wornOutfit(content, state, li), 'happy')
+    return li && sprite ? [{ li, sprite }] : []
+  })
+  // A picture whose file is not there is left out, and the screen is told without it.
+  const [missing, setMissing] = useState<string[]>([])
+  const shown = about.filter(({ sprite }) => !missing.includes(sprite))
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -37,7 +46,15 @@ export function EpilogueView({ content, state, onExit }: Props) {
   }, [screens.length])
 
   return (
-    <main className={`stage epilogue of-${screen.kind}${screen.standing ? ` ${screen.standing}` : ''}`} onClick={() => !last && setAt(index + 1)}>
+    <main className={`stage epilogue of-${screen.kind}${screen.standing ? ` ${screen.standing}` : ''}${shown.length > 0 ? ' with-cast' : ''}`} onClick={() => !last && setAt(index + 1)}>
+      {/* Whoever it is about stands behind the words, side by side when there is more than one. */}
+      {shown.length > 0 && (
+        <div key={`cast-${index}`} className="epilogue-cast" aria-hidden="true">
+          {shown.map(({ li, sprite }: { li: LoveInterest; sprite: string }) => (
+            <img key={li.id} src={`content://pack/${sprite}`} alt="" onError={() => setMissing((gone) => [...gone, sprite])} />
+          ))}
+        </div>
+      )}
       {/* Keyed by the screen, so that each one fades in afresh over the one before. */}
       <div key={index} className="epilogue-screen">
         <span className="caps epilogue-heading">{screen.heading}</span>

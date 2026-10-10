@@ -148,12 +148,19 @@ export async function chatCompletion(
       throw new Error(`LLM request failed (${response.status} ${response.statusText}): ${body}`)
     }
 
-    const data = (await response.json()) as { choices?: { finish_reason?: string; message?: AssistantMessage }[] }
+    const data = (await response.json()) as { choices?: { finish_reason?: unknown; native_finish_reason?: unknown; message?: AssistantMessage }[] }
     const choice = data.choices?.[0]
-    const finish = typeof choice?.finish_reason === 'string' ? choice.finish_reason.toLowerCase() : ''
-    if (REFUSAL_FINISHES.includes(finish)) throw new RefusalError(`the reply was stopped (${finish})`)
+    // Why it stopped, as the endpoint says it and, behind a router, as the provider itself said it.
+    const finishes = [choice?.finish_reason, choice?.native_finish_reason].filter((reason): reason is string => typeof reason === 'string').map((reason) => reason.toLowerCase())
+    const stopped = finishes.find((reason) => REFUSAL_FINISHES.includes(reason))
+    if (stopped) throw new RefusalError(`the reply was stopped (${stopped})`)
     if (typeof choice?.message?.refusal === 'string' && choice.message.refusal.length > 0) {
       throw new RefusalError(choice.message.refusal)
+    }
+    // Nothing at all, and not for want of room: that is how some providers answer what they will not write, Google's above all.
+    const said = typeof choice?.message?.content === 'string' && choice.message.content.trim().length > 0
+    if (!said && (choice?.message?.tool_calls ?? []).length === 0 && !finishes.includes('length')) {
+      throw new RefusalError('an empty reply came back, which is how some providers block one')
     }
     return choice?.message ?? {}
   }
@@ -163,7 +170,7 @@ export async function chatCompletion(
     const calls = message.tool_calls ?? []
     if (!tools || calls.length === 0) {
       if (typeof message.content !== 'string' || message.content.trim().length === 0) {
-        throw new Error('The LLM returned an empty reply')
+        throw new Error('The LLM returned an empty reply: it ran out of room before it answered. Raise the max reply tokens in Settings.')
       }
       return message.content.trim()
     }

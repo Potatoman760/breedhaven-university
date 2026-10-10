@@ -32,8 +32,8 @@ export const CourierNoteSchema = z.object({
       locationId: z.string()
     })
     .optional(),
-  /** What became of the proposal: lapsed means its time passed or filled up before an answer. */
-  answer: z.enum(['accepted', 'declined', 'lapsed']).optional(),
+  /** What became of the proposal: lapsed means its time passed or filled up before an answer; cancelled, that he accepted and then called it off. */
+  answer: z.enum(['accepted', 'declined', 'lapsed', 'cancelled']).optional(),
   /** False for a note from them the player hasn't opened yet. */
   read: z.boolean().default(true)
 })

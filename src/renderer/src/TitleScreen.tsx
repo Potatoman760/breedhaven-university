@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import music from '../../assets/Magical College Days.mp3'
+import titleArt from '../../assets/BreedhavenTitle.png'
 import { adjustStat, catalogueIsStale, createInitialState, describeModifier, describeStat, PLAYER_TOKEN, POINT_BUY, pointCost, pointsLeft, randomStats, startingStats } from '../../shared/game'
 import { STAT_LABELS, STATS, type ContentPack, type Stat } from '../../shared/model'
 import { AUTO_SLOT_ID, latestSave, type SaveData, type SaveSummary } from '../../shared/saves'
@@ -7,7 +8,7 @@ import { errorMessage } from './errors'
 import { Overlay } from './ui/Dialog'
 import { describeSave, SavesPanel } from './SavesPanel'
 import { SettingsPanel } from './SettingsPanel'
-import { Sprig, VineCorner } from './ui/icons'
+import { VineCorner } from './ui/icons'
 
 // How loud the menu's music is, and where it is remembered that the player turned it off.
 const MUSIC_VOLUME = 0.4
@@ -88,10 +89,8 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
         <VineCorner corner="bl" />
         <VineCorner corner="br" />
 
-        <div className="wordmark">
-          <h1>Breedhaven University</h1>
-          <Sprig width={260} />
-        </div>
+        {/* The game's name, as its own picture, at the head of the menu. */}
+        <img className="title-logo" src={titleArt} alt="Breedhaven University" />
 
         <div className="menu">
           <button className="continue" disabled={!latest} onClick={resume}>

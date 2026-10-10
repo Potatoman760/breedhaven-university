@@ -16,6 +16,8 @@ export interface SceneSummary {
   reasons: Record<string, string>
   /** What he paid for in the scene, and what it came to. */
   spending?: { amount: number; on: string }
+  /** What he found out over the scene, a line each: something about one of them, or a change between two of them. */
+  learned: string[]
   /** Why a memory is a plain note instead of one written by the LLM, if any is. */
   memoryError?: string
 }
@@ -164,7 +166,8 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
           </p>
         )}
 
-        {sceneWitnesses(scene).map((id) => (
+        {/* An NPC keeps no memory of a scene: there is nothing of hers to read or reword. */}
+        {(scene.npc ? [] : sceneWitnesses(scene)).map((id) => (
           <section key={id}>
             <h2>What {firstNames(content, [id])} will remember</h2>
             <textarea
@@ -183,11 +186,23 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
             )}
           </section>
         ))}
-        <p className="hint">
-          This is what goes into her memory of you, and what she is told in later scenes. Reword it if it has
-          something wrong; clear it and she forgets.
-        </p>
+        {!scene.npc && (
+          <p className="hint">
+            This is what goes into her memory of you, and what she is told in later scenes. Reword it if it has
+            something wrong; clear it and she forgets.
+          </p>
+        )}
         {memoryError && <p className="hint">Written as a plain note: {memoryError}</p>}
+        {summary.learned.length > 0 && (
+          <section className="learned">
+            <span className="caps">You learned</span>
+            <ul>
+              {summary.learned.map((line) => (
+                <li key={line}>{line}</li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <button onClick={() => onContinue(drafts)} autoFocus>
           Continue

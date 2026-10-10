@@ -192,7 +192,7 @@
       "id": "blowjob",
       "name": "Blowjob",
       "description": "",
-      "image": "sprites/daphne/nsfw-blowjob.png",
+      "image": "sprites/daphne/nsfw-blowjob-2.png",
       "loop": true
     },
     {
@@ -227,7 +227,35 @@
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/daphne/nsfw-facial.png",
+      "image": "sprites/daphne/nsfw-facial-2.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-missionary",
+      "name": "Missionary, pregnant",
+      "description": "",
+      "image": "sprites/daphne/nsfw-pregnant-missionary-2.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-doggy",
+      "name": "Doggy, pregnant",
+      "description": "",
+      "image": "sprites/daphne/nsfw-pregnant-doggy-2.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-cowgirl",
+      "name": "Cowgirl, pregnant",
+      "description": "",
+      "image": "sprites/daphne/nsfw-pregnant-cowgirl-2.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-creampie",
+      "name": "Creampie, pregnant",
+      "description": "",
+      "image": "sprites/daphne/nsfw-pregnant-creampie-2.png",
       "loop": true
     }
   ],
@@ -283,9 +311,13 @@
     "background": "generated/backgrounds/daphne/view.png"
   },
   "ai": {
-    "speechPattern": "",
-    "tone": "",
-    "verbalQuirks": [],
+    "speechPattern": "Short, direct sentences, said evenly: a captain's voice that expects to be heard without being raised. Dry jokes delivered with a straight face, and easy banter with anyone who can keep up. She says what she means and then stops.",
+    "tone": "direct, dry, steady",
+    "verbalQuirks": [
+      "Sums up a situation in a few words, as if briefing the team before a set.",
+      "Answers a compliment with a deadpan remark or a raised eyebrow rather than thanks.",
+      "Says \"Coach\" when she means Grushka, and quotes her to settle a point."
+    ],
     "exampleDialogue": [],
     "backstory": "Studies: Fourth year, College ofdAthletics\n\nCaptain of the Campus volleyball team\n\nDaphne grew up by Seedblossom's South Gate, where her family repaired body armour and duty gear for the city police, and spent her childhood watching officers train. Her coach is Grushka Tor-Vael, whose good opinion she values more than the titles. She has magic like any woman and rarely bothers with it: she competes in the unaugmented division on purpose, and trusts training over tricks.",
     "knowledge": [],

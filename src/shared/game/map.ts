@@ -2,6 +2,7 @@ import type { ContentPack, GameState, LoveInterest } from '../model'
 import { appointmentsNow, attendees } from './appointments'
 import { isGameOver, toDate } from './calendar'
 import { courseMembers, coursesInSession } from './courses'
+import { eventKeeping } from './events'
 import { isOpen, scheduledLocationId } from './schedule'
 import type { PerformCheck } from './activities'
 
@@ -29,7 +30,9 @@ export function locationOf(
   const waiting = appointmentsNow(state).find((a) => attendees(a).includes(li.id))
   if (waiting) return waiting.locationId
   const inClass = coursesInSession(content, state).find((c) => courseMembers(c).includes(li.id))
-  return inClass?.locationId ?? workplaceNow(content, state, li.id) ?? scheduledLocationId(li, toDate(content.calendar, state.time))
+  // Somewhere she said she would be comes before her ordinary day, though not before a class or her work.
+  // With nothing on her schedule she is nowhere he can walk up to her: she is in her own room, and shown so on the map. She can still be asked out.
+  return inClass?.locationId ?? workplaceNow(content, state, li.id) ?? eventKeeping(content, state, li.id)?.locationId ?? scheduledLocationId(li, toDate(content.calendar, state.time))
 }
 
 /** Love interests who are at the given location right now. */
@@ -60,7 +63,7 @@ export function approachableAt(content: ContentPack, state: GameState, locationI
   return loveInterestsAt(content, state, locationId).filter((li) => !inClassApart(content, state, li))
 }
 
-/** Love interests who aren't anywhere the player can find them right now. */
+/** Love interests with nothing on their schedule right now: each is in her own room, not somewhere he can go to. */
 export function whereaboutsUnknown(content: ContentPack, state: GameState): LoveInterest[] {
   return content.loveInterests.filter((li) => locationOf(content, state, li) === undefined)
 }
@@ -80,5 +83,5 @@ export function canTravel(content: ContentPack, state: GameState, locationId: st
 export function travel(content: ContentPack, state: GameState, locationId: string): GameState {
   const check = canTravel(content, state, locationId)
   if (!check.ok) throw new Error(`Cannot travel to "${locationId}": ${check.reasons.join('; ')}`)
-  return { ...state, locationId }
+  return { ...state, locationId, inOwnRoom: false }
 }

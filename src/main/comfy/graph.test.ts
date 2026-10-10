@@ -218,3 +218,28 @@ describe('the NSFW section', () => {
     expect(nsfwPrompt({ ...who, outfits: [] }, 'x', '')).toContain('She wears nothing at all, completely nude.')
   })
 })
+
+describe('a pose drawn pregnant', () => {
+  it('is the same pose, built on her nude with what her pregnant nude adds to it', async () => {
+    const { nsfwPrompt } = await import('../../shared/comfy')
+    const { NSFW_POSES, NSFW_PREGNANT_POSES, isPregnantPose, pregnantPoseId } = await import('../../shared/model')
+    const who = {
+      appearance: 'A woman with brown skin.',
+      outfits: [
+        { id: 'nude', name: 'Nude', description: 'nothing at all', sprites: {}, pregnant: false },
+        { id: 'nude-pregnant', name: 'Nude, pregnant', description: 'She has a round, pregnant belly.', inherits: 'nude', sprites: {}, pregnant: true }
+      ]
+    }
+    const plain = nsfwPrompt(who, 'She lies on her back.', 'wide shot')
+    const pregnant = nsfwPrompt(who, 'She lies on her back.', 'wide shot', true)
+    expect(plain).not.toContain('pregnant belly')
+    expect(pregnant).toContain('She has a round, pregnant belly.')
+    // Everything of the plain one is still there: it is built on it.
+    for (const part of plain.split('\n\n')) expect(pregnant).toContain(part)
+
+    expect(NSFW_PREGNANT_POSES.map((pose) => pose.id)).toEqual(NSFW_POSES.map((pose) => pregnantPoseId(pose.id)))
+    expect(NSFW_PREGNANT_POSES.every((pose, i) => pose.draws === NSFW_POSES[i].draws && pose.base === NSFW_POSES[i].id)).toBe(true)
+    expect(isPregnantPose('pregnant-missionary')).toBe(true)
+    expect(isPregnantPose('missionary')).toBe(false)
+  })
+})

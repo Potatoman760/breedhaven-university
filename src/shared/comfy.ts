@@ -69,7 +69,7 @@ export const DEFAULT_SIZES: Record<ArtKind, { width: number; height: number }> =
 
 /** Words that close every prompt of a kind, after its subject: how the picture is framed, not what is in it. */
 export const DEFAULT_FRAMING: Record<ArtKind, string> = {
-  sprite: 'three-quarter shot from knees up\n\nplain white background',
+  sprite: 'three-quarter shot from knees up, standing, facing forward\n\nplain white background',
   background: 'wide establishing shot, no people',
   photo: 'candid phone photo, natural light',
   nsfw: 'wide cinematic shot, bedroom, soft warm light'
@@ -99,6 +99,37 @@ export const ComfySettingsSchema = z.object({
   sizes: z.partialRecord(z.enum(ART_KINDS), SizeSchema).default({})
 })
 export type ComfySettings = z.infer<typeof ComfySettingsSchema>
+
+/** What the game says of the workflows it ships with: the parts of the settings that are about a workflow or a kind of picture, and nothing of the player's own machine. */
+export const ComfyBundleSettingsSchema = ComfySettingsSchema.pick({ promptPrefixes: true, negativePrefixes: true, overrides: true, defaults: true, framing: true, sizes: true })
+export type ComfyBundleSettings = z.infer<typeof ComfyBundleSettingsSchema>
+
+/** The workflows that ship with the game, and what each calls for that the player has to fetch themselves. */
+export interface ComfyBundle {
+  workflows: {
+    file: string
+    name: string
+    /** Model files it loads, by the name ComfyUI knows them under. */
+    models: string[]
+    /** The kinds of node it is made of. Those ComfyUI does not come with are custom nodes. */
+    nodes: string[]
+  }[]
+}
+
+/** What came of installing the game's workflows. Null settings when it was not done; `message` says why. */
+export interface ComfyBundleInstall {
+  ok: boolean
+  message: string
+  settings: ComfySettings | null
+}
+
+/** What a running ComfyUI lacks of what the game's workflows call for. */
+export interface ComfyBundleCheck {
+  ok: boolean
+  message: string
+  missingNodes: string[]
+  missingModels: string[]
+}
 
 export function framingFor(settings: Pick<ComfySettings, 'framing'>, kind: ArtKind): string {
   return settings.framing[kind] ?? DEFAULT_FRAMING[kind]
@@ -299,12 +330,14 @@ const LIGHT_WORDS: Record<string, string> = {
  * (in the words of her own nude outfit, when she has one), what the pose shows, and how
  * the picture is framed, each a paragraph, as a sprite's is written.
  */
-export function nsfwPrompt(who: Pick<LoveInterest | Npc, 'appearance' | 'outfits'> & { pronouns?: string }, pose: string, framing: string): string {
-  const [bare = 'nothing at all, completely nude'] = outfitParts(who.outfits, who.outfits.find((o) => o.id === 'nude'))
+export function nsfwPrompt(who: Pick<LoveInterest | Npc, 'appearance' | 'outfits'> & { pronouns?: string }, pose: string, framing: string, pregnant = false): string {
+  // Drawn pregnant, she is in her pregnant nude: her nude, with what that outfit adds to it.
+  const [bare = 'nothing at all, completely nude', ...added] = outfitParts(who.outfits, who.outfits.find((o) => o.id === (pregnant ? 'nude-pregnant' : 'nude')) ?? who.outfits.find((o) => o.id === 'nude'))
   const { subject } = pronounWords(who.pronouns)
   return paragraphs([
     paragraph(who.appearance),
     paragraph(`${subject[0].toUpperCase()}${subject.slice(1)} ${subject === 'they' ? 'wear' : 'wears'} ${bare}`),
+    ...(pregnant ? (added.length > 0 ? added : ['She has a round, pregnant belly.']).map(paragraph) : []),
     paragraph(pose),
     framing.trim()
   ])

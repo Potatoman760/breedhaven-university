@@ -5,7 +5,7 @@
   "age": 19,
   "pronouns": "she/her",
   "bio": "A foxkin from Veyra in head-to-toe pink gothic lolita, second-year Foreign Languages student, and the reason half her seminar now owns a parasol.",
-  "appearance": "A 19-year-old foxkin woman with warm tan skin on her face, torso and thighs and arms, Amber eyes, dark brows, full lips. Tousled, shoulder-length reddish-brown hair. Two large upright fox ears, russet with white fur inside, and a large bushy russet fox tail with a white tip. A petite, feminine figure",
+  "appearance": "A 19-year-old foxkin woman with warm tan skin on her face, torso and thighs and arms, Amber eyes, dark brows, full lips. Tousled, shoulder-length reddish-brown hair. Two large upright fox ears, russet with white fur inside, and a large bushy russet fox tail with a white tip curled behind her. A petite, feminine figure",
   "personality": "Sweet, girlish and openly delighted by pretty things: lace, ribbons, cake, a well-set tea table. She is cute on purpose and entirely sincere about it, and she is sharper than the frills suggest: she switches languages mid-thought and misses very little. Affectionate, a little vain about her outfits, and quick to pout when she is not taken seriously.",
   "traitIds": [
     "loyal",
@@ -36,11 +36,11 @@
       "description": "cute fully pink gothic lolita style dress, with cleavage",
       "sprites": {
         "neutral": {
-          "image": "sprites/maren/default-neutral-7-cutout.png",
+          "image": "sprites/maren/default-neutral-2-cutout.png",
           "description": ""
         },
         "happy": {
-          "image": "sprites/maren/default-happy-2-cutout.png",
+          "image": "sprites/maren/default-happy-cutout.png",
           "description": ""
         },
         "sad": {
@@ -48,19 +48,19 @@
           "description": ""
         },
         "angry": {
-          "image": "sprites/maren/default-angry-2-cutout.png",
-          "description": ""
-        },
-        "surprised": {
-          "image": "sprites/maren/default-surprised-cutout.png",
+          "image": "sprites/maren/default-angry-2-cutout-2.png",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/maren/default-embarrassed-cutout.png",
+          "image": "sprites/maren/default-embarrassed-cutout-2.png",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/maren/default-surprised-2-cutout.png",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/maren/default-aroused-cutout.png",
+          "image": "sprites/maren/default-aroused-3-cutout.png",
           "description": ""
         }
       },
@@ -158,7 +158,7 @@
           "description": ""
         },
         "angry": {
-          "image": "sprites/maren/nude-pregnant-angry-cutout.png",
+          "image": "sprites/maren/nude-pregnant-angry-cutout-2.png",
           "description": ""
         },
         "surprised": {
@@ -179,7 +179,6 @@
   ],
   "defaultOutfitId": "default",
   "faceY": 14,
-  "imageSeed": 62,
   "stageHeight": 100,
   "studies": {
     "subject": "Foreign Languages",
@@ -232,6 +231,48 @@
       "name": "Facial",
       "description": "",
       "image": "sprites/maren/nsfw-facial.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-blowjob",
+      "name": "Blowjob, pregnant",
+      "description": "",
+      "image": "sprites/maren/nsfw-pregnant-blowjob.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-missionary",
+      "name": "Missionary, pregnant",
+      "description": "",
+      "image": "sprites/maren/nsfw-pregnant-missionary.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-doggy",
+      "name": "Doggy, pregnant",
+      "description": "",
+      "image": "sprites/maren/nsfw-pregnant-doggy.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-cowgirl",
+      "name": "Cowgirl, pregnant",
+      "description": "",
+      "image": "sprites/maren/nsfw-pregnant-cowgirl.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-creampie",
+      "name": "Creampie, pregnant",
+      "description": "",
+      "image": "sprites/maren/nsfw-pregnant-creampie.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-facial",
+      "name": "Facial, pregnant",
+      "description": "",
+      "image": "sprites/maren/nsfw-pregnant-facial.png",
       "loop": true
     }
   ],
@@ -312,7 +353,7 @@
     "tone": "sweet, playful, a little bratty",
     "verbalQuirks": [
       "Calls things and people cute, and means it as the highest praise.",
-      "Slips into another language for a word, then gives the translation with a small flourish.",
+      "Slips into Japanese for a word, then gives the translation with a small flourish.",
       "Pouts and puffs her cheeks when teased, and forgives within the minute."
     ],
     "exampleDialogue": [],

@@ -11,6 +11,7 @@ import {
   describeChildren,
   describePregnancy,
   pregnancyStage,
+  ordinaryOutfit,
   wearableOutfits,
   wornOutfit
 } from './pregnancy'
@@ -97,8 +98,9 @@ describe('carrying', () => {
     const her = content.loveInterests[0]
     expect(wornOutfit(content, at(pregnant, 2), her)?.id).toBe('default')
     expect(wornOutfit(content, at(pregnant, 3), her)?.id).toBe('round')
-    expect(wearableOutfits(content, at(pregnant, 2), her).map((o) => o.id)).toEqual(['default'])
-    expect(wearableOutfits(content, at(pregnant, 3), her).map((o) => o.id)).toEqual(['round'])
+    // What can be asked for is always her ordinary outfits: the pregnant form is the game's to give.
+    expect(wearableOutfits(her).map((o) => o.id)).toEqual(['default'])
+    expect(ordinaryOutfit(her, wornOutfit(content, at(pregnant, 3), her)!).id).toBe('default')
     // With the four standard outfits, whatever is chosen for her is given in the form that fits her now.
     const blank = (id: string, isPregnant: boolean) => ({ id, name: id, description: '', sprites: {}, pregnant: isPregnant })
     const four = { ...her, outfits: [blank('default', false), blank('pregnant', true), blank('nude', false), blank('nude-pregnant', true)] }
@@ -109,9 +111,14 @@ describe('carrying', () => {
     expect(wornOutfit(content, at(pregnant, 2), four, 'nude')?.id).toBe('nude')
     expect(wornOutfit(content, start, four, 'nude-pregnant')?.id).toBe('nude')
     expect(wornOutfit(content, start, four, 'pregnant')?.id).toBe('default')
-    expect(buildCharacterPrompt({ content: { ...content, loveInterests: [four, ...content.loveInterests.slice(1)] }, state: showing, loveInterestId: 'ana', look: {} })).toContain(
-      'showing, so you wear only your pregnant outfits: "pregnant" dressed, "nude-pregnant" undressed.'
-    )
+    expect(ordinaryOutfit(four, wornOutfit(content, showing, four, 'nude')!).id).toBe('nude')
+    // She is told she shows, and is offered the same outfits as ever: never the pregnant ones by name.
+    const told = buildCharacterPrompt({ content: { ...content, loveInterests: [four, ...content.loveInterests.slice(1)] }, state: showing, loveInterestId: 'ana', look: {} })
+    expect(told).toContain('showing. Every picture of you is drawn pregnant by the game')
+    expect(told).toContain('You are wearing "default".')
+    expect(told).toContain('- nude (nude)')
+    expect(told).not.toContain('- pregnant (')
+    expect(told).not.toContain('nude-pregnant')
     // Someone with no pregnant outfit keeps what she has.
     const bea = conceive(certain, start, 'bea')
     expect(wornOutfit(content, { ...bea, time: 150 }, content.loveInterests[1])?.id).toBe('default')
@@ -170,5 +177,25 @@ describe('birth', () => {
     const child = (daughter: boolean) => ({ motherId: 'ana', bornAt: 0, daughter })
     expect(describeChildren([child(true)])).toBe('a daughter')
     expect(describeChildren([child(true), child(false), child(true)])).toBe('2 daughters and a son')
+  })
+})
+
+describe('an outfit and its pregnant form', () => {
+  it('are parent and child: the pregnant one names the other, and is worn in its place once she shows', async () => {
+    const { ordinaryOutfit, pregnantForm } = await import('./pregnancy')
+    const blank = (id: string, isPregnant: boolean, inherits?: string) => ({ id, name: id, description: '', sprites: {}, pregnant: isPregnant, inherits })
+    const outfits = [blank('default', false), blank('pregnant', true, 'default'), blank('nude', false), blank('nude-pregnant', true, 'nude'), blank('gown', false), blank('gown-round', true, 'gown'), blank('swimsuit', false, 'nude')]
+    const her = { outfits, defaultOutfitId: 'default' }
+    const of = (id: string) => outfits.find((o) => o.id === id)!
+    expect(pregnantForm(her, of('default'))?.id).toBe('pregnant')
+    expect(pregnantForm(her, of('nude'))?.id).toBe('nude-pregnant')
+    // One of her own, with a pregnant form of its own.
+    expect(pregnantForm(her, of('gown'))?.id).toBe('gown-round')
+    // One with none borrows that of the outfit it is built on.
+    expect(pregnantForm(her, of('swimsuit'))?.id).toBe('nude-pregnant')
+    expect(ordinaryOutfit(her, of('pregnant')).id).toBe('default')
+    expect(ordinaryOutfit(her, of('nude-pregnant')).id).toBe('nude')
+    expect(ordinaryOutfit(her, of('gown-round')).id).toBe('gown')
+    expect(ordinaryOutfit(her, of('gown')).id).toBe('gown')
   })
 })

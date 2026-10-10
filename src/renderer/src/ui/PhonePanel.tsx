@@ -3,6 +3,14 @@ import {
   addNote,
   answerInvite,
   canGoToInvite,
+  clearUntil,
+  buy,
+  canBuy,
+  isOrientationDay,
+  describeIntimacy,
+  addEventGoers,
+  cancelAppointment,
+  plansWith,
   applyForJob,
   attendees,
   bondOf,
@@ -53,7 +61,9 @@ import { Button } from './Button'
 import { Overlay } from './Dialog'
 import { useConfirm } from './Confirm'
 import { JobIcon } from './icons'
-import { BackIcon, ChatIcon, ChevronIcon, FeedIcon, FriendsIcon, HeartIcon, WorkIcon } from './icons'
+import { BackIcon, ChatIcon, ChevronIcon, FeedIcon, FriendsIcon, HeartIcon, MarketIcon, WorkIcon } from './icons'
+import { Stalls } from './MarketView'
+import { EmojiPicker } from './EmojiPicker'
 
 interface Props {
   content: ContentPack
@@ -75,7 +85,8 @@ const APPS = [
   { id: 'chats', label: 'DMs', Icon: ChatIcon },
   { id: 'friends', label: 'Friends', Icon: FriendsIcon },
   { id: 'updates', label: 'Feed', Icon: FeedIcon },
-  { id: 'jobs', label: 'Jobs', Icon: WorkIcon }
+  { id: 'jobs', label: 'Jobs', Icon: WorkIcon },
+  { id: 'shop', label: 'Market', Icon: MarketIcon }
 ] as const
 type App = (typeof APPS)[number]['id']
 
@@ -167,6 +178,7 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, onGoT
           {app === 'friends' && <Friends content={content} state={state} selectedId={friendId} onSelect={setFriendId} onMessage={message} canMessage={canMessage} />}
           {app === 'updates' && <Updates content={content} state={state} onChange={onChange} onMessage={message} canMessage={canMessage} />}
           {app === 'jobs' && <Jobs content={content} state={state} onChange={onChange} onMessage={message} />}
+          {app === 'shop' && <Market content={content} state={state} onChange={onChange} />}
         </div>
       </div>
     </Overlay>
@@ -265,21 +277,46 @@ function Thread({ content, state, li, onChange, onGoToInvite }: ThreadProps) {
     end.current?.scrollIntoView({ block: 'end' })
   }, [id, thread.length, waiting, state, onChange])
 
-  async function send(event: FormEvent) {
+  // Where he is writing, so that an emoji goes in where the cursor is and he can go on typing after it.
+  const compose = useRef<HTMLInputElement>(null)
+  function addEmoji(emoji: string) {
+    const box = compose.current
+    const at = box?.selectionStart ?? draft.length
+    const until = box?.selectionEnd ?? at
+    const next = (draft.slice(0, at) + emoji + draft.slice(until)).slice(0, 400)
+    setDraft(next)
+    // Once it has been drawn, the cursor is put after what was added.
+    requestAnimationFrame(() => {
+      box?.focus()
+      box?.setSelectionRange(at + emoji.length, at + emoji.length)
+    })
+  }
+
+  // The plans with her still to come: each can be called off here, which is a message to her.
+  const plans = plansWith(state, id)
+
+  function send(event: FormEvent) {
     event.preventDefault()
     const text = draft.trim()
     if (!text || waiting) return
-    const sent = addNote(state, id, { from: 'player', text, read: true })
-    onChange((current) => addNote(current, id, { from: 'player', text, read: true }))
     setDraft('')
+    void say((current) => addNote(current, id, { from: 'player', text, read: true }))
+  }
+
+  /** Says something to her, by whatever it does to the game, and waits for her answer. */
+  async function say(apply: (state: GameState) => GameState) {
+    const sent = apply(state)
+    onChange(apply)
     setNotice('')
     setWaiting(true)
     try {
       const reply = await window.api.courier({ state: sent, loveInterestId: id, invite: false })
       onChange((current) => {
         const answered = revealFacts(content, addNote(current, id, { from: 'them', text: reply.text, proposal: reply.proposal, read: false }), id, reply.revealed ?? [])
+        // Whoever said she would be at an event is put down for it.
+        const going = (reply.attending ?? []).reduce((next, said) => addEventGoers(next, said.eventId, said.ids), answered)
         // His boss has taken note that he will miss a shift.
-        return reply.excused ? excuseShift(answered, reply.excused) : answered
+        return reply.excused ? excuseShift(going, reply.excused) : going
       })
     } catch (error) {
       setNotice(`No answer came back: ${errorMessage(error)}`)
@@ -296,6 +333,8 @@ function Thread({ content, state, li, onChange, onGoToInvite }: ThreadProps) {
           const sentOn = toDate(content.calendar, note.time)
           const before = i > 0 ? toDate(content.calendar, thread[i - 1].time) : undefined
           const plan = note.proposal
+          // Going now skips the hours until it starts: not offered when that would carry him past a class, a shift or another plan of his.
+          const goNow = onGoToInvite !== undefined && plan !== undefined && canGoToInvite(content, state, note) && clearUntil(content, state, plan.time)
           return (
             <div key={i} className={note.from === 'player' ? 'message mine' : 'message'}>
               {/* The time is shown once for each run of messages sent in the same hour. */}
@@ -316,13 +355,13 @@ function Thread({ content, state, li, onChange, onGoToInvite }: ThreadProps) {
                     </span>
                   </div>
                   {/* One for today can be gone to at once: the hours until it starts are skipped, and it begins. */}
-                  {onGoToInvite && canGoToInvite(content, state, note) && <button onClick={() => onGoToInvite(id, i)}>Go now</button>}
+                  {goNow && <button onClick={() => onGoToInvite?.(id, i)}>Go now</button>}
                   {note.answer ? (
                     <span className="chip">{note.answer}</span>
                   ) : inviteStands(content, state, plan) ? (
                     <>
-                      <button className={onGoToInvite && canGoToInvite(content, state, note) ? 'secondary' : undefined} onClick={() => onChange((s) => answerInvite(content, s, id, i, true))}>
-                        {onGoToInvite && canGoToInvite(content, state, note) ? 'Later' : 'Accept'}
+                      <button className={goNow ? 'secondary' : undefined} onClick={() => onChange((s) => answerInvite(content, s, id, i, true))}>
+                        {goNow ? 'Later' : 'Accept'}
                       </button>
                       <button className="secondary" onClick={() => onChange((s) => answerInvite(content, s, id, i, false))}>
                         Decline
@@ -349,8 +388,26 @@ function Thread({ content, state, li, onChange, onGoToInvite }: ThreadProps) {
       </div>
 
       {notice && <p className="notice">{notice}</p>}
+      {plans.map((plan) => (
+        <div key={plan.id} className="proposal upcoming">
+          <div>
+            <strong>
+              {plan.title} with {firstNames(content, attendees(plan))}
+            </strong>
+            <span>
+              {describeWhen(content, plan.time)} · {content.locations.find((l) => l.id === plan.locationId)?.name}
+            </span>
+          </div>
+          {/* Calling it off is a message: it comes off the calendar, and nothing is held against him for missing it. */}
+          <button className="secondary" disabled={waiting} onClick={() => void say((current) => cancelAppointment(content, current, plan.id))}>
+            Cancel plan
+          </button>
+        </div>
+      ))}
       <form className="chat-compose" onSubmit={send}>
+        <EmojiPicker onPick={addEmoji} />
         <input
+          ref={compose}
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           maxLength={400}
@@ -496,7 +553,8 @@ function Updates({ content, state, onChange, onMessage, canMessage }: UpdatesPro
                 <strong>{author.name}</strong>
                 <span className="handle">
                   {handleOf(author)} · {describeAge(content, { time: post.time, summary: '' }, state.time)}
-                  {friend && ` · with ${friend.name.split(' ')[0]}`}
+                  {/* Whoever is in the picture with her is tagged as the app would: her name and her handle. */}
+                  {friend && ` · with ${friend.name.split(' ')[0]} ${handleOf(friend)}`}
                 </span>
               </div>
             </header>
@@ -523,6 +581,21 @@ function Updates({ content, state, onChange, onMessage, canMessage }: UpdatesPro
       })}
       {rest && <div ref={more} className="feed-more" aria-hidden="true" />}
     </div>
+  )
+}
+
+/** The market on his phone: every stall's gifts, ordered from wherever he is and carried at once. */
+function Market({ content, state, onChange }: { content: ContentPack; state: GameState; onChange: (update: (state: GameState) => GameState) => void }) {
+  return (
+    <Stalls
+      content={content}
+      state={state}
+      stalls={content.stalls}
+      byPhone
+      // There is no shopping on orientation day.
+      closed={isOrientationDay(content, state) ? <p className="notice">Nothing can be ordered on orientation day.</p> : undefined}
+      onBuy={(itemId) => onChange((current) => (canBuy(content, current, itemId, true).ok ? buy(content, current, itemId, true) : current))}
+    />
   )
 }
 
@@ -707,6 +780,7 @@ function About({ content, state, li }: { content: ContentPack; state: GameState;
           </span>
         )}
         {children.length > 0 && <span className="chip">Mother of {describeChildren(children)}</span>}
+        <span className="chip">{describeIntimacy(state, li.id)}</span>
       </div>
       <p>{li.bio}</p>
 

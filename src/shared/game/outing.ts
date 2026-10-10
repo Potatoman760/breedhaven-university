@@ -1,14 +1,16 @@
 import { z } from 'zod'
-import { MAX_SCENE_CAST, STATS, StatSchema, trainsAt, type ContentPack, type Drill, type Location, type GameState, type Effect, type Scene, type Stat } from '../model'
+import { MAX_SCENE_CAST, STATS, StatSchema, trainsAt, type CalendarEvent, type ContentPack, type Drill, type Location, type GameState, type Effect, type Scene, type Stat } from '../model'
 import { formatTime, isGameOver, toDate } from './calendar'
 import { applyEffects } from './conditions'
+import { eventGoers, eventsOn } from './events'
 import { courseMembers, meetingNow } from './courses'
 import { locationOf, approachableAt } from './map'
 import { shiftKey } from './jobs'
 import { timeOn } from './agenda'
 import { addCoursePoints, studyPoints } from './grades'
-import { firstNames, sceneBaseline } from './scene'
-import { isOpen } from './schedule'
+import { firstNames, hasMet, sceneBaseline } from './scene'
+import { PLAYER_ROOM } from './sceneMoves'
+import { isOpen, isOpenFor } from './schedule'
 
 // The hour he wakes: from midnight until then is for sleep (`SLEEP_HOURS` in sleep.ts).
 const SLEEP_UNTIL = 6
@@ -17,6 +19,8 @@ const DEFAULT_HOURS = 2
 const MAX_HOURS = 4
 // A night's sleep is longer than anything else the player might do.
 const MAX_REST_HOURS = 8
+// An event can be stayed at for as long as it runs, which may be most of a day.
+const MAX_EVENT_HOURS = 16
 // What an hour of working on yourself gives and costs, and what an hour of rest restores.
 const STAT_PER_HOUR = 1
 const ENERGY_PER_HOUR = 8
@@ -31,6 +35,8 @@ const STAT_WORDS: Record<Stat | 'rest', RegExp> = {
   charisma: /\b(mingl\w*|socialis\w*|socializ\w*|perform\w*|sing\w*|recit\w*|charm\w*|charisma|speech)\b/,
   wisdom: /\b(pray\w*|meditat\w*|reflect\w*|contemplat\w*|garden\w*|wisdom)\b/
 }
+// Words for going to see someone and no more than that: an hour of it.
+const TALK_WORDS = /\b(talk|chat|speak|see|visit|find|catch up|say hi|say hello|check on|drop in)\b/
 // Waiting for people to be free only looks this far ahead; beyond it, a plan is the thing.
 const MAX_WAIT_DAYS = 1
 const TITLE_CHARS = 60
@@ -46,7 +52,7 @@ export const OutingSchema = z.object({
   /** The love interests invited, the first of whom leads the scene. Empty when the player goes alone. */
   withIds: z.array(z.string()).max(MAX_SCENE_CAST).default([]),
   locationId: z.string(),
-  hours: z.number().int().min(1).max(MAX_REST_HOURS).default(DEFAULT_HOURS),
+  hours: z.number().int().min(1).max(MAX_EVENT_HOURS).default(DEFAULT_HOURS),
   /** What it does for the player: raises a stat, restores energy, or neither. */
   trains: z.union([StatSchema, z.literal('rest')]).optional(),
   /**
@@ -60,9 +66,52 @@ export const OutingSchema = z.object({
   /** It is in the player's own room, where the work goes further. */
   ownRoom: z.boolean().optional(),
   /** It is in this love interest's own room. */
-  roomOf: z.string().optional()
+  roomOf: z.string().optional(),
+  /** The event it is going to, when it is one. Whoever said she would be at it is there. */
+  eventId: z.string().optional(),
+  /** The hours it can be gone to, in game time, when it is an event that keeps hours: not before it opens, nor past its close. */
+  window: z.object({ from: z.number().int(), until: z.number().int() }).optional()
 })
 export type Outing = z.infer<typeof OutingSchema>
+
+/**
+ * The fewest and the most hours an outing can be made to take by the player, when its length is his to choose: something he
+ * typed to do, or an event he is going to. An hour at the least. A session of study or a drill is as long as it is, and has none.
+ */
+export function outingHourRange(state: GameState, outing: Outing): { min: number; max: number } | undefined {
+  if (outing.studyCourseId || (outing.dropIn && !outing.eventId)) return undefined
+  if (outing.window) return { min: 1, max: Math.max(1, Math.min(MAX_EVENT_HOURS, outing.window.until - Math.max(state.time, outing.window.from))) }
+  return { min: 1, max: outing.trains === 'rest' ? MAX_REST_HOURS : MAX_HOURS }
+}
+
+/** A room something typed can be set in: his own, or that of a love interest he has met who has one. */
+interface OutingRoom {
+  /** How it is named to the LLM: `room-of-<id>`. */
+  id: string
+  name: string
+  /** The place it is in. */
+  locationId: string
+  /** Whose it is: a love interest's id, or the player's. */
+  ownerId: string
+}
+
+/** The rooms an outing can be in: his own, when the game gives him one, and the room of anyone he has met who has one. */
+export function outingRooms(content: ContentPack, state: GameState): OutingRoom[] {
+  const own = content.newGame.room
+  return [
+    ...(own ? [{ id: `room-of-${PLAYER_ROOM}`, name: `${state.player.name}'s own room`, locationId: own.locationId ?? content.newGame.locationId, ownerId: PLAYER_ROOM }] : []),
+    ...content.loveInterests
+      .filter((li) => li.room && hasMet(state, li.id))
+      .map((li) => ({ id: `room-of-${li.id}`, name: `${li.name.split(' ')[0]}'s own room`, locationId: li.room!.locationId, ownerId: li.id }))
+  ]
+}
+
+/** An outing set in a room: at the place the room is in, in the room, and with whoever's room it is along, since nobody is in her room without her. */
+function inRoom(outing: Outing, room: OutingRoom): Outing {
+  if (room.ownerId === PLAYER_ROOM) return { ...outing, locationId: room.locationId, roomOf: PLAYER_ROOM, ownRoom: true }
+  const withIds = outing.withIds.includes(room.ownerId) ? outing.withIds : [room.ownerId, ...outing.withIds].slice(0, MAX_SCENE_CAST)
+  return { ...outing, locationId: room.locationId, roomOf: room.ownerId, withIds }
+}
 
 /** Reads the outing off the player's words without an LLM: names and places they mention, nothing cleverer. */
 export function fallbackOuting(content: ContentPack, state: GameState, text: string): Outing {
@@ -73,17 +122,27 @@ export function fallbackOuting(content: ContentPack, state: GameState, text: str
   // Somewhere suited to it, when the player didn't say where.
   const suited = trains && trains !== 'rest' ? content.locations.find((l) => trainsAt(l).includes(trains)) : undefined
   const place = named ?? suited
-  return {
+  const withIds = content.loveInterests
+    .filter((li) => mentions(li.name.split(' ')[0]))
+    .map((li) => li.id)
+    .slice(0, MAX_SCENE_CAST)
+  // "my room" is his own; "her room", or a room with her name on it, is the room of the one he named.
+  const rooms = outingRooms(content, state)
+  const room = /\bmy (own )?room\b/.test(said)
+    ? rooms.find((r) => r.ownerId === PLAYER_ROOM)
+    : /(\b(her|his|their)|'s) (own )?room\b|\broom of\b/.test(said)
+      ? rooms.find((r) => withIds.includes(r.ownerId))
+      : undefined
+  const outing: Outing = {
     trains,
     title: text.trim().slice(0, TITLE_CHARS) || 'Something else',
     description: '',
-    withIds: content.loveInterests
-      .filter((li) => mentions(li.name.split(' ')[0]))
-      .map((li) => li.id)
-      .slice(0, MAX_SCENE_CAST),
+    withIds,
     locationId: place?.id ?? state.locationId,
-    hours: trains === 'rest' && /\b(sleep|bed)\b/.test(said) ? MAX_REST_HOURS : DEFAULT_HOURS
+    // Going to see someone, with nothing else said of it, is an hour of talk.
+    hours: trains === 'rest' && /\b(sleep|bed)\b/.test(said) ? MAX_REST_HOURS : trains === undefined && TALK_WORDS.test(said) && content.loveInterests.some((li) => mentions(li.name.split(' ')[0])) ? 1 : DEFAULT_HOURS
   }
+  return room ? inRoom(outing, room) : outing
 }
 
 /** The prompt asking the LLM to turn what the player typed into an outing. */
@@ -97,8 +156,9 @@ export function buildOutingPrompt(content: ContentPack, state: GameState, text: 
     `- "description": one sentence of narration that opens the scene, in the second person and present tense.`,
     `- "with": the ids of the people ${state.player.name} names or plainly means, at most ${MAX_SCENE_CAST}. ` +
       `Use [] when ${state.player.name} means to go alone. Never add someone who was not asked.`,
-    '- "place": the id of the place it would happen. Choose the place that suits it best when none is named.',
-    `- "hours": how long it takes, a whole number from 1 to ${MAX_HOURS}, or up to ${MAX_REST_HOURS} for sleep.`,
+    '- "place": the id of the place it would happen. Choose the place that suits it best when none is named. ' +
+      `When ${state.player.name} names a room ("her room", "my room", "Ana's room"), use that room's id from the list of rooms.`,
+    `- "hours": how long it takes, a whole number from 1 to ${MAX_HOURS}, or up to ${MAX_REST_HOURS} for sleep. Going to talk to someone, or to see them with nothing more said, is 1.`,
     `- "trains": what it does for ${state.player.name}. One of ${STATS.join(', ')} when it works on that ` +
       `(sparring is strength, archery dexterity, running endurance, study intelligence, company and ` +
       `performance charisma, prayer and reflection wisdom); "rest" for sleeping or resting; "none" otherwise.`,
@@ -116,6 +176,7 @@ export function buildOutingPrompt(content: ContentPack, state: GameState, text: 
     ...content.locations.map(
       (l) => `- ${l.id}: ${l.name}${trainsAt(l).length > 0 ? ` (a good place to work on ${trainsAt(l).join(', ')})` : ''}`
     ),
+    ...(outingRooms(content, state).length > 0 ? ['', 'Rooms:', ...outingRooms(content, state).map((r) => `- ${r.id}: ${r.name}, at ${content.locations.find((l) => l.id === r.locationId)?.name ?? r.locationId}`)] : []),
     '',
     `${state.player.name} typed: ${text}`
   ].join('\n')
@@ -140,8 +201,12 @@ export function parseOuting(reply: string, content: ContentPack, state: GameStat
   const kind = typeof raw['trains'] === 'string' ? raw['trains'].trim().toLowerCase() : undefined
   const trains = kind === 'none' ? undefined : (['rest', ...STATS] as const).find((k) => k === kind) ?? (kind ? undefined : guess.trains)
   const title = typeof raw['title'] === 'string' ? raw['title'].trim() : ''
+  // A room named as the place: the LLM's, or failing any place of its own, the one his words named.
+  const room = idOf(outingRooms(content, state), raw['place'])
+  const chosen = outingRooms(content, state).find((r) => r.id === room)
+  const guessed = idOf(content.locations, raw['place']) === undefined && guess.roomOf !== undefined ? outingRooms(content, state).find((r) => r.ownerId === guess.roomOf) : undefined
 
-  return {
+  const outing: Outing = {
     title: title.slice(0, TITLE_CHARS) || guess.title,
     description: typeof raw['description'] === 'string' ? raw['description'].trim() : '',
     withIds: withIds ? [...new Set(withIds)].slice(0, MAX_SCENE_CAST) : guess.withIds,
@@ -151,6 +216,8 @@ export function parseOuting(reply: string, content: ContentPack, state: GameStat
       : guess.hours,
     trains
   }
+  const within = chosen ?? guessed
+  return within ? inRoom(outing, within) : outing
 }
 
 /** What an outing does for the player himself: a stat worked on at the cost of energy, or energy restored. */
@@ -180,8 +247,7 @@ function busyReason(content: ContentPack, state: GameState, id: string, from: nu
         : `${name} has ${course.number} at ${String(meeting.startHour).padStart(2, '0')}:00`
     }
   }
-  // Nowhere on their schedule at that hour: asleep, or off on business of their own.
-  if (locationOf(content, { ...state, time: from }, li) === undefined) return `${name} is not around`
+  // With nothing on her schedule at that hour she is at home, and can be asked out like anyone.
   return undefined
 }
 
@@ -194,7 +260,7 @@ export interface OutingCheck {
   freeNow: string[]
 }
 
-/** Everything in the way of an outing that starts at `time`: people who are busy, plans, closed doors. */
+/** Everything in the way of an outing that starts at `time`: people who are busy, closed doors. A plan of his own is not: he may go, and miss it. */
 function blockersAt(content: ContentPack, state: GameState, outing: Outing, time: number): { people: Map<string, string>; other: string[] } {
   const place = content.locations.find((l) => l.id === outing.locationId)
   const start = time
@@ -204,8 +270,9 @@ function blockersAt(content: ContentPack, state: GameState, outing: Outing, time
   if (place && !(isOpen(place, arrive.hour) && isOpen(place, leave.hour))) {
     other.push(isOpen(place, arrive.hour) ? `${place.name} closes too soon` : `${place.name} is closed`)
   }
-  const plan = state.appointments.find((a) => a.time < start + outing.hours && time < a.time + a.hours)
-  if (plan) other.push(`You have a plan at ${formatTime(toDate(content.calendar, plan.time))}: ${plan.title}`)
+  // An event is gone to while it is on: he may come late and leave early, but not before it opens or after it shuts.
+  if (outing.window && start < outing.window.from) other.push(`${outing.title} opens at ${formatTime(toDate(content.calendar, outing.window.from))}`)
+  if (outing.window && start + outing.hours > outing.window.until) other.push(`${outing.title} is over at ${formatTime(toDate(content.calendar, outing.window.until))}`)
   if (isGameOver(content.calendar, start + outing.hours - 1)) other.push('There is not enough of the season left')
   // The small hours are for sleep: nothing starts in them or runs into them, but sleep itself.
   const last = toDate(content.calendar, start + outing.hours - 1)
@@ -224,7 +291,7 @@ function blockersAt(content: ContentPack, state: GameState, outing: Outing, time
 
 /**
  * Whether an outing can happen now, and if not, why not and how long until it can:
- * everyone invited out of class and around, the place open, and no plan in the way.
+ * everyone invited out of class and around, and the place open.
  */
 export function checkOuting(content: ContentPack, state: GameState, outing: Outing): OutingCheck {
   const now = blockersAt(content, state, outing, state.time)
@@ -259,7 +326,8 @@ export function startOuting(
   const problems = [...people.values(), ...other]
   if (problems.length > 0) throw new Error(`Cannot do "${outing.title}": ${problems.join('; ')}`)
 
-  const there = { ...waited, locationId: outing.locationId }
+  // His own room is where he is from then on, until he goes somewhere else.
+  const there = { ...waited, locationId: outing.locationId, inOwnRoom: outing.ownRoom === true }
   const worked = applyEffects(there, outingEffects(outing), { content })
   // Study is work like any other, and what it earns goes on the course.
   const arrived = outing.studyCourseId
@@ -271,19 +339,26 @@ export function startOuting(
   // Of the love interests there, he runs into one or two, whoever the day throws his way.
   const around = outing.dropIn && outing.withIds.length === 0 ? approachableAt(content, there, outing.locationId).map((li) => li.id) : []
   const met = pick(state.weatherSeed, there.time, 900) < 0.5 ? 1 : MAX_RUN_INTO
-  const found = around
+  // Whoever said she would be at an event is there, whatever else the day had for her: she comes before anyone he merely runs into.
+  const promised = outing.eventId && outing.withIds.length === 0 ? eventGoers(state, outing.eventId).filter((id) => state.relationships[id] !== undefined && content.loveInterests.some((li) => li.id === id)) : []
+  const chance = around
+    .filter((id) => !promised.includes(id))
     .map((id, index) => ({ id, luck: pick(state.weatherSeed, there.time, 901 + index) }))
     .sort((a, b) => a.luck - b.luck)
-    .slice(0, met)
+    .slice(0, Math.max(0, met - promised.length))
     .map(({ id }) => id)
+  const found = [...promised, ...chance].slice(0, MAX_SCENE_CAST)
   // With no love interest about he is alone, whoever works at the place: there is no scene, only what the work did.
   const [leadId, ...companionIds] = outing.withIds.length > 0 ? outing.withIds : found
   const what = outing.studyCourseId ? 'to study' : outing.trains && outing.trains !== 'rest' ? `to work on his ${outing.trains}` : 'on his own'
   const direction = !outing.dropIn
     ? undefined
     : `${state.player.name} has come here ${what}: ${outing.title.toLowerCase()}. ${outing.description} ` +
-      `Nobody arranged this: you happen to be here, and run into him while he is at it. Open with him at his work, and then the running into each other. You may watch, join in, tease him, help or get in his way, as you would.` +
-      ` By the end of the scene the two hours are up and he is the better for it.`
+      (promised.length > 0
+        ? `${firstNames(content, promised)} said ${promised.length > 1 ? 'they' : 'she'} would be here, and ${promised.length > 1 ? 'are' : 'is'}: ${state.player.name} finds ${promised.length > 1 ? 'them' : 'her'} as he arrives. ` +
+          `Open with him arriving and the finding each other, as people who said they would. Anyone else here is run into by chance.`
+        : `Nobody arranged this: you happen to be here, and run into him while he is at it. Open with him at his work, and then the running into each other. You may watch, join in, tease him, help or get in his way, as you would.`) +
+      ` By the end of the scene the ${outing.hours === 1 ? 'hour is' : `${outing.hours} hours are`} up${outing.eventId ? '' : ' and he is the better for it'}.`
   return {
     state: { ...after, time: after.time + outing.hours },
     scene: leadId
@@ -304,8 +379,53 @@ export function startOuting(
 /** "Dinner with Seraphine and Faye at the Honeyed Bee Inn, 2 hours". */
 export function describeOuting(content: ContentPack, outing: Outing): string {
   const place = content.locations.find((l) => l.id === outing.locationId)
-  const company = outing.withIds.length > 0 ? ` with ${firstNames(content, outing.withIds)}` : ', alone'
-  return `${outing.title}${company} at ${place?.name ?? outing.locationId}, ${outing.hours} hour${outing.hours === 1 ? '' : 's'}`
+  // A title that already says who with is not told it twice.
+  const named = outing.withIds.length > 0 && outing.title.toLowerCase().includes(`with ${firstNames(content, outing.withIds).toLowerCase()}`)
+  const company = named ? '' : outing.withIds.length > 0 ? ` with ${firstNames(content, outing.withIds)}` : ', alone'
+  // In someone's room, the room is where it is.
+  const where = outing.roomOf === PLAYER_ROOM ? 'in your own room' : outing.roomOf && !outing.studyCourseId ? `in ${firstNames(content, [outing.roomOf])}'s room` : `at ${place?.name ?? outing.locationId}`
+  return `${outing.title}${company} ${where}, ${outing.hours} hour${outing.hours === 1 ? '' : 's'}`
+}
+
+/** An event that can be gone to today: the outing going to it is, and the most hours of it that are left to be had. */
+export interface EventOuting {
+  event: CalendarEvent
+  outing: Outing
+  /** The hours left of it today, counted from when he could get there, and not past midnight. At least one. */
+  maxHours: number
+}
+
+/**
+ * The events he could go to today: those under way that are somewhere and keep hours, with
+ * some of today's hours still to run. Each as something to go and do, on his own, with whoever
+ * is there: for an hour, or for as long as is left of it.
+ */
+export function eventOutings(content: ContentPack, state: GameState): EventOuting[] {
+  const { dayIndex, hour } = toDate(content.calendar, state.time)
+  return eventsOn(content, state).flatMap((event) => {
+    const place = content.locations.find((l) => l.id === event.locationId)
+    if (event.startHour === undefined || !place) return []
+    const from = timeOn(content, dayIndex, event.startHour)
+    // It shuts when it says, or at midnight if it would run past it.
+    const until = Math.min(from + (event.hours ?? 1), timeOn(content, dayIndex, content.calendar.hoursPerDay))
+    const maxHours = Math.min(MAX_EVENT_HOURS, until - Math.max(state.time, from))
+    if (maxHours < 1 || hour < 0) return []
+    const outing: Outing = { title: event.name, description: event.description, withIds: [], locationId: place.id, hours: Math.min(DEFAULT_HOURS, maxHours), dropIn: true, eventId: event.id, window: { from, until } }
+    return [{ event, outing, maxHours }]
+  })
+}
+
+/**
+ * An outing he typed that is really going to an event that is on today: it is at the event's place and names it.
+ * It is given the event's hours, so that it is not put off until after the event has shut, and no longer than is left of it.
+ * Anything else comes back as it was.
+ */
+export function asEventOuting(content: ContentPack, state: GameState, outing: Outing): Outing {
+  if (outing.eventId) return outing
+  const plain = (words: string) => words.toLowerCase().replace(/^the /, '')
+  const going = eventOutings(content, state).find(({ event, outing: to }) => to.locationId === outing.locationId && plain(outing.title).includes(plain(event.name)))
+  if (!going) return outing
+  return { ...outing, eventId: going.event.id, window: going.outing.window, hours: Math.min(outing.hours, going.maxHours) }
 }
 
 /** How long working on a stat at a place takes: long enough to be worth a scene. */
@@ -335,7 +455,10 @@ function pick(seed: number, time: number, index: number): number {
  */
 export function suggestDrills(content: ContentPack, state: GameState): StatSuggestion[] {
   return STATS.flatMap((stat, index) => {
-    const all = content.locations.flatMap((location) => location.drills.filter((drill) => drill.stat === stat).map((drill) => ({ stat, location, drill })))
+    // Only somewhere that is open now, and stays open for as long as it takes: a place that is shut is not offered.
+    const all = content.locations
+      .filter((location) => isOpenFor(content.calendar, location, state.time, DRILL_HOURS))
+      .flatMap((location) => location.drills.filter((drill) => drill.stat === stat).map((drill) => ({ stat, location, drill })))
     const doable = all.filter((option) => checkOuting(content, state, drillOuting(option)).blockers.length === 0)
     const from = doable.length > 0 ? doable : all
     return from.length > 0 ? [from[Math.floor(pick(state.weatherSeed, state.time, index) * from.length)]] : []
@@ -357,7 +480,7 @@ export function drillOuting(suggestion: StatSuggestion): Outing {
 
 /**
  * What the player would miss by going on an outing now, after the given wait: a class he
- * is taking, or a shift at his job, that falls in the hours it takes.
+ * is taking, a shift at his job, or a plan he has made, that falls in the hours it takes.
  * Each as a line. He may still go; it is for him to be told first.
  */
 export function outingMisses(content: ContentPack, state: GameState, outing: Outing, waitHours = 0): string[] {
@@ -365,6 +488,9 @@ export function outingMisses(content: ContentPack, state: GameState, outing: Out
   const until = from + outing.hours
   const clock = (hour: number) => `${String(hour).padStart(2, '0')}:00`
   const missed: string[] = []
+  for (const plan of state.appointments) {
+    if (plan.time < until && from < plan.time + plan.hours) missed.push(`your plan at ${formatTime(toDate(content.calendar, plan.time))}: ${plan.title}`)
+  }
   for (let time = from; time < until; time++) {
     const then = { ...state, time }
     const { dayIndex, hour, weekday } = toDate(content.calendar, time)

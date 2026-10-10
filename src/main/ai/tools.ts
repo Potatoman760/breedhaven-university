@@ -1,12 +1,8 @@
 import { proposeMeeting } from '../../shared/game/appointments'
 import { bondOf, canBond, describeBond, END_BOND, statusOf } from '../../shared/game/bonds'
-import { DEPARTURE_FEELINGS, MAX_SCENE_CAST, type BondProposal, type ContentPack, type DepartureFeeling, type GameState, type Proposal, type Scene } from '../../shared/model'
-import { describeRoll, rollDice, rollRange } from '../../shared/game/dice'
-import { hasContact } from '../../shared/game/courier'
+import { MAX_SCENE_CAST, type BondProposal, type ContentPack, type DepartureFeeling, type GameState, type Proposal, type Scene } from '../../shared/model'
 import { moveClash, sharedUpcoming, type Upcoming } from '../../shared/game/upcoming'
-import { handleOf } from '../../shared/game/feed'
 import { shiftLaterToday } from '../../shared/game/jobs'
-import { RELATIONS, relationBetween, type Relation } from '../../shared/game/rapport'
 import { hiddenFacts } from '../../shared/game/facts'
 import { firstNames, leavers, sceneCast } from '../../shared/game/scene'
 import { formatTime, toDate } from '../../shared/game/calendar'
@@ -39,6 +35,8 @@ export function meetingTool(
 ): LlmTool {
   const player = state.player.name
   const others = presentIds.filter((id) => id !== loveInterestId && content.loveInterests.some((li) => li.id === id))
+  // Face to face there is also the going somewhere now, which is another tool's; by message this is the only way anything is arranged.
+  const together = presentIds.length > 0
   return {
     name: 'propose_meeting',
     description:
@@ -46,9 +44,13 @@ export function meetingTool(
       `up another time: to study, for a meal or a drink, on a date, or for anything else. ` +
       `It checks everyone's timetables and returns the day and time you are all free. ` +
       `Never invent a day or time yourself; call this, then suggest exactly what it returns. ` +
-      `It is for another time only: it books something on the calendar and nobody goes anywhere. ` +
-      `For going somewhere together right now, call move_scene and not this. They are never both called for the same thing: ` +
-      `"let's go and get a coffee" is move_scene alone, "coffee on Friday?" is this alone.`,
+      (together
+        ? `It is for another time only: it books something on the calendar and nobody goes anywhere. ` +
+          `For going somewhere together right now, call move_scene and not this. They are never both called for the same thing: ` +
+          `"let's go and get a coffee" is move_scene alone, "coffee on Friday?" is this alone.`
+        : `You are writing to each other, not together, so this is the only way anything is arranged: call it for any meeting, ` +
+          `whether for later today ("come over now", "see you in an hour": ask for "today") or for another day. ` +
+          `Agreeing to meet without calling it puts nothing on ${player}'s calendar.`),
     parameters: {
       type: 'object',
       properties: {
@@ -63,8 +65,13 @@ export function meetingTool(
         },
         earliest: {
           type: 'string',
-          enum: ['today', 'tomorrow', 'later this week', 'the weekend'],
-          description: 'How soon. Leave out for the first time that works.'
+          enum: ['today', 'tomorrow', 'later this week', 'the weekend', 'next week'],
+          description: 'How soon. Leave out for the first time that works, which may be today. For "next week", say so here: nothing before the next week begins is offered.'
+        },
+        weekday: {
+          type: 'string',
+          enum: content.calendar.weekdays,
+          description: 'A day of the week, when one was named. With "next week" it is that day next week; alone, the next such day, which may be today.'
         },
         ...(others.length > 0
           ? {
@@ -96,6 +103,7 @@ export function meetingTool(
         activity: text(args['activity']) ?? '',
         place: text(args['place']) ?? '',
         earliest: text(args['earliest']),
+        weekday: text(args['weekday']),
         timeOfDay: text(args['time_of_day']),
         with: Array.isArray(args['with']) ? args['with'].filter((id): id is string => typeof id === 'string' && others.includes(id)) : undefined
       })
@@ -127,8 +135,8 @@ export function relationshipTool(
     description:
       `Ask ${player} to change what you are to each other. Call this only when the two of you ` +
       `(or the three of you) have talked your way to it and you are ready to ask outright, ` +
-      `or when you have decided to end things. It checks whether it is possible yet and ` +
-      `tells you what to say. ${player} then accepts or declines. Never declare a relationship ` +
+      `or when you have decided to end things. How long you have known him does not stand in the way: if you mean it, ask. ` +
+      `It checks only that nothing already promised forbids it, and tells you what to say. ${player} then accepts or declines. Never declare a relationship ` +
       `changed without calling this. Right now you are: ${current?.name ?? 'nothing agreed'}. The kinds: ` +
       statuses.map((s) => `${s.id}: ${s.name}. ${s.description}`).join(' ') +
       ` ${END_BOND}: end what you have.`,
@@ -171,76 +179,8 @@ export function relationshipTool(
   }
 }
 
-/**
- * Lets the LLM leave something to chance: dice in the usual notation, or a number from a
- * range. The game does the rolling, so the result is a real one; `onRoll` receives each
- * roll as a line the player can be shown.
- */
-export function diceTool(onRoll: (line: string) => void, random: () => number = Math.random): LlmTool {
-  return {
-    name: 'roll',
-    description:
-      'Roll dice or pick a random number, when something in the scene should be left to chance: ' +
-      'a game of dice or cards, a wager, a contest, whether an attempt comes off, or a number you ' +
-      'need and should not choose yourself. Give either "dice" or both "min" and "max". ' +
-      'Never invent a result; call this and use exactly what it returns. Decide what the numbers ' +
-      'will mean before you roll, and tell the story of the result in character.',
-    parameters: {
-      type: 'object',
-      properties: {
-        dice: {
-          type: 'string',
-          description: 'Dice in the usual notation: "d6", "2d6", "d20", "d20+5", "3d8-2", "d100".'
-        },
-        min: { type: 'integer', description: 'With "max": the lowest number that can come up.' },
-        max: { type: 'integer', description: 'With "min": the highest number that can come up.' },
-        reason: { type: 'string', description: 'What the roll is for, in a few words: "Tink\'s throw", "does he catch the purse".' }
-      }
-    },
-    run(args) {
-      const dice = typeof args['dice'] === 'string' ? args['dice'].trim() : ''
-      const number = (value: unknown) => (typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : Number.NaN)
-      const ranged = args['min'] !== undefined && args['max'] !== undefined
-      if (!dice && !ranged) throw new Error('Give "dice" (like d20) or both "min" and "max".')
-      const result = describeRoll(dice ? rollDice(dice, random) : rollRange(number(args['min']), number(args['max']), random))
-      const reason = typeof args['reason'] === 'string' ? args['reason'].trim() : ''
-      onRoll(reason ? `${reason}: ${result}` : result)
-      return `Rolled ${result}.`
-    }
-  }
-}
-
-/**
- * Lets a character set off with the player for the next thing on his timetable when she is in it too: a class
- * they share, or a plan she is part of. This scene ends with the two of them leaving, and the next is that class
- * or plan itself, with her in it. Undefined when nothing of his today is also hers. `onGo` receives what they left for.
- */
-export function eventTool(content: ContentPack, state: GameState, scene: Scene, onGo: (next: Upcoming, withIds: string[]) => void): LlmTool | undefined {
-  if (scene.npc) return undefined
-  const shared = sharedUpcoming(content, state, sceneCast(scene))
-  if (!shared) return undefined
-  const { next, sharedBy } = shared
-  const player = state.player.name
-  const where = content.locations.find((l) => l.id === next.locationId)?.name ?? next.locationId
-  const when = formatTime(toDate(content.calendar, next.time))
-  const who = firstNames(content, sharedBy)
-  return {
-    name: 'go_to_event',
-    description:
-      `${player} has ${next.title} at ${when} at ${where}, and ${who} ${sharedBy.length > 1 ? 'are' : 'is'} in it too. ` +
-      `Call this when ${player} and ${who} set off for it together: "shall we walk to class?", "come on, we'll be late", or ${player} saying he walks there with ${sharedBy.length > 1 ? 'them' : 'her'}. ` +
-      `It ends this scene as you leave, lets the time until ${when} go by, and the next scene is ${next.kind === 'class' ? 'the class' : 'the plan'} itself, with ${who} there. ` +
-      `Use this and not move_scene for going to it, and do not also call propose_meeting. It takes no arguments.`,
-    parameters: { type: 'object', properties: {} },
-    run() {
-      onGo(next, sharedBy)
-      return (
-        `You and ${player} set off for ${next.title} at ${where}. Write the two of you leaving here and the walk there, in character, and stop as you arrive: ` +
-        `this scene ends there, and ${next.kind === 'class' ? 'the class' : 'what you came for'} is the next one. Write nothing of it yet.`
-      )
-    }
-  }
-}
+/** The place the move tool offers for setting off together to the next thing on his timetable. */
+export const NEXT_EVENT = 'next-event'
 
 /**
  * Lets the characters take a scene somewhere else with the player: one of the places open
@@ -253,12 +193,17 @@ export function moveTool(
   content: ContentPack,
   state: GameState,
   scene: Scene,
-  onMove: (destination: Destination, hours: number, stayingIds: string[]) => void
+  onMove: (destination: Destination, hours: number, stayingIds: string[]) => void,
+  /** Told when they set off together for the next thing on his timetable that some of them are in too: this scene ends, and that begins. */
+  onEvent?: (next: Upcoming, withIds: string[]) => void
 ): LlmTool | undefined {
   const destinations = sceneDestinations(content, state, scene)
   const cast = sceneCast(scene)
   const group = cast.length > 1
-  if (destinations.length === 0) return undefined
+  // His next class or plan today, when someone here is in it too: somewhere they can go together, which is going to it.
+  const shared = onEvent && !scene.npc ? sharedUpcoming(content, state, cast) : undefined
+  if (destinations.length === 0 && !shared) return undefined
+  const sharedPlace = shared && (content.locations.find((l) => l.id === shared.next.locationId)?.name ?? shared.next.locationId)
   const player = state.player.name
   const doing = scene.beats.at(-1)?.activityName
   const soFar = sceneHours(state, scene)
@@ -284,11 +229,15 @@ export function moveTool(
       destinations
         .filter((d) => d.id.startsWith('room-of-'))
         .map((d) => ` ${d.id} is ${d.name}.`)
-        .join(''),
+        .join('') +
+      (shared
+        ? ` ${NEXT_EVENT} is ${shared.next.title} at ${formatTime(toDate(content.calendar, shared.next.time))} at ${sharedPlace}, which ${player} has next and ${firstNames(content, shared.sharedBy)} ${shared.sharedBy.length > 1 ? 'are' : 'is'} in too: ` +
+          `choose it when you set off for it together ("shall we walk to class?"). That ends this scene as you leave, lets the time until it starts go by, and the next scene is ${shared.next.kind === 'class' ? 'the class' : 'the plan'} itself. Give no hours with it.`
+        : ''),
     parameters: {
       type: 'object',
       properties: {
-        place: { type: 'string', enum: destinations.map((d) => d.id), description: 'Where to go.' },
+        place: { type: 'string', enum: [...destinations.map((d) => d.id), ...(shared ? [NEXT_EVENT] : [])], description: 'Where to go.' },
         hours: {
           type: 'integer',
           minimum: 1,
@@ -312,9 +261,16 @@ export function moveTool(
     },
     run(args) {
       const asked = typeof args['place'] === 'string' ? args['place'] : ''
+      if (shared && asked.trim().toLowerCase() === NEXT_EVENT) {
+        onEvent?.(shared.next, shared.sharedBy)
+        return (
+          `You and ${player} set off for ${shared.next.title} at ${sharedPlace}. Write the two of you leaving here and the walk there, in character, and stop as you arrive: ` +
+          `this scene ends there, and ${shared.next.kind === 'class' ? 'the class' : 'what you came for'} is the next one. Write nothing of it yet.`
+        )
+      }
       const destination = findDestination(destinations, asked)
       if (!destination) {
-        return `You cannot go to "${asked}". Stay where you are, and choose only from: ${destinations.map((d) => d.id).join(', ')}.`
+        return `You cannot go to "${asked}". Stay where you are, and choose only from: ${[...destinations.map((d) => d.id), ...(shared ? [NEXT_EVENT] : [])].join(', ')}.`
       }
       const asHours = Math.floor(Number(args['hours'] ?? 0))
       const before = Number.isFinite(asHours) && asHours >= 1 ? passSceneTime(content, state, asHours) : state
@@ -357,71 +313,6 @@ export interface Leaving {
   ids: string[]
   feeling: DepartureFeeling
   reason: string
-}
-
-/**
- * Lets love interests leave a scene that has more than one of them, while it goes on
- * with the rest: when the player has turned to one of them and the others would drift
- * off, or when someone has had enough and walks out. Someone always stays. Returns
- * undefined for a scene with only one love interest in it, where leaving is ending.
- */
-export function leaveTool(
-  content: ContentPack,
-  state: GameState,
-  scene: Scene,
-  onLeave: (leaving: Leaving) => void
-): LlmTool | undefined {
-  const cast = sceneCast(scene)
-  if (scene.npc || cast.length < 2) return undefined
-  const player = state.player.name
-  return {
-    name: 'leave_scene',
-    description:
-      `Have one or more of you leave, while the scene goes on here with whoever stays. (When it is ${player} who goes somewhere else with only some of you, use move_scene and name who stays behind instead.) Use it when ${player} has ` +
-      `plainly turned to one of you and the others would see it and drift off or make their excuses; when ` +
-      `someone has somewhere to be; or when someone is hurt or angry enough to walk out. Whoever is named is ` +
-      `gone for the rest of the scene and you stop writing for her. At least one of you must stay: to end ` +
-      `the scene for everyone, end it the usual way instead. Call it before you write the reply, then write ` +
-      `her going, in her own voice, and carry on with those who remain.`,
-    parameters: {
-      type: 'object',
-      properties: {
-        who: {
-          type: 'array',
-          minItems: 1,
-          maxItems: cast.length - 1,
-          items: { type: 'string', enum: cast },
-          description: 'Who leaves.'
-        },
-        feeling: {
-          type: 'string',
-          enum: [...DEPARTURE_FEELINGS],
-          description:
-            'How she feels as she goes: content (it is simply time, or she is giving the two of you room), hurt, or angry. ' +
-            `How she went is remembered, and tells in what she feels for ${player} afterwards, so choose hurt or angry only when he has earned it.`
-        },
-        why: { type: 'string', description: 'Why she leaves, in a few words: "saw she was not wanted", "late for the Bee", "the joke about her mother".' }
-      },
-      required: ['who', 'feeling']
-    },
-    run(args) {
-      const asked = Array.isArray(args['who']) ? args['who'].filter((id): id is string => typeof id === 'string').map((id) => id.trim().toLowerCase()) : []
-      const going = leavers(scene, asked)
-      if (going.length === 0) {
-        return asked.length >= cast.length
-          ? 'Someone has to stay. To end the scene for everyone, end it the usual way instead of calling this.'
-          : `Nobody by that name is in the scene. Choose from: ${cast.join(', ')}.`
-      }
-      const feeling = DEPARTURE_FEELINGS.find((f) => f === args['feeling']) ?? 'content'
-      const reason = typeof args['why'] === 'string' ? args['why'].trim() : ''
-      onLeave({ ids: going, feeling, reason })
-      const staying = cast.filter((id) => !going.includes(id))
-      return (
-        `${firstNames(content, going)} ${going.length > 1 ? 'leave' : 'leaves'}, ${feeling}. Write ${going.length > 1 ? 'their' : 'her'} going in this reply, ` +
-        `then carry on with ${firstNames(content, staying)} and ${player}. From the next reply on, write only for ${firstNames(content, staying)}.`
-      )
-    }
-  }
 }
 
 /** Something a love interest has just let the player know about herself. */
@@ -477,89 +368,6 @@ export function revealTool(
       if (found.length === 0) return 'None of those is on the list. Nothing was recorded; carry on with your reply.'
       for (const o of found) onReveal({ loveInterestId: o.loveInterestId, factId: o.fact.id })
       return `Recorded: ${found.map((o) => o.fact.telling).join('; ')}. Make sure your reply does say so, in character.`
-    }
-  }
-}
-
-/**
- * Lets a character give the player her Bloomr, so that the two can message. Offered only
- * for those in the scene he doesn't have yet; undefined when he has them all. `onGive`
- * receives whose.
- */
-export function contactTool(
-  content: ContentPack,
-  state: GameState,
-  loveInterestIds: string[],
-  onGive: (loveInterestId: string) => void
-): LlmTool | undefined {
-  const without = content.loveInterests.filter((li) => loveInterestIds.includes(li.id) && !hasContact(state, li.id))
-  if (without.length === 0) return undefined
-  const player = state.player.name
-  return {
-    name: 'give_contact',
-    description:
-      `Give ${player} your Bloomr, your handle on the app everyone has, so the two of you can DM each other when you are apart. He does ` +
-      `not have it yet and cannot write to you until you call this. Call it in the same reply in which you ` +
-      `give it: when he asks and you are willing, or when you decide to offer it yourself. Whether you are ` +
-      `willing is yours to decide in character, from how well you know him and how you feel about him; you ` +
-      `may refuse or put him off. Never say you have given it without calling this, and never say or show ` +
-      `a handle unless you are giving it. The handle to give, written exactly: ` +
-      `${without.map((li) => `${li.name.split(' ')[0]} is ${handleOf(li)}`).join('; ')}.`,
-    parameters: {
-      type: 'object',
-      properties: {
-        who: { type: 'string', enum: without.map((li) => li.id), description: 'Whose Bloomr is being given.' }
-      },
-      required: ['who']
-    },
-    run(args) {
-      const who = typeof args['who'] === 'string' ? args['who'].trim().toLowerCase() : ''
-      const giver = without.find((li) => li.id === who) ?? (without.length === 1 ? without[0] : undefined)
-      if (!giver) return 'Nobody by that id is here without having given it. Nothing was recorded; carry on with your reply.'
-      onGive(giver.id)
-      return `${player} now has ${giver.name.split(' ')[0]}'s Bloomr. Make sure the reply shows her giving it, in character.`
-    }
-  }
-}
-
-/**
- * Lets the LLM change what two love interests are to each other when a scene they are
- * both in changes it. Offered only where more than one is present. `onChange` receives
- * the pair and what they now are.
- */
-export function rapportTool(
-  content: ContentPack,
-  state: GameState,
-  loveInterestIds: string[],
-  onChange: (change: { a: string; b: string; relation: Relation }) => void
-): LlmTool | undefined {
-  const present = content.loveInterests.filter((li) => loveInterestIds.includes(li.id))
-  if (present.length < 2) return undefined
-  const first = (id: string) => content.loveInterests.find((li) => li.id === id)?.name.split(' ')[0] ?? id
-  return {
-    name: 'set_rapport',
-    description:
-      'Record that two of the women in this scene have become friends, become enemies, or stopped being either. Call it ' +
-      'only when what happens in this scene really changes how they stand with each other: a quarrel that will not be ' +
-      'forgotten, a peace made, a friendship struck up. Not for a passing mood or a single sharp remark.',
-    parameters: {
-      type: 'object',
-      properties: {
-        a: { type: 'string', enum: present.map((li) => li.id), description: 'One of the two.' },
-        b: { type: 'string', enum: present.map((li) => li.id), description: 'The other.' },
-        relation: { type: 'string', enum: [...RELATIONS], description: 'What they are to each other from now on.' }
-      },
-      required: ['a', 'b', 'relation']
-    },
-    run(args) {
-      const pick = (value: unknown) => present.find((li) => li.id === (typeof value === 'string' ? value.trim().toLowerCase() : ''))?.id
-      const a = pick(args['a'])
-      const b = pick(args['b'])
-      const relation = RELATIONS.find((r) => r === args['relation'])
-      if (!a || !b || a === b || !relation) return 'Name two different women in this scene, and one of: friends, enemies, neither. Nothing was recorded.'
-      if (relationBetween(state, a, b) === relation) return `${first(a)} and ${first(b)} already are. Nothing changed.`
-      onChange({ a, b, relation })
-      return `Recorded: ${first(a)} and ${first(b)} are now ${relation === 'neither' ? 'neither friends nor enemies' : relation}. Make sure the reply shows why.`
     }
   }
 }

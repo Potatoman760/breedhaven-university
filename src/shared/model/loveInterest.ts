@@ -69,9 +69,11 @@ export const OutfitSchema = z.object({
    */
   description: z.string().default(""),
   /**
-   * The id of another of her outfits whose description this one builds on. Hers is then
-   * that description with this outfit's own added to it: `pregnant` is `default` plus
-   * "She has a round, pregnant belly."
+   * The id of its parent: another of her outfits, which this one builds on. Its description
+   * is then the parent's with its own added to it: `pregnant` is `default` plus "She has a
+   * round, pregnant belly." A pregnant outfit is also the pregnant form of its parent: once
+   * her pregnancy shows it is worn wherever the parent is asked for. `pregnant` has `default`
+   * for its parent, and `nude-pregnant` has `nude`.
    */
   inherits: z.string().optional(),
   /**
@@ -81,7 +83,7 @@ export const OutfitSchema = z.object({
   fallback: z.string().optional(),
   /** Sprites keyed by their title: one of `EXPRESSIONS`, or any other name for a picture of some other kind. */
   sprites: z.record(z.string(), SpriteSchema).default({}),
-  /** Drawn pregnant. Worn once a pregnancy shows, and not before. */
+  /** Drawn pregnant. Worn in its parent's place once a pregnancy shows, and not before. */
   pregnant: z.boolean().default(false),
 });
 export type Outfit = z.infer<typeof OutfitSchema>;
@@ -227,6 +229,41 @@ const SEEDING: readonly string[] = ["creampie"];
  */
 export function isSeeding(poseId: string): boolean {
   return SEEDING.includes(poseId);
+}
+
+// What a pose drawn pregnant is filed under: the pose it is built on, with this before it.
+const PREGNANT_POSE = "pregnant-";
+
+/**
+ * The same poses drawn pregnant: a second row in the NSFW section, each built on the pose of the row above it. It is
+ * drawn from that pose's own wording with her pregnant nude in place of her nude, and it is shown in that pose's
+ * place once a pregnancy shows. Being pregnant is the game's to draw and not the LLM's to choose: it asks for the
+ * plain pose, and while her pregnancy shows the game puts up this one instead, if she has the picture.
+ */
+export const NSFW_PREGNANT_POSES = NSFW_POSES.map((pose) => ({
+  ...pose,
+  id: `${PREGNANT_POSE}${pose.id}`,
+  name: `${pose.name}, pregnant`,
+  /** The pose it is built on. */
+  base: pose.id,
+}));
+
+/** Every pose with a slot of its own: the standard ones, and each of them drawn pregnant. */
+export const STANDARD_POSES = [...NSFW_POSES, ...NSFW_PREGNANT_POSES];
+
+/** Whether a pose is one drawn pregnant, which stands in for another and is not chosen for itself. */
+export function isPregnantPose(poseId: string): boolean {
+  return poseId.startsWith(PREGNANT_POSE);
+}
+
+/** The pose a given one is built on: itself, unless it is one drawn pregnant. */
+export function basePoseId(poseId: string): string {
+  return isPregnantPose(poseId) ? poseId.slice(PREGNANT_POSE.length) : poseId;
+}
+
+/** The id of the pose a given one is drawn pregnant as. */
+export function pregnantPoseId(poseId: string): string {
+  return `${PREGNANT_POSE}${poseId}`;
 }
 
 /** What a pose shows, as the LLM is told it: her own words for it, or the standard ones. */

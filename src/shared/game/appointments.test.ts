@@ -79,7 +79,7 @@ describe('proposeMeeting', () => {
   it('returns a proposal and tells the model exactly what to suggest', () => {
     const { proposal, message } = proposeMeeting(content, state, 'ana', { activity: ' study ', place: 'home' })
     expect(proposal).toEqual({ loveInterestId: 'ana', companionIds: [], title: 'study', time: 2, hours: 2, locationId: 'home' })
-    expect(message).toContain('at 08:00, at Home')
+    expect(message).toContain('at 08:00, which is today, at Home')
     expect(message).toContain('Pat')
   })
 
@@ -185,5 +185,32 @@ describe('plans with more than one love interest', () => {
     const alone = buildCharacterPrompt({ content: crowd, state: booked, loveInterestId: 'ana' })
     expect(alone).not.toContain('Also in the scene')
     expect(alone).toContain('speak only as Ana')
+  })
+})
+
+describe('asking for next week, or a day by name', () => {
+  // The fixture's week is One, Two, Three, and the game starts on a Two: next week begins two days on.
+  const content = fixture()
+  const state = createInitialState(content)
+  const day = (time: number | undefined) => (time === undefined ? undefined : Math.floor((time + content.calendar.start.hour) / content.calendar.hoursPerDay))
+  const weekdayOn = (time: number) => content.calendar.weekdays[(content.calendar.startWeekday + day(time)!) % content.calendar.weekdays.length]
+
+  it('is never answered with today', () => {
+    const soonest = findMeetingTime(content, state, 'ana', { activity: 'tea', place: 'home' })!
+    expect(day(soonest)).toBe(0)
+    const next = findMeetingTime(content, state, 'ana', { activity: 'tea', place: 'home', earliest: 'next week' })!
+    expect(day(next)).toBe(2)
+    expect(weekdayOn(next)).toBe('One')
+    // The same day of next week, by name: not today, though today is one.
+    const sameDay = findMeetingTime(content, state, 'ana', { activity: 'tea', place: 'home', earliest: 'next week', weekday: 'Two' })!
+    expect(day(sameDay)).toBe(3)
+    expect(weekdayOn(sameDay)).toBe('Two')
+    // A day by name alone is the next such day.
+    expect(weekdayOn(findMeetingTime(content, state, 'ana', { activity: 'tea', place: 'home', weekday: 'three' })!)).toBe('Three')
+  })
+
+  it('says how far off the time it found is', () => {
+    expect(proposeMeeting(content, state, 'ana', { activity: 'tea', place: 'home' }).message).toContain('which is today')
+    expect(proposeMeeting(content, state, 'ana', { activity: 'tea', place: 'home', earliest: 'next week' }).message).toContain('which is 2 days from now')
   })
 })

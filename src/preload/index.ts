@@ -5,6 +5,11 @@ import type { RendererApi } from '../shared/types'
 const api: RendererApi = {
   getContent: () => ipcRenderer.invoke(IPC.getContent),
   chat: (request) => ipcRenderer.invoke(IPC.chat, request),
+  onSceneMoving: (listener) => {
+    const heard = (_event: unknown, where: string) => listener(where)
+    ipcRenderer.on(IPC.chatMoving, heard)
+    return () => ipcRenderer.removeListener(IPC.chatMoving, heard)
+  },
   summarize: (request) => ipcRenderer.invoke(IPC.summarize, request),
   generateEvents: (request) => ipcRenderer.invoke(IPC.generateEvents, request),
   planOuting: (request) => ipcRenderer.invoke(IPC.planOuting, request),
@@ -19,6 +24,7 @@ const api: RendererApi = {
   saveGame: (request) => ipcRenderer.invoke(IPC.saveGame, request),
   loadGame: (slotId) => ipcRenderer.invoke(IPC.loadGame, slotId),
   deleteSave: (slotId) => ipcRenderer.invoke(IPC.deleteSave, slotId),
+  renameSave: (request) => ipcRenderer.invoke(IPC.renameSave, request),
   editor: {
     info: () => ipcRenderer.invoke(IPC.editorInfo),
     saveLoveInterest: (loveInterest) => ipcRenderer.invoke(IPC.editorSaveLoveInterest, loveInterest),
@@ -44,6 +50,9 @@ const api: RendererApi = {
     test: (baseUrl) => ipcRenderer.invoke(IPC.comfyTest, baseUrl),
     chooseFolder: () => ipcRenderer.invoke(IPC.comfyChooseFolder),
     workflows: () => ipcRenderer.invoke(IPC.comfyWorkflows),
+    bundle: () => ipcRenderer.invoke(IPC.comfyBundle),
+    installBundle: () => ipcRenderer.invoke(IPC.comfyBundleInstall),
+    checkBundle: () => ipcRenderer.invoke(IPC.comfyBundleCheck),
     generate: (request) => ipcRenderer.invoke(IPC.comfyGenerate, request),
     cancel: () => ipcRenderer.invoke(IPC.comfyCancel),
     cutout: (request) => ipcRenderer.invoke(IPC.comfyCutout, request)

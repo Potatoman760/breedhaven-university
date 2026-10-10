@@ -3,6 +3,7 @@ import { RelationshipStatusSchema, type ContentPack, type GameState } from '../m
 import {
   acceptBond,
   bondOf,
+  bondLifts,
   canBond,
   changeTie,
   describeBond,
@@ -63,12 +64,17 @@ describe('ties between love interests', () => {
 })
 
 describe('canBond', () => {
-  it('needs the right people, each far enough along with the player', () => {
+  it('needs the right people, and is not held back by how far along they are: whoever agrees to it is brought up to it', () => {
     const state = friendsWith('ana')
     expect(canBond(content, state, { statusId: 'open', memberIds: ['ana'] }).ok).toBe(true)
-    expect(canBond(content, state, { statusId: 'open', memberIds: ['bea'] }).reasons).toEqual([
-      'It is too soon for Bea: Bea and Pat are only Stranger, not yet Friend'
-    ])
+    expect(bondLifts(content, state, { statusId: 'open', memberIds: ['ana'] })).toEqual([])
+    // Bea is a stranger. She may still ask, and agreeing makes her a friend, which is what the arrangement is for.
+    expect(canBond(content, state, { statusId: 'open', memberIds: ['bea'] }).ok).toBe(true)
+    expect(bondLifts(content, state, { statusId: 'open', memberIds: ['bea'] }).map((lift) => [lift.id, lift.stage.id])).toEqual([['bea', 'friend']])
+    const agreed = formBond(content, state, { statusId: 'open', memberIds: ['bea'] })
+    expect(agreed.relationships['bea']).toEqual({ affection: 30, trust: 0, desire: 0 })
+    // Someone already past it is left where she is.
+    expect(formBond(content, state, { statusId: 'open', memberIds: ['ana'] }).relationships['ana'].affection).toBe(40)
     expect(canBond(content, state, { statusId: 'open', memberIds: ['ana', 'bea'] }).reasons[0]).toBe(
       'Open courtship is between Pat and 1 other'
     )
@@ -110,7 +116,6 @@ describe('an open three', () => {
     expect(three.bonds).toEqual([{ statusId: 'open-triad', memberIds: ['ana', 'bea'], since: 0 }])
     expect(bondOf(three, 'bea')?.statusId).toBe('open-triad')
     expect(describeBond(content, three.bonds[0])).toBe('Open triad with Ana and Bea')
-    expect(() => formBond(content, friendsWith(), { statusId: 'open', memberIds: ['ana'] })).toThrow(/too soon/)
   })
 
   it('is told to each of them: who is in it, that they are with each other, and who else he sees', () => {

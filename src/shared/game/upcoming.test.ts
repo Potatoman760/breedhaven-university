@@ -71,3 +71,14 @@ describe('something of his that those he is with are in too', () => {
     expect(sharedUpcoming(content, { ...shared(['ana']), player: { ...start.player, energy: 0 } }, ['ana'])).toBeUndefined()
   })
 })
+
+describe('skipping ahead to something later', () => {
+  it('is clear only when nothing of his own starts before it', async () => {
+    const { clearUntil } = await import('./upcoming')
+    // His next class is at 09:00, which is time 3.
+    expect(clearUntil(content, start, 2)).toBe(true)
+    expect(clearUntil(content, start, 3)).toBe(true)
+    expect(clearUntil(content, start, 5)).toBe(false)
+    expect(clearUntil(content, { ...start, enrolment: [] }, 99)).toBe(true)
+  })
+})

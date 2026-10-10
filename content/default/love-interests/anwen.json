@@ -233,6 +233,34 @@
       "description": "",
       "image": "sprites/anwen/nsfw-facial.png",
       "loop": true
+    },
+    {
+      "id": "pregnant-missionary",
+      "name": "Missionary, pregnant",
+      "description": "",
+      "image": "sprites/anwen/nsfw-pregnant-missionary-4.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-doggy",
+      "name": "Doggy, pregnant",
+      "description": "",
+      "image": "sprites/anwen/nsfw-pregnant-doggy-5.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-cowgirl",
+      "name": "Cowgirl, pregnant",
+      "description": "",
+      "image": "sprites/anwen/nsfw-pregnant-cowgirl.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-creampie",
+      "name": "Creampie, pregnant",
+      "description": "",
+      "image": "sprites/anwen/nsfw-pregnant-creampie.png",
+      "loop": true
     }
   ],
   "schedule": [

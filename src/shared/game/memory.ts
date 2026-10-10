@@ -4,6 +4,8 @@ import { describeBonds } from './bonds'
 import { stageFor } from './relationships'
 import { firstNames, sceneCast, sceneWitnesses } from './scene'
 import { describeAppeal } from './stats'
+import { hiddenFacts } from './facts'
+import { RELATIONS, relationBetween, type Relation } from './rapport'
 
 // Transcripts longer than this are trimmed from the start before summarising.
 const MAX_TRANSCRIPT_CHARS = 12000
@@ -46,12 +48,14 @@ export function buildSummaryPrompt(input: SummaryInput): { system: string; user:
   // An NPC has no feelings for him to keep track of: hers is a memory and nothing more.
   const feels = !scene.npc && li !== undefined && rel !== undefined
   const max = content.relationships.meterMax
+  // What he does not yet know of her: anything of it that came out in the scene is recorded when the scene is over.
+  const unknown = feels && li ? hiddenFacts(content, state, li) : []
   const system = [
     `You write what characters in a dating sim take away from a scene. Given what happened during one ` +
       `outing between ${player} and ${name}, write the single memory ${name} keeps of it` +
       `${feels ? `, and decide how it has changed what she feels for ${player}` : ''}.`,
     feels
-      ? 'Reply with only a JSON object and nothing else: {"memory": string, "affection": number, "trust": number, "desire": number, "reason": string}'
+      ? `Reply with only a JSON object and nothing else: {"memory": string, "affection": number, "trust": number, "desire": number, "reason": string, "sex": boolean, "learned": string[]${group ? ', "rapport": {"with": string, "relation": string}[]' : ''}}`
       : 'Reply with only the memory itself.',
     'The memory:',
     '- Exactly one sentence, plain prose, past tense, third person, using both names.',
@@ -82,7 +86,15 @@ export function buildSummaryPrompt(input: SummaryInput): { system: string; user:
           '- The three move on their own. Affection is fondness and warmth. Trust is whether she can rely on him and be honest with him: kept words, discretion, not being pressed. ' +
             'Desire is wanting him: it rises with attraction and tension, and can rise while trust falls.',
           `- What she admires in a man tilts all of it: where ${player} has it she warms to the same behaviour sooner, and where he lacks it he has more to prove.`,
-          '- "reason": one short sentence, in the third person, on why it moved as it did.'
+          '- "reason": one short sentence, in the third person, on why it moved as it did.',
+          `- "sex": true only if ${name} and ${player} had sex with each other in this scene, of any kind; false for kissing, flirting, talk of it, or sex that involved only others.`,
+          unknown.length > 0
+            ? `- "learned": the ids of the things below that ${player} found out about ${name} in this scene, because she plainly said or showed them; [] when none did. Only ids from this list, and only what really came out:`
+            : '- "learned": always [].',
+          ...unknown.map((fact) => `  - ${fact.id}: ${fact.telling}`),
+          group &&
+            `- "rapport": how ${name} now stands with any of the others, only where this scene truly changed it: a quarrel that will not be forgotten, a peace made, a friendship struck up. ` +
+              `Not for a passing mood or one sharp remark; [] when nothing changed. Each entry: "with" is one of ${otherIds.join(', ')}, and "relation" is one of ${RELATIONS.join(', ')}.`
         ]
       : [])
   ]
@@ -147,6 +159,12 @@ export interface Summary {
   memory: string
   /** Left out for an NPC, and when the reply said nothing that could be read. */
   feelings?: Feelings
+  /** She and the player had sex in the scene. */
+  intimate?: boolean
+  /** Ids of the things about her that the reply says came out in the scene, as written: still to be checked against what there was to learn. */
+  learned?: string[]
+  /** How the reply says she now stands with others who were there, as written: still to be checked. */
+  rapport?: { with: string; relation: string }[]
 }
 
 /** What she feels when there was no LLM to ask: a little fonder for the time, and nothing else. */
@@ -180,8 +198,48 @@ export function parseSummary(reply: string): Summary {
       trust: change(given['trust']),
       desire: change(given['desire']),
       reason: typeof given['reason'] === 'string' ? given['reason'].trim() : ''
+    },
+    intimate: given['sex'] === true || given['sex'] === 'true',
+    learned: Array.isArray(given['learned']) ? given['learned'].filter((id): id is string => typeof id === 'string').map((id) => id.trim()) : [],
+    rapport: Array.isArray(given['rapport'])
+      ? given['rapport'].flatMap((entry) => {
+          const { with: other, relation } = (entry ?? {}) as { with?: unknown; relation?: unknown }
+          return typeof other === 'string' && typeof relation === 'string' ? [{ with: other.trim().toLowerCase(), relation: relation.trim().toLowerCase() }] : []
+        })
+      : []
+  }
+}
+
+/**
+ * What the player found out about those in a scene, from what each one's summary said came out: only things that were
+ * there to be learned, by the id the game knows them under.
+ */
+export function sceneRevelations(content: ContentPack, state: GameState, said: { id: string; learned: string[] }[]): { loveInterestId: string; factId: string }[] {
+  return said.flatMap(({ id, learned }) => {
+    const li = content.loveInterests.find((c) => c.id === id)
+    const open = li ? hiddenFacts(content, state, li) : []
+    const wanted = learned.map((factId) => factId.toLowerCase())
+    return open.filter((fact) => wanted.includes(fact.id.toLowerCase())).map((fact) => ({ loveInterestId: id, factId: fact.id }))
+  })
+}
+
+/**
+ * How those in a scene now stand with each other, from what each one's summary said had changed: only between two
+ * who were both there, only a change from how they stood, and one verdict for each pair, the first given.
+ */
+export function sceneRapport(state: GameState, presentIds: string[], said: { id: string; rapport: { with: string; relation: string }[] }[]): { a: string; b: string; relation: Relation }[] {
+  const changes: { a: string; b: string; relation: Relation }[] = []
+  for (const { id, rapport } of said) {
+    for (const entry of rapport) {
+      const other = presentIds.find((present) => present.toLowerCase() === entry.with)
+      const relation = RELATIONS.find((r) => r === entry.relation)
+      if (!other || other === id || !presentIds.includes(id) || !relation) continue
+      if (relationBetween(state, id, other) === relation) continue
+      if (changes.some((c) => (c.a === id && c.b === other) || (c.a === other && c.b === id))) continue
+      changes.push({ a: id, b: other, relation })
     }
   }
+  return changes
 }
 
 /**
@@ -200,6 +258,30 @@ export function applyFeelings(content: ContentPack, state: GameState, loveIntere
       [loveInterestId]: { ...rel, affection: within(rel.affection + feelings.affection), trust: within(rel.trust + feelings.trust), desire: within(rel.desire + feelings.desire) }
     }
   }
+}
+
+/** How many times a love interest and the player have had sex: scenes it happened in. */
+export function timesIntimate(state: GameState, loveInterestId: string): number {
+  return state.timesIntimate[loveInterestId] ?? 0
+}
+
+/**
+ * Counts a scene in which these love interests had sex with the player: once each, however much of it there was.
+ * With two or more of them in the one scene, it is also counted once as a threesome, however many they were.
+ */
+export function addIntimacy(state: GameState, loveInterestIds: string[]): GameState {
+  const counted = loveInterestIds.filter((id, i) => state.relationships[id] !== undefined && loveInterestIds.indexOf(id) === i)
+  if (counted.length === 0) return state
+  return {
+    ...state,
+    timesIntimate: { ...state.timesIntimate, ...Object.fromEntries(counted.map((id) => [id, timesIntimate(state, id) + 1])) },
+    threesomes: state.threesomes + (counted.length >= 2 ? 1 : 0)
+  }
+}
+
+/** What is told of it, to her and on her profile: "Times had sex: 2". */
+export function describeIntimacy(state: GameState, loveInterestId: string): string {
+  return `Times had sex: ${timesIntimate(state, loveInterestId)}`
 }
 
 /** A plain memory built from the activity list alone, for when no LLM is available. */

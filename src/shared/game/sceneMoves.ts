@@ -95,7 +95,7 @@ export function findDestination(destinations: Destination[], asked: string): Des
 
 /** The state after a scene has moved: the player is there with everyone in it. Going there takes no time. */
 export function moveState(state: GameState, destination: Destination): GameState {
-  return { ...state, locationId: destination.locationId }
+  return { ...state, locationId: destination.locationId, inOwnRoom: destination.roomOf === PLAYER_ROOM }
 }
 
 /**
@@ -124,6 +124,17 @@ export function movedScene<S extends Pick<Scene, 'beats' | 'roomOf' | 'backgroun
  */
 export function sceneHours(state: GameState, scene: Pick<Scene, 'baseline'>): number {
   return Math.max(0, state.time - scene.baseline.time)
+}
+
+/**
+ * The time to show while a scene is under way. The clock itself is kept in whole hours and already stands at the hour
+ * the scene's time runs out, so what is shown is the middle of the scene: half-way between when it began and that
+ * hour, the same for as long as the scene lasts. A class from 14:00 to 15:00 is shown as 14:30. It is for showing
+ * only: nothing is reckoned by it. A scene that has taken no time is shown at the hour it is.
+ */
+export function sceneClock(state: GameState, scene: Pick<Scene, 'baseline'>): { time: number; minute: number } {
+  const middle = (Math.min(scene.baseline.time, state.time) + state.time) / 2
+  return { time: Math.floor(middle), minute: Number.isInteger(middle) ? 0 : 30 }
 }
 
 /** The most hours one call can add. */

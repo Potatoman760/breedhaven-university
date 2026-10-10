@@ -195,11 +195,14 @@ and the trait library.
 - **Tools**: a chat request can carry functions for the LLM to call (OpenAI `tools`), run
   in the main process before the model writes its reply. Tools are defined in
   `src/main/ai/tools.ts`. An endpoint or model that rejects tools is retried without them.
-  - `roll` leaves something to chance: dice in the usual notation (`d6`, `2d6+3`, `d20`,
-    `d100`) or a whole number from `min` to `max`. The game does the rolling
-    (`src/shared/game/dice.ts`), the model is told the result, and the text box shows the
-    roll under the reply. It is not offered in scenes at present: the tool is kept in
-    `tools.ts` for card and dice games, wagers and skill checks later.
+  - A tool is only used where the model needs the game's answer before it can write:
+    `propose_meeting`, `propose_relationship` and `move_scene` in a scene, `reveal_fact`
+    and `excuse_shift` by message. Everything a character merely declares is a hidden
+    line in the reply instead, read by `parseDirectives` in `src/shared/game/scene.ts` and
+    costing no second round trip: `[LEAVES: Name=feeling why]`, `[ATTENDING: event-id]`,
+    `[AGREED]` (a plan suggested earlier, agreed to in words) and `[SLEEP]` (the night is
+    slept through where they are). What came out about a love interest, and what changed
+    between two of them, is asked of the scene's summary when it ends.
   - `propose_meeting` is for when a character or the player wants to meet later, to study
     or on a date. The LLM names the activity, the place and optionally how soon and what
     time of day; the game picks the first two-hour slot when both are free of classes and
@@ -338,16 +341,18 @@ and the trait library.
   - **What there is to know** is drawn from her file (`src/shared/game/facts.ts`): each
     like and dislike, each trait, each stat she is drawn to, what she studies or teaches,
     her age, birthday and room, and each secret. All of it starts unknown.
-  - **Finding out**: in a scene or a note the LLM has a `reveal_fact` tool listing what
-    the player doesn't yet know of the love interests present. When a reply tells or shows
-    one ("do you like tea?" "No, coffee"), it names it and the fact is recorded
-    (`revealed` in the save), with a "Learned:" line under the reply. A secret is only on
+  - **Finding out**: when a scene ends, each love interest's summary is given the list
+    of what the player doesn't yet know of her and names what came out ("do you like
+    tea?" "No, coffee"). Those are recorded (`revealed` in the save) and listed on the
+    summary screen under "You learned". By message, where there is no summary, the LLM
+    has a `reveal_fact` tool for the same. A secret is only on
     the list once its conditions let her share it. A gift she loves or dislikes reveals
     the like or dislike it matched.
 - **Bloomr DMs** (`courier` in the code and the save): messaging, inside Bloomr as DMs
   are inside a photo app. There is a thread
   per love interest who has given the player her Bloomr (`contacts` in the save). She gives
-  it in a scene with the `give_contact` tool: when he asks and she is willing, or unasked
+  it in a scene by saying or showing her handle, which the game reads in the reply
+  (`contactsSaid`): when he asks and she is willing, or unasked
   once she is taken with him (`offersContact` in `src/shared/game/courier.ts`), and failing
   that as they part. Until then she is not in his DMs and never writes first. A message gets
   an answer at once, written by the LLM with a prompt of
@@ -528,10 +533,10 @@ and the trait library.
   (pressure from the player, what he and another woman are doing in front of her, a class
   starting within two hours, which the game tells her about), to let a low reading show,
   and at 1, or two replies at 2, to leave: by ending the scene, or in a group with
-  `leave_scene` while the rest carry on. This is what lets a scene end without the player
+  a `[LEAVES: ...]` line while the rest carry on. This is what lets a scene end without the player
   asking.
-- **Leaving a scene**: in a scene with more than one love interest the LLM has a
-  `leave_scene` tool: one or more of them go, and the scene carries on with the rest. It
+- **Leaving a scene**: in a scene with more than one love interest the LLM can write
+  `[LEAVES: Name=feeling why]`: one or more of them go, and the scene carries on with the rest. It
   is for when the player has turned to one of them and the others would drift off, when
   someone has somewhere to be, or when someone walks out. Someone always stays, and if the
   one leading the scene goes the next takes her place. Whoever leaves is content, hurt or
@@ -676,7 +681,7 @@ outing. Classes, orientation and talks with NPCs are left alone.
   (`broughtAlong`) to have simply been brought along, and is then in the scene from its first
   moment. Anyone else arrives after one to three of the player's lines: she joins the scene's company, with a beat whose direction tells the LLM who has
   walked in and why, in the same terms that scored. From there it is an ordinary scene with
-  several people in it: expressions, friends and enemies, `leave_scene` and its costs, and a
+  several people in it: expressions, friends and enemies, leaving and its costs, and a
   memory for everyone who was there.
 - The engine decides who, as what and when. It keeps no record of who has found out about
   whom and changes no meters itself; what comes of it is the LLM's to play.

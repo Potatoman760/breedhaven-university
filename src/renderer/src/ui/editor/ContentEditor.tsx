@@ -1,4 +1,5 @@
 import { Button } from "../Button";
+import { Lightbox } from "../Lightbox";
 import { useEffect, useState, type ReactNode } from "react";
 import {
   isSafeId,
@@ -16,6 +17,7 @@ import {
   STATS,
   type ContentPack,
   type LoveInterest,
+  type LoveInterestKind,
   type Studies,
 } from "../../../../shared/model";
 import { errorMessage } from "../../errors";
@@ -79,6 +81,14 @@ const AUTHORING: readonly Side[] = ["Player", "Locations"];
  * told apart by their kind), the player as a new game starts him, the places of the game
  * and their pictures, and the course catalogue. Each side keeps its own draft.
  */
+// The kinds a character can be, as the filter over the list names them.
+const KIND_FILTERS: { kind: LoveInterestKind; label: string }[] = [
+  { kind: "student", label: "Students" },
+  { kind: "teacher", label: "Teachers" },
+  { kind: "outsider", label: "Outsiders" },
+  { kind: "npc", label: "NPCs" },
+];
+
 export function ContentEditor(props: Props) {
   const [side, setSide] = useState<Side>("Characters");
   // Whether the game's own files are what is being edited: so it is run from source, and not in a game as a player has it.
@@ -130,6 +140,8 @@ function LoveInterestEditor({
 }: Props & { switcher: (mayLeave: () => boolean) => ReactNode }) {
   const [info, setInfo] = useState<EditorInfo | null>(null);
   const [search, setSearch] = useState("");
+  // Which kind of character the list is narrowed to: all of them, to begin with.
+  const [kindShown, setKindShown] = useState<LoveInterestKind | "all">("all");
   const [tab, setTab] = useState<Tab>("Profile");
   // The character being edited, and how it stood when it was opened. `original` is null for a new one.
   // Love interests first, then the NPCs: one list, told apart by their kind.
@@ -161,6 +173,8 @@ function LoveInterestEditor({
     !dirty || window.confirm("Discard the changes you have not saved?");
   // Whether the art tool is open on her room.
   const [drawingRoom, setDrawingRoom] = useState(false);
+  // Whether her room's picture is open to be looked at whole.
+  const [viewingRoom, setViewingRoom] = useState(false);
   const set = (patch: Partial<LoveInterest>) => {
     // What was wrong with the last save may no longer be.
     setIssues([]);
@@ -246,8 +260,10 @@ function LoveInterestEditor({
     }
   }
 
-  const shown = everyone.filter((li) =>
-    li.name.toLowerCase().includes(search.trim().toLowerCase()),
+  const shown = everyone.filter(
+    (li) =>
+      li.name.toLowerCase().includes(search.trim().toLowerCase()) &&
+      (kindShown === "all" || kindOf(li) === kindShown),
   );
   const stages = content.relationships.stages;
   const roomPlace = content.locations.find(
@@ -266,15 +282,28 @@ function LoveInterestEditor({
     <main className="editor">
       {switcher(mayLeave)}
       <aside className="editor-list">
+        <Button variant="primary" onClick={() => mayLeave() && setCreating(true)}>
+          New character
+        </Button>
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={`Search ${everyone.length} characters`}
           aria-label="Search"
         />
-        <Button variant="primary" onClick={() => mayLeave() && setCreating(true)}>
-          New character
-        </Button>
+        {/* Narrows the list to one kind of character. Each is counted, so it is plain how many there are of it. */}
+        <select
+          value={kindShown}
+          onChange={(e) => setKindShown(e.target.value as LoveInterestKind | "all")}
+          aria-label="Filter by type"
+        >
+          <option value="all">All types ({everyone.length})</option>
+          {KIND_FILTERS.map(({ kind, label }) => (
+            <option key={kind} value={kind}>
+              {label} ({everyone.filter((li) => kindOf(li) === kind).length})
+            </option>
+          ))}
+        </select>
         {creating && (
           <NewCharacterDialog
             onClose={() => setCreating(false)}
@@ -759,11 +788,27 @@ function LoveInterestEditor({
                     />
                     <div className="row checks">
                       {draft.room.background ? (
-                        <img
-                          className="room-art"
-                          src={`content://pack/${draft.room.background}`}
-                          alt="Her room"
-                        />
+                        <>
+                          <button
+                            type="button"
+                            className="sprite-thumb room-thumb"
+                            title="Look at the whole picture"
+                            onClick={() => setViewingRoom(true)}
+                          >
+                            <img
+                              className="room-art"
+                              src={`content://pack/${draft.room.background}`}
+                              alt="Her room"
+                            />
+                          </button>
+                          {viewingRoom && (
+                            <Lightbox
+                              image={draft.room.background}
+                              name={draft.room.name || "Her room"}
+                              onClose={() => setViewingRoom(false)}
+                            />
+                          )}
+                        </>
                       ) : (
                         <span className="hint">No picture yet.</span>
                       )}

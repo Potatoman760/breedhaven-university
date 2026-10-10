@@ -4,7 +4,9 @@ import { createInitialState } from '../../shared/game/state'
 import { fixture } from '../../shared/game/testFixture'
 import { moveClash } from '../../shared/game/upcoming'
 import { CourseSchema, CourseworkConfigSchema, type ContentPack, type GameState, type Scene } from '../../shared/model'
-import { eventTool, meetingTool, moveTool } from './tools'
+import { meetingTool, moveTool, NEXT_EVENT } from './tools'
+import { parseDirectives } from '../../shared/game/scene'
+import { canSleepOver, sleepOver } from '../../shared/game/sleep'
 
 // The fixture starts at 06:00 at home, on a Two; the shop is a two-hour walk away. He takes a class at home at 08:00.
 const base = fixture()
@@ -94,6 +96,10 @@ describe('going now and meeting later', () => {
     let gone: string | undefined
     const meet = meetingTool(content, state, 'ana', (p) => plans.push(p.locationId), ['ana'], () => gone)
     expect(meet.description).toContain('For going somewhere together right now, call move_scene')
+    // By message there is no going anywhere together: the tool is the one way to arrange anything, today included, and says nothing of a tool that is not there.
+    const byMessage = meetingTool(content, state, 'ana', () => undefined)
+    expect(byMessage.description).not.toContain('move_scene')
+    expect(byMessage.description).toContain('this is the only way anything is arranged')
     gone = 'shop'
     expect(meet.run({ activity: 'tea', place: 'shop' })).toMatch(/^You have just gone to the Shop with move_scene/)
     expect(plans).toEqual([])
@@ -105,16 +111,73 @@ describe('going now and meeting later', () => {
 })
 
 describe('setting off together for something of his that is hers too', () => {
-  it('is offered only then, and ends the scene with the going', () => {
-    expect(eventTool(content, taking(8), scene, () => undefined)).toBeUndefined()
+  it('is a place the move tool offers only then, and ends the scene with the going', () => {
+    const places = (tool: ReturnType<typeof moveTool>) => (tool!.parameters['properties'] as { place: { enum: string[] } }).place.enum
+    const alone = moveTool(content, taking(8), scene, () => undefined, () => undefined)
+    expect(places(alone)).not.toContain(NEXT_EVENT)
+
     const together: GameState = { ...taking(8), courses: [{ ...course(8, 'home'), studentIds: ['ana'] }] }
     const gone: string[][] = []
-    const tool = eventTool(content, together, scene, (next, withIds) => gone.push([next.id, ...withIds]))!
-    expect(tool.name).toBe('go_to_event')
-    expect(tool.description).toContain('Pat has RID 101: Riddles at 08:00 at Home, and Ana is in it too')
-    expect(tool.description).toContain('Use this and not move_scene')
-    expect(tool.run({})).toMatch(/^You and Pat set off for RID 101: Riddles at Home./)
+    const moved: string[] = []
+    const tool = moveTool(content, together, scene, (d) => moved.push(d.id), (next, withIds) => gone.push([next.id, ...withIds]))!
+    expect(places(tool)).toContain(NEXT_EVENT)
+    expect(tool.description).toContain('next-event is RID 101: Riddles at 08:00 at Home, which Pat has next and Ana is in too')
+    expect(tool.run({ place: NEXT_EVENT })).toMatch(/^You and Pat set off for RID 101: Riddles at Home\./)
     expect(gone).toEqual([['rid', 'ana']])
-    expect(eventTool(content, together, { ...scene, npc: true }, () => undefined)).toBeUndefined()
+    expect(moved).toEqual([])
+    // Asked for with nothing shared, it is not somewhere to go.
+    expect(alone!.run({ place: NEXT_EVENT })).toMatch(/^You cannot go to "next-event"/)
+  })
+})
+
+describe('spending the night together', () => {
+  // The fixture's day is twenty hours long and starts at 06:00: time 14 is 20:00.
+  const fresh = createInitialState(content)
+  const evening: GameState = { ...fresh, time: 14, locationId: 'shop', player: { ...fresh.player, energy: 3 } }
+
+  it('can be done from the evening on, and wakes him rested the next morning in the same place', () => {
+    expect(canSleepOver(content, { ...evening, time: 13 })).toBe(false)
+    expect(canSleepOver(content, evening)).toBe(true)
+    const morning = sleepOver(content, evening)
+    expect(morning.time).toBe(20)
+    expect(morning.locationId).toBe('shop')
+    expect(morning.player.energy).toBe(morning.player.maxEnergy)
+  })
+
+  it('is asked for with a line of its own, which she is told of only when it is late', () => {
+    const late = buildCharacterPrompt({ content, state: evening, loveInterestId: 'ana', sceneBeats: scene.beats })
+    expect(late).toContain('put [SLEEP] on a line of its own at its end: that closes the scene, and Pat wakes here in the morning')
+    expect(buildCharacterPrompt({ content, state: fresh, loveInterestId: 'ana', sceneBeats: scene.beats })).not.toContain('[SLEEP]')
+    expect(parseDirectives('They drift off.\n[SLEEP]')).toMatchObject({ text: 'They drift off.', slept: true })
+  })
+})
+
+describe('saying she will be at an event', () => {
+  const fair = { id: 'fair', name: 'the Fair', description: 'Stalls.', month: 'a', day: 2, durationDays: 1, locationId: 'shop', startHour: 8, hours: 6, noClasses: false, generated: false }
+  const fairground = { ...content, calendar: { ...content.calendar, events: [fair] } }
+  const state = createInitialState(fairground)
+
+  it('is a line of its own, which she is told of while there is an event to go to', () => {
+    const told = buildCharacterPrompt({ content: fairground, state, loveInterestId: 'ana', sceneBeats: scene.beats })
+    expect(told).toContain('write [ATTENDING: id] on a line of its own')
+    expect(told).toContain('fair is the Fair')
+    expect(buildCharacterPrompt({ content, state: createInitialState(content), loveInterestId: 'ana', sceneBeats: scene.beats })).not.toContain('[ATTENDING')
+    expect(parseDirectives('See you there.\n[ATTENDING: fair]').attending).toEqual([{ name: '', eventId: 'fair' }])
+  })
+})
+
+describe('agreeing in words to a plan already suggested', () => {
+  const state = createInitialState(content)
+  const pending = { loveInterestId: 'ana', companionIds: [], title: 'Tea', time: 30, hours: 2, locationId: 'shop' }
+
+  it('is a line of its own, which she is told of only while such a plan is waiting', () => {
+    const plain = buildCharacterPrompt({ content, state, loveInterestId: 'ana', sceneBeats: scene.beats })
+    expect(plain).toContain('Making plans to meet again')
+    expect(plain).toContain('Saying "see you then" without calling it arranges nothing')
+    expect(plain).not.toContain('[AGREED]')
+    const waiting = buildCharacterPrompt({ content, state, loveInterestId: 'ana', sceneBeats: scene.beats, pendingProposal: pending })
+    expect(waiting).toContain('You have already suggested "Tea" on')
+    expect(waiting).toContain('write [AGREED] on a line of its own at the end of your reply, which books it')
+    expect(parseDirectives('Windsday it is.\n[AGREED]')).toMatchObject({ text: 'Windsday it is.', agreed: true })
   })
 })

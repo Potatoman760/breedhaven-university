@@ -59,8 +59,10 @@ export interface MeetingRequest {
   activity: string
   /** A location id. */
   place: string
-  /** How soon: "today", "tomorrow", "later this week" or "the weekend". */
+  /** How soon: "today", "tomorrow", "later this week", "the weekend" or "next week". */
   earliest?: string
+  /** A day of the week by name, when only that day will do. */
+  weekday?: string
   /** A period name or id, e.g. "afternoon". */
   timeOfDay?: string
   /** Ids of other love interests to bring along, up to two. */
@@ -94,7 +96,12 @@ export function findMeetingTime(
   const wanted = request.earliest?.toLowerCase() ?? ''
   const classDays = content.coursework?.weekdays ?? []
   const weekend = wanted.includes('weekend')
-  const minDay = today + (wanted.includes('tomorrow') ? 1 : wanted.includes('later') ? 2 : weekend ? 1 : 0)
+  // "Next week" is from the day the next week begins, whatever day of this one it is.
+  const week = calendar.weekdays.length
+  const untilNextWeek = week - ((((calendar.startWeekday + today) % week) + week) % week)
+  const minDay = today + (wanted.includes('next week') ? untilNextWeek : wanted.includes('tomorrow') ? 1 : wanted.includes('later') ? 2 : weekend ? 1 : 0)
+  // A day of the week asked for by name: only that day will do.
+  const onDay = calendar.weekdays.find((name) => name.toLowerCase() === request.weekday?.trim().toLowerCase())
   const period = request.timeOfDay?.toLowerCase()
   const everyone = [loveInterestId, ...companionsOf(content, loveInterestId, request)]
 
@@ -103,6 +110,7 @@ export function findMeetingTime(
     const date = toDate(calendar, time)
     if (date.dayIndex < minDay) continue
     if (weekend && classDays.includes(date.weekday)) continue
+    if (onDay && date.weekday !== onDay) continue
     const latestEnd = Math.min(LATEST_END_HOUR, calendar.hoursPerDay)
     if (date.hour < EARLIEST_HOUR || date.hour + MEETING_HOURS > latestEnd) continue
     if (period && date.period.id.toLowerCase() !== period && date.period.name.toLowerCase() !== period) continue
@@ -147,14 +155,18 @@ export function proposeMeeting(
     }
   }
   const title = request.activity.trim() || 'Meet up'
+  // How far off it is, said outright, so that a time found for today is not spoken of as next week.
+  const inDays = toDate(content.calendar, time).dayIndex - toDate(content.calendar, state.time).dayIndex
+  const off = inDays === 0 ? 'today' : inDays === 1 ? 'tomorrow' : `${inDays} days from now`
   return {
     proposal: { loveInterestId, companionIds, title, time, hours: MEETING_HOURS, locationId: location.id },
     message:
       (group
-        ? `You, ${state.player.name}, ${firstNames(content, companionIds)} are all free on ${describeWhen(content, time)}, at ${location.name}. `
-        : `You are both free on ${describeWhen(content, time)}, at ${location.name}. `) +
+        ? `You, ${state.player.name}, ${firstNames(content, companionIds)} are all free on ${describeWhen(content, time)}, which is ${off}, at ${location.name}. `
+        : `You are both free on ${describeWhen(content, time)}, which is ${off}, at ${location.name}. `) +
       `Suggest exactly that day, time and place to ${state.player.name}, in character, and ask whether it suits. ` +
-      `Do not name any other time. ${state.player.name} will accept or decline.`
+      `Do not name any other time, and do not call it next week or another day if it is not: if this is sooner or later than you meant, call the tool again with "earliest" or "weekday" set. ` +
+      ` ${state.player.name} will accept or decline.`
   }
 }
 

@@ -1,93 +1,94 @@
-import { useState } from 'react'
-import { canBuy, stallsAt, toDate } from '../../../shared/game'
-import type { ContentPack, GameState } from '../../../shared/model'
-import { Backdrop } from './Backdrop'
+import { useState, type ReactNode } from 'react'
+import { canBuy } from '../../../shared/game'
+import type { ContentPack, GameState, Stall } from '../../../shared/model'
 import { ItemIcon } from './icons'
 
 interface Props {
   content: ContentPack
   state: GameState
+  /** The stalls to choose between: a row each, down the left. */
+  stalls: Stall[]
+  /** Ordered from his phone: from any stall, wherever he is and whatever the hour. */
+  byPhone?: boolean
+  /** Said in place of the stalls' wares when nothing can be bought just now, and why. */
+  closed?: ReactNode
   onBuy: (itemId: string) => void
-  onLeave: () => void
 }
 
-/** A visit to the market or the shops of a street: one tab per stall, each listing the gifts it sells. */
-export function MarketView({ content, state, onBuy, onLeave }: Props) {
-  const stalls = stallsAt(content, state.locationId)
+/**
+ * The market as it is on his phone, laid out as his DMs are: the stalls down the left, and
+ * on the right what the one picked sells, with the way to buy it.
+ */
+export function Stalls({ content, state, stalls, byPhone = false, closed, onBuy }: Props) {
   const [stallId, setStallId] = useState(stalls[0]?.id)
   const stall = stalls.find((s) => s.id === stallId) ?? stalls[0]
-  const location = content.locations.find((l) => l.id === state.locationId)
-  const date = toDate(content.calendar, state.time)
   const carrying = Object.values(state.inventory).reduce((total, count) => total + count, 0)
 
   return (
-    <main className="stage">
-      <Backdrop screen="market" location={location} periodId={date.period.id} light={date.period.light} />
-      <div className="market glass framed">
-        <div className="market-head">
-          <div>
-            <h1>{location?.name.replace(/^the /, 'The ') ?? 'Market'}</h1>
-            <span className="hint">
-              Buy gifts here and hand them over during any scene. Carrying {carrying}.
-            </span>
-          </div>
-          <div className="purse">
-            <span className="caps">Money</span>
-            <strong>${state.player.money}</strong>
-          </div>
-          <button className="secondary" onClick={onLeave}>
-            Leave
-          </button>
-        </div>
-
-        <div className="tabs" role="tablist">
+    <>
+      <div className="chat-list">
+        <h1 className="phone-title">Market</h1>
+        <div className="chat-rows">
+          {stalls.length === 0 && <p className="hint">No stalls are trading.</p>}
           {stalls.map((s) => (
-            <button
-              key={s.id}
-              role="tab"
-              aria-selected={s.id === stall?.id}
-              className={s.id === stall?.id ? 'tab selected' : 'tab'}
-              onClick={() => setStallId(s.id)}
-            >
-              <ItemIcon name={s.icon} size={22} />
-              {s.name}
+            <button key={s.id} className={s.id === stall?.id ? 'chat-row selected' : 'chat-row'} onClick={() => setStallId(s.id)}>
+              <span className="ware-icon">
+                <ItemIcon name={s.icon} />
+              </span>
+              <span className="chat-row-text">
+                <strong>{s.name}</strong>
+              </span>
             </button>
           ))}
         </div>
+      </div>
 
+      <div className="chat-thread">
         {stall ? (
-          <div className="stall" role="tabpanel">
-            {stall.description && <p className="hint">{stall.description}</p>}
-            {stall.itemIds.map((itemId) => {
-              const item = content.items.find((i) => i.id === itemId)
-              if (!item) return null
-              const check = canBuy(content, state, item.id)
-              const owned = state.inventory[item.id] ?? 0
-              return (
-                <div key={item.id} className="ware">
-                  <span className="ware-icon">
-                    <ItemIcon name={item.icon} />
-                  </span>
-                  <div>
-                    <strong>{item.name}</strong>
-                    <span>{item.description}</span>
-                  </div>
-                  {owned > 0 && <span className="chip">Carrying {owned}</span>}
-                  <button
-                    disabled={!check.ok}
-                    title={check.reasons.join(' · ')}
-                    onClick={() => onBuy(item.id)}
-                  >
-                    Buy · ${item.price}
-                  </button>
-                </div>
-              )
-            })}
-          </div>
+          <>
+            {/* The stall is named in its row on the left: here, only what he has on him. */}
+            <div className="chat-head">
+              <div>
+                <span className="caps">Carrying</span>
+                <strong>
+                  {carrying} gift{carrying === 1 ? '' : 's'}
+                </strong>
+              </div>
+              <div className="purse">
+                <span className="caps">Money</span>
+                <strong>${state.player.money}</strong>
+              </div>
+            </div>
+            <div className="stall" role="tabpanel">
+              {stall.description && <p className="hint">{stall.description}</p>}
+              {closed ??
+                stall.itemIds.map((itemId) => {
+                  const item = content.items.find((i) => i.id === itemId)
+                  if (!item) return null
+                  const check = canBuy(content, state, item.id, byPhone)
+                  const owned = state.inventory[item.id] ?? 0
+                  return (
+                    <div key={item.id} className="ware">
+                      <span className="ware-icon">
+                        <ItemIcon name={item.icon} />
+                      </span>
+                      <div>
+                        <strong>{item.name}</strong>
+                        <span>{item.description}</span>
+                      </div>
+                      {owned > 0 && <span className="chip">Carrying {owned}</span>}
+                      <button disabled={!check.ok} title={check.reasons.join(' · ')} onClick={() => onBuy(item.id)}>
+                        Buy · ${item.price}
+                      </button>
+                    </div>
+                  )
+                })}
+            </div>
+          </>
         ) : (
-          <p className="hint">No stalls are trading here.</p>
+          <p className="hint phone-empty">This content pack has no market stalls.</p>
         )}
       </div>
-    </main>
+    </>
   )
 }

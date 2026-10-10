@@ -1,5 +1,7 @@
 import { Button } from '../Button'
-import { useEffect, useState } from 'react'
+import { ComfyBundlePanel } from './ComfyBundlePanel'
+import { useCallback, useEffect, useState } from 'react'
+import { errorMessage } from '../../errors'
 import {
   ART_KIND_LABELS,
   ART_KINDS,
@@ -117,6 +119,8 @@ export function ComfySetup({ settings, list, onSave }: Props) {
             <input type="number" min={COMFY_MIN_TIMEOUT_SECONDS} max={COMFY_MAX_TIMEOUT_SECONDS} value={timeout} onChange={(e) => setTimeoutSeconds(e.target.value)} onBlur={commitTimeout} />
           </label>
         </div>
+
+        <ComfyBundlePanel onInstalled={onSave} />
 
         <div className="editor-group">
           <h2>Kinds of picture</h2>
@@ -288,5 +292,39 @@ function WorkflowEditor({ workflow, settings, onPatch }: WorkflowEditorProps) {
         })}
       </div>
     </div>
+  )
+}
+
+/**
+ * The same setup, for a screen that has nothing else to do with ComfyUI: it reads the
+ * settings and the workflow folder itself, and saves each change as it is made.
+ */
+export function ComfySetupPanel() {
+  const [settings, setSettings] = useState<ComfySettings | null>(null)
+  const [list, setList] = useState<WorkflowListResult | null>(null)
+  const [status, setStatus] = useState('')
+
+  const reload = useCallback(() => window.api.comfy.workflows().then(setList, (error) => setStatus(errorMessage(error))), [])
+  useEffect(() => {
+    window.api.comfy.getSettings().then(setSettings, (error) => setStatus(errorMessage(error)))
+    void reload()
+  }, [reload])
+
+  /** Saves the settings, then reads the folder again, since how a workflow reads may have changed. */
+  const save = async (next: ComfySettings) => {
+    try {
+      setSettings(await window.api.comfy.saveSettings(next))
+      setStatus('')
+      await reload()
+    } catch (error) {
+      setStatus(errorMessage(error))
+    }
+  }
+
+  return (
+    <>
+      {status && <p className="notice">{status}</p>}
+      {settings ? <ComfySetup settings={settings} list={list} onSave={save} /> : <p className="hint">Reading the ComfyUI settings...</p>}
+    </>
   )
 }

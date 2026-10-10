@@ -244,7 +244,7 @@ export function describeDrama(content: ContentPack, state: GameState, scene: Pic
     confrontation:
       `Write ${actor}'s arrival first, in her own voice, as she takes in what she is seeing. Do not resolve it in this reply: let it land, ` +
       `and let the others answer for themselves, each as she would. How it goes from here depends on what ${player} says. ` +
-      `Anyone hurt or angry enough may walk out with leave_scene.`,
+      `Anyone hurt or angry enough may walk out: write her going, and a [LEAVES: Name=feeling why] line at the end of the reply.`,
     rival:
       `Write ${actor}'s arrival first, in her own voice. She is not here to make peace: she needles, competes for ${player}'s attention or ` +
       `simply refuses to leave, in her own manner, and the others answer in theirs. Do not resolve it in this reply.`,

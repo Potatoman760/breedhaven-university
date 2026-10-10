@@ -1,5 +1,5 @@
 import type { ContentPack, GameState } from '../model'
-import { toDate } from './calendar'
+import { isGameOver, toDate } from './calendar'
 import { describeWhen } from './appointments'
 import { outingMisses } from './outing'
 
@@ -28,7 +28,24 @@ export function wakeTime(content: ContentPack, state: GameState): number {
  * both what the small hours do to him and how he ends a day early.
  */
 export function sleep(content: ContentPack, state: GameState): GameState {
-  return { ...state, time: wakeTime(content, state), locationId: homeOf(content), player: { ...state.player, energy: state.player.maxEnergy } }
+  return { ...state, time: wakeTime(content, state), locationId: homeOf(content), inOwnRoom: content.newGame.room !== undefined, player: { ...state.player, energy: state.player.maxEnergy } }
+}
+
+// From this hour of the evening a night can be spent together: earlier, lying down is a rest and not the night.
+export const SLEEP_OVER_FROM_HOUR = 20
+
+/** Whether those in a scene could go to sleep for the night now: it is evening or the small hours, and there is a morning left in the game to wake to. */
+export function canSleepOver(content: ContentPack, state: GameState): boolean {
+  const { hour } = toDate(content.calendar, state.time)
+  return (hour >= SLEEP_OVER_FROM_HOUR || isSleepTime(content, state)) && !isGameOver(content.calendar, wakeTime(content, state))
+}
+
+/**
+ * Spends the night where he is, with whoever he is with: the scene they fell asleep in is over, the clock goes on
+ * to the morning and he wakes rested, in the same place. Unlike sleeping alone, it does not take him home.
+ */
+export function sleepOver(content: ContentPack, state: GameState): GameState {
+  return { ...state, time: wakeTime(content, state), player: { ...state.player, energy: state.player.maxEnergy } }
 }
 
 /** Where the player lives: the place his own room is in, or without one, where a new game starts him. */

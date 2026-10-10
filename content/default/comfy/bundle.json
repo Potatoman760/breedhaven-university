@@ -1,0 +1,10 @@
+{
+  "promptPrefixes": {
+    "krea2 comic book.json": "AstroWitchV01K2T, comic book style"
+  },
+  "negativePrefixes": {},
+  "overrides": {},
+  "defaults": {},
+  "framing": {},
+  "sizes": {}
+}

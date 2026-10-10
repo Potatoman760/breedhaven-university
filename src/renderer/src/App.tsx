@@ -43,7 +43,6 @@ import {
   shiftPay,
   startShift,
   feedRound,
-  stallsAt,
   dramaDue,
   fireDrama,
   giveContact,
@@ -54,6 +53,10 @@ import {
   hasContact,
   offersContact,
   feedRoundDue,
+  addIntimacy,
+  addEventGoers,
+  sleepOver,
+  settleAppointments,
   sharedUpcoming,
   sceneEndWriter,
   planKey,
@@ -64,7 +67,6 @@ import {
   describeBond,
   describeLearned,
   factsFromGift,
-  revealedIds,
   revealFacts,
   describeWhen,
   growTies,
@@ -75,12 +77,9 @@ import {
   passSceneTime,
   sceneDestinations,
   attend,
-  buy,
   classmates,
-  canTravel,
   carried,
   giveGift,
-  isOpen,
   approachableAt,
   perform,
   reconcileState,
@@ -104,6 +103,7 @@ import { SavesPanel } from './SavesPanel'
 import { SettingsPanel } from './SettingsPanel'
 import { TitleScreen } from './TitleScreen'
 import { CalendarPanel } from './ui/CalendarPanel'
+import { AgeGate } from './ui/AgeGate'
 import { PhonePanel } from './ui/PhonePanel'
 import { ContentEditor } from './ui/editor/ContentEditor'
 import { CoursesView } from './ui/CoursesView'
@@ -112,10 +112,21 @@ import { Dialog, ToBeImplemented } from './ui/Dialog'
 import { ItemIcon } from './ui/icons'
 import { MapPanel } from './ui/MapPanel'
 import { OutingDialog } from './ui/OutingDialog'
-import { MarketView } from './ui/MarketView'
 import type { Panel } from './ui/panels'
 import { SceneView } from './ui/SceneView'
 import { SummaryView, type SceneSummary } from './ui/SummaryView'
+
+// Where it is kept that the player has said he is an adult.
+const OF_AGE_KEY = 'breedhaven.ofAge'
+
+/** Whether he has already said so on this computer. */
+function wasConfirmedOfAge(): boolean {
+  try {
+    return window.localStorage.getItem(OF_AGE_KEY) === 'yes'
+  } catch {
+    return false
+  }
+}
 
 export function App() {
   const [content, setContent] = useState<ContentPack | null>(null)
@@ -129,7 +140,18 @@ export function App() {
   const [session, setSession] = useState<{ id: number; data: SaveData } | null>(null)
   const nextId = useRef(1)
   const [editing, setEditing] = useState(false)
+  // Asked once, before anything of the game is shown: the answer is kept on this computer, and the question is not put again.
+  const [ofAge, setOfAge] = useState(wasConfirmedOfAge)
+  const confirmOfAge = () => {
+    try {
+      window.localStorage.setItem(OF_AGE_KEY, 'yes')
+    } catch {
+      // Without somewhere to keep it, it is simply asked again next time.
+    }
+    setOfAge(true)
+  }
 
+  if (!ofAge) return <AgeGate onConfirm={confirmOfAge} />
   if (error) return <main className="title">Failed to load content: {error}</main>
   if (!content) return <main className="title">Loading...</main>
 
@@ -190,8 +212,13 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   const [scene, setScene] = useState<Scene | null>(initial.scene)
   // The character has closed the scene and the player hasn't moved on yet.
   const [ended, setEnded] = useState(false)
+  // Where the scene is on its way to, while the reply that takes it there is still being written.
+  const [movingTo, setMovingTo] = useState<string | null>(null)
+  useEffect(() => window.api.onSceneMoving(setMovingTo), [])
   // Those he set off with for the next thing on his timetable as the scene ended: once the scene is settled, that is where he goes.
   const [walkingWith, setWalkingWith] = useState<string[] | null>(null)
+  // The scene ended with them going to sleep where they were: once it is settled, he wakes there in the morning.
+  const [sleepingOver, setSleepingOver] = useState(false)
   // Set once a scene is over, until the player dismisses its summary screen.
   const [summary, setSummary] = useState<SceneSummary | null>(null)
   const [busy, setBusy] = useState(false)
@@ -225,7 +252,6 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   // Dice rolled for the reply on screen, shown under it.
   const [rolls, setRolls] = useState<string[]>([])
   // Browsing the market stalls.
-  const [shopping, setShopping] = useState(false)
   const location = content.locations.find((l) => l.id === state.locationId)
   // The view of where he is: one named for today's event or holiday if the place has one, else its default.
   const backgroundId = viewFor(content, state, location)?.id
@@ -251,6 +277,14 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   useEffect(() => {
     setState((current) => settleShifts(content, current))
   }, [content, state.time])
+
+  // As time goes by, a plan whose hours have passed without his turning up is held against him by whoever was waiting.
+  useEffect(() => {
+    const { missed } = settleAppointments(content, state)
+    if (missed.length === 0) return
+    setState((current) => settleAppointments(content, current).state)
+    setNotice(missed.map((plan) => `You missed ${plan.title} with ${firstNames(content, attendees(plan))}, and sent no word. It will be remembered.`).join(' '))
+  }, [content, state.time, state.appointments])
 
   // The small hours are for sleep and nothing else: whenever the clock stands in them and he is not in the middle of something, he sleeps till morning.
   useEffect(() => {
@@ -433,6 +467,15 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           return hours ? passSceneTime(content, moved, hours) : moved
         })
       }
+      // He agreed in words to what she had suggested: it goes in his calendar as if he had pressed Accept.
+      const agreedTo = response.proposalAccepted ? asked.proposal : undefined
+      if (agreedTo) {
+        setState((current) => acceptProposal(current, agreedTo))
+        setAgreed(`${agreedTo.title} with ${firstNames(content, attendees(agreedTo))}: ${describeWhen(content, agreedTo.time)}. Added to your calendar.`)
+      }
+      // Whoever said she would be at an event is put down for it: she is there when he goes.
+      const { attending } = response
+      if (attending) setState((current) => attending.reduce((next, said) => addEventGoers(next, said.eventId, said.ids), current))
       const placed = destination ? movedScene(asked, destination) : asked
       // What walking out cost him is hers to decide with the rest, when the scene is over.
       const { left } = response
@@ -450,8 +493,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
             messages: [...asked.messages, response.message],
             // Once the NSFW LLM has had to take over, it keeps the scene.
             nsfw: asked.nsfw || response.profileId === 'nsfw',
-            // A suggestion left unanswered lapses when the conversation moves on.
-            proposal: response.proposal,
+            // A suggestion stays on offer while the conversation moves on, until it is answered, replaced by another, or its time has gone by.
+            proposal: response.proposal ?? (response.proposalAccepted || (asked.proposal && asked.proposal.time <= at.time) ? undefined : asked.proposal),
             bondProposal: response.bondProposal,
             conceived: [...new Set([...asked.conceived, ...conceived])]
           },
@@ -459,22 +502,11 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         ), response.looks), response.comfort))
       )
       setRolls(response.rolls)
-      // What she let out goes into what the player knows of her.
-      const fresh = response.revealed.filter((r) => !revealedIds(at, r.loveInterestId).includes(r.factId))
-      if (fresh.length > 0) {
-        setState((current) => fresh.reduce((next, r) => revealFacts(content, next, r.loveInterestId, [r.factId]), current))
-      }
       // Whoever gave him her Bloomr can be messaged from now on.
       const given = response.contacts.filter((id) => !hasContact(at, id))
       if (given.length > 0) setState((current) => given.reduce(giveContact, current))
-      // What changed between the love interests themselves.
-      if (response.rapport.length > 0) setState((current) => response.rapport.reduce((next, c) => setRelation(next, c.a, c.b, c.relation), current))
+      // What he found out about her, and what changed between the love interests themselves, is settled when the scene is over.
       setLearned([
-        ...response.rapport.map((c) => {
-          const pair = firstNames(content, [c.a, c.b])
-          return c.relation === 'neither' ? `${pair} are no longer ${relationBetween(at, c.a, c.b)}` : `${pair} are now ${c.relation}`
-        }),
-        ...fresh.map((r) => describeLearned(content, r.loveInterestId, r.factId)).filter((line): line is string => line !== undefined),
         ...given.flatMap((id) => {
           const li = content.loveInterests.find((c) => c.id === id)
           return li ? [`${li.name.split(' ')[0]} gave you her Bloomr: ${handleOf(li)}`] : []
@@ -483,6 +515,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       setLastPrompt(response.systemPrompt)
       setEnded(response.sceneEnded)
       setWalkingWith(response.walkTo?.withIds ?? null)
+      setSleepingOver(response.sleptOver === true)
     } catch (error) {
       // Drop the unanswered line so the conversation stays in step.
       if (text !== undefined) setTurns((kept) => kept.slice(0, -1))
@@ -490,6 +523,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       setNotice(text === undefined ? errorMessage(error) : `${errorMessage(error)} Your line was: "${text}"`)
     } finally {
       setBusy(false)
+      setMovingTo(null)
     }
   }
 
@@ -600,7 +634,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     if (!plan) return
     setPanel(null)
     // Already under way, he walks in on it as it is; still to come, the wait is skipped.
-    keep(plan.id, { ...accepted, time: Math.max(accepted.time, plan.time), locationId: plan.locationId })
+    keep(plan.id, { ...accepted, time: Math.max(accepted.time, plan.time), locationId: plan.locationId, inOwnRoom: false })
   }
 
   /** Sits a class. With love interests in it, the class is a scene with the ones the player sits by. */
@@ -662,29 +696,6 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     send(line, { ...scene, gifts: [...scene.gifts, gift] }, after)
   }
 
-  /** Opens the shops where the player is, or failing any there, walks to the market first. */
-  function visitMarket() {
-    const marketId = stallsAt(content, state.locationId)[0]?.locationId ?? content.stalls[0]?.locationId
-    const market = content.locations.find((l) => l.id === marketId)
-    if (!market) {
-      setPanel({ kind: 'tbi', feature: 'Market', note: 'This content pack has no market stalls.' })
-      return
-    }
-    if (state.locationId !== market.id) {
-      const check = canTravel(content, state, market.id)
-      if (!check.ok) {
-        setNotice(`You can't go to ${market.name} now: ${check.reasons.join('; ')}.`)
-        return
-      }
-      setState(travel(content, state, market.id))
-    } else if (!isOpen(market, toDate(content.calendar, state.time).hour)) {
-      setNotice(`${market.name} is closed.`)
-      return
-    }
-    setNotice('')
-    setShopping(true)
-  }
-
   /** Turns the finished scene into a memory and shows what came of it. */
   async function finishScene() {
     if (!scene || busy) return
@@ -698,7 +709,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         setNotice(`${firstNames(content, parting)} gave you ${parting.length > 1 ? 'their' : 'her'} Bloomr before you parted.`)
       }
       // How each of them feels about him now is what she made of the scene, and nothing else moves it.
-      const moved = Object.entries(result.feelings).reduce((current, [id, feelings]) => applyFeelings(content, current, id, feelings), state)
+      // A scene in which they had sex is counted for each of them, once.
+      const moved = addIntimacy(Object.entries(result.feelings).reduce((current, [id, feelings]) => applyFeelings(content, current, id, feelings), state), result.intimate)
       // What he paid for along the way comes out of his pocket now.
       const felt = applySpending(moved, result.spending)
       setSummary({
@@ -711,6 +723,14 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         })),
         memories: result.memories,
         spending: result.spending,
+        // What came out about each of them over the scene, and what changed between them.
+        learned: [
+          ...result.rapport.map((c) => {
+            const pair = firstNames(content, [c.a, c.b])
+            return c.relation === 'neither' ? `${pair} are no longer ${relationBetween(state, c.a, c.b)}` : `${pair} are now ${c.relation}`
+          }),
+          ...result.revealed.map((r) => describeLearned(content, r.loveInterestId, r.factId)).filter((line): line is string => line !== undefined)
+        ],
         reasons: Object.fromEntries(Object.entries(result.feelings).map(([id, feelings]) => [id, feelings.reason])),
         memoryError: result.error
       })
@@ -721,15 +741,26 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         // A shift is paid for when it is over.
         payShift(content, growTies(content, felt, sceneCast(scene)), scene)
       )
-      setState(after)
+      // What she let out goes into what the player knows of her, and what changed between the love interests is kept.
+      const known = result.revealed.reduce((next, r) => revealFacts(content, next, r.loveInterestId, [r.factId]), after)
+      const awake = result.rapport.reduce((next, c) => setRelation(next, c.a, c.b, c.relation), known)
+      // They fell asleep where they were: the night goes by, and he wakes there in the morning, rested.
+      const settled = sleepingOver ? sleepOver(content, awake) : awake
+      setSleepingOver(false)
+      setState(settled)
       // As a scene ends, one of those whose Bloomr he has may write to him. It is written in the background, and turns up on his phone when it is.
-      const writerId = sceneEndWriter(content, after, sceneWitnesses(scene))
+      const writerId = sceneEndWriter(content, settled, sceneWitnesses(scene))
       if (writerId) {
-        const { weatherSeed } = after
+        const { weatherSeed } = settled
         window.api
-          .courier({ state: after, loveInterestId: writerId, note: true })
+          .courier({ state: settled, loveInterestId: writerId, note: true })
           .then((sent) => {
-            if (sent.text) setState((current) => (current.weatherSeed === weatherSeed ? addNote(current, writerId, { from: 'them', text: sent.text, proposal: sent.proposal, read: false }) : current))
+            if (sent.text)
+              setState((current) =>
+                current.weatherSeed === weatherSeed
+                  ? (sent.attending ?? []).reduce((next, said) => addEventGoers(next, said.eventId, said.ids), addNote(current, writerId, { from: 'them', text: sent.text, proposal: sent.proposal, read: false }))
+                  : current
+              )
           })
           .catch(() => undefined)
       }
@@ -796,6 +827,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           scene={scene}
           backgroundId={backgroundId}
           busy={busy}
+          movingTo={movingTo}
           notice={notice}
           ended={ended}
           onSend={send}
@@ -827,13 +859,6 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           learned={learned}
           onOpen={setPanel}
         />
-      ) : shopping ? (
-        <MarketView
-          content={content}
-          state={state}
-          onBuy={(itemId) => setState(buy(content, state, itemId))}
-          onLeave={() => setShopping(false)}
-        />
       ) : isGameOver(content.calendar, state.time) ? (
         // The last day of the calendar is over: what became of him.
         <EpilogueView content={content} state={state} onExit={onExit} />
@@ -851,7 +876,6 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           busy={busy}
           onPropose={propose}
           onOuting={setOuting}
-          onMarket={visitMarket}
           onOpen={setPanel}
         />
       )}
@@ -944,7 +968,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         </Dialog>
       )}
       {panel?.kind === 'menu' && (
-        <Dialog title="Paused" onClose={close} narrow>
+        <Dialog title="Menu" onClose={close} narrow>
           <div className="pause-menu">
             <button onClick={close}>Continue</button>
             <button className="secondary" onClick={() => setPanel({ kind: 'save' })}>
@@ -982,11 +1006,16 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         <MapPanel
           content={content}
           state={state}
-          onTravel={(locationId) => {
-            setState(travel(content, state, locationId))
-            setNotice('')
-            close()
-          }}
+          // In a scene, or while one is being summed up, the map is only to be looked at.
+          onTravel={
+            scene || summary
+              ? undefined
+              : (locationId) => {
+                  setState(travel(content, state, locationId))
+                  setNotice('')
+                  close()
+                }
+          }
           onClose={close}
         />
       )}

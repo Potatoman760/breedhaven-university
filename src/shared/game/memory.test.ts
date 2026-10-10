@@ -194,7 +194,7 @@ describe('what a scene does to how she feels', () => {
 
   it('is asked of the LLM along with the memory, as her own judgement of the scene', () => {
     const { system, user } = buildSummaryPrompt({ content, state, scene })
-    expect(system).toContain('{"memory": string, "affection": number, "trust": number, "desire": number, "reason": string}')
+    expect(system).toContain('{"memory": string, "affection": number, "trust": number, "desire": number, "reason": string, "sex": boolean, "learned": string[]}')
     expect(system).toContain('whole numbers from -10 to 10')
     expect(system).toContain('Nothing is owed for turning up')
     expect(user).toContain('About Ana:')
@@ -209,7 +209,7 @@ describe('what a scene does to how she feels', () => {
 
   it('is read out of the answer, kept within what one scene can do', () => {
     const read = parseSummary('Here:\n{"memory": "Pat asked Ana about the shop.", "affection": 3, "trust": 2.6, "desire": -40, "reason": "He was the first to ask."}')
-    expect(read).toEqual({ memory: 'Pat asked Ana about the shop.', feelings: { affection: 3, trust: 3, desire: -10, reason: 'He was the first to ask.' } })
+    expect(read).toEqual({ memory: 'Pat asked Ana about the shop.', feelings: { affection: 3, trust: 3, desire: -10, reason: 'He was the first to ask.' }, intimate: false, learned: [], rapport: [] })
     expect(parseSummary('{"memory": "x", "affection": "lots"}').feelings).toEqual({ affection: 0, trust: 0, desire: 0, reason: '' })
     // An answer that is not the JSON asked for is the memory alone.
     expect(parseSummary('Pat and Ana had tea.')).toEqual({ memory: 'Pat and Ana had tea.' })
@@ -253,5 +253,78 @@ describe('what he spent in a scene', () => {
     expect(applySpending(rich(), { amount: 12, on: 'drinks' }).player.money).toBe(28)
     const state = rich()
     expect(applySpending(state, undefined)).toBe(state)
+  })
+})
+
+describe('how many times they have had sex', () => {
+  it('is read from the summary, counted once a scene for each of them, and told to her', async () => {
+    const { addIntimacy, describeIntimacy, parseSummary, timesIntimate } = await import('./memory')
+    const { buildCharacterPrompt } = await import('./prompt')
+    const { createInitialState } = await import('./state')
+    const { fixture } = await import('./testFixture')
+    const content = fixture()
+    const state = createInitialState(content)
+    expect(parseSummary('{"memory":"m","affection":1,"trust":0,"desire":2,"reason":"r","sex":true}').intimate).toBe(true)
+    expect(parseSummary('{"memory":"m","affection":1,"trust":0,"desire":2,"reason":"r","sex":false}').intimate).toBe(false)
+    expect(parseSummary('{"memory":"m","affection":1,"trust":0,"desire":2,"reason":"r"}').intimate).toBe(false)
+
+    expect(timesIntimate(state, 'ana')).toBe(0)
+    expect(describeIntimacy(state, 'ana')).toBe('Times had sex: 0')
+    const once = addIntimacy(state, ['ana', 'ana', 'nobody'])
+    expect(once.timesIntimate).toEqual({ ana: 1 })
+    expect(addIntimacy(once, [])).toBe(once)
+    const twice = addIntimacy(once, ['ana'])
+    expect(describeIntimacy(twice, 'ana')).toBe('Times had sex: 2')
+    expect(buildCharacterPrompt({ content, state: twice, loveInterestId: 'ana' })).toContain('Times had sex: 2.')
+  })
+})
+
+describe('what came out over a scene, and what changed between those in it', () => {
+  it('is asked of the summary and kept only where it is something there was to learn, or a change between two who were there', async () => {
+    const { buildSummaryPrompt, parseSummary, sceneRapport, sceneRevelations } = await import('./memory')
+    const { hiddenFacts } = await import('./facts')
+    const { createInitialState } = await import('./state')
+    const { fixture } = await import('./testFixture')
+    const base = fixture()
+    const [ana] = base.loveInterests
+    const content = { ...base, loveInterests: [{ ...ana, likes: ['tea'] }, { ...ana, id: 'bea', name: 'Bea Stone' }] }
+    const state = createInitialState(content)
+    const open = hiddenFacts(content, state, content.loveInterests[0])
+    expect(open.length).toBeGreaterThan(0)
+
+    const scene = { loveInterestId: 'ana', companionIds: ['bea'], nsfw: false, beats: [{ activityName: 'Tea' }], messages: [], gifts: [], conceived: [], departed: [], npc: false, baseline: { stats: {}, energy: 0, money: 0, time: 0, relationship: { affection: 0, trust: 0, desire: 0 }, companions: {} } }
+    const { system } = buildSummaryPrompt({ content, state, scene, forId: 'ana' })
+    expect(system).toContain('"learned": string[]')
+    expect(system).toContain(`  - ${open[0].id}: ${open[0].telling}`)
+    expect(system).toContain('"rapport": {"with": string, "relation": string}[]')
+
+    const read = parseSummary(`{"memory":"m","affection":1,"trust":0,"desire":0,"reason":"r","sex":false,"learned":["${open[0].id.toUpperCase()}","made-up"],"rapport":[{"with":"BEA","relation":"Friends"},{"with":"nobody","relation":"enemies"}]}`)
+    expect(sceneRevelations(content, state, [{ id: 'ana', learned: read.learned ?? [] }])).toEqual([{ loveInterestId: 'ana', factId: open[0].id }])
+    const changes = sceneRapport(state, ['ana', 'bea'], [
+      { id: 'ana', rapport: read.rapport ?? [] },
+      { id: 'bea', rapport: [{ with: 'ana', relation: 'enemies' }] }
+    ])
+    // One verdict for the pair, the first given; nothing for someone who was not there.
+    expect(changes).toEqual([{ a: 'ana', b: 'bea', relation: 'friends' }])
+  })
+})
+
+describe('how many threesomes he has had', () => {
+  it('is counted once for a scene in which two or more of them had sex with him', async () => {
+    const { addIntimacy } = await import('./memory')
+    const { createInitialState } = await import('./state')
+    const { fixture } = await import('./testFixture')
+    const base = fixture()
+    const [ana] = base.loveInterests
+    const content = { ...base, loveInterests: [ana, { ...ana, id: 'bea', name: 'Bea Stone' }, { ...ana, id: 'cy', name: 'Cy' }] }
+    const state = createInitialState(content)
+    expect(state.threesomes).toBe(0)
+    expect(addIntimacy(state, ['ana']).threesomes).toBe(0)
+    const two = addIntimacy(state, ['ana', 'bea'])
+    expect(two.threesomes).toBe(1)
+    expect(two.timesIntimate).toEqual({ ana: 1, bea: 1 })
+    // Three at once is still one scene, and someone the game keeps no feelings for does not make up the number.
+    expect(addIntimacy(two, ['ana', 'bea', 'cy']).threesomes).toBe(2)
+    expect(addIntimacy(state, ['ana', 'nobody']).threesomes).toBe(0)
   })
 })

@@ -105,18 +105,43 @@ export function wornOutfit(content: ContentPack, state: GameState, li: LoveInter
   if (!chosen) return undefined
   const showing = pregnancyStage(content, state, li.id)?.showing === true
   if (chosen.pregnant === showing) return chosen
-  const undressed = /nude/.test(chosen.id)
-  const fitting = showing
-    ? (has(undressed ? 'nude-pregnant' : 'pregnant') ?? li.outfits.find((o) => o.pregnant))
-    : (has(undressed ? 'nude' : li.defaultOutfitId) ?? li.outfits.find((o) => !o.pregnant))
-  return fitting ?? chosen
+  // An outfit and its pregnant form are parent and child: the pregnant one names the other as its parent.
+  if (showing) return pregnantForm(li, chosen) ?? chosen
+  return ordinaryOutfit(li, chosen)
 }
 
-/** The outfits she can be shown in now. From her second trimester, while she shows, only her pregnant ones. */
-export function wearableOutfits(content: ContentPack, state: GameState, li: LoveInterest): Outfit[] {
-  const pregnant = li.outfits.filter((o) => o.pregnant)
-  const showing = pregnancyStage(content, state, li.id)?.showing
-  return showing && pregnant.length > 0 ? pregnant : li.outfits.filter((o) => !o.pregnant)
+/**
+ * The pregnant form of an ordinary outfit: the pregnant outfit that has it for its parent. One with none of its own
+ * borrows the nearest: that of the outfit it is itself built on, and failing that her pregnant nude if it is a state
+ * of undress, or her pregnant clothes.
+ */
+export function pregnantForm(li: Pick<LoveInterest, 'outfits'>, outfit: Outfit): Outfit | undefined {
+  const childOf = (id: string) => li.outfits.find((o) => o.pregnant && o.inherits === id)
+  const seen = new Set<string>()
+  for (let at: Outfit | undefined = outfit; at && !seen.has(at.id); at = li.outfits.find((o) => o.id === at?.inherits)) {
+    seen.add(at.id)
+    const form = childOf(at.id)
+    if (form) return form
+  }
+  const standard = (id: string) => li.outfits.find((o) => o.id === id && o.pregnant)
+  return standard(/nude/.test(outfit.id) ? 'nude-pregnant' : 'pregnant') ?? li.outfits.find((o) => o.pregnant)
+}
+
+/**
+ * The outfits that can be asked for, whether or not she is with child: her ordinary ones. Being pregnant is the game's
+ * to draw and nobody's to choose: `wornOutfit` gives whatever is asked for in its pregnant form once she shows.
+ */
+export function wearableOutfits(li: Pick<LoveInterest, 'outfits'>): Outfit[] {
+  const ordinary = li.outfits.filter((o) => !o.pregnant)
+  return ordinary.length > 0 ? ordinary : li.outfits
+}
+
+/** The ordinary outfit a pregnant one is the form of: its parent. An ordinary one is itself. */
+export function ordinaryOutfit(li: Pick<LoveInterest, 'outfits' | 'defaultOutfitId'>, outfit: Outfit): Outfit {
+  if (!outfit.pregnant) return outfit
+  const has = (id: string | undefined) => li.outfits.find((o) => o.id === id && !o.pregnant)
+  // Its parent, where it names one; otherwise her nude for a state of undress, and her usual clothes for anything else.
+  return has(outfit.inherits) ?? has(/nude/.test(outfit.id) ? 'nude' : li.defaultOutfitId) ?? li.outfits.find((o) => !o.pregnant) ?? outfit
 }
 
 const childWord = (child: Child) => (child.daughter ? 'a daughter' : 'a son')

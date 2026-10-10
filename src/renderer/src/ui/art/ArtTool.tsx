@@ -11,7 +11,7 @@ import {
   type GenerateArtResult,
   type WorkflowListResult
 } from '../../../../shared/comfy'
-import { EXPRESSIONS, type Location, type LoveInterest, type Npc } from '../../../../shared/model'
+import { isPregnantPose, EXPRESSIONS, type Location, type LoveInterest, type Npc } from '../../../../shared/model'
 import { errorMessage } from '../../errors'
 import { Overlay } from '../Dialog'
 import { Text } from '../editor/fields'
@@ -175,7 +175,8 @@ function Generate({ target, settings, list }: GenerateProps) {
     const framing = framingFor(settings, kind)
     if (target.kind === 'sprite') return spritePrompt(target.who, outfitId, expression, framing)
     if (target.kind === 'background') return backgroundPrompt(target.location, view, period, framing)
-    if (target.kind === 'nsfw') return nsfwPrompt(target.who, target.poses.find((pose) => pose.id === expression)?.draws ?? '', framing)
+    // A pose drawn pregnant is the same pose, with her pregnant nude in place of her nude.
+    if (target.kind === 'nsfw') return nsfwPrompt(target.who, target.poses.find((pose) => pose.id === expression)?.draws ?? '', framing, isPregnantPose(expression))
     return [subject.trim(), framing].filter(Boolean).join('\n\n')
   }
   // The prompt follows the choices until it is edited by hand; "Rewrite" puts it back.

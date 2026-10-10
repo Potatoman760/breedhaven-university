@@ -9,7 +9,8 @@ const MAX_PORTRAITS = 3
 interface Props {
   content: ContentPack
   state: GameState
-  onTravel: (locationId: string) => void
+  /** Goes to a place. Left out, the map is only to be looked at: nothing on it can be gone to, as in the middle of a scene. */
+  onTravel?: (locationId: string) => void
   onClose: () => void
 }
 
@@ -97,9 +98,9 @@ export function MapPanel({ content, state, onTravel, onClose }: Props) {
                   <span className="caps pin-closed">Closed</span>
                 ) : (
                   <button
-                    disabled={!check.ok}
-                    title={check.reasons.join(' · ')}
-                    onClick={() => onTravel(pin.locationId)}
+                    disabled={!onTravel || !check.ok}
+                    title={onTravel ? check.reasons.join(' · ') : 'You are in the middle of something'}
+                    onClick={() => onTravel?.(pin.locationId)}
                   >
                     Go
                   </button>
@@ -127,10 +128,16 @@ export function MapPanel({ content, state, onTravel, onClose }: Props) {
           )
         })}
       </div>
+      {/* Those with nothing on their schedule are in their own rooms: shown, but not somewhere to go. */}
       {unknown.length > 0 && (
-        <p className="hint">
-          Whereabouts unknown: <strong>{unknown.map((li) => li.name.split(' ')[0]).join(', ')}</strong>
-        </p>
+        <div className="map-rooms">
+          <span className="caps">In her room</span>
+          <div className="portraits">
+            {unknown.map((li) => (
+              <Portrait key={li.id} li={li} />
+            ))}
+          </div>
+        </div>
       )}
     </Dialog>
   )

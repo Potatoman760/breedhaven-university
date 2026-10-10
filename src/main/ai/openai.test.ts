@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { LlmProfileSchema } from '../../shared/settings'
 import { AFTER_TOOL, chatCompletion, isRefusalResponse, listModels, RefusalError, WROTE_BESIDE_TOOL } from './openai'
-import { excuseTool, leaveTool, moveTool, revealTool, type Leaving, type Revelation } from './tools'
+import { excuseTool, moveTool, revealTool, type Revelation } from './tools'
 import { createInitialState } from '../../shared/game/state'
 import { fixture } from '../../shared/game/testFixture'
 import { JobsConfigSchema, NpcSchema, type Scene } from '../../shared/model'
@@ -138,6 +138,16 @@ describe('chatCompletion', () => {
       const stopped = fakeFetch(200, { choices: [{ finish_reason, message: { content: 'She' } }] })
       await expect(chatCompletion(profile, input, stopped.impl)).rejects.toBeInstanceOf(RefusalError)
     }
+    // Behind a router, what the provider itself said is looked at too.
+    const routed = fakeFetch(200, { choices: [{ finish_reason: 'stop', native_finish_reason: 'SAFETY', message: { content: 'She' } }] })
+    await expect(chatCompletion(profile, input, routed.impl)).rejects.toBeInstanceOf(RefusalError)
+    // Nothing at all is a refusal too, unless it only ran out of room.
+    for (const body of [{ choices: [] }, { choices: [{ finish_reason: 'stop', message: { content: '' } }] }, { choices: [{ message: { content: null } }] }]) {
+      await expect(chatCompletion(profile, input, fakeFetch(200, body).impl)).rejects.toBeInstanceOf(RefusalError)
+    }
+    const short = chatCompletion(profile, input, fakeFetch(200, { choices: [{ finish_reason: 'length', message: { content: '' } }] }).impl)
+    await expect(short).rejects.not.toBeInstanceOf(RefusalError)
+    await expect(short).rejects.toThrow(/ran out of room/)
     const whole = fakeFetch(200, { choices: [{ finish_reason: 'stop', message: { content: 'She smiles.' } }] })
     expect(await chatCompletion(profile, input, whole.impl)).toBe('She smiles.')
   })
@@ -275,40 +285,6 @@ describe('moveTool', () => {
   it('is not offered when there is nowhere to go, or to an NPC', () => {
     expect(moveTool(content, { ...state, time: 9 }, scene, () => undefined)).toBeUndefined()
     expect(moveTool(content, state, { ...scene, npc: true }, () => undefined)).toBeUndefined()
-  })
-})
-
-describe('leaveTool', () => {
-  const base = fixture()
-  const [ana] = base.loveInterests
-  const content = { ...base, loveInterests: [ana, { ...ana, id: 'bea', name: 'Bea Stone' }, { ...ana, id: 'cy', name: 'Cy' }] }
-  const state = createInitialState(content)
-  const group = sceneOf({ companionIds: ['bea', 'cy'] })
-
-  it('is offered only where more than one love interest is in the scene', () => {
-    expect(leaveTool(content, state, sceneOf(), () => undefined)).toBeUndefined()
-    expect(leaveTool(content, state, { ...group, npc: true }, () => undefined)).toBeUndefined()
-    const tool = leaveTool(content, state, group, () => undefined)!
-    expect(tool.name).toBe('leave_scene')
-    const who = (tool.parameters['properties'] as { who: { maxItems: number; items: { enum: string[] } } }).who
-    expect(who.items.enum).toEqual(['ana', 'bea', 'cy'])
-    expect(who.maxItems).toBe(2)
-  })
-
-  it('lets some go and tells the model who it is now writing for, but never lets everyone go', () => {
-    const gone: Leaving[] = []
-    const tool = leaveTool(content, state, group, (leaving) => gone.push(leaving))!
-    expect(tool.run({ who: ['ana', 'bea', 'cy'], feeling: 'angry' })).toMatch(/^Someone has to stay/)
-    expect(tool.run({ who: ['dee'], feeling: 'content' })).toMatch(/^Nobody by that name is in the scene/)
-    expect(gone).toEqual([])
-
-    expect(tool.run({ who: ['Bea'], feeling: 'hurt', why: ' saw she was not wanted ' })).toBe(
-      'Bea leaves, hurt. Write her going in this reply, then carry on with Ana and Cy and Pat. From the next reply on, write only for Ana and Cy.'
-    )
-    expect(gone).toEqual([{ ids: ['bea'], feeling: 'hurt', reason: 'saw she was not wanted' }])
-    // A feeling the model made up is taken as none in particular.
-    tool.run({ who: ['cy'], feeling: 'bored' })
-    expect(gone[1]).toEqual({ ids: ['cy'], feeling: 'content', reason: '' })
   })
 })
 
