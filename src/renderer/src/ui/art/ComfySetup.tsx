@@ -8,40 +8,55 @@ import {
   BINDING_SLOTS,
   COMFY_DEFAULT_BASE_URL,
   COMFY_MAX_TIMEOUT_SECONDS,
+  COMFY_MAX_VIDEO_TIMEOUT_SECONDS,
   COMFY_MIN_TIMEOUT_SECONDS,
   DEFAULT_FRAMING,
   framingFor,
   normaliseComfyUrl,
   sizeFor,
   SLOT_LABELS,
+  videoPromptFor,
+  WORKFLOW_KIND_LABELS,
+  WORKFLOW_KINDS,
   type ArtKind,
   type BindingSlot,
   type ComfySettings,
   type ComfyTestResult,
   type NodeField,
+  type WorkflowKind,
   type WorkflowListResult,
   type WorkflowSummary
 } from '../../../../shared/comfy'
+import { NSFW_POSES } from '../../../../shared/model'
 
 interface Props {
   settings: ComfySettings
   list: WorkflowListResult | null
   onSave: (settings: ComfySettings) => Promise<void>
+  /**
+   * Only what a player needs for the game to reach ComfyUI at all: the server, and the game's own workflows and
+   * their models. What is drawn and how (the framing, the clips' prompts, each workflow's prefixes and bindings)
+   * is the editor's, and is left out.
+   */
+  connectionOnly?: boolean
 }
 
 const AUTO = '__auto__'
 const NONE = '__none__'
 const key = (at: NodeField) => `${at.node}\u0000${at.field}`
+/** What a workflow can be the default for: clips when it takes a first frame, and each kind of picture when it does not. */
+const kindsOf = (workflow: WorkflowSummary): readonly WorkflowKind[] => (workflow.bindings.firstFrame !== null ? ['video'] : ART_KINDS)
 
 /**
- * Setting up ComfyUI. Three things have to be true before anything can be drawn, and they
- * fail separately: ComfyUI has to be running, the folder has to hold API-format exports,
- * and each workflow has to have somewhere to put a prompt. Each has its own answer here.
+ * Setting up ComfyUI. The workflows are the game's own, so there is none to choose: ComfyUI
+ * has to be running and have what they call for, and each workflow has to have somewhere to
+ * put a prompt. Each has its own answer here.
  */
-export function ComfySetup({ settings, list, onSave }: Props) {
+export function ComfySetup({ settings, list, onSave, connectionOnly }: Props) {
   // Typed fields are held here and saved when left, so a half-typed address is not refused on every key.
   const [url, setUrl] = useState(settings.baseUrl)
   const [timeout, setTimeoutSeconds] = useState(String(settings.timeoutSeconds))
+  const [videoTimeout, setVideoTimeout] = useState(String(settings.videoTimeoutSeconds))
   const [test, setTest] = useState<ComfyTestResult | null>(null)
   const [testing, setTesting] = useState(false)
   const [selected, setSelected] = useState<string | null>(null)
@@ -60,16 +75,17 @@ export function ComfySetup({ settings, list, onSave }: Props) {
     setTimeoutSeconds(String(seconds))
     if (seconds !== settings.timeoutSeconds) patch({ timeoutSeconds: seconds })
   }
+  const commitVideoTimeout = () => {
+    const seconds = Math.min(COMFY_MAX_VIDEO_TIMEOUT_SECONDS, Math.max(COMFY_MIN_TIMEOUT_SECONDS, Math.round(Number(videoTimeout)) || settings.videoTimeoutSeconds))
+    setVideoTimeout(String(seconds))
+    if (seconds !== settings.videoTimeoutSeconds) patch({ videoTimeoutSeconds: seconds })
+  }
   const runTest = async () => {
     setTesting(true)
     setTest(null)
     commitUrl()
     setTest(await window.api.comfy.test(url))
     setTesting(false)
-  }
-  const chooseFolder = async () => {
-    const dir = await window.api.comfy.chooseFolder()
-    if (dir !== null) patch({ workflowDir: dir })
   }
   const setKind = (kind: ArtKind, change: { framing?: string; width?: number; height?: number }) => {
     const size = { ...sizeFor(settings, kind), ...(change.width ? { width: change.width } : {}), ...(change.height ? { height: change.height } : {}) }
@@ -102,26 +118,24 @@ export function ComfySetup({ settings, list, onSave }: Props) {
           {typed.problem !== null && url.trim() !== '' && <p className="notice">{typed.problem}</p>}
           {test && <p className={test.ok ? 'hint' : 'notice'}>{test.ok ? `Answered. ${test.device ?? ''}` : test.message}</p>}
 
-          <div className="row">
-            <label>
-              Workflow folder
-              <input readOnly value={settings.workflowDir ?? ''} placeholder="No folder chosen yet" />
-              <span className="hint">In ComfyUI use Workflow → Export (API) and save the files here. A workflow saved the ordinary way cannot be run.</span>
-            </label>
-            <Button onClick={chooseFolder}>
-              Choose...
-            </Button>
-          </div>
           {list && !list.ok && list.message && <p className="notice">{list.message}</p>}
 
-          <label className="studio-narrow">
-            Give up after (seconds)
-            <input type="number" min={COMFY_MIN_TIMEOUT_SECONDS} max={COMFY_MAX_TIMEOUT_SECONDS} value={timeout} onChange={(e) => setTimeoutSeconds(e.target.value)} onBlur={commitTimeout} />
-          </label>
+          <div className="row">
+            <label className="studio-narrow">
+              Give up after (seconds)
+              <input type="number" min={COMFY_MIN_TIMEOUT_SECONDS} max={COMFY_MAX_TIMEOUT_SECONDS} value={timeout} onChange={(e) => setTimeoutSeconds(e.target.value)} onBlur={commitTimeout} />
+            </label>
+            <label className="studio-narrow">
+              On a clip, after
+              <input type="number" min={COMFY_MIN_TIMEOUT_SECONDS} max={COMFY_MAX_VIDEO_TIMEOUT_SECONDS} value={videoTimeout} onChange={(e) => setVideoTimeout(e.target.value)} onBlur={commitVideoTimeout} />
+            </label>
+          </div>
         </div>
 
-        <ComfyBundlePanel onInstalled={onSave} />
+        <ComfyBundlePanel />
 
+        {!connectionOnly && (
+        <>
         <div className="editor-group">
           <h2>Kinds of picture</h2>
           <p className="hint">Each kind has its own size and its own framing words, which close every prompt of that kind, after its subject. They say how the picture is composed, not what is in it.</p>
@@ -129,11 +143,26 @@ export function ComfySetup({ settings, list, onSave }: Props) {
             <KindRow key={kind} kind={kind} settings={settings} onChange={(change) => setKind(kind, change)} />
           ))}
         </div>
+
+        <div className="editor-group">
+          <h2>Video clips</h2>
+          <p className="hint">
+            A clip is made from a sex-act's NSFW picture, which is its first frame, with the prompt kept here for that sex-act. It says what moves and
+            nothing of who she is, since the picture already shows her, so one prompt serves every character. A sex-act drawn pregnant uses the
+            prompt of the sex-act it is built on.
+          </p>
+          {NSFW_POSES.map((pose) => (
+            <VideoPromptRow key={pose.id} pose={pose} settings={settings} onChange={(prompt) => patch({ videoPrompts: { ...settings.videoPrompts, [pose.id]: prompt } })} />
+          ))}
+        </div>
+        </>
+        )}
       </div>
 
+      {!connectionOnly && (
       <div className="studio-results">
         <h2>Workflows</h2>
-        {workflows.length === 0 && <p className="hint">None yet. Choose the folder your API-format workflows are exported to.</p>}
+        {workflows.length === 0 && <p className="hint">The game has none.</p>}
         <div className="studio-workflows">
           {workflows.map((w) => (
             <button key={w.file} className={w.file === current?.file ? 'courier-person selected' : 'courier-person'} onClick={() => setSelected(w.file)}>
@@ -144,9 +173,9 @@ export function ComfySetup({ settings, list, onSave }: Props) {
                     ? 'Unreadable'
                     : w.bindings.positive === null
                       ? 'Nowhere to put a prompt'
-                      : ART_KINDS.filter((kind) => settings.defaults[kind] === w.file)
-                          .map((kind) => `Default for ${ART_KIND_LABELS[kind].toLowerCase()}s`)
-                          .join(' · ') || 'Ready'}
+                      : WORKFLOW_KINDS.filter((kind) => settings.defaults[kind] === w.file)
+                          .map((kind) => `Default for ${WORKFLOW_KIND_LABELS[kind].toLowerCase()}s`)
+                          .join(' · ') || (w.bindings.firstFrame !== null ? 'Ready, for video clips' : 'Ready')}
                 </span>
               </span>
             </button>
@@ -154,6 +183,7 @@ export function ComfySetup({ settings, list, onSave }: Props) {
         </div>
         {current && <WorkflowEditor key={current.file} workflow={current} settings={settings} onPatch={patch} />}
       </div>
+      )}
     </section>
   )
 }
@@ -188,6 +218,23 @@ function KindRow({ kind, settings, onChange }: KindRowProps) {
   )
 }
 
+interface VideoPromptRowProps {
+  pose: { id: string; name: string }
+  settings: ComfySettings
+  onChange: (prompt: string) => void
+}
+
+/** What a clip of one pose is asked for with. Held as it is typed, and saved when it is left. */
+function VideoPromptRow({ pose, settings, onChange }: VideoPromptRowProps) {
+  const [prompt, setPrompt] = useState(videoPromptFor(settings, pose.id))
+  return (
+    <label>
+      {pose.name}
+      <textarea rows={4} value={prompt} onChange={(e) => setPrompt(e.target.value)} onBlur={() => prompt !== videoPromptFor(settings, pose.id) && onChange(prompt)} />
+    </label>
+  )
+}
+
 interface WorkflowEditorProps {
   workflow: WorkflowSummary
   settings: ComfySettings
@@ -202,7 +249,7 @@ function WorkflowEditor({ workflow, settings, onPatch }: WorkflowEditorProps) {
   if (!analysis) return <p className="notice">{workflow.problem}</p>
 
   const override = settings.overrides[file] ?? {}
-  const setDefault = (kind: ArtKind, on: boolean) => {
+  const setDefault = (kind: WorkflowKind, on: boolean) => {
     const defaults = { ...settings.defaults }
     if (on) defaults[kind] = file
     else delete defaults[kind]
@@ -223,7 +270,7 @@ function WorkflowEditor({ workflow, settings, onPatch }: WorkflowEditorProps) {
     analysis.nodes.flatMap((node) => {
       const name = `${node.title ?? node.classType} #${node.id}`
       if (slot === 'output') return [{ at: { node: node.id, field: 'images' }, label: name }]
-      const wanted = slot === 'positive' || slot === 'negative' ? 'string' : 'number'
+      const wanted = slot === 'positive' || slot === 'negative' || slot === 'firstFrame' || slot === 'lastFrame' ? 'string' : 'number'
       return node.fields.filter((f) => typeof f.value === wanted).map((f) => ({ at: { node: node.id, field: f.name }, label: `${name} · ${f.name}` }))
     })
 
@@ -237,10 +284,10 @@ function WorkflowEditor({ workflow, settings, onPatch }: WorkflowEditorProps) {
 
       <div className="row checks">
         <span className="field-label">Default for</span>
-        {ART_KINDS.map((kind) => (
+        {kindsOf(workflow).map((kind) => (
           <label key={kind} className="inline">
             <input type="checkbox" checked={settings.defaults[kind] === file} onChange={(e) => setDefault(kind, e.target.checked)} />
-            {ART_KIND_LABELS[kind]}s
+            {WORKFLOW_KIND_LABELS[kind]}s
           </label>
         ))}
       </div>
@@ -269,7 +316,7 @@ function WorkflowEditor({ workflow, settings, onPatch }: WorkflowEditorProps) {
 
       <div className="editor-group">
         <h2>Where things go</h2>
-        <p className="hint">Worked out by reading the workflow. Repoint one if it chose the wrong node.</p>
+        <p className="hint">Worked out by reading the workflow. Repoint one if it chose the wrong node. A workflow with a first frame makes clips from pictures, and is not used to draw them.</p>
         {BINDING_SLOTS.map((slot) => {
           const bound = workflow.bindings[slot]
           const value = slot in override ? (override[slot] ? key(override[slot]) : NONE) : AUTO
@@ -286,7 +333,7 @@ function WorkflowEditor({ workflow, settings, onPatch }: WorkflowEditorProps) {
                   </option>
                 ))}
               </select>
-              {!bound && slot !== 'negative' && <span className="hint">Not bound: {slot === 'output' ? 'any picture the run makes is taken.' : 'this value is not sent.'}</span>}
+              {!bound && slot !== 'negative' && slot !== 'firstFrame' && slot !== 'lastFrame' && slot !== 'length' && <span className="hint">Not bound: {slot === 'output' ? 'any picture the run makes is taken.' : 'this value is not sent.'}</span>}
             </label>
           )
         })}
@@ -297,9 +344,9 @@ function WorkflowEditor({ workflow, settings, onPatch }: WorkflowEditorProps) {
 
 /**
  * The same setup, for a screen that has nothing else to do with ComfyUI: it reads the
- * settings and the workflow folder itself, and saves each change as it is made.
+ * settings and the game's workflows itself, and saves each change as it is made.
  */
-export function ComfySetupPanel() {
+export function ComfySetupPanel({ connectionOnly }: Pick<Props, 'connectionOnly'>) {
   const [settings, setSettings] = useState<ComfySettings | null>(null)
   const [list, setList] = useState<WorkflowListResult | null>(null)
   const [status, setStatus] = useState('')
@@ -324,7 +371,7 @@ export function ComfySetupPanel() {
   return (
     <>
       {status && <p className="notice">{status}</p>}
-      {settings ? <ComfySetup settings={settings} list={list} onSave={save} /> : <p className="hint">Reading the ComfyUI settings...</p>}
+      {settings ? <ComfySetup settings={settings} list={list} onSave={save} connectionOnly={connectionOnly} /> : <p className="hint">Reading the ComfyUI settings...</p>}
     </>
   )
 }

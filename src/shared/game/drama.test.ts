@@ -138,7 +138,7 @@ describe('planning and firing', () => {
   it('never happens in private: a residence hall, or a room of someone\'s own', () => {
     const { state, scene } = hit.find(({ scene }) => scene.drama!.afterLines > 0)!
     expect(content.locations.find((l) => l.id === 'dormitories')?.private).toBe(true)
-    expect(content.locations.filter((l) => l.private).map((l) => l.id)).toEqual(['dormitories'])
+    expect(content.locations.filter((l) => l.private).map((l) => l.id)).toEqual(['dormitories', 'sire-house'])
     const inHalls = { ...state, locationId: 'dormitories' }
     expect(inPrivate(content, inHalls, scene)).toBe(true)
     expect(planDrama(content, inHalls, sceneWith(inHalls, 'faye'), DATE).drama).toBeUndefined()

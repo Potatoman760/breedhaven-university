@@ -129,6 +129,10 @@ export const SceneSchema = z.object({
   roomOf: z.string().optional(),
   /** The view of the place the player has picked, if any, so the character knows exactly where they are. */
   backgroundId: z.string().optional(),
+  /** A view of the place the scene insists on, whatever the day would show: the maternity room, for a birth. Gone when the scene moves. */
+  viewId: z.string().optional(),
+  /** A picture that is the whole stage for this scene, in place of the background and with nobody standing over it. Gone when the scene moves. */
+  picture: z.string().optional(),
   /** When set, this animation plays in place of the sprite. */
   animationId: z.string().optional(),
   /** Whose pose that is, by love interest id: one of those in the scene. Only one is shown at a time. */

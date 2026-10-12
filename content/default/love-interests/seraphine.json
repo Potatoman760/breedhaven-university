@@ -9,7 +9,8 @@
   "personality": "Raised to be queen, but young at heart. Soft-spoken and shy in private. Puts on royal airs when unsure, then relaxes as she feels safe. Firm in wanting to be a good queen. Starts as a virgin.",
   "traitIds": [
     "shy",
-    "obsessive"
+    "obsessive",
+    "prude"
   ],
   "likes": [
     "sweets",
@@ -37,31 +38,31 @@
       "description": "a floor-length gown of shimmering pale green with thin shoulder straps made of leafy vines, a sweetheart neckline, and cut-outs at both sides of the waist; embroidered green leaves, gold vines and small gold flowers trail down the bodice and gather at the hips, and the skirt falls in layered, petal-shaped panels. A delicate gold circlet of vines, leaves and small flowers with a green gem at the centre",
       "sprites": {
         "neutral": {
-          "image": "sprites/seraphine/default-neutral-cutout-2.png",
+          "image": "sprites/seraphine/default-neutral-cutout-2.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/seraphine/default-happy-cutout-2.png",
+          "image": "sprites/seraphine/default-happy-cutout-2.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/seraphine/default-sad-cutout-2.png",
+          "image": "sprites/seraphine/default-sad-cutout-2.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/seraphine/default-angry-cutout-2.png",
+          "image": "sprites/seraphine/default-angry-cutout-2.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/seraphine/default-surprised-2-cutout.png",
+          "image": "sprites/seraphine/default-surprised-2-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/seraphine/default-embarrassed-cutout-2.png",
+          "image": "sprites/seraphine/default-embarrassed-cutout-2.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/seraphine/default-aroused-cutout-2.png",
+          "image": "sprites/seraphine/default-aroused-cutout-2.webp",
           "description": ""
         }
       },
@@ -74,31 +75,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/seraphine/pregnant-neutral-cutout.png",
+          "image": "sprites/seraphine/pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/seraphine/pregnant-happy-cutout.png",
+          "image": "sprites/seraphine/pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/seraphine/pregnant-sad-cutout.png",
+          "image": "sprites/seraphine/pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/seraphine/pregnant-angry-cutout.png",
+          "image": "sprites/seraphine/pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/seraphine/pregnant-surprised-cutout.png",
+          "image": "sprites/seraphine/pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/seraphine/pregnant-embarrassed-cutout.png",
+          "image": "sprites/seraphine/pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/seraphine/pregnant-aroused-cutout.png",
+          "image": "sprites/seraphine/pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -110,31 +111,31 @@
       "description": "nothing at all, completely nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/seraphine/nude-neutral-cutout.png",
+          "image": "sprites/seraphine/nude-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/seraphine/nude-happy-cutout.png",
+          "image": "sprites/seraphine/nude-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/seraphine/nude-sad-cutout.png",
+          "image": "sprites/seraphine/nude-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/seraphine/nude-angry-cutout.png",
+          "image": "sprites/seraphine/nude-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/seraphine/nude-surprised-cutout.png",
+          "image": "sprites/seraphine/nude-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/seraphine/nude-embarrassed-cutout.png",
+          "image": "sprites/seraphine/nude-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/seraphine/nude-aroused-cutout.png",
+          "image": "sprites/seraphine/nude-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -147,31 +148,31 @@
       "inherits": "nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/seraphine/nude-pregnant-neutral-cutout.png",
+          "image": "sprites/seraphine/nude-pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/seraphine/nude-pregnant-happy-cutout.png",
+          "image": "sprites/seraphine/nude-pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/seraphine/nude-pregnant-sad-cutout.png",
+          "image": "sprites/seraphine/nude-pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/seraphine/nude-pregnant-angry-cutout.png",
+          "image": "sprites/seraphine/nude-pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/seraphine/nude-pregnant-surprised-cutout.png",
+          "image": "sprites/seraphine/nude-pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/seraphine/nude-pregnant-embarrassed-cutout.png",
+          "image": "sprites/seraphine/nude-pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/seraphine/nude-pregnant-aroused-cutout.png",
+          "image": "sprites/seraphine/nude-pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -197,84 +198,90 @@
       "id": "blowjob",
       "name": "Blowjob",
       "description": "",
-      "image": "sprites/seraphine/nsfw-blowjob.png",
+      "image": "sprites/seraphine/nsfw-blowjob.webp",
+      "clip": "sprites/seraphine/nsfw-blowjob.mp4",
       "loop": true
     },
     {
       "id": "missionary",
       "name": "Missionary",
       "description": "",
-      "image": "sprites/seraphine/nsfw-missionary.png",
+      "image": "sprites/seraphine/nsfw-missionary.webp",
+      "clip": "sprites/seraphine/nsfw-missionary.mp4",
       "loop": true
     },
     {
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/seraphine/nsfw-doggy.png",
+      "image": "sprites/seraphine/nsfw-doggy.webp",
+      "clip": "sprites/seraphine/nsfw-doggy.mp4",
       "loop": true
     },
     {
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
-      "image": "sprites/seraphine/nsfw-cowgirl.png",
+      "image": "sprites/seraphine/nsfw-cowgirl.webp",
+      "clip": "sprites/seraphine/nsfw-cowgirl-2.mp4",
       "loop": true
     },
     {
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/seraphine/nsfw-creampie.png",
+      "image": "sprites/seraphine/nsfw-creampie.webp",
+      "clip": "sprites/seraphine/nsfw-creampie.mp4",
       "loop": true
     },
     {
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/seraphine/nsfw-facial.png",
+      "image": "sprites/seraphine/nsfw-facial.webp",
+      "clip": "sprites/seraphine/nsfw-facial.mp4",
       "loop": true
     },
     {
       "id": "pregnant-blowjob",
       "name": "Blowjob, pregnant",
       "description": "",
-      "image": "sprites/seraphine/nsfw-pregnant-blowjob.png",
+      "image": "sprites/seraphine/nsfw-pregnant-blowjob.webp",
       "loop": true
     },
     {
       "id": "pregnant-missionary",
       "name": "Missionary, pregnant",
       "description": "",
-      "image": "sprites/seraphine/nsfw-pregnant-missionary.png",
+      "image": "sprites/seraphine/nsfw-pregnant-missionary.webp",
       "loop": true
     },
     {
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
-      "image": "sprites/seraphine/nsfw-pregnant-doggy.png",
+      "image": "sprites/seraphine/nsfw-pregnant-doggy.webp",
       "loop": true
     },
     {
       "id": "pregnant-cowgirl",
       "name": "Cowgirl, pregnant",
       "description": "",
-      "image": "sprites/seraphine/nsfw-pregnant-cowgirl.png",
+      "image": "sprites/seraphine/nsfw-pregnant-cowgirl.webp",
       "loop": true
     },
     {
       "id": "pregnant-creampie",
       "name": "Creampie, pregnant",
       "description": "",
-      "image": "sprites/seraphine/nsfw-pregnant-creampie.png",
+      "image": "sprites/seraphine/nsfw-pregnant-creampie.webp",
       "loop": true
     },
     {
       "id": "pregnant-facial",
       "name": "Facial, pregnant",
       "description": "",
-      "image": "sprites/seraphine/nsfw-pregnant-facial.png",
+      "image": "sprites/seraphine/nsfw-pregnant-facial.webp",
       "loop": true
     }
   ],
@@ -331,8 +338,9 @@
     "name": "the royal bedchamber at Dawnbloom House",
     "description": "A grand royal bedchamber of white marble with tall arched windows onto a walled garden. A very large canopied bed with white and gold drapes, a pale carpet patterned with blossoms, a gilded writing desk with small drawers, a vase of fresh flowers, a marble fireplace, a crystal chandelier, and a discreet glowing security panel beside the carved double doors. Bright, airy morning light.",
     "locationId": "dawnbloom-house",
-    "background": "generated/backgrounds/seraphine/view.png"
+    "background": "generated/backgrounds/seraphine/view.webp"
   },
+  "birthPicture": "sprites/seraphine/birth.png",
   "ai": {
     "speechPattern": "Raised to be queen, but young at heart. Soft-spoken and shy in private. Puts on royal airs when unsure, then relaxes as she feels safe. Firm in wanting to be a good queen.",
     "tone": "royal, earnest",

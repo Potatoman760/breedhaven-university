@@ -1,6 +1,6 @@
 import { describeBeat, firstNames, sceneCast, sceneHours, sceneWitnesses, toDate, type Growth, type SceneOutcome } from '../../../shared/game'
 import { useState } from 'react'
-import type { ContentPack, GameState, Scene } from '../../../shared/model'
+import { MEMORY_LEVEL_LABELS, MEMORY_LEVELS, type ContentPack, type GameState, type MemoryLevel, type Scene } from '../../../shared/model'
 import { Backdrop } from './Backdrop'
 import { ChevronIcon, Sprig } from './icons'
 
@@ -12,6 +12,8 @@ export interface SceneSummary {
   companions: { id: string; outcome: SceneOutcome | undefined }[]
   /** What each love interest in the scene will remember, by id. */
   memories: Record<string, string>
+  /** How much each of those memories matters to her, by id. */
+  levels: Record<string, MemoryLevel>
   /** Why what each love interest feels moved as it did, in her own judgement, by id. */
   reasons: Record<string, string>
   /** What he paid for in the scene, and what it came to. */
@@ -27,8 +29,8 @@ interface Props {
   state: GameState
   summary: SceneSummary
   backgroundId: string | undefined
-  /** Called with the memories as the player leaves them, by love interest id. */
-  onContinue: (memories: Record<string, string>) => void
+  /** Called with the memories as the player leaves them, and how much each matters, by love interest id. */
+  onContinue: (memories: Record<string, string>, levels: Record<string, MemoryLevel>) => void
 }
 
 function change({ from, to }: Growth): string {
@@ -39,7 +41,7 @@ function change({ from, to }: Growth): string {
 
 /** Shown when a scene ends: what the player gained, how the relationship moved, and the memory kept. */
 export function SummaryView({ content, state, summary, backgroundId, onContinue }: Props) {
-  const { scene, outcome, memories, memoryError } = summary
+  const { scene, outcome, memories, levels, memoryError } = summary
   const partner = content.loveInterests.find((li) => li.id === scene.loveInterestId)
   const group = scene.companionIds.length > 0
   const everyone = firstNames(content, sceneCast(scene))
@@ -55,6 +57,8 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
   }
   // The memories as the player has reworded them. They are kept as they stand on leaving.
   const [drafts, setDrafts] = useState<Record<string, string>>(memories)
+  // And how much each matters, as the player has set it.
+  const [levelDrafts, setLevelDrafts] = useState<Record<string, MemoryLevel>>(levels)
 
   return (
     <main className="stage">
@@ -179,17 +183,38 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
               placeholder="Nothing. She will not remember this."
               onChange={(e) => setDrafts({ ...drafts, [id]: e.target.value })}
             />
-            {(drafts[id] ?? '') !== (memories[id] ?? '') && (
-              <button type="button" className="quiet" onClick={() => setDrafts({ ...drafts, [id]: memories[id] ?? '' })}>
-                Put back what was written
-              </button>
-            )}
+            <div className="memory-level">
+              <label className="inline">
+                Memory
+                <select
+                  aria-label={`How much ${firstNames(content, [id])} will hold on to it`}
+                  value={levelDrafts[id] ?? 'normal'}
+                  onChange={(e) => setLevelDrafts({ ...levelDrafts, [id]: e.target.value as MemoryLevel })}
+                >
+                  {MEMORY_LEVELS.map((level) => (
+                    <option key={level} value={level}>
+                      {MEMORY_LEVEL_LABELS[level]}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {((drafts[id] ?? '') !== (memories[id] ?? '') || (levelDrafts[id] ?? 'normal') !== (levels[id] ?? 'normal')) && (
+                <button
+                  type="button"
+                  className="quiet"
+                  onClick={() => (setDrafts({ ...drafts, [id]: memories[id] ?? '' }), setLevelDrafts({ ...levelDrafts, [id]: levels[id] ?? 'normal' }))}
+                >
+                  Put back what was written
+                </button>
+              )}
+            </div>
           </section>
         ))}
         {!scene.npc && (
           <p className="hint">
             This is what goes into her memory of you, and what she is told in later scenes. Reword it if it has
-            something wrong; clear it and she forgets.
+            something wrong; clear it and she forgets. She is told her core memories first, and a fleeting one only
+            while there is room.
           </p>
         )}
         {memoryError && <p className="hint">Written as a plain note: {memoryError}</p>}
@@ -204,7 +229,7 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
           </section>
         )}
 
-        <button onClick={() => onContinue(drafts)} autoFocus>
+        <button onClick={() => onContinue(drafts, levelDrafts)} autoFocus>
           Continue
           <ChevronIcon size={16} />
         </button>

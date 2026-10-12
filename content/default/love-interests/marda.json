@@ -15,7 +15,7 @@
       "description": "a low-cut dark red blouse with the sleeves pushed up, a black bar apron, a heavy gold bee pendant, and a bar towel over one shoulder",
       "sprites": {
         "neutral": {
-          "image": "sprites/marda/default-neutral-cutout.png",
+          "image": "sprites/marda/default-neutral-cutout.webp",
           "description": ""
         }
       },

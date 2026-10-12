@@ -9,7 +9,8 @@
   "personality": "A cute, cheeky joker and rascal, always a little horny. Quick to tease, steal a snack, bend a rule, or spot a chance to flirt.",
   "traitIds": [
     "flirtatious",
-    "promiscuous"
+    "promiscuous",
+    "easygoing"
   ],
   "likes": [
     "cards",
@@ -37,31 +38,31 @@
       "description": "a fitted white t shirt, over that a cropped black leather jacket, high waisted short, leggings",
       "sprites": {
         "neutral": {
-          "image": "sprites/tink/default-neutral-cutout-2.png",
+          "image": "sprites/tink/default-neutral-cutout-2.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/tink/default-happy-cutout-2.png",
+          "image": "sprites/tink/default-happy-cutout-2.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/tink/default-sad-cutout-2.png",
+          "image": "sprites/tink/default-sad-cutout-2.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/tink/default-angry-cutout-2.png",
+          "image": "sprites/tink/default-angry-cutout-2.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/tink/default-surprised-cutout-2.png",
+          "image": "sprites/tink/default-surprised-cutout-2.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/tink/default-embarrassed-cutout-2.png",
+          "image": "sprites/tink/default-embarrassed-cutout-2.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/tink/default-aroused-cutout-2.png",
+          "image": "sprites/tink/default-aroused-cutout-2.webp",
           "description": ""
         }
       },
@@ -74,31 +75,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/tink/pregnant-neutral-cutout.png",
+          "image": "sprites/tink/pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/tink/pregnant-happy-cutout.png",
+          "image": "sprites/tink/pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/tink/pregnant-sad-cutout.png",
+          "image": "sprites/tink/pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/tink/pregnant-angry-cutout.png",
+          "image": "sprites/tink/pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/tink/pregnant-surprised-cutout.png",
+          "image": "sprites/tink/pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/tink/pregnant-embarrassed-cutout.png",
+          "image": "sprites/tink/pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/tink/pregnant-aroused-cutout.png",
+          "image": "sprites/tink/pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -110,31 +111,31 @@
       "description": "nothing at all, complete nude, very large breasts",
       "sprites": {
         "neutral": {
-          "image": "sprites/tink/nude-neutral-3-cutout.png",
+          "image": "sprites/tink/nude-neutral-3-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/tink/nude-happy-cutout.png",
+          "image": "sprites/tink/nude-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/tink/nude-sad-cutout.png",
+          "image": "sprites/tink/nude-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/tink/nude-angry-cutout.png",
+          "image": "sprites/tink/nude-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/tink/nude-surprised-cutout.png",
+          "image": "sprites/tink/nude-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/tink/nude-embarrassed-cutout.png",
+          "image": "sprites/tink/nude-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/tink/nude-aroused-cutout.png",
+          "image": "sprites/tink/nude-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -147,31 +148,31 @@
       "inherits": "nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/tink/nude-pregnant-neutral-cutout.png",
+          "image": "sprites/tink/nude-pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/tink/nude-pregnant-happy-cutout.png",
+          "image": "sprites/tink/nude-pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/tink/nude-pregnant-sad-cutout.png",
+          "image": "sprites/tink/nude-pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/tink/nude-pregnant-angry-cutout.png",
+          "image": "sprites/tink/nude-pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/tink/nude-pregnant-surprised-cutout.png",
+          "image": "sprites/tink/nude-pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/tink/nude-pregnant-embarrassed-cutout.png",
+          "image": "sprites/tink/nude-pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/tink/nude-pregnant-aroused-cutout.png",
+          "image": "sprites/tink/nude-pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -197,77 +198,83 @@
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/tink/nsfw-creampie-2.png",
+      "image": "sprites/tink/nsfw-creampie-2.webp",
+      "clip": "sprites/tink/nsfw-creampie.mp4",
       "loop": true
     },
     {
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/tink/nsfw-facial.png",
+      "image": "sprites/tink/nsfw-facial.webp",
+      "clip": "sprites/tink/nsfw-facial.mp4",
       "loop": true
     },
     {
       "id": "blowjob",
       "name": "Blowjob",
       "description": "",
-      "image": "sprites/tink/nsfw-blowjob.png",
+      "image": "sprites/tink/nsfw-blowjob.webp",
+      "clip": "sprites/tink/nsfw-blowjob.mp4",
       "loop": true
     },
     {
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
-      "image": "sprites/tink/nsfw-cowgirl-2.png",
+      "image": "sprites/tink/nsfw-cowgirl-2.webp",
+      "clip": "sprites/tink/nsfw-cowgirl-2.mp4",
       "loop": true
     },
     {
       "id": "missionary",
       "name": "Missionary",
       "description": "",
-      "image": "sprites/tink/nsfw-missionary.png",
+      "image": "sprites/tink/nsfw-missionary.webp",
+      "clip": "sprites/tink/nsfw-missionary.mp4",
       "loop": true
     },
     {
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/tink/nsfw-doggy.png",
+      "image": "sprites/tink/nsfw-doggy.webp",
+      "clip": "sprites/tink/nsfw-doggy.mp4",
       "loop": true
     },
     {
       "id": "pregnant-blowjob",
       "name": "Blowjob, pregnant",
       "description": "",
-      "image": "sprites/tink/nsfw-pregnant-blowjob.png",
+      "image": "sprites/tink/nsfw-pregnant-blowjob.webp",
       "loop": true
     },
     {
       "id": "pregnant-missionary",
       "name": "Missionary, pregnant",
       "description": "",
-      "image": "sprites/tink/nsfw-pregnant-missionary.png",
+      "image": "sprites/tink/nsfw-pregnant-missionary.webp",
       "loop": true
     },
     {
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
-      "image": "sprites/tink/nsfw-pregnant-doggy.png",
+      "image": "sprites/tink/nsfw-pregnant-doggy.webp",
       "loop": true
     },
     {
       "id": "pregnant-cowgirl",
       "name": "Cowgirl, pregnant",
       "description": "",
-      "image": "sprites/tink/nsfw-pregnant-cowgirl.png",
+      "image": "sprites/tink/nsfw-pregnant-cowgirl.webp",
       "loop": true
     },
     {
       "id": "pregnant-creampie",
       "name": "Creampie, pregnant",
       "description": "",
-      "image": "sprites/tink/nsfw-pregnant-creampie.png",
+      "image": "sprites/tink/nsfw-pregnant-creampie.webp",
       "loop": true
     }
   ],
@@ -313,8 +320,9 @@
     "name": "her room in the Cloister Halls",
     "description": "A small modern dormitory room turned into a workshop. A built-in desk buried under half-built gadgets, opened phones, loose wires, circuit boards etched with glowing runes and a soldering iron on its stand; tools hang from a pegboard on a smooth white wall. A narrow bed with a rumpled blanket and a deck of playing cards on the pillow, a small drone parked on the windowsill, a coil of rope under the open window, empty bottles on the floor. Cool blue light from two screens and a strip of ward-light along the ceiling.",
     "locationId": "dormitories",
-    "background": "generated/backgrounds/tink/view.png"
+    "background": "generated/backgrounds/tink/view.webp"
   },
+  "birthPicture": "sprites/tink/birth.png",
   "ai": {
     "speechPattern": "Quick jokes, casual speech, playful dares and affectionate mischief.",
     "tone": "cheeky, playful, a little filthy",

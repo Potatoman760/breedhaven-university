@@ -15,7 +15,7 @@
       "description": "a fitted black sports crop top with the gym logo, grey leggings, a whistle on a cord and wrist wraps",
       "sprites": {
         "neutral": {
-          "image": "sprites/kessa/default-neutral-cutout.png",
+          "image": "sprites/kessa/default-neutral-cutout.webp",
           "description": ""
         }
       },

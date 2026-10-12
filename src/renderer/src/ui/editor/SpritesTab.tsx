@@ -5,14 +5,16 @@ import { EXPRESSIONS, isPregnantPose, NSFW_POSES, NSFW_PREGNANT_POSES, STANDARD_
 import { errorMessage } from '../../errors'
 import { ArtTool } from '../art/ArtTool'
 import { BatchProgress, useBatch } from '../art/batch'
+import { fileName, pngsIn, renamed, toWebp } from '../art/optimize'
 import { Button } from '../Button'
+import { VideoIcon } from '../icons'
 import { Lightbox } from '../Lightbox'
 import { Portrait } from '../MapPanel'
 import { Group, Text } from './fields'
 import { EmptySlot, PictureSlot, SlotGrid } from './slots'
 
 /** What the sprite editor needs of a character: a love interest and an NPC both have it. */
-type SpriteOwner = Pick<LoveInterest, 'id' | 'name' | 'pronouns' | 'appearance' | 'outfits' | 'defaultOutfitId' | 'faceY' | 'stageHeight' | 'animations' | 'imageSeed'>
+type SpriteOwner = Pick<LoveInterest, 'id' | 'name' | 'pronouns' | 'appearance' | 'outfits' | 'defaultOutfitId' | 'faceY' | 'stageHeight' | 'animations' | 'imageSeed' | 'birthPicture'>
 
 interface Props {
   draft: SpriteOwner
@@ -27,6 +29,8 @@ interface Props {
 const NSFW_BATCH = '(nsfw)'
 // And the run that draws the same poses pregnant.
 const NSFW_PREGNANT_BATCH = '(nsfw-pregnant)'
+// What the run that makes her pictures smaller is filed under.
+const OPTIMIZE_BATCH = '(optimize)'
 
 /** A name not already taken in the list, made from the wanted one: "happy", "happy-2"... */
 function unique(wanted: string, taken: string[]): string {
@@ -72,6 +76,11 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
   // The NSFW pose the art tool is open on, and the one opened to be looked at whole, while either is.
   const [posing, setPosing] = useState<string | null>(null)
   const [poseViewing, setPoseViewing] = useState<string | null>(null)
+  // The pose whose clip is being seen to, while the art tool is open on one: made from its picture, uploaded, replaced or taken off.
+  const [clipping, setClipping] = useState<string | null>(null)
+  // The art tool is open on her birth picture, or that picture is being looked at whole.
+  const [birthing, setBirthing] = useState(false)
+  const [birthViewing, setBirthViewing] = useState(false)
   // A seed typed for an outfit's run of missing faces, by outfit id, in place of her preferred one.
   const [batchSeeds, setBatchSeeds] = useState<Record<string, string>>({})
   // The draft as it stands now, for a run that outlives the render it was started from.
@@ -113,6 +122,29 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
       return { ok: true }
     })
     if (failed.length > 0) setNotice(`Stopped at ${failed[0]}`)
+  }
+
+  // Her pictures that are still PNGs: everything the optimize button would turn into WebP.
+  const pngs = pngsIn({ outfits: draft.outfits, animations: draft.animations, birthPicture: draft.birthPicture })
+
+  /**
+   * Turns every PNG of hers into a WebP of the same picture, one after another, and puts each in every slot the PNG
+   * was in as it is done. Nothing is kept until she is saved; the PNGs go once a save no longer names them.
+   */
+  async function optimize() {
+    const paths = pngsIn({ outfits: latest.current.outfits, animations: latest.current.animations, birthPicture: latest.current.birthPicture })
+    if (paths.length === 0 || batch) return
+    setNotice('')
+    const { failed } = await run(OPTIMIZE_BATCH, 'Optimizing', paths, fileName, async (path) => {
+      try {
+        const to = await toWebp(path)
+        set({ outfits: renamed(latest.current.outfits, path, to), animations: renamed(latest.current.animations, path, to), birthPicture: renamed(latest.current.birthPicture, path, to) })
+        return { ok: true }
+      } catch (error) {
+        return { ok: false, message: errorMessage(error) }
+      }
+    })
+    setNotice(failed.length > 0 ? `Could not optimize: ${failed.join('; ')}` : 'Optimized. Save the character to keep it.')
   }
 
   /** Whether a sprite still has its flat background: a PNG of hers in the add-on folder that is not already a cut-out. */
@@ -238,8 +270,6 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
     set({ outfits: freed, defaultOutfitId: draft.defaultOutfitId === gone ? (freed[0]?.id ?? '') : draft.defaultOutfitId })
   }
 
-  // The poses that have a picture, in the order they are shown, for stepping through them.
-  const withPictures = draft.animations.filter((a) => a.image !== undefined)
   /** The pose of that id as she has it, if she has anything for it yet. */
   const poseOf = (id: string) => draft.animations.find((a) => a.id === id)
   // Every slot of the NSFW section: the standard poses in their usual order, with or without a picture, then any of her own.
@@ -251,6 +281,9 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
   const pregnantPoses = NSFW_PREGNANT_POSES.map((pose) => poseOf(pose.id) ?? { id: pose.id, name: pose.name, description: '', image: undefined, clip: undefined, loop: true })
   /** What a pose is drawn from: the standard wording, or for one of her own, what its description says. */
   const drawsOf = (id: string) => STANDARD_POSES.find((pose) => pose.id === id)?.draws ?? poseOf(id)?.description ?? ''
+
+  // The poses that have a picture, in the order they are shown, for stepping through them.
+  const withPictures = [...poses, ...pregnantPoses].filter((pose) => pose.image !== undefined)
 
   /** Changes a pose, making its entry if she has none for it yet. Written onto the draft as it is now. */
   function setPose(id: string, patch: Partial<Animation>) {
@@ -328,6 +361,13 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
         image={image}
         name={pose.name}
         onView={() => setPoseViewing(pose.id)}
+        badge={
+          pose.clip && (
+            <button type="button" className="sprite-badge" title="This sex-act has a video clip. Open it to play, replace or remove it." aria-label={`${pose.name}: video clip`} onClick={() => setClipping(pose.id)}>
+              <VideoIcon size={18} />
+            </button>
+          )
+        }
         actions={
           <>
             <Button
@@ -339,53 +379,31 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
             >
               Replace
             </Button>
-            <Button disabled={!ready} title="Draw this pose again with ComfyUI" onClick={() => setPosing(pose.id)}>
+            <Button disabled={!ready} title="Draw this sex-act again with ComfyUI" onClick={() => setPosing(pose.id)}>
               Generate
+            </Button>
+            {/* The clip is a layer over the picture: each is made, replaced and removed without touching the other. */}
+            <Button disabled={!ready} title="The sex-act's video clip: make one from this picture with ComfyUI, upload one, or replace or remove the one it has" onClick={() => setClipping(pose.id)}>
+              Video
             </Button>
             <Button onClick={() => removePose(pose.id)}>Remove</Button>
           </>
         }
       >
         <input
-          aria-label="Pose name"
+          aria-label="Sex-act name"
           defaultValue={pose.id}
           key={pose.id}
           disabled={standard !== undefined}
           onBlur={(e) => renamePose(pose.id, slugify(e.target.value) || pose.id)}
         />
         <textarea
-          aria-label="Pose description"
+          aria-label="Sex-act description"
           rows={2}
           value={pose.description}
           placeholder={standard?.description ?? 'what it shows, so the LLM knows when it fits'}
           onChange={(e) => setPose(pose.id, { description: e.target.value })}
         />
-        {/* The clip is an extra on top of the picture. */}
-        {pose.clip ? (
-          <div className="row checks">
-            <span className="hint" title={pose.clip}>
-              Clip: {pose.clip.split('/').pop()}
-            </span>
-            <label className="inline">
-              <input type="checkbox" checked={!pose.loop} onChange={(e) => setPose(pose.id, { loop: !e.target.checked })} />
-              Play once
-            </label>
-            <Button variant="quiet" onClick={() => setPose(pose.id, { clip: undefined })}>
-              Remove clip
-            </Button>
-          </div>
-        ) : (
-          <Button
-            variant="quiet"
-            disabled={!ready}
-            onClick={async () => {
-              const clip = await pick('video')
-              if (clip) setPose(pose.id, { clip })
-            }}
-          >
-            Add a clip
-          </Button>
-        )}
       </PictureSlot>
     ) : (
       <EmptySlot
@@ -424,6 +442,29 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
           onClose={() => setPosing(null)}
         />
       )}
+      {clipping && poseOf(clipping)?.image && (
+        <ArtTool
+          target={{
+            kind: 'video',
+            who: draft,
+            pose: {
+              id: clipping,
+              name: poseOf(clipping)!.name,
+              image: poseOf(clipping)!.image!,
+              clip: poseOf(clipping)!.clip,
+              loop: poseOf(clipping)!.loop
+            },
+            onUse: (poseId, clip, loop) => setPose(poseId, loop === undefined ? { clip } : { clip, loop }),
+            onUpload: async () => {
+              const clip = await pick('video')
+              if (clip) setPose(clipping, { clip })
+            },
+            onRemove: () => setPose(clipping, { clip: undefined }),
+            onLoop: (loop) => setPose(clipping, { loop })
+          }}
+          onClose={() => setClipping(null)}
+        />
+      )}
       {poseViewing && poseOf(poseViewing)?.image && (
         <Lightbox
           image={poseOf(poseViewing)!.image!}
@@ -437,6 +478,8 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
           }
         />
       )}
+      {birthing && <ArtTool target={{ kind: 'birth', who: draft, onUse: (birthPicture) => set({ birthPicture }) }} onClose={() => setBirthing(false)} />}
+      {birthViewing && draft.birthPicture && <Lightbox image={draft.birthPicture} name="Birth" onClose={() => setBirthViewing(false)} />}
       {drawing && (
         <ArtTool
           target={{ kind: 'sprite', who: draft, outfitId: drawing.outfitId, expression: drawing.expression, onUse: useGenerated }}
@@ -445,6 +488,17 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
       )}
       {!ready && <p className="notice">Give the character an id before adding pictures: they are filed under it.</p>}
       {notice && <p className="notice">{notice}</p>}
+
+      <div className="outfit-actions">
+        <Button
+          disabled={!ready || batch !== null || pngs.length === 0}
+          title="Turn every PNG of hers into a WebP of the same picture, a fraction of the size, and put it in the same places"
+          onClick={optimize}
+        >
+          {pngs.length > 0 ? `Optimize (${pngs.length} PNG${pngs.length === 1 ? '' : 's'})` : 'Optimized'}
+        </Button>
+      </div>
+      <BatchProgress batch={batch} at={OPTIMIZE_BATCH} onStop={stop} />
 
       <Group title="Portrait" hint="The small round picture used on the map and in lists is cut from the default outfit's first sprite.">
         <div className="portrait-crop">
@@ -702,20 +756,20 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
 
       <Group
         title="NSFW"
-        hint="Explicit pictures that take the sprite's place, one to a pose, as an outfit has one to a face. The LLM shows one when the scene reaches what its description says, and takes it down when it no longer fits. A pose can have a clip (.mp4) as well: where it has one the clip is played, and the picture is what it falls back on."
+        hint="Explicit pictures that take the sprite's place, one to a sex-act, as an outfit has one to a face. The LLM shows one when the scene reaches what its description says, and takes it down when it no longer fits. A sex-act can have a video clip as a layer over its picture: where it has one the clip is played, and the picture is what it falls back on. The picture is always what is shown here, marked in its corner when it has a clip. A clip is uploaded, or made from the picture with a video workflow on your own ComfyUI, and either can be replaced without touching the other."
       >
         <div className="outfit-actions">
           {NSFW_POSES.some((pose) => !poseOf(pose.id)?.image) && (
             <Button
               variant="primary"
               disabled={!ready || batch !== null}
-              title="Draw every pose that has no picture yet with your own ComfyUI, one after another"
+              title="Draw every sex-act that has no picture yet with your own ComfyUI, one after another"
               onClick={() => generateMissingPoses()}
             >
-              Generate missing poses ({NSFW_POSES.filter((pose) => !poseOf(pose.id)?.image).length})
+              Generate missing sex-acts ({NSFW_POSES.filter((pose) => !poseOf(pose.id)?.image).length})
             </Button>
           )}
-          <Button disabled={!ready} title="Draw a pose with your own ComfyUI" onClick={() => setPosing(NSFW_POSES.find((pose) => !poseOf(pose.id)?.image)?.id ?? NSFW_POSES[0].id)}>
+          <Button disabled={!ready} title="Draw a sex-act with your own ComfyUI" onClick={() => setPosing(NSFW_POSES.find((pose) => !poseOf(pose.id)?.image)?.id ?? NSFW_POSES[0].id)}>
             Generate a picture
           </Button>
           <Button disabled={!ready} onClick={addPose}>
@@ -733,22 +787,67 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
       {!plain && (
         <Group
           title="NSFW, pregnant"
-          hint="The poses above, drawn pregnant. Each is built on the pose over it: the same wording, with her pregnant nude in place of her nude. Once her pregnancy shows, the game puts this one up whenever the LLM asks for the pose. One with no picture here simply shows the one above."
+          hint="The sex-acts above, drawn pregnant. Each is built on the sex-act over it: the same wording, with her pregnant nude in place of her nude. Once her pregnancy shows, the game puts this one up whenever the LLM asks for the sex-act. One with no picture here simply shows the one above."
         >
           <div className="outfit-actions">
             {NSFW_PREGNANT_POSES.some((pose) => !poseOf(pose.id)?.image) && (
               <Button
                 variant="primary"
                 disabled={!ready || batch !== null}
-                title="Draw every pregnant pose that has no picture yet with your own ComfyUI, one after another"
+                title="Draw every pregnant sex-act that has no picture yet with your own ComfyUI, one after another"
                 onClick={() => generateMissingPoses(NSFW_PREGNANT_POSES, NSFW_PREGNANT_BATCH)}
               >
-                Generate missing poses ({NSFW_PREGNANT_POSES.filter((pose) => !poseOf(pose.id)?.image).length})
+                Generate missing sex-acts ({NSFW_PREGNANT_POSES.filter((pose) => !poseOf(pose.id)?.image).length})
               </Button>
             )}
           </div>
           <BatchProgress batch={batch} at={NSFW_PREGNANT_BATCH} onStop={stop} />
           <SlotGrid wide>{pregnantPoses.map(poseSlot)}</SlotGrid>
+        </Group>
+      )}
+
+      {/* The picture of her with a newborn: the whole stage of the scene of a birth he is there for. */}
+      {!plain && (
+        <Group
+          title="Birth"
+          hint="One picture of her just after giving birth: sitting up in a hospital bed in a gown, with the child in her arms. When he is there for the birth of a child of hers, the scene is set in it. Without one, the Health Centre's maternity room is shown."
+        >
+          <SlotGrid wide>
+            {draft.birthPicture ? (
+              <PictureSlot
+                image={draft.birthPicture}
+                name="Birth"
+                onView={() => setBirthViewing(true)}
+                actions={
+                  <>
+                    <Button
+                      disabled={!ready}
+                      onClick={async () => {
+                        const picked = await pick('image')
+                        if (picked) set({ birthPicture: picked })
+                      }}
+                    >
+                      Replace
+                    </Button>
+                    <Button disabled={!ready} title="Draw it again with ComfyUI" onClick={() => setBirthing(true)}>
+                      Generate
+                    </Button>
+                    <Button onClick={() => set({ birthPicture: undefined })}>Remove</Button>
+                  </>
+                }
+              />
+            ) : (
+              <EmptySlot
+                name="Birth"
+                disabled={!ready}
+                onAdd={async () => {
+                  const picked = await pick('image')
+                  if (picked) set({ birthPicture: picked })
+                }}
+                onGenerate={() => setBirthing(true)}
+              />
+            )}
+          </SlotGrid>
         </Group>
       )}
     </>

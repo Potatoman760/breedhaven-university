@@ -45,22 +45,21 @@ export function loveInterestsAt(
 }
 
 /**
- * Whether someone is sitting in a class the player is not taking: she is at the place, but
- * in a room he has no business in, and not to be walked up to. Someone waiting for him by
- * arrangement is not in class.
+ * Whether someone is sitting in a class, or teaching one: she is at the place, but in the
+ * room, and not to be walked up to. The only way to her is to sit the class with her, which
+ * is its own scene. Someone waiting for him by arrangement is not in class.
  */
-export function inClassApart(content: ContentPack, state: GameState, li: Pick<LoveInterest, 'id'>): boolean {
+export function inClass(content: ContentPack, state: GameState, li: Pick<LoveInterest, 'id'>): boolean {
   if (appointmentsNow(state).some((a) => attendees(a).includes(li.id))) return false
-  const course = coursesInSession(content, state).find((c) => courseMembers(c).includes(li.id))
-  return course !== undefined && !state.enrolment?.includes(course.id)
+  return coursesInSession(content, state).some((c) => courseMembers(c).includes(li.id))
 }
 
 /**
  * The love interests at a place whom the player can go up to: everyone there but those
- * in a class he does not take with them.
+ * in class.
  */
 export function approachableAt(content: ContentPack, state: GameState, locationId: string): LoveInterest[] {
-  return loveInterestsAt(content, state, locationId).filter((li) => !inClassApart(content, state, li))
+  return loveInterestsAt(content, state, locationId).filter((li) => !inClass(content, state, li))
 }
 
 /** Love interests with nothing on their schedule right now: each is in her own room, not somewhere he can go to. */
@@ -83,5 +82,6 @@ export function canTravel(content: ContentPack, state: GameState, locationId: st
 export function travel(content: ContentPack, state: GameState, locationId: string): GameState {
   const check = canTravel(content, state, locationId)
   if (!check.ok) throw new Error(`Cannot travel to "${locationId}": ${check.reasons.join('; ')}`)
-  return { ...state, locationId, inOwnRoom: false }
+  // Wherever he was in his house, he comes into another place, or back into the house, at its door.
+  return { ...state, locationId, inOwnRoom: false, housing: { ...state.housing, room: undefined } }
 }

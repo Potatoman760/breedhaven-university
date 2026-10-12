@@ -58,9 +58,9 @@
       "guidance": "You may speak of the two of you as a couple. Other lovers are no betrayal; you can be curious, teasing or a little jealous about them, in character, but never wronged."
     },
     {
-      "id": "triad",
+      "id": "throuple",
       "committed": true,
-      "name": "Triad",
+      "name": "Throuple",
       "minStage": "dating",
       "minMembers": 2,
       "maxMembers": 2,
@@ -71,9 +71,9 @@
       "guidance": "Treat both of them as your lovers. Speak of the three of you as one household of the heart, and give the other woman her due as readily as him."
     },
     {
-      "id": "open-triad",
+      "id": "open-throuple",
       "committed": true,
-      "name": "Open triad",
+      "name": "Open throuple",
       "minStage": "dating",
       "minMembers": 2,
       "maxMembers": 2,

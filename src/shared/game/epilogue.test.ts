@@ -29,7 +29,7 @@ const content: ContentPack = {
       status('casual', 'Lovers'),
       status('exclusive', 'Exclusive', { exclusive: true, committed: true }),
       status('open', 'Open relationship', { committed: true }),
-      status('triad', 'Triad', { exclusive: true, committed: true, members: 2 })
+      status('throuple', 'Throuple', { exclusive: true, committed: true, members: 2 })
     ]
   }
 }
@@ -95,7 +95,7 @@ describe('who he ended the year with', () => {
     expect(buildEpilogue(content, { ...start, bonds: [{ statusId: 'open', memberIds: ['cy'], since: 1 }] })[1].text).toBe(
       'You found love with your boyfriend Cy, in a relationship open to others.'
     )
-    expect(buildEpilogue(content, { ...start, bonds: [{ statusId: 'triad', memberIds: ['ana', 'bea'], since: 1 }] })[1].text).toBe(
+    expect(buildEpilogue(content, { ...start, bonds: [{ statusId: 'throuple', memberIds: ['ana', 'bea'], since: 1 }] })[1].text).toBe(
       'You found love with Ana and Bea: the three of you together.'
     )
     expect(buildEpilogue(content, start).some((screen) => screen.kind === 'love')).toBe(false)

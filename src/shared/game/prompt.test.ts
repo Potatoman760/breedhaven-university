@@ -63,6 +63,10 @@ describe('who speaks first', () => {
     expect(sceneTurns([hers, his], 'Pat')).toEqual([opening[0], hers, his])
     // A scene the player opened himself is sent as it is.
     expect(sceneTurns([his, hers], 'Pat')).toEqual([his, hers])
+    // The time goes beside the latest thing said to her, and nowhere else; what is kept of the conversation is untouched.
+    expect(sceneTurns([hers, his], 'Pat', undefined, 'It is now 12:00 (Afternoon), daytime.').at(-1)).toEqual({ role: 'user', content: `${his.content}\n[It is now 12:00 (Afternoon), daytime.]` })
+    expect(sceneTurns([], 'Pat', undefined, 'It is now 22:00 (Night), dark out.')[0].content).toMatch(/\[It is now 22:00 \(Night\), dark out\.\]$/)
+    expect(sceneTurns([his, hers], 'Pat', undefined, 'noon')).toEqual([his, hers])
   })
 })
 

@@ -1,7 +1,7 @@
 import type { Activity, ContentPack, GameState } from '../model'
 import { isGameOver, toDate } from './calendar'
 import { applyEffects, describeCondition, evaluateCondition } from './conditions'
-import { locationOf } from './map'
+import { inClass, locationOf } from './map'
 import { isOpen, matchesWhen } from './schedule'
 
 export interface PerformCheck {
@@ -12,8 +12,8 @@ export interface PerformCheck {
 
 /**
  * Whether the activity can be done now. Activities tied to a location need the player
- * to be there. A shared activity needs the love interest to be at the player's location,
- * unless `inScene` says the two are already out together.
+ * to be there. A shared activity needs the love interest to be at the player's location
+ * and not in class, unless `inScene` says the two are already out together.
  */
 export function canPerform(
   activity: Activity,
@@ -36,6 +36,8 @@ export function canPerform(
   const partner = content.loveInterests.find((li) => li.id === loveInterestId)
   if (partner && !inScene && locationOf(content, state, partner) !== state.locationId) {
     reasons.push(`${partner.name} is not here`)
+  } else if (partner && !inScene && inClass(content, state, partner)) {
+    reasons.push(`${partner.name} is in class`)
   }
 
   if (availability.weekdays && !availability.weekdays.includes(date.weekday)) {

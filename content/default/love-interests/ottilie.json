@@ -8,7 +8,8 @@
   "appearance": "A beautiful 36-year-old woman with fair skin, a refined face with sharp cheekbones, a straight nose, cool green eyes under fine arched brows, long lashes, and full lips painted a muted rose. Dark blonde hair, sleek and straight, cut to the jaw with a centre parting. Tall and long-legged, with a slim, elegant figure: a full, high bust, a very narrow waist, and curved hips.",
   "personality": "Brilliant, exact and dry, with no small talk and very little patience for sentiment dressed up as science. Curious to the point of rudeness. Kinder than she sounds, and bad at showing it. She is not used to being surprised and rather likes it.",
   "traitIds": [
-    "bookish"
+    "bookish",
+    "prude"
   ],
   "likes": [
     "coffee",
@@ -34,31 +35,31 @@
       "description": "rimless rectangular glasses; a white knee-length lab coat worn open over a close-fitting charcoal high-collared dress that ends above the knee, with a narrow keyhole opening at the chest; sheer black stockings; and a blue lanyard with an ID card around her neck",
       "sprites": {
         "neutral": {
-          "image": "sprites/ottilie/default-neutral-2-cutout.png",
+          "image": "sprites/ottilie/default-neutral-2-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/ottilie/default-happy-cutout.png",
+          "image": "sprites/ottilie/default-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/ottilie/default-sad-cutout.png",
+          "image": "sprites/ottilie/default-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/ottilie/default-angry-cutout.png",
+          "image": "sprites/ottilie/default-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/ottilie/default-surprised-cutout.png",
+          "image": "sprites/ottilie/default-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/ottilie/default-embarrassed-cutout.png",
+          "image": "sprites/ottilie/default-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/ottilie/default-aroused-cutout.png",
+          "image": "sprites/ottilie/default-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -71,31 +72,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/ottilie/pregnant-neutral-2-cutout.png",
+          "image": "sprites/ottilie/pregnant-neutral-2-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/ottilie/pregnant-happy-cutout.png",
+          "image": "sprites/ottilie/pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/ottilie/pregnant-sad-cutout.png",
+          "image": "sprites/ottilie/pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/ottilie/pregnant-angry-cutout.png",
+          "image": "sprites/ottilie/pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/ottilie/pregnant-surprised-cutout.png",
+          "image": "sprites/ottilie/pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/ottilie/pregnant-embarrassed-cutout.png",
+          "image": "sprites/ottilie/pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/ottilie/pregnant-aroused-cutout.png",
+          "image": "sprites/ottilie/pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -107,31 +108,31 @@
       "description": "nothing at all, completely nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/ottilie/nude-neutral-cutout.png",
+          "image": "sprites/ottilie/nude-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/ottilie/nude-happy-cutout.png",
+          "image": "sprites/ottilie/nude-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/ottilie/nude-sad-cutout.png",
+          "image": "sprites/ottilie/nude-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/ottilie/nude-angry-cutout.png",
+          "image": "sprites/ottilie/nude-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/ottilie/nude-surprised-cutout.png",
+          "image": "sprites/ottilie/nude-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/ottilie/nude-embarrassed-cutout.png",
+          "image": "sprites/ottilie/nude-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/ottilie/nude-aroused-cutout.png",
+          "image": "sprites/ottilie/nude-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -144,31 +145,31 @@
       "inherits": "nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/ottilie/nude-pregnant-neutral-cutout.png",
+          "image": "sprites/ottilie/nude-pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/ottilie/nude-pregnant-happy-cutout.png",
+          "image": "sprites/ottilie/nude-pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/ottilie/nude-pregnant-sad-cutout.png",
+          "image": "sprites/ottilie/nude-pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/ottilie/nude-pregnant-angry-cutout.png",
+          "image": "sprites/ottilie/nude-pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/ottilie/nude-pregnant-surprised-cutout.png",
+          "image": "sprites/ottilie/nude-pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/ottilie/nude-pregnant-embarrassed-cutout.png",
+          "image": "sprites/ottilie/nude-pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/ottilie/nude-pregnant-aroused-cutout.png",
+          "image": "sprites/ottilie/nude-pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -200,77 +201,83 @@
       "id": "blowjob",
       "name": "Blowjob",
       "description": "",
-      "image": "sprites/ottilie/nsfw-blowjob.png",
+      "image": "sprites/ottilie/nsfw-blowjob.webp",
+      "clip": "sprites/ottilie/nsfw-blowjob.mp4",
       "loop": true
     },
     {
       "id": "missionary",
       "name": "Missionary",
       "description": "",
-      "image": "sprites/ottilie/nsfw-missionary.png",
+      "image": "sprites/ottilie/nsfw-missionary.webp",
+      "clip": "sprites/ottilie/nsfw-missionary.mp4",
       "loop": true
     },
     {
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/ottilie/nsfw-doggy.png",
+      "image": "sprites/ottilie/nsfw-doggy.webp",
+      "clip": "sprites/ottilie/nsfw-doggy.mp4",
       "loop": true
     },
     {
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
-      "image": "sprites/ottilie/nsfw-cowgirl.png",
+      "image": "sprites/ottilie/nsfw-cowgirl.webp",
+      "clip": "sprites/ottilie/nsfw-cowgirl-2.mp4",
       "loop": true
     },
     {
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/ottilie/nsfw-creampie.png",
+      "image": "sprites/ottilie/nsfw-creampie.webp",
+      "clip": "sprites/ottilie/nsfw-creampie.mp4",
       "loop": true
     },
     {
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/ottilie/nsfw-facial.png",
+      "image": "sprites/ottilie/nsfw-facial.webp",
+      "clip": "sprites/ottilie/nsfw-facial.mp4",
       "loop": true
     },
     {
       "id": "pregnant-blowjob",
       "name": "Blowjob, pregnant",
       "description": "",
-      "image": "sprites/ottilie/nsfw-pregnant-blowjob-2.png",
+      "image": "sprites/ottilie/nsfw-pregnant-blowjob-2.webp",
       "loop": true
     },
     {
       "id": "pregnant-missionary",
       "name": "Missionary, pregnant",
       "description": "",
-      "image": "sprites/ottilie/nsfw-pregnant-missionary.png",
+      "image": "sprites/ottilie/nsfw-pregnant-missionary.webp",
       "loop": true
     },
     {
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
-      "image": "sprites/ottilie/nsfw-pregnant-doggy.png",
+      "image": "sprites/ottilie/nsfw-pregnant-doggy.webp",
       "loop": true
     },
     {
       "id": "pregnant-cowgirl",
       "name": "Cowgirl, pregnant",
       "description": "",
-      "image": "sprites/ottilie/nsfw-pregnant-cowgirl.png",
+      "image": "sprites/ottilie/nsfw-pregnant-cowgirl.webp",
       "loop": true
     },
     {
       "id": "pregnant-creampie",
       "name": "Creampie, pregnant",
       "description": "",
-      "image": "sprites/ottilie/nsfw-pregnant-creampie.png",
+      "image": "sprites/ottilie/nsfw-pregnant-creampie.webp",
       "loop": true
     }
   ],
@@ -331,8 +338,9 @@
     "name": "her flat above Petal & Pill",
     "description": "A bare, bright flat over the pharmacy: journals in stacks on the floor, one good chair, a very expensive coffee machine, a whiteboard where a picture should be, and a bed she treats as a place to read.",
     "locationId": "lantern-row",
-    "background": "generated/backgrounds/ottilie/view-5.png"
+    "background": "generated/backgrounds/ottilie/view-5.webp"
   },
+  "birthPicture": "sprites/ottilie/birth.png",
   "ai": {
     "speechPattern": "Precise, quick and unsentimental. Short declarative sentences and exact words. Asks direct questions, often clinical ones, and waits for the answer. Dry humour delivered with no change of expression.",
     "tone": "cool, exact, dry",

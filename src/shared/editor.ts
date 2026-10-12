@@ -56,6 +56,12 @@ export interface EditorResult {
 }
 
 /** Asks for a file to be picked and copied into a character's add-on folder. `loveInterestId` may be an NPC's id. */
+/** A picture of the content made smaller: the one it was made from, and the WebP it was made into. */
+export interface OptimizedPicture {
+  path: string
+  bytes: Uint8Array
+}
+
 export interface ImportAssetRequest {
   loveInterestId: string
   /** A picture, a video, or either of the two. */

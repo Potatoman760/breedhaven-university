@@ -18,6 +18,10 @@ export const ProposalSchema = z.object({
 })
 export type Proposal = z.infer<typeof ProposalSchema>
 
-/** A plan the player has accepted. It sits on the calendar until it is kept or passes. */
-export const AppointmentSchema = ProposalSchema.extend({ id: z.string() })
+/**
+ * A plan the player has accepted. It sits on the calendar until it is kept or passes. One of the kind `birth` was
+ * never proposed by anyone: the game sets it, for the hour a child of his is to be born, and missing it is no ordinary
+ * standing-up.
+ */
+export const AppointmentSchema = ProposalSchema.extend({ id: z.string(), kind: z.literal('birth').optional() })
 export type Appointment = z.infer<typeof AppointmentSchema>

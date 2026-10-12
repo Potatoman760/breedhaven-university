@@ -9,7 +9,8 @@
   "personality": "She carries herself with the still, assured calm of someone who has already decided she is the most interesting person in the room, and she is usually right. She is generous with her attention when she gives it and devastating when she withdraws it. She treats most social encounters as opportunities to study power dynamics, and she enjoys finding out what people want and making them say it.",
   "traitIds": [
     "flirtatious",
-    "competitive"
+    "competitive",
+    "dominant"
   ],
   "likes": [
     "books",
@@ -37,31 +38,31 @@
       "description": "a long black velvet coat over a low-cut black lace blouse, a layered black skirt with fisnet stockings, and a choker of woven black leather with a silver crescent moon pendant",
       "sprites": {
         "neutral": {
-          "image": "sprites/morwenna/default-neutral-2-cutout.png",
+          "image": "sprites/morwenna/default-neutral-2-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/morwenna/default-happy-2-cutout.png",
+          "image": "sprites/morwenna/default-happy-2-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/morwenna/default-sad-2-cutout.png",
+          "image": "sprites/morwenna/default-sad-2-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/morwenna/default-angry-cutout.png",
+          "image": "sprites/morwenna/default-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/morwenna/default-surprised-4-cutout.png",
+          "image": "sprites/morwenna/default-surprised-4-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/morwenna/default-embarrassed-cutout.png",
+          "image": "sprites/morwenna/default-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/morwenna/default-aroused-cutout.png",
+          "image": "sprites/morwenna/default-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -74,31 +75,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/morwenna/pregnant-neutral-cutout.png",
+          "image": "sprites/morwenna/pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/morwenna/pregnant-happy-cutout.png",
+          "image": "sprites/morwenna/pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/morwenna/pregnant-sad-cutout.png",
+          "image": "sprites/morwenna/pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/morwenna/pregnant-angry-cutout.png",
+          "image": "sprites/morwenna/pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/morwenna/pregnant-surprised-cutout.png",
+          "image": "sprites/morwenna/pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/morwenna/pregnant-embarrassed-cutout.png",
+          "image": "sprites/morwenna/pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/morwenna/pregnant-aroused-cutout.png",
+          "image": "sprites/morwenna/pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -110,31 +111,31 @@
       "description": "nothing at all, completely nude, and a choker of woven black leather with a silver crescent moon pendant",
       "sprites": {
         "neutral": {
-          "image": "sprites/morwenna/nude-neutral-4-cutout.png",
+          "image": "sprites/morwenna/nude-neutral-4-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/morwenna/nude-happy-3-cutout.png",
+          "image": "sprites/morwenna/nude-happy-3-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/morwenna/nude-sad-cutout.png",
+          "image": "sprites/morwenna/nude-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/morwenna/nude-angry-cutout.png",
+          "image": "sprites/morwenna/nude-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/morwenna/nude-surprised-cutout.png",
+          "image": "sprites/morwenna/nude-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/morwenna/nude-embarrassed-cutout.png",
+          "image": "sprites/morwenna/nude-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/morwenna/nude-aroused-cutout.png",
+          "image": "sprites/morwenna/nude-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -147,31 +148,31 @@
       "inherits": "nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/morwenna/nude-pregnant-neutral-2-cutout.png",
+          "image": "sprites/morwenna/nude-pregnant-neutral-2-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/morwenna/nude-pregnant-happy-cutout.png",
+          "image": "sprites/morwenna/nude-pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/morwenna/nude-pregnant-sad-cutout.png",
+          "image": "sprites/morwenna/nude-pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/morwenna/nude-pregnant-angry-2-cutout.png",
+          "image": "sprites/morwenna/nude-pregnant-angry-2-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/morwenna/nude-pregnant-surprised-cutout.png",
+          "image": "sprites/morwenna/nude-pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/morwenna/nude-pregnant-embarrassed-cutout.png",
+          "image": "sprites/morwenna/nude-pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/morwenna/nude-pregnant-aroused-cutout.png",
+          "image": "sprites/morwenna/nude-pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -198,70 +199,76 @@
       "id": "blowjob",
       "name": "Blowjob",
       "description": "",
-      "image": "sprites/morwenna/nsfw-blowjob-7.png",
+      "image": "sprites/morwenna/nsfw-blowjob-7.webp",
+      "clip": "sprites/morwenna/nsfw-blowjob.mp4",
       "loop": true
     },
     {
       "id": "missionary",
       "name": "Missionary",
       "description": "",
-      "image": "sprites/morwenna/nsfw-missionary.png",
+      "image": "sprites/morwenna/nsfw-missionary.webp",
+      "clip": "sprites/morwenna/nsfw-missionary.mp4",
       "loop": true
     },
     {
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/morwenna/nsfw-doggy-2.png",
+      "image": "sprites/morwenna/nsfw-doggy-2.webp",
+      "clip": "sprites/morwenna/nsfw-doggy.mp4",
       "loop": true
     },
     {
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
-      "image": "sprites/morwenna/nsfw-cowgirl.png",
+      "image": "sprites/morwenna/nsfw-cowgirl.webp",
+      "clip": "sprites/morwenna/nsfw-cowgirl-2.mp4",
       "loop": true
     },
     {
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/morwenna/nsfw-creampie.png",
+      "image": "sprites/morwenna/nsfw-creampie.webp",
+      "clip": "sprites/morwenna/nsfw-creampie.mp4",
       "loop": true
     },
     {
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/morwenna/nsfw-facial.png",
+      "image": "sprites/morwenna/nsfw-facial.webp",
+      "clip": "sprites/morwenna/nsfw-facial.mp4",
       "loop": true
     },
     {
       "id": "pregnant-missionary",
       "name": "Missionary, pregnant",
       "description": "",
-      "image": "sprites/morwenna/nsfw-pregnant-missionary.png",
+      "image": "sprites/morwenna/nsfw-pregnant-missionary.webp",
       "loop": true
     },
     {
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
-      "image": "sprites/morwenna/nsfw-pregnant-doggy-2.png",
+      "image": "sprites/morwenna/nsfw-pregnant-doggy-2.webp",
       "loop": true
     },
     {
       "id": "pregnant-cowgirl",
       "name": "Cowgirl, pregnant",
       "description": "",
-      "image": "sprites/morwenna/nsfw-pregnant-cowgirl.png",
+      "image": "sprites/morwenna/nsfw-pregnant-cowgirl.webp",
       "loop": true
     },
     {
       "id": "pregnant-creampie",
       "name": "Creampie, pregnant",
       "description": "",
-      "image": "sprites/morwenna/nsfw-pregnant-creampie.png",
+      "image": "sprites/morwenna/nsfw-pregnant-creampie.webp",
       "loop": true
     }
   ],
@@ -319,8 +326,9 @@
     "name": "a candlelit flat above the Honeyed Bee",
     "description": "A narrow top-floor flat with a flat white ceiling, its single window draped in black lace that turns the daylight violet. Bookshelves line every wall from floor to ceiling, crammed with annotated paperbacks and leather-bound theses, their spines cracked and bristling with bookmark ribbons. A low iron-framed bed sits in the corner under a dark velvet quilt, and a round table by the window holds a teapot, a stack of essays, and a cluster of black candles in silver holders. The air smells of dried lavender, old paper, and something faintly like incense.",
     "locationId": "honeyed-bee-inn",
-    "background": "generated/backgrounds/morwenna/view-2.png"
+    "background": "generated/backgrounds/morwenna/view-2.webp"
   },
+  "birthPicture": "sprites/morwenna/birth.png",
   "ai": {
     "speechPattern": "She speaks in low, measured cadences with deliberate pauses, as though every sentence has been edited before it leaves her mouth. Her vocabulary is precise and slightly archaic, favoring words like 'exquisite' and 'intolerable,' and she tends to reframe questions as observations about the person asking them.",
     "tone": "Imperious, teasing, languid",

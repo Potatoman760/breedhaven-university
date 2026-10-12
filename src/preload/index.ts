@@ -38,22 +38,35 @@ const api: RendererApi = {
     saveEvent: (event) => ipcRenderer.invoke(IPC.editorSaveEvent, event),
     deleteEvent: (id) => ipcRenderer.invoke(IPC.editorDeleteEvent, id),
     draftEvents: () => ipcRenderer.invoke(IPC.editorDraftEvents),
+    saveJob: (job) => ipcRenderer.invoke(IPC.editorSaveJob, job),
+    deleteJob: (id) => ipcRenderer.invoke(IPC.editorDeleteJob, id),
     savePlayer: (newGame) => ipcRenderer.invoke(IPC.editorSavePlayer, newGame),
     resetPlayer: () => ipcRenderer.invoke(IPC.editorResetPlayer),
     writeCourseWording: (courses) => ipcRenderer.invoke(IPC.editorWriteCourseWording, courses),
     importAsset: (request) => ipcRenderer.invoke(IPC.editorImportAsset, request),
+    readPicture: (path) => ipcRenderer.invoke(IPC.editorReadPicture, path),
+    saveOptimized: (picture) => ipcRenderer.invoke(IPC.editorSaveOptimized, picture),
     openFolder: () => ipcRenderer.invoke(IPC.editorOpenFolder)
   },
   comfy: {
     getSettings: () => ipcRenderer.invoke(IPC.comfyGetSettings),
     saveSettings: (settings) => ipcRenderer.invoke(IPC.comfySaveSettings, settings),
     test: (baseUrl) => ipcRenderer.invoke(IPC.comfyTest, baseUrl),
-    chooseFolder: () => ipcRenderer.invoke(IPC.comfyChooseFolder),
     workflows: () => ipcRenderer.invoke(IPC.comfyWorkflows),
     bundle: () => ipcRenderer.invoke(IPC.comfyBundle),
-    installBundle: () => ipcRenderer.invoke(IPC.comfyBundleInstall),
     checkBundle: () => ipcRenderer.invoke(IPC.comfyBundleCheck),
+    downloads: () => ipcRenderer.invoke(IPC.comfyDownloads),
+    chooseModelsDir: () => ipcRenderer.invoke(IPC.comfyChooseModelsDir),
+    setCivitaiKey: (key) => ipcRenderer.invoke(IPC.comfySetCivitaiKey, key),
+    downloadModel: (file) => ipcRenderer.invoke(IPC.comfyDownloadModel, file),
+    cancelDownload: () => ipcRenderer.invoke(IPC.comfyCancelDownload),
+    onDownloadProgress: (listener) => {
+      const heard = (_event: unknown, progress: Parameters<typeof listener>[0]) => listener(progress)
+      ipcRenderer.on(IPC.comfyDownloadProgress, heard)
+      return () => ipcRenderer.removeListener(IPC.comfyDownloadProgress, heard)
+    },
     generate: (request) => ipcRenderer.invoke(IPC.comfyGenerate, request),
+    generateVideo: (request) => ipcRenderer.invoke(IPC.comfyGenerateVideo, request),
     cancel: () => ipcRenderer.invoke(IPC.comfyCancel),
     cutout: (request) => ipcRenderer.invoke(IPC.comfyCutout, request)
   }

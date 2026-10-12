@@ -11,6 +11,8 @@ export type MapPin = z.infer<typeof MapPinSchema>
 /** A labelled area drawn behind the pins, e.g. "Campus". Position and size are percentages. */
 export const MapRegionSchema = z.object({
   name: z.string(),
+  /** A picture of it, by its path inside the content pack: shown faded behind the places in it. */
+  image: z.string().optional(),
   x: z.number().min(0).max(100),
   y: z.number().min(0).max(100),
   w: z.number().min(0).max(100),

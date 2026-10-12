@@ -3,7 +3,7 @@ import { CourseworkConfigSchema, type ContentPack, type Course, type CourseMeeti
 import { canPerform } from './activities'
 import { attend, canAttend, canEnrol, classmates, classSoon, courseMatches, coursesClash, coursesInSession, describeMeetings, enrolledCourses } from './courses'
 import { buildCharacterPrompt } from './prompt'
-import { approachableAt, inClassApart, locationOf, loveInterestsAt } from './map'
+import { approachableAt, inClass, locationOf, loveInterestsAt } from './map'
 import { createInitialState } from './state'
 import { fixture } from './testFixture'
 
@@ -93,10 +93,12 @@ describe('classes in session', () => {
     expect(coursesInSession(content, { ...start(), time: 5 }).map((c) => c.number)).toEqual([])
   })
 
-  it('lets shared activities happen with a classmate found in class', () => {
+  it('keeps shared activities from happening with someone who is in class, even a classmate', () => {
     const friends = { ...start(), relationships: { ...start().relationships, bea: { affection: 30, trust: 0, desire: 0 } } }
     const date = content.activities.find((a) => a.id === 'date')!
-    expect(canPerform(date, friends, content, 'bea').ok).toBe(true)
+    expect(canPerform(date, friends, content, 'bea').reasons).toEqual([`${content.loveInterests[1].name} is in class`])
+    // Already in a scene with her, as when he sits the class, nothing stands in the way.
+    expect(canPerform(date, friends, content, 'bea', true).ok).toBe(true)
   })
 })
 
@@ -252,16 +254,17 @@ describe('searching the catalogue', () => {
   })
 })
 
-describe('someone in a class he does not take', () => {
-  it('is at the place but not to be gone up to, unless he takes it with her or she is waiting for him', () => {
+describe('someone in class', () => {
+  it('is at the place but not to be gone up to, whether or not he takes it, unless she is waiting for him', () => {
     const bea = content.loveInterests[1]
-    // POL 101 is on, and Bea is in it at the shop.
-    expect(inClassApart(content, start(['pol']), bea)).toBe(false)
-    expect(approachableAt(content, start(['pol']), 'shop').map((li) => li.id)).toEqual(['bea'])
+    // POL 101 is on, and Bea is in it at the shop. Taking it too does not let him walk up to her: he has to sit it.
+    expect(inClass(content, start(['pol']), bea)).toBe(true)
+    expect(approachableAt(content, start(['pol']), 'shop')).toEqual([])
+    expect(classmates({ ...start(['pol']), relationships: { bea: { affection: 0, trust: 0, desire: 0 } } }, pol)).toEqual(['bea'])
 
     const elsewhere = start(['his'])
     expect(loveInterestsAt(content, elsewhere, 'shop').map((li) => li.id)).toEqual(['bea'])
-    expect(inClassApart(content, elsewhere, bea)).toBe(true)
+    expect(inClass(content, elsewhere, bea)).toBe(true)
     expect(approachableAt(content, elsewhere, 'shop')).toEqual([])
     expect(approachableAt(content, start([]), 'shop')).toEqual([])
 
@@ -269,7 +272,8 @@ describe('someone in a class he does not take', () => {
     const waiting = { ...elsewhere, appointments: [{ id: 'plan-1', loveInterestId: 'bea', companionIds: [], title: 'Tea', time: 0, hours: 1, locationId: 'shop' }] }
     expect(approachableAt(content, waiting, 'shop').map((li) => li.id)).toEqual(['bea'])
     // Once the class is over she is like anyone else.
-    expect(inClassApart(content, { ...elsewhere, time: 1 }, bea)).toBe(false)
+    expect(inClass(content, waiting, bea)).toBe(false)
+    expect(inClass(content, { ...elsewhere, time: 1 }, bea)).toBe(false)
   })
 })
 

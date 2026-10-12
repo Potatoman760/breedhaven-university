@@ -35,31 +35,31 @@
       "description": "a dark midnight-blue satin fantasy gown with a sleek, sensual, draped silhouette. The bodice has an extremely deep plunging V-neckline, descending to her navel, with narrow fabric panels wrapping around the bust. Two thin halter-like shoulder straps rise from the bodice and are secured near the collarbones with matching round antique-gold brooches set with red gemstones. The shoulders remain bare. Long loose draped sleeves begin below the shoulders and hang fluidly around the arms, creating a soft off-shoulder appearance. The skirt is asymmetrically gathered at one hip with a third gold-and-red jeweled brooch. A very high thigh slit opens along one side. The fabric is smooth, glossy, lightweight silk, with dramatic folds and subtle blue highlights against an almost-black navy base. Fixed design rules: midnight-blue satin, plunging V bodice, bare shoulders, thin shoulder straps, two gold/red collarbone brooches, long detached draped sleeves, matching hip brooch, single high thigh slit, floor-length asymmetric skirt",
       "sprites": {
         "happy": {
-          "image": "sprites/faye/default-happy-2-cutout.png",
+          "image": "sprites/faye/default-happy-2-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/faye/default-sad-cutout.png",
+          "image": "sprites/faye/default-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/faye/default-angry-cutout.png",
+          "image": "sprites/faye/default-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/faye/default-surprised-2-cutout.png",
+          "image": "sprites/faye/default-surprised-2-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/faye/default-embarrassed-cutout.png",
+          "image": "sprites/faye/default-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/faye/default-aroused-cutout.png",
+          "image": "sprites/faye/default-aroused-cutout.webp",
           "description": ""
         },
         "neutral": {
-          "image": "sprites/faye/default-neutral-cutout-2.png",
+          "image": "sprites/faye/default-neutral-cutout-2.webp",
           "description": ""
         }
       },
@@ -72,31 +72,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/faye/pregnant-neutral-cutout.png",
+          "image": "sprites/faye/pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/faye/pregnant-happy-2-cutout.png",
+          "image": "sprites/faye/pregnant-happy-2-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/faye/pregnant-sad-cutout.png",
+          "image": "sprites/faye/pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/faye/pregnant-angry-cutout.png",
+          "image": "sprites/faye/pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/faye/pregnant-surprised-2-cutout.png",
+          "image": "sprites/faye/pregnant-surprised-2-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/faye/pregnant-embarrassed-cutout.png",
+          "image": "sprites/faye/pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/faye/pregnant-aroused-cutout.png",
+          "image": "sprites/faye/pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -108,31 +108,31 @@
       "description": "nothing at all, completely nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/faye/nude-neutral-cutout.png",
+          "image": "sprites/faye/nude-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/faye/nude-happy-cutout.png",
+          "image": "sprites/faye/nude-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/faye/nude-sad-cutout.png",
+          "image": "sprites/faye/nude-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/faye/nude-angry-cutout.png",
+          "image": "sprites/faye/nude-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/faye/nude-surprised-cutout.png",
+          "image": "sprites/faye/nude-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/faye/nude-embarrassed-cutout.png",
+          "image": "sprites/faye/nude-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/faye/nude-aroused-cutout.png",
+          "image": "sprites/faye/nude-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -145,31 +145,31 @@
       "inherits": "nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/faye/nude-pregnant-neutral-cutout.png",
+          "image": "sprites/faye/nude-pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/faye/nude-pregnant-happy-cutout.png",
+          "image": "sprites/faye/nude-pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/faye/nude-pregnant-sad-cutout.png",
+          "image": "sprites/faye/nude-pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/faye/nude-pregnant-angry-cutout.png",
+          "image": "sprites/faye/nude-pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/faye/nude-pregnant-surprised-cutout.png",
+          "image": "sprites/faye/nude-pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/faye/nude-pregnant-embarrassed-cutout.png",
+          "image": "sprites/faye/nude-pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/faye/nude-pregnant-aroused-cutout.png",
+          "image": "sprites/faye/nude-pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -194,84 +194,91 @@
       "id": "blowjob",
       "name": "Blowjob",
       "description": "",
-      "image": "sprites/faye/nsfw-blowjob.png",
+      "image": "sprites/faye/nsfw-blowjob.webp",
+      "clip": "sprites/faye/nsfw-blowjob.mp4",
       "loop": true
     },
     {
       "id": "missionary",
       "name": "Missionary",
       "description": "",
-      "image": "sprites/faye/nsfw-missionary.png",
+      "image": "sprites/faye/nsfw-missionary.webp",
+      "clip": "sprites/faye/nsfw-missionary.mp4",
       "loop": true
     },
     {
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/faye/nsfw-doggy.png",
+      "image": "sprites/faye/nsfw-doggy.webp",
+      "clip": "sprites/faye/nsfw-doggy.mp4",
       "loop": true
     },
     {
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
-      "image": "sprites/faye/nsfw-cowgirl.png",
+      "image": "sprites/faye/nsfw-cowgirl.webp",
+      "clip": "sprites/faye/nsfw-cowgirl-2.mp4",
       "loop": true
     },
     {
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/faye/nsfw-creampie.png",
+      "image": "sprites/faye/nsfw-creampie.webp",
+      "clip": "sprites/faye/nsfw-creampie.mp4",
       "loop": true
     },
     {
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/faye/nsfw-facial.png",
+      "image": "sprites/faye/nsfw-facial.webp",
+      "clip": "sprites/faye/nsfw-facial.mp4",
       "loop": true
     },
     {
       "id": "pregnant-blowjob",
       "name": "Blowjob, pregnant",
       "description": "",
-      "image": "sprites/faye/nsfw-pregnant-blowjob.png",
+      "image": "sprites/faye/nsfw-pregnant-blowjob.webp",
       "loop": true
     },
     {
       "id": "pregnant-missionary",
       "name": "Missionary, pregnant",
       "description": "",
-      "image": "sprites/faye/nsfw-pregnant-missionary.png",
+      "image": "sprites/faye/nsfw-pregnant-missionary.webp",
+      "clip": "sprites/faye/minimax-h3-00093-audio.mp4",
       "loop": true
     },
     {
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
-      "image": "sprites/faye/nsfw-pregnant-doggy.png",
+      "image": "sprites/faye/nsfw-pregnant-doggy.webp",
       "loop": true
     },
     {
       "id": "pregnant-cowgirl",
       "name": "Cowgirl, pregnant",
       "description": "",
-      "image": "sprites/faye/nsfw-pregnant-cowgirl.png",
+      "image": "sprites/faye/nsfw-pregnant-cowgirl.webp",
       "loop": true
     },
     {
       "id": "pregnant-creampie",
       "name": "Creampie, pregnant",
       "description": "",
-      "image": "sprites/faye/nsfw-pregnant-creampie.png",
+      "image": "sprites/faye/nsfw-pregnant-creampie.webp",
       "loop": true
     },
     {
       "id": "pregnant-facial",
       "name": "Facial, pregnant",
       "description": "",
-      "image": "sprites/faye/nsfw-pregnant-facial.png",
+      "image": "sprites/faye/nsfw-pregnant-facial.webp",
       "loop": true
     }
   ],
@@ -324,8 +331,9 @@
     "name": "a flat over a boutique on Lantern Row",
     "description": "a bedroom with silk hangings, a dressing table crowded with bottles, a computer with a second monitor running market feeds, a small licensed still for her tonics, a small cauldron, and gold on market scales. The bed is lavish and feminine",
     "locationId": "lantern-row",
-    "background": "generated/backgrounds/faye/view.png"
+    "background": "generated/backgrounds/faye/view.webp"
   },
+  "birthPicture": "sprites/faye/birth.png",
   "ai": {
     "speechPattern": "Calculating, yet always sultry and seductive. Knows she is desirable and uses that confidence to her advantage, even while discussing business.",
     "tone": "sultry, sharp, amused",

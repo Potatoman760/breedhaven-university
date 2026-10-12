@@ -1,0 +1,42 @@
+appId: com.arkanedigital.breedhaven
+productName: Breedhaven Dating Sim
+# The logo made small: build/icon.png for macOS and Linux, and build/icon.ico for Windows, whose smallest sizes show only the flower.
+icon: build/icon.png
+artifactName: ${productName}-${version}-${os}-${arch}.${ext}
+
+directories:
+  output: dist
+
+# Only the built code goes in the app archive.
+files:
+  - out/**
+  - "!out/prompt-samples/**"
+  - package.json
+
+# The content pack stays as loose files; the main process reads it from process.resourcesPath.
+extraResources:
+  - from: content
+    to: content
+
+win:
+  # A zip of the app folder: unzip anywhere and run the .exe. No installer, and none of an installer's 2 GB limit.
+  # For an installer instead: npm run build:win:installer
+  target: zip
+  icon: build/icon.ico
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+
+mac:
+  target: dmg
+  category: public.app-category.games
+  # Signed with the Developer ID certificate and notarized when electron-builder.env
+  # (see electron-builder.env.example) has the Apple credentials; unsigned without it.
+  hardenedRuntime: true
+
+linux:
+  target:
+    - AppImage
+    - tar.gz
+  category: Game

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { HousingStateSchema } from './housing'
 import { RoomSchema } from './loveInterest'
 import { AppointmentSchema } from './appointment'
 import { CalendarEventSchema } from './calendar'
@@ -31,11 +32,20 @@ export const RelationshipStateSchema = z.object({
 })
 export type RelationshipState = z.infer<typeof RelationshipStateSchema>
 
+/**
+ * How much a memory matters to the one who keeps it, most first. A core memory is one that defines what she and the
+ * player are to each other; a fleeting one is soon gone. It decides which of her memories she is told in a scene.
+ */
+export const MEMORY_LEVELS = ['core', 'normal', 'fleeting'] as const
+export type MemoryLevel = (typeof MEMORY_LEVELS)[number]
+export const MEMORY_LEVEL_LABELS: Record<MemoryLevel, string> = { core: 'Core', normal: 'Normal', fleeting: 'Fleeting' }
+
 /** What a love interest retains of one scene: a short summary, not the transcript. */
 export const MemorySchema = z.object({
   /** Game time (hours since start) at which the scene ended. */
   time: z.number().int().min(0),
-  summary: z.string()
+  summary: z.string(),
+  level: z.enum(MEMORY_LEVELS).default('normal')
 })
 export type Memory = z.infer<typeof MemorySchema>
 
@@ -123,7 +133,9 @@ export const GameStateSchema = z.object({
   /** The last day on which the drama engine had someone turn up in a scene. */
   dramaDay: z.number().int(),
   /** Calendar events generated during this playthrough, on top of the authored ones. */
-  events: z.array(CalendarEventSchema)
+  events: z.array(CalendarEventSchema),
+  /** How things stand with the house the Sire Relations Office lets him, if it has come to that. */
+  housing: HousingStateSchema.prefault({})
 })
 export type GameState = z.infer<typeof GameStateSchema>
 

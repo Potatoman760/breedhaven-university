@@ -11,6 +11,13 @@ import type { ComfyTestResult } from '../../shared/comfy'
 const CLIENT_ID = randomUUID()
 // Bigger than any picture a workflow should produce.
 const MAX_IMAGE_BYTES = 32 * 1024 * 1024
+// And than any clip: a few seconds of video, not a film.
+const MAX_VIDEO_BYTES = 512 * 1024 * 1024
+// What a clip's file is called. A video node hands back its preview picture as well, which is not the clip.
+const VIDEO_FILE = /\.(mp4|webm)$/i
+// Where a run's files are listed, by what made them: pictures under `images`, and a video node's clip under one of the others.
+const IMAGE_LISTS = ['images'] as const
+const VIDEO_LISTS = ['gifs', 'videos', 'video', 'images'] as const
 // A mistyped host must cost ten seconds, not the whole timeout.
 const FIRST_CALL_MS = 10_000
 const POLL_RUNNING_MS = 500
@@ -93,21 +100,23 @@ async function submitPrompt(baseUrl: string, prompt: Record<string, unknown>, si
   }
 }
 
-/** Prefers the bound node's pictures, but takes any the run made rather than none. */
-function collectImages(outputs: unknown, outputNode: string | null): ComfyImageRef[] {
+/** Prefers the bound node's pictures, but takes any the run made rather than none. Asked for a clip, only files that are one. */
+function collectImages(outputs: unknown, outputNode: string | null, video: boolean): ComfyImageRef[] {
   if (typeof outputs !== 'object' || outputs === null) return []
   const record = outputs as Record<string, unknown>
-  const from = (value: unknown): ComfyImageRef[] => {
-    const images = (value as { images?: unknown } | null)?.images
-    if (!Array.isArray(images)) return []
-    return images
+  const from = (value: unknown): ComfyImageRef[] =>
+    (video ? VIDEO_LISTS : IMAGE_LISTS)
+      .flatMap((list) => {
+        const files = (value as Record<string, unknown> | null)?.[list]
+        return Array.isArray(files) ? files : []
+      })
       .filter((one): one is Record<string, unknown> => typeof one === 'object' && one !== null && typeof one['filename'] === 'string')
+      .filter((one) => !video || VIDEO_FILE.test(one['filename'] as string))
       .map((one) => ({
         filename: one['filename'] as string,
         subfolder: typeof one['subfolder'] === 'string' ? one['subfolder'] : '',
         type: typeof one['type'] === 'string' ? one['type'] : 'output'
       }))
-  }
   const preferred = outputNode !== null ? from(record[outputNode]) : []
   return preferred.length > 0 ? preferred : Object.values(record).flatMap(from)
 }
@@ -128,6 +137,7 @@ async function readHistory(
   baseUrl: string,
   promptId: string,
   outputNode: string | null,
+  video: boolean,
   signal: AbortSignal
 ): Promise<{ done: boolean; images: ComfyImageRef[]; error: string | null }> {
   const idle = { done: false, images: [], error: null }
@@ -142,7 +152,7 @@ async function readHistory(
   }
   const entry = (body as Record<string, unknown> | null)?.[promptId] as { outputs?: unknown; status?: { status_str?: unknown; completed?: unknown; messages?: unknown } } | undefined
   if (typeof entry !== 'object' || entry === null) return idle
-  const images = collectImages(entry.outputs, outputNode)
+  const images = collectImages(entry.outputs, outputNode, video)
   const failed = entry.status?.status_str === 'error'
   if (!failed && images.length === 0 && entry.status?.completed !== true) return idle
   return { done: true, images, error: failed ? executionError(entry.status?.messages) : null }
@@ -160,12 +170,12 @@ async function isQueued(baseUrl: string, promptId: string, signal: AbortSignal):
   }
 }
 
-/** Fetches one picture, giving up past a size no workflow should reach. */
-async function fetchImage(baseUrl: string, ref: ComfyImageRef, signal: AbortSignal): Promise<{ bytes: Buffer | null; message: string }> {
+/** Fetches one picture or clip, giving up past a size no workflow should reach. */
+async function fetchImage(baseUrl: string, ref: ComfyImageRef, limit: number, signal: AbortSignal): Promise<{ bytes: Buffer | null; message: string }> {
   const query = new URLSearchParams({ filename: ref.filename, subfolder: ref.subfolder, type: ref.type })
   try {
     const response = await fetch(`${baseUrl}/view?${query.toString()}`, { signal })
-    if (!response.ok || !response.body) return { bytes: null, message: `Could not fetch the picture (${response.status}).` }
+    if (!response.ok || !response.body) return { bytes: null, message: `Could not fetch what ComfyUI made (${response.status}).` }
     // Read in pieces: a wrong port pointed at something that never stops sending must not take the app's memory with it.
     const reader = response.body.getReader()
     const chunks: Uint8Array[] = []
@@ -174,15 +184,35 @@ async function fetchImage(baseUrl: string, ref: ComfyImageRef, signal: AbortSign
       const { done, value } = await reader.read()
       if (done) break
       total += value.byteLength
-      if (total > MAX_IMAGE_BYTES) {
+      if (total > limit) {
         await reader.cancel().catch(() => {})
-        return { bytes: null, message: 'That picture is larger than the app will accept.' }
+        return { bytes: null, message: 'That file is larger than the app will accept.' }
       }
       chunks.push(value)
     }
     return { bytes: Buffer.concat(chunks), message: '' }
   } catch (cause) {
     return { bytes: null, message: describe(cause, baseUrl) }
+  }
+}
+
+/**
+ * Hands ComfyUI a picture to load, as a workflow's Load Image node would be given one, and says what it is filed
+ * under there. One of the same name is replaced, so that the pictures clips are made from do not pile up.
+ */
+export async function uploadImage(baseUrl: string, bytes: Buffer, filename: string, signal?: AbortSignal): Promise<{ name: string | null; message: string }> {
+  const form = new FormData()
+  form.append('image', new Blob([new Uint8Array(bytes)]), filename)
+  form.append('overwrite', 'true')
+  const deadline = AbortSignal.timeout(FIRST_CALL_MS * 3)
+  try {
+    const response = await fetch(`${baseUrl}/upload/image`, { method: 'POST', body: form, signal: signal ? AbortSignal.any([signal, deadline]) : deadline })
+    if (!response.ok) return { name: null, message: `ComfyUI would not take the picture (${response.status} ${response.statusText}).` }
+    const body = (await response.json().catch(() => null)) as { name?: unknown; subfolder?: unknown } | null
+    if (typeof body?.name !== 'string' || body.name === '') return { name: null, message: 'ComfyUI took the picture but did not say what it called it.' }
+    return { name: typeof body.subfolder === 'string' && body.subfolder !== '' ? `${body.subfolder}/${body.name}` : body.name, message: '' }
+  } catch (cause) {
+    return { name: null, message: signal?.aborted ? 'Cancelled.' : describe(cause, baseUrl) }
   }
 }
 
@@ -217,6 +247,8 @@ export interface GenerateRequest {
   prompt: Record<string, unknown>
   /** Whose pictures to collect. Null takes any the run produced. */
   outputNode: string | null
+  /** What the run is for. A clip is looked for where a video node lists what it saved, and only an .mp4 or .webm is taken. */
+  wants?: 'image' | 'video'
   timeoutMs: number
   /** Aborted when the user cancels. */
   cancel?: AbortSignal
@@ -226,12 +258,15 @@ export interface GenerateResult {
   ok: boolean
   message: string
   bytes: Buffer | null
+  /** What kind of file it is, by its ending: `png`, `mp4`. */
+  extension: string | null
 }
 
-/** One generation: queue the workflow, wait until `/history` says it is over, fetch the first picture. */
+/** One generation: queue the workflow, wait until `/history` says it is over, fetch the first picture or clip. */
 export async function generateImage(request: GenerateRequest): Promise<GenerateResult> {
   const { baseUrl } = request
-  const failed = (message: string): GenerateResult => ({ ok: false, message, bytes: null })
+  const failed = (message: string): GenerateResult => ({ ok: false, message, bytes: null, extension: null })
+  const video = request.wants === 'video'
   const deadline = AbortSignal.timeout(request.timeoutMs)
   const signal = request.cancel ? AbortSignal.any([deadline, request.cancel]) : deadline
 
@@ -247,14 +282,19 @@ export async function generateImage(request: GenerateRequest): Promise<GenerateR
           : `ComfyUI did not finish within ${Math.round(request.timeoutMs / 1000)} seconds, so the job was cancelled. Nothing was saved.`
       )
     }
-    const history = await readHistory(baseUrl, submitted.promptId, request.outputNode, signal)
+    const history = await readHistory(baseUrl, submitted.promptId, request.outputNode, video, signal)
     if (history.done) {
       if (history.error) return failed(history.error)
       if (history.images.length === 0) {
-        return failed('The workflow ran but saved no picture. It probably has no SaveImage node: add one in ComfyUI and export it again.')
+        return failed(
+          video
+            ? 'The workflow ran but saved no .mp4 or .webm clip. It needs a node that saves the video in one of those formats: add one in ComfyUI and export it again.'
+            : 'The workflow ran but saved no picture. It probably has no SaveImage node: add one in ComfyUI and export it again.'
+        )
       }
-      const image = await fetchImage(baseUrl, history.images[0], signal)
-      return image.bytes ? { ok: true, message: '', bytes: image.bytes } : failed(image.message)
+      const made = history.images[0]
+      const image = await fetchImage(baseUrl, made, video ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES, signal)
+      return image.bytes ? { ok: true, message: '', bytes: image.bytes, extension: /\.([a-z0-9]+)$/i.exec(made.filename)?.[1].toLowerCase() ?? null } : failed(image.message)
     }
     await delay((await isQueued(baseUrl, submitted.promptId, signal)) ? POLL_QUEUED_MS : POLL_RUNNING_MS, signal)
   }

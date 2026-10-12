@@ -75,8 +75,8 @@ const ATTENDING_TAG = /\[\s*ATTENDING\s*:\s*([^\]]*?)\s*\]/gi
 export const SEEDED_TAG = '[SEEDED]'
 const SEEDED = /\[\s*SEEDED\s*(?::\s*([^\]]*?)\s*)?\]/gi
 
-// [POSE: id] is the tag for an NSFW pose; [ANIMATION: id] is its older name, still read.
-const LOOK_TAG = /\[\s*(OUTFIT|EXPRESSION|ANIMATION|POSE)\s*:\s*([^\]]*?)\s*\]/gi
+// [SEX-ACT: id] is the tag for an NSFW sex-act; [POSE: id] and [ANIMATION: id] are its older names, still read.
+const LOOK_TAG = /\[\s*(OUTFIT|EXPRESSION|ANIMATION|POSE|SEX[\s_-]?ACT)\s*:\s*([^\]]*?)\s*\]/gi
 
 // [COMFORT: 3 he keeps asking] or, in a group, [COMFORT: Anwen=2 they are kissing in front of her].
 const COMFORT_TAG = /\[\s*COMFORT\s*:\s*([^\]]*?)\s*\]/gi
@@ -119,7 +119,7 @@ export function parseDirectives(written: string): Directives {
       theirs[field] = value
     } else if (field) look[field] = value
     else {
-      // A pose is one character's, and in a group the tag says whose: [POSE: Faye=missionary].
+      // A sex-act is one character's, and in a group the tag says whose: [SEX-ACT: Faye=missionary].
       look.animationId = ['none', 'off', 'stop', ''].includes(value.toLowerCase()) ? null : value
       look.animationOf = who && look.animationId !== null ? who : undefined
     }

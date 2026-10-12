@@ -15,7 +15,7 @@
       "description": "chef's whites with the sleeves rolled to the elbow, a striped apron, a white cap, a tea towel over one shoulder",
       "sprites": {
         "neutral": {
-          "image": "sprites/dorrit/default-neutral-cutout.png",
+          "image": "sprites/dorrit/default-neutral-cutout.webp",
           "description": ""
         }
       },

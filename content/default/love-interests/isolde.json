@@ -9,7 +9,8 @@
   "personality": "Isolde is very professional, but flirts constantly, in innuendo. Her face never betrays what she's thinking.",
   "traitIds": [
     "flirtatious",
-    "dirty-talk"
+    "dirty-talk",
+    "bookish"
   ],
   "likes": [
     "ledgers",
@@ -35,31 +36,31 @@
       "description": "a beautifully tailored slate-green estate-manager's long coat, shaped closely at the waist with narrow lapels and small antique-brass buttons, over an ivory silk blouse with a neat modest V neckline. A long flowing charcoal skirt. Delicate thin silver oval spectacles worn on her face, flattering and professional",
       "sprites": {
         "neutral": {
-          "image": "sprites/isolde/default-neutral-cutout.png",
+          "image": "sprites/isolde/default-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/isolde/default-happy-cutout.png",
+          "image": "sprites/isolde/default-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/isolde/default-sad-cutout.png",
+          "image": "sprites/isolde/default-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/isolde/default-angry-cutout.png",
+          "image": "sprites/isolde/default-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/isolde/default-surprised-cutout.png",
+          "image": "sprites/isolde/default-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/isolde/default-embarrassed-cutout.png",
+          "image": "sprites/isolde/default-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/isolde/default-aroused-cutout.png",
+          "image": "sprites/isolde/default-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -72,31 +73,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/isolde/pregnant-neutral-cutout.png",
+          "image": "sprites/isolde/pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/isolde/pregnant-happy-cutout.png",
+          "image": "sprites/isolde/pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/isolde/pregnant-sad-cutout.png",
+          "image": "sprites/isolde/pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/isolde/pregnant-angry-cutout.png",
+          "image": "sprites/isolde/pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/isolde/pregnant-surprised-cutout.png",
+          "image": "sprites/isolde/pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/isolde/pregnant-embarrassed-cutout.png",
+          "image": "sprites/isolde/pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/isolde/pregnant-aroused-cutout.png",
+          "image": "sprites/isolde/pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -108,31 +109,31 @@
       "description": "nothing at all, completely nude except Delicate thin silver oval spectacles worn on her face",
       "sprites": {
         "neutral": {
-          "image": "sprites/isolde/nude-neutral-2-cutout.png",
+          "image": "sprites/isolde/nude-neutral-2-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/isolde/nude-happy-cutout.png",
+          "image": "sprites/isolde/nude-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/isolde/nude-sad-cutout.png",
+          "image": "sprites/isolde/nude-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/isolde/nude-angry-cutout.png",
+          "image": "sprites/isolde/nude-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/isolde/nude-surprised-cutout.png",
+          "image": "sprites/isolde/nude-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/isolde/nude-embarrassed-cutout.png",
+          "image": "sprites/isolde/nude-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/isolde/nude-aroused-cutout.png",
+          "image": "sprites/isolde/nude-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -145,31 +146,31 @@
       "inherits": "nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/isolde/nude-pregnant-neutral-cutout.png",
+          "image": "sprites/isolde/nude-pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/isolde/nude-pregnant-happy-cutout.png",
+          "image": "sprites/isolde/nude-pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/isolde/nude-pregnant-sad-cutout.png",
+          "image": "sprites/isolde/nude-pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/isolde/nude-pregnant-angry-cutout.png",
+          "image": "sprites/isolde/nude-pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/isolde/nude-pregnant-surprised-cutout.png",
+          "image": "sprites/isolde/nude-pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/isolde/nude-pregnant-embarrassed-cutout.png",
+          "image": "sprites/isolde/nude-pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/isolde/nude-pregnant-aroused-cutout.png",
+          "image": "sprites/isolde/nude-pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -194,84 +195,90 @@
       "id": "blowjob",
       "name": "Blowjob",
       "description": "",
-      "image": "sprites/isolde/nsfw-blowjob.png",
+      "image": "sprites/isolde/nsfw-blowjob.webp",
+      "clip": "sprites/isolde/nsfw-blowjob.mp4",
       "loop": true
     },
     {
       "id": "missionary",
       "name": "Missionary",
       "description": "",
-      "image": "sprites/isolde/nsfw-missionary-4.png",
+      "image": "sprites/isolde/nsfw-missionary-4.webp",
+      "clip": "sprites/isolde/nsfw-missionary.mp4",
       "loop": true
     },
     {
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/isolde/nsfw-doggy.png",
+      "image": "sprites/isolde/nsfw-doggy.webp",
+      "clip": "sprites/isolde/nsfw-doggy.mp4",
       "loop": true
     },
     {
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
-      "image": "sprites/isolde/nsfw-cowgirl.png",
+      "image": "sprites/isolde/nsfw-cowgirl.webp",
+      "clip": "sprites/isolde/nsfw-cowgirl-2.mp4",
       "loop": true
     },
     {
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/isolde/nsfw-creampie.png",
+      "image": "sprites/isolde/nsfw-creampie.webp",
+      "clip": "sprites/isolde/nsfw-creampie.mp4",
       "loop": true
     },
     {
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/isolde/nsfw-facial.png",
+      "image": "sprites/isolde/nsfw-facial.webp",
+      "clip": "sprites/isolde/nsfw-facial.mp4",
       "loop": true
     },
     {
       "id": "pregnant-blowjob",
       "name": "Blowjob, pregnant",
       "description": "",
-      "image": "sprites/isolde/nsfw-pregnant-blowjob.png",
+      "image": "sprites/isolde/nsfw-pregnant-blowjob.webp",
       "loop": true
     },
     {
       "id": "pregnant-missionary",
       "name": "Missionary, pregnant",
       "description": "",
-      "image": "sprites/isolde/nsfw-pregnant-missionary-2.png",
+      "image": "sprites/isolde/nsfw-pregnant-missionary-2.webp",
       "loop": true
     },
     {
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
-      "image": "sprites/isolde/nsfw-pregnant-doggy.png",
+      "image": "sprites/isolde/nsfw-pregnant-doggy.webp",
       "loop": true
     },
     {
       "id": "pregnant-cowgirl",
       "name": "Cowgirl, pregnant",
       "description": "",
-      "image": "sprites/isolde/nsfw-pregnant-cowgirl.png",
+      "image": "sprites/isolde/nsfw-pregnant-cowgirl.webp",
       "loop": true
     },
     {
       "id": "pregnant-creampie",
       "name": "Creampie, pregnant",
       "description": "",
-      "image": "sprites/isolde/nsfw-pregnant-creampie.png",
+      "image": "sprites/isolde/nsfw-pregnant-creampie.webp",
       "loop": true
     },
     {
       "id": "pregnant-facial",
       "name": "Facial, pregnant",
       "description": "",
-      "image": "sprites/isolde/nsfw-pregnant-facial.png",
+      "image": "sprites/isolde/nsfw-pregnant-facial.webp",
       "loop": true
     }
   ],
@@ -305,8 +312,9 @@
     "name": "a study-bedroom on Lantern Row",
     "description": "A rented room that is more study than bedroom: a wide desk under two screens and a wall of modern art, shelves in strict order, and a posh modern bed",
     "locationId": "lantern-row",
-    "background": "generated/backgrounds/isolde/view-4.png"
+    "background": "generated/backgrounds/isolde/view-4.webp"
   },
+  "birthPicture": "sprites/isolde/birth.png",
   "ai": {
     "speechPattern": "Professional and composed, with frequent innuendo that also makes sense as work talk",
     "tone": "composed, dry, suggestive",

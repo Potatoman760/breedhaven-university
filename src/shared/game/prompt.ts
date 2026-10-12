@@ -1,8 +1,9 @@
-import { picturedOutfit, EXPRESSIONS, isPregnantPose, poseDescription, kindOf, outfitDescription, type ChatMessage, type ContentPack, type LoveInterest, type Departure, type GameState, type Lesson, type Npc, type Proposal, type Scene, type SceneBeat, type SceneGift } from '../model'
+import { MEMORY_LEVEL_LABELS, picturedOutfit, EXPRESSIONS, isPregnantPose, poseDescription, poseMedia, kindOf, outfitDescription, type ChatMessage, type ContentPack, type LoveInterest, type Departure, type GameState, type Lesson, type Npc, type Proposal, type Scene, type SceneBeat, type SceneGift } from '../model'
 import { describeGift } from './market'
 import { attendees, describeWhen, upcomingAppointments } from './appointments'
 import { bondOf, describeBonds, statusOf } from './bonds'
-import { formatDate, formatTime, toDate } from './calendar'
+import { formatDate, formatTime, toDate, type GameDate } from './calendar'
+import { describeHousehold, housingFacts } from './housing'
 import { codexExcerpt, selectCodexEntries } from './codex'
 import { DM_CLOSE, DM_OPEN, courierExcerpt, hasContact, offersContact } from './courier'
 import { handleOf, recentPostsBy } from './feed'
@@ -93,7 +94,6 @@ export interface PromptInput {
   gifts?: SceneGift[]
   /** A plan a character has suggested in this scene that the player has not yet put in his calendar. */
   pendingProposal?: Proposal
-  memoryBudgetChars?: number
   /** Recent conversation text, used to pick relevant codex entries. */
   recentText?: string
   codexBudgetChars?: number
@@ -171,7 +171,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
   /** Said of anyone far enough along to show: that it shows in every picture of her, with nothing for the writer to do about it. */
   const pregnantNote = (c: LoveInterest, who: string, is: string): string | false => {
     const stage = pregnancyStage(content, state, c.id)
-    return stage?.showing === true && `${who} ${is} ${stage.name} and showing. Every picture of ${who === 'You' ? 'you' : 'her'} is drawn pregnant by the game: choose outfits and poses as you would at any other time.`
+    return stage?.showing === true && `${who} ${is} ${stage.name} and showing. Every picture of ${who === 'You' ? 'you' : 'her'} is drawn pregnant by the game: choose outfits and sex-acts as you would at any other time.`
   }
   // What she is asked to wear is always one of her ordinary outfits: the game puts her in its pregnant form itself.
   const outfits = wearableOutfits(li)
@@ -180,7 +180,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
   const fertile = cast.filter((c) => canConceive(content, state, c.id))
   // Only a pose with something to show can be asked for.
   // The poses that can be asked for are the ordinary ones. One drawn pregnant is put up in its place by the game, once she shows.
-  const posesOf = (who: LoveInterest) => who.animations.filter((a) => (a.image !== undefined || a.clip !== undefined) && !isPregnantPose(a.id))
+  const posesOf = (who: LoveInterest) => who.animations.filter((a) => poseMedia(a).length > 0 && !isPregnantPose(a.id))
   const animations = posesOf(li)
   const traitsOf = (ids: string[]) => content.traits.filter((t) => ids.includes(t.id))
   const isBirthday = li.birthday?.month === date.month.id && li.birthday.day === date.day
@@ -189,7 +189,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
   const shareable = li.ai.secrets.filter((s) => evaluateAll(s.revealWhen, ctx))
   const guarded = li.ai.secrets.filter((s) => !shareable.includes(s))
   // An NPC keeps no memory of him: each time is the first, as far as she is told.
-  const memories = input.npc ? [] : selectMemories(state.memories[li.id] ?? [], input.memoryBudgetChars)
+  const memories = input.npc ? [] : selectMemories(state.memories[li.id] ?? [])
   const lore = selectCodexEntries({
     content,
     state,
@@ -338,7 +338,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
     ...companions.map((c) => {
       const theirs = state.relationships[c.id] ?? { affection: 0, trust: 0, desire: 0 }
       const theirStage = stageFor(content.relationships, theirs.affection)
-      const last = selectMemories(state.memories[c.id] ?? [], 300).at(-1)
+      const last = (state.memories[c.id] ?? []).at(-1)
       return section(`Also in the scene: ${c.name}`, [
         `${c.name}, age ${c.age}, ${c.pronouns}.`,
         labelled('Personality', c.personality),
@@ -363,14 +363,20 @@ export function buildCharacterPrompt(input: PromptInput): string {
 
     section(
       `What you remember of your time with ${player.name}`,
-      memories.map((m) => {
-        const then = toDate(content.calendar, m.time)
-        return `- ${describeAge(content, m, state.time)} (${then.day} ${then.month.name}): ${m.summary}`
-      })
+      memories.length === 0
+        ? []
+        : [
+            'Most important first. A core memory is one that defines what you are to each other: it stays with you and colours everything. A fleeting one has mostly faded.',
+            ...memories.map((m) => {
+              const then = toDate(content.calendar, m.time)
+              return `- ${MEMORY_LEVEL_LABELS[m.level]}, ${describeAge(content, m, state.time)} (${then.day} ${then.month.name}): ${m.summary}`
+            })
+          ]
     ),
 
     section('The scene', [
       `It is ${formatTime(date)} (${date.period.name}) on ${formatDate(date)}.`,
+      describeHour(content, date),
       weather &&
         describeWeather(weather, byCourier ? (whereabouts ? isIndoors(whereabouts, herView) : true) : owner !== undefined || his !== undefined || isIndoors(location, view)),
       ...eventsOn(content, state).map((e) => `Today is ${e.name}. ${describeEvent(content, e)}${eventGoers(state, e.id).includes(li.id) ? ` You told ${player.name} you would be there.` : ''}`.trim()),
@@ -413,10 +419,16 @@ export function buildCharacterPrompt(input: PromptInput): string {
 
     !isNpc && section('Children', describePregnancy(content, state, li.id)),
 
+    // Where he lives now, and who with: to someone of the house, as her own home.
+    !isNpc && section(`${player.name}'s house`, describeHousehold(content, state, li.id)),
+
     section(`What you know, and will tell ${player.name} if it comes up`, (input.npc?.knowledge ?? li.ai.knowledge).map((fact) => `- ${fact}`)),
 
     // Whoever he works for knows him as her employee, whatever else she is to him.
     section(`${player.name} as your employee`, jobFacts(content, state, li.id)),
+
+    // The officer who lets him his house has his file in front of her.
+    section(`${player.name}'s housing file`, housingFacts(content, state, li.id)),
 
     ...companions.map((c) =>
       section(
@@ -485,12 +497,12 @@ export function buildCharacterPrompt(input: PromptInput): string {
               // Poses belong to one of them each, and one is shown at a time, over everyone.
               ...(cast.some((c) => posesOf(c).length > 0)
                 ? [
-                    'During sex, an explicit pose of ONE of you at a time can be shown over the whole scene, on top of everyone\'s pictures.' +
+                    'During sex, an explicit picture of a sex-act by ONE of you at a time can be shown over the whole scene, on top of everyone\'s pictures.' +
                       (look.animationId ? ` "${look.animationId}" of ${cast.find((c) => c.id === (look.animationOf ?? li.id))?.name.split(' ')[0] ?? firstName} was up for the last reply.` : ''),
                     ...cast.filter((c) => posesOf(c).length > 0).map((c) => `- ${c.name.split(' ')[0]}: ${posesOf(c).map((a) => `${a.id} (${poseDescription(a) || a.name})`).join('; ')}`),
-                    'A pose is chosen in addition to the faces and outfits, never in their place. When the scene reaches what a pose shows, add a line saying whose and which: [POSE: Name=id]. ' +
-                      'Choose the one of you the moment is most about. Most replies have no [POSE] line at all: write one only in a reply whose own lines show that act happening at that moment, ' +
-                      'and never for talk, kissing or anything afterwards. A pose is up for the one reply that asks for it and comes down with the next, so do not carry it on out of habit. ' +
+                    'A sex-act is chosen in addition to the faces and outfits, never in their place. When the scene reaches one of these sex-acts, add a line saying whose and which: [SEX-ACT: Name=id]. ' +
+                      'Choose the one of you the moment is most about. Most replies have no [SEX-ACT] line at all: write one only in a reply whose own lines show that act happening at that moment, ' +
+                      'and never for talk, kissing or anything afterwards. A sex-act is up for the one reply that asks for it and comes down with the next, so do not carry it on out of habit. ' +
                       'creampie and facial are a single moment and are never shown twice running.'
                   ]
                 : [])
@@ -509,13 +521,13 @@ export function buildCharacterPrompt(input: PromptInput): string {
               ...(animations.length > 0
                 ? [
                     look.animationId
-                      ? `During sex, one of these explicit poses can be shown over the whole scene, on top of your picture. "${look.animationId}" was up for your last reply:`
-                      : 'During sex, one of these explicit poses can be shown over the whole scene, on top of your picture:',
+                      ? `During sex, an explicit picture of one of these sex-acts can be shown over the whole scene, on top of your picture. "${look.animationId}" was up for your last reply:`
+                      : 'During sex, an explicit picture of one of these sex-acts can be shown over the whole scene, on top of your picture:',
                     ...animations.map((a) => `- ${a.id} (${a.name}, ${!a.clip ? 'a picture' : a.loop ? 'a clip that loops' : 'a clip that plays once'}): ${poseDescription(a) || 'no description'}`),
-                    'A pose is chosen in addition to your face and outfit, never in their place: go on writing the [EXPRESSION] line every reply, and [OUTFIT] when what you wear changes, ' +
-                      'and add [POSE: id] on a line of its own when the scene reaches what a pose shows: for example [OUTFIT: nude], [EXPRESSION: aroused], [POSE: missionary]. ' +
-                      'Most replies have no [POSE] line at all. Write one only in a reply whose own lines show that act happening at that moment; a reply of talk, kissing, undressing, ' +
-                      'lying together or anything afterwards has none. A pose is up for the one reply that asks for it and comes down with the next, so do not carry it on out of habit: ' +
+                    'A sex-act is chosen in addition to your face and outfit, never in their place: go on writing the [EXPRESSION] line every reply, and [OUTFIT] when what you wear changes, ' +
+                      'and add [SEX-ACT: id] on a line of its own when the scene reaches one of these sex-acts: for example [OUTFIT: nude], [EXPRESSION: aroused], [SEX-ACT: missionary]. ' +
+                      'Most replies have no [SEX-ACT] line at all. Write one only in a reply whose own lines show that act happening at that moment; a reply of talk, kissing, undressing, ' +
+                      'lying together or anything afterwards has none. A sex-act is up for the one reply that asks for it and comes down with the next, so do not carry it on out of habit: ' +
                       'ask for it again only while the same act is still going on in what you write. creampie and facial are a single moment and are never shown twice running.'
                   ]
                 : [])
@@ -671,10 +683,33 @@ export function openingCue(playerName: string): string {
  * when the character spoke first, so that the exchange always starts with the player's side,
  * and with the hidden lines each of her replies began with put back in front of it.
  */
-export function sceneTurns(messages: ChatMessage[], playerName: string, lesson?: Lesson): ChatMessage[] {
+export function sceneTurns(messages: ChatMessage[], playerName: string, lesson?: Lesson, now?: string): ChatMessage[] {
   // Each of her replies goes back as she wrote it, hidden lines and all: one sent without them would teach her to leave them out.
   const turns = messages.map(({ role, content, tags }): ChatMessage => ({ role, content: role === 'assistant' && tags ? `${tags}\n${content}` : content }))
-  return turns[0]?.role === 'user' ? turns : [{ role: 'user', content: lesson ? lessonCue(playerName, lesson) : openingCue(playerName) }, ...turns]
+  const all: ChatMessage[] = turns[0]?.role === 'user' ? turns : [{ role: 'user', content: lesson ? lessonCue(playerName, lesson) : openingCue(playerName) }, ...turns]
+  // The time is said again beside the latest thing said to her, where it is hardest to lose sight of: told once, far above, it is forgotten for "tonight".
+  const last = all[all.length - 1]
+  return now && last?.role === 'user' ? [...all.slice(0, -1), { ...last, content: `${last.content}\n[${now}]` }] : all
+}
+
+/**
+ * What the hour means, said outright: by day, how long there is until dark, and that the evening's words are not
+ * for now. A clock time alone does not keep a character from asking him to stay the night at noon.
+ */
+export function describeHour(content: ContentPack, date: GameDate): string {
+  if (date.period.light === 'night') return `It is ${date.period.name.toLowerCase()}, and dark out.`
+  const dusk = [...content.calendar.periods].sort((a, b) => a.startHour - b.startHour).find((period) => period.light === 'night' && period.startHour > date.hour)
+  const left = dusk ? dusk.startHour - date.hour : 0
+  return (
+    `It is daytime${dusk ? `, with ${left} hour${left === 1 ? '' : 's'} to go before ${dusk.name.toLowerCase()}` : ''}. Speak, plan and behave as people do at this hour. ` +
+    `"Tonight", staying the night and going to bed are ${left > 2 ? 'a long way off' : 'not here yet'}: do not talk as if it were already evening, and say "later" or "this evening" for what is to come.`
+  )
+}
+
+/** The time in a few words, to go beside the player's latest line: "It is now 12:00 (Afternoon), daytime." */
+export function clockNote(content: ContentPack, state: GameState): string {
+  const date = toDate(content.calendar, state.time)
+  return `It is now ${formatTime(date)} (${date.period.name}), ${date.period.light === 'night' ? 'dark out' : 'daytime'}.`
 }
 
 /**

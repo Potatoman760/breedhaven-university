@@ -248,6 +248,11 @@ export const NSFW_PREGNANT_POSES = NSFW_POSES.map((pose) => ({
   base: pose.id,
 }));
 
+/** What of a pose is shown, best first: its clip, then its picture. */
+export function poseMedia(pose: Pick<Animation, "clip" | "image">): string[] {
+  return [pose.clip, pose.image].filter((file): file is string => file !== undefined);
+}
+
 /** Every pose with a slot of its own: the standard ones, and each of them drawn pregnant. */
 export const STANDARD_POSES = [...NSFW_POSES, ...NSFW_PREGNANT_POSES];
 
@@ -295,6 +300,8 @@ export const RoomSchema = z.object({
   locationId: z.string(),
   /** Image path inside the content pack. Left out, the location's own artwork is shown. */
   background: z.string().optional(),
+  /** A view of its location that is this room's picture, by day and by night, in place of a picture of its own. */
+  viewId: z.string().optional(),
 });
 export type Room = z.infer<typeof RoomSchema>;
 
@@ -412,6 +419,8 @@ export const LoveInterestSchema = z.object({
   schedule: z.array(ScheduleEntrySchema).default([]),
   /** Where she lives. A scene can move there. */
   room: RoomSchema.optional(),
+  /** A picture of her just after giving birth: sitting up in a hospital bed with the child in her arms. It is the whole stage of the scene of a birth he is there for. */
+  birthPicture: z.string().optional(),
   ai: LoveInterestAiSchema.prefault({}),
 });
 export type LoveInterest = z.infer<typeof LoveInterestSchema>;

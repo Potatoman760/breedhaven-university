@@ -15,7 +15,7 @@
       "description": "a brown sleeveless bodice buttoned down the front, over a pale blue shirt with the sleeves rolled above the elbow; a long brown skirt; a long grey-white apron tied at the waist; and a small leather pouch at her hip",
       "sprites": {
         "neutral": {
-          "image": "sprites/helga/default-neutral-cutout.png",
+          "image": "sprites/helga/default-neutral-cutout.webp",
           "description": ""
         }
       },

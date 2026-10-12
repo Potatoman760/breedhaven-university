@@ -7,7 +7,7 @@ export type Standing = 'failing' | 'gettingBy' | 'excelling'
 
 /** One screen of the epilogue: what it is about, what it says, and anything listed under it. */
 export interface EpilogueScreen {
-  kind: 'academics' | 'love' | 'child' | 'end'
+  kind: 'academics' | 'love' | 'child' | 'home' | 'end'
   /** A word or two over the text: "Academics", "Love". */
   heading: string
   text: string
@@ -111,7 +111,7 @@ function describeChildren(children: { daughter: boolean }[]): string {
  * The epilogue, worked out from how the game stands when its last day is over. Nothing in
  * it is written by the LLM. First how he did as a student; then a screen for each
  * arrangement that is a couple or more; then one for each love interest who carried his
- * child during the year; and the end.
+ * child during the year; then the house, if he was let one; and the end.
  */
 export function buildEpilogue(content: ContentPack, state: GameState): EpilogueScreen[] {
   const screens: EpilogueScreen[] = []
@@ -140,8 +140,30 @@ export function buildEpilogue(content: ContentPack, state: GameState): EpilogueS
     const first = li.name.split(' ')[0]
     const { subject } = pronounWords(li.pronouns)
     const alone = children.length === 1 ? 'the child' : 'the children'
-    const ending = onGoodTerms(content, state, li.id) ? `and ${subject} was overjoyed.` : `and ${subject} raised ${alone} by ${subject === 'they' ? 'themselves' : subject === 'he' ? 'himself' : 'herself'}.`
+    // One who lived in his house when the year ended did not raise them alone, whatever else stood between them.
+    const together = content.housing !== undefined && state.housing.status === 'resident' && (state.housing.residents[li.id] !== undefined || li.id === content.housing.nannyId)
+    const ending = together
+      ? `and the two of you raised ${children.length === 1 ? 'the child' : 'them'} together at ${content.housing?.name}.`
+      : onGoodTerms(content, state, li.id)
+        ? `and ${subject} was overjoyed.`
+        : `and ${subject} raised ${alone} by ${subject === 'they' ? 'themselves' : subject === 'he' ? 'himself' : 'herself'}.`
     screens.push({ kind: 'child', heading: 'Family', text: `You impregnated ${first} and ${subject} gave birth to ${describeChildren(children)}, ${ending}`, loveInterestIds: [li.id] })
+  }
+
+  // The house, if it came to that: kept, with whoever shared it, or lost.
+  const housing = content.housing
+  if (housing && state.housing.status === 'resident') {
+    const household = Object.keys(state.housing.residents).map(person).filter((li): li is LoveInterest => li !== undefined)
+    const built = housing.rooms.filter((room) => (state.housing.rooms[room.key] ?? 0) > 0).length
+    const kept = `You kept ${housing.name}${built === housing.rooms.length ? ', and built it out to the last room' : ''}`
+    screens.push({
+      kind: 'home',
+      heading: 'Home',
+      text: household.length > 0 ? `${kept}, and ${names(household)} made ${household.length === 1 ? 'her' : 'their'} home there with you.` : `${kept}, though nobody came to share it with you but the nanny.`,
+      loveInterestIds: household.map((li) => li.id)
+    })
+  } else if (housing && state.housing.status === 'evicted') {
+    screens.push({ kind: 'home', heading: 'Home', text: `You were let ${housing.name} and could not keep it: the rent went unpaid, and the year ended back in the Halls.` })
   }
 
   screens.push({ kind: 'end', heading: 'The end', text: `So ended ${state.player.name}'s first year at Breedhaven University.` })

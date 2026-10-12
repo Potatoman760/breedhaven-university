@@ -15,7 +15,7 @@
       "description": "a black band t-shirt with the sleeves rolled, dark cargo trousers, a tool pouch on his hip and fingerless gloves",
       "sprites": {
         "neutral": {
-          "image": "sprites/jax/default-neutral-cutout.png",
+          "image": "sprites/jax/default-neutral-cutout.webp",
           "description": ""
         }
       },

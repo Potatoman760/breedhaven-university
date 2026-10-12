@@ -36,31 +36,31 @@
       "description": "nothing but her own glossy, translucent blue body",
       "sprites": {
         "neutral": {
-          "image": "sprites/lira/default-neutral-cutout.png",
+          "image": "sprites/lira/default-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/lira/default-happy-cutout.png",
+          "image": "sprites/lira/default-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/lira/default-sad-cutout.png",
+          "image": "sprites/lira/default-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/lira/default-angry-cutout.png",
+          "image": "sprites/lira/default-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/lira/default-surprised-cutout.png",
+          "image": "sprites/lira/default-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/lira/default-embarrassed-cutout.png",
+          "image": "sprites/lira/default-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/lira/default-aroused-cutout.png",
+          "image": "sprites/lira/default-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -73,31 +73,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/lira/pregnant-neutral-2-cutout.png",
+          "image": "sprites/lira/pregnant-neutral-2-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/lira/pregnant-happy-cutout.png",
+          "image": "sprites/lira/pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/lira/pregnant-sad-cutout.png",
+          "image": "sprites/lira/pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/lira/pregnant-angry-cutout.png",
+          "image": "sprites/lira/pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/lira/pregnant-surprised-cutout.png",
+          "image": "sprites/lira/pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/lira/pregnant-embarrassed-cutout.png",
+          "image": "sprites/lira/pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/lira/pregnant-aroused-cutout.png",
+          "image": "sprites/lira/pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -140,84 +140,90 @@
       "id": "blowjob",
       "name": "Blowjob",
       "description": "",
-      "image": "sprites/lira/nsfw-blowjob.png",
+      "image": "sprites/lira/nsfw-blowjob.webp",
+      "clip": "sprites/lira/nsfw-blowjob.mp4",
       "loop": true
     },
     {
       "id": "missionary",
       "name": "Missionary",
       "description": "",
-      "image": "sprites/lira/nsfw-missionary.png",
+      "image": "sprites/lira/nsfw-missionary.webp",
+      "clip": "sprites/lira/nsfw-missionary.mp4",
       "loop": true
     },
     {
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/lira/nsfw-doggy.png",
+      "image": "sprites/lira/nsfw-doggy.webp",
+      "clip": "sprites/lira/nsfw-doggy.mp4",
       "loop": true
     },
     {
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
-      "image": "sprites/lira/nsfw-cowgirl.png",
+      "image": "sprites/lira/nsfw-cowgirl.webp",
+      "clip": "sprites/lira/nsfw-cowgirl-2.mp4",
       "loop": true
     },
     {
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/lira/nsfw-creampie.png",
+      "image": "sprites/lira/nsfw-creampie.webp",
+      "clip": "sprites/lira/nsfw-creampie.mp4",
       "loop": true
     },
     {
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/lira/nsfw-facial.png",
+      "image": "sprites/lira/nsfw-facial.webp",
+      "clip": "sprites/lira/nsfw-facial.mp4",
       "loop": true
     },
     {
       "id": "pregnant-blowjob",
       "name": "Blowjob, pregnant",
       "description": "",
-      "image": "sprites/lira/nsfw-pregnant-blowjob.png",
+      "image": "sprites/lira/nsfw-pregnant-blowjob.webp",
       "loop": true
     },
     {
       "id": "pregnant-missionary",
       "name": "Missionary, pregnant",
       "description": "",
-      "image": "sprites/lira/nsfw-pregnant-missionary.png",
+      "image": "sprites/lira/nsfw-pregnant-missionary.webp",
       "loop": true
     },
     {
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
-      "image": "sprites/lira/nsfw-pregnant-doggy.png",
+      "image": "sprites/lira/nsfw-pregnant-doggy.webp",
       "loop": true
     },
     {
       "id": "pregnant-cowgirl",
       "name": "Cowgirl, pregnant",
       "description": "",
-      "image": "sprites/lira/nsfw-pregnant-cowgirl.png",
+      "image": "sprites/lira/nsfw-pregnant-cowgirl.webp",
       "loop": true
     },
     {
       "id": "pregnant-creampie",
       "name": "Creampie, pregnant",
       "description": "",
-      "image": "sprites/lira/nsfw-pregnant-creampie.png",
+      "image": "sprites/lira/nsfw-pregnant-creampie.webp",
       "loop": true
     },
     {
       "id": "pregnant-facial",
       "name": "Facial, pregnant",
       "description": "",
-      "image": "sprites/lira/nsfw-pregnant-facial.png",
+      "image": "sprites/lira/nsfw-pregnant-facial.webp",
       "loop": true
     }
   ],
@@ -266,8 +272,9 @@
     "name": "her alcove off the Bathhouse pool",
     "description": "A warm, dripping stone alcove behind a tiled bathhouse pool, with a low vaulted ceiling and steam in the air. Smooth river stones are laid out in neat rows along a ledge, bright green moss grows across the wet walls, a shallow water-filled hollow is worn into the blue and white floor tiles, and old copper pipes run overhead. Soft turquoise light ripples across the walls from the pool beyond an archway.",
     "locationId": "bathhouse",
-    "background": "generated/backgrounds/lira/view.png"
+    "background": "generated/backgrounds/lira/view.webp"
   },
+  "birthPicture": "sprites/lira/birth.png",
   "ai": {
     "speechPattern": "Bright and matter-of-fact, in short declarative sentences. Says startling things as plain observations. Uses phrases she overheard from generations of students, often slightly wrong or decades out of date. Measures time in rains and seasons, not hours.",
     "tone": "sunny and unbothered",

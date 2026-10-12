@@ -4,11 +4,12 @@ import { toDate } from './calendar'
 import { meetingNow } from './courses'
 import { eventGoers, eventsOn } from './events'
 import { examOn } from './grades'
+import { householdCost, isHouseholdDay, rentOn } from './housing'
 import { firstNames } from './scene'
 
 /** One thing on a day of the calendar. */
 export interface AgendaItem {
-  kind: 'class' | 'work' | 'plan' | 'event' | 'orientation' | 'birth'
+  kind: 'class' | 'work' | 'plan' | 'event' | 'orientation' | 'birth' | 'rent' | 'household'
   /** Unique within the day. */
   id: string
   title: string
@@ -28,8 +29,8 @@ export function timeOn(content: ContentPack, dayIndex: number, hour: number): nu
 }
 
 /**
- * Everything on one day of the calendar: events and expected births across the top,
- * then orientation, the player's own classes and their plans by the hour, in order. The
+ * Everything on one day of the calendar: events, expected births and what the house costs across
+ * the top, then orientation, the player's own classes and their plans by the hour, in order. The
  * day is counted from the start of the game and may fall outside it, where only the
  * calendar's own events are known.
  */
@@ -53,9 +54,17 @@ export function dayAgenda(content: ContentPack, state: GameState, dayIndex: numb
     }))
 
   for (const [motherId, pregnancy] of Object.entries(state.pregnancies)) {
-    if (toDate(calendar, pregnancy.dueAt).dayIndex === dayIndex) {
+    // Once the hour of the birth is set it is on the day at that hour; until then, she is only known to be due.
+    if (toDate(calendar, pregnancy.dueAt).dayIndex === dayIndex && !state.appointments.some((plan) => plan.kind === 'birth' && plan.loveInterestId === motherId)) {
       whole.push({ kind: 'birth', id: `birth-${motherId}`, title: `${firstNames(content, [motherId])} is due` })
     }
+  }
+  // What the house will cost him, on the days it does: only days still to come, since what is past is in its ledger.
+  if (dayIndex >= toDate(calendar, state.time).dayIndex) {
+    const rent = rentOn(content, state, dayIndex)
+    if (rent > 0) whole.push({ kind: 'rent', id: 'rent', title: `Rent due: $${rent}`, detail: content.housing?.name })
+    const keep = householdCost(content, state)
+    if (keep > 0 && isHouseholdDay(content, dayIndex)) whole.push({ kind: 'household', id: 'household', title: `The children's week: $${keep}`, detail: content.housing?.name })
   }
   if (!inGame) return whole.filter((item) => item.startHour === undefined)
 
@@ -97,9 +106,9 @@ export function dayAgenda(content: ContentPack, state: GameState, dayIndex: numb
     if (date.dayIndex !== dayIndex) continue
     const place = content.locations.find((l) => l.id === plan.locationId)?.name
     timed.push({
-      kind: 'plan',
+      kind: plan.kind === 'birth' ? 'birth' : 'plan',
       id: `plan-${plan.id}`,
-      title: `${plan.title} with ${firstNames(content, attendees(plan))}`,
+      title: plan.kind === 'birth' ? `${firstNames(content, [plan.loveInterestId])} gives birth` : `${plan.title} with ${firstNames(content, attendees(plan))}`,
       detail: place,
       startHour: date.hour,
       hours: plan.hours

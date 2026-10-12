@@ -470,6 +470,20 @@ pre {
   height: auto;
 }
 
+/* The game's version, small, at the foot of the menu: set on the frame itself, so that it takes no room among what is in it and cannot make it scroll. */
+.title-version {
+  position: absolute;
+  right: 0;
+  bottom: 14px;
+  left: 0;
+  margin: 0;
+  color: var(--ink-soft);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+  pointer-events: none;
+}
+
 .vine {
   position: absolute;
 }
@@ -1273,6 +1287,19 @@ textarea.memory {
   font: inherit;
 }
 
+/* How much a memory matters, under it, with the way back to what was written beside it. */
+.memory-level {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.memory-level label {
+  margin: 0;
+}
+
 .roll {
   align-self: flex-start;
   margin: 0;
@@ -1850,6 +1877,11 @@ textarea.memory {
   --scrim: rgba(18, 30, 44, 0.76);
 }
 
+/* The house he was let: the same warmth as a family. */
+.epilogue.of-home {
+  --scrim: rgba(18, 30, 44, 0.76);
+}
+
 /* Whoever the screen is about: standing on the bottom edge, side by side, behind the words. */
 .epilogue-cast {
   position: absolute;
@@ -2263,10 +2295,34 @@ textarea.memory {
 
 .map.plain .pin {
   box-sizing: border-box;
-  width: 168px;
+  /* Wide enough for three people side by side. */
+  width: 230px;
   min-width: 0;
   /* Hung from its top edge, so that a card made tall by the people in it grows downward and never up over the name of its region. */
   transform: translate(-50%, -44px);
+}
+
+/* A region with a picture: the picture fills it, faded back so the places on it are what is read. */
+.region.pictured {
+  background: var(--parchment);
+}
+
+.region-art {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.32;
+  pointer-events: none;
+}
+
+.region.pictured > .caps {
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(248, 242, 226, 0.85);
+  color: var(--ink);
 }
 
 /* The name of a region stays readable over anything near it. */
@@ -3055,6 +3111,17 @@ button.stat-grid:hover {
   background: rgba(138, 74, 120, 0.16);
 }
 
+/* What the house costs him: rent on the first of the month, the children's keep each week. */
+.entry.rent {
+  border-left-color: var(--ochre, #7a5418);
+  background: rgba(122, 84, 24, 0.28);
+}
+
+.entry.household {
+  border-left-color: var(--moss-deep, #35502a);
+  background: rgba(76, 106, 58, 0.28);
+}
+
 .week {
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
@@ -3317,23 +3384,11 @@ button.stat-grid:hover {
   background: var(--paper-raised);
 }
 
-/* An app's name, on a soft blot of colour. */
+/* An app's name. */
 .phone-title {
   align-self: flex-start;
-  position: relative;
-  z-index: 0;
   margin: 0 0 6px;
   font-size: 2.5rem;
-}
-
-.phone-title::before {
-  content: '';
-  position: absolute;
-  inset: -6px -18px -8px -4px;
-  z-index: -1;
-  border-radius: 20px 26px 22px 30px;
-  background: var(--moss-tint);
-  transform: rotate(-3deg);
 }
 
 .phone-empty {
@@ -3632,12 +3687,22 @@ button.stat-grid:hover {
   background: var(--moss-tint);
 }
 
-button.btn.friend-message {
+/* Whether she is with child: a round mark at the end of her card, faint until she is, and green then. */
+.friend-pregnant {
   flex: none;
+  display: grid;
+  place-items: center;
   width: 44px;
-  min-height: 44px;
-  padding: 0;
+  height: 44px;
   border-radius: 50%;
+  color: var(--ink-soft);
+  opacity: 0.3;
+}
+
+.friend-pregnant.on {
+  background: var(--moss);
+  color: #fff;
+  opacity: 1;
 }
 
 .friend-card-text {
@@ -3859,17 +3924,42 @@ button.btn.friend-message {
 /* A picture wider than it is tall sits over its caption, not beside it. */
 .studio-result.of-background,
 .studio-result.of-photo,
-.studio-result.of-nsfw {
+.studio-result.of-nsfw,
+.studio-result.of-birth,
+.studio-result.of-video {
   flex-direction: column;
+}
+
+/* A clip, fitted to the column as a wide picture is. */
+.studio-result video {
+  display: block;
+  width: 100%;
+  border-radius: 4px;
+  background: #000;
+}
+
+/* The picture a clip starts from, shown small above its prompt. */
+.clip-frame {
+  display: block;
+  /* Its own shape: a label lays its contents out in a column, and would stretch it to the column's width. */
+  align-self: flex-start;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  max-width: 100%;
+  max-height: 24vh;
+  border-radius: 4px;
 }
 
 /* A wide picture is fitted to the column, whole, with what can be done with it underneath. */
 .studio-result.of-background .studio-thumb,
+.studio-result.of-birth .studio-thumb,
 .studio-result.of-nsfw .studio-thumb {
   align-self: stretch;
 }
 
 .studio-result.of-background .studio-thumb img,
+.studio-result.of-birth .studio-thumb img,
 .studio-result.of-nsfw .studio-thumb img {
   width: 100%;
   height: auto;
@@ -4040,6 +4130,36 @@ label.studio-narrow {
 .sprite-thumb img {
   display: block;
   width: 100%;
+}
+
+/* What a mark is laid over the picture against. */
+.sprite-frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The mark in the corner of a picture that has a clip as well: a white icon on a half-clear dark ground, so it shows on a light picture and a dark one alike. It opens the clip. */
+button.sprite-badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  cursor: pointer;
+}
+
+button.sprite-badge:hover,
+button.sprite-badge:focus-visible {
+  background: rgba(0, 0, 0, 0.8);
 }
 
 .studio-thumb {
@@ -5002,4 +5122,300 @@ button.entry:hover,
 
 .slot .slot-name:focus::placeholder {
   opacity: 0.4;
+}
+
+/* The models the game's workflows load, each with where it goes and the way to fetch it. */
+.bundle-models {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bundle-model {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+}
+
+.bundle-model > div {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.bundle-model .hint {
+  word-break: break-all;
+}
+
+/* The map is given more of the screen than other wide dialogs, so that each place has room for three people in a row. */
+.dialog.wide:has(> .map.plain) {
+  width: min(1560px, 100%);
+}
+
+/* On the plain map everyone takes the same room, whatever the length of her name: three to a row. */
+.map.plain .pin .portraits {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.map.plain .pin .portrait {
+  min-width: 0;
+}
+
+.map.plain .pin .portrait .caps {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.map.plain .pin .portraits > .chip {
+  justify-self: start;
+  align-self: center;
+}
+
+/* On a screen too narrow for the chart as drawn, the map scrolls: the regions stay side by side, and each lays its places out in a single column. */
+@media (max-width: 1640px) {
+  .map.plain {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+
+  .map.plain .region {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    left: auto !important;
+    top: auto !important;
+    width: auto !important;
+    height: auto !important;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 40px 12px 12px;
+  }
+
+  .map.plain .region > .caps {
+    position: absolute;
+    top: 8px;
+    left: 12px;
+  }
+
+  .map.plain .pin {
+    position: relative;
+    left: auto !important;
+    top: auto !important;
+    transform: none;
+    width: auto;
+  }
+}
+
+/* ---- His house: a plan of it drawn from its rooms, who lives in it, and its accounts. */
+
+.house {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.house-head {
+  align-items: center;
+}
+
+.house .tabs .house-go {
+  margin-left: auto;
+}
+
+.house-plan {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.house-floors,
+.house-floor-block,
+.house-people,
+.house-ledger {
+  display: flex;
+  flex-direction: column;
+}
+
+.house-floors {
+  gap: 14px;
+}
+
+.house-floor-block {
+  gap: 4px;
+}
+
+/* One floor: the walls of the house, and its rooms set out on a grid inside them. */
+.house-floor {
+  display: grid;
+  grid-auto-rows: 26px;
+  padding: 3px;
+  border: 2px solid var(--ink);
+  border-radius: 4px;
+  background: var(--paper);
+}
+
+/* A room on the plan. It is a button, but drawn as a room: the page's own buttons are filled and tall. */
+button.house-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 2px;
+  min-height: 0;
+  margin: 1px;
+  padding: 4px 8px;
+  overflow: hidden;
+  border: 1.5px solid var(--ink);
+  border-radius: 2px;
+  background: var(--paper-raised);
+  color: var(--ink);
+  font: 700 0.9rem var(--ui);
+  text-align: left;
+}
+
+button.house-cell span {
+  color: var(--ink-soft);
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+
+button.house-cell.outdoors {
+  background: var(--moss-tint);
+}
+
+/* Not built yet: marked out, and nothing in it. */
+button.house-cell.unbuilt {
+  border-style: dashed;
+  border-color: var(--rule-strong);
+  background: repeating-linear-gradient(45deg, transparent 0 8px, rgba(140, 127, 95, 0.14) 8px 9px);
+  color: var(--ink-soft);
+}
+
+button.house-cell.selected {
+  outline: 3px solid var(--moss);
+  outline-offset: -3px;
+  background-color: var(--moss-tint);
+}
+
+.house-room {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.house-room h2,
+.house-room p {
+  margin: 0;
+}
+
+.house-room img,
+.house-room-blank {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.house-room-blank {
+  display: grid;
+  place-items: center;
+  background: var(--track);
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.house-work {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.house-people {
+  gap: 8px;
+}
+
+.house-people h2 {
+  margin: 8px 0 0;
+}
+
+.house-person {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+}
+
+.house-person > div:not(.portrait) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* How a child is doing: a pip for each level, filled up to where it stands. One the house cannot yet take it to is dashed. */
+.house-pips {
+  display: flex;
+  gap: 4px;
+}
+
+.house-pips i {
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid var(--moss);
+  border-radius: 50%;
+}
+
+.house-pips i.on {
+  background: var(--moss);
+}
+
+.house-pips i.on.low {
+  border-color: var(--madder);
+  background: var(--madder);
+}
+
+.house-pips i.out {
+  border-style: dashed;
+  border-color: var(--rule-strong);
+}
+
+.house-line {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  gap: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+/* The way into the house from the day: one wide tile over the others. */
+.tile.home {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  gap: 10px;
+  height: 64px;
+}
+
+@media (max-width: 900px) {
+  .house-plan {
+    grid-template-columns: 1fr;
+  }
 }

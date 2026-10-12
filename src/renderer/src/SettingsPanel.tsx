@@ -96,10 +96,11 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             </button>
           ))}
         </div>
-        {/* ComfyUI draws the pictures: Bloomr's selfies in play, and everything made in the editor's art tool. Each change there is saved as it is made. */}
+        {/* ComfyUI draws the pictures: Bloomr's selfies in play, and everything made in the editor's art tool. Here is only how it is reached; what is drawn and how is set in the editor. Each change is saved as it is made. */}
         {tab === 'ComfyUI' && (
           <>
-            <ComfySetupPanel />
+            <ComfySetupPanel connectionOnly />
+            <p className="hint">The prompts, the framing of each kind of picture and what each workflow is used for are set in the content editor, under ComfyUI.</p>
             <div className="actions">
               <button type="button" className="secondary" onClick={onClose}>
                 Close

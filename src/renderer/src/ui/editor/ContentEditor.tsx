@@ -25,9 +25,11 @@ import { describeShift } from "../../../../shared/game";
 import { Portrait } from "../MapPanel";
 import { EditorFoot, PickList, Group, List, Text, LlmMark } from "./fields";
 import { ArtTool } from "../art/ArtTool";
+import { ComfyEditor } from "./ComfyEditor";
 import { NewCharacterDialog } from "./NewCharacterDialog";
 import { CatalogueEditor } from "./CatalogueEditor";
 import { EventsEditor } from "./EventsEditor";
+import { JobsEditor } from "./JobsEditor";
 import { LocationEditor } from "./LocationEditor";
 import { PlayerEditor } from "./PlayerEditor";
 import { ScheduleTab } from "./ScheduleTab";
@@ -41,7 +43,7 @@ interface Props {
   onClose: () => void;
 }
 
-const TABS = ["Profile", "Traits", "Sprites", "Academics"] as const;
+const TABS = ["Profile", "Traits", "Media", "Academics"] as const;
 type Tab = (typeof TABS)[number];
 
 /** A character with nothing filled in, valid enough to be edited. */
@@ -71,15 +73,16 @@ const NEW_SUBJECT: Studies = {
 const same = (a: unknown, b: unknown) =>
   JSON.stringify(a) === JSON.stringify(b);
 
-const SIDES = ["Characters", "Player", "Locations", "Events", "Courses"] as const;
+const SIDES = ["Characters", "Player", "Locations", "Events", "Courses", "Jobs", "ComfyUI"] as const;
 type Side = (typeof SIDES)[number];
 // The sides that change the game itself and not what a player adds to it: there only when the game's own files are being edited.
-const AUTHORING: readonly Side[] = ["Player", "Locations"];
+const AUTHORING: readonly Side[] = ["Player", "Locations", "Jobs"];
 
 /**
  * The editor: the characters (love interests and NPCs, who are written the same way and
  * told apart by their kind), the player as a new game starts him, the places of the game
- * and their pictures, and the course catalogue. Each side keeps its own draft.
+ * and their pictures, and the course catalogue. Each side keeps its own draft. The last
+ * side is not content: it is how the editor's art tool draws, which only the editor uses.
  */
 // The kinds a character can be, as the filter over the list names them.
 const KIND_FILTERS: { kind: LoveInterestKind; label: string }[] = [
@@ -124,8 +127,12 @@ export function ContentEditor(props: Props) {
     <CatalogueEditor {...props} switcher={switcher} />
   ) : side === "Events" ? (
     <EventsEditor {...props} switcher={switcher} />
+  ) : side === "Jobs" ? (
+    <JobsEditor {...props} switcher={switcher} />
   ) : side === "Player" ? (
     <PlayerEditor {...props} switcher={switcher} />
+  ) : side === "ComfyUI" ? (
+    <ComfyEditor switcher={switcher} />
   ) : side === "Locations" ? (
     <LocationEditor {...props} switcher={switcher} />
   ) : (
@@ -724,7 +731,7 @@ function LoveInterestEditor({
             />
           )}
 
-          {tab === "Sprites" && (
+          {tab === "Media" && (
             <>
               <SpritesTab draft={draft} set={set} assetPrefix={info?.assetPrefix} />
 {!isNpc && (

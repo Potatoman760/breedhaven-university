@@ -1,4 +1,4 @@
-import type { ContentPack, GameState, Memory, Scene, SceneBeat } from '../model'
+import { MEMORY_LEVELS, type ContentPack, type GameState, type Memory, type MemoryLevel, type Scene, type SceneBeat } from '../model'
 import { formatDate, toDate } from './calendar'
 import { describeBonds } from './bonds'
 import { stageFor } from './relationships'
@@ -55,7 +55,7 @@ export function buildSummaryPrompt(input: SummaryInput): { system: string; user:
       `outing between ${player} and ${name}, write the single memory ${name} keeps of it` +
       `${feels ? `, and decide how it has changed what she feels for ${player}` : ''}.`,
     feels
-      ? `Reply with only a JSON object and nothing else: {"memory": string, "affection": number, "trust": number, "desire": number, "reason": string, "sex": boolean, "learned": string[]${group ? ', "rapport": {"with": string, "relation": string}[]' : ''}}`
+      ? `Reply with only a JSON object and nothing else: {"memory": string, "level": string, "affection": number, "trust": number, "desire": number, "reason": string, "sex": boolean, "learned": string[]${group ? ', "rapport": {"with": string, "relation": string}[]' : ''}}`
       : 'Reply with only the memory itself.',
     'The memory:',
     '- Exactly one sentence, plain prose, past tense, third person, using both names.',
@@ -72,6 +72,12 @@ export function buildSummaryPrompt(input: SummaryInput): { system: string; user:
     '- No preamble, no quotation marks, no lists.',
     'Example for two other people: Alex took Sam up to the lighthouse with a bottle of wine, ' +
       'and what Sam remembered most was the way Alex kissed her.',
+    feels && `How much the memory will matter to ${name}, as "level":`,
+    feels &&
+      `- "core": a moment that defines what she and ${player} are to each other, which she will carry for good: a first kiss, the first time they slept together, ` +
+        'a confession, a promise made or broken, a real fight or a betrayal, something she had never told anyone. Rare.',
+    feels && '- "normal": time together that meant something, but changed nothing deep. Most scenes are this.',
+    feels && '- "fleeting": little happened; she will soon forget the details.',
     ...(feels
       ? [
           `How ${name} feels:`,
@@ -157,6 +163,8 @@ export interface Feelings {
 /** What a love interest takes away from a scene. */
 export interface Summary {
   memory: string
+  /** How much it will matter to her. Left out when the reply did not say, and taken as normal. */
+  level?: MemoryLevel
   /** Left out for an NPC, and when the reply said nothing that could be read. */
   feelings?: Feelings
   /** She and the player had sex in the scene. */
@@ -191,8 +199,10 @@ export function parseSummary(reply: string): Summary {
     const n = Math.round(Number(value))
     return Number.isFinite(n) ? Math.max(FEELING_RANGE.min, Math.min(FEELING_RANGE.max, n)) : 0
   }
+  const level = typeof given['level'] === 'string' ? MEMORY_LEVELS.find((one) => one === (given['level'] as string).trim().toLowerCase()) : undefined
   return {
     memory,
+    level,
     feelings: {
       affection: change(given['affection']),
       trust: change(given['trust']),
@@ -296,8 +306,8 @@ export function fallbackSummary(input: SummaryInput): string {
 }
 
 /** Returns a new state with the memory recorded at the current game time. */
-export function addMemory(state: GameState, loveInterestId: string, summary: string): GameState {
-  const memory: Memory = { time: state.time, summary }
+export function addMemory(state: GameState, loveInterestId: string, summary: string, level: MemoryLevel = 'normal'): GameState {
+  const memory: Memory = { time: state.time, summary, level }
   return {
     ...state,
     memories: {
@@ -308,33 +318,37 @@ export function addMemory(state: GameState, loveInterestId: string, summary: str
 }
 
 /**
- * Rewords a memory the player has edited: the newest one of that character's with the old
- * wording takes the new. Edited down to nothing, it is forgotten.
+ * Changes a memory the player has edited: the newest one of that character's with the old wording takes the new
+ * wording, and the level given if one is. Edited down to nothing, it is forgotten.
  */
-export function amendMemory(state: GameState, loveInterestId: string, from: string, to: string): GameState {
+export function amendMemory(state: GameState, loveInterestId: string, from: string, to: string, level?: MemoryLevel): GameState {
   const memories = state.memories[loveInterestId] ?? []
   const index = memories.map((memory) => memory.summary).lastIndexOf(from)
   const wording = to.trim()
-  if (index < 0 || wording === from) return state
+  if (index < 0 || (wording === from && (level === undefined || level === memories[index].level))) return state
   const amended =
-    wording === '' ? memories.filter((_, i) => i !== index) : memories.map((m, i) => (i === index ? { ...m, summary: wording } : m))
+    wording === '' ? memories.filter((_, i) => i !== index) : memories.map((m, i) => (i === index ? { ...m, summary: wording, level: level ?? m.level } : m))
   return { ...state, memories: { ...state.memories, [loveInterestId]: amended } }
 }
 
-/** The most recent memories that fit the budget, oldest first. Always keeps the newest. */
-export function selectMemories(memories: Memory[], budgetChars = 1500): Memory[] {
-  const selected: Memory[] = []
-  let used = 0
-  for (let i = memories.length - 1; i >= 0; i--) {
-    used += memories[i].summary.length
-    if (selected.length > 0 && used > budgetChars) break
-    selected.unshift(memories[i])
-  }
-  return selected
+/** How many of her memories a character is told in a scene. */
+export const MAX_PROMPT_MEMORIES = 8
+
+/**
+ * The memories a character is told, most important first: by level, core before normal before fleeting, and within
+ * a level the most recent first. No more than `limit` of them.
+ */
+export function selectMemories(memories: Memory[], limit = MAX_PROMPT_MEMORIES): Memory[] {
+  const rank = (memory: Memory) => MEMORY_LEVELS.indexOf(memory.level)
+  return memories
+    .map((memory, order) => ({ memory, order }))
+    .sort((a, b) => rank(a.memory) - rank(b.memory) || b.memory.time - a.memory.time || b.order - a.order)
+    .slice(0, limit)
+    .map(({ memory }) => memory)
 }
 
 /** How long ago a memory was, relative to now: "earlier today", "yesterday", "5 days ago". */
-export function describeAge(content: ContentPack, memory: Memory, now: number): string {
+export function describeAge(content: ContentPack, memory: Pick<Memory, 'time'>, now: number): string {
   const days =
     toDate(content.calendar, now).dayIndex - toDate(content.calendar, memory.time).dayIndex
   if (days <= 0) return 'earlier today'

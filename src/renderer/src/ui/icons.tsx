@@ -249,6 +249,13 @@ export function VineCorner({ corner }: { corner: 'tl' | 'tr' | 'bl' | 'br' }) {
 // The phone's own icons, drawn on a 24-unit grid.
 
 /** A cell phone: the player's own, with his DMs, Friends, the Bloomr feed and Jobs on it. */
+export const VideoIcon = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="4" y="10" width="19" height="16" rx="2" />
+    <path d="M23 16l9-5v14l-9-5z" />
+  </Icon>
+)
+
 export const PhoneIcon = (p: IconProps) => (
   <Icon viewBox="0 0 24 24" {...p}>
     <rect x="6.5" y="2.5" width="11" height="19" rx="2.5" />
@@ -283,6 +290,14 @@ export const WorkIcon = (p: IconProps) => (
   </Icon>
 )
 
+/** A woman with child, seen from the side. */
+export const PregnantIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 24 24" {...p}>
+    <circle cx="10.500" cy="4.500" r="2.300" />
+    <path d="M9.500 8.500c-1.400.700-2 2.200-2 4.200V21h5.500v-4.800c2.600 0 4.500-1.300 4.500-3.500 0-2.300-2-3.600-4.500-3.900-1.200-.400-2.400-.600-3.500-.300z" />
+  </Icon>
+)
+
 export const HeartIcon = (p: IconProps) => (
   <Icon viewBox="0 0 24 24" {...p}>
     <path d="M12 20.500s-8-4.800-8-10.700A4.600 4.600 0 0112 7a4.600 4.600 0 018 2.800c0 5.900-8 10.700-8 10.700z" />
@@ -300,7 +315,7 @@ export const BackIcon = (p: IconProps) => (
  * the barista, a book for the library page. A job that names none, or one not drawn here,
  * gets the briefcase.
  */
-const JOB_ICON_PATHS: Record<string, string> = {
+export const JOB_ICON_PATHS: Record<string, string> = {
   crate: 'M3 8h18v12H3z M3 13h18 M9 8v12 M15 8v12',
   pot: 'M5 10h14v6a4 4 0 01-4 4H9a4 4 0 01-4-4z M3 10h18 M9 6c0-1 1-1 1-2 M14 6c0-1 1-1 1-2',
   bell: 'M5 17a7 7 0 0114 0z M3 19.500h18 M12 10V7 M10 7h4',

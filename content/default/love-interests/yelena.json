@@ -9,7 +9,8 @@
   "personality": "Raised to be the perfect noble, but young at heart. Polished manners hide a longing to choose her own clothes, friends, pleasures, and future. Starts as a virgin.",
   "traitIds": [
     "jealous",
-    "loyal"
+    "loyal",
+    "prude"
   ],
   "likes": [
     "art",
@@ -37,31 +38,31 @@
       "description": "a fitted aristocratic gown of pale ivory silk with deep Goldvine-green panels and restrained antique-gold vine embroidery. Structured square neckline, long fitted sleeves, narrow waist, and layered floor-length skirt. Small gold vine brooch, single green gemstone pendant, delicate earrings, and immaculate cream gloves. Expensive, youthful, formal, and controlled; no crown, armor, or excessive ornament",
       "sprites": {
         "angry": {
-          "image": "sprites/yelena/angry-cutout.png",
+          "image": "sprites/yelena/angry-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/yelena/happy-cutout.png",
+          "image": "sprites/yelena/happy-cutout.webp",
           "description": ""
         },
         "neutral": {
-          "image": "sprites/yelena/neutral-cutout.png",
+          "image": "sprites/yelena/neutral-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/yelena/default-surprised-cutout-2.png",
+          "image": "sprites/yelena/default-surprised-cutout-2.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/yelena/default-sad-cutout-2.png",
+          "image": "sprites/yelena/default-sad-2-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/yelena/default-embarrassed-cutout.png",
+          "image": "sprites/yelena/default-embarrassed-2-cutout-2.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/yelena/default-aroused-cutout.png",
+          "image": "sprites/yelena/default-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -74,31 +75,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/yelena/pregnant-neutral-cutout.png",
+          "image": "sprites/yelena/pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/yelena/pregnant-happy-cutout.png",
+          "image": "sprites/yelena/pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/yelena/pregnant-sad-cutout.png",
+          "image": "sprites/yelena/pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/yelena/pregnant-angry-cutout.png",
+          "image": "sprites/yelena/pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/yelena/pregnant-surprised-cutout.png",
+          "image": "sprites/yelena/pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/yelena/pregnant-embarrassed-cutout.png",
+          "image": "sprites/yelena/pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/yelena/pregnant-aroused-cutout.png",
+          "image": "sprites/yelena/pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -110,31 +111,31 @@
       "description": "nothing at all, completely nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/yelena/nude-neutral-2-cutout.png",
+          "image": "sprites/yelena/nude-neutral-2-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/yelena/nude-happy-2-cutout.png",
+          "image": "sprites/yelena/nude-happy-2-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/yelena/nude-sad-2-cutout.png",
+          "image": "sprites/yelena/nude-sad-2-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/yelena/nude-angry-2-cutout.png",
+          "image": "sprites/yelena/nude-angry-2-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/yelena/nude-surprised-2-cutout.png",
+          "image": "sprites/yelena/nude-surprised-2-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/yelena/nude-embarrassed-2-cutout.png",
+          "image": "sprites/yelena/nude-embarrassed-2-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/yelena/nude-aroused-2-cutout.png",
+          "image": "sprites/yelena/nude-aroused-2-cutout.webp",
           "description": ""
         }
       },
@@ -147,31 +148,31 @@
       "inherits": "nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/yelena/nude-pregnant-neutral-cutout.png",
+          "image": "sprites/yelena/nude-pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/yelena/nude-pregnant-happy-cutout.png",
+          "image": "sprites/yelena/nude-pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/yelena/nude-pregnant-sad-cutout.png",
+          "image": "sprites/yelena/nude-pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/yelena/nude-pregnant-angry-cutout.png",
+          "image": "sprites/yelena/nude-pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/yelena/nude-pregnant-surprised-cutout.png",
+          "image": "sprites/yelena/nude-pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/yelena/nude-pregnant-embarrassed-cutout.png",
+          "image": "sprites/yelena/nude-pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/yelena/nude-pregnant-aroused-cutout.png",
+          "image": "sprites/yelena/nude-pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -197,77 +198,83 @@
       "id": "blowjob",
       "name": "Blowjob",
       "description": "",
-      "image": "sprites/yelena/nsfw-blowjob.png",
+      "image": "sprites/yelena/nsfw-blowjob.webp",
+      "clip": "sprites/yelena/nsfw-blowjob.mp4",
       "loop": true
     },
     {
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/yelena/nsfw-doggy.png",
+      "image": "sprites/yelena/nsfw-doggy.webp",
+      "clip": "sprites/yelena/nsfw-doggy.mp4",
       "loop": true
     },
     {
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
-      "image": "sprites/yelena/nsfw-cowgirl.png",
+      "image": "sprites/yelena/nsfw-cowgirl.webp",
+      "clip": "sprites/yelena/nsfw-cowgirl.mp4",
       "loop": true
     },
     {
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/yelena/nsfw-facial.png",
+      "image": "sprites/yelena/nsfw-facial.webp",
+      "clip": "sprites/yelena/nsfw-facial.mp4",
       "loop": true
     },
     {
       "id": "missionary",
       "name": "Missionary",
       "description": "",
-      "image": "sprites/yelena/nsfw-missionary-2.png",
+      "image": "sprites/yelena/nsfw-missionary-2.webp",
+      "clip": "sprites/yelena/nsfw-missionary.mp4",
       "loop": true
     },
     {
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/yelena/nsfw-creampie-2.png",
+      "image": "sprites/yelena/nsfw-creampie-2.webp",
+      "clip": "sprites/yelena/nsfw-creampie.mp4",
       "loop": true
     },
     {
       "id": "pregnant-missionary",
       "name": "Missionary, pregnant",
       "description": "",
-      "image": "sprites/yelena/nsfw-pregnant-missionary.png",
+      "image": "sprites/yelena/nsfw-pregnant-missionary.webp",
       "loop": true
     },
     {
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
-      "image": "sprites/yelena/nsfw-pregnant-doggy.png",
+      "image": "sprites/yelena/nsfw-pregnant-doggy.webp",
       "loop": true
     },
     {
       "id": "pregnant-cowgirl",
       "name": "Cowgirl, pregnant",
       "description": "",
-      "image": "sprites/yelena/nsfw-pregnant-cowgirl.png",
+      "image": "sprites/yelena/nsfw-pregnant-cowgirl.webp",
       "loop": true
     },
     {
       "id": "pregnant-creampie",
       "name": "Creampie, pregnant",
       "description": "",
-      "image": "sprites/yelena/nsfw-pregnant-creampie.png",
+      "image": "sprites/yelena/nsfw-pregnant-creampie.webp",
       "loop": true
     },
     {
       "id": "pregnant-blowjob",
       "name": "Blowjob, pregnant",
       "description": "",
-      "image": "sprites/yelena/nsfw-pregnant-blowjob.png",
+      "image": "sprites/yelena/nsfw-pregnant-blowjob.webp",
       "loop": true
     }
   ],
@@ -323,8 +330,9 @@
     "name": "a first-floor room in the Cloister Halls",
     "description": "A room furnished from home and slowly being undone: fine linen on a student bed, a trunk of gowns, sketches pinned over the Goldvine crest, ribbons on the mirror, and a family phone she keeps face down.",
     "locationId": "dormitories",
-    "background": "generated/backgrounds/yelena/view-2.png"
+    "background": "generated/backgrounds/yelena/view-2.webp"
   },
+  "birthPicture": "sprites/yelena/birth.png",
   "ai": {
     "speechPattern": "Raised to be the perfect noble, but young at heart. Polished manners hide a longing to choose her own clothes, friends, pleasures, and future.",
     "tone": "polished, guarded, eager underneath",

@@ -75,23 +75,34 @@ describe('fallbackSummary', () => {
 describe('memories', () => {
   it('are stored per love interest, stamped with the current time', () => {
     const before = { ...start(), time: 12 }
-    const after = addMemory(addMemory(before, 'ana', 'First.'), 'ana', 'Second.')
+    const after = addMemory(addMemory(before, 'ana', 'First.'), 'ana', 'Second.', 'core')
     expect(after.memories.ana).toEqual([
-      { time: 12, summary: 'First.' },
-      { time: 12, summary: 'Second.' }
+      { time: 12, summary: 'First.', level: 'normal' },
+      { time: 12, summary: 'Second.', level: 'core' }
     ])
     expect(before.memories).toEqual({})
   })
 
-  it('keeps the most recent ones that fit the budget, oldest first', () => {
-    const all = ['aaaa', 'bbbb', 'cccc'].map((summary, time) => ({ time, summary }))
-    expect(selectMemories(all, 8).map((m) => m.summary)).toEqual(['bbbb', 'cccc'])
-    expect(selectMemories(all, 1).map((m) => m.summary)).toEqual(['cccc'])
-    expect(selectMemories(all)).toEqual(all)
+  it('are told no more than eight at a time, core before normal before fleeting, and the most recent first within each', () => {
+    const levels = ['fleeting', 'core', 'normal', 'core', 'fleeting', 'normal'] as const
+    const all = levels.map((level, time) => ({ time, summary: `${level} at ${time}`, level }))
+    expect(selectMemories(all).map((m) => m.summary)).toEqual(['core at 3', 'core at 1', 'normal at 5', 'normal at 2', 'fleeting at 4', 'fleeting at 0'])
+    expect(selectMemories(all, 3).map((m) => m.summary)).toEqual(['core at 3', 'core at 1', 'normal at 5'])
+    // Twelve of them: the eight normal ones are told, and the fleeting ones are left out.
+    const many = Array.from({ length: 12 }, (_, time) => ({ time, summary: `${time}`, level: time < 4 ? ('fleeting' as const) : ('normal' as const) }))
+    expect(selectMemories(many).map((m) => m.summary)).toEqual(['11', '10', '9', '8', '7', '6', '5', '4'])
+    // Two at the same hour: the one kept later comes first.
+    expect(selectMemories([{ time: 5, summary: 'a', level: 'normal' }, { time: 5, summary: 'b', level: 'normal' }]).map((m) => m.summary)).toEqual(['b', 'a'])
+  })
+
+  it('come with a level from the summary, and an answer that names none is taken as normal', () => {
+    expect(parseSummary('{"memory": "x", "level": " Core "}').level).toBe('core')
+    expect(parseSummary('{"memory": "x", "level": "unforgettable"}').level).toBeUndefined()
+    expect(parseSummary('{"memory": "x"}').level).toBeUndefined()
   })
 
   it('are described by how many days ago they happened', () => {
-    const memory = { time: 0, summary: '' }
+    const memory = { time: 0 }
     expect(describeAge(content, memory, 5)).toBe('earlier today')
     expect(describeAge(content, memory, 14)).toBe('yesterday')
     expect(describeAge(content, memory, 94)).toBe('5 days ago')
@@ -106,8 +117,9 @@ describe('memories', () => {
       sceneBeats: scene.beats
     })
     expect(text).toContain(
-      '## What you remember of your time with Pat\n- yesterday (2 A): Pat walked Ana home.'
+      '## What you remember of your time with Pat\nMost important first.'
     )
+    expect(text).toContain('- Normal, yesterday (2 A): Pat walked Ana home.')
     expect(text).toContain('So far on this outing together: Work at the Shop, then Date.')
   })
 })
@@ -158,10 +170,16 @@ describe('amendMemory', () => {
     const twice = addMemory({ ...kept, time: 9 }, 'ana', 'They talked.')
     const after = amendMemory(twice, 'ana', 'They talked.', '  They argued about dragons.  ')
     expect(after.memories['ana']).toEqual([
-      { time: 0, summary: 'They talked.' },
-      { time: 0, summary: 'They walked.' },
-      { time: 9, summary: 'They argued about dragons.' }
+      { time: 0, summary: 'They talked.', level: 'normal' },
+      { time: 0, summary: 'They walked.', level: 'normal' },
+      { time: 9, summary: 'They argued about dragons.', level: 'normal' }
     ])
+  })
+
+  it('takes the level the player set, with or without new wording', () => {
+    expect(amendMemory(kept, 'ana', 'They walked.', 'They walked.', 'core').memories['ana'][1]).toEqual({ time: 0, summary: 'They walked.', level: 'core' })
+    expect(amendMemory(kept, 'ana', 'They walked.', 'They ran.', 'fleeting').memories['ana'][1]).toEqual({ time: 0, summary: 'They ran.', level: 'fleeting' })
+    expect(amendMemory(kept, 'ana', 'They walked.', 'They walked.', 'normal')).toBe(kept)
   })
 
   it('forgets a memory edited down to nothing, and leaves alone what was not changed', () => {
@@ -194,7 +212,7 @@ describe('what a scene does to how she feels', () => {
 
   it('is asked of the LLM along with the memory, as her own judgement of the scene', () => {
     const { system, user } = buildSummaryPrompt({ content, state, scene })
-    expect(system).toContain('{"memory": string, "affection": number, "trust": number, "desire": number, "reason": string, "sex": boolean, "learned": string[]}')
+    expect(system).toContain('{"memory": string, "level": string, "affection": number, "trust": number, "desire": number, "reason": string, "sex": boolean, "learned": string[]}')
     expect(system).toContain('whole numbers from -10 to 10')
     expect(system).toContain('Nothing is owed for turning up')
     expect(user).toContain('About Ana:')

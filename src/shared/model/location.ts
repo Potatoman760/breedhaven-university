@@ -35,7 +35,11 @@ export const BackgroundSchema = z.object({
   /** Its pictures, by day and by night: image paths inside the content pack. */
   images: z.partialRecord(z.enum(['day', 'night']), z.string()).default({}),
   /** Under a roof: the weather is not drawn over it. Left out, it is as the location says. */
-  indoors: z.boolean().optional()
+  indoors: z.boolean().optional(),
+  /** Told to the LLM in a scene at this view, after what the place itself is: what this spot of it is. */
+  description: z.string().optional(),
+  /** What this view looks like, for an image model, in place of the location's own: so that the rooms of one house are not all drawn alike. */
+  appearance: z.string().optional()
 })
 export type Background = z.infer<typeof BackgroundSchema>
 

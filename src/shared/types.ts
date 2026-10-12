@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import type { LoveInterest } from './model'
-import type { ComfyBundle, ComfyBundleCheck, ComfyBundleInstall, ComfySettings, ComfyTestResult, CutoutRequest, CutoutResult, GenerateArtRequest, GenerateArtResult, WorkflowListResult } from './comfy'
+import type { ComfyBundle, ComfyBundleCheck, ComfyDownloadList, ComfySettings, ModelDownloadProgress, ModelDownloadResult, ComfyTestResult, CutoutRequest, CutoutResult, GenerateArtRequest, GenerateArtResult, GenerateVideoRequest, WorkflowListResult } from './comfy'
 import {
   GameStateSchema,
   PostPlanSchema,
@@ -13,7 +13,8 @@ import {
   type DepartureFeeling,
   type Proposal
 } from './model'
-import type { EditorInfo, EditorResult, ImportAssetRequest } from './editor'
+import type { EditorInfo, EditorResult, ImportAssetRequest, OptimizedPicture } from './editor'
+import type { MemoryLevel } from './model'
 import type { PostDraft } from './game/feed'
 import type { Outing } from './game/outing'
 import type { SceneLook } from './game/scene'
@@ -76,6 +77,8 @@ export interface ChatResponse {
 export interface SummarizeResponse {
   /** The memory each love interest in the scene keeps of it, by id. */
   memories: Record<string, string>
+  /** How much each of those memories matters to her, by id. */
+  levels: Record<string, MemoryLevel>
   /** How the scene changed what each love interest feels for the player, by id, and why. None for an NPC. */
   feelings: Record<string, { affection: number; trust: number; desire: number; reason: string }>
   /** The love interests who had sex with the player in the scene, by id. */
@@ -227,6 +230,10 @@ export interface RendererApi {
     deleteEvent(id: string): Promise<EditorResult>
     /** Has the Main LLM think of events for the calendar. They are not saved: the editor adds the ones it is given. Never rejects. */
     draftEvents(): Promise<{ events?: CalendarEvent[]; error?: string }>
+    /** Adds a job to the game, or changes one. Only when the game's own files are being edited. */
+    saveJob(job: unknown): Promise<EditorResult>
+    /** Takes a job out of the game. Only when the game's own files are being edited. */
+    deleteJob(id: string): Promise<EditorResult>
     /** Writes the player a new game starts with: his default name, what he starts with, and his room. */
     savePlayer(newGame: unknown): Promise<EditorResult>
     /** Puts the player back as the game shipped him. */
@@ -240,6 +247,13 @@ export interface RendererApi {
     writeCourseWording(courses: Course[]): Promise<CourseWordingResponse>
     /** Has the user pick a file, copies it into the add-on folder, and returns its content path. Null if they cancelled. */
     importAsset(request: ImportAssetRequest): Promise<string | null>
+    /** The bytes of one of the content's pictures, by its path. Rejects for a path outside the content. */
+    readPicture(path: string): Promise<Uint8Array>
+    /**
+     * Files a WebP made from one of the content's pictures beside it (in the add-on folder, for a picture of the game's
+     * own while an add-on is edited), and returns its path. The original goes once a save no longer names it.
+     */
+    saveOptimized(picture: OptimizedPicture): Promise<string>
     openFolder(): Promise<void>
   }
   /** The art studio's link to the user's own ComfyUI. Called only from the studio, never from a scene. */
@@ -249,19 +263,29 @@ export interface RendererApi {
     saveSettings(settings: ComfySettings): Promise<ComfySettings>
     /** Asks the address given whether ComfyUI is there. Never rejects. */
     test(baseUrl: string): Promise<ComfyTestResult>
-    /** Has the user pick the folder their workflows are exported to. Null if they cancelled. */
-    chooseFolder(): Promise<string | null>
-    /** Reads the workflow folder as the saved settings have it. */
+    /** Reads the game's workflows, as the saved settings have them bound. */
     workflows(): Promise<WorkflowListResult>
-    /** The workflows the game ships with, and what each calls for. */
+    /** The game's workflows, and what each calls for. */
     bundle(): Promise<ComfyBundle>
-    /** Has the player pick a folder, writes the game's workflows into it and points the settings at them. Never rejects. */
-    installBundle(): Promise<ComfyBundleInstall>
     /** Asks the ComfyUI in the settings which of the models and nodes the game's workflows call for it lacks. Never rejects. */
     checkBundle(): Promise<ComfyBundleCheck>
+    /** The models and node packs the game's workflows call for, with which models are already in place. */
+    downloads(): Promise<ComfyDownloadList>
+    /** Has the player pick his ComfyUI folder, finds where its models are kept, and remembers it. The list as it then is; unchanged if he cancelled. Rejects when no models folder is found there. */
+    chooseModelsDir(): Promise<ComfyDownloadList>
+    /** Keeps the player's Civitai key for downloads, or with an empty one forgets it. */
+    setCivitaiKey(key: string): Promise<ComfyDownloadList>
+    /** Downloads one of the listed models into its folder. One at a time. Never rejects. */
+    downloadModel(file: string): Promise<ModelDownloadResult>
+    /** Stops the download that is running, if one is. */
+    cancelDownload(): Promise<void>
+    /** Hears how far a download has got. Returns what stops the listening. */
+    onDownloadProgress(listener: (progress: ModelDownloadProgress) => void): () => void
     /** Draws one picture and files it in the add-on folder. Never rejects; a failure comes back as `message`. */
     generate(request: GenerateArtRequest): Promise<GenerateArtResult>
-    /** Gives up on the picture being drawn, if one is. */
+    /** Makes one clip from a picture of the content and files it in the add-on folder. Never rejects; a failure comes back as `message`. */
+    generateVideo(request: GenerateVideoRequest): Promise<GenerateArtResult>
+    /** Gives up on the picture or clip being made, if one is. */
     cancel(): Promise<void>
     /** Takes the flat background out from behind a generated picture, into a new file that replaces it. Never rejects. */
     cutout(request: CutoutRequest): Promise<CutoutResult>

@@ -10,6 +10,7 @@ import {
   movedScene,
   moveState,
   passSceneTime,
+  roomBackdrop,
   roomOwner,
   sceneHours,
   sceneDestinations,
@@ -106,6 +107,10 @@ describe('where a scene can go', () => {
     // Going on from her room to the shop leaves it.
     expect(movedScene(upstairs, shop).roomOf).toBeUndefined()
     expect(roomOwner(content, scene)).toBeUndefined()
+    // A view the scene insisted on, and a picture it was set in, are left where they were.
+    const set = movedScene({ ...scene, viewId: 'yard', picture: 'bed.png' }, shop)
+    expect(set.viewId).toBeUndefined()
+    expect(set.picture).toBeUndefined()
   })
 
   it('lets hours pass in the story, within reason', () => {
@@ -140,6 +145,12 @@ describe('what the character is told of where she is', () => {
     expect(describePlace(shop, shop.backgrounds[1])).toBe('the Shop, the yard. You are out of doors, under the open sky. Shelves to the ceiling.')
     // A place with no views goes by what the place itself says.
     expect(describePlace({ ...shop, indoors: true }, undefined)).toContain('You are indoors')
+    // A view that says what it is has that said after the place.
+    expect(describePlace(shop, { ...shop.backgrounds[0], description: 'The till is here.' })).toBe('the Shop, the counter. You are indoors, under a roof. Shelves to the ceiling. The till is here.')
+    // A room is staged by its own picture, or by a view of the place it is in.
+    expect(roomBackdrop({ name: 'a loft', description: '', locationId: 'shop', background: 'loft.png' }, 'k')).toEqual({ room: { image: 'loft.png', key: 'k' } })
+    expect(roomBackdrop({ name: 'a loft', description: '', locationId: 'shop', viewId: 'yard' }, 'k')).toEqual({ viewId: 'yard' })
+    expect(roomBackdrop(undefined, 'k')).toEqual({})
     expect(sceneView(content, { ...state, locationId: 'shop' })?.id).toBe('counter')
     expect(sceneView(content, { ...state, locationId: 'shop' }, 'yard')?.id).toBe('yard')
   })

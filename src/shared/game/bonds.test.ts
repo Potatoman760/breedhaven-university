@@ -30,7 +30,7 @@ const content: ContentPack = {
     statuses: [
       { id: 'exclusive', name: 'Courting', exclusive: true, minStage: 'friend', description: 'A couple.', guidance: 'Expect to be put first.' },
       { id: 'open', name: 'Open courtship', minStage: 'friend', description: 'A couple who may see others.' },
-      { id: 'open-triad', name: 'Open triad', minMembers: 2, maxMembers: 2, mutual: true, minStage: 'friend', minTie: 30, description: 'Three together.' }
+      { id: 'open-throuple', name: 'Open throuple', minMembers: 2, maxMembers: 2, mutual: true, minStage: 'friend', minTie: 30, description: 'Three together.' }
     ].map((s) => RelationshipStatusSchema.parse(s)),
     tieLevels: [
       { id: 'strangers', name: 'barely acquainted', min: 0, description: '' },
@@ -83,7 +83,7 @@ describe('canBond', () => {
 
   it('needs the love interests in a three to be close to each other as well', () => {
     const state = friendsWith('ana', 'bea')
-    const three = { statusId: 'open-triad', memberIds: ['ana', 'bea'] }
+    const three = { statusId: 'open-throuple', memberIds: ['ana', 'bea'] }
     expect(canBond(content, state, three).reasons).toEqual(['Ana and Bea are not close enough to each other yet'])
     expect(canBond(content, changeTie(content, state, 'ana', 'bea', 30), three).ok).toBe(true)
   })
@@ -109,18 +109,18 @@ describe('an open three', () => {
     statusId: 'open',
     memberIds: ['bea']
   })
-  const three = formBond(content, both, { statusId: 'open-triad', memberIds: ['ana', 'bea'] })
+  const three = formBond(content, both, { statusId: 'open-throuple', memberIds: ['ana', 'bea'] })
 
   it('replaces what each of them had with the player before', () => {
     expect(both.bonds).toHaveLength(2)
-    expect(three.bonds).toEqual([{ statusId: 'open-triad', memberIds: ['ana', 'bea'], since: 0 }])
-    expect(bondOf(three, 'bea')?.statusId).toBe('open-triad')
-    expect(describeBond(content, three.bonds[0])).toBe('Open triad with Ana and Bea')
+    expect(three.bonds).toEqual([{ statusId: 'open-throuple', memberIds: ['ana', 'bea'], since: 0 }])
+    expect(bondOf(three, 'bea')?.statusId).toBe('open-throuple')
+    expect(describeBond(content, three.bonds[0])).toBe('Open throuple with Ana and Bea')
   })
 
   it('is told to each of them: who is in it, that they are with each other, and who else he sees', () => {
     const lines = describeBonds(content, three, 'ana')
-    expect(lines[0]).toBe('You and Pat are in a relationship: Open triad. Three together.')
+    expect(lines[0]).toBe('You and Pat are in a relationship: Open throuple. Three together.')
     expect(lines[1]).toBe('Bea is part of it too: you are with her as well as with Pat.')
     expect(lines[2]).toMatch(/free to see others/)
     expect(lines[3]).toBe('You and Bea: close. You trust her.')
@@ -140,8 +140,8 @@ describe('an open three', () => {
 
   it('reaches the prompt, including what the others in a scene are to him and to her', () => {
     const prompt = buildCharacterPrompt({ content, state: three, loveInterestId: 'ana', companionIds: ['bea'] })
-    expect(prompt).toContain('## What you are to each other, and to the others\nYou and Pat are in a relationship: Open triad.')
-    expect(prompt).toContain('She and Pat are in a relationship: Open triad.')
+    expect(prompt).toContain('## What you are to each other, and to the others\nYou and Pat are in a relationship: Open throuple.')
+    expect(prompt).toContain('She and Pat are in a relationship: Open throuple.')
     // What she and the other are to each other is said once, and not again under the other's name.
     expect(prompt).toContain('You and Bea: close.')
     expect(prompt).not.toContain('You and she are close.')

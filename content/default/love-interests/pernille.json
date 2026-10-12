@@ -15,7 +15,7 @@
       "description": "a fitted pale pink blouse, a charcoal pencil skirt, a name badge with a blossom logo and a lanyard",
       "sprites": {
         "neutral": {
-          "image": "sprites/pernille/default-neutral-cutout.png",
+          "image": "sprites/pernille/default-neutral-cutout.webp",
           "description": ""
         }
       },

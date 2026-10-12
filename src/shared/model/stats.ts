@@ -32,6 +32,8 @@ export const CourierNoteSchema = z.object({
       locationId: z.string()
     })
     .optional(),
+  /** Something other than a meeting that this note offers him, to take or leave: a house. What he said to it is `answer`. */
+  offer: z.literal('housing').optional(),
   /** What became of the proposal: lapsed means its time passed or filled up before an answer; cancelled, that he accepted and then called it off. */
   answer: z.enum(['accepted', 'declined', 'lapsed', 'cancelled']).optional(),
   /** False for a note from them the player hasn't opened yet. */

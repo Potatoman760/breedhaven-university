@@ -32,7 +32,8 @@ import {
   stageFor,
   toDate,
   unreadNotes,
-  weatherOn
+  weatherOn,
+  roomBackdrop
 } from '../../../shared/game'
 import { STAT_LABELS, STATS, type Activity, type ContentPack, type GameState } from '../../../shared/model'
 import { ActivityList } from './ActivityList'
@@ -43,7 +44,8 @@ import {
   MapIcon,
   MenuIcon,
   PhoneIcon,
-  WeatherIcon
+  WeatherIcon,
+  JobIcon
 } from './icons'
 import type { Panel } from './panels'
 
@@ -88,7 +90,7 @@ export function DayView(props: Props) {
   const today = eventsOn(content, state)
   const over = isGameOver(calendar, state.time)
   const weather = weatherOn(content, state)
-  // Whoever is here and can be gone up to: someone in a class he does not take with her is left out.
+  // Whoever is here and can be gone up to: someone in class is left out, and met only by sitting it with her.
   const present = approachableAt(content, state, state.locationId)
   const npcsHere = npcsAt(content, state, state.locationId)
   // The player's own courses that are meeting right now.
@@ -110,11 +112,14 @@ export function DayView(props: Props) {
   // The next class, shift or plan of his still to come today. Only one thing is put forward at a time: with something
   // on now, that is it, and what follows it waits its turn.
   const upcoming = onNow ? undefined : nextUp(content, state)
+  // Whether a plan on his timetable is the birth of a child of his, which is said as what it is.
+  const isBirth = (planId: string) => state.appointments.find((plan) => plan.id === planId)?.kind === 'birth'
   // While orientation has a part left, it is the only thing to do.
   const induction = over ? undefined : orientationStep(content, state)
   const inductionPlace = content.locations.find((l) => l.id === induction?.locationId)
 
 
+  const ownRoom = roomBackdrop(state.inOwnRoom ? content.newGame.room : undefined, 'room-of-player')
   return (
     <main className="stage">
       {/* In his own room, the room is what is behind him, and not the building it is in. */}
@@ -124,8 +129,8 @@ export function DayView(props: Props) {
         location={location}
         periodId={date.period.id}
         light={date.period.light}
-        backgroundId={props.backgroundId}
-        room={state.inOwnRoom && content.newGame.room ? { image: content.newGame.room.background, key: 'room-of-player' } : undefined}
+        backgroundId={ownRoom.viewId ?? props.backgroundId}
+        room={ownRoom.room}
       />
 
       <div className="date-banner glass framed">
@@ -235,7 +240,7 @@ export function DayView(props: Props) {
         {!induction && !over && upcoming && (
           canGoTo(content, state, upcoming).ok ? (
             <button className="featured" disabled={props.busy} onClick={() => props.onGoTo(upcoming)}>
-              <span className="chip outline-light">{upcoming.kind === 'class' ? 'Next class' : upcoming.kind === 'work' ? 'Next shift' : 'Next plan'}</span>
+              <span className="chip outline-light">{upcoming.kind === 'class' ? 'Next class' : upcoming.kind === 'work' ? 'Next shift' : isBirth(upcoming.id) ? 'Birth' : 'Next plan'}</span>
               <span className="featured-title">{upcoming.title}</span>
               <span>
                 skip to {formatTime(toDate(calendar, upcoming.time))} · {content.locations.find((l) => l.id === upcoming.locationId)?.name}
@@ -275,16 +280,14 @@ export function DayView(props: Props) {
           const who = firstNames(content, attendees(plan))
           return check.ok ? (
             <button key={plan.id} className="featured" onClick={() => props.onGoTo(item)}>
-              <span className="chip outline-light">Plan</span>
-              <span className="featured-title">
-                {plan.title} with {who}
-              </span>
+              <span className="chip outline-light">{plan.kind === 'birth' ? 'Birth' : 'Plan'}</span>
+              <span className="featured-title">{plan.kind === 'birth' ? `${who} is giving birth` : `${plan.title} with ${who}`}</span>
               <ChevronIcon size={18} />
             </button>
           ) : (
             <p key={plan.id} className="glass note">
               <strong>
-                {who} {plan.companionIds.length > 0 ? 'are' : 'is'} waiting for you: {plan.title}.
+                {plan.kind === 'birth' ? `${who} is giving birth, and wants you there.` : `${who} ${plan.companionIds.length > 0 ? 'are' : 'is'} waiting for you: ${plan.title}.`}
               </strong>{' '}
               {check.reasons.join(' · ')}
             </p>
@@ -458,6 +461,14 @@ export function DayView(props: Props) {
       </div>
 
       <div className="tiles">
+        {/* His house, once he has one: its plan, who lives in it, and its accounts. */}
+        {content.housing && state.housing.status === 'resident' && (
+          <button className="tile glass home" onClick={() => onOpen({ kind: 'house' })}>
+            <JobIcon name="house" size={30} />
+            {content.housing.name}
+            {state.housing.arrears > 0 && <span className="badge">!</span>}
+          </button>
+        )}
         <button className="tile glass" onClick={() => onOpen({ kind: 'map' })}>
           <MapIcon size={36} />
           Map

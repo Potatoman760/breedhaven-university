@@ -1,6 +1,6 @@
 import { useRef, useState, type FormEvent, type CSSProperties, type KeyboardEvent } from 'react'
-import { attendees, bondLifts, describeBond, describeWhen, statusOf, dialogueLines, firstNames, sceneCast, sceneClock, toDate, weatherOn, wornOutfit, lookOf, spriteFor, npcAsCharacter, playerRoom, roomOwner, sceneExtras, unreadNotes } from '../../../shared/game'
-import { type ContentPack, type GameState, type LoveInterest, type Scene } from '../../../shared/model'
+import { attendees, bondLifts, describeBond, describeWhen, statusOf, dialogueLines, firstNames, sceneCast, sceneClock, toDate, weatherOn, wornOutfit, lookOf, spriteFor, npcAsCharacter, playerRoom, roomBackdrop, roomOwner, sceneExtras, unreadNotes } from '../../../shared/game'
+import { poseMedia, type ContentPack, type GameState, type LoveInterest, type Scene } from '../../../shared/model'
 import logo from '../../../assets/logo.png'
 import { Wisps } from '../fx/Wisps'
 import { Backdrop } from './Backdrop'
@@ -87,6 +87,8 @@ export function SceneView(props: Props) {
   const [hidden, setHidden] = useState(false)
   // The sprite or video file that last failed to load, so it isn't retried every render.
   const [missing, setMissing] = useState<string | null>(null)
+  // A pose's files that would not load, so that the next of them is shown in their place.
+  const [lost, setLost] = useState<string[]>([])
 
   const date = toDate(content.calendar, state.time)
   // What the date card shows: the middle of the scene, since the clock already stands at the hour it ends.
@@ -124,9 +126,9 @@ export function SceneView(props: Props) {
   // It is one character's: the lead's, or in a group whoever it was named for. It covers everyone either way.
   const poser = cast.find((li) => li.id === scene.animationOf) ?? partner
   const animation = poser.animations.find((a) => a.id === scene.animationId)
-  // What of it is shown: its clip when it has one that will play, and its picture otherwise.
-  const media = animation && (animation.clip !== undefined && missing !== animation.clip ? animation.clip : animation.image)
-  const playing = animation !== undefined && media !== undefined && missing !== media
+  // What of it is shown: the first of its clip, its picture and its first frame that will load.
+  const media = animation && poseMedia(animation).find((file) => !lost.includes(file))
+  const playing = animation !== undefined && media !== undefined
   const beat = scene.beats[scene.beats.length - 1]
 
   // What the text box shows: the latest exchange, or the activity's description as
@@ -201,6 +203,9 @@ export function SceneView(props: Props) {
   // Where the scene is, in a word or two: someone's room is hers and no more, without the building it is in.
   const placeName = his ? 'Your room' : owner ? `${owner.name.split(' ')[0]}'s room` : (beat?.locationName ?? location?.name)
 
+  // What is behind them: a picture the scene is set in, else the room it is in, else the place.
+  const staged = scene.picture ? { room: { image: scene.picture, key: 'scene-picture' }, viewId: undefined } : his ? roomBackdrop(his, 'room-of-player') : roomBackdrop(owner?.room, `room-of-${owner?.id}`)
+
   function submit(event: FormEvent) {
     event.preventDefault()
     const text = input.trim()
@@ -227,10 +232,11 @@ export function SceneView(props: Props) {
     >
       <Backdrop
         screen="scene"
-        room={his ? { image: his.background, key: 'room-of-player' } : owner && { image: owner.room?.background, key: `room-of-${owner.id}` }}
+        room={staged.room}
         weather={weather?.effect}
-        location={location} periodId={date.period.id} light={date.period.light} backgroundId={props.backgroundId} />
-      {group || extraSpeaking ? (
+        location={location} periodId={date.period.id} light={date.period.light} backgroundId={staged.viewId ?? props.backgroundId} />
+      {/* A scene set in a picture has her in the picture: nobody is stood in front of it. */}
+      {scene.picture ? null : group || extraSpeaking ? (
         <div className="cast">
           {onStage.map((li) => {
             const image = spriteOf(li)
@@ -269,7 +275,7 @@ export function SceneView(props: Props) {
       {playing &&
         (media !== animation.clip ? (
           // A picture stays up until the LLM takes it down.
-          <img key={media} className="scene-video" src={`content://pack/${media}`} alt={animation.name} onError={() => setMissing(media)} />
+          <img key={media} className="scene-video" src={`content://pack/${media}`} alt={animation.name} onError={() => setLost((before) => [...before, media])} />
         ) : (
           <video
             key={media}
@@ -281,7 +287,7 @@ export function SceneView(props: Props) {
             muted
             playsInline
             onEnded={props.onAnimationEnd}
-            onError={() => setMissing(media)}
+            onError={() => setLost((before) => [...before, media])}
           />
         ))}
 

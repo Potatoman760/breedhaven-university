@@ -8,6 +8,8 @@ import { backgroundFor, isIndoors, isOpen } from './schedule'
 const MAX_HOURS_PER_REPLY = 12
 // How a love interest's own room is named among the places a scene can go.
 const ROOM_PREFIX = 'room-of-'
+// And a room of his house.
+const HOUSE_PREFIX = 'home-'
 /** Whose room a scene is in when it is in the player's own: no love interest has this id. */
 export const PLAYER_ROOM = 'player'
 
@@ -20,6 +22,8 @@ export interface Destination {
   indoors: boolean
   /** Set when it is someone's own room: whose. */
   roomOf?: string
+  /** Set when it is a room of his house: which, by its key. */
+  houseRoom?: string
 }
 
 /** The love interest whose room the scene is in, if it is in one. */
@@ -73,6 +77,16 @@ export function sceneDestinations(
       roomOf: PLAYER_ROOM
     })
   }
+  // At home, the rooms of the house that are built and are anyone's to sit in can be gone through to.
+  const config = content.housing
+  if (config && state.housing.status === 'resident' && state.locationId === config.locationId) {
+    for (const room of config.rooms) {
+      if (room.role !== 'common' || (state.housing.rooms[room.key] ?? 0) < 1) continue
+      // The room he is in already, or the one a scene at the house's door is in, is not somewhere to go.
+      if (scene.roomOf === undefined && (state.housing.room ?? config.rooms.find((r) => r.viewId === 'default')?.key) === room.key) continue
+      rooms.push({ id: `${HOUSE_PREFIX}${room.key}`, name: `${room.name.toLowerCase()} of ${config.name}`, locationId: config.locationId, indoors: !room.plan.outdoors, houseRoom: room.key })
+    }
+  }
   const places = content.locations
     // The place a room is in can be gone back down to from the room.
     .filter((l) => (l.id !== state.locationId || scene.roomOf !== undefined) && reachable(l.id) && open(l))
@@ -95,14 +109,15 @@ export function findDestination(destinations: Destination[], asked: string): Des
 
 /** The state after a scene has moved: the player is there with everyone in it. Going there takes no time. */
 export function moveState(state: GameState, destination: Destination): GameState {
-  return { ...state, locationId: destination.locationId, inOwnRoom: destination.roomOf === PLAYER_ROOM }
+  // In his house, he is in the room he went to; anywhere else, or at its door, in none.
+  return { ...state, locationId: destination.locationId, inOwnRoom: destination.roomOf === PLAYER_ROOM, housing: { ...state.housing, room: destination.houseRoom } }
 }
 
 /**
  * The scene after it has moved. What was being done where it was is over and marked so;
  * arriving is the new beat; and it is, or is no longer, in someone's room.
  */
-export function movedScene<S extends Pick<Scene, 'beats' | 'roomOf' | 'backgroundId'>>(scene: S, destination: Destination): S {
+export function movedScene<S extends Pick<Scene, 'beats' | 'roomOf' | 'backgroundId' | 'viewId' | 'picture'>>(scene: S, destination: Destination): S {
   return {
     ...scene,
     beats: [
@@ -113,8 +128,10 @@ export function movedScene<S extends Pick<Scene, 'beats' | 'roomOf' | 'backgroun
       }
     ],
     roomOf: destination.roomOf,
-    // A view picked for the old place means nothing in the new one.
-    backgroundId: undefined
+    // A view picked for the old place means nothing in the new one, and neither does one it insisted on or a picture it was set in.
+    backgroundId: undefined,
+    viewId: undefined,
+    picture: undefined
   }
 }
 
@@ -166,7 +183,16 @@ export function viewFor(content: ContentPack, state: GameState, location: Locati
 export function describePlace(location: Location, view: Background | undefined): string {
   const spot = view && view.name.toLowerCase() !== location.name.toLowerCase() ? `, ${view.name.toLowerCase()}` : ''
   const shelter = isIndoors(location, view) ? 'You are indoors, under a roof.' : 'You are out of doors, under the open sky.'
-  return `${location.name}${spot}. ${shelter} ${location.description}`.trim()
+  return `${location.name}${spot}. ${shelter} ${location.description} ${view?.description ?? ''}`.trim()
+}
+
+/**
+ * How a room is put on the stage: by its own picture, or when it is a view of the place it is in, by that view, which
+ * has a picture for the day and one for the night. Nothing for no room.
+ */
+export function roomBackdrop(room: Room | undefined, key: string): { room?: { image: string | undefined; key: string }; viewId?: string } {
+  if (!room) return {}
+  return room.viewId !== undefined ? { viewId: room.viewId } : { room: { image: room.background, key } }
 }
 
 /** Told to the characters in a scene that is in the player's own room. */

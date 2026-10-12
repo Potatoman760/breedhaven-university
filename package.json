@@ -1,6 +1,6 @@
 {
   "name": "breedhaven-dating-sim",
-  "version": "0.1.0",
+  "version": "0.6.0",
   "description": "An AI-driven dating sim built on Electron",
   "private": true,
   "main": "./out/main/index.js",
@@ -8,8 +8,15 @@
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "start": "electron-vite preview",
+    "build:win": "electron-vite build && electron-builder --win",
+    "build:win:installer": "electron-vite build && electron-builder --win nsis",
+    "build:mac": "electron-vite build && electron-builder --mac",
+    "build:linux": "electron-vite build && electron-builder --linux",
+    "build:unpack": "electron-vite build && electron-builder --dir",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "clips": "jiti scripts/generate-clips.ts",
+    "births": "jiti scripts/generate-births.ts"
   },
   "dependencies": {
     "@fontsource/alegreya-sans": "^5.3.0",
@@ -25,7 +32,9 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^5.2.0",
     "electron": "^44.5.1",
+    "electron-builder": "^26.15.3",
     "electron-vite": "^5.0.0",
+    "jiti": "^2.7.0",
     "typescript": "^7.0.2",
     "vite": "^7.3.6",
     "vitest": "^5.0.3"

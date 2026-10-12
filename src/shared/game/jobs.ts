@@ -3,7 +3,7 @@ import type { PerformCheck } from './activities'
 import { timeOn } from './agenda'
 import { isGameOver, toDate } from './calendar'
 import { addNote, giveContact } from './courier'
-import { loveInterestsAt } from './map'
+import { approachableAt } from './map'
 import { sceneBaseline } from './scene'
 import { statOf, trainStat } from './stats'
 
@@ -155,8 +155,8 @@ export function startShift(content: ContentPack, state: GameState): { state: Gam
   const place = content.locations.find((l) => l.id === job.locationId)
   const { hour } = toDate(content.calendar, state.time)
   const left = shift.startHour + shift.hours - hour
-  // Whoever is here now is here for his shift: found before the clock is run on.
-  const [lead, ...others] = loveInterestsAt(content, state, job.locationId).slice(0, MAX_SCENE_CAST)
+  // Whoever is here now, and not in class, is here for his shift: found before the clock is run on.
+  const [lead, ...others] = approachableAt(content, state, job.locationId).slice(0, MAX_SCENE_CAST)
   const companionIds = others.map((li) => li.id)
   const leadId = lead?.id ?? job.bossId
   const bossName = boss?.name ?? 'the boss'

@@ -35,31 +35,31 @@
       "description": "a long, close-fitting deep green dress with long sleeves, a low off-the-shoulder neckline and a skirt slit to the thigh on one side; a soft grey shawl draped over her elbows; a silver pendant shaped like an open seed resting at her chest; a small gold cuff on each ear; and a pair of reading glasses pushed up into her hair",
       "sprites": {
         "neutral": {
-          "image": "sprites/caelwen/default-neutral-cutout-2.png",
+          "image": "sprites/caelwen/default-neutral-cutout-2.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/caelwen/default-happy-2-cutout.png",
+          "image": "sprites/caelwen/default-happy-2-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/caelwen/default-sad-cutout.png",
+          "image": "sprites/caelwen/default-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/caelwen/default-angry-cutout.png",
+          "image": "sprites/caelwen/default-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/caelwen/default-surprised-cutout.png",
+          "image": "sprites/caelwen/default-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/caelwen/default-embarrassed-cutout.png",
+          "image": "sprites/caelwen/default-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/caelwen/default-aroused-cutout.png",
+          "image": "sprites/caelwen/default-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -72,31 +72,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/caelwen/pregnant-neutral-cutout.png",
+          "image": "sprites/caelwen/pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/caelwen/pregnant-happy-cutout.png",
+          "image": "sprites/caelwen/pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/caelwen/pregnant-sad-cutout.png",
+          "image": "sprites/caelwen/pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/caelwen/pregnant-angry-cutout.png",
+          "image": "sprites/caelwen/pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/caelwen/pregnant-surprised-cutout.png",
+          "image": "sprites/caelwen/pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/caelwen/pregnant-embarrassed-cutout.png",
+          "image": "sprites/caelwen/pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/caelwen/pregnant-aroused-cutout.png",
+          "image": "sprites/caelwen/pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -108,31 +108,31 @@
       "description": "nothing at all, completely nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/caelwen/nude-neutral-cutout.png",
+          "image": "sprites/caelwen/nude-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/caelwen/nude-happy-cutout.png",
+          "image": "sprites/caelwen/nude-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/caelwen/nude-sad-cutout.png",
+          "image": "sprites/caelwen/nude-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/caelwen/nude-angry-cutout.png",
+          "image": "sprites/caelwen/nude-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/caelwen/nude-surprised-cutout.png",
+          "image": "sprites/caelwen/nude-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/caelwen/nude-embarrassed-cutout.png",
+          "image": "sprites/caelwen/nude-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/caelwen/nude-aroused-cutout.png",
+          "image": "sprites/caelwen/nude-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -145,31 +145,31 @@
       "inherits": "nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/caelwen/nude-pregnant-neutral-cutout.png",
+          "image": "sprites/caelwen/nude-pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/caelwen/nude-pregnant-happy-cutout.png",
+          "image": "sprites/caelwen/nude-pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/caelwen/nude-pregnant-sad-cutout.png",
+          "image": "sprites/caelwen/nude-pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/caelwen/nude-pregnant-angry-cutout.png",
+          "image": "sprites/caelwen/nude-pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/caelwen/nude-pregnant-surprised-cutout.png",
+          "image": "sprites/caelwen/nude-pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/caelwen/nude-pregnant-embarrassed-cutout.png",
+          "image": "sprites/caelwen/nude-pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/caelwen/nude-pregnant-aroused-cutout.png",
+          "image": "sprites/caelwen/nude-pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -201,84 +201,90 @@
       "id": "blowjob",
       "name": "Blowjob",
       "description": "",
-      "image": "sprites/caelwen/nsfw-blowjob.png",
+      "image": "sprites/caelwen/nsfw-blowjob.webp",
+      "clip": "sprites/caelwen/nsfw-blowjob.mp4",
       "loop": true
     },
     {
       "id": "missionary",
       "name": "Missionary",
       "description": "",
-      "image": "sprites/caelwen/nsfw-missionary.png",
+      "image": "sprites/caelwen/nsfw-missionary.webp",
+      "clip": "sprites/caelwen/nsfw-missionary.mp4",
       "loop": true
     },
     {
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/caelwen/nsfw-doggy.png",
+      "image": "sprites/caelwen/nsfw-doggy.webp",
+      "clip": "sprites/caelwen/nsfw-doggy.mp4",
       "loop": true
     },
     {
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
-      "image": "sprites/caelwen/nsfw-cowgirl.png",
+      "image": "sprites/caelwen/nsfw-cowgirl.webp",
+      "clip": "sprites/caelwen/nsfw-cowgirl-2.mp4",
       "loop": true
     },
     {
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/caelwen/nsfw-creampie-2.png",
+      "image": "sprites/caelwen/nsfw-creampie.png",
+      "clip": "sprites/caelwen/nsfw-creampie.mp4",
       "loop": true
     },
     {
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/caelwen/nsfw-facial.png",
+      "image": "sprites/caelwen/nsfw-facial.webp",
+      "clip": "sprites/caelwen/nsfw-facial.mp4",
       "loop": true
     },
     {
       "id": "pregnant-blowjob",
       "name": "Blowjob, pregnant",
       "description": "",
-      "image": "sprites/caelwen/nsfw-pregnant-blowjob.png",
+      "image": "sprites/caelwen/nsfw-pregnant-blowjob.webp",
       "loop": true
     },
     {
       "id": "pregnant-missionary",
       "name": "Missionary, pregnant",
       "description": "",
-      "image": "sprites/caelwen/nsfw-pregnant-missionary.png",
+      "image": "sprites/caelwen/nsfw-pregnant-missionary.webp",
       "loop": true
     },
     {
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
-      "image": "sprites/caelwen/nsfw-pregnant-doggy.png",
+      "image": "sprites/caelwen/nsfw-pregnant-doggy.webp",
       "loop": true
     },
     {
       "id": "pregnant-cowgirl",
       "name": "Cowgirl, pregnant",
       "description": "",
-      "image": "sprites/caelwen/nsfw-pregnant-cowgirl.png",
+      "image": "sprites/caelwen/nsfw-pregnant-cowgirl.webp",
       "loop": true
     },
     {
       "id": "pregnant-creampie",
       "name": "Creampie, pregnant",
       "description": "",
-      "image": "sprites/caelwen/nsfw-pregnant-creampie.png",
+      "image": "sprites/caelwen/nsfw-pregnant-creampie.webp",
       "loop": true
     },
     {
       "id": "pregnant-facial",
       "name": "Facial, pregnant",
       "description": "",
-      "image": "sprites/caelwen/nsfw-pregnant-facial.png",
+      "image": "sprites/caelwen/nsfw-pregnant-facial.webp",
       "loop": true
     }
   ],
@@ -332,8 +338,9 @@
     "name": "her tall house by Riverside Park",
     "description": "The sitting room of a tall, narrow old house, lined with bookshelves from floor to ceiling. Framed photographs crowd the mantelpiece, the oldest in sepia. An upright piano with sheet music, deep armchairs with knitted throws, a long worn kitchen table visible through an archway, and glass doors opening onto a conservatory full of large, very old potted plants and ferns. Soft green-tinted daylight, lived-in and quiet.",
     "locationId": "riverside-park",
-    "background": "generated/backgrounds/caelwen/view-2.png"
+    "background": "generated/backgrounds/caelwen/view-2.webp"
   },
+  "birthPicture": "sprites/caelwen/birth.png",
   "ai": {
     "speechPattern": "Measured, warm and lightly ironic, in full sentences. Answers a question with a better question. Old-fashioned turns of phrase that she knows are old-fashioned. Gentle teasing, and real attention to what is said back.",
     "tone": "wry, warm, unhurried",

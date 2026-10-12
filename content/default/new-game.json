@@ -19,6 +19,6 @@
     "name": "his room",
     "description": "a standard dorm with a queen bed with cream sheets, a desk with a laptop on it, kept clean, with artwork on the walls",
     "locationId": "dormitories",
-    "background": "generated/backgrounds/player/view-7.png"
+    "background": "generated/backgrounds/player/view-7.webp"
   }
 }

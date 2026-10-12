@@ -15,7 +15,7 @@
       "description": "a black leather corset top, slim black trousers, and an earpiece",
       "sprites": {
         "neutral": {
-          "image": "sprites/nyx/default-neutral-2-cutout.png",
+          "image": "sprites/nyx/default-neutral-2-cutout.webp",
           "description": ""
         }
       },

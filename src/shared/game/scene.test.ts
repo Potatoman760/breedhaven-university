@@ -87,6 +87,10 @@ describe('look directives', () => {
     // A pose goes on top of a face and an outfit, and is asked for beside them.
     expect(parseDirectives('[OUTFIT: nude]\n[EXPRESSION: aroused]\n[POSE: missionary]\nYes.')).toMatchObject({ text: 'Yes.', outfitId: 'nude', expression: 'aroused', animationId: 'missionary' })
     expect(parseDirectives('Enough.\n[POSE: none]').animationId).toBeNull()
+    // The tag is [SEX-ACT: id], however it is spaced or joined; [POSE] is still read.
+    expect(parseDirectives('[SEX-ACT: cowgirl]\nYes.')).toMatchObject({ text: 'Yes.', animationId: 'cowgirl' })
+    expect(parseDirectives('[Sex Act: Faye=doggy]').animationOf).toBe('Faye')
+    expect(parseDirectives('[SEX_ACT: none]').animationId).toBeNull()
     expect(parseDirectives('Enough.\n[ANIMATION: none]\n[END SCENE]')).toEqual({
       text: 'Enough.',
       ended: true,

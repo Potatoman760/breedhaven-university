@@ -1,29 +1,41 @@
 import { z } from 'zod'
-import { DEFAULT_VIEW, outfitParts, type Location, type LoveInterest, type Npc, pronounWords } from './model'
+import { basePoseId, DEFAULT_VIEW, outfitParts, type Location, type LoveInterest, type Npc, pronounWords } from './model'
 
 /**
  * The art studio's link to the user's own ComfyUI. It is a tool the user calls directly to
  * make sprites and backgrounds (and, later, photos); nothing in a scene ever calls it.
  *
- * ComfyUI has no "draw this" endpoint: a request is a whole workflow graph. So the user
- * exports their workflows in API format into a folder, and the app writes the prompt, the
- * size and the seed into the right places in one of them. Those places are the bindings
+ * ComfyUI has no "draw this" endpoint: a request is a whole workflow graph. So the game
+ * carries its own workflows, exported in API format, in its content (`comfy/`), and the app
+ * writes the prompt, the size and the seed into the right places in one of them. Those places are the bindings
  * below, worked out by reading the graph (`main/comfy/graph.ts`) and correctable by hand.
  */
 
 /** What a picture is for. Each kind has its own default workflow, size and framing words. */
-export const ART_KINDS = ['sprite', 'background', 'photo', 'nsfw'] as const
+export const ART_KINDS = ['sprite', 'background', 'photo', 'nsfw', 'birth'] as const
 export type ArtKind = (typeof ART_KINDS)[number]
 
 export const ART_KIND_LABELS: Record<ArtKind, string> = {
   sprite: 'Sprite',
   background: 'Background',
   photo: 'Photo',
-  nsfw: 'NSFW picture'
+  nsfw: 'NSFW picture',
+  birth: 'Birth picture'
 }
 
-/** A place in a graph the app may write to. Nothing is written to `output`: it names whose pictures to collect. */
-export const BINDING_SLOTS = ['positive', 'negative', 'width', 'height', 'seed', 'output'] as const
+/** What a workflow can be the default for: each kind of picture, and the clips made from the NSFW pictures. */
+export const WORKFLOW_KINDS = [...ART_KINDS, 'video'] as const
+export type WorkflowKind = (typeof WORKFLOW_KINDS)[number]
+
+export const WORKFLOW_KIND_LABELS: Record<WorkflowKind, string> = { ...ART_KIND_LABELS, video: 'Video clip' }
+
+/**
+ * A place in a graph the app may write to. Nothing is written to `output`: it names whose pictures to collect.
+ * `firstFrame` and `lastFrame` are the pictures a video workflow starts from and ends on: a workflow with
+ * somewhere to put a first frame is a video workflow, and makes clips and not pictures. `length` is how long its
+ * clip runs, in seconds.
+ */
+export const BINDING_SLOTS = ['positive', 'negative', 'width', 'height', 'seed', 'firstFrame', 'lastFrame', 'length', 'output'] as const
 export type BindingSlot = (typeof BINDING_SLOTS)[number]
 
 export const SLOT_LABELS: Record<BindingSlot, string> = {
@@ -32,6 +44,9 @@ export const SLOT_LABELS: Record<BindingSlot, string> = {
   width: 'Width',
   height: 'Height',
   seed: 'Seed',
+  firstFrame: 'First frame',
+  lastFrame: 'Last frame',
+  length: 'Length (seconds)',
   output: 'Saved image'
 }
 
@@ -53,6 +68,12 @@ export const COMFY_DEFAULT_BASE_URL = 'http://127.0.0.1:8188'
 export const COMFY_DEFAULT_TIMEOUT_SECONDS = 300
 export const COMFY_MIN_TIMEOUT_SECONDS = 30
 export const COMFY_MAX_TIMEOUT_SECONDS = 1800
+// A clip is many frames: ten seconds of video takes several times what a picture does.
+export const COMFY_DEFAULT_VIDEO_TIMEOUT_SECONDS = 1200
+export const COMFY_MAX_VIDEO_TIMEOUT_SECONDS = 7200
+// How long a clip runs, in seconds, unless the studio is told otherwise; and as long as one may be asked to.
+export const DEFAULT_CLIP_SECONDS = 10
+export const MAX_CLIP_SECONDS = 60
 
 const SizeSchema = z.object({
   width: z.number().int().min(64).max(8192),
@@ -64,7 +85,8 @@ export const DEFAULT_SIZES: Record<ArtKind, { width: number; height: number }> =
   sprite: { width: 1080, height: 1920 },
   background: { width: 1920, height: 1080 },
   photo: { width: 1024, height: 1024 },
-  nsfw: { width: 1920, height: 1080 }
+  nsfw: { width: 1920, height: 1080 },
+  birth: { width: 1920, height: 1080 }
 }
 
 /** Words that close every prompt of a kind, after its subject: how the picture is framed, not what is in it. */
@@ -72,16 +94,30 @@ export const DEFAULT_FRAMING: Record<ArtKind, string> = {
   sprite: 'three-quarter shot from knees up, standing, facing forward\n\nplain white background',
   background: 'wide establishing shot, no people',
   photo: 'candid phone photo, natural light',
-  nsfw: 'wide cinematic shot, bedroom, soft warm light'
+  nsfw: 'wide cinematic shot, bedroom, soft warm light',
+  birth: 'wide cinematic shot, a bright modern hospital maternity room, soft daylight'
 }
+
+/**
+ * What a clip of a pose is asked for with, by pose id. Unlike a picture's prompt it is not written from the
+ * character: the picture it starts from already shows her, so only what moves is said, and that is the same
+ * for everyone. None is written yet, so each pose uses the general one below until it has its own.
+ */
+export const DEFAULT_VIDEO_PROMPTS: Record<string, string> = {}
+
+/** What a clip is asked for with when nothing is written for its pose. */
+export const DEFAULT_VIDEO_PROMPT =
+  'static camera\n\nShe moves slowly and steadily in the pose she is in, breathing, her hair shifting a little. The motion is smooth and ends as it began.\n\nAudio: soft ambient room noise'
 
 export const ComfySettingsSchema = z.object({
   /** Where ComfyUI answers. */
   baseUrl: z.string().default(COMFY_DEFAULT_BASE_URL),
-  /** Folder of API-format workflow exports, or null when none is chosen. */
-  workflowDir: z.string().nullable().default(null),
+  /** The folder ComfyUI keeps its models in, where downloaded ones are put. Null until it is found or chosen. */
+  modelsDir: z.string().nullable().default(null),
   /** How long one generation may take. */
   timeoutSeconds: z.number().int().min(COMFY_MIN_TIMEOUT_SECONDS).max(COMFY_MAX_TIMEOUT_SECONDS).default(COMFY_DEFAULT_TIMEOUT_SECONDS),
+  /** How long one clip may take. */
+  videoTimeoutSeconds: z.number().int().min(COMFY_MIN_TIMEOUT_SECONDS).max(COMFY_MAX_VIDEO_TIMEOUT_SECONDS).default(COMFY_DEFAULT_VIDEO_TIMEOUT_SECONDS),
   /**
    * Text put before the prompt, by workflow file name. Per workflow because LoRA triggers
    * and model tokens that help one graph are meaningless or harmful in another.
@@ -91,20 +127,30 @@ export const ComfySettingsSchema = z.object({
   negativePrefixes: z.record(z.string(), z.string()).default({}),
   /** Hand corrections to the bindings, by workflow file name. */
   overrides: z.record(z.string(), BindingOverrideSchema).default({}),
-  /** The workflow each kind of picture uses when none is picked, by file name. */
-  defaults: z.partialRecord(z.enum(ART_KINDS), z.string()).default({}),
+  /** The workflow each kind of picture uses when none is picked, by file name; and the one clips are made with. */
+  defaults: z.partialRecord(z.enum(WORKFLOW_KINDS), z.string()).default({}),
   /** Framing words for each kind, in place of the built-in ones. */
   framing: z.partialRecord(z.enum(ART_KINDS), z.string()).default({}),
   /** The size each kind is drawn at, in place of the built-in ones. */
-  sizes: z.partialRecord(z.enum(ART_KINDS), SizeSchema).default({})
+  sizes: z.partialRecord(z.enum(ART_KINDS), SizeSchema).default({}),
+  /** What a clip of each pose is asked for with, by pose id, in place of the built-in ones. */
+  videoPrompts: z.record(z.string(), z.string()).default({}),
+  /** Whether a clip is made to loop: asked to end on the picture it starts from, so that it goes round without a jump. One that is not is played once. */
+  videoLastFrame: z.boolean().default(false),
+  /** How long a clip runs, in seconds. */
+  videoSeconds: z.number().min(1).max(MAX_CLIP_SECONDS).default(DEFAULT_CLIP_SECONDS)
 })
 export type ComfySettings = z.infer<typeof ComfySettingsSchema>
 
-/** What the game says of the workflows it ships with: the parts of the settings that are about a workflow or a kind of picture, and nothing of the player's own machine. */
-export const ComfyBundleSettingsSchema = ComfySettingsSchema.pick({ promptPrefixes: true, negativePrefixes: true, overrides: true, defaults: true, framing: true, sizes: true })
+/**
+ * What the game itself says of its workflows: the parts of the settings that are about a workflow or a kind of
+ * picture, and nothing of the player's own machine. Kept in the content beside the workflows, and read under
+ * whatever a player has changed for themselves.
+ */
+export const ComfyBundleSettingsSchema = ComfySettingsSchema.pick({ promptPrefixes: true, negativePrefixes: true, overrides: true, defaults: true, framing: true, sizes: true, videoPrompts: true })
 export type ComfyBundleSettings = z.infer<typeof ComfyBundleSettingsSchema>
 
-/** The workflows that ship with the game, and what each calls for that the player has to fetch themselves. */
+/** The game's workflows, and what each calls for that the player has to fetch themselves. */
 export interface ComfyBundle {
   workflows: {
     file: string
@@ -116,11 +162,64 @@ export interface ComfyBundle {
   }[]
 }
 
-/** What came of installing the game's workflows. Null settings when it was not done; `message` says why. */
-export interface ComfyBundleInstall {
+/** One model file the game's workflows call for, and where it comes from. */
+export const ModelDownloadSchema = z.object({
+  /** Its path inside its folder, as the workflow names it, with forward slashes: `krea2/style.safetensors`. */
+  file: z.string(),
+  /** The folder of ComfyUI's models it belongs in: `diffusion_models`, `loras`, `vae`. */
+  folder: z.string(),
+  /** What it is, for a person. */
+  name: z.string().default(''),
+  /** For one on Civitai: the id of the version to fetch. Adult-rated ones need the player's own key. */
+  civitaiVersionId: z.number().int().optional(),
+  /** For one anywhere else: the address of the file itself. */
+  url: z.string().optional(),
+  /** Its page, to read about it or fetch it by hand. */
+  page: z.string(),
+  /** About how big it is. */
+  sizeMb: z.number().min(0),
+  /** What it must hash to, so that a broken or wrong download is not kept. */
+  sha256: z.string().optional()
+})
+export type ModelDownload = z.infer<typeof ModelDownloadSchema>
+
+/** A pack of custom nodes a workflow needs, which the player installs into ComfyUI himself. */
+export const NodePackSchema = z.object({
+  name: z.string(),
+  /** The kinds of node it brings, as a workflow names them. */
+  provides: z.array(z.string()).default([]),
+  page: z.string()
+})
+export type NodePack = z.infer<typeof NodePackSchema>
+
+export const ComfyDownloadsSchema = z.object({
+  models: z.array(ModelDownloadSchema).default([]),
+  nodes: z.array(NodePackSchema).default([])
+})
+export type ComfyDownloads = z.infer<typeof ComfyDownloadsSchema>
+
+/** What there is to download, as the window is told it: each model with whether it is already there. */
+export interface ComfyDownloadList {
+  models: (ModelDownload & { present: boolean })[]
+  nodes: NodePack[]
+  /** Where models are put, once it is known. */
+  modelsDir: string | null
+  /** Whether a Civitai key is kept. The key itself never leaves the main process. */
+  hasCivitaiKey: boolean
+}
+
+/** What came of downloading one model. */
+export interface ModelDownloadResult {
   ok: boolean
+  file: string
   message: string
-  settings: ComfySettings | null
+}
+
+/** How far a download has got, in bytes. */
+export interface ModelDownloadProgress {
+  file: string
+  received: number
+  total: number
 }
 
 /** What a running ComfyUI lacks of what the game's workflows call for. */
@@ -137,6 +236,12 @@ export function framingFor(settings: Pick<ComfySettings, 'framing'>, kind: ArtKi
 
 export function sizeFor(settings: Pick<ComfySettings, 'sizes'>, kind: ArtKind): { width: number; height: number } {
   return settings.sizes[kind] ?? DEFAULT_SIZES[kind]
+}
+
+/** What a clip of a pose is asked for with. One drawn pregnant moves as the pose it is built on does. */
+export function videoPromptFor(settings: Pick<ComfySettings, 'videoPrompts'>, poseId: string): string {
+  const pose = basePoseId(poseId)
+  return settings.videoPrompts[pose] ?? DEFAULT_VIDEO_PROMPTS[pose] ?? DEFAULT_VIDEO_PROMPT
 }
 
 /** A prompt with a workflow's prefix in front of it, as a paragraph of its own, when it has one. */
@@ -246,6 +351,26 @@ export interface GenerateArtResult {
   skipped: BindingSlot[]
 }
 
+export const GenerateVideoRequestSchema = z.object({
+  /** Whose clip it is: decides the folder. */
+  subjectId: z.string().max(64).default(''),
+  /** What the file is called, before a number is added to keep it from replacing another. */
+  name: z.string().max(64).default(''),
+  /** Workflow file name. Empty means the default for clips, or failing that the first that takes a first frame. */
+  workflow: z.string().default(''),
+  /** The picture the clip starts from, by its content path. */
+  image: z.string().min(1),
+  /** What moves in it. */
+  prompt: z.string().max(8000),
+  /** The picture the clip ends on, by its content path: the same one, for a clip that loops; another, for a pose that ends somewhere else. Left out, it ends where it goes. */
+  lastImage: z.string().min(1).optional(),
+  /** How long it runs, in seconds. Left out, as long as the workflow has it. */
+  seconds: z.number().min(1).max(MAX_CLIP_SECONDS).optional(),
+  /** Left out, a new one is drawn each time. */
+  seed: z.number().int().min(0).optional()
+})
+export type GenerateVideoRequest = z.input<typeof GenerateVideoRequestSchema>
+
 export const CutoutRequestSchema = z.object({
   /** The picture's content path, in the add-on folder. */
   path: z.string(),
@@ -339,6 +464,22 @@ export function nsfwPrompt(who: Pick<LoveInterest | Npc, 'appearance' | 'outfits
     paragraph(`${subject[0].toUpperCase()}${subject.slice(1)} ${subject === 'they' ? 'wear' : 'wears'} ${bare}`),
     ...(pregnant ? (added.length > 0 ? added : ['She has a round, pregnant belly.']).map(paragraph) : []),
     paragraph(pose),
+    framing.trim()
+  ])
+}
+
+/**
+ * The prompt for the picture of a character just after she has given birth, which is the whole stage of the scene of
+ * a birth he is there for: her body, that she is in a hospital bed in a gown with the child in her arms, and how the
+ * picture is framed, each a paragraph. She is no longer drawn pregnant: the child is born.
+ */
+export function birthPrompt(who: Pick<LoveInterest | Npc, 'appearance'> & { pronouns?: string }, framing: string): string {
+  const { subject } = pronounWords(who.pronouns)
+  const She = `${subject[0].toUpperCase()}${subject.slice(1)}`
+  return paragraphs([
+    paragraph(who.appearance),
+    paragraph(`${She} ${subject === 'they' ? 'wear' : 'wears'} a pale hospital gown`),
+    paragraph(`${She} ${subject === 'they' ? 'sit' : 'sits'} propped up on pillows in a hospital bed, cradling a newborn baby wrapped in a soft blanket in ${subject === 'they' ? 'their' : subject === 'he' ? 'his' : 'her'} arms, smiling down at it, tired and radiant`),
     framing.trim()
   ])
 }

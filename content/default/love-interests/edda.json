@@ -15,7 +15,7 @@
       "description": "a tailored charcoal wool dress, a long scholar's robe of deep blue worn open, a silver brooch at the collar, and reading glasses on a chain",
       "sprites": {
         "neutral": {
-          "image": "sprites/edda/default-neutral-cutout.png",
+          "image": "sprites/edda/default-neutral-cutout.webp",
           "description": ""
         }
       },

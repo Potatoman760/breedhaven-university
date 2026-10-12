@@ -48,6 +48,16 @@ const TEXT_FIELDS = ['text', 'text_g', 'text_l', 'prompt', 'string', 'value'] as
 const SEED_FIELDS = ['seed', 'noise_seed'] as const
 // Nodes that pictures come out of, best first: one that saves is preferred to one that previews.
 const OUTPUT_CLASSES = ['SaveImage', 'SaveImageWebsocket', 'PreviewImage']
+// The inputs a video node takes the picture it starts from by, and the one it ends on, whatever the node is called.
+const FIRST_FRAME_INPUTS = ['first_frame', 'start_image', 'first_image', 'start_frame'] as const
+const LAST_FRAME_INPUTS = ['last_frame', 'end_image', 'last_image', 'end_frame'] as const
+// What a value that says how long a clip runs, in seconds, is called: by the title of the node that holds it, or by the input itself.
+// Not the video node's own `length`, which is a count of frames.
+const LENGTH_TITLE = /\b(length|duration|seconds)\b/i
+const LENGTH_FIELDS = ['seconds', 'duration', 'length_seconds', 'duration_seconds'] as const
+// Where a loaded picture's file is named, and the inputs a picture is passed along by.
+const IMAGE_FIELD = 'image'
+const IMAGE_INPUTS = /^(image|images|pixels)$/
 
 function isLink(value: unknown): value is [string | number, number] {
   return Array.isArray(value) && value.length === 2 && (typeof value[0] === 'string' || typeof value[0] === 'number') && typeof value[1] === 'number'
@@ -250,6 +260,48 @@ function findNearby(graph: ComfyGraph, start: string, fields: readonly string[],
   return null
 }
 
+/** Walks back from where a picture is taken in to the node that loads it from a file, through any resize or crop on the way. */
+function followToImage(graph: ComfyGraph, id: string, seen: Set<string>, depth: number): NodeField | null {
+  if (depth > MAX_DEPTH || seen.has(id)) return null
+  seen.add(id)
+  const node = graph.nodes.get(id)
+  if (!node) return null
+  if (typeof valueOf(graph, id, IMAGE_FIELD) === 'string') return { node: id, field: IMAGE_FIELD }
+  // The picture itself first, so that a mask or a size wired into the same node is not followed in its place.
+  const links = linkInputs(node)
+  const ordered = [...links.filter((l) => IMAGE_INPUTS.test(l.name)), ...links.filter((l) => !IMAGE_INPUTS.test(l.name))]
+  for (const link of ordered) {
+    const found = followToImage(graph, link.node, seen, depth + 1)
+    if (found) return found
+  }
+  return null
+}
+
+/** The picture a video workflow starts from or ends on: the node that takes it in, by which input, and the file it is loaded from. */
+function findFrame(graph: ComfyGraph, inputs: readonly string[]): { taker: string; input: string; at: NodeField } | null {
+  for (const id of graph.order) {
+    for (const input of inputs) {
+      const link = graph.nodes.get(id)!.inputs.get(input)
+      if (link?.kind !== 'link') continue
+      const at = followToImage(graph, link.node, new Set(), 0)
+      if (at) return { taker: id, input, at }
+    }
+  }
+  return null
+}
+
+/** Where a video workflow is told how long its clip runs, in seconds: a number the user titled for it, or one named for it. */
+function findLength(graph: ComfyGraph): NodeField | null {
+  for (const id of graph.order) {
+    const node = graph.nodes.get(id)!
+    if (node.title && LENGTH_TITLE.test(node.title) && typeof valueOf(graph, id, 'value') === 'number') return { node: id, field: 'value' }
+  }
+  for (const id of graph.order) {
+    for (const field of LENGTH_FIELDS) if (typeof valueOf(graph, id, field) === 'number') return { node: id, field }
+  }
+  return null
+}
+
 function findOutput(graph: ComfyGraph): string | null {
   const named = graph.order
     .filter((id) => OUTPUT_CLASSES.includes(graph.nodes.get(id)!.classType))
@@ -259,7 +311,8 @@ function findOutput(graph: ComfyGraph): string | null {
   // No node with a name we know: anything that takes images and feeds nothing else is where they come out.
   const fedFrom = new Set<string>()
   for (const id of graph.order) for (const link of linkInputs(graph.nodes.get(id)!)) fedFrom.add(link.node)
-  return graph.order.find((id) => !fedFrom.has(id) && graph.nodes.get(id)?.inputs.get('images')?.kind === 'link') ?? null
+  const takes = (id: string, name: string) => graph.nodes.get(id)?.inputs.get(name)?.kind === 'link'
+  return graph.order.find((id) => !fedFrom.has(id) && (takes(id, 'images') || takes(id, 'video'))) ?? null
 }
 
 function summarise(graph: ComfyGraph): WorkflowNodeSummary[] {
@@ -272,7 +325,7 @@ function summarise(graph: ComfyGraph): WorkflowNodeSummary[] {
 }
 
 export function noBindings(): WorkflowBindings {
-  return { positive: null, negative: null, width: null, height: null, seed: null, output: null }
+  return { positive: null, negative: null, width: null, height: null, seed: null, firstFrame: null, lastFrame: null, length: null, output: null }
 }
 
 /** Reads a graph and works out where everything goes. */
@@ -280,7 +333,39 @@ export function analyse(graph: ComfyGraph): WorkflowAnalysis {
   const problems: string[] = []
   const detected = noBindings()
   const notes: Partial<Record<BindingSlot, string>> = {}
-  const sampler = pickSampler(graph, samplerCandidates(graph), problems)
+  const output = findOutput(graph)
+  const first = findFrame(graph, FIRST_FRAME_INPUTS)
+  const last = findFrame(graph, LAST_FRAME_INPUTS)
+  // A video node often takes its prompt itself, with no sampler of the usual shape anywhere: the words are then on the node the first frame goes into.
+  const candidates = samplerCandidates(graph)
+  const framed = first ? TEXT_FIELDS.find((field) => typeof valueOf(graph, first.taker, field) === 'string') : undefined
+  const sampler = candidates.length === 0 && first && framed ? null : pickSampler(graph, candidates, problems)
+
+  if (first) {
+    detected.firstFrame = first.at
+    notes.firstFrame = `${label(graph, first.taker)} ${first.input} → ${label(graph, first.at.node)} ${first.at.field}`
+    // Only a clip has a length.
+    const length = findLength(graph)
+    if (length) {
+      detected.length = length
+      notes.length = `${label(graph, length.node)} ${length.field}`
+    }
+  }
+  // One picture loaded for both would be a clip that cannot be told to end anywhere else.
+  if (last && !(first && last.at.node === first.at.node)) {
+    detected.lastFrame = last.at
+    notes.lastFrame = `${label(graph, last.taker)} ${last.input} → ${label(graph, last.at.node)} ${last.at.field}`
+  }
+  if (!sampler && first && framed) {
+    detected.positive = { node: first.taker, field: framed }
+    notes.positive = `${label(graph, first.taker)} ${framed}`
+    // With no sampler to start from, the noise is looked for back from where the clip comes out.
+    const seed = output ? findNearby(graph, output, SEED_FIELDS, MAX_DEPTH) : null
+    if (seed) {
+      detected.seed = seed
+      notes.seed = `${label(graph, seed.node)} ${seed.field}`
+    }
+  }
 
   if (sampler) {
     const node = graph.nodes.get(sampler)!
@@ -330,7 +415,6 @@ export function analyse(graph: ComfyGraph): WorkflowAnalysis {
     problems.push('No seed was found. ComfyUI caches by workflow, so the same prompt will return the same picture every time.')
   }
 
-  const output = findOutput(graph)
   if (output) {
     detected.output = { node: output, field: 'images' }
     notes.output = label(graph, output)
@@ -394,9 +478,26 @@ export interface GenerationValues {
   width?: number
   height?: number
   seed?: number
+  /** The pictures a clip starts from and ends on, by the names ComfyUI was given them under. */
+  firstFrame?: string
+  lastFrame?: string
+  /** How long a clip runs, in seconds. */
+  length?: number
 }
 
-const WRITABLE = ['positive', 'negative', 'width', 'height', 'seed'] as const
+const WRITABLE = ['positive', 'negative', 'width', 'height', 'seed', 'firstFrame', 'lastFrame', 'length'] as const
+
+/**
+ * Takes the closing picture out of a graph that is about to be sent: whatever takes one in is unplugged from it, so
+ * the clip ends wherever the model takes it. The node that loaded it is then wired to nothing, and ComfyUI leaves it alone.
+ */
+export function unplugLastFrame(prompt: Record<string, unknown>): void {
+  for (const node of Object.values(prompt)) {
+    const inputs = (node as { inputs?: Record<string, unknown> } | null)?.inputs
+    if (typeof inputs !== 'object' || inputs === null) continue
+    for (const input of LAST_FRAME_INPUTS) if (isLink(inputs[input])) delete inputs[input]
+  }
+}
 
 /**
  * The graph as it will be sent: the user's own export with our values written into a

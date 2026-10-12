@@ -4,7 +4,7 @@ import { formatTime, isGameOver, toDate } from './calendar'
 import { applyEffects } from './conditions'
 import { eventGoers, eventsOn } from './events'
 import { courseMembers, meetingNow } from './courses'
-import { locationOf, approachableAt } from './map'
+import { locationOf, approachableAt, inClass } from './map'
 import { shiftKey } from './jobs'
 import { timeOn } from './agenda'
 import { addCoursePoints, studyPoints } from './grades'
@@ -169,7 +169,7 @@ export function buildOutingPrompt(content: ContentPack, state: GameState, text: 
     '',
     'People:',
     ...content.loveInterests.map(
-      (li) => `- ${li.id}: ${li.name}${locationOf(content, state, li) === state.locationId ? ' (here now)' : ''}`
+      (li) => `- ${li.id}: ${li.name}${inClass(content, state, li) ? ' (in class)' : locationOf(content, state, li) === state.locationId ? ' (here now)' : ''}`
     ),
     '',
     'Places:',
@@ -235,6 +235,9 @@ function busyReason(content: ContentPack, state: GameState, id: string, from: nu
   const li = content.loveInterests.find((c) => c.id === id)
   if (!li) return 'nobody by that name'
   const name = li.name.split(' ')[0]
+  // In the hours her child is being born she is nowhere else.
+  const birth = state.appointments.find((plan) => plan.kind === 'birth' && plan.loveInterestId === id && plan.time < from + hours && from < plan.time + plan.hours)
+  if (birth) return `${name} is at ${content.locations.find((l) => l.id === birth.locationId)?.name ?? 'the Health Centre'}: the child is coming`
   for (let time = from; time < from + hours; time++) {
     const then = { ...state, time }
     for (const course of state.courses.filter((c) => courseMembers(c).includes(id))) {

@@ -35,31 +35,31 @@
       "description": "a tight black cropped training top with a deep neckline that leaves her midriff bare; low-slung, close-fitting grey leggings; a wide red cloth sash knotted at one hip with its ends hanging to the knee; white wrist wraps on both forearms; and a steel whistle on a cord that rests between her breasts",
       "sprites": {
         "neutral": {
-          "image": "sprites/grushka/default-neutral-cutout-2.png",
+          "image": "sprites/grushka/default-neutral-cutout-2.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/grushka/default-happy-cutout.png",
+          "image": "sprites/grushka/default-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/grushka/default-sad-cutout.png",
+          "image": "sprites/grushka/default-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/grushka/default-angry-cutout.png",
+          "image": "sprites/grushka/default-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/grushka/default-surprised-cutout.png",
+          "image": "sprites/grushka/default-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/grushka/default-embarrassed-cutout.png",
+          "image": "sprites/grushka/default-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/grushka/default-aroused-cutout.png",
+          "image": "sprites/grushka/default-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -72,31 +72,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/grushka/pregnant-neutral-cutout.png",
+          "image": "sprites/grushka/pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/grushka/pregnant-happy-cutout.png",
+          "image": "sprites/grushka/pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/grushka/pregnant-sad-cutout.png",
+          "image": "sprites/grushka/pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/grushka/pregnant-angry-cutout.png",
+          "image": "sprites/grushka/pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/grushka/pregnant-surprised-cutout.png",
+          "image": "sprites/grushka/pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/grushka/pregnant-embarrassed-cutout.png",
+          "image": "sprites/grushka/pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/grushka/pregnant-aroused-cutout.png",
+          "image": "sprites/grushka/pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -108,31 +108,31 @@
       "description": "nothing at all, completely nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/grushka/nude-neutral-cutout.png",
+          "image": "sprites/grushka/nude-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/grushka/nude-happy-cutout.png",
+          "image": "sprites/grushka/nude-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/grushka/nude-sad-cutout.png",
+          "image": "sprites/grushka/nude-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/grushka/nude-angry-cutout.png",
+          "image": "sprites/grushka/nude-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/grushka/nude-surprised-cutout.png",
+          "image": "sprites/grushka/nude-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/grushka/nude-embarrassed-cutout.png",
+          "image": "sprites/grushka/nude-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/grushka/nude-aroused-cutout.png",
+          "image": "sprites/grushka/nude-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -145,31 +145,31 @@
       "inherits": "nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/grushka/nude-pregnant-neutral-cutout.png",
+          "image": "sprites/grushka/nude-pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/grushka/nude-pregnant-happy-cutout.png",
+          "image": "sprites/grushka/nude-pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/grushka/nude-pregnant-sad-cutout.png",
+          "image": "sprites/grushka/nude-pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/grushka/nude-pregnant-angry-cutout.png",
+          "image": "sprites/grushka/nude-pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/grushka/nude-pregnant-surprised-cutout.png",
+          "image": "sprites/grushka/nude-pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/grushka/nude-pregnant-embarrassed-cutout.png",
+          "image": "sprites/grushka/nude-pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/grushka/nude-pregnant-aroused-cutout.png",
+          "image": "sprites/grushka/nude-pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -202,84 +202,90 @@
       "id": "blowjob",
       "name": "Blowjob",
       "description": "",
-      "image": "sprites/grushka/nsfw-blowjob.png",
+      "image": "sprites/grushka/nsfw-blowjob.webp",
+      "clip": "sprites/grushka/nsfw-blowjob.mp4",
       "loop": true
     },
     {
       "id": "missionary",
       "name": "Missionary",
       "description": "",
-      "image": "sprites/grushka/nsfw-missionary.png",
+      "image": "sprites/grushka/nsfw-missionary.webp",
+      "clip": "sprites/grushka/nsfw-missionary.mp4",
       "loop": true
     },
     {
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/grushka/nsfw-doggy-2.png",
+      "image": "sprites/grushka/nsfw-doggy-2.webp",
+      "clip": "sprites/grushka/nsfw-doggy.mp4",
       "loop": true
     },
     {
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
-      "image": "sprites/grushka/nsfw-cowgirl.png",
+      "image": "sprites/grushka/nsfw-cowgirl.webp",
+      "clip": "sprites/grushka/nsfw-cowgirl-2.mp4",
       "loop": true
     },
     {
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/grushka/nsfw-creampie.png",
+      "image": "sprites/grushka/nsfw-creampie.webp",
+      "clip": "sprites/grushka/nsfw-creampie.mp4",
       "loop": true
     },
     {
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/grushka/nsfw-facial.png",
+      "image": "sprites/grushka/nsfw-facial.webp",
+      "clip": "sprites/grushka/nsfw-facial.mp4",
       "loop": true
     },
     {
       "id": "pregnant-blowjob",
       "name": "Blowjob, pregnant",
       "description": "",
-      "image": "sprites/grushka/nsfw-pregnant-blowjob.png",
+      "image": "sprites/grushka/nsfw-pregnant-blowjob.webp",
       "loop": true
     },
     {
       "id": "pregnant-missionary",
       "name": "Missionary, pregnant",
       "description": "",
-      "image": "sprites/grushka/nsfw-pregnant-missionary.png",
+      "image": "sprites/grushka/nsfw-pregnant-missionary.webp",
       "loop": true
     },
     {
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
-      "image": "sprites/grushka/nsfw-pregnant-doggy.png",
+      "image": "sprites/grushka/nsfw-pregnant-doggy.webp",
       "loop": true
     },
     {
       "id": "pregnant-cowgirl",
       "name": "Cowgirl, pregnant",
       "description": "",
-      "image": "sprites/grushka/nsfw-pregnant-cowgirl.png",
+      "image": "sprites/grushka/nsfw-pregnant-cowgirl.webp",
       "loop": true
     },
     {
       "id": "pregnant-creampie",
       "name": "Creampie, pregnant",
       "description": "",
-      "image": "sprites/grushka/nsfw-pregnant-creampie.png",
+      "image": "sprites/grushka/nsfw-pregnant-creampie.webp",
       "loop": true
     },
     {
       "id": "pregnant-facial",
       "name": "Facial, pregnant",
       "description": "",
-      "image": "sprites/grushka/nsfw-pregnant-facial.png",
+      "image": "sprites/grushka/nsfw-pregnant-facial.webp",
       "loop": true
     }
   ],
@@ -333,8 +339,9 @@
     "name": "her apartment overlooking the Tiltyard",
     "description": "A plain two-room apartment in a modern block beside a sports ground, with white walls and a wide floor-to-ceiling window. A wide, low bed under a thick red and grey woven wool blanket, a wall rack of training swords and wooden practice blades, children's crayon drawings pinned beside the door, an iron kettle and a cast-iron pan on an induction hob, a set of dumbbells in the corner, a tablet showing a training schedule on the counter. The window looks down onto a sanded arena ring under floodlights. Warm evening lamplight.",
     "locationId": "tiltyard",
-    "background": "generated/backgrounds/grushka/view.png"
+    "background": "generated/backgrounds/grushka/view.webp"
   },
+  "birthPicture": "sprites/grushka/birth.png",
   "ai": {
     "speechPattern": "Low, plain and unhurried. Short sentences, no hedging. States terms and keeps to them. Praise is rare and specific. Uses a few Kharadi turns of phrase and swears mildly in it.",
     "tone": "blunt, steady, warm underneath",

@@ -37,31 +37,31 @@
       "description": "a form fitting yellow sundress, with cleavage",
       "sprites": {
         "neutral": {
-          "image": "sprites/elowen/default-neutral-cutout-2.png",
+          "image": "sprites/elowen/default-neutral-cutout-2.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/elowen/default-happy-2-cutout.png",
+          "image": "sprites/elowen/default-happy-2-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/elowen/default-sad-3-cutout.png",
+          "image": "sprites/elowen/default-sad-3-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/elowen/default-angry-2-cutout.png",
+          "image": "sprites/elowen/default-angry-2-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/elowen/default-surprised-cutout.png",
+          "image": "sprites/elowen/default-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/elowen/default-embarrassed-cutout.png",
+          "image": "sprites/elowen/default-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/elowen/default-aroused-5-cutout.png",
+          "image": "sprites/elowen/default-aroused-5-cutout.webp",
           "description": ""
         }
       },
@@ -74,31 +74,31 @@
       "inherits": "default",
       "sprites": {
         "happy": {
-          "image": "sprites/elowen/pregnant-happy-2-cutout.png",
+          "image": "sprites/elowen/pregnant-happy-2-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/elowen/pregnant-sad-2-cutout.png",
+          "image": "sprites/elowen/pregnant-sad-2-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/elowen/pregnant-surprised-2-cutout.png",
+          "image": "sprites/elowen/pregnant-surprised-2-cutout.webp",
           "description": ""
         },
         "neutral": {
-          "image": "sprites/elowen/pregnant-neutral-3-cutout.png",
+          "image": "sprites/elowen/pregnant-neutral-3-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/elowen/pregnant-aroused-3-cutout.png",
+          "image": "sprites/elowen/pregnant-aroused-3-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/elowen/pregnant-angry-5-cutout.png",
+          "image": "sprites/elowen/pregnant-angry-5-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/elowen/pregnant-embarrassed-cutout.png",
+          "image": "sprites/elowen/pregnant-embarrassed-cutout.webp",
           "description": ""
         }
       },
@@ -110,31 +110,31 @@
       "description": "nothing at all, completely nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/elowen/nude-neutral-2-cutout.png",
+          "image": "sprites/elowen/nude-neutral-2-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/elowen/nude-happy-2-cutout.png",
+          "image": "sprites/elowen/nude-happy-2-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/elowen/nude-sad-cutout.png",
+          "image": "sprites/elowen/nude-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/elowen/nude-angry-cutout.png",
+          "image": "sprites/elowen/nude-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/elowen/nude-surprised-cutout.png",
+          "image": "sprites/elowen/nude-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/elowen/nude-embarrassed-2-cutout.png",
+          "image": "sprites/elowen/nude-embarrassed-2-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/elowen/nude-aroused-9-cutout.png",
+          "image": "sprites/elowen/nude-aroused-9-cutout.webp",
           "description": ""
         }
       },
@@ -147,31 +147,31 @@
       "inherits": "nude",
       "sprites": {
         "happy": {
-          "image": "sprites/elowen/nude-pregnant-happy-cutout.png",
+          "image": "sprites/elowen/nude-pregnant-happy-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/elowen/nude-pregnant-angry-cutout.png",
+          "image": "sprites/elowen/nude-pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/elowen/nude-pregnant-surprised-cutout.png",
+          "image": "sprites/elowen/nude-pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/elowen/nude-pregnant-embarrassed-cutout.png",
+          "image": "sprites/elowen/nude-pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/elowen/nude-pregnant-aroused-cutout.png",
+          "image": "sprites/elowen/nude-pregnant-aroused-cutout.webp",
           "description": ""
         },
         "neutral": {
-          "image": "sprites/elowen/nude-pregnant-neutral-4-cutout.png",
+          "image": "sprites/elowen/nude-pregnant-neutral-4-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/elowen/nude-pregnant-sad-5-cutout.png",
+          "image": "sprites/elowen/nude-pregnant-sad-5-cutout.webp",
           "description": ""
         }
       },
@@ -197,77 +197,83 @@
       "id": "blowjob",
       "name": "Blowjob",
       "description": "",
-      "image": "sprites/elowen/nsfw-blowjob.png",
+      "image": "sprites/elowen/nsfw-blowjob.webp",
+      "clip": "sprites/elowen/nsfw-blowjob.mp4",
       "loop": true
     },
     {
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
-      "image": "sprites/elowen/nsfw-cowgirl-8.png",
+      "image": "sprites/elowen/nsfw-cowgirl-8.webp",
+      "clip": "sprites/elowen/nsfw-cowgirl-2.mp4",
       "loop": true
     },
     {
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/elowen/nsfw-doggy-2.png",
+      "image": "sprites/elowen/nsfw-doggy-2.webp",
+      "clip": "sprites/elowen/nsfw-doggy.mp4",
       "loop": true
     },
     {
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/elowen/nsfw-creampie-2.png",
+      "image": "sprites/elowen/nsfw-creampie-2.webp",
+      "clip": "sprites/elowen/nsfw-creampie-3.mp4",
       "loop": true
     },
     {
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/elowen/nsfw-facial-2.png",
+      "image": "sprites/elowen/nsfw-facial-2.webp",
+      "clip": "sprites/elowen/nsfw-facial.mp4",
       "loop": true
     },
     {
       "id": "missionary",
       "name": "Missionary",
       "description": "",
-      "image": "sprites/elowen/nsfw-missionary-8.png",
+      "image": "sprites/elowen/nsfw-missionary-8.webp",
+      "clip": "sprites/elowen/nsfw-missionary.mp4",
       "loop": true
     },
     {
       "id": "pregnant-blowjob",
       "name": "Blowjob, pregnant",
       "description": "",
-      "image": "sprites/elowen/nsfw-pregnant-blowjob.png",
+      "image": "sprites/elowen/nsfw-pregnant-blowjob.webp",
       "loop": true
     },
     {
       "id": "pregnant-missionary",
       "name": "Missionary, pregnant",
       "description": "",
-      "image": "sprites/elowen/nsfw-pregnant-missionary-2.png",
+      "image": "sprites/elowen/nsfw-pregnant-missionary-2.webp",
       "loop": true
     },
     {
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
-      "image": "sprites/elowen/nsfw-pregnant-doggy-4.png",
+      "image": "sprites/elowen/nsfw-pregnant-doggy-4.webp",
       "loop": true
     },
     {
       "id": "pregnant-cowgirl",
       "name": "Cowgirl, pregnant",
       "description": "",
-      "image": "sprites/elowen/nsfw-pregnant-cowgirl.png",
+      "image": "sprites/elowen/nsfw-pregnant-cowgirl.webp",
       "loop": true
     },
     {
       "id": "pregnant-creampie",
       "name": "Creampie, pregnant",
       "description": "",
-      "image": "sprites/elowen/nsfw-pregnant-creampie.png",
+      "image": "sprites/elowen/nsfw-pregnant-creampie.webp",
       "loop": true
     }
   ],
@@ -319,8 +325,9 @@
     "name": "her lantern room in the Cloister Halls",
     "description": "A bright, cluttered modern dormitory room, strung wall to wall with paper lanterns that float and glow without wires, and strings of fairy lights. Gig posters and coloured ribbons cover the smooth white walls. An unmade single bed heaped with patterned cushions, shelves crowded with collected bottles and trinkets, a row of glass fermenting jars bubbling on the windowsill, a small speaker on a stool, clothes over a desk chair, a phone on a glowing charging plate. Warm, colourful light.",
     "locationId": "dormitories",
-    "background": "generated/backgrounds/elowen/view.png"
+    "background": "generated/backgrounds/elowen/view.webp"
   },
+  "birthPicture": "sprites/elowen/birth.png",
   "ai": {
     "speechPattern": "Quick, bright and talkative. Runs ahead of herself, starts plans mid-sentence, laughs easily. Direct about what she wants.",
     "tone": "lively, warm, impulsive",

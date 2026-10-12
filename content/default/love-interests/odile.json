@@ -15,7 +15,7 @@
       "description": "a patterned headscarf, a faded blue canvas apron with deep pockets over a rolled-sleeve checked shirt, a money belt",
       "sprites": {
         "neutral": {
-          "image": "sprites/odile/default-neutral-cutout.png",
+          "image": "sprites/odile/default-neutral-cutout.webp",
           "description": ""
         }
       },

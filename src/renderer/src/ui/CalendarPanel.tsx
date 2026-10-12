@@ -240,7 +240,13 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
             <span className="entry plan">Plan</span>
             <span className="entry event">Event</span>
             <span className="entry orientation">Orientation</span>
-            <span className="entry birth">Expected</span>
+            <span className="entry birth">Birth</span>
+            {content.housing && state.housing.status === 'resident' && (
+              <>
+                <span className="entry rent">Rent</span>
+                <span className="entry household">Children's week</span>
+              </>
+            )}
           </div>
         </div>
 

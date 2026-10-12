@@ -1,12 +1,13 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import type { ArtKind, ComfySettings, WorkflowAnalysis, WorkflowBindings, WorkflowListResult, WorkflowSummary } from '../../shared/comfy'
+import type { ComfySettings, WorkflowAnalysis, WorkflowBindings, WorkflowKind, WorkflowListResult, WorkflowSummary } from '../../shared/comfy'
+import { isWorkflow } from './bundle'
 import { analyse, effectiveBindings, noBindings, parseGraph, type ComfyGraph } from './graph'
 
 /**
- * The folder of workflows the user exported. A folder, because that is how people already
- * keep them: ComfyUI's Export (API) writes a file, and dropping another in is how a new
- * one arrives. A file that will not parse stays in the list with its problem attached.
+ * Reading a folder of workflows: the game's own, in its content. A workflow arrives there as
+ * a file, as ComfyUI's Export (API) writes one. A file that will not parse stays in the list
+ * with its problem attached.
  */
 
 // Enough for any workflow; past this something else is in the folder.
@@ -29,20 +30,19 @@ export interface LoadResult {
   broken: { file: string; name: string; problem: string }[]
 }
 
-export function loadWorkflows(dir: string | null, overrides: ComfySettings['overrides']): LoadResult {
+export function loadWorkflows(dir: string, overrides: ComfySettings['overrides']): LoadResult {
   const none = (message: string): LoadResult => ({ ok: false, message, loaded: [], broken: [] })
-  if (dir === null || dir.trim().length === 0) return none('No workflow folder is chosen yet.')
 
   let names: string[]
   try {
     names = readdirSync(dir, { withFileTypes: true })
-      .filter((entry) => entry.isFile() && entry.name.toLowerCase().endsWith('.json'))
+      .filter((entry) => entry.isFile() && isWorkflow(entry.name))
       .map((entry) => entry.name)
       .sort((a, b) => a.localeCompare(b))
   } catch (cause) {
-    return none((cause as NodeJS.ErrnoException).code === 'ENOENT' ? `There is no folder at ${dir}.` : `Could not read ${dir}: ${(cause as Error).message}`)
+    return none((cause as NodeJS.ErrnoException).code === 'ENOENT' ? `The game has no workflows: there is no folder at ${dir}.` : `Could not read ${dir}: ${(cause as Error).message}`)
   }
-  if (names.length === 0) return none(`No .json files in ${dir}. In ComfyUI use Workflow → Export (API) and save into this folder.`)
+  if (names.length === 0) return none(`The game has no workflows: there are none in ${dir}.`)
 
   const result: LoadResult = { ok: false, message: '', loaded: [], broken: [] }
   for (const file of names) {
@@ -72,7 +72,7 @@ export function loadWorkflows(dir: string | null, overrides: ComfySettings['over
 }
 
 /** The same reading, flattened for the renderer: no graphs, no Maps. */
-export function listWorkflows(dir: string | null, overrides: ComfySettings['overrides']): WorkflowListResult {
+export function listWorkflows(dir: string, overrides: ComfySettings['overrides']): WorkflowListResult {
   const result = loadWorkflows(dir, overrides)
   const workflows: WorkflowSummary[] = [
     ...result.loaded.map((one) => ({
@@ -89,16 +89,18 @@ export function listWorkflows(dir: string | null, overrides: ComfySettings['over
 
 /**
  * Which workflow a request runs: the one named; else the kind's default, if it is still
- * in the folder; else the first that has somewhere to put a prompt. Falling back matters
- * because the folder is a folder, and a file can be renamed with the app shut.
+ * there; else the first that has somewhere to put a prompt. Falling back matters because a
+ * default is kept by file name, and the file may since have been renamed or taken out. A workflow
+ * that takes a first frame makes clips: it is never fallen back on for a picture, nor one
+ * that takes none for a clip.
  */
 export function resolveWorkflow(
   loaded: LoadedWorkflow[],
   asked: string,
-  kind: ArtKind,
+  kind: WorkflowKind,
   defaults: ComfySettings['defaults']
 ): { workflow: LoadedWorkflow | null; problem: string | null } {
-  if (loaded.length === 0) return { workflow: null, problem: 'No workflow in that folder could be read.' }
+  if (loaded.length === 0) return { workflow: null, problem: 'None of the game\'s workflows could be read.' }
   const wanted = asked.trim()
   if (wanted !== '') {
     const named = loaded.find((one) => one.file === wanted || one.name === wanted.replace(/\.json$/i, ''))
@@ -106,6 +108,14 @@ export function resolveWorkflow(
       ? { workflow: named, problem: null }
       : { workflow: null, problem: `There is no workflow called "${asked}". These are available: ${loaded.map((one) => one.name).join(', ')}.` }
   }
-  const chosen = loaded.find((one) => one.file === defaults[kind]) ?? loaded.find((one) => one.bindings.positive !== null) ?? loaded[0]
-  return { workflow: chosen, problem: null }
+  const fitting = loaded.filter((one) => (one.bindings.firstFrame !== null) === (kind === 'video'))
+  const chosen = fitting.find((one) => one.file === defaults[kind]) ?? fitting.find((one) => one.bindings.positive !== null) ?? fitting[0]
+  if (chosen) return { workflow: chosen, problem: null }
+  return {
+    workflow: null,
+    problem:
+      kind === 'video'
+        ? 'None of the game\'s workflows makes a clip: none has somewhere to put a first frame.'
+        : 'Every one of the game\'s workflows makes clips: there is none to draw a picture with.'
+  }
 }

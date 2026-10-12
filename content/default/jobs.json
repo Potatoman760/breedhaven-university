@@ -11,7 +11,7 @@
       "description": "Haul crates, mind the card reader and haggle for a stallholder.",
       "locationId": "market",
       "bossId": "odile",
-      "hourlyRate": 6,
+      "hourlyRate": 8,
       "trains": "strength",
       "requirements": {},
       "shifts": [
@@ -39,7 +39,7 @@
       "description": "Wash up, carry trays and serve at the hot counter through the rush.",
       "locationId": "commons",
       "bossId": "dorrit",
-      "hourlyRate": 6,
+      "hourlyRate": 8,
       "trains": "endurance",
       "requirements": {},
       "shifts": [
@@ -67,7 +67,7 @@
       "description": "Sit the front desk of the Cloister Halls: sign for parcels, let in the locked-out, keep the peace.",
       "locationId": "dormitories",
       "bossId": "helga",
-      "hourlyRate": 6,
+      "hourlyRate": 9,
       "trains": "charisma",
       "requirements": {},
       "shifts": [
@@ -95,7 +95,7 @@
       "description": "Work the tills and tidy the shelves under the slogan.",
       "locationId": "bloom-and-co",
       "bossId": "pernille",
-      "hourlyRate": 7,
+      "hourlyRate": 8,
       "trains": "charisma",
       "requirements": {},
       "shifts": [
@@ -128,7 +128,7 @@
       "description": "Tear tickets, show people to their seats and sweep up popcorn between screenings.",
       "locationId": "lumen",
       "bossId": "coralie",
-      "hourlyRate": 7,
+      "hourlyRate": 9,
       "trains": "charisma",
       "requirements": {},
       "shifts": [
@@ -156,7 +156,7 @@
       "description": "Hand out towels, mop the tiles and keep an eye on the hot end of the pool.",
       "locationId": "bathhouse",
       "bossId": "sunna",
-      "hourlyRate": 7,
+      "hourlyRate": 10,
       "trains": "endurance",
       "requirements": {
         "endurance": 12
@@ -186,7 +186,7 @@
       "description": "Shake, seal and serve bubble tea, and smile at the queue.",
       "locationId": "boba-blossom",
       "bossId": "mimi",
-      "hourlyRate": 8,
+      "hourlyRate": 10,
       "trains": "dexterity",
       "requirements": {
         "charisma": 12
@@ -216,7 +216,7 @@
       "description": "Dig, weed, water and carry in the teaching garden, in all weathers.",
       "locationId": "physic-garden",
       "bossId": "rowena",
-      "hourlyRate": 8,
+      "hourlyRate": 11,
       "trains": "endurance",
       "requirements": {
         "endurance": 13
@@ -246,7 +246,7 @@
       "description": "Shelve returns, fetch from the stacks and keep the reading cells quiet.",
       "locationId": "library",
       "bossId": "agnes",
-      "hourlyRate": 9,
+      "hourlyRate": 11,
       "trains": "intelligence",
       "requirements": {
         "intelligence": 13
@@ -276,7 +276,7 @@
       "description": "Give change, clear jams, reset cabinets and referee the air hockey.",
       "locationId": "pixel-and-rune",
       "bossId": "jax",
-      "hourlyRate": 9,
+      "hourlyRate": 10,
       "trains": "dexterity",
       "requirements": {
         "dexterity": 13
@@ -311,7 +311,7 @@
       "description": "Pull espresso, serve pastries and keep the study booths from being hexed.",
       "locationId": "spell-and-sip",
       "bossId": "wren",
-      "hourlyRate": 10,
+      "hourlyRate": 11,
       "trains": "charisma",
       "requirements": {
         "charisma": 13,
@@ -347,7 +347,7 @@
       "description": "Carry kit, rack blades and work the bellows in the Tiltyard workshop.",
       "locationId": "tiltyard",
       "bossId": "bryn",
-      "hourlyRate": 11,
+      "hourlyRate": 13,
       "trains": "strength",
       "requirements": {
         "strength": 14
@@ -377,7 +377,7 @@
       "description": "Pull pints, collect glasses and run the quiz-night scoreboard.",
       "locationId": "honeyed-bee-inn",
       "bossId": "marda",
-      "hourlyRate": 12,
+      "hourlyRate": 13,
       "trains": "charisma",
       "requirements": {
         "charisma": 14,
@@ -413,7 +413,7 @@
       "description": "Book appointments, hand out prescriptions and say nothing to anyone.",
       "locationId": "health-centre",
       "bossId": "ilse",
-      "hourlyRate": 13,
+      "hourlyRate": 15,
       "trains": "wisdom",
       "requirements": {
         "wisdom": 16,
@@ -444,7 +444,7 @@
       "description": "Spot lifters, rack weights and run the beginners' circuit.",
       "locationId": "ironroot",
       "bossId": "kessa",
-      "hourlyRate": 14,
+      "hourlyRate": 16,
       "trains": "strength",
       "requirements": {
         "strength": 18,
@@ -480,7 +480,7 @@
       "description": "Work the door and the floor of the club, and walk people to the quiet room.",
       "locationId": "undergrowth",
       "bossId": "nyx",
-      "hourlyRate": 15,
+      "hourlyRate": 18,
       "trains": "strength",
       "requirements": {
         "strength": 16,
@@ -511,7 +511,7 @@
       "description": "Serve dishes that are on fire, below freezing or humming, without dropping any of them.",
       "locationId": "cauldron",
       "bossId": "yann",
-      "hourlyRate": 16,
+      "hourlyRate": 17,
       "trains": "dexterity",
       "requirements": {
         "charisma": 18,
@@ -547,7 +547,7 @@
       "description": "Calibrate the benches, recharge the wards and stop first-years blowing up the test cell.",
       "locationId": "foundry",
       "bossId": "halla",
-      "hourlyRate": 18,
+      "hourlyRate": 20,
       "trains": "intelligence",
       "requirements": {
         "intelligence": 20,
@@ -578,7 +578,7 @@
       "description": "Read, sort and summarise archive boxes for a professor's book on the Sire Registry.",
       "locationId": "lecture-halls",
       "bossId": "edda",
-      "hourlyRate": 20,
+      "hourlyRate": 24,
       "trains": "wisdom",
       "requirements": {
         "intelligence": 22,

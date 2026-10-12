@@ -36,31 +36,31 @@
       "description": "cute fully pink gothic lolita style dress, with cleavage",
       "sprites": {
         "neutral": {
-          "image": "sprites/maren/default-neutral-2-cutout.png",
+          "image": "sprites/maren/default-neutral-2-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/maren/default-happy-cutout.png",
+          "image": "sprites/maren/default-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/maren/default-sad-2-cutout.png",
+          "image": "sprites/maren/default-sad-2-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/maren/default-angry-2-cutout-2.png",
+          "image": "sprites/maren/default-angry-2-cutout-2.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/maren/default-embarrassed-cutout-2.png",
+          "image": "sprites/maren/default-embarrassed-cutout-2.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/maren/default-surprised-2-cutout.png",
+          "image": "sprites/maren/default-surprised-2-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/maren/default-aroused-3-cutout.png",
+          "image": "sprites/maren/default-aroused-3-cutout.webp",
           "description": ""
         }
       },
@@ -73,31 +73,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/maren/pregnant-neutral-3-cutout.png",
+          "image": "sprites/maren/pregnant-neutral-3-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/maren/pregnant-happy-cutout.png",
+          "image": "sprites/maren/pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/maren/pregnant-sad-cutout.png",
+          "image": "sprites/maren/pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/maren/pregnant-angry-cutout.png",
+          "image": "sprites/maren/pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/maren/pregnant-surprised-cutout.png",
+          "image": "sprites/maren/pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/maren/pregnant-embarrassed-cutout.png",
+          "image": "sprites/maren/pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/maren/pregnant-aroused-cutout.png",
+          "image": "sprites/maren/pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -109,31 +109,31 @@
       "description": "nothing at all, completely nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/maren/nude-neutral-cutout.png",
+          "image": "sprites/maren/nude-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/maren/nude-happy-cutout.png",
+          "image": "sprites/maren/nude-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/maren/nude-sad-cutout.png",
+          "image": "sprites/maren/nude-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/maren/nude-angry-cutout.png",
+          "image": "sprites/maren/nude-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/maren/nude-surprised-cutout.png",
+          "image": "sprites/maren/nude-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/maren/nude-embarrassed-cutout.png",
+          "image": "sprites/maren/nude-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/maren/nude-aroused-cutout.png",
+          "image": "sprites/maren/nude-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -146,31 +146,31 @@
       "inherits": "nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/maren/nude-pregnant-neutral-cutout.png",
+          "image": "sprites/maren/nude-pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/maren/nude-pregnant-happy-cutout.png",
+          "image": "sprites/maren/nude-pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/maren/nude-pregnant-sad-cutout.png",
+          "image": "sprites/maren/nude-pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/maren/nude-pregnant-angry-cutout-2.png",
+          "image": "sprites/maren/nude-pregnant-angry-cutout-2.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/maren/nude-pregnant-surprised-cutout.png",
+          "image": "sprites/maren/nude-pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/maren/nude-pregnant-embarrassed-cutout.png",
+          "image": "sprites/maren/nude-pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/maren/nude-pregnant-aroused-cutout.png",
+          "image": "sprites/maren/nude-pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -195,84 +195,90 @@
       "id": "blowjob",
       "name": "Blowjob",
       "description": "",
-      "image": "sprites/maren/nsfw-blowjob.png",
+      "image": "sprites/maren/nsfw-blowjob.webp",
+      "clip": "sprites/maren/nsfw-blowjob.mp4",
       "loop": true
     },
     {
       "id": "missionary",
       "name": "Missionary",
       "description": "",
-      "image": "sprites/maren/nsfw-missionary.png",
+      "image": "sprites/maren/nsfw-missionary.webp",
+      "clip": "sprites/maren/nsfw-missionary.mp4",
       "loop": true
     },
     {
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/maren/nsfw-doggy.png",
+      "image": "sprites/maren/nsfw-doggy.webp",
+      "clip": "sprites/maren/nsfw-doggy.mp4",
       "loop": true
     },
     {
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
-      "image": "sprites/maren/nsfw-cowgirl.png",
+      "image": "sprites/maren/nsfw-cowgirl.webp",
+      "clip": "sprites/maren/nsfw-cowgirl-2.mp4",
       "loop": true
     },
     {
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/maren/nsfw-creampie.png",
+      "image": "sprites/maren/nsfw-creampie.webp",
+      "clip": "sprites/maren/nsfw-creampie.mp4",
       "loop": true
     },
     {
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/maren/nsfw-facial.png",
+      "image": "sprites/maren/nsfw-facial.webp",
+      "clip": "sprites/maren/nsfw-facial.mp4",
       "loop": true
     },
     {
       "id": "pregnant-blowjob",
       "name": "Blowjob, pregnant",
       "description": "",
-      "image": "sprites/maren/nsfw-pregnant-blowjob.png",
+      "image": "sprites/maren/nsfw-pregnant-blowjob.webp",
       "loop": true
     },
     {
       "id": "pregnant-missionary",
       "name": "Missionary, pregnant",
       "description": "",
-      "image": "sprites/maren/nsfw-pregnant-missionary.png",
+      "image": "sprites/maren/nsfw-pregnant-missionary.webp",
       "loop": true
     },
     {
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
-      "image": "sprites/maren/nsfw-pregnant-doggy.png",
+      "image": "sprites/maren/nsfw-pregnant-doggy.webp",
       "loop": true
     },
     {
       "id": "pregnant-cowgirl",
       "name": "Cowgirl, pregnant",
       "description": "",
-      "image": "sprites/maren/nsfw-pregnant-cowgirl.png",
+      "image": "sprites/maren/nsfw-pregnant-cowgirl.webp",
       "loop": true
     },
     {
       "id": "pregnant-creampie",
       "name": "Creampie, pregnant",
       "description": "",
-      "image": "sprites/maren/nsfw-pregnant-creampie.png",
+      "image": "sprites/maren/nsfw-pregnant-creampie.webp",
       "loop": true
     },
     {
       "id": "pregnant-facial",
       "name": "Facial, pregnant",
       "description": "",
-      "image": "sprites/maren/nsfw-pregnant-facial.png",
+      "image": "sprites/maren/nsfw-pregnant-facial.webp",
       "loop": true
     }
   ],
@@ -346,8 +352,9 @@
     "name": "her pink room in the Cloister Halls",
     "description": "A small modern dormitory room turned into a pink gothic lolita bedroom. Smooth white walls hung with black lace and pink ribbon garlands, a flat ceiling with a strip of soft rose-tinted ward-light. A single bed piled with frilled pink and black cushions and plush toys, a white vanity with a heart-shaped mirror ringed in small glowing crystals, a dress rail crowded with ruffled dresses and petticoats, a row of platform shoes, a lace parasol in a stand. A built-in desk holds a tiered cake stand, a floral teapot and cups, a tablet showing vocabulary flashcards, and a stack of foreign-language dictionaries. Soft pink light through a tall window with lace curtains.",
     "locationId": "dormitories",
-    "background": "generated/backgrounds/maren/view.png"
+    "background": "generated/backgrounds/maren/view.webp"
   },
+  "birthPicture": "sprites/maren/birth.png",
   "ai": {
     "speechPattern": "Bright, quick and girlish, with a lilt. Gushes about what she finds cute and says so at once. Drops a word or an endearment from another language into a sentence and then translates it, pleased with herself.",
     "tone": "sweet, playful, a little bratty",

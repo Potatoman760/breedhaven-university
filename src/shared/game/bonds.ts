@@ -139,7 +139,7 @@ export function acceptBond(content: ContentPack, state: GameState, proposal: Bon
 /** The status id a proposal carries when it is to end things, not begin them. */
 export const END_BOND = 'none'
 
-/** "Open triad with Faye and Seraphine", for the player to read. */
+/** "Open throuple with Faye and Seraphine", for the player to read. */
 export function describeBond(content: ContentPack, bond: Pick<Bond, 'statusId' | 'memberIds'>): string {
   const status = statusOf(content, bond)
   const who = firstNames(content, bond.memberIds)

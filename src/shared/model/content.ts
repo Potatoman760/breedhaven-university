@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { DramaConfigSchema } from './drama'
+import { HousingConfigSchema } from './housing'
 import { ActivitySchema } from './activity'
 import { CalendarConfigSchema } from './calendar'
 import { CodexEntrySchema } from './codex'
@@ -43,6 +44,8 @@ export const ContentPackSchema = z.object({
   /** The jobs the player can hold, and the rules for them. Without it there are none. */
   jobs: JobsConfigSchema.optional(),
   pregnancy: PregnancyConfigSchema.optional(),
+  /** The house a Sire is let, and what it is to keep one. Without it there is none. */
+  housing: HousingConfigSchema.optional(),
   /** What the drama engine weighs things with. Without it, nobody turns up uninvited. */
   drama: DramaConfigSchema.optional(),
   items: z.array(ItemSchema).default([]),
@@ -251,6 +254,39 @@ function checkReferences(pack: ContentPack): string[] {
   for (const stall of pack.stalls) {
     need(locations, stall.locationId, `stalls.${stall.id}`, 'location')
     for (const id of stall.itemIds) need(items, id, `stalls.${stall.id}`, 'item')
+  }
+
+  if (pack.pregnancy) {
+    const place = pack.locations.find((l) => l.id === pack.pregnancy?.birthLocationId)
+    if (!place) issues.push(`pregnancy.birthLocationId: unknown location "${pack.pregnancy.birthLocationId}"`)
+    else if (pack.pregnancy.birthViewId !== undefined && !place.backgrounds.some((view) => view.id === pack.pregnancy?.birthViewId)) {
+      issues.push(`pregnancy.birthViewId: "${place.id}" has no view "${pack.pregnancy.birthViewId}"`)
+    }
+  }
+
+  const housing = pack.housing
+  if (housing) {
+    const house = pack.locations.find((l) => l.id === housing.locationId)
+    if (!house) issues.push(`housing.locationId: unknown location "${housing.locationId}"`)
+    if (![...pack.npcs, ...pack.loveInterests].some((character) => character.id === housing.officerId)) issues.push(`housing.officerId: unknown character "${housing.officerId}"`)
+    need(loveInterests, housing.nannyId, 'housing.nannyId', 'love interest')
+    idSet(housing.rooms.map((room) => ({ id: room.key })), 'housing.rooms')
+    for (const role of ['master', 'nanny'] as const) {
+      if (housing.rooms.filter((room) => room.role === role).length !== 1) issues.push(`housing.rooms: there must be exactly one room of the role "${role}"`)
+    }
+    housing.rooms.forEach((room) => {
+      const at = `housing.rooms (${room.key})`
+      if (house && !house.backgrounds.some((view) => view.id === room.viewId)) issues.push(`${at}: "${house.id}" has no view "${room.viewId}"`)
+      if (room.plan.floor >= housing.floors.length) issues.push(`${at}: there is no floor ${room.plan.floor}`)
+      if (room.plan.x + room.plan.w > housing.grid.columns || room.plan.y + room.plan.h > housing.grid.rows) issues.push(`${at}: its plan runs off the grid`)
+    })
+    housing.homePeriods.forEach((period) => need(periods, period, 'housing.homePeriods', 'period'))
+    const levels = housing.babies.levels.length
+    if (housing.babies.startLevel >= levels) issues.push('housing.babies.startLevel: there is no such level')
+    if (housing.babies.thrivingFrom >= levels) issues.push('housing.babies.thrivingFrom: there is no such level')
+    housing.babies.caps.forEach((cap, i) => {
+      if (cap.level >= levels) issues.push(`housing.babies.caps[${i}]: there is no level ${cap.level}`)
+    })
   }
 
   need(locations, pack.newGame.locationId, 'newGame', 'location')

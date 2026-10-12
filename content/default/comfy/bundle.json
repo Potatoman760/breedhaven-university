@@ -1,10 +1,22 @@
 {
   "promptPrefixes": {
-    "krea2 comic book.json": "AstroWitchV01K2T, comic book style"
+    "krea2 comic book.json": "AstroWitchV01K2T, comic book style",
+    "minimax h3 eros.json": "comic book style animation",
+    "krea2.json": "AstroWitchV01K2T, comic book style"
   },
   "negativePrefixes": {},
   "overrides": {},
-  "defaults": {},
+  "defaults": {
+    "video": "minimax h3 eros.json"
+  },
   "framing": {},
-  "sizes": {}
+  "sizes": {},
+  "videoPrompts": {
+    "blowjob": "comic book style animation, static camera\n\nTimeline:\n[0s-6s] the woman takes the penis into her mouth, sucking on it, bobbing her head up and down on the penis, making wet sucking and slurping sounds\n[7s-10s] The woman licks the shaft and top of the penis with her tongue\n\nAudio: wet slurping sounds\n\nthe woman makes natural movements and micro-expressions",
+    "missionary": "static shot\n\nThe man thrusts his hips back and forth, his long, erect penis shaft moving back and forth inside of her pussy in missionary style sex. Every thrust has his hips meet her's, and buries his penis completely inside of her, and makes a squishy wet squelching sound\n\nThe girl moans with pleasure with every thrust.",
+    "doggy": "static shot\n\nTimeline:\n[0s-5s] The man thrusts his hips back and forth, his erect penis shaft moving back and forth inside of her. Every thrust makes a squishy wet squelching sound\n\n[5s-7s]The girl moans with pleasure\n\n[8s-10s] The girl continues to moan while the man thrusts\n\nThe man and the girl make natural movements and micro-expressions\n\nAudio: wet squelching sounds and moans",
+    "cowgirl": "static shot\n\nTimeline:\n[0s-5s] The girl bounces her hips up and down on the man's penis, taking it all the way in and out of her pussy in cowgirl style sex. Every bounce causes loud, wet squelching sounds. \n\n[5s-7s] The girl moans with pleasure\n\n[8s-10s] The girl orgasms and  moans in pleasure while she continues to bounce her hips up and down\n\nThe man and the girl make natural movements and micro-expressions\n\nAudio: jungle background sounds, wet squelching sounds and moans",
+    "creampie": "comic book style animation, static camera\n\nthe woman breathes heavily as white semen flows slowly out of her vagina. The motion is smooth and ends as it began.\n\nthe woman makes natural movements and micro-expressions",
+    "facial": "static camera\n\nShe moves slowly and steadily in the pose she is in, breathing, her hair shifting a little, semen slowly running down her face. The motion is smooth and ends as it began.\n\nAudio: soft ambient room noise"
+  }
 }

@@ -10,8 +10,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/great-court/default-day.png",
-          "night": "generated/backgrounds/great-court/default-night.png"
+          "day": "generated/backgrounds/great-court/default-day.webp",
+          "night": "generated/backgrounds/great-court/default-night.webp"
         }
       }
     ],
@@ -36,8 +36,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/lecture-halls/pavilion-day.png",
-          "night": "generated/backgrounds/lecture-halls/pavilion-night.png"
+          "day": "generated/backgrounds/lecture-halls/pavilion-day.webp",
+          "night": "generated/backgrounds/lecture-halls/pavilion-night.webp"
         }
       }
     ],
@@ -66,8 +66,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/library/cell-day.png",
-          "night": "generated/backgrounds/library/cell-night.png"
+          "day": "generated/backgrounds/library/cell-day.webp",
+          "night": "generated/backgrounds/library/cell-night.webp"
         },
         "indoors": true
       }
@@ -102,7 +102,7 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/commons/view.png"
+          "day": "generated/backgrounds/commons/view.webp"
         }
       }
     ],
@@ -136,7 +136,7 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/chapel/view.png"
+          "day": "generated/backgrounds/chapel/view.webp"
         }
       }
     ],
@@ -165,8 +165,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/tiltyard/default-day-2.png",
-          "night": "generated/backgrounds/tiltyard/default-night-2.png"
+          "day": "generated/backgrounds/tiltyard/default-day-2.webp",
+          "night": "generated/backgrounds/tiltyard/default-night-2.webp"
         }
       }
     ],
@@ -205,8 +205,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/physic-garden/beds-afternoon.png",
-          "night": "generated/backgrounds/physic-garden/beds-night.png"
+          "day": "generated/backgrounds/physic-garden/beds-afternoon.webp",
+          "night": "generated/backgrounds/physic-garden/beds-night.webp"
         }
       }
     ],
@@ -236,7 +236,7 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/bathhouse/the-pool-morning.png"
+          "day": "generated/backgrounds/bathhouse/the-pool-morning.webp"
         },
         "indoors": true
       }
@@ -266,8 +266,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/foundry/default-day.png",
-          "night": "generated/backgrounds/foundry/default-night.png"
+          "day": "generated/backgrounds/foundry/default-day.webp",
+          "night": "generated/backgrounds/foundry/default-night.webp"
         }
       }
     ],
@@ -301,9 +301,17 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/health-centre/default-day.png",
-          "night": "generated/backgrounds/health-centre/default-night.png"
+          "day": "generated/backgrounds/health-centre/default-day.webp",
+          "night": "generated/backgrounds/health-centre/default-night.webp"
         }
+      },
+      {
+        "id": "maternity",
+        "name": "Maternity room",
+        "images": {},
+        "indoors": true,
+        "description": "This is one of the maternity rooms upstairs, beside the Bloom Chamber: private, warded and quiet, with a bed, a cot and a chair for whoever sits up with her.",
+        "appearance": "A private maternity room in a bright modern clinic: a hospital bed with crisp white sheets and raised pillows, a clear-sided newborn cot on a wheeled stand beside it, an armchair, a window with pale green curtains, white walls and pale wood, soft pink protective runes glowing faintly round the door frame, a vase of flowers on the bedside table."
       }
     ],
     "open": {
@@ -331,8 +339,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/dormitories/default-day-2.png",
-          "night": "generated/backgrounds/dormitories/default-night-2.png"
+          "day": "generated/backgrounds/dormitories/default-day-2.webp",
+          "night": "generated/backgrounds/dormitories/default-night-2.webp"
         },
         "indoors": true
       }
@@ -352,8 +360,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/lantern-row/default-day.png",
-          "night": "generated/backgrounds/lantern-row/default-night.png"
+          "day": "generated/backgrounds/lantern-row/default-day.webp",
+          "night": "generated/backgrounds/lantern-row/default-night.webp"
         }
       }
     ],
@@ -378,8 +386,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/honeyed-bee-inn/default-day.png",
-          "night": "generated/backgrounds/honeyed-bee-inn/default-night.png"
+          "day": "generated/backgrounds/honeyed-bee-inn/default-day.webp",
+          "night": "generated/backgrounds/honeyed-bee-inn/default-night.webp"
         },
         "indoors": true
       }
@@ -414,8 +422,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/market/default-day.png",
-          "night": "generated/backgrounds/market/default-night.png"
+          "day": "generated/backgrounds/market/default-day.webp",
+          "night": "generated/backgrounds/market/default-night.webp"
         }
       }
     ],
@@ -449,8 +457,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/bloom-and-co/default-day-3.png",
-          "night": "generated/backgrounds/bloom-and-co/default-night-2.png"
+          "day": "generated/backgrounds/bloom-and-co/default-day-3.webp",
+          "night": "generated/backgrounds/bloom-and-co/default-night-2.webp"
         }
       }
     ],
@@ -473,8 +481,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/dawnbloom-house/default-day.png",
-          "night": "generated/backgrounds/dawnbloom-house/default-night.png"
+          "day": "generated/backgrounds/dawnbloom-house/default-day.webp",
+          "night": "generated/backgrounds/dawnbloom-house/default-night.webp"
         },
         "indoors": true
       }
@@ -494,8 +502,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/spell-and-sip/default-day-5.png",
-          "night": "generated/backgrounds/spell-and-sip/default-night-3.png"
+          "day": "generated/backgrounds/spell-and-sip/default-day-5.webp",
+          "night": "generated/backgrounds/spell-and-sip/default-night-3.webp"
         }
       }
     ],
@@ -529,8 +537,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/pixel-and-rune/default-day.png",
-          "night": "generated/backgrounds/pixel-and-rune/default-night.png"
+          "day": "generated/backgrounds/pixel-and-rune/default-day.webp",
+          "night": "generated/backgrounds/pixel-and-rune/default-night.webp"
         }
       }
     ],
@@ -559,8 +567,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/boba-blossom/default-day-3.png",
-          "night": "generated/backgrounds/boba-blossom/default-night-3.png"
+          "day": "generated/backgrounds/boba-blossom/default-day-3.webp",
+          "night": "generated/backgrounds/boba-blossom/default-night-3.webp"
         }
       }
     ],
@@ -589,8 +597,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/cauldron/default-day.png",
-          "night": "generated/backgrounds/cauldron/default-night.png"
+          "day": "generated/backgrounds/cauldron/default-day.webp",
+          "night": "generated/backgrounds/cauldron/default-night.webp"
         }
       }
     ],
@@ -624,8 +632,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/ironroot/default-day.png",
-          "night": "generated/backgrounds/ironroot/default-night.png"
+          "day": "generated/backgrounds/ironroot/default-day.webp",
+          "night": "generated/backgrounds/ironroot/default-night.webp"
         }
       }
     ],
@@ -659,8 +667,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/lumen/default-day.png",
-          "night": "generated/backgrounds/lumen/default-night.png"
+          "day": "generated/backgrounds/lumen/default-day.webp",
+          "night": "generated/backgrounds/lumen/default-night.webp"
         }
       }
     ],
@@ -689,8 +697,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/undergrowth/default-day.png",
-          "night": "generated/backgrounds/undergrowth/default-night.png"
+          "day": "generated/backgrounds/undergrowth/default-day.webp",
+          "night": "generated/backgrounds/undergrowth/default-night.webp"
         }
       }
     ],
@@ -724,8 +732,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/riverside-park/default-day.png",
-          "night": "generated/backgrounds/riverside-park/default-night.png"
+          "day": "generated/backgrounds/riverside-park/default-day.webp",
+          "night": "generated/backgrounds/riverside-park/default-night.webp"
         }
       }
     ],
@@ -743,5 +751,84 @@
         "description": "You take a bench facing the river and let your thoughts run out."
       }
     ]
+  },
+  {
+    "id": "sire-house",
+    "name": "Quince House",
+    "icon": "house",
+    "description": "Quince House, a family house on Quince Row, behind Riverside Park in Seedblossom. The Sire Relations Office holds the lease and lets it to a registered Sire: the gate and every sill are warded, the front door keeps a log, and nobody comes in who is not of the house or brought by someone who is. It is plain, warm and half-furnished, a house meant to be added to. A nanny employed by the Office lives in. It is a private home.",
+    "appearance": "A warm open-plan kitchen and living room in a modest modern family house: a long scrubbed wooden table with mismatched chairs, a cast-iron stove, open shelves of crockery, a worn sofa under a window, a front door with a small glowing brass ward-plate beside it, pale plaster walls, wooden floor.",
+    "backgrounds": [
+      {
+        "id": "default",
+        "name": "Default",
+        "images": {},
+        "appearance": "A warm open-plan kitchen and living room in a modest modern family house: a long scrubbed wooden table with mismatched chairs, a cast-iron stove, open shelves of crockery, a worn sofa under a window, a front door with a small glowing brass ward-plate beside it, pale plaster walls, wooden floor."
+      },
+      {
+        "id": "family",
+        "name": "The family room",
+        "images": {},
+        "appearance": "A comfortable family sitting room: two deep sofas facing each other over a thick rug, a low table, shelves of board games and picture books, a basket of soft toys, a fireplace with a guard, lamps with warm shades, tall windows with heavy curtains."
+      },
+      {
+        "id": "study",
+        "name": "The study",
+        "images": {},
+        "appearance": "A small tidy study: a wooden desk under a window with a green-shaded lamp and a laptop, a comfortable chair, a wall of half-filled bookshelves, a corkboard with pinned notes, a rug, a closed panelled door."
+      },
+      {
+        "id": "nanny",
+        "name": "The nanny's room",
+        "images": {},
+        "appearance": "A neat small bedroom on the ground floor: a narrow bed made up crisply with white linen, a dressing table with an oval mirror hung with small coloured ribbons and a row of perfume bottles, a black dress with a white collar on a hanger behind the door, a softly glowing crystal on the windowsill, a vase of fresh flowers, a small framed print of a harbour."
+      },
+      {
+        "id": "nursery",
+        "name": "The nursery",
+        "images": {},
+        "appearance": "A bright nursery: three white wooden cots along one wall, a changing table, a rocking chair with a folded blanket, a mobile of paper birds, shelves of folded cloths and small clothes, pale yellow walls, a window with faintly glowing runes on its frame."
+      },
+      {
+        "id": "garden",
+        "name": "The garden",
+        "images": {},
+        "appearance": "A small walled garden behind a town house: a neat lawn, an old quince tree heavy with yellow fruit, flower and herb beds along a brick wall, a wooden bench, a washing line, a gravel path to a back door.",
+        "indoors": false
+      },
+      {
+        "id": "master",
+        "name": "The master bedroom",
+        "images": {},
+        "appearance": "A large bedroom on the first floor of a modest family house: a wide bed with a plain wooden headboard and cream linen, a wardrobe, a chest of drawers, a wicker bassinet in the corner, a window overlooking a garden, a rug on a wooden floor, a lamp on each bedside table."
+      },
+      {
+        "id": "bathroom",
+        "name": "The bathroom",
+        "images": {},
+        "appearance": "A plain clean bathroom: a deep white enamel bathtub, a basin under a mirror, white tiles to shoulder height, a wooden stool with folded towels, a frosted window."
+      },
+      {
+        "id": "suite-west",
+        "name": "The west bedroom",
+        "images": {},
+        "appearance": "A pleasant bedroom at the back of a town house: a double bed with a quilt, a window seat with cushions, a dressing table with a mirror, an empty bookshelf waiting to be filled, soft afternoon light."
+      },
+      {
+        "id": "suite-east",
+        "name": "The east bedroom",
+        "images": {},
+        "appearance": "A bright bedroom that gets the morning sun: a double bed with pale blue linen, a wardrobe, a small writing desk, a rag rug, sunlight through thin curtains."
+      },
+      {
+        "id": "suite-attic",
+        "name": "The attic room",
+        "images": {},
+        "appearance": "A long attic bedroom under a sloping roof: exposed beams, a low double bed under a round window, a reading chair, a trunk, a string of small warm lights along a beam, a skylight showing sky."
+      }
+    ],
+    "indoors": true,
+    "private": true,
+    "drills": []
   }
 ]

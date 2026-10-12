@@ -111,6 +111,7 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
           </button>
         </div>
         {notice && <p className="notice">{notice}</p>}
+        <p className="title-version">v{__APP_VERSION__}</p>
       </div>
 
       {panel === 'new' && (

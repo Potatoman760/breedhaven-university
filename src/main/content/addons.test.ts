@@ -176,17 +176,20 @@ describe('tidying up on save', () => {
       mkdirSync(join(dir, path, '..'), { recursive: true })
       writeFileSync(join(dir, path), 'x')
     }
-    for (const file of ['sprites/mira/neutral.png', 'sprites/mira/neutral-old.png', 'sprites/mira/dance.mp4', 'sprites/mira/room.png']) put(file)
+    for (const file of ['sprites/mira/neutral.png', 'sprites/mira/neutral-old.png', 'sprites/mira/dance.mp4', 'sprites/mira/room.png', 'sprites/mira/birth.png']) put(file)
     for (const file of ['generated/backgrounds/mira/try-1.png', 'generated/backgrounds/mira/kept.png', 'sprites/faye/hers.png']) put(file)
     const saved = {
       id: 'mira',
       outfits: [{ id: 'default', name: 'Usual', description: '', pregnant: false, sprites: { neutral: { image: 'addons/sprites/mira/neutral.png', description: '' } } }],
       animations: [{ id: 'dance', name: 'Dance', description: '', clip: 'addons/sprites/mira/dance.mp4', loop: true }],
-      room: { background: 'addons/generated/backgrounds/mira/kept.png' }
+      room: { background: 'addons/generated/backgrounds/mira/kept.png' },
+      birthPicture: 'addons/sprites/mira/birth.png'
     }
     expect(removeUnusedAssets(dir, saved).sort()).toEqual(['neutral-old.png', 'room.png', 'try-1.png'])
     expect(existsSync(join(dir, 'sprites/mira/neutral.png'))).toBe(true)
     expect(existsSync(join(dir, 'sprites/mira/dance.mp4'))).toBe(true)
+    // Her picture of a birth is hers to keep.
+    expect(existsSync(join(dir, 'sprites/mira/birth.png'))).toBe(true)
     expect(existsSync(join(dir, 'generated/backgrounds/mira/kept.png'))).toBe(true)
     expect(existsSync(join(dir, 'sprites/faye/hers.png'))).toBe(true)
     expect(removeUnusedAssets(dir, saved)).toEqual([])
@@ -246,5 +249,38 @@ describe('the player as an add-on', () => {
     expect(resetPlayer(dir)).toEqual([])
     expect(loadWithAddons(packDir, dir).content.newGame).toEqual(base.content.newGame)
     expect(resetPlayer(dir)).toEqual(['The player has not been changed.'])
+  })
+})
+
+describe('jobs, which are the game\'s own', () => {
+  it('are added, changed and taken out in the game\'s jobs file, and refused when they would not load', async () => {
+    const { deleteJob, saveJob } = await import('./addons')
+    // A pack folder of its own to write in, holding only the jobs file: the rest is checked against the content as loaded.
+    const pack = mkdtempSync(join(tmpdir(), 'bh-jobs-'))
+    const shipped = base.content.jobs!
+    writeFileSync(join(pack, 'jobs.json'), JSON.stringify({ energyPerHour: shipped.energyPerHour, jobs: [shipped.jobs[0]] }))
+    const read = () => JSON.parse(readFileSync(join(pack, 'jobs.json'), 'utf8')) as { energyPerHour: number; jobs: { id: string; hourlyRate: number }[] }
+
+    const porter = { ...shipped.jobs[0], id: 'night-porter', title: 'Night porter', hourlyRate: 11 }
+    expect(saveJob(pack, base.content, porter)).toEqual([])
+    expect(read().jobs.map((job) => job.id)).toEqual([shipped.jobs[0].id, 'night-porter'])
+    // The rules of the file are left as they were.
+    expect(read().energyPerHour).toBe(shipped.energyPerHour)
+
+    // Saved again, it takes its own place and is not added twice.
+    expect(saveJob(pack, base.content, { ...porter, hourlyRate: 12 })).toEqual([])
+    expect(read().jobs.find((job) => job.id === 'night-porter')?.hourlyRate).toBe(12)
+    expect(read().jobs).toHaveLength(2)
+
+    expect(saveJob(pack, base.content, { ...porter, id: 'Bad Id' })[0]).toMatch(/lower-case letters/)
+    expect(saveJob(pack, base.content, { ...porter, title: ' ' })).toEqual(['A title is needed.'])
+    expect(saveJob(pack, base.content, { ...porter, locationId: 'nowhere' })).toEqual(['Choose where the job is.'])
+    expect(saveJob(pack, base.content, { ...porter, bossId: 'nobody' })).toEqual(['Choose who he answers to.'])
+    expect(saveJob(pack, base.content, { ...porter, shifts: [] }).length).toBeGreaterThan(0)
+    expect(read().jobs).toHaveLength(2)
+
+    expect(deleteJob(pack, 'night-porter')).toEqual([])
+    expect(read().jobs.map((job) => job.id)).toEqual([shipped.jobs[0].id])
+    expect(deleteJob(pack, 'night-porter')).toEqual(['There is no such job.'])
   })
 })

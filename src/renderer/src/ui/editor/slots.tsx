@@ -19,15 +19,20 @@ interface PictureProps {
   children?: ReactNode
   /** The buttons under it: replace, generate again, remove. */
   actions: ReactNode
+  /** Something laid over a corner of the picture, to say what it has besides: a clip. */
+  badge?: ReactNode
 }
 
 /** A slot that has its picture. */
-export function PictureSlot({ image, name, onView, children, actions }: PictureProps) {
+export function PictureSlot({ image, name, onView, children, actions, badge }: PictureProps) {
   return (
     <div className="sprite-card">
-      <button type="button" className="sprite-thumb" title="Look at the whole picture" onClick={onView}>
-        <img src={`content://pack/${image}`} alt={name} />
-      </button>
+      <div className="sprite-frame">
+        <button type="button" className="sprite-thumb" title="Look at the whole picture" onClick={onView}>
+          <img src={`content://pack/${image}`} alt={name} />
+        </button>
+        {badge}
+      </div>
       {children ?? <span className="caps">{name}</span>}
       <div className="row">{actions}</div>
     </div>

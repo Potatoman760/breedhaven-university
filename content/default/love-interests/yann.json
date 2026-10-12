@@ -15,7 +15,7 @@
       "description": "a black double-breasted chef's jacket with copper buttons, a long dark apron, checked trousers and a side towel",
       "sprites": {
         "neutral": {
-          "image": "sprites/yann/default-neutral-cutout.png",
+          "image": "sprites/yann/default-neutral-cutout.webp",
           "description": ""
         }
       },

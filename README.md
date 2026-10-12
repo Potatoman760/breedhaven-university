@@ -16,8 +16,17 @@ npm run dev
 | `npm run dev`       | Launch the app with hot reload                |
 | `npm run build`     | Build main, preload and renderer into `out/`  |
 | `npm start`         | Run the built app                             |
+| `npm run build:win` | Package Windows as a `.zip` into `dist/` (unzip and run) |
+| `npm run build:win:installer` | Package a Windows installer instead |
+| `npm run build:mac` | Package a macOS `.dmg` (run on a Mac)         |
+| `npm run build:linux` | Package a Linux AppImage and `.tar.gz`      |
+| `npm run build:unpack` | Package an unpacked app, without an installer |
 | `npm run typecheck` | Type-check the whole project                  |
 | `npm test`          | Run the unit tests                            |
+
+To sign and notarize the macOS build, copy `electron-builder.env.example` to
+`electron-builder.env` and fill in the Apple credentials. Without that file the build is
+left unsigned.
 
 ## Layout
 
@@ -87,7 +96,10 @@ npm run dev
   The editor shows when the saved catalogue is out of date (a character's subject or year
   has changed since). At the start of term the player picks up to `maxCourses` on a week
   planner, a column per day and a row per hour; two courses whose hours overlap cannot
-  both be taken. While a course meets, everyone taking it is at the Lecture Halls.
+  both be taken. While a course meets, everyone taking it is at the Lecture Halls, and
+  in class (`inClass` in `src/shared/game/map.ts`): not in the day view's "Here" row, not
+  to be done anything with or asked out, and not run into by someone dropping in or working
+  a shift there. The only way to her then is to attend the same class, which is a scene.
   Attending a meeting lasts until it ends, and is worth `statGain` stat points and costs
   `energy` for each of its hours, so a lab is worth three lectures.
 - **Activities** take a whole number of hours, can be limited by weekday, period, hour,
@@ -162,7 +174,7 @@ and the trait library.
   admired stats, studies), Traits, Sprites, Voice (everything that goes to the LLM) and
   Schedule. Saving checks the whole game would still load with the change and says what is
   wrong if not. An id can't be changed once saved, because saved games refer to it.
-- **Sprites**: outfits and their pictures with a name and description each, the default
+- **Media**: outfits and their pictures with a name and description each, the default
   outfit, the pregnant flag, the portrait crop, and the NSFW pictures and clips. Adding a picture or video
   copies the chosen file into the character's add-on folder; content paths that start
   with `addons/` are served from there.
@@ -295,8 +307,8 @@ and the trait library.
   description, guidance for the character, how many love interests it joins to the player,
   whether they are also with each other (`mutual`), whether it is `exclusive`, the stage
   each must have reached, and for a mutual one how close the love interests must be to
-  each other). The game's are: lovers without promises, courting, open courtship, triad
-  and open triad. What is in force is kept in the save as `bonds`.
+  each other). The game's are: lovers without promises, courting, open courtship, throuple
+  and open throuple. What is in force is kept in the save as `bonds`.
   - **Ties** are how two love interests feel about each other: a number per pair (`ties`
     in the save), named by `tieLevels`, optionally started by `ties` in
     `relationships.json` with a note of their history. Sharing a scene raises each pair's.
@@ -312,8 +324,8 @@ and the trait library.
   `lengthDays`, `recoveryDays` after a birth, `daughterChance`, and the `stages` (each from
   a fraction of the way through, with a description for the character and whether it
   shows). The length is the same for everyone.
-  - **Conception by pose**: choosing the `creampie` pose (`isSeeding` in
-    `src/shared/model/loveInterest.ts`) counts as the `[SEEDED]` tag for whoever the pose is
+  - **Conception by sex-act**: choosing the `creampie` sex-act (`isSeeding` in
+    `src/shared/model/loveInterest.ts`) counts as the `[SEEDED]` tag for whoever the sex-act is
     of, whether or not the tag was written.
   - **Conception**: in a scene the LLM writes a hidden `[SEEDED]` tag (`[SEEDED: name]` in
     a group) when sex ends in a way that could leave her with child. The game then throws
@@ -322,10 +334,67 @@ and the trait library.
   - **Carrying**: her prompt gives the day, the stage and its description; once it shows,
     the others are told too, and she wears an outfit marked `pregnant` if she has one.
     The character panel and the calendar show the stage and the due date.
-  - **Birth**: when the time is up the child is recorded (`children` in the save), the
-    day view says so, and she sends word by courier. Her prompt and the others' mention
-    the child from then on. The `pregnant` condition lets activities, secrets and codex
-    entries depend on it.
+  - **Birth** (`src/shared/game/births.ts`): `birthNoticeDays` before she is due (three),
+    the game sets the hour of the birth and puts it on his calendar, at `birthLocationId`
+    (the Health Centre) for `birthHours`, and she DMs him the time. The hour is the earliest
+    stretch of the due day that is free of everything else of his while the place is open;
+    failing that the earliest that costs him only a calendar event, then only a shift, then
+    a class, then another plan (`birthSlot`). It cannot be called off.
+    - **Kept**, it is a scene of its own (`attendBirth`): the child is born as it opens, the
+      scene is set in the place's `birthViewId` view (the maternity room) with her
+      `birthPicture` for its whole stage if she has one, and its opening beat tells the LLM
+      what the moment is. What it does to her feelings is the scene's own summary.
+    - **Missed**, the child is born all the same at the end of the hour (`settleBirths`):
+      she takes `MISSED_BIRTH` (affection -25, trust -30, desire -15), keeps a **core**
+      memory of it and writes to say so.
+    The child is recorded in `children` in the save, and her prompt and the others' mention
+    it from then on. The `pregnant` condition lets activities, secrets and codex entries
+    depend on it. A birth still to come when the calendar ends is told in the epilogue.
+  - **Her birth picture**: each love interest has one optional `birthPicture` (the Birth
+    slot on the editor's Media tab), drawn at 1920×1080 by the `birth` kind of picture from
+    her appearance (`birthPrompt` in `src/shared/comfy.ts`): sitting up in a hospital bed in
+    a gown with the child in her arms.
+- **Sire housing** (`housing.json`, optional; `src/shared/game/housing.ts`): once a love
+  interest he is in any agreed relationship with is carrying his child, the housing
+  officer of the Sire Relations Office (an NPC, `officerId`) DMs him the offer of a house,
+  which the thread shows with Accept and Decline. Declined, it can still be taken.
+  - **The house is put into the content**, not handled beside it. `withHousing(content,
+    state)` gives the pack as one game sees it, and is applied wherever content is prepared
+    for a state (`App.tsx` and `readBy` in `src/main/index.ts`). Until he lives there the
+    house's location and the nanny are not in the pack at all, so no scene can go there and
+    nobody has heard of her. Once he does, `newGame.room` is its master bedroom (so sleep,
+    home and study in his own room all follow), each love interest who lives there has her
+    `room` in it and comes home to it (`residentSchedule`), and each room's view says what
+    has been made of it. Everything else reads the content as it always did.
+  - **Rent** (`rent`) falls on the first of each month. Short of it, it is carried as
+    arrears for `graceDays` and the officer writes; still unpaid, the house is taken back
+    (`evict`): everyone goes home, the children go to the creche, and he is back in the
+    Halls. There is no second offer.
+  - **Rooms** (`rooms`): each has a `role` (`common`, `master`, `nanny` or `suite`), a
+    `cost`, whether it `startsBuilt`, what it adds (`beds` for love interests, `cots`,
+    `comfort`, `study` toward the own-room study bonus), at most a few `tiers` to fit it out
+    further, a rectangle on the `plan` of its floor, and the `viewId` of the house
+    location's view that is its picture. The plan on the House screen
+    (`src/renderer/src/ui/HousePanel.tsx`) is drawn from those rectangles; there is no plan
+    image. A room's picture is generated in the Locations editor like any other view, each
+    view having its own `appearance`. Built common rooms are places a scene at home can move
+    to (`home-<key>`).
+  - **Who lives there**: the nanny (`nannyId`, a love interest who comes with the house),
+    and whoever he offers a bedroom to from the plan: a love interest who is carrying his
+    child or has borne one, is in a relationship with him, is at `invite.minAffection` or
+    more, where a bed is free. She accepts, remembers it as a core memory, and can be asked
+    to leave, which she does not forgive and does not come back from.
+  - **Babies**: a child whose mother lives in the house lives there too while there is a
+    cot, and has a `health` level (`babies.levels`, worst first); any other child is at the
+    University's creche and costs nothing. On the first day of each week each child in the
+    house costs `babies.weeklyCost`, the one doing worst paid for first. Paid for, it comes
+    on a level, as far as the house's comfort allows (`babies.caps`); not paid for, it drops
+    a level and its mother's affection and trust fall (`babies.neglect`). At the bottom she
+    takes it back to the creche and leaves. No child is ever lost.
+  - **Reckoning** (`settleHousehold`) walks every day since it was last done, so a jump of
+    several days settles each once. Rent day and the children's week are on the calendar.
+  - **The epilogue** has a Home screen, and a mother who lived with him raised the child
+    with him.
 - **The calendar** opens on the week, laid out by the hour like a diary: the player's
   classes, plans, orientation, events and expected births are blocks where they fall, side
   by side when they overlap. A Month view names up to three things a day; clicking a day
@@ -452,7 +521,7 @@ and the trait library.
   does for anything the player sets out to do. The stats a place has drills for are also
   what it counts as a good place to work on.
 - **Jobs** (`jobs.json`, `src/shared/game/jobs.ts`): a job is a place, a boss (an NPC), an
-  hourly rate, the stats it asks for and its weekly shifts, 8 to 20 hours of them, which are
+  hourly rate, the stats it asks for and its weekly shifts, 8 to 16 hours of them, which are
   written in the content so that a job is the same in every game. The phone has a Jobs
   board: whoever meets a job's requirements is taken on at once, one job at a time, and
   better-paid jobs ask more. Being taken on puts the boss in his DMs. A shift is clocked
@@ -551,7 +620,7 @@ and the trait library.
 - **Appearance**: during a scene the prompt lists the character's outfits, each outfit's
   sprites, and their animations, with every name and description. The LLM decides when
   each fits and switches with hidden tags at the end of a reply: `[OUTFIT: id]`,
-  `[EXPRESSION: name]`, `[POSE: id]` and `[POSE: none]` (`[ANIMATION: ...]` is still read). A pose is chosen on top of the face and
+  `[EXPRESSION: name]`, `[SEX-ACT: id]` and `[SEX-ACT: none]` (`[POSE: ...]` and `[ANIMATION: ...]` are still read). A sex-act is chosen on top of the face and
   outfit, not in their place, and is drawn as a layer over the background and the sprites. It lasts one reply: the next
   reply takes it down unless it asks for it again. An animation is a
   looping video that takes the sprite's place until it is stopped or the character goes
@@ -563,13 +632,18 @@ and the trait library.
     `{ "id": "...", "name": "...", "description": "...", "image": "...png", "clip": "...mp4" }`:
     a picture first, and optionally a clip played in its place. The editor calls this
     section NSFW and lays it out as an outfit's faces are, with a slot for each standard
-    pose (`NSFW_POSES` in `src/shared/model/loveInterest.ts`) and the same Generate and
+    sex-act (`NSFW_POSES` in `src/shared/model/loveInterest.ts`) and the same Generate and
     "Generate missing" buttons; the pictures are drawn at 1920×1080 with the NSFW picture
     workflow, size and framing set under ComfyUI setup (`nsfwPrompt` in `src/shared/comfy.ts`)
     in the love interest's `animations` list.
 - **Memories**: ending a scene asks the LLM for a one- or two-sentence summary (what they
   did, in order, and what the character remembered most). Only that summary is kept; the
-  transcript is discarded. The most recent memories are fed into the character's prompt.
+  transcript is discarded. The LLM also rates each memory **Core** (a moment that defines
+  what they are to each other: a first kiss, a confession, a betrayal), **Normal** or
+  **Fleeting**, and the player can change the rating, as well as the wording, on the summary
+  screen. A character is told at most eight of her memories in a scene, core first, then
+  normal, then fleeting, and the most recent first within each (`selectMemories` in
+  `src/shared/game/memory.ts`). A memory saved before levels existed counts as normal.
   If the LLM is unavailable, a plain note built from the activity list is saved instead.
 
 ## Outfits and faces
@@ -606,21 +680,25 @@ place, and deleting the add-on puts the original back.
 
 ## Art tool (ComfyUI)
 
-The content editor's **Sprites** tab can draw a character's sprites on your own ComfyUI.
+The content editor's **Media** tab can draw a character's sprites on your own ComfyUI.
 Pick the character first; then "Generate a picture" on an outfit, or "Generate" on a sprite
 to draw it again, opens the art tool on that outfit and expression. It is a tool you call
 directly: nothing in a scene ever calls it, and it talks only to the address you give it.
 
 - **The tool** (`src/renderer/src/ui/art/ArtTool.tsx`) is a dialog any editor screen can
-  open with a target: a sprite of a character, a background, or a photo. The Sprites tab
+  open with a target: a sprite of a character, a background, or a photo. The Media tab
   opens it for sprites, of love interests and NPCs alike, and a love interest's room opens
   it for a background: her room's picture can be uploaded, generated from the room's
   description, or set to one of the views of the place the room is in. Photos have no
   screen that opens the tool yet.
-- **ComfyUI setup** (a tab in the tool): the server address (with a Test button that names
-  the machine that answered), the folder your workflows are exported to, and how long to
-  wait. Workflows must be exported with ComfyUI's *Workflow → Export (API)*; one saved the
-  ordinary way cannot be run, and is listed with that reason.
+- **ComfyUI setup** (a tab in the tool, and the editor's own ComfyUI side; the game's Settings keep only the server and the game's workflows and models, which a player needs): the server address (with a Test button that names
+  the machine that answered) and how long to wait.
+- **The workflows** are the game's own, in `content/default/comfy/`, and are run from
+  there: nobody points the game at a folder. To add one, export it with ComfyUI's
+  *Workflow → Export (API)* into that folder; one saved the ordinary way cannot be run, and
+  is listed with that reason. `bundle.json` beside them holds what the game says of each
+  (its prefixes, its bindings, what it is the default for) and of each kind of picture and
+  clip, and `downloads.json` the models and node packs they call for.
 - **Reading a workflow** (`src/main/comfy/graph.ts`): the app follows the graph's wiring from
   the sampler to find where the prompt, negative prompt, width, height and seed are written
   and which node's picture to collect. Each can be repointed by hand under "Where things
@@ -633,6 +711,19 @@ directly: nothing in a scene ever calls it, and it talks only to the address you
 - **The prompt** is written from the character's `appearance` and the outfit's
   `description`, which is why those fields hold only what can be drawn. It can be edited
   before sending. Pictures are saved in the add-on folder and never replace one another.
+- **Video clips**: a sex-act in the NSFW section that has its picture can have its clip made
+  from it ("Generate a clip" under the picture). The picture is uploaded to ComfyUI and
+  written into a video workflow as its first frame, and with "Looping video" ticked, as
+  its last as well, so the clip goes round without a jump; unticked, the workflow's last
+  frame is unplugged and the clip is set to play once when it is put on the sex-act. A workflow is a video workflow when it has somewhere
+  to put a first frame (the `first_frame` / `start_image` input of its video node, followed
+  back to the node that loads the file); such a one is offered only for clips, and has its
+  own "Default for" tick. The prompt is not written from the character, since the picture
+  already shows her: it is the one kept for the sex-act (`videoPromptFor` in
+  `src/shared/comfy.ts`), edited for every character under ComfyUI setup → Video clips,
+  and a sex-act drawn pregnant shares the prompt of the sex-act it is built on. The clip's size
+  and length are the workflow's own. The clip is saved beside the picture as an `.mp4`,
+  and clips have a time limit of their own, since they take far longer than a picture.
 - **Using a picture**: "Use as the sprite" puts it on the outfit under that expression in
   the editor's draft; saving the character keeps it, like any other edit.
 - **Locations** (Edit game content, Locations): each of the game's places can be changed
@@ -652,7 +743,19 @@ directly: nothing in a scene ever calls it, and it talks only to the address you
   a second mode also clears gaps the art has closed around. The cut-out is a new
   `-cutout.png` and the picture it was made from is deleted. Available on a generated
   picture in the tool, and as "Cut out" on any PNG sprite in the add-on folder.
-- Settings are kept in `comfy.json` in the app's user data folder.
+- Settings about this computer (the address, where the models are, how long to wait) are
+  kept in `comfy.json` in the app's user data folder. Settings about a workflow, a kind of
+  picture or a clip are the game's, in `content/default/comfy/bundle.json`: with the
+  game's own files being edited, the editor writes changes there, and otherwise a player's
+  changes go into their `comfy.json`, which holds only what differs from the game's.
+
+## Money
+
+Wages, the rent, a child's keep and the price of every room of the house are balanced
+against each other, and `src/main/content/economy.test.ts` pins the balance: any job
+keeps the house and one child with care, a strong player can build most of it, and a
+whole year at the best wage does not buy the lot. Change a number in `jobs.json` or
+`housing.json` and that test says whether the balance still holds.
 
 ## Drama
 

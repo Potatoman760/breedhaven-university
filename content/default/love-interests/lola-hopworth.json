@@ -40,31 +40,31 @@
       "description": "a white double-breasted chef's jacket, dark trousers , her hair pinned back under a thin pink band",
       "sprites": {
         "neutral": {
-          "image": "sprites/lola-hopworth/default-neutral-6-cutout.png",
+          "image": "sprites/lola-hopworth/default-neutral-6-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/lola-hopworth/default-happy-2-cutout.png",
+          "image": "sprites/lola-hopworth/default-happy-2-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/lola-hopworth/default-angry-cutout.png",
+          "image": "sprites/lola-hopworth/default-angry-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/lola-hopworth/default-embarrassed-cutout.png",
+          "image": "sprites/lola-hopworth/default-embarrassed-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/lola-hopworth/default-sad-2-cutout.png",
+          "image": "sprites/lola-hopworth/default-sad-2-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/lola-hopworth/default-surprised-2-cutout.png",
+          "image": "sprites/lola-hopworth/default-surprised-2-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/lola-hopworth/default-aroused-cutout.png",
+          "image": "sprites/lola-hopworth/default-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -77,31 +77,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/lola-hopworth/pregnant-neutral-cutout.png",
+          "image": "sprites/lola-hopworth/pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/lola-hopworth/pregnant-happy-cutout.png",
+          "image": "sprites/lola-hopworth/pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/lola-hopworth/pregnant-sad-cutout.png",
+          "image": "sprites/lola-hopworth/pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/lola-hopworth/pregnant-angry-cutout.png",
+          "image": "sprites/lola-hopworth/pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/lola-hopworth/pregnant-surprised-cutout.png",
+          "image": "sprites/lola-hopworth/pregnant-surprised-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/lola-hopworth/pregnant-aroused-cutout.png",
+          "image": "sprites/lola-hopworth/pregnant-aroused-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/lola-hopworth/pregnant-embarrassed-2-cutout.png",
+          "image": "sprites/lola-hopworth/pregnant-embarrassed-2-cutout.webp",
           "description": ""
         }
       },
@@ -113,31 +113,31 @@
       "description": "nothing at all, completely nude,  her hair pinned back under a thin pink band",
       "sprites": {
         "neutral": {
-          "image": "sprites/lola-hopworth/nude-neutral-2-cutout.png",
+          "image": "sprites/lola-hopworth/nude-neutral-2-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/lola-hopworth/nude-happy-cutout.png",
+          "image": "sprites/lola-hopworth/nude-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/lola-hopworth/nude-sad-cutout.png",
+          "image": "sprites/lola-hopworth/nude-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/lola-hopworth/nude-angry-cutout.png",
+          "image": "sprites/lola-hopworth/nude-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/lola-hopworth/nude-surprised-cutout.png",
+          "image": "sprites/lola-hopworth/nude-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/lola-hopworth/nude-embarrassed-cutout.png",
+          "image": "sprites/lola-hopworth/nude-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/lola-hopworth/nude-aroused-cutout.png",
+          "image": "sprites/lola-hopworth/nude-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -150,31 +150,31 @@
       "inherits": "nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/lola-hopworth/nude-pregnant-neutral-cutout.png",
+          "image": "sprites/lola-hopworth/nude-pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/lola-hopworth/nude-pregnant-happy-cutout.png",
+          "image": "sprites/lola-hopworth/nude-pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/lola-hopworth/nude-pregnant-sad-cutout.png",
+          "image": "sprites/lola-hopworth/nude-pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/lola-hopworth/nude-pregnant-angry-cutout.png",
+          "image": "sprites/lola-hopworth/nude-pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/lola-hopworth/nude-pregnant-surprised-cutout.png",
+          "image": "sprites/lola-hopworth/nude-pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/lola-hopworth/nude-pregnant-embarrassed-cutout.png",
+          "image": "sprites/lola-hopworth/nude-pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/lola-hopworth/nude-pregnant-aroused-cutout.png",
+          "image": "sprites/lola-hopworth/nude-pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -192,7 +192,7 @@
     "subjects": [
       {
         "subject": "Culinary Arts and Brewing",
-        "code": "CUB",
+        "code": "CUL",
         "level": 3,
         "stats": [
           "dexterity",
@@ -207,84 +207,90 @@
       "id": "blowjob",
       "name": "Blowjob",
       "description": "",
-      "image": "sprites/lola-hopworth/nsfw-blowjob.png",
+      "image": "sprites/lola-hopworth/nsfw-blowjob.webp",
+      "clip": "sprites/lola-hopworth/nsfw-blowjob.mp4",
       "loop": true
     },
     {
       "id": "missionary",
       "name": "Missionary",
       "description": "",
-      "image": "sprites/lola-hopworth/nsfw-missionary.png",
+      "image": "sprites/lola-hopworth/nsfw-missionary.webp",
+      "clip": "sprites/lola-hopworth/nsfw-missionary.mp4",
       "loop": true
     },
     {
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/lola-hopworth/nsfw-doggy.png",
+      "image": "sprites/lola-hopworth/nsfw-doggy.webp",
+      "clip": "sprites/lola-hopworth/nsfw-doggy.mp4",
       "loop": true
     },
     {
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
-      "image": "sprites/lola-hopworth/nsfw-cowgirl.png",
+      "image": "sprites/lola-hopworth/nsfw-cowgirl.webp",
+      "clip": "sprites/lola-hopworth/nsfw-cowgirl-2.mp4",
       "loop": true
     },
     {
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/lola-hopworth/nsfw-creampie-2.png",
+      "image": "sprites/lola-hopworth/nsfw-creampie-2.webp",
+      "clip": "sprites/lola-hopworth/nsfw-creampie.mp4",
       "loop": true
     },
     {
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/lola-hopworth/nsfw-facial.png",
+      "image": "sprites/lola-hopworth/nsfw-facial.webp",
+      "clip": "sprites/lola-hopworth/nsfw-facial.mp4",
       "loop": true
     },
     {
       "id": "pregnant-blowjob",
       "name": "Blowjob, pregnant",
       "description": "",
-      "image": "sprites/lola-hopworth/nsfw-pregnant-blowjob.png",
+      "image": "sprites/lola-hopworth/nsfw-pregnant-blowjob.webp",
       "loop": true
     },
     {
       "id": "pregnant-missionary",
       "name": "Missionary, pregnant",
       "description": "",
-      "image": "sprites/lola-hopworth/nsfw-pregnant-missionary.png",
+      "image": "sprites/lola-hopworth/nsfw-pregnant-missionary.webp",
       "loop": true
     },
     {
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
-      "image": "sprites/lola-hopworth/nsfw-pregnant-doggy.png",
+      "image": "sprites/lola-hopworth/nsfw-pregnant-doggy.webp",
       "loop": true
     },
     {
       "id": "pregnant-cowgirl",
       "name": "Cowgirl, pregnant",
       "description": "",
-      "image": "sprites/lola-hopworth/nsfw-pregnant-cowgirl.png",
+      "image": "sprites/lola-hopworth/nsfw-pregnant-cowgirl.webp",
       "loop": true
     },
     {
       "id": "pregnant-creampie",
       "name": "Creampie, pregnant",
       "description": "",
-      "image": "sprites/lola-hopworth/nsfw-pregnant-creampie.png",
+      "image": "sprites/lola-hopworth/nsfw-pregnant-creampie.webp",
       "loop": true
     },
     {
       "id": "pregnant-facial",
       "name": "Facial, pregnant",
       "description": "",
-      "image": "sprites/lola-hopworth/nsfw-pregnant-facial.png",
+      "image": "sprites/lola-hopworth/nsfw-pregnant-facial.webp",
       "loop": true
     }
   ],
@@ -331,8 +337,9 @@
     "name": "a flat above the Honeyed Bee's kitchen",
     "description": "A narrow flat above a pub kitchen, warm from the ovens below, with a single bed pushed against the wall and a counter crowded with jars of fermenting things. Copper pans hang from a rack above a scrubbed table, and a window looks out over Lantern Row's lanterns. The air smells of yeast, toasted grain and dried lavender. Light comes from a bare bulb and the orange glow rising through the floorboards.",
     "locationId": "honeyed-bee-inn",
-    "background": "generated/backgrounds/lola-hopworth/view-2.png"
+    "background": "generated/backgrounds/lola-hopworth/view-2.webp"
   },
+  "birthPicture": "sprites/lola-hopworth/birth.png",
   "ai": {
     "speechPattern": "She speaks quickly and in short bursts, clipping the ends of her sentences, and jumps from practical instruction to personal observation without warning. She uses food metaphors for everything and asks blunt personal questions the way other people ask about the weather.",
     "tone": "Blunt, fast, warm, irreverent",

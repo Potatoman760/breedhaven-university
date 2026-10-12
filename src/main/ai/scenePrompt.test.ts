@@ -70,7 +70,7 @@ describe('what a scene sends to the LLM', () => {
       state = {
         ...state,
         relationships: { ...state.relationships, [id]: { ...state.relationships[id], ...meters } },
-        memories: { ...state.memories, [id]: memories.map((summary, i) => ({ time: state.time - 24 * (memories.length - i), summary: summary.split(PLAYER_TOKEN).join(state.player.name) })) }
+        memories: { ...state.memories, [id]: memories.map((summary, i) => ({ time: state.time - 24 * (memories.length - i), summary: summary.split(PLAYER_TOKEN).join(state.player.name), level: 'normal' as const })) }
       }
     }
     return state

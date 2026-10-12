@@ -9,10 +9,15 @@ import {
   addMemory,
   amendMemory,
   addNote,
-  birthNote,
-  birthsDue,
+  attendBirth,
+  scheduleBirths,
+  settleBirths,
+  withHousing,
+  homeViewId,
+  housingOfferDue,
+  sendHousingOffer,
+  settleHousehold,
   conceive,
-  deliver,
   attendOrientation,
   courierRound,
   courierRoundDue,
@@ -105,6 +110,7 @@ import { TitleScreen } from './TitleScreen'
 import { CalendarPanel } from './ui/CalendarPanel'
 import { AgeGate } from './ui/AgeGate'
 import { PhonePanel } from './ui/PhonePanel'
+import { HousePanel } from './ui/HousePanel'
 import { ContentEditor } from './ui/editor/ContentEditor'
 import { CoursesView } from './ui/CoursesView'
 import { DayView } from './ui/DayView'
@@ -207,8 +213,8 @@ const NOTICE_MS = 9000
 /** Owns the running game: its state, the open scene, and whichever dialog is showing. */
 function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   const [state, setState] = useState<GameState>(initial.state)
-  // The content as this game reads it: the player's name wherever the content wrote the token.
-  const content = useMemo(() => personalise(written, state.player.name), [written, state.player.name])
+  // The content as this game reads it: the player's name wherever the content wrote the token, and the house he has been let in it or out of it.
+  const content = useMemo(() => withHousing(personalise(written, state.player.name), state), [written, state.player.name, state.housing])
   const [scene, setScene] = useState<Scene | null>(initial.scene)
   // The character has closed the scene and the player hasn't moved on yet.
   const [ended, setEnded] = useState(false)
@@ -254,7 +260,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   // Browsing the market stalls.
   const location = content.locations.find((l) => l.id === state.locationId)
   // The view of where he is: one named for today's event or holiday if the place has one, else its default.
-  const backgroundId = viewFor(content, state, location)?.id
+  // At home, that is the room of the house he is in.
+  const backgroundId = viewFor(content, state, location, homeViewId(content, state))?.id
 
   // Autosave on every change, but not for the state the game was opened with.
   const untouched = useRef(true)
@@ -373,26 +380,35 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   const cast = scene?.npc ? withNpc(content, scene.loveInterestId) : content
   const partner = cast.loveInterests.find((li) => li.id === partnerId)
 
-  // A child whose time has come is born as soon as nothing else is going on, and its mother sends word.
+  // A few days before a child is due, the hour of its birth is set and goes on his calendar. Only while nothing else is going on:
+  // a turn taken back keeps what was written to him, and would have her write twice.
   useEffect(() => {
-    if (!idle || !birthsDue(state)) return
-    const { state: after, born } = deliver(content, state)
-    setState(after)
-    setNotice(
-      born
-        .map((child) => `${firstNames(content, [child.motherId])} has given birth: you have ${child.daughter ? 'a daughter' : 'a son'}.`)
-        .join(' ')
-    )
-    for (const child of born) {
-      const plain = birthNote(content, after, child)
-      const news =
-        `You gave birth today to ${after.player.name}'s child, ${child.daughter ? 'a daughter' : 'a son'}, and you are both well. ` +
-        `Tell him in your own way, and say what you want of him now.`
-      window.api
-        .courier({ state: after, loveInterestId: child.motherId, invite: false, news })
-        .then((note) => note.text || plain, () => plain)
-        .then((text) => setState((current) => addNote(giveContact(current, child.motherId), child.motherId, { from: 'them', text, read: false })))
-    }
+    if (!idle || over || scheduleBirths(content, state).state === state) return
+    setState((current) => scheduleBirths(content, current).state)
+  }, [idle, over, state, content])
+
+  // A birth whose hour has gone by without him has happened without him, and she does not forget it.
+  useEffect(() => {
+    if (!idle) return
+    const { missed } = settleBirths(content, state)
+    if (missed.length === 0) return
+    setState((current) => settleBirths(content, current).state)
+    setNotice(missed.map(({ motherId, child }) => `${firstNames(content, [motherId])} gave birth to your ${child.daughter ? 'daughter' : 'son'}, and you were not there. She will not forget it.`).join(' '))
+  }, [idle, state, content])
+
+  // Once someone he is with is carrying his child, the Sire Relations Office writes to him about a house.
+  useEffect(() => {
+    if (!idle || over || !housingOfferDue(content, state)) return
+    setState((current) => sendHousingOffer(content, current))
+  }, [idle, over, state, content])
+
+  // As the days go by the house is reckoned up: rent on the first of the month, the children's keep each week.
+  useEffect(() => {
+    if (!idle) return
+    const settled = settleHousehold(content, state)
+    if (settled.state === state) return
+    setState((current) => settleHousehold(content, current).state)
+    if (settled.notices.length > 0) setNotice(settled.notices.join(' '))
   }, [idle, state, content])
 
   /**
@@ -441,7 +457,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     const at = arrival?.state ?? when
     if (arrival) setState((current) => ({ ...current, dramaDay: arrival.state.dramaDay }))
     // The view the player has picked goes along, so the character knows exactly where they are.
-    const asked: Scene = { ...from, backgroundId: backgroundId ?? from.backgroundId, messages: text === undefined ? from.messages : [...from.messages, { role: 'user', content: text }] }
+    const asked: Scene = { ...from, backgroundId: from.viewId ?? backgroundId ?? from.backgroundId, messages: text === undefined ? from.messages : [...from.messages, { role: 'user', content: text }] }
     setScene(asked)
     setNotice('')
     setAgreed(arrival?.notice ?? '')
@@ -554,6 +570,14 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
 
   /** Turns up for a plan made earlier, which opens a scene with everyone it was made with. */
   function keep(appointmentId: string, at: GameState = state) {
+    // A birth is its own scene, set by the game and not opened like any other: nobody walks in on it.
+    if (at.appointments.find((plan) => plan.id === appointmentId)?.kind === 'birth') {
+      const born = attendBirth(content, at, appointmentId)
+      setNotice('')
+      setState(born.state)
+      setScene(born.scene)
+      return
+    }
     const { state: after, appointment } = keepAppointment(content, at, appointmentId)
     setNotice('')
     begin({
@@ -722,6 +746,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           outcome: sceneOutcome(content, scene.baseline, felt, id, true)
         })),
         memories: result.memories,
+        levels: result.levels,
         spending: result.spending,
         // What came out about each of them over the scene, and what changed between them.
         learned: [
@@ -737,7 +762,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       // Everyone who was there keeps their own memory of it.
       // Sharing a scene also brings the love interests in it closer to each other.
       const after = sceneWitnesses(scene).reduce(
-        (current, id) => (result.memories[id] ? addMemory(current, id, result.memories[id]) : current),
+        (current, id) => (result.memories[id] ? addMemory(current, id, result.memories[id], result.levels[id]) : current),
         // A shift is paid for when it is over.
         payShift(content, growTies(content, felt, sceneCast(scene)), scene)
       )
@@ -803,13 +828,13 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           content={summary.scene.npc ? withNpc(content, summary.scene.loveInterestId) : content}
           state={state}
           summary={summary}
-          backgroundId={backgroundId}
-          onContinue={(edited) => {
+          backgroundId={summary.scene.viewId ?? backgroundId}
+          onContinue={(edited, levels) => {
             // The memories were kept as written when the scene ended, so that nothing is lost
-            // if the game is closed here. What the player has reworded takes their place now.
+            // if the game is closed here. What the player has reworded, or made more or less important, takes their place now.
             setState((current) =>
               sceneWitnesses(summary.scene).reduce(
-                (next, id) => amendMemory(next, id, summary.memories[id] ?? '', edited[id] ?? ''),
+                (next, id) => amendMemory(next, id, summary.memories[id] ?? '', edited[id] ?? '', levels[id]),
                 current
               )
             )
@@ -825,7 +850,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           content={cast}
           state={state}
           scene={scene}
-          backgroundId={backgroundId}
+          backgroundId={scene.viewId ?? backgroundId}
           busy={busy}
           movingTo={movingTo}
           notice={notice}
@@ -915,7 +940,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       )}
 
       {panel?.kind === 'courier' && (
-        <PhonePanel content={content} state={state} onChange={applyUpdate} onClose={close} initialId={panel.id} onGoToInvite={scene || summary ? undefined : goToInvite} />
+        <PhonePanel content={content} state={state} onChange={applyUpdate} onClose={close} initialId={panel.id} onGoToInvite={scene || summary ? undefined : goToInvite} canAct={!scene && !summary} />
       )}
       <div className="toasts">
       {!scene && notice && (
@@ -968,7 +993,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         </Dialog>
       )}
       {panel?.kind === 'menu' && (
-        <Dialog title="Menu" onClose={close} narrow>
+        <Dialog title="Menu" onClose={close} narrow noClose>
           <div className="pause-menu">
             <button onClick={close}>Continue</button>
             <button className="secondary" onClick={() => setPanel({ kind: 'save' })}>
@@ -1002,6 +1027,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       {panel?.kind === 'calendar' && (
         <CalendarPanel content={content} state={state} onChange={setState} onClose={close} />
       )}
+      {panel?.kind === 'house' && <HousePanel content={content} state={state} onChange={applyUpdate} onClose={close} />}
       {panel?.kind === 'map' && (
         <MapPanel
           content={content}

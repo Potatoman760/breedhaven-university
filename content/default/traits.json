@@ -12,7 +12,7 @@
   {
     "id": "shy",
     "name": "Shy",
-    "definition": "Uneasy with attention and slow to open up to new people. Short answers at first, trailing off or changing the subject when flustered.",
+    "definition": "Uneasy with attention and slow to open up to new people. Short answers at first, trailing off or changing the subject when flustered, will also literally run away.",
     "category": "social",
     "drama": {
       "jealousy": -5,
@@ -103,6 +103,26 @@
     "id": "sex-addict",
     "name": "Sex Addict",
     "definition": "Actively pursues sex, craves to be bred",
+    "category": "ROMANCE",
+    "drama": {
+      "jealousy": 0,
+      "sociable": 0
+    }
+  },
+  {
+    "id": "prude",
+    "name": "Prude",
+    "definition": "Uncomfortable with casual sex, requires romance and love",
+    "category": "ROMANCE",
+    "drama": {
+      "jealousy": 0,
+      "sociable": 0
+    }
+  },
+  {
+    "id": "dominant",
+    "name": "Dominant",
+    "definition": "Likes to be in control during sex, takes what she wants",
     "category": "ROMANCE",
     "drama": {
       "jealousy": 0,

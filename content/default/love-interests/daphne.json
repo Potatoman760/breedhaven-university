@@ -8,7 +8,9 @@
   "appearance": "A 22-year-old woman with warm tan skin, a strong jaw, amber-brown eyes under straight dark brows, and full lips. Long, straight auburn hair pulled into a high ponytail that reaches her waist. An athletic, muscular build: defined abdominal muscles, strong shoulders and thighs, a full bust, and wide hips.",
   "personality": "Direct, confident, and controlled, with dry humor and easy banter ",
   "traitIds": [
-    "loyal"
+    "loyal",
+    "competitive",
+    "dominant"
   ],
   "likes": [
     "weapons",
@@ -33,31 +35,31 @@
       "description": "she wears a white crop top jersey with the number 69 in red, baring her midriff. She has on tight blue athletic shorts. Her hair is in a ponytail.",
       "sprites": {
         "neutral": {
-          "image": "sprites/daphne/default-neutral-cutout.png",
+          "image": "sprites/daphne/default-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/daphne/default-happy-cutout.png",
+          "image": "sprites/daphne/default-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/daphne/default-sad-cutout-2.png",
+          "image": "sprites/daphne/default-sad-cutout-2.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/daphne/default-angry-cutout-2.png",
+          "image": "sprites/daphne/default-angry-cutout-2.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/daphne/default-surprised-cutout-2.png",
+          "image": "sprites/daphne/default-surprised-cutout-2.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/daphne/default-embarrassed-cutout-2.png",
+          "image": "sprites/daphne/default-embarrassed-cutout-2.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/daphne/default-aroused-cutout-2.png",
+          "image": "sprites/daphne/default-aroused-cutout-2.webp",
           "description": ""
         }
       },
@@ -70,31 +72,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/daphne/pregnant-neutral-2-cutout.png",
+          "image": "sprites/daphne/pregnant-neutral-2-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/daphne/pregnant-happy-2-cutout.png",
+          "image": "sprites/daphne/pregnant-happy-2-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/daphne/pregnant-sad-2-cutout.png",
+          "image": "sprites/daphne/pregnant-sad-2-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/daphne/pregnant-angry-2-cutout.png",
+          "image": "sprites/daphne/pregnant-angry-2-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/daphne/pregnant-surprised-2-cutout.png",
+          "image": "sprites/daphne/pregnant-surprised-2-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/daphne/pregnant-embarrassed-2-cutout.png",
+          "image": "sprites/daphne/pregnant-embarrassed-2-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/daphne/pregnant-aroused-2-cutout.png",
+          "image": "sprites/daphne/pregnant-aroused-2-cutout.webp",
           "description": ""
         }
       },
@@ -106,31 +108,31 @@
       "description": "nothing at all, completely nude",
       "sprites": {
         "happy": {
-          "image": "sprites/daphne/nude-happy-cutout.png",
+          "image": "sprites/daphne/nude-happy-cutout.webp",
           "description": ""
         },
         "neutral": {
-          "image": "sprites/daphne/nude-neutral-cutout.png",
+          "image": "sprites/daphne/nude-neutral-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/daphne/nude-sad-cutout.png",
+          "image": "sprites/daphne/nude-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/daphne/nude-angry-cutout.png",
+          "image": "sprites/daphne/nude-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/daphne/nude-surprised-cutout.png",
+          "image": "sprites/daphne/nude-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/daphne/nude-embarrassed-cutout.png",
+          "image": "sprites/daphne/nude-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/daphne/nude-aroused-cutout.png",
+          "image": "sprites/daphne/nude-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -143,31 +145,31 @@
       "inherits": "nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/daphne/nude-pregnant-neutral-cutout.png",
+          "image": "sprites/daphne/nude-pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/daphne/nude-pregnant-happy-cutout.png",
+          "image": "sprites/daphne/nude-pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/daphne/nude-pregnant-sad-cutout.png",
+          "image": "sprites/daphne/nude-pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/daphne/nude-pregnant-angry-cutout.png",
+          "image": "sprites/daphne/nude-pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/daphne/nude-pregnant-surprised-cutout.png",
+          "image": "sprites/daphne/nude-pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/daphne/nude-pregnant-embarrassed-cutout.png",
+          "image": "sprites/daphne/nude-pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/daphne/nude-pregnant-aroused-cutout.png",
+          "image": "sprites/daphne/nude-pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -192,70 +194,76 @@
       "id": "blowjob",
       "name": "Blowjob",
       "description": "",
-      "image": "sprites/daphne/nsfw-blowjob-2.png",
+      "image": "sprites/daphne/nsfw-blowjob-2.webp",
+      "clip": "sprites/daphne/nsfw-blowjob.mp4",
       "loop": true
     },
     {
       "id": "missionary",
       "name": "Missionary",
       "description": "",
-      "image": "sprites/daphne/nsfw-missionary.png",
+      "image": "sprites/daphne/nsfw-missionary.webp",
+      "clip": "sprites/daphne/nsfw-missionary.mp4",
       "loop": true
     },
     {
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/daphne/nsfw-doggy.png",
+      "image": "sprites/daphne/nsfw-doggy.webp",
+      "clip": "sprites/daphne/nsfw-doggy.mp4",
       "loop": true
     },
     {
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
-      "image": "sprites/daphne/nsfw-cowgirl.png",
+      "image": "sprites/daphne/nsfw-cowgirl.webp",
+      "clip": "sprites/daphne/nsfw-cowgirl-2.mp4",
       "loop": true
     },
     {
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/daphne/nsfw-creampie.png",
+      "image": "sprites/daphne/nsfw-creampie.webp",
+      "clip": "sprites/daphne/nsfw-creampie.mp4",
       "loop": true
     },
     {
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/daphne/nsfw-facial-2.png",
+      "image": "sprites/daphne/nsfw-facial-2.webp",
+      "clip": "sprites/daphne/nsfw-facial.mp4",
       "loop": true
     },
     {
       "id": "pregnant-missionary",
       "name": "Missionary, pregnant",
       "description": "",
-      "image": "sprites/daphne/nsfw-pregnant-missionary-2.png",
+      "image": "sprites/daphne/nsfw-pregnant-missionary-2.webp",
       "loop": true
     },
     {
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
-      "image": "sprites/daphne/nsfw-pregnant-doggy-2.png",
+      "image": "sprites/daphne/nsfw-pregnant-doggy-2.webp",
       "loop": true
     },
     {
       "id": "pregnant-cowgirl",
       "name": "Cowgirl, pregnant",
       "description": "",
-      "image": "sprites/daphne/nsfw-pregnant-cowgirl-2.png",
+      "image": "sprites/daphne/nsfw-pregnant-cowgirl-2.webp",
       "loop": true
     },
     {
       "id": "pregnant-creampie",
       "name": "Creampie, pregnant",
       "description": "",
-      "image": "sprites/daphne/nsfw-pregnant-creampie-2.png",
+      "image": "sprites/daphne/nsfw-pregnant-creampie-2.webp",
       "loop": true
     }
   ],
@@ -308,8 +316,9 @@
     "name": "a duty flat over the Cloister Halls gate",
     "description": "A modern Breedhaven university apartment bedroom belonging to a fourth-year female volleyball captain: spacious and stylish, with magitech touches, a large bed, university volleyball trophies and medals, framed team photos, volleyball gear, athletic shoes, and a captain’s jacket. Warm wood furniture, soft ambient magical lighting, subtle Bloom-inspired decorations, laptop and textbooks on a desk, lived-in but tidy, confident sporty atmosphere.",
     "locationId": "dormitories",
-    "background": "generated/backgrounds/daphne/view.png"
+    "background": "generated/backgrounds/daphne/view.webp"
   },
+  "birthPicture": "sprites/daphne/birth.png",
   "ai": {
     "speechPattern": "Short, direct sentences, said evenly: a captain's voice that expects to be heard without being raised. Dry jokes delivered with a straight face, and easy banter with anyone who can keep up. She says what she means and then stops.",
     "tone": "direct, dry, steady",

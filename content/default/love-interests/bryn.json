@@ -15,7 +15,7 @@
       "description": "a simple sleeveless dark brown leather smithing apron over a muted rust-red linen shirt, sturdy work trousers, leather wrist guards, and a plain utility belt. She holds one large blunted blacksmith hammer at her side in one hand",
       "sprites": {
         "neutral": {
-          "image": "sprites/bryn/default-neutral-cutout.png",
+          "image": "sprites/bryn/default-neutral-cutout.webp",
           "description": ""
         }
       },

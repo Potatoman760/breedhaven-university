@@ -2,12 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { PregnancyConfigSchema, type ContentPack, type GameState } from '../model'
 import { evaluateCondition } from './conditions'
 import {
-  birthNote,
-  birthsDue,
   canConceive,
   conceive,
   daysUntilDue,
-  deliver,
+  deliverChild,
   describeChildren,
   describePregnancy,
   pregnancyStage,
@@ -37,6 +35,7 @@ const content: ContentPack = {
     lengthDays: 10,
     recoveryDays: 3,
     daughterChance: 0.5,
+    birthLocationId: 'shop',
     stages: [
       { id: 'early', name: 'newly with child', from: 0, description: 'Nothing shows yet.' },
       { id: 'showing', name: 'showing', from: 0.25, showing: true, description: 'Your belly has rounded.' }
@@ -153,25 +152,24 @@ describe('carrying', () => {
 
 describe('birth', () => {
   it('comes when the time is up, records the child, and leaves her able to conceive again after a rest', () => {
-    expect(birthsDue(at(pregnant, 9))).toBe(false)
-    expect(deliver(content, at(pregnant, 9)).born).toEqual([])
+    // Nobody who is not carrying is brought to bed.
+    expect(deliverChild(content, at(pregnant, 11), 'bea', 200)).toEqual({ state: at(pregnant, 11) })
     const due = at(pregnant, 11)
-    expect(birthsDue(due)).toBe(true)
-    const { state: after, born } = deliver(content, due)
-    expect(born).toHaveLength(1)
-    expect(born[0]).toMatchObject({ motherId: 'ana', bornAt: 200 })
+    const { state: after, child } = deliverChild(content, due, 'ana', 200)
+    expect(child).toMatchObject({ motherId: 'ana', bornAt: 200 })
     expect(after.pregnancies).toEqual({})
-    expect(after.children).toEqual(born)
+    expect(after.children).toEqual([child])
 
     expect(canConceive(content, after, 'ana')).toBe(false)
     expect(canConceive(content, at(after, 13), 'ana')).toBe(true)
     expect(describePregnancy(content, after, 'ana')[0]).toMatch(/^You have borne Pat a (daughter|son), born yesterday\./)
     expect(describePregnancy(content, after, 'bea')[0]).toMatch(/^Ana has borne Pat a (daughter|son)\.$/)
-    expect(birthNote(content, after, born[0])).toMatch(/^Pat\. It is done, and we are both well: you have a (daughter|son)\. Come and see us\. Ana$/)
+    // A child with no house to live in is at the creche.
+    expect(describePregnancy(content, after, 'ana')[0]).toContain("at the University's creche")
   })
 
   it('gives daughters and sons in the proportion the content sets', () => {
-    const girls = Array.from({ length: 400 }, (_, seed) => deliver(content, at({ ...pregnant, weatherSeed: seed }, 10)).born[0].daughter).filter(Boolean).length
+    const girls = Array.from({ length: 400 }, (_, seed) => deliverChild(content, at({ ...pregnant, weatherSeed: seed }, 10), 'ana', 200).child!.daughter).filter(Boolean).length
     expect(girls).toBeGreaterThan(150)
     expect(girls).toBeLessThan(250)
     const child = (daughter: boolean) => ({ motherId: 'ana', bornAt: 0, daughter })

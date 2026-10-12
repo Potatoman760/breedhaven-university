@@ -1,10 +1,10 @@
-import { mkdtempSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { backgroundPrompt, ComfySettingsSchema, DEFAULT_SIZES, normaliseComfyUrl, nsfwPrompt, prependPrompt, spritePrompt } from '../../shared/comfy'
+import { backgroundPrompt, birthPrompt, ComfySettingsSchema, DEFAULT_SIZES, DEFAULT_VIDEO_PROMPT, normaliseComfyUrl, nsfwPrompt, prependPrompt, spritePrompt, videoPromptFor } from '../../shared/comfy'
 import { NSFW_POSES, outfitDescription, poseDescription } from '../../shared/model'
-import { analyse, applyBindings, effectiveBindings, parseGraph } from './graph'
+import { analyse, applyBindings, effectiveBindings, parseGraph, unplugLastFrame } from './graph'
 import { ComfyStore, fileArt } from './studio'
 import { listWorkflows, loadWorkflows, resolveWorkflow } from './workflows'
 
@@ -31,6 +31,9 @@ describe('reading a workflow', () => {
       width: { node: '5', field: 'width' },
       height: { node: '5', field: 'height' },
       seed: { node: '3', field: 'seed' },
+      firstFrame: null,
+      lastFrame: null,
+      length: null,
       output: { node: '9', field: 'images' }
     })
     expect(analysis.notes.positive).toContain('CLIPTextEncode #6 ("Positive") text')
@@ -85,7 +88,7 @@ describe('reading a workflow', () => {
   })
 })
 
-describe('the workflow folder', () => {
+describe('the folder of workflows', () => {
   const dir = mkdtempSync(join(tmpdir(), 'comfy-'))
   writeFileSync(join(dir, 'sprites.json'), JSON.stringify(BASIC))
   writeFileSync(join(dir, 'scenery.json'), JSON.stringify(BASIC))
@@ -99,8 +102,12 @@ describe('the workflow folder', () => {
       ['scenery', true],
       ['sprites', true]
     ])
-    expect(listWorkflows(null, {}).message).toBe('No workflow folder is chosen yet.')
-    expect(listWorkflows(join(dir, 'missing'), {}).message).toContain('There is no folder')
+    expect(listWorkflows(join(dir, 'missing'), {}).message).toContain('there is no folder')
+    // What the game keeps beside its workflows is not one of them.
+    const beside = mkdtempSync(join(tmpdir(), 'comfy-'))
+    writeFileSync(join(beside, 'bundle.json'), '{}')
+    writeFileSync(join(beside, 'downloads.json'), '{}')
+    expect(listWorkflows(beside, {})).toMatchObject({ ok: false, workflows: [] })
   })
 
   it('runs the one named, else the default for the kind, else the first that takes a prompt', () => {
@@ -122,6 +129,35 @@ describe('the studio', () => {
     expect(() => store.update({ ...store.get(), baseUrl: '127.0.0.1:8188' })).toThrow('Include the http://')
     expect(normaliseComfyUrl('file:///etc/passwd').problem).toContain('Only http and https')
     expect(ComfySettingsSchema.parse({}).timeoutSeconds).toBe(300)
+  })
+
+  it('reads what the game says of its workflows under what the player changed, and keeps only the changes', () => {
+    const root = mkdtempSync(join(tmpdir(), 'comfy-'))
+    const pack = join(root, 'pack')
+    mkdirSync(join(pack, 'comfy'), { recursive: true })
+    const shipped = { promptPrefixes: { 'a.json': 'comic book style', 'b.json': 'watercolour' }, defaults: { sprite: 'a.json' }, videoPrompts: { doggy: 'she rocks' } }
+    writeFileSync(join(pack, 'comfy', 'bundle.json'), JSON.stringify(shipped))
+    const path = join(root, 'comfy.json')
+    const store = new ComfyStore(path, pack)
+    expect(store.get()).toMatchObject(shipped)
+
+    // A player's change is theirs: kept on their computer, and the game's content is left as it was.
+    store.update({ ...store.get(), timeoutSeconds: 600, promptPrefixes: { ...store.get().promptPrefixes, 'a.json': 'mine' } })
+    const kept = JSON.parse(readFileSync(path, 'utf8'))
+    expect(kept).toMatchObject({ timeoutSeconds: 600, promptPrefixes: { 'a.json': 'mine' }, defaults: {}, videoPrompts: {} })
+    expect(JSON.parse(readFileSync(join(pack, 'comfy', 'bundle.json'), 'utf8'))).toEqual(shipped)
+    // What they never touched still follows the game when the game changes it.
+    writeFileSync(join(pack, 'comfy', 'bundle.json'), JSON.stringify({ ...shipped, promptPrefixes: { 'a.json': 'new', 'b.json': 'ink wash' } }))
+    expect(new ComfyStore(path, pack).get().promptPrefixes).toEqual({ 'a.json': 'mine', 'b.json': 'ink wash' })
+
+    // The game's author changes the game itself, and nothing of it is left on their own computer to shadow it.
+    const author = new ComfyStore(join(root, 'author.json'), pack)
+    author.update({ ...author.get(), baseUrl: 'http://10.0.0.5:8188', videoPrompts: { doggy: 'she sways' } }, true)
+    const game = JSON.parse(readFileSync(join(pack, 'comfy', 'bundle.json'), 'utf8'))
+    expect(game.videoPrompts).toEqual({ doggy: 'she sways' })
+    expect(JSON.stringify(game)).not.toContain('10.0.0.5')
+    expect(JSON.parse(readFileSync(join(root, 'author.json'), 'utf8'))).toMatchObject({ baseUrl: 'http://10.0.0.5:8188', videoPrompts: {}, promptPrefixes: {} })
+    expect(new ComfyStore(path, pack).get().videoPrompts).toEqual({ doggy: 'she sways' })
   })
 
   it('files a picture under a name of its own, and can make it a view of a location', () => {
@@ -219,6 +255,25 @@ describe('the NSFW section', () => {
   })
 })
 
+describe('the picture of a birth', () => {
+  it('is drawn wide, from her body, in a hospital bed with the child in her arms', () => {
+    expect(DEFAULT_SIZES.birth).toEqual({ width: 1920, height: 1080 })
+    expect(birthPrompt({ pronouns: 'she/her', appearance: 'A woman with brown skin and long black hair' }, 'wide shot, a maternity room')).toBe(
+      'A woman with brown skin and long black hair.\n\nShe wears a pale hospital gown.\n\n' +
+        'She sits propped up on pillows in a hospital bed, cradling a newborn baby wrapped in a soft blanket in her arms, smiling down at it, tired and radiant.\n\nwide shot, a maternity room'
+    )
+  })
+})
+
+describe('what of a pose is shown', () => {
+  it('is its clip, and failing that its picture', async () => {
+    const { poseMedia } = await import('../../shared/model')
+    expect(poseMedia({ clip: 'c.mp4', image: 'p.webp' })).toEqual(['c.mp4', 'p.webp'])
+    expect(poseMedia({ image: 'p.webp' })).toEqual(['p.webp'])
+    expect(poseMedia({})).toEqual([])
+  })
+})
+
 describe('a pose drawn pregnant', () => {
   it('is the same pose, built on her nude with what her pregnant nude adds to it', async () => {
     const { nsfwPrompt } = await import('../../shared/comfy')
@@ -241,5 +296,87 @@ describe('a pose drawn pregnant', () => {
     expect(NSFW_PREGNANT_POSES.every((pose, i) => pose.draws === NSFW_POSES[i].draws && pose.base === NSFW_POSES[i].id)).toBe(true)
     expect(isPregnantPose('pregnant-missionary')).toBe(true)
     expect(isPregnantPose('missionary')).toBe(false)
+  })
+})
+
+describe('a video workflow', () => {
+  // The one the game ships with: its prompt is on the video node itself, and nothing in it has a sampler's usual shape.
+  const shipped = readFileSync(join(__dirname, '../../../content/default/comfy/minimax h3 eros.json'), 'utf8')
+  const graph = parseGraph(shipped).graph!
+  const analysis = analyse(graph)
+  const { bindings } = effectiveBindings(graph, analysis, undefined)
+
+  it('is read for its prompt, its seed, the pictures it starts from and ends on, and where the clip comes out', () => {
+    expect(analysis.sampler).toBeNull()
+    expect(analysis.detected).toEqual({
+      positive: { node: '7', field: 'prompt' },
+      negative: null,
+      width: null,
+      height: null,
+      seed: { node: '13', field: 'noise_seed' },
+      // Each through the resize between the video node and the picture's file.
+      firstFrame: { node: '8', field: 'image' },
+      lastFrame: { node: '22', field: 'image' },
+      // The number the workflow's author titled "Length (in Seconds)", and not the video node's count of frames.
+      length: { node: '55', field: 'value' },
+      output: { node: '20', field: 'images' }
+    })
+    expect(analysis.problems).toEqual([])
+  })
+
+  it('has the picture written in as its first frame, and as its last only when that is asked for', () => {
+    const inputs = (prompt: Record<string, unknown>, id: string) => (prompt[id] as { inputs: Record<string, unknown> }).inputs
+    const both = applyBindings(graph, bindings, { positive: 'she breathes', seed: 7, firstFrame: 'frame.png', lastFrame: 'frame.png', length: 6 })
+    expect(both.skipped).toEqual([])
+    expect(inputs(both.prompt, '55').value).toBe(6)
+    expect(inputs(both.prompt, '7').prompt).toBe('she breathes')
+    expect(inputs(both.prompt, '13').noise_seed).toBe(7)
+    expect(inputs(both.prompt, '8').image).toBe('frame.png')
+    expect(inputs(both.prompt, '22').image).toBe('frame.png')
+    expect(inputs(both.prompt, '7').last_frame).toEqual(['69', 0])
+
+    // Not asked to end on it, the video node is unplugged from the picture the workflow was saved with.
+    const first = applyBindings(graph, bindings, { positive: 'she breathes', firstFrame: 'frame.png' })
+    unplugLastFrame(first.prompt)
+    expect(inputs(first.prompt, '7').first_frame).toEqual(['67', 0])
+    expect('last_frame' in inputs(first.prompt, '7')).toBe(false)
+    // The export itself is never changed.
+    expect((graph.source['7'] as { inputs: Record<string, unknown> }).inputs.last_frame).toEqual(['69', 0])
+  })
+
+  it('is the one a clip is made with, and never the one a picture is drawn with', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'video-'))
+    writeFileSync(join(dir, 'a-clips.json'), shipped)
+    expect(resolveWorkflow(loadWorkflows(dir, {}).loaded, '', 'video', {}).workflow?.name).toBe('a-clips')
+    expect(resolveWorkflow(loadWorkflows(dir, {}).loaded, '', 'nsfw', {}).problem).toContain('makes clips')
+    writeFileSync(join(dir, 'pictures.json'), JSON.stringify(BASIC))
+    const { loaded } = loadWorkflows(dir, {})
+    expect(resolveWorkflow(loaded, '', 'nsfw', {}).workflow?.name).toBe('pictures')
+    expect(resolveWorkflow(loaded, '', 'video', { video: 'pictures.json' }).workflow?.name).toBe('a-clips')
+    writeFileSync(join(dir, 'a-clips.json'), JSON.stringify(BASIC))
+    expect(resolveWorkflow(loadWorkflows(dir, {}).loaded, '', 'video', {}).problem).toContain('first frame')
+  })
+
+  it('finds the frames of a workflow that does have a sampler, by what the video node calls them', () => {
+    const wan = {
+      ...BASIC,
+      '5': { class_type: 'WanFirstLastFrameToVideo', inputs: { width: 832, height: 480, positive: ['6', 0], negative: ['7', 0], start_image: ['20', 0], end_image: ['21', 0] } },
+      '20': { class_type: 'LoadImage', inputs: { image: 'a.png' } },
+      '21': { class_type: 'LoadImage', inputs: { image: 'b.png' } }
+    }
+    const found = analyse(read(wan)).detected
+    expect(found.positive).toEqual({ node: '6', field: 'text' })
+    expect(found.firstFrame).toEqual({ node: '20', field: 'image' })
+    expect(found.lastFrame).toEqual({ node: '21', field: 'image' })
+  })
+
+  it('is asked for with the prompt kept for the pose, which a pose drawn pregnant shares', () => {
+    const settings = ComfySettingsSchema.parse({ videoPrompts: { doggy: 'she rocks back and forth' } })
+    expect(settings.videoLastFrame).toBe(false)
+    expect(settings.videoSeconds).toBe(10)
+    expect(videoPromptFor(settings, 'doggy')).toBe('she rocks back and forth')
+    expect(videoPromptFor(settings, 'pregnant-doggy')).toBe('she rocks back and forth')
+    expect(videoPromptFor(settings, 'cowgirl')).toBe(DEFAULT_VIDEO_PROMPT)
+    expect(videoPromptFor(settings, 'her-own')).toBe(DEFAULT_VIDEO_PROMPT)
   })
 })

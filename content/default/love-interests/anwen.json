@@ -37,31 +37,31 @@
       "description": "white tube top with cleavage, black miniskirt, black leather jacket off her shoulders",
       "sprites": {
         "neutral": {
-          "image": "sprites/anwen/default-neutral-2-cutout.png",
+          "image": "sprites/anwen/default-neutral-2-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/anwen/default-happy-6-cutout.png",
+          "image": "sprites/anwen/default-happy-6-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/anwen/default-sad-cutout-2.png",
+          "image": "sprites/anwen/default-sad-cutout-2.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/anwen/default-angry-cutout-2.png",
+          "image": "sprites/anwen/default-angry-cutout-2.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/anwen/default-surprised-6-cutout.png",
+          "image": "sprites/anwen/default-surprised-6-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/anwen/default-embarrassed-cutout-2.png",
+          "image": "sprites/anwen/default-embarrassed-cutout-2.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/anwen/default-aroused-cutout-2.png",
+          "image": "sprites/anwen/default-aroused-cutout-2.webp",
           "description": ""
         }
       },
@@ -74,31 +74,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/anwen/pregnant-neutral-cutout.png",
+          "image": "sprites/anwen/pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/anwen/pregnant-happy-cutout.png",
+          "image": "sprites/anwen/pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/anwen/pregnant-sad-cutout.png",
+          "image": "sprites/anwen/pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/anwen/pregnant-angry-cutout.png",
+          "image": "sprites/anwen/pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/anwen/pregnant-surprised-cutout.png",
+          "image": "sprites/anwen/pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/anwen/pregnant-embarrassed-cutout.png",
+          "image": "sprites/anwen/pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/anwen/pregnant-aroused-cutout.png",
+          "image": "sprites/anwen/pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -110,31 +110,31 @@
       "description": "nothing at all, completely nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/anwen/nude-neutral-cutout.png",
+          "image": "sprites/anwen/nude-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/anwen/nude-happy-cutout.png",
+          "image": "sprites/anwen/nude-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/anwen/nude-sad-cutout.png",
+          "image": "sprites/anwen/nude-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/anwen/nude-angry-5-cutout.png",
+          "image": "sprites/anwen/nude-angry-5-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/anwen/nude-surprised-cutout.png",
+          "image": "sprites/anwen/nude-surprised-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/anwen/nude-aroused-cutout.png",
+          "image": "sprites/anwen/nude-aroused-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/anwen/nude-embarrassed-7-cutout.png",
+          "image": "sprites/anwen/nude-embarrassed-7-cutout.webp",
           "description": ""
         }
       },
@@ -147,31 +147,31 @@
       "inherits": "nude",
       "sprites": {
         "happy": {
-          "image": "sprites/anwen/nude-pregnant-happy-cutout-2.png",
+          "image": "sprites/anwen/nude-pregnant-happy-cutout-2.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/anwen/nude-pregnant-sad-cutout-2.png",
+          "image": "sprites/anwen/nude-pregnant-sad-cutout-2.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/anwen/nude-pregnant-angry-cutout-2.png",
+          "image": "sprites/anwen/nude-pregnant-angry-cutout-2.webp",
           "description": ""
         },
         "neutral": {
-          "image": "sprites/anwen/nude-pregnant-neutral-cutout.png",
+          "image": "sprites/anwen/nude-pregnant-neutral-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/anwen/nude-pregnant-surprised-4-cutout.png",
+          "image": "sprites/anwen/nude-pregnant-surprised-4-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/anwen/nude-pregnant-aroused-8-cutout.png",
+          "image": "sprites/anwen/nude-pregnant-aroused-8-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/anwen/nude-pregnant-embarrassed-9-cutout.png",
+          "image": "sprites/anwen/nude-pregnant-embarrassed-9-cutout.webp",
           "description": ""
         }
       },
@@ -196,70 +196,76 @@
       "id": "blowjob",
       "name": "Blowjob",
       "description": "",
-      "image": "sprites/anwen/nsfw-blowjob-5.png",
+      "image": "sprites/anwen/nsfw-blowjob-5.webp",
+      "clip": "sprites/anwen/nsfw-blowjob.mp4",
       "loop": true
     },
     {
       "id": "missionary",
       "name": "Missionary",
       "description": "",
-      "image": "sprites/anwen/nsfw-missionary.png",
+      "image": "sprites/anwen/nsfw-missionary.webp",
+      "clip": "sprites/anwen/nsfw-missionary.mp4",
       "loop": true
     },
     {
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/anwen/nsfw-doggy-3.png",
+      "image": "sprites/anwen/nsfw-doggy-3.webp",
+      "clip": "sprites/anwen/nsfw-doggy.mp4",
       "loop": true
     },
     {
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
-      "image": "sprites/anwen/nsfw-cowgirl.png",
+      "image": "sprites/anwen/nsfw-cowgirl.webp",
+      "clip": "sprites/anwen/nsfw-cowgirl-2.mp4",
       "loop": true
     },
     {
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/anwen/nsfw-creampie-3.png",
+      "image": "sprites/anwen/nsfw-creampie-3.webp",
+      "clip": "sprites/anwen/nsfw-creampie-2.mp4",
       "loop": true
     },
     {
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/anwen/nsfw-facial.png",
+      "image": "sprites/anwen/nsfw-facial.webp",
+      "clip": "sprites/anwen/nsfw-facial.mp4",
       "loop": true
     },
     {
       "id": "pregnant-missionary",
       "name": "Missionary, pregnant",
       "description": "",
-      "image": "sprites/anwen/nsfw-pregnant-missionary-4.png",
+      "image": "sprites/anwen/nsfw-pregnant-missionary-4.webp",
       "loop": true
     },
     {
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
-      "image": "sprites/anwen/nsfw-pregnant-doggy-5.png",
+      "image": "sprites/anwen/nsfw-pregnant-doggy-5.webp",
       "loop": true
     },
     {
       "id": "pregnant-cowgirl",
       "name": "Cowgirl, pregnant",
       "description": "",
-      "image": "sprites/anwen/nsfw-pregnant-cowgirl.png",
+      "image": "sprites/anwen/nsfw-pregnant-cowgirl.webp",
       "loop": true
     },
     {
       "id": "pregnant-creampie",
       "name": "Creampie, pregnant",
       "description": "",
-      "image": "sprites/anwen/nsfw-pregnant-creampie.png",
+      "image": "sprites/anwen/nsfw-pregnant-creampie.webp",
       "loop": true
     }
   ],
@@ -310,8 +316,9 @@
     "name": "her room in the Cloister Halls",
     "description": "A small, tidy modern dormitory room with smooth white walls and a flat ceiling edged by a strip of soft warm ward-light. A built-in pale wood desk holds a closed laptop, a ceramic teapot, two cups and an electric kettle on a glowing blue charging plate. A neatly made single bed with a cream quilt, a shelf of ledgers and files squared to its edge, a woven rug on a grey floor, a small rune-lit panel beside the door. Soft daylight through a tall window with linen curtains, everything in its place.",
     "locationId": "dormitories",
-    "background": "generated/backgrounds/anwen/view-3.png"
+    "background": "generated/backgrounds/anwen/view-3.webp"
   },
+  "birthPicture": "sprites/anwen/birth.png",
   "ai": {
     "speechPattern": "Soft-spoken, exact and economical. Short sentences. Dry, understated humour that is easy to miss. Notices details and names them.",
     "tone": "quiet, careful, dry",

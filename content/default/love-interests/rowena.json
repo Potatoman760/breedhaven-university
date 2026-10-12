@@ -15,7 +15,7 @@
       "description": "a straw hat, a moss-green waxed gilet over a linen shirt, patched canvas trousers, and leather gardening gloves tucked in her belt",
       "sprites": {
         "neutral": {
-          "image": "sprites/rowena/default-neutral-cutout.png",
+          "image": "sprites/rowena/default-neutral-cutout.webp",
           "description": ""
         }
       },

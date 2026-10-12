@@ -3,6 +3,7 @@
   "regions": [
     {
       "name": "Breedhaven University",
+      "image": "map/university.webp",
       "x": 1,
       "y": 2,
       "w": 48.5,
@@ -10,6 +11,7 @@
     },
     {
       "name": "Lantern Row",
+      "image": "map/lantern-row.webp",
       "x": 50.5,
       "y": 2,
       "w": 32,
@@ -17,6 +19,7 @@
     },
     {
       "name": "Seedblossom",
+      "image": "map/seedblossom.webp",
       "x": 83.3,
       "y": 2,
       "w": 15.7,

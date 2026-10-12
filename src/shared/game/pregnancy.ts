@@ -67,30 +67,17 @@ export function conceive(content: ContentPack, state: GameState, loveInterestId:
   }
 }
 
-/** Whether any pregnancy has reached its time. */
-export function birthsDue(state: GameState): boolean {
-  return Object.values(state.pregnancies).some((pregnancy) => pregnancy.dueAt <= state.time)
-}
-
 /**
- * Brings every pregnancy that has reached its time to its end: the child is recorded and
- * the mother is no longer carrying. Returns the children born, for the news to be told.
+ * Brings one pregnancy to its end at a given time: the child is recorded as born then, and its mother is no longer
+ * carrying. The state is unchanged, and there is no child, when she was not.
  */
-export function deliver(content: ContentPack, state: GameState): { state: GameState; born: Child[] } {
-  const born: Child[] = []
-  const pregnancies = { ...state.pregnancies }
-  for (const [motherId, pregnancy] of Object.entries(state.pregnancies)) {
-    if (pregnancy.dueAt > state.time) continue
-    const index = content.loveInterests.findIndex((li) => li.id === motherId)
-    const { dayIndex } = toDate(content.calendar, pregnancy.dueAt)
-    born.push({
-      motherId,
-      bornAt: pregnancy.dueAt,
-      daughter: roll(state.weatherSeed, dayIndex, index, 2) < (content.pregnancy?.daughterChance ?? 0.5)
-    })
-    delete pregnancies[motherId]
-  }
-  return born.length > 0 ? { state: { ...state, pregnancies, children: [...state.children, ...born] }, born } : { state, born }
+export function deliverChild(content: ContentPack, state: GameState, motherId: string, at: number): { state: GameState; child?: Child } {
+  if (!state.pregnancies[motherId]) return { state }
+  const index = content.loveInterests.findIndex((li) => li.id === motherId)
+  const { dayIndex } = toDate(content.calendar, at)
+  const child: Child = { motherId, bornAt: at, daughter: roll(state.weatherSeed, dayIndex, index, 2) < (content.pregnancy?.daughterChance ?? 0.5) }
+  const { [motherId]: _born, ...pregnancies } = state.pregnancies
+  return { state: { ...state, pregnancies, children: [...state.children, child] }, child }
 }
 
 /**
@@ -144,8 +131,6 @@ export function ordinaryOutfit(li: Pick<LoveInterest, 'outfits' | 'defaultOutfit
   return has(outfit.inherits) ?? has(/nude/.test(outfit.id) ? 'nude' : li.defaultOutfitId) ?? li.outfits.find((o) => !o.pregnant) ?? outfit
 }
 
-const childWord = (child: Child) => (child.daughter ? 'a daughter' : 'a son')
-
 /** "a daughter", "two daughters and a son" */
 export function describeChildren(children: Child[]): string {
   const count = (n: number, one: string, many: string) => (n === 0 ? '' : n === 1 ? `a ${one}` : `${n} ${many}`)
@@ -185,7 +170,7 @@ export function describePregnancy(content: ContentPack, state: GameState, loveIn
     lines.push(
       `You have borne ${name} ${describeChildren(born)}` +
         `${born.length === 1 ? `, born ${ago === 0 ? 'today' : ago === 1 ? 'yesterday' : `${ago} days ago`}` : `, the youngest ${ago} days ago`}. ` +
-        `The child is nursed and minded at the University's creche while you study, and is never far from your thoughts.`
+        whereChildrenAre(content, state, loveInterestId, born)
     )
   }
 
@@ -202,8 +187,25 @@ export function describePregnancy(content: ContentPack, state: GameState, loveIn
   return lines
 }
 
-/** The news a mother sends by courier when no LLM is there to write it. */
-export function birthNote(content: ContentPack, state: GameState, child: Child): string {
-  const mother = content.loveInterests.find((li) => li.id === child.motherId)?.name.split(' ')[0] ?? ''
-  return `${state.player.name}. It is done, and we are both well: you have ${childWord(child)}. Come and see us. ${mother}`
+/**
+ * Told to a mother: where her children are and how they do. One who lives in his house is at home with her, minded by
+ * the nanny, and as well or as poorly as the house has kept it; any other is at the University's creche.
+ */
+function whereChildrenAre(content: ContentPack, state: GameState, motherId: string, born: Child[]): string {
+  const creche = "nursed and minded at the University's creche while you study, and never far from your thoughts"
+  const housing = content.housing
+  const home = born.filter((child) => child.health !== undefined)
+  if (!housing || home.length === 0) return `${born.length === 1 ? 'The child is' : 'They are'} ${creche}.`
+  const nanny = content.loveInterests.find((li) => li.id === housing.nannyId)?.name.split(' ')[0]
+  // One child is "her" or "him"; more are "them".
+  const them = home.length === 1 ? (home[0].daughter ? 'her' : 'him') : 'them'
+  const minded = motherId === housing.nannyId || !nanny ? `and you mind ${them} yourself` : `where ${nanny}, the nanny, minds ${them} when you cannot`
+  const worst = Math.min(...home.map((child) => child.health ?? 0))
+  const level = housing.babies.levels[Math.min(worst, housing.babies.levels.length - 1)]
+  const away = born.length - home.length
+  return (
+    `${home.length === born.length ? (born.length === 1 ? 'The child lives' : 'They live') : `${home.length} of them live${home.length === 1 ? 's' : ''}`} with you at ${housing.name}, ${state.player.name}'s house, ${minded}. ` +
+    `${level ? `${level.name}: ${level.description}` : ''}` +
+    `${away > 0 ? ` The other${away === 1 ? ' is' : 's are'} ${creche}, for want of a cot.` : ''}`
+  ).trim()
 }

@@ -41,7 +41,11 @@ import {
   hasMet,
   inviteStands,
   locationOf,
+  inClass,
   markRead,
+  pregnancyOf,
+  answerHousingOffer,
+  canTakeHouse,
   pregnancyStage,
   revealedIds,
   revealFacts,
@@ -55,13 +59,12 @@ import {
   unreadPosts,
   markFeedSeen
 } from '../../../shared/game'
-import { METERS, STATS, type ContentPack, type GameState, type Job, type LoveInterest } from '../../../shared/model'
+import { MEMORY_LEVEL_LABELS, METERS, STATS, type ContentPack, type GameState, type Job, type LoveInterest } from '../../../shared/model'
 import { errorMessage } from '../errors'
-import { Button } from './Button'
 import { Overlay } from './Dialog'
 import { useConfirm } from './Confirm'
 import { JobIcon } from './icons'
-import { BackIcon, ChatIcon, ChevronIcon, FeedIcon, FriendsIcon, HeartIcon, MarketIcon, WorkIcon } from './icons'
+import { BackIcon, ChatIcon, ChevronIcon, FeedIcon, FriendsIcon, HeartIcon, MarketIcon, PregnantIcon, WorkIcon } from './icons'
 import { Stalls } from './MarketView'
 import { EmojiPicker } from './EmojiPicker'
 
@@ -75,6 +78,8 @@ interface Props {
   initialId?: string
   /** Goes straight to the plan an invitation is for, accepting it first if it is still to be answered. Left out when he cannot leave: in a scene. */
   onGoToInvite?: (loveInterestId: string, noteIndex: number) => void
+  /** Whether something offered to him in a message can be taken up now: not in the middle of a scene. */
+  canAct?: boolean
 }
 
 /**
@@ -122,7 +127,7 @@ function Presence({ content, state, li }: { content: ContentPack; state: GameSta
   return (
     <span className={where ? 'presence' : 'presence away'}>
       <i />
-      {where ? `At ${where.name}` : 'Whereabouts unknown'}
+      {where ? `${inClass(content, state, li) ? 'In class at' : 'At'} ${where.name}` : 'Whereabouts unknown'}
     </span>
   )
 }
@@ -131,7 +136,7 @@ function Presence({ content, state, li }: { content: ContentPack; state: GameSta
  * The player's phone: his Bloomr DMs for messages, Friends to keep track of everyone he is
  * getting to know, the Bloomr feed for what they post, and Jobs for work.
  */
-export function PhonePanel({ content, state, onChange, onClose, initialId, onGoToInvite }: Props) {
+export function PhonePanel({ content, state, onChange, onClose, initialId, onGoToInvite, canAct = true }: Props) {
   // Everyone who can be in his DMs: the love interests, and any NPC he has worked for.
   const people = messageable(content)
   const [app, setApp] = useState<App>(initialId === undefined ? 'chats' : 'friends')
@@ -174,7 +179,7 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, onGoT
         </nav>
 
         <div className={`phone-screen ${app}`}>
-          {app === 'chats' && <Chats content={content} state={state} onChange={onChange} selectedId={chatId} onSelect={setChatId} onGoToInvite={onGoToInvite} />}
+          {app === 'chats' && <Chats content={content} state={state} onChange={onChange} selectedId={chatId} onSelect={setChatId} onGoToInvite={onGoToInvite} canAct={canAct} />}
           {app === 'friends' && <Friends content={content} state={state} selectedId={friendId} onSelect={setFriendId} onMessage={message} canMessage={canMessage} />}
           {app === 'updates' && <Updates content={content} state={state} onChange={onChange} onMessage={message} canMessage={canMessage} />}
           {app === 'jobs' && <Jobs content={content} state={state} onChange={onChange} onMessage={message} />}
@@ -192,10 +197,11 @@ interface ChatsProps {
   selectedId: string | undefined
   onSelect: (id: string) => void
   onGoToInvite?: (loveInterestId: string, noteIndex: number) => void
+  canAct: boolean
 }
 
 /** His Bloomr DMs: every conversation on the left, the open one on the right. */
-function Chats({ content, state, onChange, selectedId, onSelect, onGoToInvite }: ChatsProps) {
+function Chats({ content, state, onChange, selectedId, onSelect, onGoToInvite, canAct }: ChatsProps) {
   const today = toDate(content.calendar, state.time).dayIndex
   const stamp = (time: number) => {
     if (time === state.time) return 'Now'
@@ -243,7 +249,7 @@ function Chats({ content, state, onChange, selectedId, onSelect, onGoToInvite }:
               </div>
               <Presence content={content} state={state} li={selected} />
             </div>
-            <Thread key={selected.id} content={content} state={state} li={selected} onChange={onChange} onGoToInvite={onGoToInvite} />
+            <Thread key={selected.id} content={content} state={state} li={selected} onChange={onChange} onGoToInvite={onGoToInvite} canAct={canAct} />
           </>
         ) : (
           <p className="hint phone-empty">{listed.length === 0 ? 'No conversations yet.' : 'Pick a conversation on the left to view it.'}</p>
@@ -259,10 +265,11 @@ interface ThreadProps {
   li: LoveInterest
   onChange: (update: (state: GameState) => GameState) => void
   onGoToInvite?: (loveInterestId: string, noteIndex: number) => void
+  canAct: boolean
 }
 
 /** The messages that have gone between the player and one love interest. */
-function Thread({ content, state, li, onChange, onGoToInvite }: ThreadProps) {
+function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadProps) {
   const [draft, setDraft] = useState('')
   const [waiting, setWaiting] = useState(false)
   const [notice, setNotice] = useState('')
@@ -344,6 +351,31 @@ function Thread({ content, state, li, onChange, onGoToInvite }: ThreadProps) {
                 </span>
               )}
               <p className="bubble">{note.text}</p>
+              {/* A house offered to him: taken or left here, and one that was left can still be taken. */}
+              {note.offer === 'housing' && content.housing && (
+                <div className="proposal">
+                  <div>
+                    <strong>Sire housing: {content.housing.name}</strong>
+                    <span>
+                      ${content.housing.rent} on the first of each month · takes the place of your room in the Halls
+                    </span>
+                  </div>
+                  {canTakeHouse(content, state) ? (
+                    <>
+                      <button disabled={!canAct} title={canAct ? undefined : 'You are in the middle of something'} onClick={() => onChange((s) => answerHousingOffer(content, s, i, true))}>
+                        {note.answer === 'declined' ? 'Take it after all' : 'Accept'}
+                      </button>
+                      {!note.answer && (
+                        <button className="secondary" onClick={() => onChange((s) => answerHousingOffer(content, s, i, false))}>
+                          Decline
+                        </button>
+                      )}
+                    </>
+                  ) : (
+                    <span className="chip">{state.housing.status === 'evicted' ? 'taken back' : (note.answer ?? 'accepted')}</span>
+                  )}
+                </div>
+              )}
               {plan && (
                 <div className="proposal">
                   <div>
@@ -494,11 +526,15 @@ function Friends({ content, state, selectedId, onSelect, onMessage, canMessage }
                 </span>
                 <span className={close ? 'chip madder' : 'chip'}>{standing}</span>
               </button>
-              {canMessage(li.id) && (
-                <Button variant="primary" className="friend-message" aria-label={`Message ${li.name}`} title={`Message ${li.name.split(' ')[0]}`} onClick={() => onMessage(li.id)}>
-                  <ChatIcon size={20} />
-                </Button>
-              )}
+              {/* Lit when she is with child, and faint when she is not. */}
+              <span
+                className={pregnancyOf(state, li.id) ? 'friend-pregnant on' : 'friend-pregnant'}
+                role="img"
+                aria-label={pregnancyOf(state, li.id) ? `${li.name} is pregnant` : `${li.name} is not pregnant`}
+                title={pregnancyOf(state, li.id) ? `${li.name.split(' ')[0]} is pregnant` : 'Not pregnant'}
+              >
+                <PregnantIcon size={22} />
+              </span>
             </div>
           )
         })}
@@ -552,7 +588,7 @@ function Updates({ content, state, onChange, onMessage, canMessage }: UpdatesPro
               <div>
                 <strong>{author.name}</strong>
                 <span className="handle">
-                  {handleOf(author)} · {describeAge(content, { time: post.time, summary: '' }, state.time)}
+                  {handleOf(author)} · {describeAge(content, { time: post.time }, state.time)}
                   {/* Whoever is in the picture with her is tagged as the app would: her name and her handle. */}
                   {friend && ` · with ${friend.name.split(' ')[0]} ${handleOf(friend)}`}
                 </span>
@@ -843,7 +879,9 @@ function About({ content, state, li }: { content: ContentPack; state: GameState;
       {memories.length === 0 && <p className="hint">Nothing yet. Each scene you share becomes one short memory.</p>}
       {[...memories].reverse().map((m, i) => (
         <div key={i} className="card">
-          <span className="hint">{describeAge(content, m, state.time)}</span>
+          <span className="hint">
+            {describeAge(content, m, state.time)} · {MEMORY_LEVEL_LABELS[m.level]}
+          </span>
           <span>{m.summary}</span>
         </div>
       ))}

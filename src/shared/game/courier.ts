@@ -115,7 +115,8 @@ export const STOOD_UP = { affection: -8, trust: -10 } as const
  * he said so, so neither is here to be counted.
  */
 export function settleAppointments(content: ContentPack, state: GameState): { state: GameState; missed: Appointment[] } {
-  const missed = state.appointments.filter((plan) => plan.time + plan.hours <= state.time)
+  // A birth is not a plan stood up: what missing one costs is its own reckoning.
+  const missed = state.appointments.filter((plan) => plan.kind !== 'birth' && plan.time + plan.hours <= state.time)
   if (missed.length === 0) return { state, missed }
   const within = (value: number) => Math.max(0, Math.min(content.relationships.meterMax, value))
   let next: GameState = { ...state, appointments: state.appointments.filter((plan) => !missed.includes(plan)) }
@@ -133,7 +134,8 @@ export function settleAppointments(content: ContentPack, state: GameState): { st
 
 /** The plans still to come that a love interest is part of, soonest first: what he could call off by writing to her. */
 export function plansWith(state: GameState, loveInterestId: string): Appointment[] {
-  return upcomingAppointments(state).filter((plan) => plan.time > state.time && attendees(plan).includes(loveInterestId))
+  // A birth cannot be called off.
+  return upcomingAppointments(state).filter((plan) => plan.kind !== 'birth' && plan.time > state.time && attendees(plan).includes(loveInterestId))
 }
 
 /** What he writes to call a plan off. */
@@ -148,7 +150,7 @@ export function cancelText(content: ContentPack, plan: Appointment): string {
  */
 export function cancelAppointment(content: ContentPack, state: GameState, appointmentId: string): GameState {
   const plan = state.appointments.find((a) => a.id === appointmentId)
-  if (!plan || plan.time <= state.time) return state
+  if (!plan || plan.kind === 'birth' || plan.time <= state.time) return state
   let next: GameState = { ...state, appointments: state.appointments.filter((a) => a.id !== appointmentId) }
   for (const id of attendees(plan).filter((who) => hasContact(state, who))) {
     const thread = courierThread(next, id).map((note) =>
@@ -194,7 +196,7 @@ export function courierExcerpt(
   loveInterestId: string,
   budgetChars = COURIER_HISTORY_CHARS
 ): string[] {
-  const them = content.loveInterests.find((li) => li.id === loveInterestId)?.name.split(' ')[0] ?? loveInterestId
+  const them = [...content.loveInterests, ...content.npcs].find((li) => li.id === loveInterestId)?.name.split(' ')[0] ?? loveInterestId
   const lines: string[] = []
   let used = 0
   const thread = courierThread(state, loveInterestId)
@@ -203,7 +205,8 @@ export function courierExcerpt(
     const plan = note.proposal
       ? ` [invitation: ${note.proposal.title}, ${describeWhen(content, note.proposal.time)}; ${note.answer === 'cancelled' ? `accepted, then called off by ${state.player.name}` : (note.answer ?? 'not yet answered')}]`
       : ''
-    const line = `${note.from === 'player' ? state.player.name : them}: ${note.text}${plan}`
+    const offer = note.offer === 'housing' ? ` [offer of Sire housing: ${note.answer ?? 'not yet answered'}]` : ''
+    const line = `${note.from === 'player' ? state.player.name : them}: ${note.text}${plan}${offer}`
     used += line.length
     if (lines.length > 0 && used > budgetChars) break
     lines.unshift(line)

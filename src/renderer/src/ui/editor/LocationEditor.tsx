@@ -6,10 +6,14 @@ import { DEFAULT_VIEW, LIGHTS, STATS, type Stat, type Background, type ContentPa
 import { errorMessage } from '../../errors'
 import { ArtTool } from '../art/ArtTool'
 import { BatchProgress, useBatch } from '../art/batch'
+import { fileName, pngsIn, renamed, toWebp } from '../art/optimize'
 import { Button } from '../Button'
 import { Lightbox } from '../Lightbox'
 import { EditorFoot, Group, Text } from './fields'
 import { EmptySlot, PictureSlot, SlotGrid } from './slots'
+
+// What the run that makes the place's pictures smaller is filed under, beside the runs of its views.
+const OPTIMIZE_BATCH = '(optimize)'
 
 interface Props {
   content: ContentPack
@@ -63,6 +67,28 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
   useEffect(() => {
     window.api.editor.info().then(setInfo, (error) => setStatus(errorMessage(error)))
   }, [])
+
+  // The place's pictures that are still PNGs: everything the optimize button would turn into WebP.
+  const pngs = pngsIn(draft.backgrounds)
+  /**
+   * Turns every PNG of the place into a WebP of the same picture, one after another, and puts each in every view the
+   * PNG was in as it is done. Nothing is kept until the place is saved; the PNGs go once a save no longer names them.
+   */
+  async function optimize() {
+    const paths = pngsIn(latest.current.backgrounds)
+    if (paths.length === 0 || batch) return
+    setStatus('')
+    const { failed } = await run(OPTIMIZE_BATCH, 'Optimizing', paths, fileName, async (path) => {
+      try {
+        const to = await toWebp(path)
+        setDraft((current) => ({ ...current, backgrounds: renamed(current.backgrounds, path, to) }))
+        return { ok: true }
+      } catch (error) {
+        return { ok: false, message: errorMessage(error) }
+      }
+    })
+    setStatus(failed.length > 0 ? `Could not optimize: ${failed.join('; ')}` : 'Optimized. Save the place to keep it.')
+  }
 
   // A view is drawn twice, as an outfit is drawn once for each expression.
   const periods = LIGHTS
@@ -146,7 +172,7 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
         kind: 'background',
         subjectId: place.id,
         name: `${viewId}-${p.id}`,
-        positive: backgroundPrompt({ ...place, indoors: now?.indoors ?? place.indoors }, now?.name ?? '', p.id, framingFor(settings, 'background')),
+        positive: backgroundPrompt({ ...place, appearance: now?.appearance ?? place.appearance, indoors: now?.indoors ?? place.indoors }, now?.name ?? '', p.id, framingFor(settings, 'background')),
         width: size.width,
         height: size.height
       })
@@ -175,7 +201,7 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
         <ArtTool
           target={{
             kind: 'background',
-            location: { id: draft.id, name: draft.name, appearance: draft.appearance, indoors: drawn.indoors ?? draft.indoors },
+            location: { id: draft.id, name: draft.name, appearance: drawn.appearance ?? draft.appearance, indoors: drawn.indoors ?? draft.indoors },
             periods: [...LIGHTS],
             view: drawn.name,
             period: drawing.period,
@@ -320,6 +346,16 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
             title="Views"
             hint="A place has views, as a character has outfits. Every place has its default view. Another view is shown in its place on the day of an event or holiday of the same name: call one “Winter Break” and the place is dressed for it while it lasts. Each is drawn twice, by day and by night; whichever has not been drawn shows the other. Pictures are generated from the appearance above."
           >
+            <div className="outfit-actions">
+              <Button
+                disabled={batch !== null || pngs.length === 0}
+                title="Turn every PNG of this place into a WebP of the same picture, a fraction of the size, and put it in the same views"
+                onClick={optimize}
+              >
+                {pngs.length > 0 ? `Optimize (${pngs.length} PNG${pngs.length === 1 ? '' : 's'})` : 'Optimized'}
+              </Button>
+            </div>
+            <BatchProgress batch={batch} at={OPTIMIZE_BATCH} onStop={stop} />
             {draft.backgrounds.map((view, index) => {
               const missing = periods.filter((p) => !(p.id in view.images))
               const isDefault = view.id === DEFAULT_VIEW.id
@@ -339,6 +375,21 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
                       </select>
                     </label>
                   </div>
+                  {/* A view that is a room of its own, such as one room of a house, can say what it is and what it looks like. */}
+                  <Text
+                    label="What this view is"
+                    value={view.description ?? ''}
+                    rows={2}
+                    placeholder="Left empty, the place's own description is all a character is told."
+                    onChange={(description) => changeView(view.id, (v) => ({ ...v, description: description || undefined }))}
+                  />
+                  <Text
+                    label="What it looks like"
+                    value={view.appearance ?? ''}
+                    rows={2}
+                    placeholder="Left empty, it is drawn from the place's own appearance."
+                    onChange={(appearance) => changeView(view.id, (v) => ({ ...v, appearance: appearance || undefined }))}
+                  />
                   <div className="outfit-actions">
                     {missing.length > 0 && (
                       <Button

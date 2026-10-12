@@ -9,8 +9,11 @@ import {
   NewGameSchema,
   STANDARD_OUTFITS,
   TraitSchema,
+  JobSchema,
+  poseMedia,
   validateContentPack,
   type CalendarEvent,
+  type Job,
   type ContentPack,
   type Location,
   type LoveInterest,
@@ -300,6 +303,41 @@ export function deleteEvent(addonDir: string, id: string, base = false): string[
   return []
 }
 
+const JOBS_FILE = 'jobs.json'
+
+/**
+ * Adds a job to the game, or changes one, after checking the game would still load with it. Jobs are the game's own:
+ * they are written to its own file, and can only be edited when it is run from source.
+ */
+export function saveJob(packDir: string, content: ContentPack, raw: unknown): string[] {
+  const parsed = JobSchema.safeParse(raw)
+  if (!parsed.success) return parsed.error.issues.map((issue) => `${issue.path.join('.') || 'job'}: ${issue.message}`)
+  const job = parsed.data
+  if (!isSafeId(job.id)) return ['The id may only have lower-case letters, digits and hyphens, and must start with a letter or digit.']
+  if (job.title.trim() === '') return ['A title is needed.']
+  if (!content.locations.some((l) => l.id === job.locationId)) return ['Choose where the job is.']
+  if (![...content.npcs, ...content.loveInterests].some((c) => c.id === job.bossId)) return ['Choose who he answers to.']
+  const file = join(packDir, JOBS_FILE)
+  const config = (existsSync(file) ? readJsonFile(file) : {}) as { jobs?: Job[] }
+  const jobs = overlay(config.jobs ?? [], [job])
+  try {
+    validateContentPack({ ...content, jobs: { ...content.jobs, jobs } })
+  } catch (error) {
+    return (error as { issues?: string[] }).issues ?? [(error as Error).message]
+  }
+  writeFileSync(file, `${JSON.stringify({ ...config, jobs }, null, 2)}\n`)
+  return []
+}
+
+/** Takes a job out of the game. */
+export function deleteJob(packDir: string, id: string): string[] {
+  const file = join(packDir, JOBS_FILE)
+  const config = (existsSync(file) ? readJsonFile(file) : {}) as { jobs?: Job[] }
+  if (!(config.jobs ?? []).some((job) => job.id === id)) return ['There is no such job.']
+  writeFileSync(file, `${JSON.stringify({ ...config, jobs: (config.jobs ?? []).filter((job) => job.id !== id) }, null, 2)}\n`)
+  return []
+}
+
 /** Writes the course catalogue every new game starts with. */
 export function saveCatalogue(addonDir: string, raw: unknown): string[] {
   const parsed = CatalogueSchema.safeParse(raw)
@@ -466,15 +504,16 @@ export function importAsset(addonDir: string, loveInterestId: string, sourcePath
  */
 export function removeUnusedAssets(
   addonDir: string,
-  who: Pick<LoveInterest, 'id' | 'outfits' | 'animations'> & { room?: { background?: string } },
+  who: Pick<LoveInterest, 'id' | 'outfits' | 'animations'> & { room?: { background?: string }; birthPicture?: string },
   prefix: string = ADDON_PREFIX
 ): string[] {
   if (!isSafeId(who.id)) return []
   const used = new Set(
     [
       ...who.outfits.flatMap((outfit) => Object.values(outfit.sprites).map((sprite) => sprite.image)),
-      ...who.animations.flatMap((animation) => [animation.image, animation.clip].filter((file): file is string => file !== undefined)),
-      who.room?.background
+      ...who.animations.flatMap(poseMedia),
+      who.room?.background,
+      who.birthPicture
     ].filter((path): path is string => typeof path === 'string')
   )
   const removed: string[] = []

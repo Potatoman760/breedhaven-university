@@ -3,6 +3,10 @@
   "lengthDays": 56,
   "recoveryDays": 7,
   "daughterChance": 0.875,
+  "birthLocationId": "health-centre",
+  "birthViewId": "maternity",
+  "birthHours": 2,
+  "birthNoticeDays": 3,
   "stages": [
     {
       "id": "early",
