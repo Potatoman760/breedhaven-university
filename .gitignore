@@ -5,5 +5,8 @@ dist/
 .env
 .env.*
 !.env.example
+electron-builder.env
+scripts/clip-batch.progress.json
+scripts/clip-batch.overwrite.json
 .DS_Store
 Thumbs.db
