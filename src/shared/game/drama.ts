@@ -8,6 +8,8 @@ import { relationBetween } from './rapport'
 import { stageFor, stageRank } from './relationships'
 import { firstNames, hasMet, sceneCast } from './scene'
 import { appealLevel } from './stats'
+import { factor } from './modifiers'
+import { seedOf } from './seed'
 
 /**
  * The drama engine. When the player starts a scene it weighs what is simmering around
@@ -197,8 +199,8 @@ export function planDrama<S extends Scene>(content: ContentPack, state: GameStat
   if (state.dramaDay >= 0 && dayIndex - state.dramaDay <= config.cooldownDays) return scene
 
   const hooks = dramaHooks(content, state, scene, ctx)
-  const lead = content.loveInterests.findIndex((li) => li.id === scene.loveInterestId)
-  if (roll(state.weatherSeed, state.time, lead, 0) >= dramaChance(content, hooks)) return scene
+  const lead = seedOf(scene.loveInterestId)
+  if (roll(state.weatherSeed, state.time, lead, 0) >= dramaChance(content, hooks) * factor(content, state, 'drama')) return scene
 
   // Which of them: likelier the stronger the pull.
   const total = hooks.reduce((sum, hook) => sum + hook.score, 0)

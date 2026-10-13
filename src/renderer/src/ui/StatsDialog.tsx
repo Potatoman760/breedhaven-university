@@ -1,9 +1,9 @@
-import { describeModifier, describeStat, STAT_CAP, STAT_TIERS, statOf, trainingToward } from '../../../shared/game'
-import { STATS, type GameState } from '../../../shared/model'
+import { describeModifier, describeStat, STAT_CAP, STAT_TIERS, statOf, skillProgress, trainingToward } from '../../../shared/game'
+import { STATS, type ContentPack, type GameState } from '../../../shared/model'
 import { Dialog } from './Dialog'
 
 /** The player's stats in full: each score, how far he is toward its next point, and where it stands on the scale of what a score is called. */
-export function StatsDialog({ state, onClose }: { state: GameState; onClose: () => void }) {
+export function StatsDialog({ content, state, onClose }: { content: ContentPack; state: GameState; onClose: () => void }) {
   return (
     <Dialog title="Stats" onClose={onClose}>
       <div className="stat-sheet">
@@ -52,6 +52,23 @@ export function StatsDialog({ state, onClose }: { state: GameState; onClose: () 
           )
         })}
       </div>
+      {content.skills.length > 0 && (
+        <div className="skill-list">
+          <h2>Skills</h2>
+          {content.skills.map((skill) => {
+            const { has, marks, at } = skillProgress(state, skill)
+            const course = state.courses.find((one) => one.code === skill.code)
+            return (
+              <p key={skill.id} className={has ? 'skill has' : 'skill'}>
+                <strong>{skill.name}</strong> {skill.description}{' '}
+                <span className="hint">
+                  {has ? 'Learnt.' : `${course ? `${course.number}, ${course.title}` : skill.code} teaches it at ${at} marks${marks > 0 ? `: you have ${Math.round(marks)}` : ''}.`}
+                </span>
+              </p>
+            )
+          })}
+        </div>
+      )}
     </Dialog>
   )
 }

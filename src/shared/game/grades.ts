@@ -1,4 +1,4 @@
-import { EXAM_KINDS, type ContentPack, type Course, type CourseMeeting, type ExamKind, type GameState, type Grade, type Grading, type LoveInterest } from '../model'
+import { EXAM_KINDS, type ContentPack, type Course, type CourseMeeting, type ExamKind, type GameState, type Grading, type LoveInterest } from '../model'
 import { timeOn } from './agenda'
 import { toDate } from './calendar'
 import type { Outing } from './outing'
@@ -6,7 +6,7 @@ import { hasMet } from './scene'
 import { isOpenFor } from './schedule'
 
 /** The rules for marks, where the game has coursework. */
-function gradingOf(content: ContentPack): Grading | undefined {
+export function gradingOf(content: ContentPack): Grading | undefined {
   return content.coursework?.grading
 }
 
@@ -92,55 +92,6 @@ export function examWeek(content: ContentPack, dayIndex: number): ExamKind | und
 /** The examination, if any, that takes the place of a course's meeting on a given day at a given hour. */
 export function examOn(content: ContentPack, course: Course, dayIndex: number, startHour: number): ExamSlot | undefined {
   return EXAM_KINDS.map((kind) => examSlot(content, course, kind)).find((slot) => slot?.dayIndex === dayIndex && slot.meeting.startHour === startHour)
-}
-
-/**
- * The grade a number of points earns at an examination. The midterm is marked against the
- * part of the term that has gone by, and the final against the whole of it; a pass is the
- * share of those marks the rules ask for, and the letters above it come by tenths.
- */
-export function gradeFor(content: ContentPack, kind: ExamKind, points: number, time: number): Grade {
-  const grading = gradingOf(content)!
-  const outOf = kind === 'midterm' ? Math.round((grading.points * grading.midtermWeek) / grading.finalWeek) : grading.points
-  const share = outOf > 0 ? points / outOf : 0
-  const passed = share >= grading.passAt
-  // A, B and C are the top three tenths; whatever else passes is a D.
-  const letter = share >= 0.9 && passed ? 'A' : share >= 0.8 && passed ? 'B' : share >= 0.7 && passed ? 'C' : passed ? 'D' : 'F'
-  return { letter, points: Math.round(points), outOf, passed, time }
-}
-
-/** A grade that has just been given, for telling the player. */
-export interface Graded {
-  course: Course
-  kind: ExamKind
-  grade: Grade
-}
-
-/**
- * Marks every examination whose slot has gone by and has not been marked yet: the player's
- * points in the course as they stand when it ends are his grade. Nothing is asked of him at
- * the time; there is no scene, and he need not be in the hall. Returns the state with the
- * grades kept, and what was given just now.
- */
-export function settleExams(content: ContentPack, state: GameState): { state: GameState; graded: Graded[] } {
-  if (!gradingOf(content)) return { state, graded: [] }
-  const graded: Graded[] = []
-  let grades = state.grades
-  for (const course of state.courses.filter((c) => state.enrolment?.includes(c.id))) {
-    for (const kind of EXAM_KINDS) {
-      const slot = examSlot(content, course, kind)
-      if (!slot || slot.ends > state.time || grades[course.id]?.[kind]) continue
-      const grade = gradeFor(content, kind, coursePoints(state, course.id), slot.ends)
-      grades = { ...grades, [course.id]: { ...grades[course.id], [kind]: grade } }
-      graded.push({ course, kind, grade })
-    }
-  }
-  return graded.length === 0 ? { state, graded } : { state: { ...state, grades }, graded }
-}
-
-/** "Midterm in ECO 101: B (42 of 50)" */
-export function describeGrade({ course, kind, grade }: Graded): string {
-  return `${kind === 'midterm' ? 'Midterm' : 'Final'} in ${course.number}: ${grade.letter} (${grade.points} of ${grade.outOf})${grade.passed ? '' : ', not a pass'}`
 }
 
 /** Somewhere to study for a course. */

@@ -1,5 +1,6 @@
 import { SceneShiftSchema } from './job'
 import { z } from 'zod'
+import { TopicSchema } from './syllabus'
 import { MAX_SCENE_CAST, ProposalSchema } from './appointment'
 import { SceneDramaSchema } from './drama'
 import { GiftReactionSchema } from './item'
@@ -25,7 +26,9 @@ export const LessonSchema = z.object({
   /** The course, as it is spoken of: "Riddles (RID 101)". */
   course: z.string(),
   /** What the course is about, from its description. */
-  about: z.string().default('')
+  about: z.string().default(''),
+  /** What this class of it is on, from the course's syllabus, where it has one. */
+  topic: TopicSchema.optional()
 })
 export type Lesson = z.infer<typeof LessonSchema>
 
@@ -133,6 +136,14 @@ export const SceneSchema = z.object({
   viewId: z.string().optional(),
   /** A picture that is the whole stage for this scene, in place of the background and with nobody standing over it. Gone when the scene moves. */
   picture: z.string().optional(),
+  /** An NPC who is there for this scene whatever her day says: the one showing him round. */
+  guideId: z.string().optional(),
+  /** The scene is the birth of a child: the hour it was born, by which it is known. While it is set, he can name the child. */
+  newborn: z.number().int().min(0).optional(),
+  /** The name its mother thought of, once he has chosen another. */
+  suggestedName: z.string().optional(),
+  /** The child's name is settled: he has kept hers or given his own, and is not asked again. */
+  nameSettled: z.boolean().optional(),
   /** When set, this animation plays in place of the sprite. */
   animationId: z.string().optional(),
   /** Whose pose that is, by love interest id: one of those in the scene. Only one is shown at a time. */

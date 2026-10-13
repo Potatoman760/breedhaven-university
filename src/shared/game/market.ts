@@ -9,8 +9,9 @@ import type {
 } from '../model'
 import type { PerformCheck } from './activities'
 import { toDate } from './calendar'
-import { applyEffect } from './conditions'
+import { applyEffect, applyEffects } from './conditions'
 import { isOpen } from './schedule'
+import { factor } from './modifiers'
 
 /** The stalls trading at a location. */
 export function stallsAt(content: ContentPack, locationId: string): Stall[] {
@@ -22,6 +23,11 @@ export function carried(content: ContentPack, state: GameState): { item: Item; c
   return content.items
     .map((item) => ({ item, count: state.inventory[item.id] ?? 0 }))
     .filter((entry) => entry.count > 0)
+}
+
+/** What something costs him: its price, less what he has learnt of getting a better one. */
+export function priceOf(content: ContentPack, state: GameState, item: Pick<Item, 'price'>): number {
+  return Math.max(0, Math.round(item.price * factor(content, state, 'prices')))
 }
 
 /**
@@ -38,7 +44,7 @@ export function canBuy(content: ContentPack, state: GameState, itemId: string, b
   if (!byPhone && location && !isOpen(location, toDate(content.calendar, state.time).hour)) {
     reasons.push(`${location.name} is closed`)
   }
-  if (state.player.money < item.price) reasons.push('Not enough money')
+  if (state.player.money < priceOf(content, state, item)) reasons.push('Not enough money')
   return { ok: reasons.length === 0, reasons }
 }
 
@@ -49,9 +55,33 @@ export function buy(content: ContentPack, state: GameState, itemId: string, byPh
   const item = content.items.find((i) => i.id === itemId)!
   return {
     ...state,
-    player: { ...state.player, money: state.player.money - item.price },
+    player: { ...state.player, money: state.player.money - priceOf(content, state, item) },
     inventory: { ...state.inventory, [itemId]: (state.inventory[itemId] ?? 0) + 1 }
   }
+}
+
+/** What he is carrying with one fewer of something: used, or given away. Unchanged when he has none. */
+export function consume(state: GameState, itemId: string): GameState {
+  const count = state.inventory[itemId] ?? 0
+  if (count < 1) return state
+  const { [itemId]: _gone, ...rest } = state.inventory
+  return { ...state, inventory: count > 1 ? { ...rest, [itemId]: count - 1 } : rest }
+}
+
+/** Whether he can use something he carries: it is a thing that is used, and where it is used on a woman, he is with one. */
+export function canUse(content: ContentPack, state: GameState, itemId: string, loveInterestId?: string): PerformCheck {
+  const item = content.items.find((i) => i.id === itemId)
+  if (!item?.use) return { ok: false, reasons: ['It is not something to use'] }
+  if ((state.inventory[itemId] ?? 0) < 1) return { ok: false, reasons: ['You have none'] }
+  if (item.use.on === 'her' && loveInterestId === undefined) return { ok: false, reasons: ['It is for someone you are with'] }
+  return { ok: true, reasons: [] }
+}
+
+/** Uses one of something he carries: it is gone, and what it does is done. */
+export function useItem(content: ContentPack, state: GameState, itemId: string, loveInterestId?: string): GameState {
+  const item = content.items.find((i) => i.id === itemId)
+  if (!item?.use || !canUse(content, state, itemId, loveInterestId).ok) return state
+  return applyEffects(consume(state, itemId), item.use.effects, { content, loveInterestId: item.use.on === 'her' ? loveInterestId : undefined, source: item.name })
 }
 
 /**
@@ -59,6 +89,8 @@ export function buy(content: ContentPack, state: GameState, itemId: string, byPh
  * if it is a kind they dislike, and merely liked otherwise (or when it is both).
  */
 export function giftReaction(item: Item, li: LoveInterest): GiftReaction {
+  // Made to be given: there is nobody it does not suit.
+  if (item.lovedByAll) return 'loved'
   const among = (list: string[]) =>
     item.tags.some((tag) => list.some((entry) => entry.toLowerCase() === tag.toLowerCase()))
   const liked = among(li.likes)
@@ -81,10 +113,12 @@ export function giveGift(
   const reaction = giftReaction(item, li)
   const { [itemId]: _given, ...rest } = state.inventory
   const lighter = { ...state, inventory: count > 1 ? { ...rest, [itemId]: count - 1 } : rest }
+  const worth = content.relationships.gifts[reaction]
   return {
     state: applyEffect(
       lighter,
-      { type: 'meter', meter: 'affection', amount: content.relationships.gifts[reaction] },
+      // A gift that lands is worth more from someone who knows how to choose one; one that does not is no worse for it.
+      { type: 'meter', meter: 'affection', amount: worth > 0 ? Math.round(worth * factor(content, state, 'gifts')) : worth },
       { content, loveInterestId }
     ),
     gift: { name: item.name, description: item.description, reaction, recipientId: loveInterestId }

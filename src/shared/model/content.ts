@@ -1,6 +1,9 @@
 import { z } from 'zod'
 import { DramaConfigSchema } from './drama'
 import { HousingConfigSchema } from './housing'
+import { SyllabusSchema } from './syllabus'
+import { CurriculumSchema, courseId, resolveCurriculum } from './curriculum'
+import { SkillSchema } from './skill'
 import { ActivitySchema } from './activity'
 import { CalendarConfigSchema } from './calendar'
 import { CodexEntrySchema } from './codex'
@@ -40,6 +43,12 @@ export const ContentPackSchema = z.object({
   tips: z.array(z.string()).default([]),
   /** The course catalogue built in the editor. A pack with coursework needs one before a game can start. */
   catalogue: CatalogueSchema.optional(),
+  /** Everything the University teaches, written down. The general subjects, the syllabuses and the skills below are drawn from it when the pack is read. */
+  curriculum: CurriculumSchema.optional(),
+  /** What each course teaches, class by class: told to its teacher and shown to nobody. */
+  syllabus: SyllabusSchema.default([]),
+  /** What he can learn to do by getting on in a course. */
+  skills: z.array(SkillSchema).default([]),
   orientation: OrientationSchema.optional(),
   /** The jobs the player can hold, and the rules for them. Without it there are none. */
   jobs: JobsConfigSchema.optional(),
@@ -64,7 +73,8 @@ export class ContentError extends Error {
 
 /** Parses raw content and checks that every id it references exists. Throws ContentError. */
 export function validateContentPack(raw: unknown): ContentPack {
-  const parsed = ContentPackSchema.safeParse(raw)
+  // What the curriculum has written is laid over the rest first: a character names her subject, and it is filled in from there.
+  const parsed = ContentPackSchema.safeParse(resolveCurriculum(raw))
   if (!parsed.success) {
     throw new ContentError(
       parsed.error.issues.map((i) => `${i.path.map(String).join('.')}: ${i.message}`)
@@ -231,6 +241,41 @@ function checkReferences(pack: ContentPack): string[] {
     if (pack.coursework.dayEnd - pack.coursework.dayStart < Math.max(pack.coursework.lectureHours, pack.coursework.labHours)) {
       issues.push('coursework: the teaching day is shorter than a class')
     }
+    for (const entry of pack.syllabus) {
+      // Written with its course in a curriculum, a syllabus cannot be for a course there is not; some of those courses are simply not given this term.
+      if (!pack.curriculum && pack.catalogue && !pack.catalogue.courses.some((course) => course.id === entry.courseId)) issues.push(`syllabus: unknown course "${entry.courseId}"`)
+    }
+    for (const skill of pack.skills) {
+      if (!pack.curriculum && pack.catalogue && !pack.catalogue.courses.some((course) => course.code === skill.code)) issues.push(`skills (${skill.id}): no course of the subject "${skill.code}" teaches it`)
+    }
+    // A class is time with the love interests in it: one with none is an empty hour, and one with too many is a crowd.
+    for (const course of pack.catalogue?.courses ?? []) {
+      const inClass = course.studentIds.length + (course.teacherId ? 1 : 0)
+      // Those who read the subject sit its course whoever else is there; the cap is on the ones passing through.
+      const reading = course.studentIds.filter((id) => pack.loveInterests.find((li) => li.id === id)?.studies?.code === course.code).length
+      const most = reading > 0 ? Math.max(pack.coursework.maxPerClass, pack.coursework.maxMajorClass) : pack.coursework.maxPerClass
+      if (inClass === 0) issues.push(`catalogue (${course.number}): no love interest takes or teaches it`)
+      if (inClass > most) issues.push(`catalogue (${course.number}): ${inClass} love interests are in it, and a class holds ${most}`)
+    }
+    // Nobody makes a subject up: what a character reads or teaches is one the curriculum has written.
+    if (pack.curriculum) {
+      const majors = pack.curriculum.majors
+      idSet(majors.map((major) => ({ id: major.code })), 'curriculum.majors')
+      for (const major of majors) {
+        if (!pack.curriculum.colleges.some((college) => college.id === major.college)) issues.push(`curriculum (${major.code}): unknown college "${major.college}"`)
+        if (new Set(major.courses.map((course) => course.level)).size !== major.courses.length) issues.push(`curriculum (${major.code}): two courses are written for one year`)
+        if (major.general && major.courses.length !== 1) issues.push(`curriculum (${major.code}): a general subject has one course`)
+      }
+      for (const character of [...pack.loveInterests, ...pack.npcs]) {
+        const read = character.studies
+        if (read && !majors.some((major) => major.code === read.code && !major.general)) issues.push(`${character.id}: reads "${read.code}", which is not a subject the curriculum has`)
+        for (const taught of character.teaching?.subjects ?? []) {
+          if (!majors.some((major) => major.code === taught.code && major.courses.some((course) => course.level === taught.level))) {
+            issues.push(`${character.id}: teaches ${courseId(taught.code, taught.level)}, which the curriculum has not written`)
+          }
+        }
+      }
+    }
   }
 
   const jobIds = new Set<string>()
@@ -255,6 +300,14 @@ function checkReferences(pack: ContentPack): string[] {
     need(locations, stall.locationId, `stalls.${stall.id}`, 'location')
     for (const id of stall.itemIds) need(items, id, `stalls.${stall.id}`, 'item')
   }
+  // What is made has to be something there is: a thing a skill or another thing puts in his bag.
+  const made = (effects: Effect[], where: string): void => {
+    for (const effect of effects) if (effect.type === 'item') need(items, effect.itemId, where, 'item')
+  }
+  for (const item of pack.items) made(item.use?.effects ?? [], `items.${item.id}`)
+  for (const skill of pack.skills) {
+    made(skill.ability?.effects ?? [], `skills.${skill.id}`)
+  }
 
   if (pack.pregnancy) {
     const place = pack.locations.find((l) => l.id === pack.pregnancy?.birthLocationId)
@@ -270,6 +323,8 @@ function checkReferences(pack: ContentPack): string[] {
     if (!house) issues.push(`housing.locationId: unknown location "${housing.locationId}"`)
     if (![...pack.npcs, ...pack.loveInterests].some((character) => character.id === housing.officerId)) issues.push(`housing.officerId: unknown character "${housing.officerId}"`)
     need(loveInterests, housing.nannyId, 'housing.nannyId', 'love interest')
+    if (housing.viewing && !pack.locations.some((l) => l.id === housing.viewing?.meetLocationId)) issues.push(`housing.viewing.meetLocationId: unknown location "${housing.viewing.meetLocationId}"`)
+    if (housing.viewing && !pack.npcs.some((npc) => npc.id === housing.officerId)) issues.push('housing.viewing: the officer who shows the house must be an NPC')
     idSet(housing.rooms.map((room) => ({ id: room.key })), 'housing.rooms')
     for (const role of ['master', 'nanny'] as const) {
       if (housing.rooms.filter((room) => room.role === role).length !== 1) issues.push(`housing.rooms: there must be exactly one room of the role "${role}"`)

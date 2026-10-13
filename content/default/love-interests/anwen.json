@@ -183,13 +183,8 @@
   "imageSeed": 62,
   "stageHeight": 100,
   "studies": {
-    "subject": "Hospitality Management",
-    "code": "HSP",
-    "level": 2,
-    "stats": [
-      "intelligence"
-    ],
-    "practical": false
+    "major": "HSP",
+    "level": 2
   },
   "animations": [
     {
@@ -319,6 +314,19 @@
     "background": "generated/backgrounds/anwen/view-3.webp"
   },
   "birthPicture": "sprites/anwen/birth.png",
+  "childNames": {
+    "daughters": [
+      "Carys",
+      "Seren",
+      "Eira",
+      "Nia",
+      "Bronwen"
+    ],
+    "sons": [
+      "Emrys",
+      "Gethin"
+    ]
+  },
   "ai": {
     "speechPattern": "Soft-spoken, exact and economical. Short sentences. Dry, understated humour that is easy to miss. Notices details and names them.",
     "tone": "quiet, careful, dry",

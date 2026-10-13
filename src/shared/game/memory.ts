@@ -4,6 +4,7 @@ import { describeBonds } from './bonds'
 import { stageFor } from './relationships'
 import { firstNames, sceneCast, sceneWitnesses } from './scene'
 import { describeAppeal } from './stats'
+import { feltChange } from './modifiers'
 import { hiddenFacts } from './facts'
 import { RELATIONS, relationBetween, type Relation } from './rapport'
 
@@ -257,15 +258,17 @@ export function sceneRapport(state: GameState, presentIds: string[], said: { id:
  * relationship moves: by what she made of the time, not by the time. Each stays within
  * its scale. Nothing for anyone the game keeps no feelings for.
  */
-export function applyFeelings(content: ContentPack, state: GameState, loveInterestId: string, feelings: Feelings): GameState {
+export function applyFeelings(content: ContentPack, state: GameState, loveInterestId: string, feelings: Feelings, asGiven = false): GameState {
   const rel = state.relationships[loveInterestId]
   if (!rel) return state
   const within = (value: number) => Math.max(0, Math.min(content.relationships.meterMax, value))
+  // What he has learnt and what he has taken change what a scene is worth; a reckoning that is meant to cost what it costs is `asGiven`.
+  const change = (meter: 'affection' | 'trust' | 'desire') => (asGiven ? feelings[meter] : feltChange(content, state, loveInterestId, meter, feelings[meter]))
   return {
     ...state,
     relationships: {
       ...state.relationships,
-      [loveInterestId]: { ...rel, affection: within(rel.affection + feelings.affection), trust: within(rel.trust + feelings.trust), desire: within(rel.desire + feelings.desire) }
+      [loveInterestId]: { ...rel, affection: within(rel.affection + change('affection')), trust: within(rel.trust + change('trust')), desire: within(rel.desire + change('desire')) }
     }
   }
 }

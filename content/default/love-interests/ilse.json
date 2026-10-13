@@ -2,10 +2,10 @@
   "id": "ilse",
   "name": "Ilse Brandt",
   "kind": "npc",
-  "role": "practice manager at the Health Centre",
+  "role": "practice manager at the Health Center",
   "age": 40,
   "pronouns": "she/her",
-  "bio": "Ilse runs the front desk and the appointments at the Reproductive Health Centre, and guards its confidentiality like a vault.",
+  "bio": "Ilse runs the front desk and the appointments at the Reproductive Health Center, and guards its confidentiality like a vault.",
   "appearance": "A trim, attractive woman of 40 with fair skin, steady blue eyes, a calm oval face and soft pink lips. Ash-blonde hair in a smooth low ponytail. A slender figure with neat, upright posture.",
   "personality": "Discreet, brisk and kind in a practical way. Never surprised, never gossips.",
   "outfits": [

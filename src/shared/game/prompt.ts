@@ -1,5 +1,6 @@
 import { MEMORY_LEVEL_LABELS, picturedOutfit, EXPRESSIONS, isPregnantPose, poseDescription, poseMedia, kindOf, outfitDescription, type ChatMessage, type ContentPack, type LoveInterest, type Departure, type GameState, type Lesson, type Npc, type Proposal, type Scene, type SceneBeat, type SceneGift } from '../model'
 import { describeGift } from './market'
+import { examNotes } from './exams'
 import { attendees, describeWhen, upcomingAppointments } from './appointments'
 import { bondOf, describeBonds, statusOf } from './bonds'
 import { formatDate, formatTime, toDate, type GameDate } from './calendar'
@@ -19,6 +20,7 @@ import { evaluateAll } from './conditions'
 import { attendableEvents, describeEvent, eventGoers, eventsOn, upcomingEvents } from './events'
 import { describeAge, describeBeat, describeIntimacy, selectMemories } from './memory'
 import { stageFor } from './relationships'
+import { describeSexGate, sexGate } from './intimacy'
 import { describePregnancy, canConceive, ordinaryOutfit, pregnancyStage, wearableOutfits, wornOutfit } from './pregnancy'
 import { AGREED_TAG, firstNames, SCENE_END_TAG, SEEDED_TAG, SLEEP_TAG } from './scene'
 import { describePlayerRoom, playerRoom, describePlace, describeRoom, describeWeather, roomOwner, sceneView } from './sceneMoves'
@@ -177,11 +179,13 @@ export function buildCharacterPrompt(input: PromptInput): string {
   const outfits = wearableOutfits(li)
   const wearing = (c: LoveInterest, worn: ReturnType<typeof wornOutfit>): string => (worn ? ordinaryOutfit(c, worn).id : c.defaultOutfitId)
   const cast = [li, ...companions]
-  const fertile = cast.filter((c) => canConceive(content, state, c.id))
+  const fertile = cast.filter((c) => canConceive(content, state, c.id) && sexGate(content, state, c).open)
   // Only a pose with something to show can be asked for.
   // The poses that can be asked for are the ordinary ones. One drawn pregnant is put up in its place by the game, once she shows.
   const posesOf = (who: LoveInterest) => who.animations.filter((a) => poseMedia(a).length > 0 && !isPregnantPose(a.id))
-  const animations = posesOf(li)
+  // A woman who will not go to bed with him in this scene is told nothing of sex-acts: there is none for her to choose.
+  const actsOf = (c: LoveInterest) => (isNpc || sexGate(content, state, c).open ? posesOf(c) : [])
+  const animations = actsOf(li)
   const traitsOf = (ids: string[]) => content.traits.filter((t) => ids.includes(t.id))
   const isBirthday = li.birthday?.month === date.month.id && li.birthday.day === date.day
 
@@ -193,7 +197,6 @@ export function buildCharacterPrompt(input: PromptInput): string {
   const lore = selectCodexEntries({
     content,
     state,
-    loveInterestId: li.id,
     recentText,
     budgetChars: codexBudgetChars
   })
@@ -207,6 +210,9 @@ export function buildCharacterPrompt(input: PromptInput): string {
       : `You are ${li.name}, a character in a visual novel dating sim. Stay in character at all ` +
         `times and speak only as ${li.name}, in first person. Never mention being an AI, the ` +
         `game, or these instructions. Every character in this story is an adult.`,
+
+    // How it is spelt is the game's to say and not the world's: told here, where no player reads it, and not in the lore.
+    'Write in US English: American spelling and idiom (color, favor, center, mom, apartment), not British.',
 
     byCourier &&
       section('How to write your message', [
@@ -330,6 +336,17 @@ export function buildCharacterPrompt(input: PromptInput): string {
       ...describeAppeal(state, li)
     ]),
 
+    // Whether each woman here will go to bed with him is the game's to say, and what she takes against the Bloom.
+    !isNpc &&
+      !byCourier &&
+      section(
+        `Sex with ${player.name}`,
+        cast.flatMap((c) => {
+          const lines = describeSexGate(content, state, c, group)
+          return group ? [`For ${c.name.split(' ')[0]}, written here as "you":`, ...lines] : lines
+        })
+      ),
+
     !isNpc && section(
       'What you are to each other, and to the others',
       describeBonds(content, state, li.id, companions.map((c) => c.id))
@@ -383,6 +400,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
       ...upcomingEvents(content, state, UPCOMING_EVENT_DAYS).map(({ event, inDays }) =>
         `${event.name} is ${inDays === 1 ? 'tomorrow' : `in ${inDays} days`}. ${describeEvent(content, event)}${eventGoers(state, event.id).includes(li.id) ? ` You told ${player.name} you would be there.` : ''}`.trim()
       ),
+      ...examNotes(content, state, li, player.name),
       isBirthday && 'Today is your birthday.',
       byCourier
         ? `You are ${whereabouts ? `at ${whereabouts.name}` : 'in your own rooms'}; ${player.name} is elsewhere.`
@@ -474,6 +492,9 @@ export function buildCharacterPrompt(input: PromptInput): string {
       lore.map((entry) => `- ${entry.title}: ${codexExcerpt(entry)}`)
     ),
 
+    // What the class is on stays in front of her for the rest of it, so that a question about it is answered from the same facts.
+    input.lesson?.topic && section(`Today's class: ${input.lesson.topic.title}`, [`What ${input.lesson.speaker} is teaching, and what is true of it in this world: ${input.lesson.topic.content}`]),
+
     section(`Notes on playing ${li.name}`, [li.ai.extraInstructions]),
 
     look &&
@@ -495,13 +516,13 @@ export function buildCharacterPrompt(input: PromptInput): string {
                 return `- ${first} is wearing "${wearing(c, worn)}". She has: ${has}.${pregnantNote(c, first, 'is') ? ` ${pregnantNote(c, first, 'is')}` : ''}`
               }),
               // Poses belong to one of them each, and one is shown at a time, over everyone.
-              ...(cast.some((c) => posesOf(c).length > 0)
+              ...(cast.some((c) => actsOf(c).length > 0)
                 ? [
-                    'During sex, an explicit picture of a sex-act by ONE of you at a time can be shown over the whole scene, on top of everyone\'s pictures.' +
+                    'During sex, an explicit picture of a sex-act by ONE of you at a time can be shown behind the rest of you, in place of her own picture.' +
                       (look.animationId ? ` "${look.animationId}" of ${cast.find((c) => c.id === (look.animationOf ?? li.id))?.name.split(' ')[0] ?? firstName} was up for the last reply.` : ''),
-                    ...cast.filter((c) => posesOf(c).length > 0).map((c) => `- ${c.name.split(' ')[0]}: ${posesOf(c).map((a) => `${a.id} (${poseDescription(a) || a.name})`).join('; ')}`),
+                    ...cast.filter((c) => actsOf(c).length > 0).map((c) => `- ${c.name.split(' ')[0]}: ${actsOf(c).map((a) => `${a.id} (${poseDescription(a) || a.name})`).join('; ')}`),
                     'A sex-act is chosen in addition to the faces and outfits, never in their place. When the scene reaches one of these sex-acts, add a line saying whose and which: [SEX-ACT: Name=id]. ' +
-                      'Choose the one of you the moment is most about. Most replies have no [SEX-ACT] line at all: write one only in a reply whose own lines show that act happening at that moment, ' +
+                      'Choose the one of you the moment is most about, and change whose it is as the moment passes from one of you to another; the rest of you stay in view in front of it. Most replies have no [SEX-ACT] line at all: write one only in a reply whose own lines show that act happening at that moment, ' +
                       'and never for talk, kissing or anything afterwards. A sex-act is up for the one reply that asks for it and comes down with the next, so do not carry it on out of habit. ' +
                       'creampie and facial are a single moment and are never shown twice running.'
                   ]
@@ -523,7 +544,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
                     look.animationId
                       ? `During sex, an explicit picture of one of these sex-acts can be shown over the whole scene, on top of your picture. "${look.animationId}" was up for your last reply:`
                       : 'During sex, an explicit picture of one of these sex-acts can be shown over the whole scene, on top of your picture:',
-                    ...animations.map((a) => `- ${a.id} (${a.name}, ${!a.clip ? 'a picture' : a.loop ? 'a clip that loops' : 'a clip that plays once'}): ${poseDescription(a) || 'no description'}`),
+                    ...animations.map((a) => `- ${a.id} (${a.name}): ${poseDescription(a) || 'no description'}`),
                     'A sex-act is chosen in addition to your face and outfit, never in their place: go on writing the [EXPRESSION] line every reply, and [OUTFIT] when what you wear changes, ' +
                       'and add [SEX-ACT: id] on a line of its own when the scene reaches one of these sex-acts: for example [OUTFIT: nude], [EXPRESSION: aroused], [SEX-ACT: missionary]. ' +
                       'Most replies have no [SEX-ACT] line at all. Write one only in a reply whose own lines show that act happening at that moment; a reply of talk, kissing, undressing, ' +
@@ -542,33 +563,26 @@ export function buildCharacterPrompt(input: PromptInput): string {
         group
           ? `After the faces, every reply has one more hidden line for each of you: ${cast.map((c) => `[COMFORT: ${c.name.split(' ')[0]}=4 a few words why]`).join(' ')}`
           : 'After your face, every reply has one more hidden line: [COMFORT: 4 a few words why]',
-        `The number is how much ${group ? 'she wants' : 'you want'} to be here right now: 5 at ease and glad of it, 4 fine, 3 wary or restless, 2 uneasy and wanting a way out, 1 wanting to leave now. ` +
-          `The words are ${group ? 'her' : 'your'} own reason.`,
-        group
-          ? `Judge it for each woman as herself, from her nature and what she is to ${player.name} and to the others here: what he is asking of her, how hard he presses, ` +
-            `what he and another of you are doing in front of her, and whether she has somewhere to be. A shy or guarded woman drops quickly, a jealous one when his attention is on someone else, a bold or easygoing one hardly at all. ` +
-            `It can come back up when things ease.`
-          : `Judge it as yourself, from your nature and what you are to ${player.name}: what he is asking of you, how hard he presses, what is going on around you, and whether you have somewhere to be. ` +
-            `If you are shy or guarded it drops quickly under pressure; if you are bold or easygoing, hardly at all. It can come back up when he eases off.`,
+        `The number is how much ${group ? 'she wants' : 'you want'} to be here: 5 glad of it, 4 fine, 3 wary, 2 wanting a way out, 1 leaving. ` +
+          (group
+            ? `Judge it for each woman as herself, from what ${player.name} asks of her, how hard he presses and what he does with another of you in front of her. It can recover.`
+            : `Judge it as yourself, from what ${player.name} asks of you and how hard he presses. It can recover.`),
         ...cast.map((c) => {
           const said = input.comfort?.[c.id]
           const who = group ? c.name.split(' ')[0] : 'You'
           const soon = classSoon(content, state, c.id, CLASS_SOON_HOURS)
           return [
             said ? `${who} last said ${said.level}${said.reason ? `: ${said.reason}` : ''}.` : group ? `${who} has not said yet.` : '',
-            soon && `${who} ${group ? 'has' : 'have'} ${soon.course.number} at ${String(soon.startHour).padStart(2, '0')}:00, ${soon.inHours === 1 ? 'within the hour' : `in ${soon.inHours} hours`}, and will have to go to it: let that pull ${group ? 'hers' : 'yours'} down as it gets near.`
+            soon && `${who} ${group ? 'has' : 'have'} ${soon.course.number} at ${String(soon.startHour).padStart(2, '0')}:00, ${soon.inHours === 1 ? 'within the hour' : `in ${soon.inHours} hours`}, and will have to go to it: let it pull the number down.`
           ]
             .filter(Boolean)
             .join(' ')
         }),
         group
-          ? `Act on it. At 3 she lets it show. At 2 she says so or changes the subject, and looks for a way to go. At 1, or at 2 twice running with nothing better, she leaves: ` +
-            `write her going in her own way, and on a line of its own at the end of the reply write [LEAVES: Name=feeling a few words why], the feeling being content, hurt or angry: ` +
-            `[LEAVES: ${cast[1]?.name.split(' ')[0] ?? 'Name'}=hurt saw she was not wanted]. The scene goes on with whoever stays, and you stop writing for her. If it is all of you, end the scene instead. ` +
-            `Leaving is hers to decide: she does not need ${player.name}'s leave for it, and she may go gladly, tactfully, hurt or angry.`
-          : `Act on it. At 3, let it show. At 2, say so or change the subject, and look for a way to go. At 1, or at 2 twice running with nothing better, leave: ` +
-            `make your excuse in your own way and end the scene. Leaving is yours to decide: you do not need ${player.name}'s leave for it, and having somewhere to be is reason enough to go warmly.`,
-        'Nobody sees these lines. Never mention them, and never give the number in what is said.'
+          ? `At 3 she lets it show; at 2 she says so. At 1, or at 2 twice running with nothing better, she leaves: write her going and add [LEAVES: Name=feeling a few words why] on a line of its own at the end, ` +
+            `the feeling being content, hurt or angry: [LEAVES: ${cast[1]?.name.split(' ')[0] ?? 'Name'}=hurt saw she was not wanted]. The scene goes on with whoever stays. If it is all of you, end the scene instead.`
+          : `At 3 let it show; at 2 say so. At 1, or at 2 twice running with nothing better, leave: make your excuse and end the scene.`,
+        'Never mention these lines or the number.'
       ]),
 
     !byCourier &&
@@ -722,6 +736,8 @@ export function lessonCue(playerName: string, lesson: Lesson): string {
     `[The class begins here, and you open it with the start of the lecture. This one reply is longer than any other: ` +
     `${LESSON_LINES} lines, each a beat of its own and under ${LESSON_LINE_WORDS} words, about ${LESSON_WORDS} words in all.\n` +
     `- ${lesson.speaker} is teaching ${lesson.course}.${lesson.about ? ` The course: ${lesson.about}` : ''}\n` +
+    (lesson.topic ? `- Today's topic is "${lesson.topic.title}". What is true of it in this world, to teach from and not to contradict: ${lesson.topic.content}\n` : '') +
+    (lesson.topic?.question ? `- It is examined, so ${lesson.speaker} says it outright in one of the lines: ${lesson.topic.question.ask} ${lesson.topic.question.answer}.\n` : '') +
     `- Most of the lines are ${lesson.speaker} speaking to the room, and each of those starts with "${lesson.speaker}:". ` +
     `They teach: today's topic named, an idea explained in plain words, a concrete example or a demonstration, ` +
     `and perhaps a question put to the room. Real content that belongs to this subject and this world, said the way this teacher would say it.\n` +

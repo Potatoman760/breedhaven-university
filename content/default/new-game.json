@@ -12,7 +12,7 @@
     "energy": 100,
     "maxEnergy": 100,
     "money": 50,
-    "bio": "{player} is nineteen, a first-year student, and came to Breedhaven from outside the Expanse. His fertility rate was the strongest ever recorded, and the result did not stay private. "
+    "bio": "{player} is eighteen, a first-year student. His fertility rate was the strongest ever recorded, and the result did not stay private."
   },
   "locationId": "dormitories",
   "room": {

@@ -6,6 +6,7 @@ import { addNote, giveContact } from './courier'
 import { approachableAt } from './map'
 import { sceneBaseline } from './scene'
 import { statOf, trainStat } from './stats'
+import { factor } from './modifiers'
 
 const clock = (hour: number): string => `${String(hour).padStart(2, '0')}:00`
 
@@ -174,7 +175,7 @@ export function startShift(content: ContentPack, state: GameState): { state: Gam
   const after: GameState = {
     ...trained,
     time: state.time + left,
-    player: { ...trained.player, energy: Math.max(0, state.player.energy - config.energyPerHour * left) },
+    player: { ...trained.player, energy: Math.max(0, state.player.energy - Math.round(config.energyPerHour * left * factor(content, state, 'effort'))) },
     job: { ...state.job!, worked: [...state.job!.worked, key] }
   }
   return {
@@ -202,15 +203,30 @@ export function startShift(content: ContentPack, state: GameState): { state: Gam
   }
 }
 
-/** What a shift scene pays when it ends: the hours he was there for, at the job's rate. Nothing for any other scene. */
-export function shiftPay(content: ContentPack, scene: Pick<Scene, 'shift'>): number {
+/**
+ * How much more than its rate a job pays him, as a fraction: so much for each point he has over what it asks, in every
+ * stat it asks for, up to the most the rules allow. A job that asks nothing of him pays nobody more.
+ */
+export function payBonus(content: ContentPack, state: Pick<GameState, 'player'>, job: Job): number {
+  const config = content.jobs
+  if (!config) return 0
+  const over = Object.entries(job.requirements).reduce((sum, [stat, needed]) => sum + Math.max(0, (state.player.stats[stat] ?? 0) - (needed ?? 0)), 0)
+  // Rounded to a whole percent, so that what is shown is what is paid.
+  return Math.round(Math.min(config.bonusCap, over * config.bonusPerPoint) * 100) / 100
+}
+
+/**
+ * What a shift scene pays when it ends: the hours he was there for, at the job's rate, and more on top for what he
+ * has over what the job asks. Nothing for any other scene.
+ */
+export function shiftPay(content: ContentPack, state: GameState, scene: Pick<Scene, 'shift'>): number {
   const job = jobOf(content, scene.shift?.jobId)
-  return job && scene.shift ? Math.round(job.hourlyRate * scene.shift.hours) : 0
+  return job && scene.shift ? Math.round(job.hourlyRate * scene.shift.hours * (1 + payBonus(content, state, job)) * factor(content, state, 'wages')) : 0
 }
 
 /** Pays the player for the shift a scene was. */
 export function payShift(content: ContentPack, state: GameState, scene: Pick<Scene, 'shift'>): GameState {
-  const pay = shiftPay(content, scene)
+  const pay = shiftPay(content, state, scene)
   return pay === 0 ? state : { ...state, player: { ...state.player, money: state.player.money + pay } }
 }
 
@@ -274,7 +290,7 @@ export function jobFacts(content: ContentPack, state: GameState, npcId: string):
   const { dayIndex } = toDate(content.calendar, state.time)
   const told = shiftsOn(content, job, dayIndex).find((shift) => state.job!.excused.includes(shiftKey(dayIndex, shift)))
   return [
-    `${state.player.name} works for you as ${job.title.toLowerCase()}, paid $${job.hourlyRate} an hour. His shifts are ${job.shifts.map(describeShift).join(', ')}.`,
+    `${state.player.name} works for you as ${job.title.toLowerCase()}, paid $${job.hourlyRate} an hour${payBonus(content, state, job) > 0 ? `, and ${Math.round(payBonus(content, state, job) * 100)}% over that because he is better at it than the job asks` : ''}. His shifts are ${job.shifts.map(describeShift).join(', ')}.`,
     `He has ${state.job.strikes} of ${config.strikes} strikes. A shift missed without a word is a full strike, and one he warned you of that day is half. At ${config.strikes} he is out.`,
     today ? `He has a shift today at ${clock(today.shift.startHour)} that has not started yet.` : told ? `He has already told you he will miss today's ${clock(told.startHour)} shift.` : 'He has no shift still to come today.'
   ]

@@ -35,7 +35,6 @@ export const IPC = {
   editorDeleteJob: 'editor:deleteJob',
   editorSavePlayer: 'editor:savePlayer',
   editorResetPlayer: 'editor:resetPlayer',
-  editorWriteCourseWording: 'editor:writeCourseWording',
   editorImportAsset: 'editor:importAsset',
   editorReadPicture: 'editor:readPicture',
   editorSaveOptimized: 'editor:saveOptimized',

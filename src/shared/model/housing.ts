@@ -81,6 +81,8 @@ export const HousingConfigSchema = z.object({
   /** The periods of the day a love interest who lives there is always at home, whatever her old habits. */
   homePeriods: z.array(z.string()).default([]),
   invite: z.object({ minAffection: z.number().default(30) }).prefault({}),
+  /** What each child of his takes off the month's rent, and the least the rent can come down to. */
+  rentRelief: z.object({ perChild: z.number().int().min(0).default(0), floor: z.number().int().min(0).default(0) }).prefault({}),
   babies: z.object({
     /** What one baby in the house costs each week. */
     weeklyCost: z.number().int().min(0),
@@ -106,6 +108,18 @@ export const HousingConfigSchema = z.object({
     paid: z.string(),
     evicted: z.string()
   }),
+  /**
+   * Being shown the house before it is his: where the officer meets him, for how long, and what she writes to set the
+   * hour (`{date}`, `{place}`) and to set another when he did not come. Left out, saying yes is moving in.
+   */
+  viewing: z
+    .object({
+      meetLocationId: z.string(),
+      hours: z.number().int().min(1).default(2),
+      text: z.string(),
+      missedText: z.string()
+    })
+    .optional(),
   /** The floors, from the ground up, by name. */
   floors: z.array(z.string()).min(1),
   /** How many columns and rows each floor's plan is drawn on. */
@@ -114,7 +128,7 @@ export const HousingConfigSchema = z.object({
 })
 export type HousingConfig = z.infer<typeof HousingConfigSchema>
 
-export const HOUSING_STATUSES = ['none', 'offered', 'declined', 'resident', 'evicted'] as const
+export const HOUSING_STATUSES = ['none', 'offered', 'declined', 'accepted', 'resident', 'evicted'] as const
 export type HousingStatus = (typeof HOUSING_STATUSES)[number]
 
 /** One line of the house's accounts. */

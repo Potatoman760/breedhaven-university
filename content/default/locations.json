@@ -129,7 +129,7 @@
     "id": "chapel",
     "name": "the Furrow Chapel",
     "icon": "chapel",
-    "description": "The Furrow Chapel, the campus chapel of the Order of the First Furrow, which holds the Bloom sacred. It is open to any student who wants quiet, believer or not. Services are short and sung; postulants in green tend the candles. Bloom Counselling keeps its rooms upstairs: free, confidential, and staffed by people who have heard it all before, for anyone the Bloom's pull is troubling. Voices are kept low. People come here to think, to grieve, to pray for a child, or to talk about what they cannot say elsewhere.",
+    "description": "The Furrow Chapel, the campus chapel of the Order of the First Furrow, which holds the Bloom sacred. It is open to any student who wants quiet, believer or not. Services are short and sung; postulants in green tend the candles. Bloom Counseling keeps its rooms upstairs: free, confidential, and staffed by people who have heard it all before, for anyone the Bloom's pull is troubling. Voices are kept low. People come here to think, to grieve, to pray for a child, or to talk about what they cannot say elsewhere.",
     "appearance": "The interior of a small campus chapel of pale stone, calm and plain. Rows of simple wooden pews face a low altar draped in green cloth, with a carved stone relief of a ploughed field and a single sprouting seed above it. Tall narrow windows of green and gold stained glass cast soft coloured light across the floor. Clusters of lit candles in brass stands, vases of fresh wildflowers, sheaves of wheat tied with ribbon. A spiral stone staircase in one corner leads up to a wooden door with a small softly glowing sign.",
     "backgrounds": [
       {
@@ -292,9 +292,9 @@
   },
   {
     "id": "health-centre",
-    "name": "the Health Centre",
+    "name": "the Health Center",
     "icon": "cross",
-    "description": "The Reproductive Health Centre, a bright modern clinic. Suppressants (\"dampers\") and contraception are free at the desk, no questions asked. It offers fertility counselling, prenatal care, and a warded Bloom Chamber for conception under supervision. Its lab runs the University's Sire Assays. The Sire Relations Office, which looks after the few registered True Sires, is on the first floor behind a door with no sign on it. The staff are discreet and brisk. People in the waiting room do not ask each other why they are there.",
+    "description": "The Reproductive Health Center, a bright modern clinic. Suppressants (\"dampers\") and contraception are free at the desk, no questions asked. It offers fertility counseling, prenatal care, and a warded Bloom Chamber for conception under supervision. Its lab runs the University's Sire Assays. The Sire Relations Office, which looks after the few registered True Sires, is on the first floor behind a door with no sign on it. The staff are discreet and brisk. People in the waiting room do not ask each other why they are there.",
     "appearance": "The reception of a bright modern health clinic with white walls, pale wood and soft green accents. A curved reception desk with a computer and a tray of small boxed prescriptions stands in front of a wall of frosted glass. Rows of comfortable waiting chairs, low tables with leaflets, potted plants, and posters showing a blooming flower emblem. A corridor of numbered consulting-room doors leads off to one side, and at its end a round door ringed with softly glowing pink runes. A staircase with a glass balustrade leads to an upper floor. Clean daylight from large windows.",
     "backgrounds": [
       {
@@ -323,7 +323,7 @@
     "drills": [
       {
         "stat": "wisdom",
-        "title": "Sit in on a counselling talk",
+        "title": "Sit in on a counseling talk",
         "description": "An open session in a quiet room, on living with the Bloom and with each other."
       }
     ]
@@ -754,76 +754,109 @@
   },
   {
     "id": "sire-house",
-    "name": "Quince House",
     "icon": "house",
-    "description": "Quince House, a family house on Quince Row, behind Riverside Park in Seedblossom. The Sire Relations Office holds the lease and lets it to a registered Sire: the gate and every sill are warded, the front door keeps a log, and nobody comes in who is not of the house or brought by someone who is. It is plain, warm and half-furnished, a house meant to be added to. A nanny employed by the Office lives in. It is a private home.",
+    "name": "Haven House",
+    "description": "Haven House, a family house on Quince Row, behind Riverside Park in Seedblossom. The Sire Relations Office holds the lease and lets it to a registered Sire: the gate and every sill are warded, the front door keeps a log, and nobody comes in who is not of the house or brought by someone who is. It is plain, warm and half-furnished, a house meant to be added to. A nanny employed by the Office lives in. It is a private home.",
     "appearance": "A warm open-plan kitchen and living room in a modest modern family house: a long scrubbed wooden table with mismatched chairs, a cast-iron stove, open shelves of crockery, a worn sofa under a window, a front door with a small glowing brass ward-plate beside it, pale plaster walls, wooden floor.",
     "backgrounds": [
       {
         "id": "default",
         "name": "Default",
-        "images": {},
+        "images": {
+          "day": "generated/backgrounds/sire-house/default-day.webp",
+          "night": "generated/backgrounds/sire-house/default-night.webp"
+        },
         "appearance": "A warm open-plan kitchen and living room in a modest modern family house: a long scrubbed wooden table with mismatched chairs, a cast-iron stove, open shelves of crockery, a worn sofa under a window, a front door with a small glowing brass ward-plate beside it, pale plaster walls, wooden floor."
       },
       {
         "id": "family",
         "name": "The family room",
-        "images": {},
+        "images": {
+          "day": "generated/backgrounds/sire-house/family-day.webp",
+          "night": "generated/backgrounds/sire-house/family-night.webp"
+        },
         "appearance": "A comfortable family sitting room: two deep sofas facing each other over a thick rug, a low table, shelves of board games and picture books, a basket of soft toys, a fireplace with a guard, lamps with warm shades, tall windows with heavy curtains."
       },
       {
         "id": "study",
         "name": "The study",
-        "images": {},
+        "images": {
+          "day": "generated/backgrounds/sire-house/study-day.webp",
+          "night": "generated/backgrounds/sire-house/study-night.webp"
+        },
         "appearance": "A small tidy study: a wooden desk under a window with a green-shaded lamp and a laptop, a comfortable chair, a wall of half-filled bookshelves, a corkboard with pinned notes, a rug, a closed panelled door."
       },
       {
         "id": "nanny",
         "name": "The nanny's room",
-        "images": {},
+        "images": {
+          "day": "generated/backgrounds/sire-house/nanny-day.webp",
+          "night": "generated/backgrounds/sire-house/nanny-night.webp"
+        },
         "appearance": "A neat small bedroom on the ground floor: a narrow bed made up crisply with white linen, a dressing table with an oval mirror hung with small coloured ribbons and a row of perfume bottles, a black dress with a white collar on a hanger behind the door, a softly glowing crystal on the windowsill, a vase of fresh flowers, a small framed print of a harbour."
       },
       {
         "id": "nursery",
         "name": "The nursery",
-        "images": {},
+        "images": {
+          "day": "generated/backgrounds/sire-house/nursery-day.webp",
+          "night": "generated/backgrounds/sire-house/nursery-night.webp"
+        },
         "appearance": "A bright nursery: three white wooden cots along one wall, a changing table, a rocking chair with a folded blanket, a mobile of paper birds, shelves of folded cloths and small clothes, pale yellow walls, a window with faintly glowing runes on its frame."
       },
       {
         "id": "garden",
         "name": "The garden",
-        "images": {},
-        "appearance": "A small walled garden behind a town house: a neat lawn, an old quince tree heavy with yellow fruit, flower and herb beds along a brick wall, a wooden bench, a washing line, a gravel path to a back door.",
-        "indoors": false
+        "images": {
+          "day": "generated/backgrounds/sire-house/garden-day.webp",
+          "night": "generated/backgrounds/sire-house/garden-night.webp"
+        },
+        "indoors": false,
+        "appearance": "A small walled garden behind a town house: a neat lawn, an old quince tree heavy with yellow fruit, flower and herb beds along a brick wall, a wooden bench, a washing line, a gravel path to a back door."
       },
       {
         "id": "master",
         "name": "The master bedroom",
-        "images": {},
+        "images": {
+          "day": "generated/backgrounds/sire-house/master-day.webp",
+          "night": "generated/backgrounds/sire-house/master-night.webp"
+        },
         "appearance": "A large bedroom on the first floor of a modest family house: a wide bed with a plain wooden headboard and cream linen, a wardrobe, a chest of drawers, a wicker bassinet in the corner, a window overlooking a garden, a rug on a wooden floor, a lamp on each bedside table."
       },
       {
         "id": "bathroom",
         "name": "The bathroom",
-        "images": {},
+        "images": {
+          "day": "generated/backgrounds/sire-house/the-bathroom-day.webp",
+          "night": "generated/backgrounds/sire-house/bathroom-night.webp"
+        },
         "appearance": "A plain clean bathroom: a deep white enamel bathtub, a basin under a mirror, white tiles to shoulder height, a wooden stool with folded towels, a frosted window."
       },
       {
         "id": "suite-west",
         "name": "The west bedroom",
-        "images": {},
+        "images": {
+          "day": "generated/backgrounds/sire-house/suite-west-day.webp",
+          "night": "generated/backgrounds/sire-house/suite-west-night.webp"
+        },
         "appearance": "A pleasant bedroom at the back of a town house: a double bed with a quilt, a window seat with cushions, a dressing table with a mirror, an empty bookshelf waiting to be filled, soft afternoon light."
       },
       {
         "id": "suite-east",
         "name": "The east bedroom",
-        "images": {},
+        "images": {
+          "day": "generated/backgrounds/sire-house/suite-east-day.webp",
+          "night": "generated/backgrounds/sire-house/suite-east-night.webp"
+        },
         "appearance": "A bright bedroom that gets the morning sun: a double bed with pale blue linen, a wardrobe, a small writing desk, a rag rug, sunlight through thin curtains."
       },
       {
         "id": "suite-attic",
         "name": "The attic room",
-        "images": {},
+        "images": {
+          "day": "generated/backgrounds/sire-house/suite-attic-day.webp",
+          "night": "generated/backgrounds/sire-house/suite-attic-night.webp"
+        },
         "appearance": "A long attic bedroom under a sloping roof: exposed beams, a low double bed under a round window, a reading chair, a trunk, a string of small warm lights along a beam, a skylight showing sky."
       }
     ],

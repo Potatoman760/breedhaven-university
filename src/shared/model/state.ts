@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { BoonSchema } from './modifier'
 import { HousingStateSchema } from './housing'
 import { RoomSchema } from './loveInterest'
 import { AppointmentSchema } from './appointment'
@@ -54,6 +55,10 @@ export const RapportSchema = z.object({ friends: z.array(z.string()), enemies: z
 export type Rapport = z.infer<typeof RapportSchema>
 
 /** Everything that changes during play. Plain JSON, so it doubles as the save format. */
+/** The one thing he works on when he has nothing else to do. */
+export const FocusSchema = z.object({ kind: z.enum(['stat', 'course']), id: z.string() })
+export type Focus = z.infer<typeof FocusSchema>
+
 export const GameStateSchema = z.object({
   /** Hours elapsed since the calendar's start moment. */
   time: z.number().int().min(0),
@@ -79,6 +84,8 @@ export const GameStateSchema = z.object({
   training: z.record(z.string(), z.number()),
   /** How much he has trained each stat on one day of the game, so that a day's work on one thing counts for less and less. */
   trainedOn: z.object({ day: z.number().int(), points: z.record(z.string(), z.number()) }),
+  /** What he gives his spare hours to: a stat, or a course he takes. Hours skipped on the way to the next thing are spent on it. */
+  focus: FocusSchema.optional(),
   /** How far along he is in each course he takes: points earned in class and by study, by course id. */
   coursePoints: z.record(z.string(), z.number()),
   /** The grades he has been given, by course id: at the midterm, and at the final. */
@@ -112,6 +119,14 @@ export const GameStateSchema = z.object({
   timesIntimate: z.record(z.string(), z.number().int().min(0)).default({}),
   /** How many scenes he has had sex in with two or more love interests at once. Kept, and shown nowhere yet. */
   threesomes: z.number().int().min(0).default(0),
+  /** What is changing the game's numbers for a while: what he has drunk, and charms he has set off. */
+  boons: z.array(BoonSchema).default([]),
+  /** When he last did each thing he can make or set off, by the skill's id: the game time. */
+  abilityUsed: z.record(z.string(), z.number().int()).default({}),
+  /** The skills he has been told he has, by id: earning one is said once. */
+  skillsTold: z.array(z.string()).default([]),
+  /** The love interests who took something against the Bloom and have stopped, by id. */
+  offBirthControl: z.array(z.string()).default([]),
   /** Who has said she will be at an event, by the event's id: she is there when he goes to it. */
   eventGoers: z.record(z.string(), z.array(z.string())).default({}),
   /** He is in his own room, in the place it is in, and not merely somewhere in that place: what is shown behind him is the room. */

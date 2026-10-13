@@ -23,6 +23,7 @@ import {
   rentOn,
   sendHousingOffer,
   settleHousehold,
+  monthlyRent,
   withHousing
 } from './housing'
 import { scheduledLocationId } from './schedule'
@@ -91,7 +92,7 @@ const written: ContentPack = validateContentPack({
 const start = createInitialState(written)
 const at = (state: GameState, day: number, hour = 6): GameState => ({ ...state, time: day * 20 + (hour - 6) })
 const rich = (state: GameState, money: number): GameState => ({ ...state, player: { ...state.player, money } })
-const withChild = (state: GameState, motherId: string): GameState => ({ ...state, children: [...state.children, { motherId, bornAt: 0, daughter: true }] })
+const withChild = (state: GameState, motherId: string): GameState => ({ ...state, children: [...state.children, { motherId, bornAt: 0, daughter: true, name: 'Ada' }] })
 const bonded = (state: GameState, id: string, affection = 50): GameState => ({
   ...state,
   bonds: [...state.bonds, { statusId: 'casual', memberIds: [id], since: 0 }],
@@ -180,7 +181,7 @@ describe('moving in', () => {
     const fitted = buildRoom(seen(built), built, 'nursery')
     expect(fitted.player.money).toBe(6)
     expect(houseTotals(pack.housing!, fitted)).toEqual({ beds: 1, cots: 4, comfort: 8, study: 0 })
-    expect(healthCap(pack.housing!, fitted)).toBe(4)
+    expect(healthCap(pack, fitted)).toBe(4)
     expect(canBuild(seen(fitted), fitted, 'nursery')).toEqual({ ok: false, reasons: ['There is nothing more to do to it'] })
     expect(fitted.housing.ledger.map((line) => line.amount)).toEqual([0, -8, -6])
     // What a room has been made into is said of it wherever the room is described.
@@ -315,6 +316,20 @@ describe('what the house costs', () => {
     expect(thriving.state.relationships['ana'].affection).toBe(home.relationships['ana'].affection + 1)
   })
 
+  it('comes down with each child of his, wherever it lives, to no less than the Office lets a house for', () => {
+    const relieved: ContentPack = { ...written, housing: { ...written.housing!, rentRelief: { perChild: 3, floor: 2 } } }
+    const cheaper = (state: GameState) => withHousing(relieved, state)
+    expect(monthlyRent(seen(moved), withChild(moved, 'ana'))).toBe(10)
+    expect(monthlyRent(cheaper(moved), moved)).toBe(10)
+    expect(monthlyRent(cheaper(home), home)).toBe(7)
+    const four = [1, 2, 3].reduce((state) => withChild(state, 'ana'), home)
+    expect(monthlyRent(cheaper(four), four)).toBe(2)
+    // It is what is asked on the day, and what the calendar says.
+    expect(rentOn(cheaper(home), home, 2)).toBe(7)
+    expect(dayAgenda(cheaper(home), home, 2).find((item) => item.kind === 'rent')?.title).toBe('Rent due: $7')
+    expect(settleHousehold(cheaper(home), at(rich(home, 20), 2)).notices[0]).toBe('Rent paid: $7.')
+  })
+
   it('goes badly for a child he does not keep, until its mother takes it away', () => {
     // Day 2 is a rent day as well: he can find neither.
     const once = settle(at(home, 2)).state
@@ -335,7 +350,7 @@ describe('what the house costs', () => {
   })
 
   it('pays first for the child doing worst when he cannot pay for them all', () => {
-    const two: GameState = { ...home, children: [{ motherId: 'ana', bornAt: 0, daughter: true, health: 2 }, { motherId: 'ana', bornAt: 1, daughter: false, health: 1 }] }
+    const two: GameState = { ...home, children: [{ motherId: 'ana', bornAt: 0, daughter: true, name: 'Ada', health: 2 }, { motherId: 'ana', bornAt: 1, daughter: false, name: 'Bram', health: 1 }] }
     // Money for the rent and one child.
     const week = settle(at(rich(two, 14), 2)).state
     expect(week.player.money).toBe(0)

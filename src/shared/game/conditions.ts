@@ -3,12 +3,15 @@ import { toDate } from './calendar'
 import { eventsOn } from './events'
 import { stageFor, stageRank } from './relationships'
 import { affectionGain, trainStat } from './stats'
+import { addBoon, feltChange } from './modifiers'
 
 export interface RuleContext {
   state: GameState
   content: ContentPack
   /** Target for conditions and effects that don't name a love interest. */
   loveInterestId?: string
+  /** What the effects come from, as he would name it: a boon is known by it. */
+  source?: string
 }
 
 function inRange(value: number, min?: number, max?: number): boolean {
@@ -103,7 +106,8 @@ export function applyEffect(state: GameState, e: Effect, ctx: Omit<RuleContext, 
       const rel = id === undefined ? undefined : state.relationships[id]
       if (id === undefined || rel === undefined) return state
       // Someone who admires what the player has made of himself warms to him faster.
-      const amount = e.meter === 'affection' ? affectionGain(ctx.content, state, id, e.amount) : e.amount
+      const appealed = e.meter === 'affection' ? affectionGain(ctx.content, state, id, e.amount) : e.amount
+      const amount = feltChange(ctx.content, state, id, e.meter, appealed)
       const value = clamp(rel[e.meter] + amount, 0, ctx.content.relationships.meterMax)
       return {
         ...state,
@@ -112,6 +116,12 @@ export function applyEffect(state: GameState, e: Effect, ctx: Omit<RuleContext, 
     }
     case 'flag':
       return { ...state, flags: { ...state.flags, [e.flag]: e.value } }
+    case 'boon':
+      // One meant for her and used on nobody does nothing.
+      if (e.on === 'her' && ctx.loveInterestId === undefined) return state
+      return addBoon(state, { ...e.modifier, until: state.time + e.hours, source: ctx.source ?? 'Something', targetId: e.on === 'her' ? ctx.loveInterestId : undefined, telling: e.telling })
+    case 'item':
+      return { ...state, inventory: { ...state.inventory, [e.itemId]: (state.inventory[e.itemId] ?? 0) + e.count } }
     case 'unlockCodex':
       if (state.unlockedCodexIds.includes(e.entryId)) return state
       return { ...state, unlockedCodexIds: [...state.unlockedCodexIds, e.entryId] }

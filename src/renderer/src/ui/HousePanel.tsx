@@ -14,18 +14,23 @@ import {
   healthName,
   houseComfort,
   householdCost,
+  monthlyRent,
   houseTotals,
   invitable,
   invite,
   nextRentDay,
   nextWork,
+  inRoom,
+  factor,
   payArrears,
   pregnancyOf,
   toDate,
   viewImage
 } from '../../../shared/game'
 import type { ContentPack, GameState, HouseRoom, HousingConfig } from '../../../shared/model'
+import { Button } from './Button'
 import { useConfirm } from './Confirm'
+import { Facts } from './Facts'
 import { Dialog } from './Dialog'
 import { Portrait } from './MapPanel'
 
@@ -83,7 +88,7 @@ export function HousePanel({ content, state, onChange, onClose }: Props) {
   const babies = babiesAtHome(state)
   const rentDay = nextRentDay(content, state)
   const deadline = arrearsDeadline(content, state)
-  const cap = healthCap(config, state)
+  const cap = healthCap(content, state)
   const atHome = state.locationId === config.locationId
   const room = config.rooms.find((r) => r.key === picked) ?? config.rooms[0]
 
@@ -93,36 +98,41 @@ export function HousePanel({ content, state, onChange, onClose }: Props) {
     ...(r.role === 'nanny' ? [firstOf(config.nannyId)] : []),
     ...residents.filter(([, key]) => key === r.key).map(([id]) => firstOf(id))
   ]
+  /** Who is in a room this hour, wherever she sleeps: the house as it is being lived in. */
+  const present = (r: HouseRoom): string[] => inRoom(content, state, r.key).map((li) => li.name.split(' ')[0])
 
   return (
     <Dialog title={config.name} note={atHome ? 'You are at home' : undefined} onClose={onClose} wide>
       {dialog}
       <div className="house">
-        <div className="chips house-head">
-          {deadline !== undefined ? (
-            <>
-              <span className="chip madder">
-                Rent owing: ${state.housing.arrears} · by {dayLabel(deadline)}
-              </span>
-              <button disabled={state.player.money < state.housing.arrears} title={state.player.money < state.housing.arrears ? `You have $${state.player.money}` : undefined} onClick={() => onChange((s) => payArrears(content, s))}>
-                Pay ${state.housing.arrears}
-              </button>
-            </>
-          ) : (
-            <span className="chip">{rentDay === undefined ? 'No more rent this year' : `Rent $${config.rent} · due ${dayLabel(rentDay)}`}</span>
-          )}
-          <span className="chip">
-            Beds {residents.length} / {totals.beds}
-          </span>
-          <span className="chip">
-            Cots {babies.length} / {totals.cots}
-          </span>
-          <span className="chip">Children's week ${householdCost(content, state)}</span>
-          <span className="chip" title="How well the house looks after those in it. It sets how well a child can come to do here.">
-            Comfort {houseComfort(config, state)} · children can reach {healthName(config, cap).toLowerCase()}
-          </span>
-          <span className="chip">You have ${state.player.money}</span>
-        </div>
+        {/* The standing of the house, read across: figures under their names. */}
+        <Facts
+          facts={[
+            deadline !== undefined
+              ? {
+                  label: 'Rent owing',
+                  value: `$${state.housing.arrears}`,
+                  note: `by ${dayLabel(deadline)}`,
+                  warn: true,
+                  action: (
+                    <Button variant="primary" size="small" disabled={state.player.money < state.housing.arrears} title={state.player.money < state.housing.arrears ? `You have $${state.player.money}` : undefined} onClick={() => onChange((s) => payArrears(content, s))}>
+                      Pay
+                    </Button>
+                  )
+                }
+              : {
+                  label: 'Rent',
+                  value: rentDay === undefined ? 'None left' : `$${monthlyRent(content, state)}`,
+                  note: rentDay === undefined ? 'this year' : `due ${dayLabel(rentDay)}`,
+                  title: config.rentRelief.perChild > 0 ? `$${config.rent} a month, less $${config.rentRelief.perChild} for each child of yours, to no less than $${Math.min(config.rent, config.rentRelief.floor)}.` : undefined
+                },
+            { label: "Children's week", value: `$${householdCost(content, state)}`, note: 'each week' },
+            { label: 'Beds', value: `${residents.length} of ${totals.beds}`, note: 'taken' },
+            { label: 'Cots', value: `${babies.length} of ${totals.cots}`, note: 'taken' },
+            { label: 'Comfort', value: houseComfort(content, state), note: `children can reach ${healthName(config, cap).toLowerCase()}`, title: 'How well the house looks after those in it. It sets how well a child can come to do here.' },
+            { label: 'You have', value: `$${state.player.money}` }
+          ]}
+        />
 
         <div className="tabs" role="tablist">
           {TABS.map((name) => (
@@ -131,15 +141,15 @@ export function HousePanel({ content, state, onChange, onClose }: Props) {
             </button>
           ))}
           {!atHome && (
-            <button
-              className="secondary house-go"
+            <Button
+              className="house-go"
               onClick={() => {
                 onChange((s) => goHome(content, s))
                 onClose()
               }}
             >
               Go home
-            </button>
+            </Button>
           )}
         </div>
 
@@ -168,7 +178,8 @@ export function HousePanel({ content, state, onChange, onClose }: Props) {
                               onClick={() => setPicked(r.key)}
                             >
                               <strong>{r.name}</strong>
-                              <span>{tier < 1 ? `Not built · $${r.cost}` : here.length > 0 ? here.join(', ') : tier > 1 ? r.tiers[tier - 2]?.name : ''}</span>
+                              {tier > 0 && present(r).length > 0 && <span className="house-here">Here now: {present(r).join(', ')}</span>}
+                              <span>{tier < 1 ? `Not built · $${Math.round(r.cost * factor(content, state, 'build'))}` : here.length > 0 ? here.join(', ') : tier > 1 ? r.tiers[tier - 2]?.name : ''}</span>
                             </button>
                           )
                         })}
@@ -215,15 +226,15 @@ export function HousePanel({ content, state, onChange, onClose }: Props) {
                       {pregnancyOf(state, id) ? ' · pregnant' : ''}
                     </span>
                   </div>
-                  <button
-                    className="secondary"
+                  <Button
+                    size="small"
                     onClick={async () =>
                       (await ask({ title: `Ask ${firstOf(id)} to leave?`, detail: 'She will take her children back to the creche, will think the less of you for it, and will not come back.', confirm: 'Ask her to leave', cancel: 'Let her stay', grave: true })) &&
                       onChange((s) => askToLeave(content, s, id))
                     }
                   >
                     Ask to leave
-                  </button>
+                  </Button>
                 </div>
               )
             })}
@@ -231,7 +242,7 @@ export function HousePanel({ content, state, onChange, onClose }: Props) {
             <h2>The children</h2>
             {state.children.length === 0 && <p className="hint">None yet.</p>}
             {state.children.map((child, i) => {
-              const whose = `${firstOf(child.motherId)}'s ${child.daughter ? 'daughter' : 'son'}`
+              const whose = `${child.name}, ${firstOf(child.motherId)}'s ${child.daughter ? 'daughter' : 'son'}`
               return (
                 <div key={i} className="card house-person">
                   <div>
@@ -303,7 +314,7 @@ interface RoomCardProps {
 /** The room picked on the plan: its picture, what it is, who is in it, and what can be done with it. */
 function RoomCard({ content, state, config, room, image, occupants, atHome, onChange, onClose }: RoomCardProps) {
   const tier = builtTier(state, room.key)
-  const work = nextWork(config, state, room.key)
+  const work = nextWork(config, state, room.key, factor(content, state, 'build'))
   const check = canBuild(content, state, room.key)
   const bedroom = room.role === 'suite' || room.role === 'master'
   const free = freeBeds(config, state, room.key)
@@ -333,9 +344,9 @@ function RoomCard({ content, state, config, room, image, occupants, atHome, onCh
 
       {work && (
         <div className="house-work">
-          <button disabled={!check.ok} title={check.reasons.join(' · ')} onClick={() => onChange((s) => buildRoom(content, s, room.key))}>
+          <Button variant="primary" disabled={!check.ok} title={check.reasons.join(' · ')} onClick={() => onChange((s) => buildRoom(content, s, room.key))}>
             {work.upgrade ? `${work.name} · $${work.cost}` : `Build · $${work.cost}`}
-          </button>
+          </Button>
           {work.upgrade && <span className="hint">{[work.description, effectsOf(room.tiers[tier - 1] ?? { beds: 0, cots: 0, comfort: 0, study: 0 })].filter(Boolean).join(' ')}</span>}
           {!check.ok && <span className="hint">{check.reasons.join(' · ')}</span>}
         </div>
@@ -345,9 +356,9 @@ function RoomCard({ content, state, config, room, image, occupants, atHome, onCh
         <div className="house-work">
           <span className="caps">Offer this room to</span>
           {candidates.map((li) => (
-            <button key={li.id} className="secondary" onClick={() => onChange((s) => invite(content, s, li.id, room.key))}>
+            <Button key={li.id} size="small" onClick={() => onChange((s) => invite(content, s, li.id, room.key))}>
               {li.name}
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -358,15 +369,14 @@ function RoomCard({ content, state, config, room, image, occupants, atHome, onCh
       ))}
 
       {tier > 0 && (!atHome || state.housing.room !== room.key) && (
-        <button
-          className="secondary"
+        <Button
           onClick={() => {
             onChange((s) => goToRoom(content, s, room.key))
             onClose()
           }}
         >
           Go to this room
-        </button>
+        </Button>
       )}
     </aside>
   )

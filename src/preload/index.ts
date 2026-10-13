@@ -42,7 +42,6 @@ const api: RendererApi = {
     deleteJob: (id) => ipcRenderer.invoke(IPC.editorDeleteJob, id),
     savePlayer: (newGame) => ipcRenderer.invoke(IPC.editorSavePlayer, newGame),
     resetPlayer: () => ipcRenderer.invoke(IPC.editorResetPlayer),
-    writeCourseWording: (courses) => ipcRenderer.invoke(IPC.editorWriteCourseWording, courses),
     importAsset: (request) => ipcRenderer.invoke(IPC.editorImportAsset, request),
     readPicture: (path) => ipcRenderer.invoke(IPC.editorReadPicture, path),
     saveOptimized: (picture) => ipcRenderer.invoke(IPC.editorSaveOptimized, picture),

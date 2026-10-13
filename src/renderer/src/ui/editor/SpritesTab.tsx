@@ -78,9 +78,6 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
   const [poseViewing, setPoseViewing] = useState<string | null>(null)
   // The pose whose clip is being seen to, while the art tool is open on one: made from its picture, uploaded, replaced or taken off.
   const [clipping, setClipping] = useState<string | null>(null)
-  // The art tool is open on her birth picture, or that picture is being looked at whole.
-  const [birthing, setBirthing] = useState(false)
-  const [birthViewing, setBirthViewing] = useState(false)
   // A seed typed for an outfit's run of missing faces, by outfit id, in place of her preferred one.
   const [batchSeeds, setBatchSeeds] = useState<Record<string, string>>({})
   // The draft as it stands now, for a run that outlives the render it was started from.
@@ -478,8 +475,6 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
           }
         />
       )}
-      {birthing && <ArtTool target={{ kind: 'birth', who: draft, onUse: (birthPicture) => set({ birthPicture }) }} onClose={() => setBirthing(false)} />}
-      {birthViewing && draft.birthPicture && <Lightbox image={draft.birthPicture} name="Birth" onClose={() => setBirthViewing(false)} />}
       {drawing && (
         <ArtTool
           target={{ kind: 'sprite', who: draft, outfitId: drawing.outfitId, expression: drawing.expression, onUse: useGenerated }}
@@ -803,51 +798,6 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
           </div>
           <BatchProgress batch={batch} at={NSFW_PREGNANT_BATCH} onStop={stop} />
           <SlotGrid wide>{pregnantPoses.map(poseSlot)}</SlotGrid>
-        </Group>
-      )}
-
-      {/* The picture of her with a newborn: the whole stage of the scene of a birth he is there for. */}
-      {!plain && (
-        <Group
-          title="Birth"
-          hint="One picture of her just after giving birth: sitting up in a hospital bed in a gown, with the child in her arms. When he is there for the birth of a child of hers, the scene is set in it. Without one, the Health Centre's maternity room is shown."
-        >
-          <SlotGrid wide>
-            {draft.birthPicture ? (
-              <PictureSlot
-                image={draft.birthPicture}
-                name="Birth"
-                onView={() => setBirthViewing(true)}
-                actions={
-                  <>
-                    <Button
-                      disabled={!ready}
-                      onClick={async () => {
-                        const picked = await pick('image')
-                        if (picked) set({ birthPicture: picked })
-                      }}
-                    >
-                      Replace
-                    </Button>
-                    <Button disabled={!ready} title="Draw it again with ComfyUI" onClick={() => setBirthing(true)}>
-                      Generate
-                    </Button>
-                    <Button onClick={() => set({ birthPicture: undefined })}>Remove</Button>
-                  </>
-                }
-              />
-            ) : (
-              <EmptySlot
-                name="Birth"
-                disabled={!ready}
-                onAdd={async () => {
-                  const picked = await pick('image')
-                  if (picked) set({ birthPicture: picked })
-                }}
-                onGenerate={() => setBirthing(true)}
-              />
-            )}
-          </SlotGrid>
         </Group>
       )}
     </>

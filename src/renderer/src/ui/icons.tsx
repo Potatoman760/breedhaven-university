@@ -64,6 +64,15 @@ export const WeatherIcon = ({ kind, ...p }: IconProps & { kind?: string }) => (
   </Icon>
 )
 
+/** A satchel: what he carries. */
+export const BagIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 20 20" strokeWidth={1.6} {...p}>
+    <path d="M3 8h14l-1 9H4z" />
+    <path d="M7 8V6a3 3 0 0 1 6 0v2" />
+    <path d="M8 12h4" />
+  </Icon>
+)
+
 export const MarketIcon = (p: IconProps) => (
   <Icon {...p}>
     <path d="M8 13h20l-1.5 17h-17z" />

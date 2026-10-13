@@ -1,6 +1,7 @@
 import { pronounWords, type ContentPack, type GameState, type LoveInterest } from '../model'
 import { statusOf } from './bonds'
-import { coursePoints, gradeFor } from './grades'
+import { gradeFor } from './exams'
+import { seedOf } from './seed'
 
 /** How the year went for him as a student. */
 export type Standing = 'failing' | 'gettingBy' | 'excelling'
@@ -20,20 +21,20 @@ export interface EpilogueScreen {
 }
 
 // What each letter is worth, as a grade point.
-const POINTS: Record<string, number> = { A: 4, B: 3, C: 2, D: 1, F: 0 }
-// An average of a B or better, with nothing failed, is excelling; under a D, or most of it failed, is failing.
+const POINTS: Record<string, number> = { A: 4, B: 3, C: 2, F: 0 }
+// An average of a B or better, with nothing failed, is excelling; under one point, or most of it failed, is failing.
 const EXCELLING = 3
 const FAILING = 1
 // Without rules of its own, a child is a daughter seven times in eight: there are seven women to every man.
 const DAUGHTER_CHANCE = 7 / 8
 
-/** His grade in each course he took: the final he sat, or what he would get on what he has, if the year ended first. */
+/** His grade in each course he took: the final he sat, or what his marks and his attendance would earn him, if the year ended first. */
 export function finalGrades(content: ContentPack, state: GameState): { number: string; title: string; letter: string; passed: boolean }[] {
   if (!content.coursework) return []
   return state.courses
     .filter((course) => state.enrolment?.includes(course.id))
     .map((course) => {
-      const grade = state.grades[course.id]?.final ?? gradeFor(content, 'final', coursePoints(state, course.id), state.time)
+      const grade = state.grades[course.id]?.final ?? gradeFor(content, state, course, 'final', { topics: [], correct: 0 }, state.time)
       return { number: course.number, title: course.title, letter: grade.letter, passed: grade.passed }
     })
 }
@@ -92,8 +93,7 @@ export function onGoodTerms(content: ContentPack, state: GameState, loveInterest
 export function childrenBy(content: ContentPack, state: GameState, loveInterestId: string): { daughter: boolean }[] {
   const born = state.children.filter((child) => child.motherId === loveInterestId).map(({ daughter }) => ({ daughter }))
   if (!state.pregnancies[loveInterestId]) return born
-  const index = content.loveInterests.findIndex((li) => li.id === loveInterestId)
-  return [...born, { daughter: roll(state.weatherSeed, index) < (content.pregnancy?.daughterChance ?? DAUGHTER_CHANCE) }]
+  return [...born, { daughter: roll(state.weatherSeed, seedOf(loveInterestId)) < (content.pregnancy?.daughterChance ?? DAUGHTER_CHANCE) }]
 }
 
 /** "a beautiful baby girl", "two beautiful children, a girl and a boy". */

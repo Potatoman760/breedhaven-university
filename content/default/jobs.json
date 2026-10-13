@@ -3,6 +3,8 @@
   "strikes": 3,
   "missedStrike": 1,
   "excusedStrike": 0.5,
+  "bonusPerPoint": 0.04,
+  "bonusCap": 0.4,
   "jobs": [
     {
       "id": "market-stallhand",
@@ -16,19 +18,14 @@
       "requirements": {},
       "shifts": [
         {
-          "weekday": "Solday",
+          "weekday": "Marketday",
           "startHour": 8,
-          "hours": 4
+          "hours": 6
         },
         {
-          "weekday": "Moonday",
-          "startHour": 11,
-          "hours": 4
-        },
-        {
-          "weekday": "Windsday",
-          "startHour": 14,
-          "hours": 4
+          "weekday": "Restday",
+          "startHour": 8,
+          "hours": 6
         }
       ]
     },
@@ -45,17 +42,17 @@
       "shifts": [
         {
           "weekday": "Moonday",
-          "startHour": 12,
+          "startHour": 18,
           "hours": 4
         },
         {
           "weekday": "Hearthday",
-          "startHour": 7,
+          "startHour": 18,
           "hours": 4
         },
         {
           "weekday": "Restday",
-          "startHour": 11,
+          "startHour": 8,
           "hours": 4
         }
       ]
@@ -73,17 +70,17 @@
       "shifts": [
         {
           "weekday": "Solday",
-          "startHour": 17,
+          "startHour": 18,
           "hours": 4
         },
         {
           "weekday": "Windsday",
-          "startHour": 19,
+          "startHour": 18,
           "hours": 3
         },
         {
           "weekday": "Restday",
-          "startHour": 19,
+          "startHour": 18,
           "hours": 3
         }
       ]
@@ -101,17 +98,17 @@
       "shifts": [
         {
           "weekday": "Tidesday",
-          "startHour": 11,
+          "startHour": 18,
           "hours": 4
         },
         {
           "weekday": "Hearthday",
-          "startHour": 9,
+          "startHour": 18,
           "hours": 4
         },
         {
           "weekday": "Marketday",
-          "startHour": 15,
+          "startHour": 13,
           "hours": 4
         },
         {
@@ -134,17 +131,17 @@
       "shifts": [
         {
           "weekday": "Solday",
-          "startHour": 15,
+          "startHour": 18,
           "hours": 4
         },
         {
           "weekday": "Moonday",
-          "startHour": 19,
+          "startHour": 18,
           "hours": 4
         },
         {
           "weekday": "Windsday",
-          "startHour": 17,
+          "startHour": 18,
           "hours": 4
         }
       ]
@@ -164,17 +161,17 @@
       "shifts": [
         {
           "weekday": "Solday",
-          "startHour": 16,
+          "startHour": 18,
           "hours": 3
         },
         {
           "weekday": "Moonday",
-          "startHour": 8,
+          "startHour": 18,
           "hours": 3
         },
         {
-          "weekday": "Hearthday",
-          "startHour": 10,
+          "weekday": "Marketday",
+          "startHour": 8,
           "hours": 4
         }
       ]
@@ -194,17 +191,17 @@
       "shifts": [
         {
           "weekday": "Moonday",
-          "startHour": 17,
+          "startHour": 18,
           "hours": 4
         },
         {
           "weekday": "Windsday",
-          "startHour": 15,
+          "startHour": 18,
           "hours": 4
         },
         {
           "weekday": "Hearthday",
-          "startHour": 17,
+          "startHour": 18,
           "hours": 4
         }
       ]
@@ -223,19 +220,14 @@
       },
       "shifts": [
         {
-          "weekday": "Moonday",
-          "startHour": 10,
-          "hours": 4
-        },
-        {
-          "weekday": "Hearthday",
-          "startHour": 8,
-          "hours": 3
-        },
-        {
           "weekday": "Marketday",
-          "startHour": 9,
-          "hours": 3
+          "startHour": 8,
+          "hours": 5
+        },
+        {
+          "weekday": "Restday",
+          "startHour": 8,
+          "hours": 5
         }
       ]
     },
@@ -254,18 +246,23 @@
       "shifts": [
         {
           "weekday": "Windsday",
-          "startHour": 17,
-          "hours": 4
+          "startHour": 18,
+          "hours": 3
         },
         {
           "weekday": "Hearthday",
-          "startHour": 11,
-          "hours": 4
+          "startHour": 18,
+          "hours": 3
         },
         {
           "weekday": "Marketday",
           "startHour": 9,
-          "hours": 4
+          "hours": 3
+        },
+        {
+          "weekday": "Restday",
+          "startHour": 9,
+          "hours": 3
         }
       ]
     },
@@ -284,22 +281,22 @@
       "shifts": [
         {
           "weekday": "Tidesday",
-          "startHour": 16,
+          "startHour": 18,
           "hours": 3
         },
         {
           "weekday": "Hearthday",
-          "startHour": 12,
+          "startHour": 18,
           "hours": 4
         },
         {
           "weekday": "Marketday",
-          "startHour": 17,
+          "startHour": 18,
           "hours": 3
         },
         {
           "weekday": "Restday",
-          "startHour": 20,
+          "startHour": 18,
           "hours": 4
         }
       ]
@@ -320,22 +317,22 @@
       "shifts": [
         {
           "weekday": "Moonday",
-          "startHour": 7,
+          "startHour": 18,
           "hours": 4
         },
         {
           "weekday": "Tidesday",
-          "startHour": 10,
+          "startHour": 18,
           "hours": 4
         },
         {
           "weekday": "Windsday",
-          "startHour": 9,
+          "startHour": 18,
           "hours": 4
         },
         {
           "weekday": "Restday",
-          "startHour": 7,
+          "startHour": 8,
           "hours": 4
         }
       ]
@@ -354,19 +351,14 @@
       },
       "shifts": [
         {
-          "weekday": "Solday",
+          "weekday": "Marketday",
           "startHour": 8,
-          "hours": 4
-        },
-        {
-          "weekday": "Moonday",
-          "startHour": 15,
-          "hours": 4
+          "hours": 6
         },
         {
           "weekday": "Restday",
-          "startHour": 14,
-          "hours": 4
+          "startHour": 13,
+          "hours": 6
         }
       ]
     },
@@ -386,7 +378,7 @@
       "shifts": [
         {
           "weekday": "Moonday",
-          "startHour": 17,
+          "startHour": 18,
           "hours": 4
         },
         {
@@ -396,12 +388,12 @@
         },
         {
           "weekday": "Marketday",
-          "startHour": 14,
+          "startHour": 18,
           "hours": 4
         },
         {
           "weekday": "Restday",
-          "startHour": 17,
+          "startHour": 18,
           "hours": 4
         }
       ]
@@ -422,17 +414,22 @@
       "shifts": [
         {
           "weekday": "Solday",
-          "startHour": 8,
-          "hours": 4
+          "startHour": 18,
+          "hours": 2
         },
         {
           "weekday": "Tidesday",
+          "startHour": 18,
+          "hours": 2
+        },
+        {
+          "weekday": "Marketday",
           "startHour": 9,
           "hours": 4
         },
         {
-          "weekday": "Marketday",
-          "startHour": 11,
+          "weekday": "Restday",
+          "startHour": 9,
           "hours": 4
         }
       ]
@@ -453,17 +450,17 @@
       "shifts": [
         {
           "weekday": "Moonday",
-          "startHour": 10,
+          "startHour": 18,
           "hours": 4
         },
         {
           "weekday": "Tidesday",
-          "startHour": 15,
+          "startHour": 18,
           "hours": 3
         },
         {
           "weekday": "Hearthday",
-          "startHour": 12,
+          "startHour": 18,
           "hours": 4
         },
         {
@@ -520,12 +517,12 @@
       "shifts": [
         {
           "weekday": "Windsday",
-          "startHour": 17,
+          "startHour": 18,
           "hours": 4
         },
         {
           "weekday": "Hearthday",
-          "startHour": 16,
+          "startHour": 18,
           "hours": 4
         },
         {
@@ -535,7 +532,7 @@
         },
         {
           "weekday": "Restday",
-          "startHour": 16,
+          "startHour": 18,
           "hours": 4
         }
       ]
@@ -556,12 +553,12 @@
       "shifts": [
         {
           "weekday": "Moonday",
-          "startHour": 16,
+          "startHour": 18,
           "hours": 4
         },
         {
           "weekday": "Tidesday",
-          "startHour": 13,
+          "startHour": 18,
           "hours": 4
         },
         {
@@ -586,13 +583,13 @@
       },
       "shifts": [
         {
-          "weekday": "Moonday",
-          "startHour": 12,
+          "weekday": "Marketday",
+          "startHour": 9,
           "hours": 4
         },
         {
-          "weekday": "Hearthday",
-          "startHour": 13,
+          "weekday": "Restday",
+          "startHour": 9,
           "hours": 4
         }
       ]

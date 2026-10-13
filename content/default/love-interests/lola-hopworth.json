@@ -191,14 +191,12 @@
     "title": "Professor",
     "subjects": [
       {
-        "subject": "Culinary Arts and Brewing",
-        "code": "CUL",
-        "level": 3,
-        "stats": [
-          "dexterity",
-          "wisdom"
-        ],
-        "practical": false
+        "major": "CUL",
+        "level": 2
+      },
+      {
+        "major": "CUL",
+        "level": 3
       }
     ]
   },
@@ -340,6 +338,20 @@
     "background": "generated/backgrounds/lola-hopworth/view-2.webp"
   },
   "birthPicture": "sprites/lola-hopworth/birth.png",
+  "childNames": {
+    "daughters": [
+      "Clover",
+      "Bunty",
+      "Hazel",
+      "Primrose",
+      "Tansy"
+    ],
+    "sons": [
+      "Bramble",
+      "Thistle"
+    ]
+  },
+  "birthControl": false,
   "ai": {
     "speechPattern": "She speaks quickly and in short bursts, clipping the ends of her sentences, and jumps from practical instruction to personal observation without warning. She uses food metaphors for everything and asks blunt personal questions the way other people ask about the weather.",
     "tone": "Blunt, fast, warm, irreverent",

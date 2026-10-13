@@ -114,7 +114,7 @@ describe('attending', () => {
     expect(after.player.energy).toBe(energy - 5)
     expect(after.relationships).toEqual(state.relationships)
     expect(after.time).toBe(1)
-    expect(after.attendance['pol']).toEqual({ count: 1, last: '0:6' })
+    expect(after.attendance['pol']).toEqual({ sat: ['0:6'] })
   })
 
   it('makes a lab worth, and cost, its three hours', () => {
@@ -124,7 +124,7 @@ describe('attending', () => {
     expect(after.player.stats).toMatchObject({ wisdom: 1, charisma: 1 })
     expect(after.player.energy).toBe(energy - 15)
     expect(after.time).toBe(5)
-    expect(after.attendance['pol']).toEqual({ count: 1, last: '0:8' })
+    expect(after.attendance['pol']).toEqual({ sat: ['0:8'] })
   })
 
   it('keeps a latecomer only until the class ends', () => {
@@ -136,9 +136,9 @@ describe('attending', () => {
     const once = attend(content, start(), 'pol')
     expect(canAttend(content, { ...once, time: 0 }, 'pol').reasons).toEqual(['You have already sat this class'])
     // The lab later the same day is another meeting.
-    expect(attend(content, { ...once, time: 2 }, 'pol').attendance['pol'].count).toBe(2)
+    expect(attend(content, { ...once, time: 2 }, 'pol').attendance['pol'].sat).toHaveLength(2)
     // Day 3 is the next Two.
-    expect(attend(content, { ...once, time: 3 * 20 }, 'pol').attendance['pol'].count).toBe(2)
+    expect(attend(content, { ...once, time: 3 * 20 }, 'pol').attendance['pol'].sat).toHaveLength(2)
   })
 
   it('refuses when not enrolled, elsewhere or too tired', () => {

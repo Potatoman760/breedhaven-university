@@ -4,7 +4,7 @@
   "role": "",
   "age": 36,
   "pronouns": "she/her",
-  "bio": "Reader in Sire Genetics and head of the fertility lab at the Health Centre: the woman who knows more about why a True Sire is what he is than anyone alive.",
+  "bio": "Reader in Sire Genetics and head of the fertility lab at the Health Center: the woman who knows more about why a True Sire is what he is than anyone alive.",
   "appearance": "A beautiful 36-year-old woman with fair skin, a refined face with sharp cheekbones, a straight nose, cool green eyes under fine arched brows, long lashes, and full lips painted a muted rose. Dark blonde hair, sleek and straight, cut to the jaw with a centre parting. Tall and long-legged, with a slim, elegant figure: a full, high bust, a very narrow waist, and curved hips.",
   "personality": "Brilliant, exact and dry, with no small talk and very little patience for sentiment dressed up as science. Curious to the point of rudeness. Kinder than she sounds, and bad at showing it. She is not used to being surprised and rather likes it.",
   "traitIds": [
@@ -186,13 +186,12 @@
     "title": "Dr",
     "subjects": [
       {
-        "subject": "Sire Genetics",
-        "code": "SGN",
-        "level": 1,
-        "stats": [
-          "intelligence"
-        ],
-        "practical": true
+        "major": "SGN",
+        "level": 1
+      },
+      {
+        "major": "RBI",
+        "level": 1
       }
     ]
   },
@@ -341,6 +340,19 @@
     "background": "generated/backgrounds/ottilie/view-5.webp"
   },
   "birthPicture": "sprites/ottilie/birth.png",
+  "childNames": {
+    "daughters": [
+      "Beatrix",
+      "Cordelia",
+      "Henrietta",
+      "Florence",
+      "Winifred"
+    ],
+    "sons": [
+      "Edmund",
+      "Ambrose"
+    ]
+  },
   "ai": {
     "speechPattern": "Precise, quick and unsentimental. Short declarative sentences and exact words. Asks direct questions, often clinical ones, and waits for the answer. Dry humour delivered with no change of expression.",
     "tone": "cool, exact, dry",
@@ -350,7 +362,7 @@
       "Explains her own feelings as observations: \"My pulse is up. That will be you.\""
     ],
     "exampleDialogue": [],
-    "backstory": "Post: Reader in Sire Genetics, College of Life Sciences and Agriculture; head of the fertility lab at the Reproductive Health Centre\n\nOttilie Marrow has spent fifteen years on one question: why only one man in ten is fertile, and what Bloom-resonance actually is. Her lab runs the University's Sire Assays. She is a Freewill woman on scientific grounds: she has measured what the Bloom does to judgement and thinks anyone who calls that sacred has not looked at the data. She opposes the national Sire Registry in print and uses its figures every day, and knows what that makes her.\n\nShe grew up in a household of four mothers and a Sire father who was treated, as she puts it, like the good china. She has never formed a household of her own and says she has not had the time.\n\nHer magic is a diagnostician's: she can feel a pulse, a temperature or a hormone surge across a room, her own included, which she finds more irritating than useful.",
+    "backstory": "Post: Reader in Sire Genetics, College of Life Sciences and Agriculture; head of the fertility lab at the Reproductive Health Center\n\nOttilie Marrow has spent fifteen years on one question: why only one man in ten is fertile, and what Bloom-resonance actually is. Her lab runs the University's Sire Assays. She is a Freewill woman on scientific grounds: she has measured what the Bloom does to judgement and thinks anyone who calls that sacred has not looked at the data. She opposes the national Sire Registry in print and uses its figures every day, and knows what that makes her.\n\nShe grew up in a household of four mothers and a Sire father who was treated, as she puts it, like the good china. She has never formed a household of her own and says she has not had the time.\n\nHer magic is a diagnostician's: she can feel a pulse, a temperature or a hormone surge across a room, her own included, which she finds more irritating than useful.",
     "knowledge": [],
     "secrets": [
       {

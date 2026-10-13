@@ -66,13 +66,25 @@ export const TieSchema = z.object({
   note: z.string().optional()
 })
 
+/** When a woman will go to bed with him. */
+export const IntimacyRulesSchema = z.object({
+  /** Traits that make it easy: a woman with one is held to nothing below. */
+  easyTraitIds: z.array(z.string()).default([]),
+  /** How much desire for him any other woman must have first. */
+  minDesire: z.number().min(0).default(0),
+  /** Traits that make her hold back longer, and the desire she must have. */
+  reluctantTraitIds: z.array(z.string()).default([]),
+  reluctantMinDesire: z.number().min(0).default(0)
+})
+
 export const RelationshipConfigSchema = z.object({
   meterMax: z.number().positive().default(100),
   gifts: GiftValuesSchema.prefault({}),
   stages: z.array(RelationshipStageSchema).min(1),
   statuses: z.array(RelationshipStatusSchema).default([]),
   tieLevels: z.array(TieLevelSchema).default([]),
-  ties: z.array(TieSchema).default([])
+  ties: z.array(TieSchema).default([]),
+  intimacy: IntimacyRulesSchema.prefault({})
 })
 
 /** An arrangement in force between the player and the love interests named. */

@@ -229,7 +229,7 @@ describe('raising a stat', () => {
     expect(outingMisses(town, enrolled, drillOuting(workout))).toEqual(['RID 101 Riddles, a lecture at 06:00'])
     // Not one he is not taking, nor one he has already sat, nor one that is over by then.
     expect(outingMisses(town, state, drillOuting(workout))).toEqual([])
-    expect(outingMisses(town, { ...enrolled, attendance: { c1: { count: 1, last: '0:6' } } }, drillOuting(workout))).toEqual([])
+    expect(outingMisses(town, { ...enrolled, attendance: { c1: { sat: ['0:6'] } } }, drillOuting(workout))).toEqual([])
     expect(outingMisses(town, { ...enrolled, time: 3 }, drillOuting(workout))).toEqual([])
   })
 })

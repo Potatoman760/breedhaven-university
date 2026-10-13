@@ -49,6 +49,8 @@ export function readPack(dir: string): Record<string, unknown> {
     tips: optionalJson(join(dir, 'tips.json')),
     // The course catalogue, once one has been built for the pack.
     catalogue: optionalJson(join(dir, 'catalogue.json')),
+    // Everything the University teaches: its subjects, their courses, and what each is on and teaches.
+    curriculum: optionalJson(join(dir, 'curriculum.json')),
     loveInterests
   }
 }

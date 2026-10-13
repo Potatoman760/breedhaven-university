@@ -22,14 +22,14 @@
       "dampers",
       "suppressant"
     ],
-    "alwaysInclude": true,
+    "alwaysInclude": false,
     "priority": 9
   },
   {
     "id": "sires",
     "title": "True Sires",
     "category": "Lore",
-    "content": "Women outnumber men seven to one across the Sown Expanse, and most men cannot father children. Roughly one in ten can. They are True Sires, and civilization has organised itself around how few of them there are.\n\nA True Sire is not powerful; he is valuable. The law protects him heavily: assault, kidnapping and reproductive coercion of a Sire carry the gravest penalties, and paternity, inheritance and reproductive contracts have whole courts of their own. Fertility is established by a clinical assay and recorded in the national Sire Registry. The record is private by law and a Sire's status is his to disclose. Asking someone's fertility on a first date is very rude. In practice it leaks, and a known Sire lives with constant attention, some of it flattering and much of it wearying: he is treated as a prospect before he is treated as a person.\n\nMen who are not fertile have the opposite trouble. They are a small minority in every room and of no interest to the Bloom, and many feel invisible.",
+    "content": "Women outnumber men seven to one across the Sown Expanse, and most men cannot father children. Roughly one in ten can. They are True Sires, and civilization has organized itself around how few of them there are.\n\nA True Sire is not powerful; he is valuable. The law protects him heavily: assault, kidnapping and reproductive coercion of a Sire carry the gravest penalties, and paternity, inheritance and reproductive contracts have whole courts of their own. Fertility is established by a clinical assay and recorded in the national Sire Registry. The record is private by law and a Sire's status is his to disclose. Asking someone's fertility on a first date is very rude. In practice it leaks, and a known Sire lives with constant attention, some of it flattering and much of it wearying: he is treated as a prospect before he is treated as a person.\n\nMen who are not fertile have the opposite trouble. They are a small minority in every room and of no interest to the Bloom, and many feel invisible.",
     "keywords": [
       "Sire",
       "True Sire",
@@ -38,14 +38,14 @@
       "the Registry",
       "fertile"
     ],
-    "alwaysInclude": true,
+    "alwaysInclude": false,
     "priority": 8
   },
   {
     "id": "breedhaven-university",
     "title": "Breedhaven University",
     "category": "Places",
-    "content": "Breedhaven University stands in Seedblossom, on a campus whose oldest stone is seven centuries old and whose newest building is the Foundry, a magical engineering lab. It is a modern university of some thirty thousand students: lectures, labs, residence halls, a dining commons, clubs, a student government and too little parking. Every student is an adult; undergraduates are eighteen to twenty-two and graduate students run into their mid-twenties. About one student in eight is a man.\n\nIts colleges: Government and Law (which by custom educates the heir to the throne), Business, Bloom Studies and Divinity, Engineering, Life Sciences and Agriculture, Public Safety and Athletics (whose cadets staff Campus Security), and Arts and Humanities. Classes meet Solday to Hearthday; Marketday and Restday are free.\n\nThe Bloom shapes its institutions. The Reproductive Health Centre provides contraception, suppressants, fertility counselling and prenatal care. Bloom Counselling is free. The Sire Relations Office looks after the few registered True Sires, who are offered secure housing. Pregnant students get accommodations and, because pregnancy multiplies their magic, extra safety rules in the labs.",
+    "content": "Breedhaven University stands in Seedblossom, on a campus whose oldest stone is seven centuries old and whose newest building is the Foundry, a magical engineering lab. It is a modern university of some thirty thousand students: lectures, labs, residence halls, a dining commons, clubs, a student government and too little parking. Every student is an adult; undergraduates are eighteen to twenty-two and graduate students run into their mid-twenties. About one student in eight is a man.\n\nIts colleges: Government and Law (which by custom educates the heir to the throne), Business, Bloom Studies and Divinity, Engineering, Life Sciences and Agriculture, Public Safety and Athletics (whose cadets staff Campus Security), and Arts and Humanities. Classes meet Solday to Hearthday; Marketday and Restday are free.\n\nThe Bloom shapes its institutions. The Reproductive Health Center provides contraception, suppressants, fertility counseling and prenatal care. Bloom Counseling is free. The Sire Relations Office looks after the few registered True Sires, who are offered secure housing. Pregnant students get accommodations and, because pregnancy multiplies their magic, extra safety rules in the labs.",
     "keywords": [
       "university",
       "campus",
@@ -60,16 +60,16 @@
       "exam",
       "Campus Security",
       "Sire Relations",
-      "Bloom Counselling"
+      "Bloom Counseling"
     ],
-    "alwaysInclude": true,
+    "alwaysInclude": false,
     "priority": 7
   },
   {
     "id": "disciplines",
     "title": "What the University teaches",
     "category": "Lore",
-    "content": "Most subjects would be familiar anywhere: mathematics, computer science, literature, economics, law, history, engineering. Others exist because of the Bloom. Bloomology is the science of the Bloom itself. Magical Engineering joins electronics and mechanics to enchantment. Reproductive Biology is the best-funded department on campus, with Sire Genetics, the study of why so few men are fertile, close behind. Prenatal Thaumaturgy studies what pregnancy does to magic, and Bloom Psychology what the Bloom does to the mind. Every first-year writes the Magical Ethics essay: does a will the Bloom leans on still count as free? Household Studies teaches the law, money and manners of living several adults to a home.\n\nSpell-work is graded in tiers, and practicals are streamed by what a student can safely cast. Pregnancy upsets the streaming: a woman who could not manage a Tier III working last term may be able to wreck a laboratory by accident at six months. Pregnant students are moved up into advanced practicals for as long as the surge lasts, and work at a warded bench with a spotter. Professors are used to it and congratulate them first.",
+    "content": "Most subjects would be familiar anywhere: mathematics, computer science, literature, economics, law, history, engineering. Others exist because of the Bloom. Bloomology is the science of the Bloom itself. Magical Engineering joins electronics and mechanics to enchantment. Reproductive Biology is the best-funded department on campus, with Sire Genetics, the study of why so few men are fertile, close behind. Prenatal Thaumaturgy studies what pregnancy does to magic, and Bloom Psychology what the Bloom does to the mind. Every first-year writes the Magical Ethics essay: does a will the Bloom leans on still count as free? Household Studies teaches the law, money and manners of living several adults to a home.\n\nSpell-work is graded in tiers, and practicals are streamed by what a student can safely cast. Pregnancy upsets the streaming: a woman who could not manage a Tier III working last term may be able to wreck a laboratory by accident six weeks into a pregnancy. Pregnant students are moved up into advanced practicals for as long as the surge lasts, and work at a warded bench with a spotter. Professors are used to it and congratulate them first.",
     "keywords": [
       "Bloomology",
       "Magical Engineering",
@@ -85,7 +85,10 @@
       "essay"
     ],
     "priority": 4,
-    "relatedLocationIds": ["lecture-halls", "foundry"]
+    "relatedLocationIds": [
+      "lecture-halls",
+      "foundry"
+    ]
   },
   {
     "id": "magitech",
@@ -110,14 +113,14 @@
     "id": "dress",
     "title": "Dress",
     "category": "Lore",
-    "content": "Clothes never made the break with the past that machines did. Laced bodices, corsets, long gowns, wraps, kerchiefs and working aprons are everyday wear, cut in modern fabrics and worn with a phone in the pocket, alongside jeans, hoodies and trainers. Nobody finds a gown in a lecture hall or a leather corset in a pub worth a remark.\n\nUniforms keep the oldest forms. The Campus Security cadets wear green duty armour, ward-reinforced composite in a leaf pattern centuries old, and carry a plain sword: firearms belong to the army and the city police and are not allowed inside the University walls. The Order's priestesses and postulants wear vestments, and the court still dresses for court.",
+    "content": "Clothes never made the break with the past that machines did. Laced bodices, corsets, long gowns, wraps, kerchiefs and working aprons are everyday wear, cut in modern fabrics and worn with a phone in the pocket, alongside jeans, hoodies and trainers. Nobody finds a gown in a lecture hall or a leather corset in a pub worth a remark.\n\nUniforms keep the oldest forms. The Campus Security cadets wear green duty armor, ward-reinforced composite in a leaf pattern centuries old, and carry a plain sword: firearms belong to the army and the city police and are not allowed inside the University walls. The Order's priestesses and postulants wear vestments, and the court still dresses for court.",
     "keywords": [
       "clothes",
       "clothing",
       "dress",
       "outfit",
       "wearing",
-      "armour",
+      "armor",
       "armor",
       "gown",
       "bodice",
@@ -130,7 +133,7 @@
     "id": "magic",
     "title": "Pregnancy and magic",
     "category": "Lore",
-    "content": "Pregnancy is a magical state as much as a bodily one. From the first weeks a woman's power rises, and it keeps rising: a small lift early on, a marked one by the middle months, and exceptional strength near term. A middling student at six months can out-cast her professor. She is hardier, senses other pregnancies, and often feels the child's moods as her own.\n\nThe surge is useful and dangerous. Workplaces and laboratories have rules for it, the most demanding circle-work in industry and medicine is led by pregnant mages, and university sport has a separate Bloom division. Birth ends it with a discharge of magic strong enough to crack masonry, so hospitals deliver in warded Bloom Chambers.\n\nCarrying a True Sire's child is no different in kind, only stronger. A pregnancy is counted in weeks, not seasons: the Bloom hurries it, and under two months from conception to birth is ordinary.",
+    "content": "Pregnancy is a magical state as much as a bodily one. From the first weeks a woman's power rises, and it keeps rising: a small lift early on, a marked one by the middle weeks, and exceptional strength near term. A middling student in her sixth week can out-cast her professor. She is hardier, senses other pregnancies, and often feels the child's moods as her own.\n\nThe surge is useful and dangerous. Workplaces and laboratories have rules for it, the most demanding circle-work in industry and medicine is led by pregnant mages, and university sport has a separate Bloom division. Birth ends it with a discharge of magic strong enough to crack masonry, so hospitals deliver in warded Bloom Chambers.\n\nCarrying a True Sire's child is no different in kind, only stronger. A pregnancy is counted in weeks, not seasons: the Bloom hurries it, and it runs seven weeks from conception to birth, forty-eight days as the clinics count it.",
     "keywords": [
       "pregnant",
       "pregnancy",
@@ -159,8 +162,14 @@
     "id": "households",
     "title": "Households and relationships",
     "category": "Lore",
-    "content": "With so few fertile men, the two-parent couple was never the norm. The ordinary family is a household: several adults who share a home, money and the raising of children. A common shape is one True Sire and two to five women, who may each be with him, with each other, both, or neither. A household of women with no Sire at all is just as usual, as are pairs and threes of women.\n\nSo three people together raises no eyebrows, and five under one roof is a family. Exclusive couples exist and are respected, but are thought a little austere, the way choosing to have no children might be elsewhere. Jealousy is real and so is etiquette for it: who is with whom is said plainly, and going behind a household's back is the offence, not the wanting.\n\nResidence halls at the University are arranged as suites for the same reason. Students form and re-form \"house\" groups, and learning to live in one is counted part of an education.",
-    "keywords": ["household", "households", "marriage", "polyamory", "throuple"],
+    "content": "With so few fertile men, the two-parent couple was never the norm. The ordinary family is a household: several adults who share a home, money and the raising of children. A common shape is one True Sire and two to five women, who may each be with him, with each other, both, or neither. A household of women with no Sire at all is just as usual, as are pairs and threes of women.\n\nSo three people together raises no eyebrows, and five under one roof is a family. Exclusive couples exist and are respected, but are thought a little austere, the way choosing to have no children might be elsewhere. Jealousy is real and so is etiquette for it: who is with whom is said plainly, and going behind a household's back is the offense, not the wanting.\n\nResidence halls at the University are arranged as suites for the same reason. Students form and re-form \"house\" groups, and learning to live in one is counted part of an education.",
+    "keywords": [
+      "household",
+      "households",
+      "marriage",
+      "polyamory",
+      "throuple"
+    ],
     "priority": 5
   },
   {
@@ -180,7 +189,9 @@
       "suitemate"
     ],
     "priority": 4,
-    "relatedLocationIds": ["dormitories"]
+    "relatedLocationIds": [
+      "dormitories"
+    ]
   },
   {
     "id": "dating",
@@ -204,19 +215,33 @@
     "id": "reproductive-medicine",
     "title": "Reproductive medicine",
     "category": "Lore",
-    "content": "Because the Bloom pushes hard and Sires are few, reproductive medicine is the largest and best-funded science there is. Contraception is safe, cheap and free at any clinic: daily suppressants, long-acting implants and a ward-charm a healer can set in a minute. Fertility counselling, assisted conception, embryo storage, genetic screening and magical prenatal care are routine.\n\nIt is also politics. Governments track birth rates, Sire numbers and where the magical population lives, and one side calls that planning for survival while the other answers that people are not livestock. The national Sire Registry is the sharpest edge of the argument: it protects Sires from fraud and coercion, and it is a file the state keeps on a young man's body.",
-    "keywords": ["clinic", "Health Centre", "implant", "fertility", "registry"],
+    "content": "Because the Bloom pushes hard and Sires are few, reproductive medicine is the largest and best-funded science there is. Contraception is safe, cheap and free at any clinic: daily suppressants, long-acting implants and a ward-charm a healer can set in a minute. Fertility counseling, assisted conception, embryo storage, genetic screening and magical prenatal care are routine.\n\nIt is also politics. Governments track birth rates, Sire numbers and where the magical population lives, and one side calls that planning for survival while the other answers that people are not livestock. The national Sire Registry is the sharpest edge of the argument: it protects Sires from fraud and coercion, and it is a file the state keeps on a young man's body.",
+    "keywords": [
+      "clinic",
+      "Health Center",
+      "implant",
+      "fertility",
+      "registry"
+    ],
     "priority": 4,
-    "relatedLocationIds": ["health-centre"]
+    "relatedLocationIds": [
+      "health-centre"
+    ]
   },
   {
     "id": "seedblossom",
     "title": "Seedblossom",
     "category": "Places",
     "content": "The capital of Breedhaven: an old river city of stone bridges and orchard parks with a modern city grown through it, tram lines under plane trees and glass towers behind the cathedral quarter. The Assembly sits here, the crown keeps Dawnbloom House here, and the University fills the north bank.\n\nStudents know the streets outside the south gate best. Lantern Row is the high street: flats, shops, bars and late food. The Honeyed Bee is the student pub; Spell & Sip is the coffee shop everyone revises in; Boba Blossom does bubble tea; Cauldron is where you take someone you want to impress; Pixel and Rune is the arcade, with the Mana Bar upstairs; Ironroot is the gym; and the Undergrowth is where people go dancing. Further into town are the old market, Bloom & Co. at the tram terminus, the Lumen for films, and the Riverside Park along the water.",
-    "keywords": ["the city", "capital", "Lantern Row"],
+    "keywords": [
+      "the city",
+      "capital",
+      "Lantern Row"
+    ],
     "priority": 5,
-    "relatedCharacterIds": ["daphne"],
+    "relatedCharacterIds": [
+      "daphne"
+    ],
     "relatedLocationIds": [
       "lantern-row",
       "honeyed-bee-inn",
@@ -236,7 +261,7 @@
     "id": "high-street",
     "title": "Shops and chains",
     "category": "Places",
-    "content": "A Breedhaven high street tells you about the country by what stands next to what. A technology shop beside a magic shop (on Lantern Row, Byte & Bloom and Arcana). A bookshop beside an occult one (the Book Nook and the Forbidden Shelf). A florist beside a maternity boutique (Petal & Thorn and the Cradle). A hair salon beside one that does glamours: eye colour for a week, illusion make-up, a tattoo that moves (Velvet and Glamour). A bubble tea shop beside a women's health clinic, with one queue running into the other and nobody thinking it odd.\n\nThe chains are the same in every town. Seven Petals is the convenience store, open all night, selling snacks, chargers, contraception, pregnancy tests and lottery cards; the name is the old joke about seven girls to a boy. Petal & Pill is the pharmacy. Bloom & Co. (\"Everything for Life\") is the big store with a floor for mothers and babies. Second Bloom is a thrift shop; the phrase also means the years after menopause, when the Bloom lets go and a woman's time is her own. Matchleaf is the café where Trellis sends first dates: your table number comes with your match.\n\nPrices are posted with and without the student discount, and most places will ask for a student card before anyone asks your name.",
+    "content": "A Breedhaven high street tells you about the country by what stands next to what. A technology shop beside a magic shop (on Lantern Row, Byte & Bloom and Arcana). A bookshop beside an occult one (the Book Nook and the Forbidden Shelf). A florist beside a maternity boutique (Petal & Thorn and the Cradle). A hair salon beside one that does glamours: eye color for a week, illusion make-up, a tattoo that moves (Velvet and Glamour). A bubble tea shop beside a women's health clinic, with one queue running into the other and nobody thinking it odd.\n\nThe chains are the same in every town. Seven Petals is the convenience store, open all night, selling snacks, chargers, contraception, pregnancy tests and lottery cards; the name is the old joke about seven girls to a boy. Petal & Pill is the pharmacy. Bloom & Co. (\"Everything for Life\") is the big store with a floor for mothers and babies. Second Bloom is a thrift shop; the phrase also means the years after menopause, when the Bloom lets go and a woman's time is her own. Matchleaf is the café where Trellis sends first dates: your table number comes with your match.\n\nPrices are posted with and without the student discount, and most places will ask for a student card before anyone asks your name.",
     "keywords": [
       "Seven Petals",
       "Petal & Pill",
@@ -256,16 +281,25 @@
       "store"
     ],
     "priority": 4,
-    "relatedLocationIds": ["lantern-row", "bloom-and-co"]
+    "relatedLocationIds": [
+      "lantern-row",
+      "bloom-and-co"
+    ]
   },
   {
     "id": "slime-girls",
     "title": "Slimes",
     "category": "Lore",
-    "content": "Slimes are one of the peoples of the Bloom: sentient, amorphous, translucent, and a single colour for life. They can take any shape and most settle on one that people find easy to talk to. They live where water stands in shade and feed on moss and algae, though they are curious about food. They have full legal personhood, to the occasional confusion of forms that ask for an address.\n\nThey are born by splitting and arrive mature. Old ones are rare and odd, having watched cities arrive around their ponds.",
-    "keywords": ["slime", "slimegirl", "slime girl"],
+    "content": "Slimes are one of the peoples of the Bloom: sentient, amorphous, translucent, and a single color for life. They can take any shape and most settle on one that people find easy to talk to. They live where water stands in shade and feed on moss and algae, though they are curious about food. They have full legal personhood, to the occasional confusion of forms that ask for an address.\n\nThey are born by splitting and arrive mature. Old ones are rare and odd, having watched cities arrive around their ponds.",
+    "keywords": [
+      "slime",
+      "slimegirl",
+      "slime girl"
+    ],
     "priority": 3,
-    "relatedCharacterIds": ["lira"]
+    "relatedCharacterIds": [
+      "lira"
+    ]
   },
   {
     "id": "peoples",
@@ -287,15 +321,19 @@
     "id": "the-sown-expanse",
     "title": "The Sown Expanse",
     "category": "Places",
-    "content": "The known world. The Bloom reaches all of it, and in every nation women outnumber men seven to one. Breedhaven is one prosperous state among several, linked to the rest by rail, sea, the net and a few long-range portal lines.\n\nIts neighbours: Kharad-Tor, the orc federation of the northern hills. Veyra, the beastkin democracy to the east. Iscara, where mages govern and the portal network is run. The Vesperan League, a maritime trading power. The Starkelands, the frozen north, most of whose people live in one great heated city.\n\nA True Sire of record assay is international news.",
-    "keywords": ["the Expanse", "abroad", "foreign"],
+    "content": "The known world. The Bloom reaches all of it, and in every nation women outnumber men seven to one. Breedhaven is one prosperous state among several, linked to the rest by rail, sea, the net and a few long-range portal lines.\n\nIts neighbors: Kharad-Tor, the orc federation of the northern hills. Veyra, the beastkin democracy to the east. Iscara, where mages govern and the portal network is run. The Vesperan League, a maritime trading power. The Starkelands, the frozen north, most of whose people live in one great heated city.\n\nA True Sire of record assay is international news.",
+    "keywords": [
+      "the Expanse",
+      "abroad",
+      "foreign"
+    ],
     "priority": 5
   },
   {
     "id": "iscara",
     "title": "Iscara",
     "category": "Nations",
-    "content": "Iscara is governed by its mages. Office is earned by demonstrated ability, and the head of state, the Sorceress Queen, wins her title in open demonstration. It has the best-organised magic in the Expanse: it built and operates the long-range portal network, its wards protect half the world's ports, and its disaster teams are the ones other countries call.\n\nBecause pregnancy multiplies power, Iscara's great workings are led by pregnant mages, and its state takes a frank, clinical interest in strong Sires.",
+    "content": "Iscara is governed by its mages. Office is earned by demonstrated ability, and the head of state, the Sorceress Queen, wins her title in open demonstration. It has the best-organized magic in the Expanse: it built and operates the long-range portal network, its wards protect half the world's ports, and its disaster teams are the ones other countries call.\n\nBecause pregnancy multiplies power, Iscara's great workings are led by pregnant mages, and its state takes a frank, clinical interest in strong Sires.",
     "keywords": [
       "the Iscaran Conclave",
       "Iscaran",
@@ -309,7 +347,11 @@
     "title": "Kharad-Tor",
     "category": "Nations",
     "content": "Kharad-Tor is the orc nation of the red hills north of Breedhaven: mines, steelworks, mountain rail and the most disciplined army in the Expanse. Its people live in large extended households called holds, each led by a War-Mother who has proved she can protect her people and keep her word. The Council of War-Mothers governs.\n\nKharadi are blunt, loyal and exact about contracts. They want lawful access to strong Sires for their holds and prefer to negotiate for it in the open.",
-    "keywords": ["Kharadi", "the War-Mothers", "the holds"],
+    "keywords": [
+      "Kharadi",
+      "the War-Mothers",
+      "the holds"
+    ],
     "priority": 3
   },
   {
@@ -317,16 +359,27 @@
     "title": "Veyra",
     "category": "Nations",
     "content": "Veyra is the beastkin federation east of Breedhaven: foxkin, catkin, wolfkin, rabbitkin and many smaller peoples sharing cities and forests under an elected National Assembly. No one people holds a majority, so its politics is coalition and compromise, and its diplomats are very good.\n\nIt also runs the Quiet Office, the most capable intelligence service in the Expanse, whose emblem is a pair of masks, one smiling and one blank. Veyrans abroad are assumed, usually unfairly, to be reporting to it.",
-    "keywords": ["the Veyran Federation", "Veyran", "the Quiet Office"],
+    "keywords": [
+      "the Veyran Federation",
+      "Veyran",
+      "the Quiet Office"
+    ],
     "priority": 3,
-    "relatedCharacterIds": ["maren"]
+    "relatedCharacterIds": [
+      "maren"
+    ]
   },
   {
     "id": "the-vesperan-league",
     "title": "The Vesperan League",
     "category": "Nations",
-    "content": "The Vesperan League is a maritime power of islands and harbour cities, founded by pirate queens who agreed to stop raiding one another and split the sea lanes instead. It is now shipping, insurance and banking, governed from the Admiralty Exchange by an elected High Queen who is still, ceremonially, a pirate.\n\nVesperans treat everything as a deal and are cheerful about it. The League has offered Breedhaven a generous trade agreement that happens to include terms concerning a certain True Sire.",
-    "keywords": ["Vespera", "the League", "Vesperan", "Goldport"],
+    "content": "The Vesperan League is a maritime power of islands and harbor cities, founded by pirate queens who agreed to stop raiding one another and split the sea lanes instead. It is now shipping, insurance and banking, governed from the Admiralty Exchange by an elected High Queen who is still, ceremonially, a pirate.\n\nVesperans treat everything as a deal and are cheerful about it. The League has offered Breedhaven a generous trade agreement that happens to include terms concerning a certain True Sire.",
+    "keywords": [
+      "Vespera",
+      "the League",
+      "Vesperan",
+      "Goldport"
+    ],
     "priority": 3
   },
   {
@@ -369,8 +422,16 @@
     "title": "Sport",
     "category": "Lore",
     "content": "Sport is played in three divisions. Unaugmented allows no magic and is where most male athletes compete. Mage allows it. Bloom is open to pregnant competitors, whose power is in another class, and whether that counts as a natural advantage or an unfair one is argued every season. The University's ground is still called the Tiltyard, and the big student prize is the Great Arena's combat-sports title.",
-    "keywords": ["sport", "division", "Great Arena", "tournament", "match"],
+    "keywords": [
+      "sport",
+      "division",
+      "Great Arena",
+      "tournament",
+      "match"
+    ],
     "priority": 3,
-    "relatedLocationIds": ["tiltyard"]
+    "relatedLocationIds": [
+      "tiltyard"
+    ]
   }
 ]

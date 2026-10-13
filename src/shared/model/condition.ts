@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { ModifierSchema } from './modifier'
 import { MeterSchema } from './relationship'
 
 // Conditions and effects that omit `loveInterestId` target the love interest in
@@ -50,6 +51,10 @@ export const EffectSchema = z.discriminatedUnion('type', [
     amount: z.number()
   }),
   z.object({ type: z.literal('flag'), flag: z.string(), value: z.boolean().default(true) }),
-  z.object({ type: z.literal('unlockCodex'), entryId: z.string() })
+  z.object({ type: z.literal('unlockCodex'), entryId: z.string() }),
+  /** Puts a modifier in force for so many hours: on him, or with `on: 'her'` on the love interest it is used on, who is told `telling` while it lasts. */
+  z.object({ type: z.literal('boon'), modifier: ModifierSchema, hours: z.number().int().min(1), on: z.enum(['self', 'her']).default('self'), telling: z.string().optional() }),
+  /** Puts something in his bag: what he has brewed or made. */
+  z.object({ type: z.literal('item'), itemId: z.string(), count: z.number().int().min(1).default(1) })
 ])
 export type Effect = z.infer<typeof EffectSchema>

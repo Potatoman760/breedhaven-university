@@ -91,8 +91,9 @@ export type ExamKind = (typeof EXAM_KINDS)[number]
 
 /**
  * How a course is marked. The player fills a course's points up over the term, by sitting
- * its classes and by studying for it, and is graded on what he has at the midterm and at
- * the final: each takes the place of the course's last class of its week.
+ * its classes and by studying for it, and is graded at the midterm and at the final, each of
+ * which takes the place of the course's last class of its week: on the points he has, and
+ * what he answers on the day.
  */
 export const GradingSchema = z.object({
   /** Full marks in a course. */
@@ -107,8 +108,12 @@ export const GradingSchema = z.object({
   /** The weeks of the term, counted from 1, in which the examinations fall. The final week is the last of teaching. */
   midtermWeek: z.number().int().min(1).default(9),
   finalWeek: z.number().int().min(1).default(18),
-  /** The share of the marks then to be had that is a pass. */
+  /** The share of the marks then to be had that is a pass, and a C: under it he fails. */
   passAt: z.number().min(0).max(1).default(0.6),
+  /** The share that is the mark the course asks for, and a B. */
+  markAt: z.number().min(0).max(1).default(0.8),
+  /** How many questions an examination asks, each on a topic of a class he sat. All of them right lifts a pass by a letter. */
+  examQuestions: z.number().int().min(0).default(3),
   /** The places that are good for studying, besides his own room and a classmate's. */
   studyLocationIds: z.array(z.string()).default([])
 })
@@ -116,11 +121,16 @@ export type Grading = z.infer<typeof GradingSchema>
 
 /** A grade given at an examination, kept for what the game later makes of it. */
 export const GradeSchema = z.object({
-  letter: z.enum(['A', 'B', 'C', 'D', 'F']),
+  letter: z.enum(['A', 'B', 'C', 'F']),
   /** What he had in the course when it was sat, and what was to be had by then. */
   points: z.number(),
   outOf: z.number(),
   passed: z.boolean(),
+  /** Whether he turned up for it. One he did not sit is failed. */
+  sat: z.boolean(),
+  /** The topics it asked him about, by their place in the syllabus, and how many he answered rightly. */
+  topics: z.array(z.number().int().min(0)),
+  correct: z.number().int().min(0),
   /** The game time it was given. */
   time: z.number().int()
 })
@@ -139,8 +149,10 @@ export const CourseworkConfigSchema = z.object({
   lectureHours: z.number().int().min(1).default(1),
   labHours: z.number().int().min(1).default(3),
   lecturesPerWeek: z.number().int().min(1).default(2),
-  /** How many courses the catalogue has in each love interest's major. */
-  coursesPerMajor: z.number().int().min(1).default(3),
+  /** The most love interests one class holds, its teacher among them: few enough that sitting in it is time with them. */
+  maxPerClass: z.number().int().min(1).default(2),
+  /** The most a class may come to when those in it read its subject: her own subject's course is hers to sit, whoever else is in it. */
+  maxMajorClass: z.number().int().min(1).default(3),
   /** The most courses anyone, player or love interest, may take. */
   maxCourses: z.number().int().min(1).default(5),
   /** Stat points an hour of class is worth, shared between the stats the course teaches. */
@@ -157,9 +169,7 @@ export const CourseworkConfigSchema = z.object({
 export type CourseworkConfig = z.infer<typeof CourseworkConfigSchema>
 
 export const AttendanceSchema = z.object({
-  /** Classes attended so far. */
-  count: z.number().int().min(0),
-  /** The last meeting attended, so the same class can't be sat twice. */
-  last: z.string()
+  /** The classes he has sat, in order, each as its day and the hour it began: "12:9". What he has been taught is worked out from these. */
+  sat: z.array(z.string())
 })
 export type Attendance = z.infer<typeof AttendanceSchema>

@@ -3,7 +3,9 @@ import type { PerformCheck } from './activities'
 import { toDate } from './calendar'
 import { applyEffects } from './conditions'
 import { eventsOn } from './events'
+import { factor } from './modifiers'
 import { addCoursePoints, examNow, examOn, examWeek, pointsPerClassHour } from './grades'
+import { classKey } from './syllabus'
 
 const clock = (hour: number): string => `${String(hour).padStart(2, '0')}:00`
 
@@ -110,17 +112,17 @@ export function canAttend(content: ContentPack, state: GameState, courseId: stri
   const meeting = meetingNow(content, state, course)
   if (!state.enrolment?.includes(courseId)) reasons.push('You are not taking this course')
   if (!meeting) reasons.push('It is not meeting now')
-  // An examination takes the place of the class: there is nothing to attend, and the grade comes when it is over.
+  // An examination takes the place of the class: it is sat, not attended.
   const exam = meeting && examNow(content, state, course)
-  if (exam) reasons.push(`The ${exam.kind} is being sat: your grade is given when it ends at ${String(exam.meeting.startHour + exam.meeting.hours).padStart(2, '0')}:00`)
+  if (exam) reasons.push(`The ${exam.kind} is being sat`)
   if (state.locationId !== course.locationId) {
     const where = content.locations.find((l) => l.id === course.locationId)
     reasons.push(`Go to ${where?.name ?? course.locationId} first`)
   }
-  if (meeting && state.attendance[courseId]?.last === `${date.dayIndex}:${meeting.startHour}`) {
+  if (meeting && state.attendance[courseId]?.sat.includes(classKey(date.dayIndex, meeting.startHour))) {
     reasons.push('You have already sat this class')
   }
-  const energy = config.energy * (meeting?.hours ?? 1)
+  const energy = Math.round(config.energy * (meeting?.hours ?? 1) * factor(content, state, 'effort'))
   if (state.player.energy < energy) reasons.push(`Requires ${energy} energy`)
   return { ok: reasons.length === 0, reasons }
 }
@@ -194,7 +196,7 @@ export function attend(content: ContentPack, state: GameState, courseId: string)
         stat,
         amount: (config.statGain * meeting.hours) / course.stats.length
       })),
-      { type: 'energy', amount: -config.energy * meeting.hours }
+      { type: 'energy', amount: -Math.round(config.energy * meeting.hours * factor(content, state, 'effort')) }
     ],
     { content }
   )
@@ -206,10 +208,7 @@ export function attend(content: ContentPack, state: GameState, courseId: string)
     time: after.time + (meeting.startHour + meeting.hours - date.hour),
     attendance: {
       ...after.attendance,
-      [courseId]: {
-        count: (after.attendance[courseId]?.count ?? 0) + 1,
-        last: `${date.dayIndex}:${meeting.startHour}`
-      }
+      [courseId]: { sat: [...(after.attendance[courseId]?.sat ?? []), classKey(date.dayIndex, meeting.startHour)] }
     }
   }
 }

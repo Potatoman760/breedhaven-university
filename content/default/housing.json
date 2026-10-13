@@ -1,9 +1,13 @@
 {
   "locationId": "sire-house",
-  "name": "Quince House",
+  "name": "Haven House",
   "officerId": "una",
   "nannyId": "zelie",
   "rent": 200,
+  "rentRelief": {
+    "perChild": 20,
+    "floor": 60
+  },
   "graceDays": 7,
   "homePeriods": [
     "night"
@@ -12,7 +16,7 @@
     "minAffection": 30
   },
   "babies": {
-    "weeklyCost": 25,
+    "weeklyCost": 20,
     "startLevel": 2,
     "levels": [
       {
@@ -86,6 +90,12 @@
     "paid": "Received, {amount}. The file on {house} is in order again. Thank you for seeing to it.",
     "evicted": "{player}, the rent on {house} went unpaid past the days of grace, and the Office has taken the house back as of this morning. Your room in the Halls has been kept. I am sorry it came to this. There will not be a second offer."
   },
+  "viewing": {
+    "meetLocationId": "health-centre",
+    "hours": 2,
+    "text": "Noted for the file, {player}: accepted. Before the keys are logged to you I show every Sire his house in person. Meet me at {place}, {date}, and I will walk you over to {house}, take you through it room by room and introduce you to your nanny. Two hours. Please be there.",
+    "missedText": "{player}, you were not at {place} at the hour we set. The house is not yours until you have been shown it. I have put the viewing down again: {date}, at {place}. Please be there this time."
+  },
   "floors": [
     "Ground floor",
     "First floor",
@@ -118,7 +128,7 @@
       "tiers": [
         {
           "name": "A proper kitchen",
-          "cost": 260,
+          "cost": 210,
           "comfort": 1,
           "description": "The kitchen has been fitted out properly: a range, a deep sink, a pantry that is kept full."
         }
@@ -130,7 +140,7 @@
       "description": "A sitting room for the whole house: deep sofas, a rug to lie on, shelves of games and picture books, and room for everyone at once.",
       "role": "common",
       "viewId": "family",
-      "cost": 300,
+      "cost": 240,
       "startsBuilt": false,
       "beds": 0,
       "cots": 0,
@@ -151,7 +161,7 @@
       "description": "A small quiet room with a desk under the window, a good lamp and a door that shuts.",
       "role": "common",
       "viewId": "study",
-      "cost": 260,
+      "cost": 210,
       "startsBuilt": false,
       "beds": 0,
       "cots": 0,
@@ -167,7 +177,7 @@
       "tiers": [
         {
           "name": "The reading wall",
-          "cost": 240,
+          "cost": 190,
           "study": 1,
           "description": "One whole wall is books now, with the set texts of every course he takes and a ladder to reach them."
         }
@@ -200,7 +210,7 @@
       "description": "A nursery with three cots, a changing table, a rocking chair, and wards on the window that hum very slightly.",
       "role": "common",
       "viewId": "nursery",
-      "cost": 240,
+      "cost": 190,
       "startsBuilt": false,
       "beds": 0,
       "cots": 3,
@@ -216,7 +226,7 @@
       "tiers": [
         {
           "name": "The night nursery",
-          "cost": 300,
+          "cost": 240,
           "cots": 2,
           "comfort": 2,
           "description": "It has been made over into a proper night nursery: two more cots, a bed for whoever sits up, a stove of its own and a lamp that never quite goes out."
@@ -229,7 +239,7 @@
       "description": "A walled garden behind the house: a lawn, a quince tree, beds somebody has to weed, and a bench in the sun.",
       "role": "common",
       "viewId": "garden",
-      "cost": 360,
+      "cost": 290,
       "startsBuilt": false,
       "beds": 0,
       "cots": 0,
@@ -246,7 +256,7 @@
       "tiers": [
         {
           "name": "The glasshouse",
-          "cost": 280,
+          "cost": 220,
           "comfort": 1,
           "description": "A glasshouse stands against the south wall, warm in any weather, with a table and two chairs among the plants."
         }
@@ -274,7 +284,7 @@
       "tiers": [
         {
           "name": "The household bed",
-          "cost": 340,
+          "cost": 270,
           "beds": 1,
           "description": "The bed has been replaced with one built for more than two, as the Office catalogue puts it without blushing."
         }
@@ -302,7 +312,7 @@
       "tiers": [
         {
           "name": "The bath suite",
-          "cost": 400,
+          "cost": 320,
           "comfort": 1,
           "description": "It has been knocked through into a bath suite: a sunken tub big enough for company, warm stone underfoot, and hot water that does not run out."
         }
@@ -314,7 +324,7 @@
       "description": "A bedroom at the back of the house with a window seat, for someone to make her own.",
       "role": "suite",
       "viewId": "suite-west",
-      "cost": 300,
+      "cost": 240,
       "startsBuilt": false,
       "beds": 1,
       "cots": 0,
@@ -335,7 +345,7 @@
       "description": "A bedroom that gets the morning sun, for someone to make her own.",
       "role": "suite",
       "viewId": "suite-east",
-      "cost": 300,
+      "cost": 240,
       "startsBuilt": false,
       "beds": 1,
       "cots": 0,
@@ -356,7 +366,7 @@
       "description": "A long room under the roof with sloping ceilings and a round window, private and a little apart from the rest of the house.",
       "role": "suite",
       "viewId": "suite-attic",
-      "cost": 380,
+      "cost": 300,
       "startsBuilt": false,
       "beds": 1,
       "cots": 0,

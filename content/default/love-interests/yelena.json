@@ -184,14 +184,8 @@
   "imageSeed": 60,
   "stageHeight": 100,
   "studies": {
-    "subject": "Law",
-    "code": "LAW",
-    "level": 1,
-    "stats": [
-      "charisma",
-      "intelligence"
-    ],
-    "practical": false
+    "major": "LAW",
+    "level": 1
   },
   "animations": [
     {
@@ -333,6 +327,19 @@
     "background": "generated/backgrounds/yelena/view-2.webp"
   },
   "birthPicture": "sprites/yelena/birth.png",
+  "childNames": {
+    "daughters": [
+      "Katya",
+      "Mila",
+      "Zlata",
+      "Anya",
+      "Vesna"
+    ],
+    "sons": [
+      "Misha",
+      "Lev"
+    ]
+  },
   "ai": {
     "speechPattern": "Raised to be the perfect noble, but young at heart. Polished manners hide a longing to choose her own clothes, friends, pleasures, and future.",
     "tone": "polished, guarded, eager underneath",

@@ -5,11 +5,25 @@ import { GameStateSchema, SceneSchema } from './model'
 /** Bump when the save format changes in a way older code can't read. */
 export const SAVE_VERSION = 1
 
+/** The game's own slot: written as he plays, and never by hand. */
 export const AUTO_SLOT_ID = 'auto'
-export const MANUAL_SLOT_IDS = ['slot1', 'slot2', 'slot3', 'slot4', 'slot5', 'slot6'] as const
-export const SLOT_IDS = [AUTO_SLOT_ID, ...MANUAL_SLOT_IDS] as const
-export const SlotIdSchema = z.enum(SLOT_IDS)
-export type SlotId = z.infer<typeof SlotIdSchema>
+// The slots he saves to himself, and how many of them the list shows at a time.
+export const MANUAL_SLOTS = 40
+export const SLOTS_PER_PAGE = 8
+export const MANUAL_SLOT_IDS: readonly string[] = Array.from({ length: MANUAL_SLOTS }, (_, i) => `slot${i + 1}`)
+export const SLOT_IDS: readonly string[] = [AUTO_SLOT_ID, ...MANUAL_SLOT_IDS]
+export const SlotIdSchema = z.string().refine((id) => SLOT_IDS.includes(id), 'No such save slot')
+export type SlotId = string
+
+/** The pages the manual slots are shown in, in order. */
+export const SLOT_PAGES: readonly (readonly string[])[] = Array.from({ length: Math.ceil(MANUAL_SLOTS / SLOTS_PER_PAGE) }, (_, page) =>
+  MANUAL_SLOT_IDS.slice(page * SLOTS_PER_PAGE, (page + 1) * SLOTS_PER_PAGE)
+)
+
+/** The page a slot is on, from 0. The autosave is on none of them: it stands above them all. */
+export function pageOf(slotId: SlotId): number {
+  return Math.max(0, Math.floor(MANUAL_SLOT_IDS.indexOf(slotId) / SLOTS_PER_PAGE))
+}
 
 /** Everything needed to resume play, including a scene that was still open. */
 export const SaveDataSchema = z.object({

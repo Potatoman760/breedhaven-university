@@ -43,6 +43,8 @@ export interface Directives extends SceneLook {
    * name means the scene's love interest.
    */
   seeded: string[]
+  /** Who the reply says has stopped taking what she takes against the Bloom, likewise. */
+  stopsControl: string[]
   /** Looks asked for by name: in a group, each love interest's own. */
   named: NamedLook[]
   /** How comfortable each love interest says she is, by the name written in the tag. An empty name means the scene's love interest. */
@@ -55,6 +57,20 @@ export interface Directives extends SceneLook {
   agreed: boolean
   /** The reply says they go to sleep for the night where they are. */
   slept: boolean
+}
+
+/**
+ * A name as it is compared: without its accents, in lower case. The LLM writes "Zelie" for "Zélie" as often as not,
+ * above all in the hidden lines, and a name that is not known is a line that is not acted on.
+ */
+export function plainName(name: string): string {
+  return name.normalize('NFD').replace(/\p{M}/gu, '').trim().toLowerCase()
+}
+
+/** Whether what was written names this character: her id, her name, or her first name, whatever became of the accents. */
+export function namesHer(written: string, character: { id: string; name: string }): boolean {
+  const asked = plainName(written)
+  return [character.id, character.name, character.name.split(' ')[0]].some((known) => plainName(known) === asked)
 }
 
 /** A love interest's own reading of how much she wants to be here, as written in a reply. */
@@ -74,6 +90,8 @@ const ATTENDING_TAG = /\[\s*ATTENDING\s*:\s*([^\]]*?)\s*\]/gi
 /** The LLM writes this when sex in the scene ends in a way that could leave her with child. */
 export const SEEDED_TAG = '[SEEDED]'
 const SEEDED = /\[\s*SEEDED\s*(?::\s*([^\]]*?)\s*)?\]/gi
+// [STOPS BIRTH CONTROL], or in a group [STOPS BIRTH CONTROL: Bea].
+const STOPS_CONTROL = /\[\s*STOPS?[\s_-]*BIRTH[\s_-]*CONTROL\s*(?::\s*([^\]]*?)\s*)?\]/gi
 
 // [SEX-ACT: id] is the tag for an NSFW sex-act; [POSE: id] and [ANIMATION: id] are its older names, still read.
 const LOOK_TAG = /\[\s*(OUTFIT|EXPRESSION|ANIMATION|POSE|SEX[\s_-]?ACT)\s*:\s*([^\]]*?)\s*\]/gi
@@ -115,7 +133,7 @@ export function parseDirectives(written: string): Directives {
     const [, who, value] = /^([^=:]*?)\s*[=:]\s*(.*)$/.exec(written) ?? [undefined, undefined, written]
     const field = kind.toUpperCase() === 'OUTFIT' ? 'outfitId' : kind.toUpperCase() === 'EXPRESSION' ? 'expression' : undefined
     if (field && who) {
-      const theirs = named.find((n) => n.name.toLowerCase() === who.toLowerCase()) ?? (named[named.push({ name: who }) - 1])
+      const theirs = named.find((n) => plainName(n.name) === plainName(who)) ?? (named[named.push({ name: who }) - 1])
       theirs[field] = value
     } else if (field) look[field] = value
     else {
@@ -130,9 +148,14 @@ export function parseDirectives(written: string): Directives {
     seeded.push((name ?? '').trim())
     return ''
   })
+  const stopsControl: string[] = []
+  const withoutControl = withoutSeeded.replace(STOPS_CONTROL, (_tag, name: string | undefined) => {
+    stopsControl.push((name ?? '').trim())
+    return ''
+  })
   // Moving and the passing of time are done with tools, so that the game is the one keeping
   // count. A tag written for either is dropped.
-  const withoutMoves = withoutSeeded.replace(/\[\s*(?:MOVE|HOURS)\s*:[^\]]*\]/gi, '')
+  const withoutMoves = withoutControl.replace(/\[\s*(?:MOVE|HOURS)\s*:[^\]]*\]/gi, '')
   // Her reading of herself is never shown: the tag comes out whether or not it can be made sense of.
   const comfort: NamedComfort[] = []
   const withoutComfort = withoutMoves.replace(COMFORT_TAG, (_tag, written: string) => {
@@ -159,7 +182,7 @@ export function parseDirectives(written: string): Directives {
   const agreed = agreedTag.test(withoutAttending)
   const slept = sleepTag.test(withoutAttending)
   const plain = withoutAttending.replace(/\[\s*(?:AGREED|SLEEP)\s*\]/gi, '')
-  return { ...splitSceneEnd(plain), ...look, seeded, named, comfort, leaving, attending, agreed, slept }
+  return { ...splitSceneEnd(plain), ...look, seeded, stopsControl, named, comfort, leaving, attending, agreed, slept }
 }
 
 /**
@@ -278,7 +301,7 @@ export function dialogueLines(reply: string, cast: Pick<LoveInterest, 'id' | 'na
       const named = /^\**([^:*]{1,40}?)\**\s*:\s*(.+)$/.exec(line)
       const speaker =
         named &&
-        cast.find((li) => [li.name, li.name.split(' ')[0]].some((n) => n.toLowerCase() === named[1].trim().toLowerCase()))
+        cast.find((li) => namesHer(named[1], li))
       if (speaker && named) return { action: false, text: named[2], speakerId: speaker.id }
       // Someone with a voice and no place in the cast: named in full, or by the last word of the name ("Reed" for "Doctor Reed").
       const voice = named && voices.find((name) => name.toLowerCase() === named[1].trim().toLowerCase() || last(name) === last(named[1]))

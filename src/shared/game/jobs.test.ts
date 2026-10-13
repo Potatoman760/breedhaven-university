@@ -17,6 +17,7 @@ import {
   shiftLaterToday,
   shiftNow,
   shiftPay,
+  payBonus,
   startShift
 } from './jobs'
 import { workplaceNow } from './map'
@@ -126,8 +127,9 @@ describe('working a shift', () => {
     expect(scene.beats[0].direction).toContain("Pat's shift at work: he is shop clerk at the Shop, from 08:00 to 11:00")
     expect(scene.beats[0].direction).toContain('Bryn is his boss')
     expect(sceneExtras(content, state, scene).map((npc) => npc.id)).toEqual(['bryn'])
-    expect(shiftPay(content, scene)).toBe(8)
-    expect(payShift(content, state, scene).player.money).toBe(state.player.money + 8)
+    // Two hours at $4, and 12% over it: his strength is now 10, four more than the job asks.
+    expect(shiftPay(content, state, scene)).toBe(9)
+    expect(payShift(content, state, scene).player.money).toBe(state.player.money + 9)
     expect(payShift(content, state, { shift: undefined })).toBe(state)
     // The same shift cannot be clocked in for twice.
     expect(() => startShift(content, { ...state, time: 4 })).toThrow(/Cannot work now/)
@@ -214,5 +216,30 @@ describe('jobs elsewhere in the game', () => {
     expect(pack({ bossId: 'nobody' })).toThrow(/unknown character "nobody"/)
     expect(pack({ locationId: 'moon' })).toThrow()
     expect(pack({ shifts: [{ weekday: 'Funday', startHour: 8, hours: 3 }] })).toThrow()
+  })
+})
+
+describe('being better than a job asks', () => {
+  const porter = content.jobs!.jobs.find((job) => job.id === 'porter')!
+  const clerk = content.jobs!.jobs.find((job) => job.id === 'clerk')!
+  const strong = (strength: number): GameState => ({ ...createInitialState(content), player: { ...createInitialState(content).player, stats: { strength } } })
+
+  it('pays 3% more a point over what it requires, up to 30%, and nothing more for a job that asks nothing', () => {
+    expect(payBonus(content, strong(12), porter)).toBe(0)
+    expect(payBonus(content, strong(11), porter)).toBe(0)
+    expect(payBonus(content, strong(16), porter)).toBe(0.12)
+    expect(payBonus(content, strong(40), porter)).toBe(0.3)
+    expect(payBonus(content, strong(40), { ...clerk, requirements: {} })).toBe(0)
+    // Four hours at $9 is $36; with four points to spare it is 12% more.
+    const scene = { shift: { jobId: 'porter', key: '0:6', hours: 4 } }
+    expect(shiftPay(content, strong(12), scene)).toBe(36)
+    expect(shiftPay(content, strong(16), scene)).toBe(40)
+    expect(payShift(content, strong(16), scene).player.money).toBe(strong(16).player.money + 40)
+  })
+
+  it('counts every stat a job names', () => {
+    const both = { ...porter, requirements: { strength: 12, charisma: 10 } }
+    const state = { ...strong(14), player: { ...strong(14).player, stats: { strength: 14, charisma: 13 } } }
+    expect(payBonus(content, state, both)).toBe(0.15)
   })
 })

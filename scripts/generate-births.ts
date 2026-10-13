@@ -1,6 +1,6 @@
 /**
  * Makes the birth picture of every love interest, one at a time, on the ComfyUI in the app's settings, and puts each
- * on her as it is made: the same picture the Birth slot of the editor's Media tab draws, from the same prompt, size
+ * on her as it is made: the same picture the Birth slot of the editor's Family tab draws, from the same prompt, size
  * and workflow. Not part of the app: run it from the project folder with `npm run births`, and anything after `--`
  * narrows it:
  *

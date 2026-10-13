@@ -1,12 +1,33 @@
 {
   "chance": 1,
-  "lengthDays": 56,
+  "birthControlChance": 0.2,
+  "cycleDays": 28,
+  "periodDays": 4,
+  "lengthDays": 48,
   "recoveryDays": 7,
   "daughterChance": 0.875,
   "birthLocationId": "health-centre",
   "birthViewId": "maternity",
   "birthHours": 2,
   "birthNoticeDays": 3,
+  "names": {
+    "daughters": [
+      "Rosa",
+      "Ivy",
+      "Maeve",
+      "Juniper",
+      "Elodie",
+      "Sorrel",
+      "Thea",
+      "Willa"
+    ],
+    "sons": [
+      "Rowan",
+      "Finn",
+      "Alder",
+      "Corin"
+    ]
+  },
   "stages": [
     {
       "id": "early",
@@ -33,7 +54,7 @@
       "name": "near her time",
       "from": 0.92,
       "showing": true,
-      "description": "The birth is days away at most and the Health Centre has a Bloom Chamber booked. You move slowly, sleep badly, and think of little else. You want him close, and you want to know he will be there."
+      "description": "The birth is days away at most and the Health Center has a Bloom Chamber booked. You move slowly, sleep badly, and think of little else. You want him close, and you want to know he will be there."
     }
   ]
 }

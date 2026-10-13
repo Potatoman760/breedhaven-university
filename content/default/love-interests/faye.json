@@ -181,13 +181,8 @@
   "imageSeed": 60,
   "stageHeight": 100,
   "studies": {
-    "subject": "Economics",
-    "code": "ECO",
-    "level": 4,
-    "stats": [
-      "intelligence"
-    ],
-    "practical": false
+    "major": "ECO",
+    "level": 4
   },
   "animations": [
     {
@@ -334,6 +329,19 @@
     "background": "generated/backgrounds/faye/view.webp"
   },
   "birthPicture": "sprites/faye/birth.png",
+  "childNames": {
+    "daughters": [
+      "Rosalind",
+      "Clover",
+      "Marigold",
+      "Posy",
+      "Linnet"
+    ],
+    "sons": [
+      "Jasper",
+      "Robin"
+    ]
+  },
   "ai": {
     "speechPattern": "Calculating, yet always sultry and seductive. Knows she is desirable and uses that confidence to her advantage, even while discussing business.",
     "tone": "sultry, sharp, amused",

@@ -8,7 +8,6 @@ import {
   type CalendarEvent,
   type ChatMessage,
   type ContentPack,
-  type Course,
   type BondProposal,
   type DepartureFeeling,
   type Proposal
@@ -70,6 +69,8 @@ export interface ChatResponse {
   rolls: string[]
   /** Love interests the reply says could have conceived. The game decides whether they did. */
   seededIds: string[]
+  /** Love interests who have said in the reply that they will stop taking what they take against the Bloom. */
+  offControlIds: string[]
   /** A change to the relationship the character has just asked for, for the player to accept or decline. */
   bondProposal?: BondProposal
 }
@@ -159,13 +160,6 @@ export interface FeedPictureResponse {
   error?: string
 }
 
-export interface CourseWordingResponse {
-  /** The courses sent, with whatever titles and descriptions the LLM wrote for them. */
-  courses: Course[]
-  /** Set when the LLM could not be used and the courses are as they were sent. */
-  error?: string
-}
-
 export interface TestConnectionResponse {
   ok: boolean
   message: string
@@ -244,7 +238,6 @@ export interface RendererApi {
      * Has the Main LLM write titles and descriptions for a batch of courses. Nothing is saved.
      * Never rejects; a failure comes back as `error`, with the courses as they were sent.
      */
-    writeCourseWording(courses: Course[]): Promise<CourseWordingResponse>
     /** Has the user pick a file, copies it into the add-on folder, and returns its content path. Null if they cancelled. */
     importAsset(request: ImportAssetRequest): Promise<string | null>
     /** The bytes of one of the content's pictures, by its path. Rejects for a path outside the content. */

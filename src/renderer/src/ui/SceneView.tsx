@@ -1,5 +1,6 @@
+import { Button } from './Button'
 import { useRef, useState, type FormEvent, type CSSProperties, type KeyboardEvent } from 'react'
-import { attendees, bondLifts, describeBond, describeWhen, statusOf, dialogueLines, firstNames, sceneCast, sceneClock, toDate, weatherOn, wornOutfit, lookOf, spriteFor, npcAsCharacter, playerRoom, roomBackdrop, roomOwner, sceneExtras, unreadNotes } from '../../../shared/game'
+import { MAX_CHILD_NAME, COMFORT_WORDS, hasSkill, attendees, bondLifts, describeBond, describeWhen, statusOf, dialogueLines, firstNames, sceneCast, sceneClock, toDate, weatherOn, wornOutfit, lookOf, spriteFor, npcAsCharacter, playerRoom, roomBackdrop, roomOwner, sceneExtras, unreadNotes } from '../../../shared/game'
 import { poseMedia, type ContentPack, type GameState, type LoveInterest, type Scene } from '../../../shared/model'
 import logo from '../../../assets/logo.png'
 import { Wisps } from '../fx/Wisps'
@@ -33,6 +34,8 @@ interface Props {
   /** The character has closed the scene; all that is left is to move on. */
   ended: boolean
   onSend: (text: string) => void
+  /** Settles the name of the child just born: another than the one its mother thought of, or with nothing given, hers. */
+  onNameChild: (name: string) => void
   /** How many of his turns in this scene can be redone, counting back from the last. */
   turnsKept: number
   /** Says something else in place of what he said that many turns back: everything from that turn on is undone, and the scene goes on from the new line. */
@@ -78,6 +81,16 @@ function standing(li: Pick<LoveInterest, 'stageHeight'>, before = ''): CSSProper
 /** A scene with a love interest, or up to three: background, sprites, and the text box. */
 export function SceneView(props: Props) {
   const { content, state, scene, busy, notice, ended, onSend, onContinue, onOpen } = props
+  // The child this scene is the birth of, which he may name while it lasts.
+  const newborn = scene.newborn === undefined ? undefined : state.children.find((child) => child.motherId === scene.loveInterestId && child.bornAt === scene.newborn)
+  const [childName, setChildName] = useState('')
+  // How comfortable each woman last said she was, for one who has learnt to read it.
+  const reading = hasSkill(content, state, 'comfort')
+    ? Object.entries(scene.comfort ?? {}).flatMap(([id, said]) => {
+        const who = content.loveInterests.find((li) => li.id === id)
+        return who ? [{ id, name: who.name.split(' ')[0], level: said.level, reason: said.reason }] : []
+      })
+    : []
   // One tip for each time the loading screen comes up: picked when the scene is first shown, and kept while it loads.
   const [tip] = useState(() => {
     const tips = content.tips.map((line) => line.trim()).filter((line) => line !== '')
@@ -122,8 +135,8 @@ export function SceneView(props: Props) {
     const look = lookOf(scene, li.id)
     return spriteFor(li, wornOutfit(content, state, li, look.outfitId), look.expression)
   }
-  // An NSFW pose is shown over the background and the sprites while it is up.
-  // It is one character's: the lead's, or in a group whoever it was named for. It covers everyone either way.
+  // An NSFW pose is shown over the background while it is up, in place of the sprite of whoever's it is:
+  // the lead's, or in a group whoever it was named for.
   const poser = cast.find((li) => li.id === scene.animationOf) ?? partner
   const animation = poser.animations.find((a) => a.id === scene.animationId)
   // What of it is shown: the first of its clip, its picture and its first frame that will load.
@@ -191,6 +204,8 @@ export function SceneView(props: Props) {
   // An NPC who is about is seen only while a line of theirs is on screen: they step into view to say it, and out again.
   const extraSpeaking = extras.find((extra) => extra.id === speaker?.id)
   const onStage = extraSpeaking ? [...cast, extraSpeaking] : cast
+  // Who stands on the stage: everyone but the one whose sex-act is up, since its picture is her.
+  const beside = onStage.filter((li) => !(playing && li.id === poser.id))
   // Whose name is on the text box: whoever says the line on screen, or while a reply is awaited the one the
   // scene is with. Nobody, for narration, an action, or a group that has yet to answer.
   // A line said by someone with a voice and no place in the cast, such as the professor of a class: a name on the tab, and no face.
@@ -235,42 +250,10 @@ export function SceneView(props: Props) {
         room={staged.room}
         weather={weather?.effect}
         location={location} periodId={date.period.id} light={date.period.light} backgroundId={staged.viewId ?? props.backgroundId} />
-      {/* A scene set in a picture has her in the picture: nobody is stood in front of it. */}
-      {scene.picture ? null : group || extraSpeaking ? (
-        <div className="cast">
-          {onStage.map((li) => {
-            const image = spriteOf(li)
-            return (
-              image && (
-                <img
-                  key={li.id}
-                  className={speaker && speaker.id !== li.id && !line?.action ? 'listening' : undefined}
-                  src={`content://pack/${image}`}
-                  alt={li.name}
-                  style={standing(li)}
-                />
-              )
-            )
-          })}
-        </div>
-      ) : sprite && missing !== sprite ? (
-        <img
-          className="sprite-art"
-          src={`content://pack/${sprite}`}
-          alt={partner.name}
-          style={standing(partner, 'translateX(-50%) ')}
-          onError={() => setMissing(sprite)}
-        />
-      ) : (
-        <div className="sprite">
-          {sprite ?? `No sprite set for ${partner.name}`}
-          <span>{sprite ? 'Sprite file not found' : 'Add one to the character file'}</span>
-        </div>
-      )}
-
       {/*
-        An NSFW pose is a layer of its own, over the background and everyone standing in it: she goes on
-        wearing what she wears and looking as she looks underneath, and is there again when it is taken down.
+        An NSFW pose is a layer of its own, over the background: it is the picture of whoever's it is, so she
+        is not stood in front of it, and is there again as she was when it is taken down. Anyone else in the
+        scene stays where she stands, in front of it.
       */}
       {playing &&
         (media !== animation.clip ? (
@@ -290,6 +273,42 @@ export function SceneView(props: Props) {
             onError={() => setLost((before) => [...before, media])}
           />
         ))}
+
+      {/* A scene set in a picture has her in the picture: nobody is stood in front of it. */}
+      {scene.picture || (playing && !group && !extraSpeaking) ? null : group || extraSpeaking ? (
+        <div className="cast">
+          {beside.flatMap((li, index) => {
+            const image = spriteOf(li)
+            return [
+              // While a sex-act is up the middle of the stage is its own: the others part to either side of it.
+              playing && index === Math.ceil(beside.length / 2) && <span key="middle" className="cast-middle" />,
+              image && (
+                <img
+                  key={li.id}
+                  className={speaker && speaker.id !== li.id && !line?.action ? 'listening' : undefined}
+                  src={`content://pack/${image}`}
+                  alt={li.name}
+                  style={standing(li)}
+                />
+              )
+            ]
+          })}
+          {playing && beside.length === 1 && <span className="cast-middle wide" />}
+        </div>
+      ) : sprite && missing !== sprite ? (
+        <img
+          className="sprite-art"
+          src={`content://pack/${sprite}`}
+          alt={partner.name}
+          style={standing(partner, 'translateX(-50%) ')}
+          onError={() => setMissing(sprite)}
+        />
+      ) : (
+        <div className="sprite">
+          {sprite ?? `No sprite set for ${partner.name}`}
+          <span>{sprite ? 'Sprite file not found' : 'Add one to the character file'}</span>
+        </div>
+      )}
 
       {hidden ? (
         <button className="unhide" aria-label="Show the interface" onClick={() => setHidden(false)} />
@@ -376,6 +395,42 @@ export function SceneView(props: Props) {
                 }
               : {})}
           >
+            {reading.length > 0 && (
+              <div className="comfort-read" onClick={(event) => event.stopPropagation()}>
+                {reading.map(({ id, name, level, reason }) => (
+                  <span key={id} className={level <= 2 ? 'chip madder' : 'chip'} title={reason || undefined}>
+                    {name}: {COMFORT_WORDS[level]}
+                    <span className="house-pips" role="img" aria-label={`${level} of 5`}>
+                      {[1, 2, 3, 4, 5].map((pip) => (
+                        <i key={pip} className={pip <= level ? (level <= 2 ? 'on low' : 'on') : undefined} />
+                      ))}
+                    </span>
+                  </span>
+                ))}
+              </div>
+            )}
+            {/* Asked once: he keeps the name she thought of or gives another, and it is not put to him again. */}
+            {newborn && !ended && !scene.nameSettled && (
+              <form
+                className="naming"
+                onClick={(event) => event.stopPropagation()}
+                onSubmit={(event) => {
+                  event.preventDefault()
+                  props.onNameChild(childName)
+                }}
+              >
+                <span>
+                  She would like to call your {newborn.daughter ? 'daughter' : 'son'} <strong>{newborn.name}</strong>
+                </span>
+                <Button variant="primary" size="small" disabled={busy} onClick={() => props.onNameChild('')}>
+                  Keep {newborn.name}
+                </Button>
+                <input aria-label="Another name" placeholder="Or another name" maxLength={MAX_CHILD_NAME} value={childName} onChange={(event) => setChildName(event.target.value)} />
+                <Button type="submit" size="small" disabled={busy || childName.trim() === '' || childName.trim() === newborn.name}>
+                  Name {newborn.daughter ? 'her' : 'him'}
+                </Button>
+              </form>
+            )}
             {notice && (
               <div className="notice">
                 {notice}

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { CourseworkConfigSchema, type ContentPack, type Course, type GameState } from '../model'
 import { dayAgenda } from './agenda'
 import { attend, canAttend, meetingNow } from './courses'
-import { coursePoints, describeGrade, examNow, examSlot, examWeek, gradeFor, pointsPerClassHour, settleExams, studyOuting, studyPlaces, studyPoints } from './grades'
+import { coursePoints, examNow, examSlot, examWeek, pointsPerClassHour, studyOuting, studyPlaces, studyPoints } from './grades'
 import { checkOuting, startOuting } from './outing'
 import { meet } from './scene'
 import { createInitialState } from './state'
@@ -111,34 +111,9 @@ describe('examinations', () => {
     expect(examNow(content, during, course)?.kind).toBe('midterm')
     expect(examNow(content, start, course)).toBeUndefined()
     // There is no class to sit in its place.
-    expect(canAttend(content, during, 'rid').reasons).toEqual(['The midterm is being sat: your grade is given when it ends at 09:00'])
+    expect(canAttend(content, during, 'rid').reasons).toEqual(['The midterm is being sat'])
     expect(dayAgenda(content, during, 13).find((item) => item.kind === 'class')?.title).toBe('Midterm: RID 101 Riddles')
     expect(dayAgenda(content, start, 0).find((item) => item.kind === 'class')?.title).toBe('RID 101 Riddles')
-  })
-
-  it('mark him on the points he has when they are over, against what was to be had by then', () => {
-    // Half the term has gone by at the midterm: it is out of fifty.
-    const letters = [45, 40, 35, 30, 29].map((points) => gradeFor(content, 'midterm', points, 0))
-    expect(letters.map((g) => g.letter)).toEqual(['A', 'B', 'C', 'D', 'F'])
-    expect(letters.map((g) => g.passed)).toEqual([true, true, true, true, false])
-    expect(letters[0]).toMatchObject({ points: 45, outOf: 50 })
-    expect(gradeFor(content, 'final', 62, 0)).toMatchObject({ letter: 'D', outOf: 100, passed: true })
-    expect(gradeFor(content, 'final', 59, 0)).toMatchObject({ letter: 'F', passed: false })
-  })
-
-  it('are marked once their hour has gone by, with nothing asked of him, and kept', () => {
-    expect(settleExams(content, withPoints(40, 13 * 20 + 2)).graded).toEqual([])
-    const marked = settleExams(content, withPoints(40, 13 * 20 + 3))
-    expect(marked.graded.map(describeGrade)).toEqual(['Midterm in RID 101: B (40 of 50)'])
-    expect(marked.state.grades).toEqual({ rid: { midterm: { letter: 'B', points: 40, outOf: 50, passed: true, time: 13 * 20 + 3 } } })
-    // Only once, whatever he earns afterwards.
-    expect(settleExams(content, { ...marked.state, coursePoints: { rid: 90 } }).graded).toEqual([])
-
-    const done = settleExams(content, { ...marked.state, time: 27 * 20 + 1, coursePoints: { rid: 55 } })
-    expect(done.graded.map(describeGrade)).toEqual(['Final in RID 101: F (55 of 100), not a pass'])
-    expect(done.state.grades['rid']).toMatchObject({ midterm: { letter: 'B' }, final: { letter: 'F', passed: false } })
-    // A course he is not taking is not marked.
-    expect(settleExams(content, { ...withPoints(40, 600), enrolment: [] }).graded).toEqual([])
   })
 })
 

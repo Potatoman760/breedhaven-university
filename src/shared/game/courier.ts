@@ -5,6 +5,7 @@ import { handleOf } from './feed'
 import { bondOf, statusOf } from './bonds'
 import { addMemory } from './memory'
 import { appealLevel } from './stats'
+import { seedOf } from './seed'
 
 // About 600 tokens of the exchange are shown to a character, at four characters a token.
 export const COURIER_HISTORY_CHARS = 2400
@@ -116,7 +117,7 @@ export const STOOD_UP = { affection: -8, trust: -10 } as const
  */
 export function settleAppointments(content: ContentPack, state: GameState): { state: GameState; missed: Appointment[] } {
   // A birth is not a plan stood up: what missing one costs is its own reckoning.
-  const missed = state.appointments.filter((plan) => plan.kind !== 'birth' && plan.time + plan.hours <= state.time)
+  const missed = state.appointments.filter((plan) => plan.kind === undefined && plan.time + plan.hours <= state.time)
   if (missed.length === 0) return { state, missed }
   const within = (value: number) => Math.max(0, Math.min(content.relationships.meterMax, value))
   let next: GameState = { ...state, appointments: state.appointments.filter((plan) => !missed.includes(plan)) }
@@ -135,7 +136,7 @@ export function settleAppointments(content: ContentPack, state: GameState): { st
 /** The plans still to come that a love interest is part of, soonest first: what he could call off by writing to her. */
 export function plansWith(state: GameState, loveInterestId: string): Appointment[] {
   // A birth cannot be called off.
-  return upcomingAppointments(state).filter((plan) => plan.kind !== 'birth' && plan.time > state.time && attendees(plan).includes(loveInterestId))
+  return upcomingAppointments(state).filter((plan) => plan.kind === undefined && plan.time > state.time && attendees(plan).includes(loveInterestId))
 }
 
 /** What he writes to call a plan off. */
@@ -150,7 +151,7 @@ export function cancelText(content: ContentPack, plan: Appointment): string {
  */
 export function cancelAppointment(content: ContentPack, state: GameState, appointmentId: string): GameState {
   const plan = state.appointments.find((a) => a.id === appointmentId)
-  if (!plan || plan.kind === 'birth' || plan.time <= state.time) return state
+  if (!plan || plan.kind !== undefined || plan.time <= state.time) return state
   let next: GameState = { ...state, appointments: state.appointments.filter((a) => a.id !== appointmentId) }
   for (const id of attendees(plan).filter((who) => hasContact(state, who))) {
     const thread = courierThread(next, id).map((note) =>
@@ -285,7 +286,7 @@ export function chanceOfDm(content: ContentPack, state: GameState, loveInterestI
  */
 export function sceneEndWriter(content: ContentPack, state: GameState, justSeen: string[] = []): string | undefined {
   return content.loveInterests
-    .map((li, index) => ({ id: li.id, luck: roll(state.weatherSeed, 100000 + state.time, index), chance: chanceOfDm(content, state, li.id, justSeen) }))
+    .map((li) => ({ id: li.id, luck: roll(state.weatherSeed, 100000 + state.time, seedOf(li.id)), chance: chanceOfDm(content, state, li.id, justSeen) }))
     .filter(({ luck, chance }) => luck < chance)
     .sort((a, b) => a.luck / a.chance - b.luck / b.chance)[0]?.id
 }
@@ -303,7 +304,7 @@ export function courierRoundDue(content: ContentPack, state: GameState): boolean
 export function courierRound(content: ContentPack, state: GameState): { state: GameState; writerId: string | undefined } {
   const { dayIndex } = toDate(content.calendar, state.time)
   const writer = content.loveInterests
-    .map((li, index) => ({ id: li.id, luck: roll(state.weatherSeed, dayIndex, index) }))
+    .map((li) => ({ id: li.id, luck: roll(state.weatherSeed, dayIndex, seedOf(li.id)) }))
     .filter(({ id, luck }) => luck < chanceOfWriting(content, state, id))
     .sort((a, b) => a.luck - b.luck)[0]
   return { state: { ...state, courierDay: dayIndex }, writerId: writer?.id }

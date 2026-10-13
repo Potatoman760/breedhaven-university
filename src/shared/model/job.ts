@@ -44,6 +44,12 @@ export const JobsConfigSchema = z.object({
   /** What a missed shift counts for, and what it counts for when he told his boss beforehand. */
   missedStrike: z.number().default(1),
   excusedStrike: z.number().default(0.5),
+  /**
+   * What being better than a job asks is worth: this fraction more pay for each point he has over what it requires,
+   * counted across every stat it names, up to the most it can come to.
+   */
+  bonusPerPoint: z.number().min(0).default(0.03),
+  bonusCap: z.number().min(0).default(0.3),
   jobs: z.array(JobSchema).default([])
 })
 export type JobsConfig = z.infer<typeof JobsConfigSchema>

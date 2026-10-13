@@ -184,14 +184,8 @@
   "imageSeed": 60,
   "stageHeight": 100,
   "studies": {
-    "subject": "Government",
-    "code": "POL",
-    "level": 1,
-    "stats": [
-      "charisma",
-      "intelligence"
-    ],
-    "practical": false
+    "major": "POL",
+    "level": 1
   },
   "animations": [
     {
@@ -341,6 +335,19 @@
     "background": "generated/backgrounds/seraphine/view.webp"
   },
   "birthPicture": "sprites/seraphine/birth.png",
+  "childNames": {
+    "daughters": [
+      "Celeste",
+      "Aurelie",
+      "Solene",
+      "Lucia",
+      "Estelle"
+    ],
+    "sons": [
+      "Lucien",
+      "Raphael"
+    ]
+  },
   "ai": {
     "speechPattern": "Raised to be queen, but young at heart. Soft-spoken and shy in private. Puts on royal airs when unsure, then relaxes as she feels safe. Firm in wanting to be a good queen.",
     "tone": "royal, earnest",

@@ -1,5 +1,5 @@
-import { useRef, useState, type ReactNode } from 'react'
-import { buildCatalogue, catalogueBasis, catalogueOf, describeMeetings, WORDING_BATCH } from '../../../../shared/game'
+import { useState, type ReactNode } from 'react'
+import { buildCatalogue, catalogueBasis, catalogueOf, describeMeetings, dormantCourses, skillFor, topicsOf } from '../../../../shared/game'
 import type { ContentPack, Course } from '../../../../shared/model'
 import { errorMessage } from '../../errors'
 import { Button } from '../Button'
@@ -17,9 +17,10 @@ interface Props {
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
 
 /**
- * The course catalogue every new game starts with. The schedule is built by rule in an
- * instant, from the characters as they stand; the LLM is asked only for titles and
- * descriptions, and only when told to.
+ * The term's schedule every new game starts with. What the courses are, what they are called and what they teach
+ * is written in the curriculum and only shown here. This lays them out: which are given, when each meets, and who
+ * is in it. It is built by rule in an instant from the characters as they stand, and is built again when one is
+ * added or changes what she reads.
  */
 export function CatalogueEditor({ content, onContent, switcher }: Props) {
   const saved = content.catalogue
@@ -30,56 +31,23 @@ export function CatalogueEditor({ content, onContent, switcher }: Props) {
   const [only, setOnly] = useState('')
   const [status, setStatus] = useState('')
   const [issues, setIssues] = useState<string[]>([])
-  const [writing, setWriting] = useState<{ done: number; total: number } | null>(null)
-  const stopped = useRef(false)
-  const latest = useRef(courses)
-  latest.current = courses
 
   const config = content.coursework
   const stale = saved !== undefined && saved.basis !== catalogueBasis(content)
   const dirty = !same(courses, saved?.courses ?? [])
-  const mayLeave = () => !dirty || window.confirm('Discard the catalogue you have not saved?')
+  const mayLeave = () => !dirty || window.confirm('Discard the schedule you have not saved?')
   const focus = courses.find((c) => c.id === focusId)
   const majors = [...new Map(courses.map((c) => [c.code, c.subject])).entries()]
   const shown = only ? courses.filter((c) => c.code === only) : courses
   const nameOf = (id: string) => content.loveInterests.find((li) => li.id === id)?.name.split(' ')[0] ?? id
+  const dormant = dormantCourses(content, courses)
 
   function generate(withSeed: number) {
     setSeed(withSeed)
     setCourses(buildCatalogue(content, withSeed))
     setFocusId(null)
     setIssues([])
-    setStatus('Schedule built. Titles are plain until you have them written. Save to use it in new games.')
-  }
-
-  /** Has the LLM title and describe every course, a batch at a time, putting each batch in as it arrives. */
-  async function write() {
-    if (writing || courses.length === 0) return
-    stopped.current = false
-    setIssues([])
-    setStatus('')
-    const ids = courses.map((c) => c.id)
-    const failed: string[] = []
-    try {
-      for (let from = 0; from < ids.length; from += WORDING_BATCH) {
-        if (stopped.current) break
-        setWriting({ done: from, total: ids.length })
-        const batch = ids.slice(from, from + WORDING_BATCH)
-        const result = await window.api.editor.writeCourseWording(latest.current.filter((c) => batch.includes(c.id)))
-        if (result.error) {
-          failed.push(result.error)
-          // Without a working LLM the rest would fail the same way.
-          break
-        }
-        const written = new Map(result.courses.map((c) => [c.id, c]))
-        setCourses(latest.current.map((c) => (written.has(c.id) ? { ...c, title: written.get(c.id)!.title, description: written.get(c.id)!.description } : c)))
-      }
-      setStatus(failed.length > 0 ? `Stopped: ${failed[0]}` : stopped.current ? 'Stopped. What was written is kept.' : 'Titles and descriptions written. Save to keep them.')
-    } catch (error) {
-      setStatus(errorMessage(error))
-    } finally {
-      setWriting(null)
-    }
+    setStatus('Schedule built. Save to use it in new games.')
   }
 
   async function save() {
@@ -88,54 +56,38 @@ export function CatalogueEditor({ content, onContent, switcher }: Props) {
       setIssues(result.issues)
       if (result.issues.length > 0) return
       onContent(result.content)
-      setStatus('Saved. Every new game starts with this catalogue.')
+      setStatus('Saved. Every new game starts with this schedule.')
     } catch (error) {
       setStatus(errorMessage(error))
     }
   }
-
-  const setCourse = (id: string, patch: Partial<Course>) => setCourses(courses.map((c) => (c.id === id ? { ...c, ...patch } : c)))
 
   return (
     <main className="editor">
       {switcher(mayLeave)}
       <aside className="editor-list">
         <p className="hint">
-          {!config
+          {!config || !content.curriculum
             ? 'This game has no coursework.'
             : saved === undefined
-              ? 'No catalogue has been saved yet. A new game cannot start without one.'
+              ? 'No schedule has been saved yet. A new game cannot start without one.'
               : stale
-                ? 'The saved catalogue is out of date: the characters or the rules have changed since it was built. Build it again.'
-                : `The saved catalogue has ${saved.courses.length} courses.`}
+                ? 'The saved schedule is out of date: a character was added or changed what she reads or teaches, or the curriculum has changed. Build it again.'
+                : `The saved schedule has ${saved.courses.length} courses.`}
         </p>
         <label>
           Seed
           <input inputMode="numeric" value={seed} onChange={(e) => setSeed(Number(e.target.value.replace(/\D/g, '').slice(0, 9)) || 0)} />
           <span className="hint">The same seed and the same characters always give the same schedule.</span>
         </label>
-        <Button variant="primary" disabled={!config || writing !== null} onClick={() => generate(seed)}>
+        <Button variant="primary" disabled={!config} onClick={() => generate(seed)}>
           Generate schedule
         </Button>
-        <Button disabled={!config || writing !== null} onClick={() => generate(Math.floor(Math.random() * 1_000_000))}>
+        <Button disabled={!config} onClick={() => generate(Math.floor(Math.random() * 1_000_000))}>
           Generate with a new seed
         </Button>
-        <Button disabled={courses.length === 0 || writing !== null} title="Asks the Main LLM for a title and a description for every course" onClick={write}>
-          Write titles and descriptions
-        </Button>
-        {writing && (
-          <div className="batch" role="status">
-            <span>
-              Writing {writing.done + 1} to {Math.min(writing.done + WORDING_BATCH, writing.total)} of {writing.total}
-            </span>
-            <div className="meter" role="progressbar" aria-valuemin={0} aria-valuemax={writing.total} aria-valuenow={writing.done}>
-              <div style={{ width: `${(writing.done / writing.total) * 100}%` }} />
-            </div>
-            <Button onClick={() => (stopped.current = true)}>Stop</Button>
-          </div>
-        )}
-        <Button variant="primary" disabled={!dirty || courses.length === 0 || writing !== null} onClick={save}>
-          Save catalogue
+        <Button variant="primary" disabled={!dirty || courses.length === 0} onClick={save}>
+          Save schedule
         </Button>
         {status && <p className="status">{status}</p>}
         {issues.map((issue) => (
@@ -143,6 +95,11 @@ export function CatalogueEditor({ content, onContent, switcher }: Props) {
             {issue}
           </p>
         ))}
+        {dormant.length > 0 && (
+          <p className="hint">
+            Written but not given this term, because no love interest reads or teaches them: {dormant.map((course) => `${course.number} ${course.title}`).join('; ')}.
+          </p>
+        )}
       </aside>
 
       <section className="editor-main">
@@ -180,17 +137,20 @@ export function CatalogueEditor({ content, onContent, switcher }: Props) {
                   <span className="chip">{focus.subject}</span>
                   {focus.general && <span className="chip">General education</span>}
                 </div>
-                <label>
-                  Title
-                  <input value={focus.title} onChange={(e) => setCourse(focus.id, { title: e.target.value })} />
-                </label>
-                <label>
-                  Description
-                  <textarea rows={2} value={focus.description} onChange={(e) => setCourse(focus.id, { description: e.target.value })} />
-                </label>
+                {/* What it is and what it teaches is the curriculum's: shown, and changed there. */}
+                <strong>{focus.title}</strong>
+                <p>{focus.description}</p>
                 <span className="hint">
                   {focus.professor} · {describeMeetings(focus)}
                   {focus.studentIds.length > 0 && ` · taken by ${focus.studentIds.map(nameOf).join(', ')}`}
+                </span>
+                {skillFor(content, focus) && (
+                  <span className="hint">
+                    Teaches at {skillFor(content, focus)!.at} marks: {skillFor(content, focus)!.name}. {skillFor(content, focus)!.description}
+                  </span>
+                )}
+                <span className="hint">
+                  Classes: {topicsOf(content, focus.id).map((topic) => topic.title).join(' · ') || 'none written'}
                 </span>
               </div>
             )}

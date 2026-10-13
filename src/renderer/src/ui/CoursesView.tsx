@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { canEnrol, courseMatches, describeMeetings, toDate } from '../../../shared/game'
+import { canEnrol, courseMatches, describeMeetings, toDate, skillFor } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { Backdrop } from './Backdrop'
 import { Portrait } from './MapPanel'
@@ -92,6 +92,12 @@ export function CoursesView({ content, state, onEnrol }: Props) {
                   <span className="hint">{focus.professor}</span>
                   <span className="hint">{describeMeetings(focus)}</span>
                   <p>{focus.description}</p>
+                  {skillFor(content, focus) && (
+                    <p className="course-skill">
+                      <span className="caps">Teaches at {skillFor(content, focus)!.at} marks</span>
+                      <strong>{skillFor(content, focus)!.name}</strong> {skillFor(content, focus)!.description}
+                    </p>
+                  )}
                   <span className="caps">In this class</span>
                   {classmates.length === 0 && !teacher && <span className="hint">No one you know.</span>}
                   <div className="portraits">

@@ -299,7 +299,16 @@
     "icon": "bottle",
     "tags": [
       "coffee"
-    ]
+    ],
+    "use": {
+      "effects": [
+        {
+          "type": "energy",
+          "amount": 25
+        }
+      ],
+      "on": "self"
+    }
   },
   {
     "id": "scratchcard",
@@ -349,7 +358,20 @@
     "icon": "vial",
     "tags": [
       "potions"
-    ]
+    ],
+    "use": {
+      "effects": [
+        {
+          "type": "boon",
+          "modifier": {
+            "kind": "marks",
+            "amount": 1.5
+          },
+          "hours": 6
+        }
+      ],
+      "on": "self"
+    }
   },
   {
     "id": "pocket-speaker",
@@ -502,5 +524,64 @@
     "tags": [
       "books"
     ]
+  },
+  {
+    "id": "heartsease-draught",
+    "name": "Heartsease draught",
+    "description": "A small bottle of something rose-gold you brewed yourself. It makes you easy to warm to for a day.",
+    "price": 0,
+    "icon": "vial",
+    "tags": [
+      "potions"
+    ],
+    "use": {
+      "effects": [
+        {
+          "type": "boon",
+          "modifier": {
+            "kind": "affection",
+            "amount": 2
+          },
+          "hours": 24
+        }
+      ],
+      "on": "self"
+    }
+  },
+  {
+    "id": "bloom-cordial",
+    "name": "Bloom cordial",
+    "description": "A sweet dark cordial of your own brewing, to be poured for two. It quiets whatever she takes against the Bloom, for a day.",
+    "price": 0,
+    "icon": "bottle",
+    "tags": [
+      "potions"
+    ],
+    "use": {
+      "effects": [
+        {
+          "type": "boon",
+          "modifier": {
+            "kind": "unguarded",
+            "amount": 1
+          },
+          "hours": 24,
+          "on": "her",
+          "telling": "You shared a cordial he brewed, and you know what it does: for today, what you take against the Bloom will not hold. You drank it knowing that."
+        }
+      ],
+      "on": "her"
+    }
+  },
+  {
+    "id": "charmed-confection",
+    "name": "Charmed confection",
+    "description": "A box of small sweets you made and charmed at the stove. Nobody has ever been sorry to be given one.",
+    "price": 0,
+    "icon": "sweet",
+    "tags": [
+      "sweets"
+    ],
+    "lovedByAll": true
   }
 ]

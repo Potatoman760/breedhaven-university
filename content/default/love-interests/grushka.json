@@ -186,14 +186,16 @@
     "title": "Coach",
     "subjects": [
       {
-        "subject": "Strength and Conditioning",
-        "code": "KIN",
-        "level": 1,
-        "stats": [
-          "strength",
-          "endurance"
-        ],
-        "practical": true
+        "major": "KIN",
+        "level": 1
+      },
+      {
+        "major": "KIN",
+        "level": 4
+      },
+      {
+        "major": "PSF",
+        "level": 4
       }
     ]
   },
@@ -342,6 +344,19 @@
     "background": "generated/backgrounds/grushka/view.webp"
   },
   "birthPicture": "sprites/grushka/birth.png",
+  "childNames": {
+    "daughters": [
+      "Varga",
+      "Draza",
+      "Ulgra",
+      "Shura",
+      "Morga"
+    ],
+    "sons": [
+      "Torvak",
+      "Gruum"
+    ]
+  },
   "ai": {
     "speechPattern": "Low, plain and unhurried. Short sentences, no hedging. States terms and keeps to them. Praise is rare and specific. Uses a few Kharadi turns of phrase and swears mildly in it.",
     "tone": "blunt, steady, warm underneath",

@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { canBuy } from '../../../shared/game'
+import { canBuy, priceOf } from '../../../shared/game'
 import type { ContentPack, GameState, Stall } from '../../../shared/model'
 import { ItemIcon } from './icons'
 
@@ -78,7 +78,7 @@ export function Stalls({ content, state, stalls, byPhone = false, closed, onBuy 
                       </div>
                       {owned > 0 && <span className="chip">Carrying {owned}</span>}
                       <button disabled={!check.ok} title={check.reasons.join(' · ')} onClick={() => onBuy(item.id)}>
-                        Buy · ${item.price}
+                        Buy · ${priceOf(content, state, item)}
                       </button>
                     </div>
                   )

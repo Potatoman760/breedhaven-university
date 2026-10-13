@@ -1,20 +1,7 @@
-import { z } from 'zod'
-import { kindOf, MAX_SCENE_CAST, type Catalogue, type ContentPack, type Course, type CourseMeeting, type CourseworkConfig, type LoveInterest, type Stat } from '../model'
+import { courseId, courseNumber, kindOf, type Catalogue, type ContentPack, type Course, type CourseMeeting, type LoveInterest, type Major, type WrittenCourse } from '../model'
 
-// Titles a course has until the LLM is asked for better ones, by year of study.
-const PLAIN_TITLES = [
-  'Foundations of {subject}',
-  'Topics in {subject}',
-  'Advanced {subject}',
-  'Senior Seminar in {subject}',
-  'Graduate Colloquium in {subject}'
-]
-
-// How many courses a student takes: this many, or one more.
-const STUDENT_LOAD = 3
-
-// How many courses one request asks the LLM to title.
-export const WORDING_BATCH = 20
+// How many courses a student takes besides her own major's.
+const ELECTIVES = 2
 
 /** A run of numbers from 0 up to 1 that is the same every time for the same seed. */
 function random(seed: number): () => number {
@@ -35,114 +22,79 @@ function shuffled<T>(items: T[], next: () => number): T[] {
     .map(({ item }) => item)
 }
 
-/** A subject the catalogue has courses in. */
-interface Major {
-  code: string
-  subject: string
-  stats: Stat[]
-  practical: boolean
-  general: boolean
-  /** The years a course must exist at: one for each student reading it, and each a love interest teaches. */
-  levels: number[]
-  /** The love interest who teaches it at a given year, where one does. */
-  teachers: Map<number, LoveInterest>
-}
-
 function studentsOf(content: ContentPack): LoveInterest[] {
   return content.loveInterests.filter((li) => kindOf(li) === 'student' && li.studies)
 }
 
-/** Every subject there are courses in: the love interests' own first, in the order they are listed, then the general ones. */
-function majorsOf(content: ContentPack, config: CourseworkConfig): Major[] {
-  const majors = new Map<string, Major>()
-  const major = (from: { code: string; subject: string; stats: Stat[]; practical: boolean }, general: boolean): Major => {
-    const found = majors.get(from.code)
-    if (found) return found
-    const made: Major = { code: from.code, subject: from.subject, stats: from.stats, practical: from.practical, general, levels: [], teachers: new Map() }
-    majors.set(from.code, made)
-    return made
-  }
-  for (const li of content.loveInterests) {
-    if (kindOf(li) === 'teacher' && li.teaching) {
-      for (const taught of li.teaching.subjects) {
-        const m = major(taught, false)
-        if (!m.levels.includes(taught.level)) m.levels.push(taught.level)
-        if (!m.teachers.has(taught.level)) m.teachers.set(taught.level, li)
-      }
-    } else if (kindOf(li) === 'student' && li.studies) {
-      const m = major(li.studies, false)
-      if (!m.levels.includes(li.studies.level)) m.levels.push(li.studies.level)
-    }
-  }
-  for (const general of config.generalEd) {
-    const m = major(general, true)
-    if (m.general && m.levels.length === 0) m.levels.push(1)
-  }
-  return [...majors.values()]
-}
-
-/** The years a major's courses are taught at: those it must have, then the rest of an undergraduate's four, nearest first. */
-function levelsFor(major: Major, wanted: number): number[] {
-  if (major.general) return major.levels
-  const levels = [...major.levels]
-  for (const level of [1, 2, 3, 4]) {
-    if (levels.length >= wanted) break
-    if (!levels.includes(level)) levels.push(level)
-  }
-  return levels.sort((a, b) => a - b)
+/**
+ * The course of her subject a student sits: the one written for her year, or where none is, the nearest written for
+ * a year below hers, and failing that the first there is. Nothing for a subject the University does not teach.
+ */
+export function courseFor(major: Major | undefined, level: number): WrittenCourse | undefined {
+  if (!major) return undefined
+  const byLevel = [...major.courses].sort((a, b) => a.level - b.level)
+  return byLevel.filter((course) => course.level <= level).at(-1) ?? byLevel[0]
 }
 
 const overlap = (a: CourseMeeting, b: CourseMeeting): boolean =>
   a.weekday === b.weekday && a.startHour < b.startHour + b.hours && b.startHour < a.startHour + a.hours
 
 /**
- * Builds the course catalogue by rule, with no LLM: what courses there are, their numbers
- * and professors, when each meets, and which love interests take which. The same seed and
- * the same characters always give the same catalogue.
+ * Lays out a term of the courses the curriculum has written, by rule and with no LLM: which of them are given, who
+ * gives each, when each meets, and which love interests take which. It writes nothing of what a course is: that is
+ * the curriculum's. The same seed and the same characters always give the same catalogue.
  *
- * Meetings are placed one at a time, each in the hours with the fewest classes already in
- * them, so the week fills before anything overlaps. Once it is full, classes share hours,
- * but never two of the same major, and never two that the same love interest teaches.
+ * A course is given when a love interest reads it or teaches it, or it is a general one. Meetings are placed one at
+ * a time, each in the hours with the fewest classes already in them, so the week fills before anything overlaps.
+ * Once it is full, classes share hours, but never two of the same major, and never two that the same love interest
+ * teaches.
+ *
+ * Every course has a love interest in it, and none is a crowd: each student sits her own subject's course, students
+ * are spread over the rest so that each has company, and whatever is still empty at the end is not offered.
  */
 export function buildCatalogue(content: ContentPack, seed: number): Course[] {
   const config = content.coursework
-  if (!config) return []
+  const curriculum = content.curriculum
+  if (!config || !curriculum) return []
   const next = random(seed)
-  const majors = majorsOf(content, config)
+  const students = studentsOf(content)
+  const teachers = content.loveInterests.filter((li) => kindOf(li) === 'teacher' && li.teaching)
+  const majorOf = (li: LoveInterest) => curriculum.majors.find((major) => major.code === li.studies?.code)
 
   // ---- what courses there are
   const names = shuffled(config.professors, next)
-  const courses: Course[] = majors.flatMap((major, m) => {
-    const ordinals = new Map<number, number>()
+  const courses: Course[] = curriculum.majors.flatMap((major, m) => {
     // One professor to a major, so a department has a face.
     const professor = names.length > 0 ? names[m % names.length] : 'To be announced'
-    return levelsFor(major, config.coursesPerMajor).map((level): Course => {
-      const ordinal = (ordinals.get(level) ?? 0) + 1
-      ordinals.set(level, ordinal)
-      const number = `${major.code} ${level}${String(ordinal).padStart(2, '0')}`
-      // A love interest who teaches the subject gives every course in it: the one listed for a year
-      // where there is one, and otherwise whoever teaches the subject at all.
-      const teacher = major.teachers.get(level) ?? [...major.teachers.values()][0]
-      const title = major.general ? major.subject : PLAIN_TITLES[level - 1].replace('{subject}', major.subject)
-      return {
-        id: `course-${number.toLowerCase().replace(/\s+/g, '-')}`,
-        number,
-        title,
-        professor: teacher ? `${teacher.teaching?.title ?? ''} ${teacher.name}`.trim() : professor,
-        description: major.general ? `${major.subject}, a general course open to every student.` : `${title}, as taught at the University this term.`,
-        subject: major.subject,
-        code: major.code,
-        level,
-        general: major.general,
-        stats: major.stats,
-        teacherId: teacher?.id,
-        studentIds: [],
-        locationId: config.locationId,
-        meetings: []
-      }
-    })
+    return [...major.courses]
+      .sort((a, b) => a.level - b.level)
+      .flatMap((written): Course[] => {
+        const teacher = teachers.find((li) => li.teaching?.subjects.some((taught) => taught.code === major.code && taught.level === written.level))
+        const read = students.some((li) => majorOf(li) === major && courseFor(major, li.studies!.level) === written)
+        // Written, and nobody's this term: it waits for someone to read it or teach it.
+        const general = major.general || written.general
+        if (!general && !teacher && !read) return []
+        return [
+          {
+            id: courseId(major.code, written.level),
+            number: courseNumber(major.code, written.level),
+            title: written.title,
+            professor: teacher ? `${teacher.teaching?.title ?? ''} ${teacher.name}`.trim() : professor,
+            description: written.description,
+            subject: major.subject,
+            code: major.code,
+            level: written.level,
+            general,
+            stats: major.stats,
+            teacherId: teacher?.id,
+            studentIds: [],
+            locationId: config.locationId,
+            meetings: []
+          }
+        ]
+      })
   })
-  const practical = new Set(majors.filter((major) => major.practical).map((major) => major.code))
+  const practical = new Set(curriculum.majors.filter((major) => major.practical).map((major) => major.code))
 
   // ---- when each meets
   const lastStart = (hours: number) => config.dayEnd - hours
@@ -189,42 +141,62 @@ export function buildCatalogue(content: ContentPack, seed: number): Course[] {
 
   // ---- who takes what
   const clash = (a: Course, b: Course) => a.meetings.some((m) => b.meetings.some((n) => overlap(m, n)))
-  // A class is a scene with everyone in it, so it holds no more love interests than a scene does, its teacher among them.
-  const full = (course: Course) => course.studentIds.length + (course.teacherId ? 1 : 0) >= MAX_SCENE_CAST
-  const own = (li: LoveInterest) => courses.filter((c) => c.code === li.studies!.code && c.level === li.studies!.level)
-  // Everyone into her own major's course first, so that nobody is kept out of it by someone passing through.
-  for (const li of studentsOf(content)) for (const course of own(li)) course.studentIds.push(li.id)
-  for (const li of studentsOf(content)) {
-    const studies = li.studies!
-    const taking = own(li)
-    const wanted = Math.min(config.maxCourses, Math.max(taking.length, STUDENT_LOAD + (next() < 0.5 ? 0 : 1)))
-    // The rest from the general courses and the first-year courses of other subjects: the ones anyone can walk into.
-    const open = shuffled(
-      courses.filter((c) => c.code !== studies.code && (c.general || c.level === 1)),
-      next
-    )
-    for (const course of open) {
-      if (taking.length >= wanted) break
-      if (full(course) || taking.some((hers) => clash(hers, course))) continue
-      taking.push(course)
+  // How many love interests a class has in it, its teacher among them, and whether it can take another passing through.
+  const inClass = (course: Course) => course.studentIds.length + (course.teacherId ? 1 : 0)
+  const full = (course: Course) => inClass(course) >= config.maxPerClass
+  const own = (li: LoveInterest): Course[] => {
+    const major = majorOf(li)
+    const written = courseFor(major, li.studies!.level)
+    return courses.filter((course) => major !== undefined && written !== undefined && course.code === major.code && course.level === written.level)
+  }
+  // Everyone into her own subject's course first, whoever else reads it: it is hers to sit, and she is not kept out
+  // of it by the room being full of people passing through.
+  for (const li of students) for (const course of own(li)) course.studentIds.push(li.id)
+  // Then her electives, one at a time and turn about, so that the places go round. She takes what anyone can walk
+  // into: a general course, the first-year course of another subject, or whatever a love interest teaches. Of those
+  // she takes first a class whose teacher has nobody yet, then a general course nobody is in, then one where she
+  // would have company; so every class comes to have someone in it before any has two.
+  const taking = new Map(students.map((li) => [li.id, own(li)]))
+  const worth = (course: Course): number => (course.teacherId && course.studentIds.length === 0 ? 0 : inClass(course) === 0 ? 1 : 2)
+  for (let round = 0; round < ELECTIVES; round++) {
+    for (const li of shuffled(students, next)) {
+      const hers = taking.get(li.id)!
+      if (hers.length >= config.maxCourses) continue
+      const open = shuffled(
+        courses.filter((c) => c.code !== li.studies!.code && (c.general || c.level === 1 || c.teacherId !== undefined) && !hers.includes(c) && !full(c) && !hers.some((one) => clash(one, c))),
+        next
+      ).sort((a, b) => worth(a) - worth(b))
+      const course = open[0]
+      if (!course) continue
+      hers.push(course)
       course.studentIds.push(li.id)
     }
   }
-  return courses
+  return courses.filter((course) => inClass(course) > 0)
+}
+
+/** The courses the curriculum has written that a catalogue does not give, each with why: nobody reads or teaches it. */
+export function dormantCourses(content: ContentPack, courses: Course[]): { number: string; title: string }[] {
+  return (content.curriculum?.majors ?? []).flatMap((major) =>
+    major.courses
+      .filter((written) => !courses.some((course) => course.id === courseId(major.code, written.level)))
+      .map((written) => ({ number: courseNumber(major.code, written.level), title: written.title }))
+  )
 }
 
 /**
- * What a catalogue is built from, as one string: the rules, and each love interest's place
- * in the University. A saved catalogue whose own differs was built for other characters.
+ * What a catalogue is built from, as one string: the rules, the courses there are to give, and each love interest's
+ * place in the University. A saved catalogue whose own differs was built for other characters.
  */
 export function catalogueBasis(content: ContentPack): string {
   const config = content.coursework
   if (!config) return ''
-  const { weekdays, dayStart, dayEnd, locationId, lectureHours, labHours, lecturesPerWeek, coursesPerMajor, maxCourses, generalEd, professors } = config
+  const { weekdays, dayStart, dayEnd, locationId, lectureHours, labHours, lecturesPerWeek, maxPerClass, maxCourses, professors } = config
+  const written = (content.curriculum?.majors ?? []).map((major) => [major.code, major.general, major.practical, major.courses.map((course) => course.level)])
   const people = content.loveInterests
     .filter((li) => kindOf(li) !== 'outsider')
-    .map((li) => [li.id, li.name, kindOf(li), li.studies ?? null, li.teaching ?? null])
-  return JSON.stringify([weekdays, dayStart, dayEnd, locationId, lectureHours, labHours, lecturesPerWeek, coursesPerMajor, maxCourses, generalEd, professors, people])
+    .map((li) => [li.id, li.name, kindOf(li), li.studies ? [li.studies.code, li.studies.level] : null, li.teaching ? [li.teaching.title, li.teaching.subjects.map((subject) => [subject.code, subject.level])] : null])
+  return JSON.stringify([weekdays, dayStart, dayEnd, locationId, lectureHours, labHours, lecturesPerWeek, maxPerClass, maxCourses, professors, written, people])
 }
 
 /** Whether the saved catalogue was built for characters or rules that have since changed. */
@@ -237,6 +209,14 @@ export function catalogueOf(content: ContentPack, seed: number, courses: Course[
   return { seed, basis: catalogueBasis(content), courses }
 }
 
+/**
+ * A catalogue as it is kept on disk: only what was worked out for each course. What a course is called and what it
+ * teaches is the curriculum's to say, and is put back from there when the pack is read.
+ */
+export function writtenCatalogue(catalogue: Catalogue): { seed: number; basis: string; courses: Pick<Course, 'id' | 'professor' | 'teacherId' | 'studentIds' | 'meetings'>[] } {
+  return { seed: catalogue.seed, basis: catalogue.basis, courses: catalogue.courses.map(({ id, professor, teacherId, studentIds, meetings }) => ({ id, professor, teacherId, studentIds, meetings })) }
+}
+
 /** The courses a new game starts with: the saved catalogue's, with anyone no longer in the game left off the rolls. */
 export function startingCourses(content: ContentPack): Course[] {
   const known = new Set(content.loveInterests.map((li) => li.id))
@@ -245,55 +225,4 @@ export function startingCourses(content: ContentPack): Course[] {
     teacherId: course.teacherId !== undefined && known.has(course.teacherId) ? course.teacherId : undefined,
     studentIds: course.studentIds.filter((id) => known.has(id))
   }))
-}
-
-/** The prompt asking the LLM to title and describe some courses, as a JSON object keyed by course number. */
-export function buildCourseWordingPrompt(content: ContentPack, courses: Course[]): { system: string; user: string } {
-  const system = [
-    'You write the course catalogue for a modern university in a magitech fantasy setting, where ' +
-      'everyday magic and modern science and technology exist side by side. Courses are taught by lecture ' +
-      'and laboratory practical, and read like a real university catalogue.',
-    'Reply with only a JSON object and nothing else. Each key is a course number exactly as given; each value is an object with:',
-    '- "title": the course title, a few words, fitting its subject and year. Courses in one subject must have different titles.',
-    '- "description": one or two sentences, as it would read in a catalogue'
-  ].join('\n')
-
-  const lore = content.codex.filter((entry) => entry.alwaysInclude && entry.startsUnlocked)
-  const levelOf = (course: Course): string =>
-    course.general ? 'general-education course open to all years' : course.level >= 5 ? 'graduate course' : `year ${course.level} undergraduate course`
-  const user = [
-    ...(lore.length > 0 ? ['Setting:', ...lore.map((e) => `- ${e.title}: ${e.content}`), ''] : []),
-    `Write ${courses.length} courses:`,
-    ...courses.map(
-      (c) => `- ${c.number}: subject ${c.subject}, ${levelOf(c)}${c.meetings.some((m) => m.kind === 'lab') ? ', with a weekly lab' : ''}; taught by ${c.professor}`
-    )
-  ].join('\n')
-  return { system, user }
-}
-
-const WordingSchema = z.object({
-  title: z.string().trim().min(1),
-  description: z.string().trim().default('')
-})
-
-/**
- * Puts the LLM's titles and descriptions on the courses, by course number. A course the
- * reply leaves out or gets wrong keeps the wording it had. Throws only when the reply
- * holds no JSON object.
- */
-export function parseCourseWording(reply: string, courses: Course[]): Course[] {
-  const start = reply.indexOf('{')
-  const end = reply.lastIndexOf('}')
-  let entries: unknown
-  try {
-    entries = start < 0 || end < start ? undefined : JSON.parse(reply.slice(start, end + 1))
-  } catch {
-    entries = undefined
-  }
-  if (typeof entries !== 'object' || entries === null || Array.isArray(entries)) throw new Error('The LLM did not return the courses.')
-  const byNumber = new Map(Object.entries(entries).map(([number, value]) => [number.trim().toLowerCase(), value]))
-  return courses.map((course) => {
-    const parsed = WordingSchema.safeParse(byNumber.get(course.number.toLowerCase()))
-    return parsed.success ? { ...course, title: parsed.data.title, description: parsed.data.description || course.description } : course
-  })
 }

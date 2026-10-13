@@ -126,14 +126,8 @@
   "imageSeed": 60,
   "stageHeight": 100,
   "studies": {
-    "subject": "Bloomology",
-    "code": "BLM",
-    "level": 1,
-    "stats": [
-      "intelligence",
-      "wisdom"
-    ],
-    "practical": true
+    "major": "BLM",
+    "level": 1
   },
   "animations": [
     {
@@ -275,6 +269,20 @@
     "background": "generated/backgrounds/lira/view.webp"
   },
   "birthPicture": "sprites/lira/birth.png",
+  "childNames": {
+    "daughters": [
+      "Dew",
+      "Pearl",
+      "Misty",
+      "Ripple",
+      "Brook"
+    ],
+    "sons": [
+      "Pebble",
+      "Reed"
+    ]
+  },
+  "birthControl": false,
   "ai": {
     "speechPattern": "Bright and matter-of-fact, in short declarative sentences. Says startling things as plain observations. Uses phrases she overheard from generations of students, often slightly wrong or decades out of date. Measures time in rains and seasons, not hours.",
     "tone": "sunny and unbothered",

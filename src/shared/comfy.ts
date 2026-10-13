@@ -509,15 +509,19 @@ export function selfiePrompt(
     const { subject } = pronounWords(who.pronouns)
     return who.wears.trim() === '' ? '' : paragraph(`${subject[0].toUpperCase()}${subject.slice(1)} ${subject === 'they' ? 'wear' : 'wears'} ${who.wears}`)
   }
+  const { subject, object } = pronounWords(author.pronouns)
+  // What the picture shows is said of the one taking it, by name of what she is in it: left as a sentence on its own,
+  // an image model takes it for someone else and draws her in.
+  const moment = shot.trim() === '' ? '' : paragraph(`${friend ? 'What the two of them are doing in the picture' : `What ${subject} ${subject === 'they' ? 'are' : 'is'} doing as ${subject} ${subject === 'they' ? 'take' : 'takes'} it, the same person as above`}: ${shot.trim()}`)
   return paragraphs([
     friend
-      ? "A selfie of two friends close together, taken at arm's length on a phone by the one in front, both looking into the camera."
-      : "A selfie taken at arm's length on a phone, looking into the camera.",
+      ? "A selfie of two friends close together, taken at arm's length on a phone by the one in front, both looking into the camera. Only the two of them are in the picture."
+      : `A selfie taken at arm's length on a phone, looking into the camera. One person only: ${subject} ${subject === 'they' ? 'are' : 'is'} alone in the picture, with nobody else anywhere in it.`,
     paragraph(author.appearance),
     clothes(author),
-    friend && paragraph(`Beside ${pronounWords(author.pronouns).object}, a friend: ${friend.appearance}`),
+    friend && paragraph(`Beside ${object}, a friend: ${friend.appearance}`),
     friend && clothes(friend),
-    paragraph(shot),
+    moment,
     place && place.appearance.trim() !== '' && paragraph(`In the background: ${place.appearance}`),
     LIGHT_WORDS[light.trim().toLowerCase()],
     framing.trim()

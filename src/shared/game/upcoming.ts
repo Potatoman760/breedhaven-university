@@ -4,12 +4,13 @@ import { timeOn } from './agenda'
 import { attendees, canKeep } from './appointments'
 import { toDate } from './calendar'
 import { canAttend, courseMembers, meetingNow } from './courses'
+import { canSitExam } from './exams'
 import { examOn } from './grades'
 import { canWork, shiftLaterToday, shiftNow } from './jobs'
 
 /** Something on his timetable still to come today: a class he takes, a shift at his job, or a plan he has made. */
 export interface Upcoming {
-  kind: 'class' | 'work' | 'plan'
+  kind: 'class' | 'work' | 'plan' | 'exam'
   /** The course, the job or the plan. */
   id: string
   title: string
@@ -20,8 +21,8 @@ export interface Upcoming {
 
 /**
  * The next thing on his timetable today that has yet to start: the soonest of the classes
- * he takes, his shift, and the plans he has made. Nothing when the rest of the day is his
- * own. A class that is an examination is not one to turn up for, and is left out.
+ * he takes, an examination in one of them, his shift, and the plans he has made. Nothing when the rest of the
+ * day is his own.
  */
 export function nextUp(content: ContentPack, state: GameState): Upcoming | undefined {
   const { dayIndex, hour, weekday } = toDate(content.calendar, state.time)
@@ -47,8 +48,14 @@ export function nextUp(content: ContentPack, state: GameState): Upcoming | undef
     for (const meeting of course.meetings) {
       if (meeting.weekday !== weekday || meeting.startHour <= hour) continue
       const time = timeOn(content, dayIndex, meeting.startHour)
-      // No class meets on orientation day or a holiday, and an examination takes the place of one.
-      if (!meetingNow(content, { ...state, time }, course) || examOn(content, course, dayIndex, meeting.startHour)) continue
+      // An examination takes the place of the class in its slot, and is something to turn up for like any other.
+      const exam = examOn(content, course, dayIndex, meeting.startHour)
+      if (exam) {
+        if (!state.grades[course.id]?.[exam.kind]) found.push({ kind: 'exam', id: course.id, title: `${exam.kind === 'midterm' ? 'Midterm' : 'Final'}: ${course.number}`, time, locationId: course.locationId })
+        continue
+      }
+      // No class meets on orientation day or a holiday.
+      if (!meetingNow(content, { ...state, time }, course)) continue
       found.push({ kind: 'class', id: course.id, title: `${course.number}: ${course.title}`, time, locationId: course.locationId })
     }
   }
@@ -75,6 +82,7 @@ export function arriveFor(state: GameState, next: Upcoming): GameState {
 export function canGoTo(content: ContentPack, state: GameState, next: Upcoming): PerformCheck {
   const there = arriveFor(state, next)
   if (next.kind === 'class') return canAttend(content, there, next.id)
+  if (next.kind === 'exam') return canSitExam(content, there, next.id)
   if (next.kind === 'work') return canWork(content, there)
   return canKeep(content, there, next.id)
 }

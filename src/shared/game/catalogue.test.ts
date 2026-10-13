@@ -1,37 +1,41 @@
 import { describe, expect, it } from 'vitest'
-import { CourseworkConfigSchema, type ContentPack, type Course, type CourseMeeting } from '../model'
-import { buildCatalogue, buildCourseWordingPrompt, catalogueBasis, catalogueIsStale, catalogueOf, parseCourseWording, startingCourses } from './catalogue'
+import { CourseworkConfigSchema, CurriculumSchema, resolveCurriculum, validateContentPack, type ContentPack, type Course, type CourseMeeting } from '../model'
+import { buildCatalogue, catalogueBasis, catalogueIsStale, catalogueOf, courseFor, dormantCourses, startingCourses, writtenCatalogue } from './catalogue'
 import { coursesClash } from './courses'
 import { createInitialState } from './state'
-import { fixture } from './testFixture'
+import { fixture, rawFixture } from './testFixture'
 
 // Fixture calendar: weekdays One, Two, Three. Classes run from 06:00 to 16:00: thirty hours a week.
+const topics = Array.from({ length: 6 }, (_, i) => ({ title: `Class ${i + 1}`, content: 'What is taught.' }))
+const written = (level: number, title: string) => ({ level, title, description: `${title}, as it is taught.`, topics })
+const curriculum = CurriculumSchema.parse({
+  colleges: [{ id: 'arts', name: 'Arts' }],
+  majors: [
+    { code: 'POL', subject: 'Politics', college: 'arts', stats: ['wisdom'], courses: [written(1, 'First Politics'), written(2, 'Second Politics')] },
+    { code: 'ENG', subject: 'Engines', college: 'arts', stats: ['wisdom'], practical: true, courses: [written(1, 'First Engines'), written(3, 'Third Engines')] },
+    { code: 'RID', subject: 'Riddles', college: 'arts', stats: ['wisdom'], courses: [written(2, 'Second Riddles')] },
+    { code: 'CIP', subject: 'Ciphers', college: 'arts', stats: ['intelligence'], practical: true, courses: [written(1, 'First Ciphers')] },
+    { code: 'HIS', subject: 'History', college: 'arts', general: true, courses: [written(1, 'History')] },
+    { code: 'PHY', subject: 'Physical Training', college: 'arts', general: true, practical: true, courses: [written(1, 'Physical Training')] }
+  ]
+})
 const base = fixture()
 const ana = base.loveInterests[0]
-const student = (id: string, code: string, level: number, practical = false) => ({
-  ...ana,
-  id,
-  name: id[0].toUpperCase() + id.slice(1),
-  schedule: [],
-  studies: { subject: `${code} studies`, code, level, stats: ['wisdom' as const], practical }
-})
-const cy = {
-  ...ana,
-  id: 'cy',
-  name: 'Cy Vane',
-  schedule: [],
-  studies: undefined,
-  teaching: { department: 'the College of Riddles', title: 'Magistra', subjects: [{ subject: 'Riddles', code: 'RID', level: 2, stats: ['wisdom' as const], practical: false }] }
+const subject = (code: string, level: number) => {
+  const major = curriculum.majors.find((one) => one.code === code)!
+  return { subject: major.subject, code, level, stats: major.stats, practical: major.practical }
 }
-const school = (coursesPerMajor: number): ContentPack => ({
+const student = (id: string, code: string, level: number) => ({ ...ana, id, name: id[0].toUpperCase() + id.slice(1), schedule: [], studies: subject(code, level) })
+const cy = { ...ana, id: 'cy', name: 'Cy Vane', schedule: [], studies: undefined, teaching: { department: 'the College of Riddles', title: 'Magistra', subjects: [subject('RID', 2)] } }
+const content: ContentPack = {
   ...base,
-  loveInterests: [student('ana', 'POL', 1), student('bea', 'POL', 2), student('cee', 'ENG', 3, true), cy, { ...ana, id: 'dee', schedule: [], studies: undefined }],
+  curriculum,
+  loveInterests: [student('ana', 'POL', 1), student('bea', 'POL', 2), student('cee', 'ENG', 3), cy, { ...ana, id: 'dee', schedule: [], studies: undefined }],
   coursework: CourseworkConfigSchema.parse({
     weekdays: ['One', 'Two', 'Three'],
     dayStart: 6,
     dayEnd: 16,
     locationId: 'shop',
-    coursesPerMajor,
     maxCourses: 4,
     generalEd: [
       { code: 'HIS', subject: 'History' },
@@ -39,11 +43,11 @@ const school = (coursesPerMajor: number): ContentPack => ({
     ],
     professors: ['Magistra Vey', 'Doctor Reed', 'Doctor Sedge']
   })
-})
-const content = school(3)
+}
 const courses = buildCatalogue(content, 7)
 const numbered = (number: string) => courses.find((c) => c.number === number)!
 const overlap = (a: CourseMeeting, b: CourseMeeting) => a.weekday === b.weekday && a.startHour < b.startHour + b.hours && b.startHour < a.startHour + a.hours
+const inClass = (course: Course) => course.studentIds.length + (course.teacherId ? 1 : 0)
 /** The most courses meeting in any one hour of the week. */
 const busiest = (all: Course[]) => {
   const load = new Map<string, number>()
@@ -55,22 +59,39 @@ describe('the catalogue', () => {
   it('is the same for the same seed, and different for another', () => {
     expect(buildCatalogue(content, 7)).toEqual(courses)
     expect(buildCatalogue(content, 8)).not.toEqual(courses)
+    // With no curriculum there is nothing to lay out.
+    expect(buildCatalogue({ ...content, curriculum: undefined }, 7)).toEqual([])
     expect(buildCatalogue(base, 7)).toEqual([])
   })
 
-  it('has a few courses in each major, at the years its students and teachers need, each with its own number', () => {
-    expect(courses.map((c) => c.number).sort()).toEqual(
-      ['ENG 101', 'ENG 201', 'ENG 301', 'HIS 101', 'PHY 101', 'POL 101', 'POL 201', 'POL 301', 'RID 101', 'RID 201', 'RID 301'].sort()
-    )
+  it('gives only courses the curriculum has written, and of those only the ones somebody reads or teaches, and the general ones', () => {
+    expect(courses.map((c) => c.number).sort()).toEqual(['ENG 301', 'HIS 101', 'PHY 101', 'POL 101', 'POL 201', 'RID 201'].sort())
     expect(new Set(courses.map((c) => c.id)).size).toBe(courses.length)
-    expect(numbered('POL 201')).toMatchObject({ id: 'course-pol-201', title: 'Topics in POL studies', subject: 'POL studies', code: 'POL', level: 2, general: false, locationId: 'shop' })
+    // What a course is comes from the curriculum, word for word.
+    expect(numbered('POL 201')).toMatchObject({ id: 'course-pol-201', title: 'Second Politics', description: 'Second Politics, as it is taught.', subject: 'Politics', code: 'POL', level: 2, general: false, locationId: 'shop' })
     expect(numbered('HIS 101')).toMatchObject({ title: 'History', general: true })
+    // Written, and nobody's this term.
+    expect(dormantCourses(content, courses)).toEqual([
+      { number: 'ENG 101', title: 'First Engines' },
+      { number: 'CIP 101', title: 'First Ciphers' }
+    ])
   })
 
-  it('gives a love interest every course in the subject she teaches, and each other major one professor', () => {
-    for (const number of ['RID 101', 'RID 201', 'RID 301']) expect(numbered(number)).toMatchObject({ teacherId: 'cy', professor: 'Magistra Cy Vane' })
+  it('sits a student in the course written for her year, or the nearest below it', () => {
+    const engines = curriculum.majors.find((major) => major.code === 'ENG')!
+    expect(courseFor(engines, 3)?.level).toBe(3)
+    expect(courseFor(engines, 2)?.level).toBe(1)
+    expect(courseFor(engines, 5)?.level).toBe(3)
+    expect(courseFor(curriculum.majors.find((major) => major.code === 'RID'), 1)?.level).toBe(2)
+    expect(courseFor(undefined, 1)).toBeUndefined()
+    const second: ContentPack = { ...content, loveInterests: content.loveInterests.map((li) => (li.id === 'cee' ? student('cee', 'ENG', 2) : li)) }
+    expect(buildCatalogue(second, 7).find((c) => c.studentIds.includes('cee') && c.code === 'ENG')?.number).toBe('ENG 101')
+  })
+
+  it('has a love interest give the courses she is down for, and each other subject one professor', () => {
+    expect(numbered('RID 201')).toMatchObject({ teacherId: 'cy', professor: 'Magistra Cy Vane' })
     expect(courses.filter((c) => c.teacherId !== undefined).every((c) => c.code === 'RID')).toBe(true)
-    expect(new Set(['POL 101', 'POL 201', 'POL 301'].map((n) => numbered(n).professor)).size).toBe(1)
+    expect(new Set(['POL 101', 'POL 201'].map((n) => numbered(n).professor)).size).toBe(1)
     expect(content.coursework!.professors).toContain(numbered('POL 101').professor)
   })
 
@@ -98,47 +119,57 @@ describe('the catalogue', () => {
 
   it('fills the empty hours first, and lets classes overlap only when the week is full', () => {
     // Six courses, eighteen hours of class in a thirty-hour week: room for all of it.
-    for (const seed of [1, 2, 3, 7, 99]) expect(busiest(buildCatalogue(school(1), seed))).toBe(1)
-    // Eleven courses, thirty-four hours: something has to share, and nothing piles up while other hours are lighter.
-    expect(busiest(courses)).toBe(2)
+    for (const seed of [1, 2, 3, 7, 99]) expect(busiest(buildCatalogue(content, seed))).toBe(1)
+    const crowded: ContentPack = { ...content, coursework: { ...content.coursework!, lecturesPerWeek: 4 } }
+    expect(busiest(buildCatalogue(crowded, 7))).toBeLessThanOrEqual(2)
   })
 
   it('never has a teaching love interest in two rooms at once', () => {
-    const twice: ContentPack = {
-      ...content,
-      loveInterests: content.loveInterests.map((li) =>
-        li.id === 'cy' ? { ...cy, teaching: { ...cy.teaching, subjects: [...cy.teaching.subjects, { subject: 'Ciphers', code: 'CIP', level: 1, stats: ['intelligence' as const], practical: true }] } } : li
-      )
-    }
+    const twice: ContentPack = { ...content, loveInterests: content.loveInterests.map((li) => (li.id === 'cy' ? { ...cy, teaching: { ...cy.teaching, subjects: [subject('RID', 2), subject('CIP', 1)] } } : li)) }
     for (const seed of [1, 2, 3]) {
       const hers = buildCatalogue(twice, seed).filter((c) => c.teacherId === 'cy')
-      expect(hers.map((c) => c.number).sort()).toEqual(['CIP 101', 'CIP 201', 'CIP 301', 'RID 101', 'RID 201', 'RID 301'])
+      expect(hers.map((c) => c.number).sort()).toEqual(['CIP 101', 'RID 201'])
       for (const a of hers) for (const b of hers) if (a !== b) expect(coursesClash(a, b)).toBe(false)
     }
   })
 
-  it("puts each student in her own major's course at her year, and in nothing that clashes with it", () => {
+  it("puts each student in her own subject's course, and in nothing that clashes with it", () => {
     const taking = (id: string) => courses.filter((c) => c.studentIds.includes(id))
     expect(taking('ana').map((c) => c.number)).toContain('POL 101')
     expect(taking('bea').map((c) => c.number)).toContain('POL 201')
     expect(taking('cee').map((c) => c.number)).toContain('ENG 301')
     for (const id of ['ana', 'bea', 'cee']) {
       const hers = taking(id)
-      expect(hers.length).toBeGreaterThanOrEqual(3)
-      expect(hers.length).toBeLessThanOrEqual(4)
+      // Her own and up to two more: in a school this small there is not always a second place left for her.
+      expect(hers.length).toBeGreaterThanOrEqual(2)
+      expect(hers.length).toBeLessThanOrEqual(3)
       for (const a of hers) for (const b of hers) if (a !== b) expect(coursesClash(a, b)).toBe(false)
-      // Besides her own, only general courses and the first-year courses of other subjects.
+      // Besides her own, only what anyone can walk into: a general course, another subject's first year, or a class a love interest teaches.
       const major = content.loveInterests.find((li) => li.id === id)!.studies!.code
-      expect(hers.every((c) => c.code === major || c.general || c.level === 1)).toBe(true)
+      expect(hers.every((c) => c.code === major || c.general || c.level === 1 || c.teacherId !== undefined)).toBe(true)
     }
-    // No class holds more love interests than a scene can, its teacher counted.
+    // Every class has a love interest in it and none has more than two, its teacher counted: whatever the seed.
     for (const seed of [1, 2, 3, 7, 99]) {
-      for (const c of buildCatalogue(content, seed)) expect(c.studentIds.length + (c.teacherId ? 1 : 0)).toBeLessThanOrEqual(3)
+      for (const c of buildCatalogue(content, seed)) {
+        expect(inClass(c)).toBeGreaterThanOrEqual(1)
+        expect(inClass(c)).toBeLessThanOrEqual(2)
+      }
     }
+    // A class nobody he could know is in is not offered: with nobody to take them, the general courses go.
+    const alone: ContentPack = { ...content, loveInterests: content.loveInterests.filter((li) => li.id === 'cy') }
+    expect(buildCatalogue(alone, 7).map((c) => c.number)).toEqual(['RID 201'])
     // A teacher and an outsider take nothing.
     expect(taking('cy')).toEqual([])
     expect(taking('dee')).toEqual([])
     expect(overlap(courses[0].meetings[0], courses[0].meetings[0])).toBe(true)
+  })
+
+  it('sits everyone who reads a subject in its course, though that makes three', () => {
+    const three: ContentPack = { ...content, loveInterests: [...content.loveInterests, student('eve', 'POL', 1), student('fay', 'POL', 1)] }
+    for (const seed of [1, 7, 99]) {
+      const first = buildCatalogue(three, seed).find((c) => c.number === 'POL 101')!
+      expect(first.studentIds.sort()).toEqual(['ana', 'eve', 'fay'])
+    }
   })
 })
 
@@ -150,12 +181,14 @@ describe('the saved catalogue', () => {
     expect(createInitialState(content).courses).toEqual([])
   })
 
-  it('is out of date once a character has changed what she studies, and leaves off anyone who has gone', () => {
+  it('is out of date once a character has changed what she studies or the curriculum has another course, and leaves off anyone who has gone', () => {
     expect(catalogueIsStale(content)).toBe(false)
     expect(catalogueIsStale(saved)).toBe(false)
     const moved: ContentPack = { ...saved, loveInterests: saved.loveInterests.map((li) => (li.id === 'ana' ? student('ana', 'POL', 2) : li)) }
     expect(catalogueBasis(moved)).not.toBe(catalogueBasis(saved))
     expect(catalogueIsStale(moved)).toBe(true)
+    const more: ContentPack = { ...saved, curriculum: { ...curriculum, majors: curriculum.majors.map((major) => (major.code === 'RID' ? { ...major, courses: [...major.courses, { ...major.courses[0], level: 3 }] } : major)) } }
+    expect(catalogueIsStale(more)).toBe(true)
     // Someone who is not of the University changes nothing.
     expect(catalogueIsStale({ ...saved, loveInterests: saved.loveInterests.filter((li) => li.id !== 'dee') })).toBe(false)
 
@@ -164,31 +197,36 @@ describe('the saved catalogue', () => {
     expect(begun.some((c) => c.studentIds.includes('ana') || c.teacherId === 'cy')).toBe(false)
     expect(begun.find((c) => c.number === 'RID 201')?.professor).toBe('Magistra Cy Vane')
   })
+
+  it('is kept as only what was worked out, and put back together from the curriculum when the pack is read', () => {
+    const kept = writtenCatalogue(saved.catalogue!)
+    expect(Object.keys(kept.courses[0]).sort()).toEqual(['id', 'meetings', 'professor', 'studentIds', 'teacherId'].sort())
+    // Read back with the curriculum beside it, every course is whole again.
+    const read = resolveCurriculum({ curriculum, coursework: content.coursework, catalogue: kept, loveInterests: [] }) as { catalogue: { courses: Course[] } }
+    expect(read.catalogue.courses).toEqual(courses.map((course) => ({ ...course })))
+    // A course the curriculum no longer has is not given.
+    const fewer = { ...curriculum, majors: curriculum.majors.filter((major) => major.code !== 'RID') }
+    const without = resolveCurriculum({ curriculum: fewer, coursework: content.coursework, catalogue: kept, loveInterests: [] }) as { catalogue: { courses: Course[] } }
+    expect(without.catalogue.courses.some((course) => course.code === 'RID')).toBe(false)
+  })
 })
 
-describe('course wording', () => {
-  const batch = [numbered('POL 101'), numbered('PHY 101'), numbered('RID 201')]
+describe('a pack with a curriculum', () => {
+  const raw = { ...rawFixture(), curriculum, coursework: { weekdays: ['One', 'Two', 'Three'], dayStart: 6, dayEnd: 16, locationId: 'shop', professors: ['Doctor Reed'] } }
+  const named = (studies: unknown) => ({ ...raw, loveInterests: raw.loveInterests.map((li, i) => (i === 0 ? { ...li, studies } : li)) })
 
-  it('asks for each course by number, with its subject, year, lab and professor', () => {
-    const { system, user } = buildCourseWordingPrompt(content, batch)
-    expect(system).toContain('JSON object')
-    expect(user).toContain('Write 3 courses:')
-    expect(user).toContain(`- POL 101: subject POL studies, year 1 undergraduate course; taught by ${numbered('POL 101').professor}`)
-    expect(user).toContain('- PHY 101: subject Physical Training, general-education course open to all years, with a weekly lab;')
-    expect(user).toContain('taught by Magistra Cy Vane')
+  it('fills in what a character reads from the subject she names, and draws the syllabuses, skills and general subjects out of it', () => {
+    const pack = validateContentPack(named({ major: 'ENG', level: 3 }))
+    expect(pack.loveInterests[0].studies).toEqual({ subject: 'Engines', code: 'ENG', level: 3, stats: ['wisdom'], practical: true })
+    expect(pack.coursework?.generalEd.map((general) => general.code)).toEqual(['HIS', 'PHY'])
+    expect(pack.syllabus.find((entry) => entry.courseId === 'course-eng-301')?.topics).toHaveLength(6)
+    expect(pack.skills).toEqual([])
+    // Read again as it now stands, it is the same.
+    expect(validateContentPack(pack).loveInterests[0].studies).toEqual(pack.loveInterests[0].studies)
   })
 
-  it('puts titles and descriptions on by number, and leaves alone what the reply leaves out or gets wrong', () => {
-    const reply = `Here:\n${JSON.stringify({
-      'pol 101': { title: 'The Art of Rule', description: 'How realms are held.', professor: 'Doctor Someone' },
-      'RID 201': { title: '' },
-      'XYZ 999': { title: 'Nothing' }
-    })}`
-    const written = parseCourseWording(reply, batch)
-    // Only the wording changes: her professor, her times and her students are the catalogue's own.
-    expect(written[0]).toEqual({ ...batch[0], title: 'The Art of Rule', description: 'How realms are held.' })
-    expect(written[1]).toEqual(batch[1])
-    expect(written[2]).toEqual(batch[2])
-    expect(() => parseCourseWording('I cannot.', batch)).toThrow(/did not return the courses/)
+  it('will not have a subject made up, nor a general one read as her own', () => {
+    expect(() => validateContentPack(named({ major: 'ZZZ', level: 1 }))).toThrow(/reads "ZZZ", which is not a subject the curriculum has/)
+    expect(() => validateContentPack(named({ major: 'HIS', level: 1 }))).toThrow(/reads "HIS"/)
   })
 })

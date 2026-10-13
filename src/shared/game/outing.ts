@@ -11,6 +11,8 @@ import { addCoursePoints, studyPoints } from './grades'
 import { firstNames, hasMet, sceneBaseline } from './scene'
 import { PLAYER_ROOM } from './sceneMoves'
 import { isOpen, isOpenFor } from './schedule'
+import { factor } from './modifiers'
+import { seedOf } from './seed'
 
 // The hour he wakes: from midnight until then is for sleep (`SLEEP_HOURS` in sleep.ts).
 const SLEEP_UNTIL = 6
@@ -237,7 +239,7 @@ function busyReason(content: ContentPack, state: GameState, id: string, from: nu
   const name = li.name.split(' ')[0]
   // In the hours her child is being born she is nowhere else.
   const birth = state.appointments.find((plan) => plan.kind === 'birth' && plan.loveInterestId === id && plan.time < from + hours && from < plan.time + plan.hours)
-  if (birth) return `${name} is at ${content.locations.find((l) => l.id === birth.locationId)?.name ?? 'the Health Centre'}: the child is coming`
+  if (birth) return `${name} is at ${content.locations.find((l) => l.id === birth.locationId)?.name ?? 'the Health Center'}: the child is coming`
   for (let time = from; time < from + hours; time++) {
     const then = { ...state, time }
     for (const course of state.courses.filter((c) => courseMembers(c).includes(id))) {
@@ -334,7 +336,7 @@ export function startOuting(
   const worked = applyEffects(there, outingEffects(outing), { content })
   // Study is work like any other, and what it earns goes on the course.
   const arrived = outing.studyCourseId
-    ? addCoursePoints(content, applyEffects(worked, [{ type: 'energy', amount: -ENERGY_PER_HOUR * outing.hours }], { content }), outing.studyCourseId, studyPoints(content, outing))
+    ? addCoursePoints(content, applyEffects(worked, [{ type: 'energy', amount: -ENERGY_PER_HOUR * outing.hours }], { content }), outing.studyCourseId, studyPoints(content, outing) * factor(content, worked, 'marks'))
     : worked
   const after = arrived
   const place = content.locations.find((l) => l.id === outing.locationId)
@@ -346,7 +348,7 @@ export function startOuting(
   const promised = outing.eventId && outing.withIds.length === 0 ? eventGoers(state, outing.eventId).filter((id) => state.relationships[id] !== undefined && content.loveInterests.some((li) => li.id === id)) : []
   const chance = around
     .filter((id) => !promised.includes(id))
-    .map((id, index) => ({ id, luck: pick(state.weatherSeed, there.time, 901 + index) }))
+    .map((id) => ({ id, luck: pick(state.weatherSeed, there.time, seedOf(id)) }))
     .sort((a, b) => a.luck - b.luck)
     .slice(0, Math.max(0, met - promised.length))
     .map(({ id }) => id)
@@ -501,7 +503,7 @@ export function outingMisses(content: ContentPack, state: GameState, outing: Out
       const meeting = meetingNow(content, then, course)
       // Counted at the hour it begins, or at the first hour if it is already under way; not one he has sat.
       if (!meeting || (meeting.startHour !== hour && time !== from)) continue
-      if (state.attendance[course.id]?.last === `${dayIndex}:${meeting.startHour}`) continue
+      if (state.attendance[course.id]?.sat.includes(`${dayIndex}:${meeting.startHour}`)) continue
       missed.push(`${course.number} ${course.title}, ${meeting.kind === 'lab' ? 'a lab' : 'a lecture'} at ${clock(meeting.startHour)}`)
     }
     const job = content.jobs?.jobs.find((j) => j.id === state.job?.jobId)

@@ -3,9 +3,10 @@ import { formatDate, toDate } from '../../shared/game'
 import type { ContentPack } from '../../shared/model'
 import {
   AUTO_SLOT_ID,
-  MANUAL_SLOT_IDS,
   SAVE_NAME_CHARS,
-  SLOT_IDS,
+  SLOT_PAGES,
+  latestSave,
+  pageOf,
   saveLabel,
   slotLabel,
   type SaveData,
@@ -27,7 +28,7 @@ export function describeSave(content: ContentPack, save: SaveSummary): string {
 
 interface Props {
   content: ContentPack
-  /** In save mode, the game to write; the autosave slot is not offered. */
+  /** In save mode, the game to write. The autosave is shown and cannot be written to: it is the game's own. */
   mode: 'save' | 'load'
   current?: SaveData
   onLoad: (data: SaveData) => void
@@ -40,9 +41,16 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
   // The names as they are being typed, by slot: one for an empty slot is what the save made there will be called.
   const [names, setNames] = useState<Partial<Record<SlotId, string>>>({})
 
+  // Which page of the slots is showing. It opens on the page of the save he made last, where he is likeliest to be going.
+  const [page, setPage] = useState(0)
+
   const refresh = () => window.api.listSaves().then(setSaves)
   useEffect(() => {
-    refresh()
+    window.api.listSaves().then((listed) => {
+      setSaves(listed)
+      const latest = latestSave(listed.filter((save) => save.slotId !== AUTO_SLOT_ID))
+      if (latest) setPage(pageOf(latest.slotId))
+    })
   }, [])
 
   // Overwriting and deleting are asked about first, in the game's own dialog.
@@ -102,10 +110,11 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
     <Overlay onClose={onClose}>
       <div className="settings">
         <h1>{mode === 'save' ? 'Save game' : 'Load game'}</h1>
-        {(mode === 'save' ? MANUAL_SLOT_IDS : SLOT_IDS).map((slotId) => {
+        {[AUTO_SLOT_ID, ...SLOT_PAGES[page]].map((slotId) => {
           const summary = saves.find((s) => s.slotId === slotId)
+          const auto = slotId === AUTO_SLOT_ID
           return (
-            <div key={slotId} className="slot">
+            <div key={slotId} className={auto ? 'slot auto' : 'slot'}>
               <div>
                 {/* A save can be given a name of its own, and called something else at any time. The autosave is the game's, and keeps its own. */}
                 {slotId === AUTO_SLOT_ID || summary?.unreadable || (mode === 'load' && !summary) ? (
@@ -126,18 +135,47 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
                 {summary && <span>Saved {new Date(summary.savedAt).toLocaleString()}</span>}
               </div>
               {mode === 'save' ? (
-                <button onClick={() => save(slotId, summary !== undefined)}>Save here</button>
+                auto ? (
+                  // The game writes this one itself, as he plays: it is not his to save over.
+                  <span className="hint slot-auto-note">Saved as you play</span>
+                ) : (
+                  <button onClick={() => save(slotId, summary !== undefined)}>Save here</button>
+                )
               ) : (
                 <button disabled={!summary || summary.unreadable} onClick={() => load(slotId)}>
                   Load
                 </button>
               )}
-              <button className="secondary" disabled={!summary} onClick={() => remove(slotId)}>
-                Delete
-              </button>
+              {!(auto && mode === 'save') && (
+                <button className="secondary" disabled={!summary} onClick={() => remove(slotId)}>
+                  Delete
+                </button>
+              )}
             </div>
           )
         })}
+        <div className="slot-pages" role="tablist" aria-label="Pages of save slots">
+          <button className="secondary" disabled={page === 0} onClick={() => setPage(page - 1)} aria-label="Previous page">
+            ‹
+          </button>
+          {SLOT_PAGES.map((slots, i) => (
+            <button
+              key={i}
+              role="tab"
+              aria-selected={i === page}
+              className={i === page ? 'slot-page selected' : 'slot-page secondary'}
+              title={`Slots ${i * slots.length + 1} to ${i * slots.length + slots.length}`}
+              onClick={() => setPage(i)}
+            >
+              {i + 1}
+              {/* A dot on a page that has a save on it, so that he need not hunt for them. */}
+              {slots.some((slotId) => summaryOf(slotId)) && <i aria-hidden />}
+            </button>
+          ))}
+          <button className="secondary" disabled={page === SLOT_PAGES.length - 1} onClick={() => setPage(page + 1)} aria-label="Next page">
+            ›
+          </button>
+        </div>
         {notice && <p className="notice">{notice}</p>}
         <div className="actions">
           <button className="secondary" onClick={onClose}>

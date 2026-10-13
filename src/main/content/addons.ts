@@ -21,6 +21,7 @@ import {
 } from '../../shared/model'
 import { ADDON_PREFIX, isSafeId, type ContentOrigin, type EditorInfo } from '../../shared/editor'
 import { readPack } from './loader'
+import { writtenCatalogue } from '../../shared/game/catalogue'
 
 const LOVE_INTERESTS = 'love-interests'
 const LOCATIONS = 'locations'
@@ -159,7 +160,10 @@ export function loadWithAddons(packDir: string, addonDir: string): LoadedContent
   let catalogue: unknown
   if (existsSync(join(addonDir, CATALOGUE_FILE))) {
     try {
-      catalogue = CatalogueSchema.parse(readJsonFile(join(addonDir, CATALOGUE_FILE)))
+      // It is checked with the pack it belongs to: on its own it says only who is in what and when.
+      const read = readJsonFile(join(addonDir, CATALOGUE_FILE))
+      validateContentPack({ ...pack(accepted), catalogue: read })
+      catalogue = read
     } catch (error) {
       issues.push(`${CATALOGUE_FILE} was left out: ${(error as Error).message}`)
     }
@@ -344,8 +348,23 @@ export function saveCatalogue(addonDir: string, raw: unknown): string[] {
   if (!parsed.success) return parsed.error.issues.map((issue) => `${issue.path.join('.') || 'catalogue'}: ${issue.message}`)
   if (parsed.data.courses.length === 0) return ['There are no courses in it.']
   mkdirSync(addonDir, { recursive: true })
-  writeFileSync(join(addonDir, CATALOGUE_FILE), `${JSON.stringify(parsed.data, null, 2)}\n`)
+  // Only what was worked out is kept: what each course is called and teaches is the curriculum's.
+  writeFileSync(join(addonDir, CATALOGUE_FILE), `${JSON.stringify(writtenCatalogue(parsed.data), null, 2)}\n`)
   return []
+}
+
+/**
+ * A character as her file has her: what she reads or teaches by the subject's name in the curriculum, and nothing
+ * of what that subject is. A pack with no curriculum keeps what was written.
+ */
+function asWritten(content: ContentPack, li: LoveInterest): unknown {
+  if (!content.curriculum) return li
+  const named = (subject: { code: string; level: number }) => ({ major: subject.code, level: subject.level })
+  return {
+    ...li,
+    ...(li.studies && { studies: named(li.studies) }),
+    ...(li.teaching && { teaching: { ...li.teaching, subjects: li.teaching.subjects.map(named) } })
+  }
 }
 
 /** Every character in the content, love interests and NPCs together, as they are written. */
@@ -388,7 +407,7 @@ export function saveLoveInterest(addonDir: string, content: ContentPack, raw: un
   const problems = problemsWith(content, overlay(everyone(content), [li]), content.traits)
   if (problems.length > 0) return problems
   mkdirSync(join(addonDir, LOVE_INTERESTS), { recursive: true })
-  writeFileSync(join(addonDir, LOVE_INTERESTS, `${li.id}.json`), `${JSON.stringify(li, null, 2)}\n`)
+  writeFileSync(join(addonDir, LOVE_INTERESTS, `${li.id}.json`), `${JSON.stringify(asWritten(content, li), null, 2)}\n`)
   return []
 }
 

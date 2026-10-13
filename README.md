@@ -69,30 +69,46 @@ left unsigned.
   of its tags is in the person's `likes`, disliked if one is in their `dislikes`, and the
   affection it earns is set under `gifts` in `relationships.json`. The character is told
   what they were given and how they feel about it.
-- **Coursework** (`coursework.json`): the course catalogue is built ahead of time in the
-  editor (Edit game content, Courses) and saved to the add-on folder as `catalogue.json`;
-  every new game starts with it, and a game cannot start without one. It is built by rule,
-  with no LLM (`buildCatalogue` in `src/shared/game/catalogue.ts`), and the same seed and
-  characters always give the same catalogue:
-  - **Majors** are every student's `studies`, every teacher's subjects and the
-    `generalEd` list. A love interest's major gets `coursesPerMajor` courses, at the years
-    its students and teachers need and then the rest of years 1 to 4; a general subject
-    gets one. Numbers are the prefix, the year and an ordinal: `ECO 101`, `ECO 401`.
+- **The curriculum** (`curriculum.json`, `src/shared/model/curriculum.ts`) is everything the
+  University teaches, written down: its colleges, the subjects in them, and each subject's
+  courses, each with its title, description, the six topics of its syllabus and the one
+  skill it teaches. Nobody makes a subject up. A character's file names what she reads
+  (`"studies": { "major": "POL", "level": 1 }`) or the courses she gives
+  (`"subjects": [{ "major": "ETH", "level": 1 }]`), and the rest is filled in from the
+  curriculum when the pack is read (`resolveCurriculum`), which also draws out of it the
+  general subjects, `content.syllabus` and `content.skills`. The editor offers subjects and
+  courses from a list, and saves a character with only the names. A subject is `general`
+  when it is open to all and nobody reads it; a single course of a subject that is read can
+  be `general` too (the first-year ethics course every student passes through). It is
+  edited by hand, like the codex.
+- **Coursework** (`coursework.json`) holds the rules of the timetable, and **the catalogue**
+  (`catalogue.json`) is the term laid out: which of the written courses are given, who
+  gives each, when each meets and who is in it. It is built by rule, with no LLM
+  (`buildCatalogue` in `src/shared/game/catalogue.ts`), the same every time for the same
+  seed and characters, in the editor (Edit game content, Courses) or with
+  `npx jiti scripts/build-catalogue.ts`; build it again after adding a character or
+  changing what one reads or teaches. On disk it holds only what was worked out (`id`,
+  `professor`, `teacherId`, `studentIds`, `meetings`); what a course is called and teaches
+  is put back from the curriculum. A `catalogue.json` in the add-on folder is read in place
+  of the game's own.
+  - **Which courses are given**: a course a love interest reads or teaches, and every
+    general one. The rest are written and dormant (`dormantCourses`): they are what a new
+    character can be given. A student sits her subject's course for her year, or the
+    nearest written below it (`courseFor`).
   - **Meetings**: every course has `lecturesPerWeek` lectures of `lectureHours`, on
     different days. A subject marked `practical` also has one lab of `labHours`.
   - **Slots** are given out one meeting at a time, each to the hours between `dayStart`
     and `dayEnd` with the fewest classes already in them, so the week fills before
     anything overlaps. After that classes share hours, but never two of one major, and
     never two that the same love interest teaches.
-  - **Professors**: a love interest who teaches a subject gives every course in it. Each
-    other major has one professor from the `professors` list, who gives all of its courses.
-  - **Classmates**: each student takes her own major's course at her year, then fills up
-    with general and first-year courses that do not clash with what she has. A class
-    holds at most three love interests, its teacher counted, since attending it is a
-    scene with all of them.
-  - **Wording** is the one thing the LLM does, and only when asked: "Write titles and
-    descriptions" sends the courses in batches of twenty and puts back what comes, by
-    course number. Until then titles are plain ("Foundations of Economics").
+  - **Professors**: a love interest gives the courses she is down for. Each other subject
+    has one professor from the `professors` list.
+  - **Classmates**: each student takes her own subject's course and two more that do not
+    clash with it: a general course, another subject's first year, or a class a love
+    interest teaches. They are given out turn about, a teacher's empty class first, then
+    an empty general course, then one where she would have company. A class holds at most
+    `maxPerClass` (2) love interests, its teacher counted; those who read its subject sit
+    it regardless, up to `maxMajorClass` (3). A course nobody ends up in is not given.
   The editor shows when the saved catalogue is out of date (a character's subject or year
   has changed since). At the start of term the player picks up to `maxCourses` on a week
   planner, a column per day and a row per hour; two courses whose hours overlap cannot
@@ -124,14 +140,18 @@ left unsigned.
   (`personalise` in `src/shared/game/personalise.ts`); the editor shows it as written. The
   only name in the content is the default in `new-game.json`, and a test keeps it so.
 - **Traits** are a shared library of name + definition, referenced by id.
-- **Codex** entries reach the AI only when unlocked and relevant: always-on, tied to the
-  current location or character, or mentioned in the recent conversation, within a budget.
+- **Codex** entries reach the AI only when unlocked and relevant: always-on (only the opening
+  world entry is), or mentioned by title or keyword in what has been said in the scene so
+  far, within a budget. Where the scene is and who is in it bring nothing in.
 
 ## Saves
 
 - The title screen offers **Continue** (the most recently written save), **New Game** and
   **Load**. In game, **Save** and **Load** open the slot list.
-- There are six manual slots plus an **autosave**, which is rewritten after every change.
+- There are forty manual slots, shown eight to a page (`MANUAL_SLOTS`, `SLOTS_PER_PAGE` in
+  `src/shared/saves.ts`), plus an **autosave**, which is rewritten after every change. The
+  autosave stands at the top of every page and cannot be saved over by hand. The list
+  opens on the page of the most recent manual save, and a dot marks each page that has one.
 - A save holds the whole game state and any scene still in progress. Saves are JSON files
   in the `saves` folder of Electron's user-data directory, one per slot.
 - Saves from a different format version, or damaged files, are shown as unreadable rather
@@ -293,7 +313,7 @@ and the trait library.
   impressive, 22 exceptional and 26 legendary: what love interests notice and what jobs
   ask for. Each score has a
   modifier, (score - 10) / 2 rounded down, kept for the magic to come. A class raises the one or two stats its
-  course teaches (`stats` on a love interest's `studies` and on each `generalEd` entry in
+  course teaches (`stats` on the subject in the curriculum, drawn out as `generalEd` in
   `coursework.json`; `statGain` points for each hour of class, shared between them). An activity the
   player makes up can work on a stat (+1 an hour, for energy) or be rest (energy back);
   the LLM judges which from the wording, and each location lists what it is a good place
@@ -324,6 +344,23 @@ and the trait library.
   `lengthDays`, `recoveryDays` after a birth, `daughterChance`, and the `stages` (each from
   a fraction of the way through, with a description for the character and whether it
   shows). The length is the same for everyone.
+  - **Whether she will** (`src/shared/game/intimacy.ts`, `intimacy` in
+    `relationships.json`): a woman with one of `easyTraitIds` (promiscuous, sex-addict) is
+    held to nothing. Any other will not have sex in the first scene she is ever in with
+    him, nor until her desire has reached `minDesire` (25), or `reluctantMinDesire` (50)
+    with one of `reluctantTraitIds` (prude). It is settled as a scene stands (`sexGate`),
+    told to her as a rule, and enforced: while it is shut no sex-act is shown and nothing
+    can be conceived, whatever the reply says.
+  - **Birth control** (`onBirthControl`): a love interest's `birthControl` flag (the
+    editor's Family tab; on unless written off) says whether she takes something against
+    the Bloom when the game begins. While she does, the chance is `birthControlChance`
+    (0.2) in place of `chance` (1). Stopping is hers to decide in a scene: she is told so,
+    and writes `[STOPS BIRTH CONTROL]` when she does (`stopBirthControl`), which puts her
+    in `offBirthControl` in the save and gives her a core memory of the choice.
+  - **Her period** (`periodDay`): every woman has a cycle of `cycleDays` (28) that began on
+    a day of her own, settled by the game's seed. For its first `periodDays` (4) she is on
+    her period: she is told so, her profile says so, and she cannot conceive. It stops
+    while she is carrying.
   - **Conception by sex-act**: choosing the `creampie` sex-act (`isSeeding` in
     `src/shared/model/loveInterest.ts`) counts as the `[SEEDED]` tag for whoever the sex-act is
     of, whether or not the tag was written.
@@ -336,7 +373,7 @@ and the trait library.
     The character panel and the calendar show the stage and the due date.
   - **Birth** (`src/shared/game/births.ts`): `birthNoticeDays` before she is due (three),
     the game sets the hour of the birth and puts it on his calendar, at `birthLocationId`
-    (the Health Centre) for `birthHours`, and she DMs him the time. The hour is the earliest
+    (the Health Center) for `birthHours`, and she DMs him the time. The hour is the earliest
     stretch of the due day that is free of everything else of his while the place is open;
     failing that the earliest that costs him only a calendar event, then only a shift, then
     a class, then another plan (`birthSlot`). It cannot be called off.
@@ -347,17 +384,29 @@ and the trait library.
     - **Missed**, the child is born all the same at the end of the hour (`settleBirths`):
       she takes `MISSED_BIRTH` (affection -25, trust -30, desire -15), keeps a **core**
       memory of it and writes to say so.
+    The child is a daughter by `daughterChance` (seven in eight) and has a **name**: its
+    mother's suggestion (`suggestName`), the next unused one of her `childNames` (the
+    editor's Family tab), then of the pack's
+    `names` in `pregnancy.json`. While he is in the scene of the birth he can give another
+    (`renameNewborn`), which she takes gladly; a birth he missed keeps hers.
     The child is recorded in `children` in the save, and her prompt and the others' mention
     it from then on. The `pregnant` condition lets activities, secrets and codex entries
     depend on it. A birth still to come when the calendar ends is told in the epilogue.
   - **Her birth picture**: each love interest has one optional `birthPicture` (the Birth
-    slot on the editor's Media tab), drawn at 1920×1080 by the `birth` kind of picture from
+    slot on the editor's Family tab), drawn at 1920×1080 by the `birth` kind of picture from
     her appearance (`birthPrompt` in `src/shared/comfy.ts`): sitting up in a hospital bed in
     a gown with the child in her arms.
 - **Sire housing** (`housing.json`, optional; `src/shared/game/housing.ts`): once a love
   interest he is in any agreed relationship with is carrying his child, the housing
   officer of the Sire Relations Office (an NPC, `officerId`) DMs him the offer of a house,
   which the thread shows with Accept and Decline. Declined, it can still be taken.
+  - **The viewing** (`viewing` in `housing.json`, `src/shared/game/viewing.ts`): saying yes
+    does not move him in. The officer sets an hour to show him the house (`scheduleViewing`):
+    the first stretch from the next day on, in office hours, that is free of everything else
+    of his, at `meetLocationId`. It is on his calendar and he has to be there; missed, it is
+    simply set again. Kept (`attendViewing`), it is a scene at the house with the nanny, the
+    officer there as its guide (`guideId` on the scene), and the house is his as it opens:
+    the Home button is there when the scene ends. A pack without `viewing` moves him in on yes.
   - **The house is put into the content**, not handled beside it. `withHousing(content,
     state)` gives the pack as one game sees it, and is applied wherever content is prepared
     for a state (`App.tsx` and `readBy` in `src/main/index.ts`). Until he lives there the
@@ -366,7 +415,9 @@ and the trait library.
     home and study in his own room all follow), each love interest who lives there has her
     `room` in it and comes home to it (`residentSchedule`), and each room's view says what
     has been made of it. Everything else reads the content as it always did.
-  - **Rent** (`rent`) falls on the first of each month. Short of it, it is carried as
+  - **Rent** (`rent`) falls on the first of each month, less `rentRelief.perChild` (20)
+    for each child of his wherever it lives, to no less than `rentRelief.floor` (60)
+    (`monthlyRent`). Short of it, it is carried as
     arrears for `graceDays` and the officer writes; still unpaid, the house is taken back
     (`evict`): everyone goes home, the children go to the creche, and he is back in the
     Halls. There is no second offer.
@@ -492,6 +543,44 @@ and the trait library.
   takes an optional `hours` (whole, up to twelve) for time the characters stayed on
   before leaving: a meal that ran long, an afternoon's study, a night. There is no
   separate tool for passing time. The summary screen shows how long the scene took.
+- **Syllabus** (`topics` on each course of the curriculum, `src/shared/game/syllabus.ts`):
+  the topics a course's classes are on, in order: a title and what is true of it in this
+  world. It is lore like the codex, but hidden: it is not in the player's book and no word
+  calls it up. The class he sits takes the next topic after the classes he has attended
+  (`lessonTopic`), round again at the end; it is given to the teacher in the instruction
+  that opens the lecture and kept in the prompt for the rest of that class.
+- **Skills** (`skill` on each course of the curriculum, `src/shared/game/skills.ts`): every
+  course teaches one thing at so many marks (`at`, 30). He has it while he is taking the
+  course and has the marks; nothing is stored but `skillsTold`, so that it is announced
+  once. A skill is one of three shapes (`src/shared/model/skill.ts`):
+  - a **sight** (`grants`, one of `SKILL_GRANTS`): `cycle`, `contraception` and `desire`
+    show the period, birth-control and desire-needed chips on her phone page (a "?" chip
+    says where it is learnt until then), `schedule` lists her week there, `comfort` shows
+    each woman's comfort in a scene, and `tastes` finds one like or dislike of hers when a
+    scene ends;
+  - a **passive** (a modifier, below): always on once learnt;
+  - an **ability**: something he makes or sets off, then waits `cooldownDays` to do again
+    (`canUseAbility`, `useAbility`, `abilityUsed` in the save). He never casts: he brews,
+    or readies a thing at the bench and triggers it. Brewing is an ability whose effect
+    puts an item in his bag.
+- **Modifiers** (`src/shared/model/modifier.ts`, `src/shared/game/modifiers.ts`): one
+  vocabulary, `MODIFIER_KINDS`, for every number of the game a course or a potion changes.
+  Two things feed it: the passives of the skills he has, and **boons**, which are
+  modifiers in force until a time (`boons` in the save; one that has run out is simply
+  ignored). Whatever works a number out asks `factor` (what it is multiplied by) or `bonus`
+  (what is added): what a scene is worth to her (`feltChange`, in `applyFeelings` and the
+  `meter` effect), training (`trainStat`), marks from study and Focus, wages, prices, rent,
+  a child's keep, building, gifts, the energy of a class or shift, the desire she needs
+  (`desireNeeded`), the chance of a child and how soon after a birth, the comfort of the
+  house, and how often a scene is walked in on. A boon set on a woman counts for her alone
+  and may carry a line told to her while it lasts.
+- **Using things** (`use` on an item, `src/shared/game/market.ts`): an item can be something
+  he uses as well as gives, on himself or on a woman he is with (`canUse`, `useItem`). Two
+  effects exist for it and for abilities: `boon`, and `item`, which puts things in his bag.
+  The **Bag** (`src/renderer/src/ui/Bag.tsx`) is an app on his phone and what the Gift
+  button opens in a scene: what he carries, what he can make and when each is ready, and
+  what is in effect. Used in a scene on a woman, a charm takes hold with her next reply,
+  which is the one thing that moves the desire gate inside a scene.
 - **Marks and grades** (`grading` in `coursework.json`, `src/shared/game/grades.ts`): every
   course has a hundred points for the player to fill over the term. Sitting a class earns
   them by the hour, so that every class of the term comes to `attendanceShare` (60) of
@@ -504,10 +593,22 @@ and the trait library.
   and `finalWeek` and each takes the place of the course's last class of that week. Those
   two weeks have no lectures or labs at all: every course meets only in that one slot, for
   the player and for everyone else, and the weeks are left out when an hour of class is
-  valued. In the slot itself there is nothing to attend and no scene, and when the hour is over he is graded on the points
-  he has, the midterm against the part of the term gone by and the final against the whole.
-  `passAt` (0.6) of those is a pass and a D; C, B and A come at seven, eight and nine
-  tenths. Grades are kept in the save under `grades`, by course, for later systems to use.
+  valued.
+- **Examinations** (`src/shared/game/exams.ts`, `ExamDialog.tsx`): an examination is
+  something he turns up for, like a class. He is taken to the hall and handed its paper:
+  `examQuestions` (3) multiple-choice questions, each on a topic of a class he sat
+  (`topicsCovered`; a class missed taught him nothing), the final asking first about what
+  the midterm did not. Every topic in `curriculum.json` has one `question` (`ask`,
+  `answer`, three `wrong`), and whoever teaches the class is told to say its answer in the
+  lecture, so that what is asked is something he heard. Handing it in passes the rest of
+  the slot and gives the grade (`gradeFor`): with `passAt` (0.6) of the marks to be had by
+  then (the midterm against the part of the term gone by, the final against the whole) a
+  C; with `markAt` (0.8) of them a B; every answer right lifts either by a letter; and an F
+  under a pass, or when its hour goes by without him (`settleExams`). The classes he sat
+  are kept in the save by day and hour under `attendance`. Grades are kept under
+  `grades`, by course. Every love interest is told when the examinations are next week or
+  on, when her own are, and what he got in a course she takes with him or teaches
+  (`examNotes`).
 - **Raising a stat**: each location lists what can be done there for a stat (`drills` in
   `locations.json`: a stat, a title and an opening line; edited under Locations). The day
   view's **Stats** option opens into one suggestion for each of the six stats, picked from
@@ -527,10 +628,15 @@ and the trait library.
   better-paid jobs ask more. Being taken on puts the boss in his DMs. A shift is clocked
   in for at the place while it is on, like a class, and is a scene: the boss is there, and
   so is any love interest who happens to be at the place. It keeps him until the shift
-  ends, costs energy by the hour, and pays when the scene is over. A shift that ends
+  ends, costs energy by the hour, and pays when the scene is over. Being better than the
+  job asks pays more (`payBonus`): `bonusPerPoint` (4%) on top of the rate for each point
+  he has over its requirements, across every stat it names, up to `bonusCap` (40%). A job
+  that asks nothing pays no bonus. A shift that ends
   without him is a strike, or half of one if he messaged his boss that day before it began
   (she records it with the `excuse_shift` tool); at three he is let go. He may quit at any
-  time. A job he has quit or lost will not have him back. Shifts may overlap his classes;
+  time. A job he has quit or lost will not have him back. The game's own jobs keep
+  clear of the teaching day: shifts are on weekday evenings, after the last class, and on the
+  two days no classes meet (`economy.test.ts` pins it). An add-on's may overlap his classes;
   the board says where they do.
 - **The lecture**: a class scene opens with the teacher teaching. The first reply of a
   class is asked for with a prompt of its own (`lessonCue` in `src/shared/game/prompt.ts`):
@@ -539,17 +645,22 @@ and the trait library.
   player, ending on something he can answer. The teacher speaks under her own name when
   she is a love interest sitting in the scene, and under the course's professor otherwise,
   shown as a name on the text box with no face. After it, replies are their usual length.
+- **Focus** (`src/shared/game/focus.ts`): under the Here bar on the day screen he picks one
+  stat, or one course he is taking, as his focus (`focus` in the save). When he skips ahead
+  to the next thing on his timetable, the hours that go by are spent on it
+  (`spendOnFocus`): `FOCUS_SHARE` (half) of what the same hours of a session would earn,
+  for no energy. A toast says what came of it as the next thing begins.
 - **What is next** (`src/shared/game/upcoming.ts`): the day screen puts the next thing on
   the player's timetable today at the head of what he can do: the soonest of the classes
   he takes, his shift, and the plans he has made (`nextUp`). Taking it skips the hours
   until it starts, puts him at the place, and begins it as if he had turned up on time.
   When he could not go through with it (too tired for the class, say) it is a note with
-  the reason and not a button. An examination is not offered: it is sat without him.
+  the reason and not a button. An examination is offered the same way, and opens its paper.
 - **The epilogue** (`src/shared/game/epilogue.ts`, `EpilogueView.tsx`): when the last day of
   the calendar is over, the day screen gives way to the epilogue, a screen of text at a time
   that fades in over a placeholder backdrop. Nothing in it is written by the LLM. First his
   studies: failing, getting by or excelling, from the final grade in each course he took
-  (the final he sat, or what his marks would earn if the year ended first), with the grades
+  (the final he sat, or what his marks and attendance would earn if the year ended first), with the grades
   listed. Then a screen for each arrangement whose status is `committed` in
   `relationships.json` (every one but lovers without promises). Then a screen for each love
   interest who carried his child during the year: the children she bore, and for one still
@@ -563,8 +674,7 @@ and the trait library.
   lists the classes, shift and plans still to come that he would miss, asks, and then
   skips straight to 06:00 the next morning. Either way he wakes with full energy, at home:
   the place his room is in, or where a new game starts him. What
-  was skipped is settled as usual: a missed shift is a strike, a missed exam is graded
-  on the points he has.
+  was skipped is settled as usual: a missed shift is a strike, a missed exam is failed.
 - **How she feels afterwards** (`src/shared/game/memory.ts`): affection, trust and desire
   are not earned by the hour. When a scene ends, the same request that writes each love
   interest's memory of it asks how the scene changed what she feels for the player: a
@@ -753,8 +863,9 @@ directly: nothing in a scene ever calls it, and it talks only to the address you
 
 Wages, the rent, a child's keep and the price of every room of the house are balanced
 against each other, and `src/main/content/economy.test.ts` pins the balance: any job
-keeps the house and one child with care, a strong player can build most of it, and a
-whole year at the best wage does not buy the lot. Change a number in `jobs.json` or
+keeps the house and one child with care, a strong player can build most of it, and one
+whose stats have earned him half the pay bonus at a good job can finish the whole house by
+the end of the year with four children in it, which the rate alone does not. Change a number in `jobs.json` or
 `housing.json` and that test says whether the balance still holds.
 
 ## Drama

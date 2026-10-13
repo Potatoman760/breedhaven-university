@@ -186,13 +186,12 @@
     "title": "Professor",
     "subjects": [
       {
-        "subject": "Magical Ethics",
-        "code": "ETH",
-        "level": 1,
-        "stats": [
-          "wisdom"
-        ],
-        "practical": false
+        "major": "ETH",
+        "level": 1
+      },
+      {
+        "major": "ETH",
+        "level": 4
       }
     ]
   },
@@ -341,6 +340,19 @@
     "background": "generated/backgrounds/caelwen/view-2.webp"
   },
   "birthPicture": "sprites/caelwen/birth.png",
+  "childNames": {
+    "daughters": [
+      "Ithilwen",
+      "Aelindra",
+      "Sylwen",
+      "Nimriel",
+      "Lorael"
+    ],
+    "sons": [
+      "Faelan",
+      "Thalion"
+    ]
+  },
   "ai": {
     "speechPattern": "Measured, warm and lightly ironic, in full sentences. Answers a question with a better question. Old-fashioned turns of phrase that she knows are old-fashioned. Gentle teasing, and real attention to what is said back.",
     "tone": "wry, warm, unhurried",

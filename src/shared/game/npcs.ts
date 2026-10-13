@@ -49,10 +49,10 @@ export function npcsAt(content: ContentPack, state: GameState, locationId: strin
  * where the scene is. They are not part of the company, but they are there to be spoken
  * to: the one who takes the order, minds the door, keeps the forge.
  */
-export function sceneExtras(content: ContentPack, state: GameState, scene: Pick<Scene, 'npc' | 'shift'>): Npc[] {
+export function sceneExtras(content: ContentPack, state: GameState, scene: Pick<Scene, 'npc' | 'shift' | 'guideId'>): Npc[] {
   if (scene.npc) return []
-  // On a shift his boss is there whatever her day says, and comes first.
-  const bossId = content.jobs?.jobs.find((job) => job.id === scene.shift?.jobId)?.bossId
+  // On a shift his boss is there whatever her day says, and comes first; so does whoever a scene is led by.
+  const bossId = scene.guideId ?? content.jobs?.jobs.find((job) => job.id === scene.shift?.jobId)?.bossId
   const boss = content.npcs.filter((npc) => npc.id === bossId)
   return [...boss, ...npcsAt(content, state, state.locationId).filter((npc) => npc.id !== bossId)].slice(0, MAX_EXTRAS)
 }

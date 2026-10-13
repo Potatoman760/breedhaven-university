@@ -19,6 +19,17 @@ import {
   currentJob,
   excuseShift,
   hoursPerWeek,
+  useItem,
+  useAbility,
+  hasSkill,
+  skillGranting,
+  courseMembers,
+  describeMeetings,
+  periodDay,
+  sexGate,
+  desireNeeded,
+  onBirthControl,
+  payBonus,
   npcAsCharacter,
   quitJob,
   weekAgainst,
@@ -59,12 +70,14 @@ import {
   unreadPosts,
   markFeedSeen
 } from '../../../shared/game'
-import { MEMORY_LEVEL_LABELS, METERS, STATS, type ContentPack, type GameState, type Job, type LoveInterest } from '../../../shared/model'
+import { MEMORY_LEVEL_LABELS, METERS, STATS, type ContentPack, type GameState, type Job, type LoveInterest, type SkillGrant } from '../../../shared/model'
 import { errorMessage } from '../errors'
+import { Bag } from './Bag'
 import { Overlay } from './Dialog'
 import { useConfirm } from './Confirm'
 import { JobIcon } from './icons'
-import { BackIcon, ChatIcon, ChevronIcon, FeedIcon, FriendsIcon, HeartIcon, MarketIcon, PregnantIcon, WorkIcon } from './icons'
+import { BackIcon, ChatIcon, ChevronIcon, FeedIcon, FriendsIcon, HeartIcon, MarketIcon,
+  BagIcon, PregnantIcon, WorkIcon } from './icons'
 import { Stalls } from './MarketView'
 import { EmojiPicker } from './EmojiPicker'
 
@@ -91,7 +104,8 @@ const APPS = [
   { id: 'friends', label: 'Friends', Icon: FriendsIcon },
   { id: 'updates', label: 'Feed', Icon: FeedIcon },
   { id: 'jobs', label: 'Jobs', Icon: WorkIcon },
-  { id: 'shop', label: 'Market', Icon: MarketIcon }
+  { id: 'shop', label: 'Market', Icon: MarketIcon },
+  { id: 'bag', label: 'Bag', Icon: BagIcon }
 ] as const
 type App = (typeof APPS)[number]['id']
 
@@ -184,6 +198,17 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, onGoT
           {app === 'updates' && <Updates content={content} state={state} onChange={onChange} onMessage={message} canMessage={canMessage} />}
           {app === 'jobs' && <Jobs content={content} state={state} onChange={onChange} onMessage={message} />}
           {app === 'shop' && <Market content={content} state={state} onChange={onChange} />}
+          {/* What he carries and can make. Used here, a thing is used on himself: what is for a woman waits until he is with her. */}
+          {app === 'bag' && (
+            <div className="feed">
+              <Bag
+                content={content}
+                state={state}
+                onUseItem={(itemId) => onChange((current) => useItem(content, current, itemId))}
+                onAbility={(skillId) => onChange((current) => useAbility(content, current, skillId))}
+              />
+            </div>
+          )}
         </div>
       </div>
     </Overlay>
@@ -694,6 +719,11 @@ function Jobs({ content, state, onChange, onMessage }: JobsProps) {
   const held = currentJob(content, state)
   const place = (id: string) => content.locations.find((l) => l.id === id)?.name ?? id
   const { ask, dialog } = useConfirm()
+  // What he would be paid over a job's rate as he is now, said beside the rate: " +12%".
+  const bonusNote = (job: Job) => {
+    const bonus = Math.round(payBonus(content, state, job) * 100)
+    return bonus > 0 ? ` +${bonus}% for your stats` : ''
+  }
   // What he can be taken on for first, then by pay; a job he has left goes to the bottom.
   const openings = [...(config?.jobs ?? [])]
     .filter((job) => job.id !== held?.id)
@@ -715,7 +745,7 @@ function Jobs({ content, state, onChange, onMessage }: JobsProps) {
                 {held.title} · {place(held.locationId)}
               </strong>
               <span className="handle">
-                ${held.hourlyRate} an hour · {hoursPerWeek(held)} hours a week{held.trains ? ` · builds ${held.trains}` : ''} · {bossOf(content, held)?.name ?? 'the boss'}
+                ${held.hourlyRate} an hour{bonusNote(held)} · {hoursPerWeek(held)} hours a week{held.trains ? ` · builds ${held.trains}` : ''} · {bossOf(content, held)?.name ?? 'the boss'}
               </span>
             </div>
             <span className={state.job.strikes > 0 ? 'chip madder' : 'chip'}>
@@ -760,7 +790,7 @@ function Jobs({ content, state, onChange, onMessage }: JobsProps) {
                   {job.title} · {place(job.locationId)}
                 </strong>
                 <span className="handle">
-                  ${job.hourlyRate} an hour · {hoursPerWeek(job)} hours a week{job.trains ? ` · builds ${job.trains}` : ''}
+                  ${job.hourlyRate} an hour{bonusNote(job)} · {hoursPerWeek(job)} hours a week{job.trains ? ` · builds ${job.trains}` : ''}
                 </span>
               </div>
               <button disabled={!check.ok} onClick={() => onChange((current) => (canApply(content, current, job.id).ok ? applyForJob(content, current, job.id) : current))}>
@@ -775,6 +805,11 @@ function Jobs({ content, state, onChange, onMessage }: JobsProps) {
                   {stat} {job.requirements[stat]}
                 </span>
               ))}
+              {needs.length > 0 && config && config.bonusPerPoint > 0 && (
+                <span className="chip" title="Each point you have over what the job asks, in any stat it asks for, adds to what every shift pays.">
+                  +{Math.round(config.bonusPerPoint * 100)}% pay a point over, up to {Math.round(config.bonusCap * 100)}%
+                </span>
+              )}
               <CalendarCompare content={content} state={state} job={job} />
             </div>
             {!check.ok && <span className="pin-note">{check.reasons.join(' · ')}</span>}
@@ -796,6 +831,19 @@ function About({ content, state, li }: { content: ContentPack; state: GameState;
   const facts = factsOf(content, li)
   const known = revealedIds(state, li.id)
   const first = li.name.split(' ')[0]
+  // A pack with no skills hides nothing: there would be no way to learn to see it.
+  const can = (grant: SkillGrant) => skillGranting(content, grant) === undefined || hasSkill(content, state, grant)
+  const unknown = (grant: SkillGrant, label: string) => {
+    const skill = skillGranting(content, grant)
+    const course = state.courses.find((one) => one.code === skill?.code)
+    return (
+      <span className="chip unknown" title={skill ? `${skill.name} would tell you. ${course ? `${course.number}, ${course.title}` : skill.code} teaches it at ${skill.at} marks.` : undefined}>
+        {label} ?
+      </span>
+    )
+  }
+  const classes = state.courses.filter((course) => courseMembers(course).includes(li.id))
+  const periodName = (id: string) => content.calendar.periods.find((period) => period.id === id)?.name ?? id
   const ties = content.loveInterests
     .filter((other) => other.id !== li.id && tieOf(content, state, li.id, other.id) > 0)
     .map((other) => ({ other, value: tieOf(content, state, li.id, other.id) }))
@@ -805,6 +853,27 @@ function About({ content, state, li }: { content: ContentPack; state: GameState;
     <div className="people-about">
       <div className="chips">
         <span className="chip madder">{stage.name}</span>
+        {/* What he can only tell of her once he has learnt how: without the skill, the chip says where it is learnt. */}
+        {!can('desire')
+          ? unknown('desire', 'Desire needed')
+          : !sexGate(content, state, li).open && (
+              <span className="chip" title="She will not go to bed with you yet: not on the day you meet, and not until she wants you this much.">
+                Desire {state.relationships[li.id]?.desire ?? 0} of {desireNeeded(content, state, li)} needed
+              </span>
+            )}
+        {content.pregnancy && !can('cycle')
+          ? unknown('cycle', 'Cycle')
+          : periodDay(content, state, li.id) !== undefined && (
+              <span className="chip" title="She cannot conceive while it lasts.">
+                On her period · day {periodDay(content, state, li.id)} of {content.pregnancy?.periodDays}
+              </span>
+            )}
+        {content.pregnancy && !can('contraception') && unknown('contraception', 'Birth control')}
+        {content.pregnancy && can('contraception') && (
+          <span className="chip" title={onBirthControl(content, state, li.id) ? 'She takes something against the Bloom, and a child is unlikely. Stopping is hers to decide: it is something to talk to her about.' : 'She has stopped taking anything against the Bloom: a child is very likely.'}>
+            {onBirthControl(content, state, li.id) ? 'On birth control' : 'Off birth control'}
+          </span>
+        )}
         {bond && (
           <span className="chip dark" title={statusOf(content, bond)?.description}>
             {describeBond(content, { ...bond, memberIds: bond.memberIds.filter((id) => id !== li.id) }).replace(/ with $/, '')}
@@ -830,6 +899,27 @@ function About({ content, state, li }: { content: ContentPack; state: GameState;
         </div>
       ))}
 
+      {skillGranting(content, 'schedule') && hasSkill(content, state, 'schedule') && (
+        <>
+          <h2>Her week</h2>
+          <ul className="her-week">
+            {li.schedule.map((entry, i) => (
+              <li key={i}>
+                <span className="caps">
+                  {entry.weekdays?.join(', ') ?? 'Every day'}
+                  {entry.periods ? ` · ${entry.periods.map(periodName).join(', ')}` : ''}
+                </span>{' '}
+                {content.locations.find((l) => l.id === entry.locationId)?.name ?? entry.locationId}
+              </li>
+            ))}
+            {classes.map((course) => (
+              <li key={course.id}>
+                <span className="caps">{course.number}</span> {describeMeetings(course)}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
       <h2>
         What you know of her
         <span className="hint">

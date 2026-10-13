@@ -9,6 +9,7 @@ import {
 } from "../../../../shared/editor";
 import {
   LIGHTS,
+  courseNumber,
   kindOf,
   LOVE_INTEREST_KINDS,
   LoveInterestSchema,
@@ -33,6 +34,7 @@ import { JobsEditor } from "./JobsEditor";
 import { LocationEditor } from "./LocationEditor";
 import { PlayerEditor } from "./PlayerEditor";
 import { ScheduleTab } from "./ScheduleTab";
+import { FamilyTab } from "./FamilyTab";
 import { SpritesTab } from "./SpritesTab";
 import { TraitsTab } from "./TraitsTab";
 
@@ -43,7 +45,7 @@ interface Props {
   onClose: () => void;
 }
 
-const TABS = ["Profile", "Traits", "Media", "Academics"] as const;
+const TABS = ["Profile", "Traits", "Media", "Family", "Academics"] as const;
 type Tab = (typeof TABS)[number];
 
 /** A character with nothing filled in, valid enough to be edited. */
@@ -61,14 +63,26 @@ function blank(): LoveInterest {
   });
 }
 
-/** A subject not yet filled in. */
-const NEW_SUBJECT: Studies = {
-  subject: "",
-  code: "GEN",
-  level: 1,
-  stats: ["intelligence"],
-  practical: false,
-};
+/** The subjects a student can read: every one the curriculum has that is not a general course. */
+const majorsToRead = (content: ContentPack) => (content.curriculum?.majors ?? []).filter((major) => !major.general);
+
+/** Every course the curriculum has written, for a teacher to be given. */
+const writtenCourses = (content: ContentPack) =>
+  (content.curriculum?.majors ?? []).flatMap((major) =>
+    major.courses.map((course) => ({ code: major.code, level: course.level, number: courseNumber(major.code, course.level), title: course.title })),
+  );
+
+/** A subject of the curriculum at a year, as a character has it. */
+function subjectOf(content: ContentPack, code: string, level: number): Studies | undefined {
+  const major = content.curriculum?.majors.find((one) => one.code === code);
+  return major && { subject: major.subject, code: major.code, level, stats: major.stats, practical: major.practical };
+}
+
+/** What a character who has just become a student or a teacher is given until something is chosen for her: the first there is. */
+function firstSubject(content: ContentPack, teaching: boolean): Studies {
+  const major = (teaching ? content.curriculum?.majors : majorsToRead(content))?.[0];
+  return (major && subjectOf(content, major.code, major.courses[0].level)) ?? { subject: "", code: "", level: 1, stats: ["intelligence"], practical: false };
+}
 
 const same = (a: unknown, b: unknown) =>
   JSON.stringify(a) === JSON.stringify(b);
@@ -384,7 +398,7 @@ function LoveInterestEditor({
             </span>
           </div>
           <div className="tabs" role="tablist">
-            {TABS.filter((name) => !(isNpc && name === "Traits")).map((name) => (
+            {TABS.filter((name) => !(isNpc && (name === "Traits" || name === "Family"))).map((name) => (
               <button
                 key={name}
                 role="tab"
@@ -434,14 +448,14 @@ function LoveInterestEditor({
                       kind: next,
                       studies:
                         next === "student"
-                          ? (draft.studies ?? NEW_SUBJECT)
+                          ? (draft.studies ?? firstSubject(content, false))
                           : undefined,
                       teaching:
                         next === "teacher"
                           ? (draft.teaching ?? {
                               department: "",
                               title: "Professor",
-                              subjects: [NEW_SUBJECT],
+                              subjects: [firstSubject(content, true)],
                             })
                           : undefined,
                     });
@@ -731,6 +745,8 @@ function LoveInterestEditor({
             />
           )}
 
+          {tab === "Family" && !isNpc && <FamilyTab draft={draft} set={set} />}
+
           {tab === "Media" && (
             <>
               <SpritesTab draft={draft} set={set} assetPrefix={info?.assetPrefix} />
@@ -940,191 +956,108 @@ function LoveInterestEditor({
                       hint="Before her name in the catalogue."
                     />
                   </div>
-                  {draft.teaching.subjects.map((subject, index) => {
-                    const change = (patch: Partial<Studies>) =>
-                      set({
-                        teaching: {
-                          ...draft.teaching!,
-                          subjects: draft.teaching!.subjects.map((s, i) =>
-                            i === index ? { ...s, ...patch } : s,
-                          ),
-                        },
-                      });
-                    return (
-                      <div key={index} className="card">
-                        <div className="row">
-                          <Text
-                            label="Subject"
-                llm
-                            value={subject.subject}
-                            onChange={(value) => change({ subject: value })}
-                          />
-                          <Text
-                            label="Catalogue code"
-                            value={subject.code}
-                            onChange={(code) =>
-                              change({ code: code.toUpperCase().slice(0, 4) })
-                            }
-                          />
-                          <label>
-                            Year
-                            <select
-                              value={subject.level}
-                              onChange={(e) =>
-                                change({ level: Number(e.target.value) })
-                              }
-                            >
-                              {[1, 2, 3, 4].map((year) => (
-                                <option key={year} value={year}>
-                                  Year {year}
-                                </option>
-                              ))}
-                              <option value={5}>Graduate</option>
-                            </select>
-                          </label>
-                          <Button variant="quiet"
-                            disabled={draft.teaching!.subjects.length <= 1}
- onClick={() =>
- set({
- teaching: {
- ...draft.teaching!,
- subjects: draft.teaching!.subjects.filter(
- (_, i) => i !== index,
- ),
- },
- })
- }
-                          >
-                            Remove
-                          </Button>
-                        </div>
-                        <label className="inline">
-                          <input
-                            type="checkbox"
-                            checked={subject.practical}
-                            onChange={(e) =>
-                              change({ practical: e.target.checked })
-                            }
-                          />
-                          Has a lab: a practical subject, with a long weekly
-                          class as well as its lectures
-                        </label>
-                        <PickList
-                          label="A class in it raises"
-                          options={STATS.map((stat) => ({
-                            id: stat,
-                            name: stat,
-                          }))}
-                          value={subject.stats}
-                          onChange={(stats) =>
-                            stats.length > 0 && change({ stats })
-                          }
-                          max={2}
-                        />
-                      </div>
-                    );
-                  })}
+                  {/* What she teaches is courses the curriculum has written: she is not asked to make a subject up. */}
+                  {draft.teaching.subjects.map((subject, index) => (
+                    <div key={index} className="row">
+                      <label>
+                        Course
+                        <select
+                          value={`${subject.code}:${subject.level}`}
+                          onChange={(e) => {
+                            const [code, level] = e.target.value.split(":");
+                            const picked = subjectOf(content, code, Number(level));
+                            if (picked)
+                              set({
+                                teaching: {
+                                  ...draft.teaching!,
+                                  subjects: draft.teaching!.subjects.map((s, i) => (i === index ? picked : s)),
+                                },
+                              });
+                          }}
+                        >
+                          {writtenCourses(content).map((course) => (
+                            <option key={`${course.code}:${course.level}`} value={`${course.code}:${course.level}`}>
+                              {course.number}: {course.title}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <Button
+                        disabled={draft.teaching!.subjects.length < 2}
+                        onClick={() =>
+                          set({
+                            teaching: {
+                              ...draft.teaching!,
+                              subjects: draft.teaching!.subjects.filter((_, i) => i !== index),
+                            },
+                          })
+                        }
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ))}
                   <Button
-                    onClick={() =>
- set({
- teaching: {
- ...draft.teaching!,
- subjects: [...draft.teaching!.subjects, NEW_SUBJECT],
- },
- })
- }
+                    onClick={() => {
+                      const first = writtenCourses(content)[0];
+                      const picked = first && subjectOf(content, first.code, first.level);
+                      if (picked)
+                        set({
+                          teaching: {
+                            ...draft.teaching!,
+                            subjects: [...draft.teaching!.subjects, picked],
+                          },
+                        });
+                    }}
                   >
-                    Add a subject
+                    Add a course
                   </Button>
                 </Group>
               )}
               {kind === "student" && (
-                <Group
-                  title="Studies"
-                >
+                <Group title="Studies" hint="She reads one of the University's subjects, and sits its course for her year. After changing it, build the schedule again under Courses.">
                   <div className="row">
-                    <Text
-                      label="Subject"
-                llm
-                      value={draft.studies?.subject ?? ""}
-                      onChange={(subject) =>
-                        set({
-                          studies: {
-                            ...NEW_SUBJECT,
-                            ...draft.studies,
-                            subject,
-                          },
-                        })
-                      }
-                    />
+                    <label>
+                      Subject
+                      <select
+                        value={draft.studies?.code ?? ""}
+                        onChange={(e) => {
+                          const picked = subjectOf(content, e.target.value, draft.studies?.level ?? 1);
+                          if (picked) set({ studies: picked });
+                        }}
+                      >
+                        {!majorsToRead(content).some((major) => major.code === draft.studies?.code) && <option value="">Choose a subject</option>}
+                        {majorsToRead(content).map((major) => (
+                          <option key={major.code} value={major.code}>
+                            {major.code}: {major.subject}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
                     {draft.studies && (
-                      <>
-                        <Text
-                          label="Catalogue code"
-                          value={draft.studies.code}
-                          onChange={(code) =>
+                      <label>
+                        Year
+                        <select
+                          value={draft.studies.level}
+                          onChange={(e) =>
                             set({
                               studies: {
                                 ...draft.studies!,
-                                code: code.toUpperCase().slice(0, 4),
+                                level: Number(e.target.value),
                               },
                             })
                           }
-                        />
-                        <label>
-                          Year
-                          <select
-                            value={draft.studies.level}
-                            onChange={(e) =>
-                              set({
-                                studies: {
-                                  ...draft.studies!,
-                                  level: Number(e.target.value),
-                                },
-                              })
-                            }
-                          >
-                            {[1, 2, 3, 4].map((year) => (
-                              <option key={year} value={year}>
-                                Year {year}
-                              </option>
-                            ))}
-                            <option value={5}>Graduate</option>
-                          </select>
-                        </label>
-                      </>
+                        >
+                          {[1, 2, 3, 4].map((year) => (
+                            <option key={year} value={year}>
+                              Year {year}
+                            </option>
+                          ))}
+                          <option value={5}>Graduate</option>
+                        </select>
+                      </label>
                     )}
                   </div>
-                  {draft.studies && (
-                    <label className="inline">
-                      <input
-                        type="checkbox"
-                        checked={draft.studies.practical}
-                        onChange={(e) =>
-                          set({
-                            studies: {
-                              ...draft.studies!,
-                              practical: e.target.checked,
-                            },
-                          })
-                        }
-                      />
-                      Has a lab: a practical subject, with a long weekly class
-                      as well as its lectures
-                    </label>
-                  )}
-                  {draft.studies && (
-                    <PickList
-                      label="A class in it raises"
-                      options={STATS.map((stat) => ({ id: stat, name: stat }))}
-                      value={draft.studies.stats}
-                      onChange={(stats) =>
-                        stats.length > 0 &&
-                        set({ studies: { ...draft.studies!, stats } })
-                      }
-                      max={2}
-                    />
-                  )}
                 </Group>
               )}
             </>

@@ -184,14 +184,8 @@
   "imageSeed": 62,
   "stageHeight": 70,
   "studies": {
-    "subject": "Magical Engineering",
-    "code": "MEN",
-    "level": 1,
-    "stats": [
-      "intelligence",
-      "dexterity"
-    ],
-    "practical": true
+    "major": "MEN",
+    "level": 1
   },
   "animations": [
     {
@@ -323,6 +317,19 @@
     "background": "generated/backgrounds/tink/view.webp"
   },
   "birthPicture": "sprites/tink/birth.png",
+  "childNames": {
+    "daughters": [
+      "Pip",
+      "Dottie",
+      "Merry",
+      "Fenna",
+      "Tuppence"
+    ],
+    "sons": [
+      "Milo",
+      "Perrin"
+    ]
+  },
   "ai": {
     "speechPattern": "Quick jokes, casual speech, playful dares and affectionate mischief.",
     "tone": "cheeky, playful, a little filthy",

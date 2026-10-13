@@ -905,6 +905,15 @@ pre {
   transition: filter 0.2s;
 }
 
+/* The part of the stage kept clear for a sex-act: the cast stands to either side of it, or all to the left when there is one of them. */
+.cast-middle {
+  flex: 0 0 50%;
+}
+
+.cast-middle.wide {
+  flex-basis: 72%;
+}
+
 /* Whoever isn't speaking steps back a little. */
 .cast img.listening {
   filter: brightness(0.62) saturate(0.85);
@@ -928,7 +937,7 @@ pre {
   inset: 0;
   width: 100%;
   height: 100%;
-  /* Over the background and everyone standing in it, and nothing of either showing round its edges. */
+  /* Over the background, with nothing of it showing round its edges. */
   object-fit: contain;
   background: #0f130c;
   pointer-events: none;
@@ -1323,6 +1332,24 @@ textarea.memory {
 .narration.action {
   font-style: italic;
   color: var(--ink-soft);
+}
+
+/* Naming a child, in the scene of its birth. */
+.naming {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+  background: var(--paper-raised);
+  font-size: 0.875rem;
+}
+
+.naming input {
+  flex: 1 1 140px;
+  min-width: 0;
 }
 
 .notice button {
@@ -5223,17 +5250,17 @@ button.entry:hover,
 
 /* ---- His house: a plan of it drawn from its rooms, who lives in it, and its accounts. */
 
+/* One height whichever tab is showing, so that the panel does not jump: what is longer scrolls inside it. */
 .house {
   display: flex;
   flex-direction: column;
   gap: 14px;
+  box-sizing: border-box;
+  height: min(74vh, 760px);
   min-height: 0;
   overflow-y: auto;
 }
 
-.house-head {
-  align-items: center;
-}
 
 .house .tabs .house-go {
   margin-left: auto;
@@ -5417,5 +5444,515 @@ button.house-cell.selected {
 @media (max-width: 900px) {
   .house-plan {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Help: the button in the corner, and the pages it opens. */
+.help-button {
+  position: fixed;
+  top: 6px;
+  left: 50%;
+  z-index: 5;
+  width: 28px;
+  min-width: 0;
+  height: 28px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 50%;
+  font: 700 0.9375rem/1 var(--ui);
+  opacity: 0.8;
+  transform: translateX(-50%);
+}
+
+.help-button:hover {
+  opacity: 1;
+}
+
+/* Every page of it is the same size, so that the window does not jump from tab to tab: what is longer scrolls. */
+.help-page,
+.help .book {
+  box-sizing: border-box;
+  height: min(64vh, 620px);
+  margin-top: 10px;
+}
+
+.help-page {
+  padding-right: 12px;
+  overflow-y: scroll;
+}
+
+.help-page h2 {
+  margin: 16px 0 6px;
+  font: 600 1.125rem/1.2 var(--display);
+}
+
+.help-page h2:first-child {
+  margin-top: 8px;
+}
+
+.help-page ul {
+  margin: 6px 0;
+  padding-left: 20px;
+}
+
+.help-page li {
+  margin: 3px 0;
+}
+
+.help-page table {
+  width: 100%;
+  margin: 6px 0;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.help-page th,
+.help-page td {
+  padding: 5px 10px;
+  border: 1px solid var(--rule-soft);
+  text-align: left;
+  vertical-align: top;
+}
+
+.help-page th {
+  background: var(--paper-raised);
+  font-weight: 600;
+}
+
+/* The codex, as a book lying open: two pages either side of a spine. */
+.book {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 8fr);
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px 8px 8px 4px;
+  background: var(--paper);
+  box-shadow:
+    0 2px 0 var(--rule),
+    0 4px 0 var(--parchment),
+    0 6px 0 var(--rule),
+    0 10px 18px rgba(42, 40, 31, 0.25);
+}
+
+.book-page {
+  min-height: 0;
+  padding: 22px 28px 14px;
+  overflow-y: auto;
+}
+
+/* The gutter: each page darkens toward the spine. */
+.book-contents {
+  border-right: 1px solid var(--rule);
+  background: linear-gradient(to right, var(--paper-raised) 80%, var(--parchment));
+}
+
+.book-entry {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(to left, var(--paper-raised) 86%, var(--parchment));
+}
+
+.book h2 {
+  margin: 0 0 10px;
+  font: 600 1.75rem/1.15 var(--display);
+}
+
+.book-contents h2 {
+  padding-bottom: 8px;
+  border-bottom: 3px double var(--rule-strong);
+  font-size: 1.375rem;
+  text-align: center;
+}
+
+.book-contents h3 {
+  margin: 14px 0 4px;
+  color: var(--madder);
+  font: 600 0.75rem/1.2 var(--ui);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.book-contents ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* A line of the contents: the title, a row of dots, the page. */
+.book-link {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  width: 100%;
+  min-height: 0;
+  padding: 3px 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--ink);
+  font: 500 1.0625rem/1.3 var(--display);
+  text-align: left;
+}
+
+.book-link i {
+  flex: 1;
+  border-bottom: 1px dotted var(--rule-strong);
+}
+
+.book-link:hover,
+.book-link.reading {
+  background: none;
+  color: var(--moss-deep);
+}
+
+.book-link.reading span:first-child {
+  font-weight: 700;
+  font-style: italic;
+}
+
+.book-text {
+  flex: 1;
+  font: 500 1.1875rem/1.55 var(--display);
+}
+
+.book-text p {
+  margin: 0 0 0.7em;
+  text-align: justify;
+  hyphens: auto;
+}
+
+/* A dropped capital opens the entry. */
+.book-text p:first-child::first-letter {
+  float: left;
+  padding: 4px 8px 0 0;
+  color: var(--madder);
+  font: 700 3.4rem/0.8 var(--display);
+}
+
+.book-entry footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--rule-soft);
+  color: var(--ink-soft);
+  font: 500 0.9375rem/1 var(--display);
+}
+
+.book-turn {
+  min-height: 0;
+  padding: 4px 6px;
+  border: 0;
+  background: none;
+  color: var(--moss-deep);
+  font: 600 1rem/1 var(--display);
+}
+
+.book-turn:hover:not(:disabled) {
+  background: none;
+  text-decoration: underline;
+}
+
+.book-turn:disabled {
+  background: none;
+  color: var(--rule);
+}
+
+/* A bar of its own under who is here, at the foot of the day's choices. */
+.focus-pick {
+  display: flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 10px;
+  padding: 6px 12px;
+}
+
+.focus-pick select {
+  min-width: 180px;
+  max-width: 320px;
+}
+
+/* Skills: where each is learnt, on the stat sheet and beside a course; what one lets him see, in a scene and on her page. */
+.skill-list h2 {
+  margin: 14px 0 6px;
+}
+
+.skill {
+  margin: 4px 0;
+  opacity: 0.7;
+}
+
+.skill.has {
+  opacity: 1;
+}
+
+.course-skill .caps {
+  display: block;
+}
+
+.comfort-read {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.comfort-read .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.her-week {
+  margin: 4px 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.her-week li {
+  margin: 2px 0;
+}
+
+/* Saves: the game's own slot set apart at the top, and the pages of the rest. */
+.slot.auto {
+  margin-bottom: 6px;
+  padding-bottom: 12px;
+  border-bottom: 3px double var(--rule-strong);
+}
+
+.slot-auto-note {
+  align-self: center;
+}
+
+.slot-pages {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.slot-pages button {
+  position: relative;
+  min-width: 36px;
+  min-height: 32px;
+  padding: 0 8px;
+}
+
+.slot-page i {
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  transform: translateX(-50%);
+}
+
+/* The bag: what he carries, what he can make, and what is working now. */
+.bag h2 {
+  margin: 12px 0 6px;
+  font: 600 1.0625rem/1.2 var(--display);
+}
+
+.bag h2:first-child {
+  margin-top: 0;
+}
+
+.bag .ware .hint {
+  display: block;
+}
+
+.bag-boon {
+  margin: 4px 0;
+}
+
+/* The plan of the house is laid over a cottage interior: the picture is behind the plan and what is chosen on it,
+   under a wash of parchment so that both can be read, and nowhere else on the screen. */
+.house-plan {
+  padding: 16px;
+  border-radius: var(--radius);
+  background:
+    linear-gradient(rgba(248, 242, 226, 0.7), rgba(248, 242, 226, 0.7)),
+    var(--paper) url('../../assets/Cozy Rustic Cottage Interior.png') center / cover no-repeat;
+}
+
+/* A row of figures under their names (ui/Facts.tsx): the standing of something, read across. */
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+}
+
+.fact {
+  flex: 1 1 130px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 16px;
+  border-left: 1px solid var(--rule-soft);
+}
+
+.fact:first-child {
+  border-left: 0;
+}
+
+.fact dt {
+  color: var(--ink-soft);
+}
+
+.fact dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 8px;
+  margin: 0;
+}
+
+.fact dd strong {
+  font: 600 1.375rem/1.1 var(--display);
+}
+
+.fact.warn dd strong {
+  color: var(--madder);
+}
+
+.fact dd .btn {
+  align-self: center;
+  margin-left: auto;
+}
+
+/* What can be done with a room: its buttons and what they need said beside them, evenly apart. */
+.house-room {
+  gap: 10px;
+}
+
+.house-work {
+  gap: 8px 10px;
+}
+
+.house-work .hint {
+  flex-basis: 100%;
+}
+
+/* Whoever is in the room he is looking at, at home: standing in it behind the day's choices, a little back from the front. */
+.home-cast {
+  justify-content: center;
+  padding: 0 320px 0 0;
+}
+
+.home-cast img {
+  max-width: 34vw;
+  filter: brightness(0.92);
+}
+
+/* On the plan: who is in a room this hour. */
+button.house-cell span.house-here {
+  color: var(--moss-deep);
+  font-weight: 700;
+}
+
+/* One question of an examination paper: what it asks, and the answers to choose among. */
+.exam-question {
+  margin: 12px 0 0;
+  padding: 8px 12px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+}
+
+.exam-question legend {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 4px;
+  font-weight: 700;
+}
+
+.exam-question label.inline {
+  min-height: 36px;
+}
+
+.exam-question label.inline.right {
+  color: var(--moss-deep);
+  font-weight: 700;
+}
+
+.exam-question label.inline.wrong {
+  color: var(--madder);
+  text-decoration: line-through;
+}
+
+.exam-tick {
+  margin-left: auto;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* The paper marked: his marks against the lines the letters fall at, and the grade stamped beside them. */
+.exam-result {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.exam-marks {
+  flex: 1;
+  min-width: 0;
+}
+
+.exam-measure {
+  position: relative;
+  margin-top: 8px;
+  padding-bottom: 22px;
+}
+
+.exam-line {
+  position: absolute;
+  top: -3px;
+  padding-top: 18px;
+  border-left: 2px solid var(--rule-strong);
+  transform: translateX(-1px);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink-soft);
+  text-indent: 4px;
+}
+
+.exam-stamp {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 112px;
+  height: 112px;
+  border: 5px double var(--madder);
+  border-radius: 50%;
+  color: var(--madder);
+  font-family: var(--display);
+  font-size: 5rem;
+  font-weight: 700;
+  line-height: 1;
+  transform: rotate(-12deg);
+  animation: exam-stamp 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) 0.6s both;
+}
+
+/* It comes down from above the paper and lands with a small bounce, after he has had a moment to read the marking. */
+@keyframes exam-stamp {
+  from {
+    opacity: 0;
+    transform: rotate(-30deg) scale(3.5);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-12deg) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .exam-stamp {
+    animation: none;
   }
 }

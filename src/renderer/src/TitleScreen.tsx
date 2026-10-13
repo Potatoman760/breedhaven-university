@@ -174,10 +174,6 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
                 <button type="button" className="secondary" title="Spend the whole pool at random" onClick={() => setStats(randomStats())}>
                   Randomize
                 </button>
-                <span className="hint">
-                  Every stat starts at {POINT_BUY.min} and can go to {POINT_BUY.max}. A point buys a point up to 13; the two above that cost two each. Ten is ordinary.
-                  Classes, training and work raise them from here.
-                </span>
               </div>
             </div>
             {noCatalogue && (

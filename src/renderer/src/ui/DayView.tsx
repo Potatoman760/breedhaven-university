@@ -27,6 +27,16 @@ import {
   hasMet,
   formatTime,
   nextUp,
+  examNow,
+  roomHeIsIn,
+  inRoom,
+  spriteFor,
+  wornOutfit,
+  skillFor,
+  skillProgress,
+  focusOf,
+  focusChoices,
+  focusName,
   canGoTo,
   type Upcoming,
   stageFor,
@@ -35,7 +45,7 @@ import {
   weatherOn,
   roomBackdrop
 } from '../../../shared/game'
-import { STAT_LABELS, STATS, type Activity, type ContentPack, type GameState } from '../../../shared/model'
+import { MAX_SCENE_CAST, STAT_LABELS, STATS, type Activity, type ContentPack, type Focus, type GameState } from '../../../shared/model'
 import { ActivityList } from './ActivityList'
 import { Backdrop } from './Backdrop'
 import {
@@ -59,6 +69,8 @@ interface Props {
   busy: boolean
   /** Something of the player's own devising: "invite Faye and Tink out for dinner". */
   onPropose: (text: string) => void
+  /** Chooses what his spare hours go to, or nothing. */
+  onFocus: (focus: Focus | undefined) => void
   /** Asks to go and do something that was suggested, such as a way of raising a stat. */
   onOuting: (outing: Outing) => void
   onActivity: (activity: Activity) => void
@@ -106,7 +118,7 @@ export function DayView(props: Props) {
   const underWay = (kind: Upcoming['kind'], id: string, locationId: string): Upcoming => ({ kind, id, title: '', time: state.time, locationId })
   // Whether something of his is on right now that he can still take up: a class that has just begun counts from its first hour.
   const onNow =
-    classes.some((course) => canGoTo(content, state, underWay('class', course.id, course.locationId)).ok) ||
+    classes.some((course) => canGoTo(content, state, underWay(examNow(content, state, course) ? 'exam' : 'class', course.id, course.locationId)).ok) ||
     (shift !== undefined && canGoTo(content, state, underWay('work', shift.job.id, shift.job.locationId)).ok) ||
     appointmentsNow(state).some((plan) => canGoTo(content, state, underWay('plan', plan.id, plan.locationId)).ok)
   // The next class, shift or plan of his still to come today. Only one thing is put forward at a time: with something
@@ -120,6 +132,9 @@ export function DayView(props: Props) {
 
 
   const ownRoom = roomBackdrop(state.inOwnRoom ? content.newGame.room : undefined, 'room-of-player')
+  // At home, whoever of the household is in the room he is looking at is standing in it: the house is lived in, not a set of empty pictures.
+  const here = roomHeIsIn(content, state)
+  const inTheRoom = here ? inRoom(content, state, here.key).slice(0, MAX_SCENE_CAST) : []
   return (
     <main className="stage">
       {/* In his own room, the room is what is behind him, and not the building it is in. */}
@@ -132,6 +147,24 @@ export function DayView(props: Props) {
         backgroundId={ownRoom.viewId ?? props.backgroundId}
         room={ownRoom.room}
       />
+
+      {inTheRoom.length > 0 && (
+        <div className="cast home-cast">
+          {inTheRoom.map((li) => {
+            const image = spriteFor(li, wornOutfit(content, state, li), undefined)
+            return (
+              image && (
+                <img
+                  key={li.id}
+                  src={`content://pack/${image}`}
+                  alt={li.name}
+                  style={li.stageHeight === 100 ? undefined : { transform: `scale(${li.stageHeight / 100})`, transformOrigin: '50% 100%' }}
+                />
+              )
+            )
+          })}
+        </div>
+      )}
 
       <div className="date-banner glass framed">
         <div className="weather" title={weather?.name}>
@@ -159,7 +192,7 @@ export function DayView(props: Props) {
           <div style={{ width: `${(player.energy / player.maxEnergy) * 100}%` }} />
         </div>
         <div className="caps">
-          Gifts carried {Object.values(state.inventory).reduce((total, count) => total + count, 0)}
+          Carrying {Object.values(state.inventory).reduce((total, count) => total + count, 0)}
         </div>
         <button type="button" className="stat-grid" aria-label="Your stats in full" onClick={() => setStatSheet(true)}>
           {STATS.map((stat) => (
@@ -179,7 +212,7 @@ export function DayView(props: Props) {
           ))}
         </button>
       </div>
-      {statSheet && <StatsDialog state={state} onClose={() => setStatSheet(false)} />}
+      {statSheet && <StatsDialog content={content} state={state} onClose={() => setStatSheet(false)} />}
 
       <div className="choices">
         {over && <h1 className="prompt glass">The season has ended.</h1>}
@@ -220,6 +253,27 @@ export function DayView(props: Props) {
         </div>
         )}
 
+        {/* What the hours he skips go on: under who is here, where the day's choices begin. */}
+        {!over && (
+          <label className="focus-pick glass" title="When you skip ahead to your next class, shift or plan, the hours in between are spent on this: half of what a session of it would earn, for no energy.">
+            <span className="caps">Focus</span>
+            <select
+              value={focusOf(state) ? `${focusOf(state)!.kind}:${focusOf(state)!.id}` : ''}
+              onChange={(e) => {
+                const [kind, ...id] = e.target.value.split(':')
+                props.onFocus(kind === 'stat' || kind === 'course' ? { kind, id: id.join(':') } : undefined)
+              }}
+            >
+              <option value="">Nothing</option>
+              {focusChoices(state).map(({ focus, label }) => (
+                <option key={`${focus.kind}:${focus.id}`} value={`${focus.kind}:${focus.id}`}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+
         {induction && (
           <button className="featured" onClick={props.onOrientation}>
             <span className="chip outline-light">Orientation</span>
@@ -240,10 +294,11 @@ export function DayView(props: Props) {
         {!induction && !over && upcoming && (
           canGoTo(content, state, upcoming).ok ? (
             <button className="featured" disabled={props.busy} onClick={() => props.onGoTo(upcoming)}>
-              <span className="chip outline-light">{upcoming.kind === 'class' ? 'Next class' : upcoming.kind === 'work' ? 'Next shift' : isBirth(upcoming.id) ? 'Birth' : 'Next plan'}</span>
+              <span className="chip outline-light">{upcoming.kind === 'class' ? 'Next class' : upcoming.kind === 'exam' ? 'Exam' : upcoming.kind === 'work' ? 'Next shift' : isBirth(upcoming.id) ? 'Birth' : 'Next plan'}</span>
               <span className="featured-title">{upcoming.title}</span>
               <span>
                 skip to {formatTime(toDate(calendar, upcoming.time))} · {content.locations.find((l) => l.id === upcoming.locationId)?.name}
+                {focusName(state) && upcoming.time > state.time ? ` · ${upcoming.time - state.time}h on ${focusName(state)}` : ''}
               </span>
               <ChevronIcon size={18} />
             </button>
@@ -280,14 +335,14 @@ export function DayView(props: Props) {
           const who = firstNames(content, attendees(plan))
           return check.ok ? (
             <button key={plan.id} className="featured" onClick={() => props.onGoTo(item)}>
-              <span className="chip outline-light">{plan.kind === 'birth' ? 'Birth' : 'Plan'}</span>
-              <span className="featured-title">{plan.kind === 'birth' ? `${who} is giving birth` : `${plan.title} with ${who}`}</span>
+              <span className="chip outline-light">{plan.kind === 'birth' ? 'Birth' : plan.kind === 'viewing' ? 'House' : 'Plan'}</span>
+              <span className="featured-title">{plan.kind === 'birth' ? `${who} is giving birth` : plan.kind === 'viewing' ? plan.title : `${plan.title} with ${who}`}</span>
               <ChevronIcon size={18} />
             </button>
           ) : (
             <p key={plan.id} className="glass note">
               <strong>
-                {plan.kind === 'birth' ? `${who} is giving birth, and wants you there.` : `${who} ${plan.companionIds.length > 0 ? 'are' : 'is'} waiting for you: ${plan.title}.`}
+                {plan.kind === 'birth' ? `${who} is giving birth, and wants you there.` : plan.kind === 'viewing' ? `${plan.title}: the housing officer is waiting for you.` : `${who} ${plan.companionIds.length > 0 ? 'are' : 'is'} waiting for you: ${plan.title}.`}
               </strong>{' '}
               {check.reasons.join(' · ')}
             </p>
@@ -310,6 +365,31 @@ export function DayView(props: Props) {
         )}
 
         {!induction && classes.map((course) => {
+          // An examination being sat is gone to like a class: he is taken to the hall and given its paper.
+          const exam = examNow(content, state, course)
+          if (exam) {
+            const sitting = underWay('exam', course.id, course.locationId)
+            const until = `${String(exam.meeting.startHour + exam.meeting.hours).padStart(2, '0')}:00`
+            return canGoTo(content, state, sitting).ok ? (
+              <button key={course.id} className="featured" disabled={props.busy} onClick={() => props.onGoTo(sitting)}>
+                <span className="chip outline-light">{exam.kind === 'midterm' ? 'Midterm' : 'Final'}</span>
+                <span className="featured-title">
+                  Sit the {exam.kind}: {course.number}
+                </span>
+                <span>
+                  until {until} · {content.locations.find((l) => l.id === course.locationId)?.name}
+                </span>
+                <ChevronIcon size={18} />
+              </button>
+            ) : (
+              <p key={course.id} className="glass note">
+                <strong>
+                  The {exam.kind} in {course.number} is over at {until}.
+                </strong>{' '}
+                {canGoTo(content, state, sitting).reasons.join(' · ')}
+              </p>
+            )
+          }
           const item = underWay('class', course.id, course.locationId)
           const check = canGoTo(content, state, item)
           return check.ok ? (
@@ -360,6 +440,11 @@ export function DayView(props: Props) {
                       {course.number} · {Math.round(coursePoints(state, course.id))} of {content.coursework?.grading.points}
                     </span>
                     <strong>{course.title}</strong>
+                    {skillFor(content, course) && (
+                      <span className="hint">
+                        {skillProgress(state, skillFor(content, course)!).has ? `Taught you: ${skillFor(content, course)!.name}` : `Teaches ${skillFor(content, course)!.name} at ${skillFor(content, course)!.at} marks`}
+                      </span>
+                    )}
                     <span className="hint">
                       {grades?.final ? `Final ${grades.final.letter}` : grades?.midterm ? `Midterm ${grades.midterm.letter}` : 'Not yet graded'}
                     </span>

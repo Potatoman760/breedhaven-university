@@ -5,6 +5,7 @@ import { formatDate, isGameOver, toDate } from './calendar'
 import { addNote, courierThread, giveContact } from './courier'
 import { addMemory, applyFeelings } from './memory'
 import { childrenOf, pregnancyOf } from './pregnancy'
+import { bonus, factor } from './modifiers'
 
 /**
  * Sire housing. The Sire Relations Office lets him a house once someone he is with is carrying his child. He pays
@@ -85,15 +86,20 @@ export function freeCots(config: HousingConfig, state: Pick<GameState, 'housing'
 }
 
 /** The comfort of the house as its babies feel it: what is built, and a nanny who has taken to him. */
-export function houseComfort(config: HousingConfig, state: Pick<GameState, 'housing' | 'relationships'>): number {
-  return houseTotals(config, state).comfort + ((state.relationships[config.nannyId]?.affection ?? 0) >= NANNY_WARMS_AT ? 1 : 0)
+export function houseComfort(content: ContentPack, state: GameState): number {
+  const config = content.housing
+  if (!config) return 0
+  // What is built, a nanny who has taken to him, and whatever he has learnt that makes a house a better one to grow up in.
+  return houseTotals(config, state).comfort + ((state.relationships[config.nannyId]?.affection ?? 0) >= NANNY_WARMS_AT ? 1 : 0) + bonus(content, state, 'comfort')
 }
 
 /** The best a baby can do in the house as it stands. */
-export function healthCap(config: HousingConfig, state: Pick<GameState, 'housing' | 'relationships'>): number {
-  const comfort = houseComfort(config, state)
+export function healthCap(content: ContentPack, state: GameState): number {
+  const config = content.housing
+  if (!config) return 0
+  const comfort = houseComfort(content, state)
   const met = [...config.babies.caps].sort((a, b) => a.comfort - b.comfort).filter((cap) => cap.comfort <= comfort)
-  return Math.min(config.babies.levels.length - 1, met.at(-1)?.level ?? config.babies.startLevel)
+  return Math.min(config.babies.levels.length - 1, (met.at(-1)?.level ?? config.babies.startLevel) + bonus(content, state, 'care'))
 }
 
 /** The view of the house he is looking at, while he is at home: the room he is in. */
@@ -219,6 +225,11 @@ export function canTakeHouse(content: ContentPack, state: Pick<GameState, 'housi
   return content.housing !== undefined && (state.housing.status === 'offered' || state.housing.status === 'declined')
 }
 
+/** Fills a text of the housing rules in: the house, the rent, and whatever else is given. */
+export function fillHousingText(config: HousingConfig, text: string, more: Record<string, string> = {}): string {
+  return fill(config, text, more)
+}
+
 /** Answers the offer in the given note of the officer's thread. Declined, it can be taken after all. */
 export function answerHousingOffer(content: ContentPack, state: GameState, noteIndex: number, accept: boolean): GameState {
   const config = content.housing
@@ -227,7 +238,9 @@ export function answerHousingOffer(content: ContentPack, state: GameState, noteI
   if (thread[noteIndex]?.offer !== 'housing') return state
   const answer = accept ? ('accepted' as const) : ('declined' as const)
   const answered: GameState = { ...state, courier: { ...state.courier, [config.officerId]: thread.map((note, i) => (i === noteIndex ? { ...note, answer } : note)) } }
-  return accept ? moveIn(content, answered) : { ...answered, housing: { ...answered.housing, status: 'declined' } }
+  if (!accept) return { ...answered, housing: { ...answered.housing, status: 'declined' } }
+  // Where the Office shows a house before it hands it over, yes only sets that in train: the hour is set, and he has to be there.
+  return config.viewing ? { ...answered, housing: { ...answered.housing, status: 'accepted' } } : moveIn(content, answered)
 }
 
 /**
@@ -236,7 +249,7 @@ export function answerHousingOffer(content: ContentPack, state: GameState, noteI
  */
 export function moveIn(content: ContentPack, state: GameState): GameState {
   const config = content.housing
-  if (!config || !canTakeHouse(content, state)) return state
+  if (!config || !(canTakeHouse(content, state) || state.housing.status === 'accepted')) return state
   const rooms = Object.fromEntries(config.rooms.filter((room) => room.startsBuilt).map((room) => [room.key, 1]))
   let next: GameState = {
     ...state,
@@ -268,19 +281,19 @@ function ledger(state: GameState, text: string, amount: number): GameState {
 }
 
 /** What building a room, or fitting it out further, would be: what it is called and what it costs. Nothing when there is no more to do to it. */
-export function nextWork(config: HousingConfig, state: Pick<GameState, 'housing'>, key: string): { name: string; description: string; cost: number; upgrade: boolean } | undefined {
+export function nextWork(config: HousingConfig, state: Pick<GameState, 'housing'>, key: string, discount = 1): { name: string; description: string; cost: number; upgrade: boolean } | undefined {
   const room = roomOf(config, key)
   if (!room) return undefined
   const tier = builtTier(state, key)
-  if (tier < 1) return { name: room.name, description: room.description, cost: room.cost, upgrade: false }
+  if (tier < 1) return { name: room.name, description: room.description, cost: Math.round(room.cost * discount), upgrade: false }
   const more = room.tiers[tier - 1]
-  return more && { name: more.name, description: more.description, cost: more.cost, upgrade: true }
+  return more && { name: more.name, description: more.description, cost: Math.round(more.cost * discount), upgrade: true }
 }
 
 export function canBuild(content: ContentPack, state: GameState, key: string): PerformCheck {
   const config = content.housing
   if (!config || !isResident(content, state)) return { ok: false, reasons: ['You do not live there'] }
-  const work = nextWork(config, state, key)
+  const work = nextWork(config, state, key, factor(content, state, 'build'))
   if (!work) return { ok: false, reasons: ['There is nothing more to do to it'] }
   return state.player.money >= work.cost ? { ok: true, reasons: [] } : { ok: false, reasons: [`You need $${work.cost}`] }
 }
@@ -289,7 +302,7 @@ export function canBuild(content: ContentPack, state: GameState, key: string): P
 export function buildRoom(content: ContentPack, state: GameState, key: string): GameState {
   const config = content.housing
   if (!config || !canBuild(content, state, key).ok) return state
-  const work = nextWork(config, state, key)!
+  const work = nextWork(config, state, key, factor(content, state, 'build'))!
   const built: GameState = {
     ...state,
     player: { ...state.player, money: state.player.money - work.cost },
@@ -415,23 +428,40 @@ export function askToLeave(content: ContentPack, state: GameState, loveInterestI
 const startOf = (calendar: CalendarConfig, dayIndex: number): number => dayIndex * calendar.hoursPerDay
 
 /** What is owed in rent on a given day of the game: something on the first of a month while he lives there, and nothing otherwise. */
-export function rentOn(content: ContentPack, state: Pick<GameState, 'housing'>, dayIndex: number): number {
+/**
+ * What a month of the house costs him as things stand: the rent, less what the Office takes off it for each child of
+ * his, wherever the child lives, and never less than the least it lets a house for.
+ */
+export function monthlyRent(content: ContentPack, state: Pick<GameState, 'children' | 'courses' | 'enrolment' | 'coursePoints' | 'boons' | 'time'>): number {
+  const config = content.housing
+  if (!config) return 0
+  const asked = Math.max(Math.min(config.rent, config.rentRelief.floor), config.rent - config.rentRelief.perChild * state.children.length)
+  // And less again for a tenant who knows the scheme he is housed under.
+  return Math.round(asked * factor(content, state, 'rent'))
+}
+
+export function rentOn(content: ContentPack, state: Pick<GameState, 'housing' | 'children' | 'courses' | 'enrolment' | 'coursePoints' | 'boons' | 'time'>, dayIndex: number): number {
   const config = content.housing
   if (!config || !isResident(content, state) || dayIndex < 0 || dayIndex >= content.calendar.lengthDays) return 0
-  return toDate(content.calendar, startOf(content.calendar, dayIndex)).day === 1 ? config.rent : 0
+  return toDate(content.calendar, startOf(content.calendar, dayIndex)).day === 1 ? monthlyRent(content, state) : 0
 }
 
 /** The next day rent falls due, counting from tomorrow, if one is left in the game. */
-export function nextRentDay(content: ContentPack, state: Pick<GameState, 'housing' | 'time'>): number | undefined {
+export function nextRentDay(content: ContentPack, state: Pick<GameState, 'housing' | 'children' | 'time' | 'courses' | 'enrolment' | 'coursePoints' | 'boons'>): number | undefined {
   const today = toDate(content.calendar, state.time).dayIndex
   for (let day = today + 1; day < content.calendar.lengthDays; day++) if (rentOn(content, state, day) > 0) return day
   return undefined
 }
 
+/** What one child in the house costs him a week: the keep, less what he has learnt to claim against it. */
+export function keepOf(content: ContentPack, state: Pick<GameState, 'courses' | 'enrolment' | 'coursePoints' | 'boons' | 'time'>): number {
+  return Math.round((content.housing?.babies.weeklyCost ?? 0) * factor(content, state, 'keep'))
+}
+
 /** What the children in the house cost him each week. */
-export function householdCost(content: ContentPack, state: Pick<GameState, 'housing' | 'children'>): number {
+export function householdCost(content: ContentPack, state: Pick<GameState, 'housing' | 'children' | 'courses' | 'enrolment' | 'coursePoints' | 'boons' | 'time'>): number {
   const config = content.housing
-  return config && isResident(content, state) ? babiesAtHome(state).length * config.babies.weeklyCost : 0
+  return config && isResident(content, state) ? babiesAtHome(state).length * keepOf(content, state) : 0
 }
 
 /** Whether a day of the game is the day the household's week is reckoned: the first day of the week. */
@@ -526,8 +556,8 @@ export function settleHousehold(content: ContentPack, state: GameState): { state
 function settleWeek(content: ContentPack, config: HousingConfig, state: GameState): { state: GameState; notices: string[] } {
   const at = state.children.map((child, index) => ({ child, index })).filter(({ child }) => child.health !== undefined)
   if (at.length === 0) return { state, notices: [] }
-  const cap = healthCap(config, state)
-  const cost = config.babies.weeklyCost
+  const cap = healthCap(content, state)
+  const cost = keepOf(content, state)
   const health = new Map<number, number>()
   const unpaid = new Set<string>()
   let money = state.player.money
@@ -625,9 +655,10 @@ export function housingFacts(content: ContentPack, state: GameState, characterId
   if (!config || characterId !== config.officerId) return []
   const { name } = state.player
   const { housing } = state
-  const terms = `The terms: ${config.name}, a secure family house with a live-in nanny employed by the Office; rent of $${config.rent} on the first of each month, which is the subsidised rate; ${config.graceDays} days' grace on rent not paid, and then the house is taken back. He may build onto it and fit it out at his own cost, and may take in the mothers of his children.`
+  const terms = `The terms: ${config.name}, a secure family house with a live-in nanny employed by the Office; rent of $${config.rent} on the first of each month, which is the subsidised rate${config.rentRelief.perChild > 0 ? `, less $${config.rentRelief.perChild} for each child of his, to no less than $${Math.min(config.rent, config.rentRelief.floor)} (it stands at $${monthlyRent(content, state)} now)` : ''}; ${config.graceDays} days' grace on rent not paid, and then the house is taken back. He may build onto it and fit it out at his own cost, and may take in the mothers of his children.`
   if (housing.status === 'none') return []
   if (housing.status === 'offered') return [`You have written to ${name} offering him Sire housing, and he has not answered yet. ${terms}`]
+  if (housing.status === 'accepted') return [`${name} has accepted Sire housing. You are to show him round ${config.name} yourself and introduce him to the nanny before the keys are his: the hour is in his calendar. ${terms}`]
   if (housing.status === 'declined') return [`You offered ${name} Sire housing and he declined. The offer stands if he changes his mind. ${terms}`]
   if (housing.status === 'evicted') return [`${name} held ${config.name} and lost it: the rent went unpaid past the days of grace and the Office took the house back. That cannot be undone, and there will not be another.`]
   const residents = Object.keys(housing.residents).map((id) => content.loveInterests.find((li) => li.id === id)?.name ?? id)

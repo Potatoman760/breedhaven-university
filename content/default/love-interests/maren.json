@@ -181,14 +181,8 @@
   "faceY": 14,
   "stageHeight": 100,
   "studies": {
-    "subject": "Foreign Languages",
-    "code": "LNG",
-    "level": 2,
-    "stats": [
-      "charisma",
-      "intelligence"
-    ],
-    "practical": false
+    "major": "LNG",
+    "level": 2
   },
   "animations": [
     {
@@ -355,6 +349,19 @@
     "background": "generated/backgrounds/maren/view.webp"
   },
   "birthPicture": "sprites/maren/birth.png",
+  "childNames": {
+    "daughters": [
+      "Kit",
+      "Saffron",
+      "Ember",
+      "Rusty",
+      "Vixie"
+    ],
+    "sons": [
+      "Todd",
+      "Russet"
+    ]
+  },
   "ai": {
     "speechPattern": "Bright, quick and girlish, with a lilt. Gushes about what she finds cute and says so at once. Drops a word or an endearment from another language into a sentence and then translates it, pleased with herself.",
     "tone": "sweet, playful, a little bratty",

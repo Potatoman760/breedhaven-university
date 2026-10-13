@@ -12,105 +12,10 @@
   "lectureHours": 1,
   "labHours": 3,
   "lecturesPerWeek": 2,
-  "coursesPerMajor": 3,
+  "maxPerClass": 2,
   "maxCourses": 5,
   "statGain": 1,
   "energy": 8,
-  "generalEd": [
-    {
-      "code": "HIS",
-      "subject": "History of the Bloom",
-      "stats": [
-        "wisdom"
-      ],
-      "practical": false
-    },
-    {
-      "code": "BPS",
-      "subject": "Bloom Psychology",
-      "stats": [
-        "wisdom",
-        "charisma"
-      ],
-      "practical": false
-    },
-    {
-      "code": "RBI",
-      "subject": "Reproductive Biology",
-      "stats": [
-        "intelligence",
-        "wisdom"
-      ],
-      "practical": true
-    },
-    {
-      "code": "PTH",
-      "subject": "Prenatal Thaumaturgy",
-      "stats": [
-        "intelligence",
-        "wisdom"
-      ],
-      "practical": true
-    },
-    {
-      "code": "HHS",
-      "subject": "Household Studies",
-      "stats": [
-        "charisma",
-        "wisdom"
-      ],
-      "practical": false
-    },
-    {
-      "code": "MTH",
-      "subject": "Calculus and Statistics",
-      "stats": [
-        "intelligence"
-      ],
-      "practical": false
-    },
-    {
-      "code": "CSC",
-      "subject": "Computer Science",
-      "stats": [
-        "intelligence"
-      ],
-      "practical": true
-    },
-    {
-      "code": "RHE",
-      "subject": "Rhetoric and Debate",
-      "stats": [
-        "charisma"
-      ],
-      "practical": false
-    },
-    {
-      "code": "GEO",
-      "subject": "Peoples and Politics of the Sown Expanse",
-      "stats": [
-        "intelligence"
-      ],
-      "practical": false
-    },
-    {
-      "code": "ART",
-      "subject": "Studio Art",
-      "stats": [
-        "dexterity",
-        "wisdom"
-      ],
-      "practical": true
-    },
-    {
-      "code": "MUS",
-      "subject": "Music",
-      "stats": [
-        "charisma"
-      ],
-      "practical": true
-    }
-  ],
   "grading": {
     "points": 100,
     "attendanceShare": 60,
@@ -120,6 +25,8 @@
     "midtermWeek": 9,
     "finalWeek": 18,
     "passAt": 0.6,
+    "markAt": 0.8,
+    "examQuestions": 3,
     "studyLocationIds": [
       "library",
       "spell-and-sip",

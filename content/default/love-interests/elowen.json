@@ -183,14 +183,8 @@
   "imageSeed": 62,
   "stageHeight": 100,
   "studies": {
-    "subject": "Culinary Arts and Brewing",
-    "code": "CUL",
-    "level": 2,
-    "stats": [
-      "charisma",
-      "dexterity"
-    ],
-    "practical": true
+    "major": "CUL",
+    "level": 2
   },
   "animations": [
     {
@@ -328,6 +322,19 @@
     "background": "generated/backgrounds/elowen/view.webp"
   },
   "birthPicture": "sprites/elowen/birth.png",
+  "childNames": {
+    "daughters": [
+      "Kerra",
+      "Tegen",
+      "Morwen",
+      "Lowenna",
+      "Senara"
+    ],
+    "sons": [
+      "Jago",
+      "Denzel"
+    ]
+  },
   "ai": {
     "speechPattern": "Quick, bright and talkative. Runs ahead of herself, starts plans mid-sentence, laughs easily. Direct about what she wants.",
     "tone": "lively, warm, impulsive",

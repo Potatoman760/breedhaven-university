@@ -1,6 +1,7 @@
 import { z } from 'zod'
+import { EffectSchema } from './condition'
 
-/** Something the player can buy and give as a gift. */
+/** Something the player can carry: a gift to give, or something to use himself. */
 export const ItemSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -12,7 +13,11 @@ export const ItemSchema = z.object({
    * What kind of thing it is. A love interest loves a gift whose tags appear in their
    * likes, and dislikes one whose tags appear in their dislikes.
    */
-  tags: z.array(z.string()).default([])
+  tags: z.array(z.string()).default([]),
+  /** What using it does, when it is something he can use and not only give: on himself, or on a woman he is with. */
+  use: z.object({ effects: z.array(EffectSchema).min(1), on: z.enum(['self', 'her']).default('self') }).optional(),
+  /** A gift nobody could fail to love: something made for the giving. */
+  lovedByAll: z.boolean().default(false)
 })
 export type Item = z.infer<typeof ItemSchema>
 

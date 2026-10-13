@@ -1,5 +1,6 @@
 import { STATS, type ContentPack, type GameState, type LoveInterest, type Stat } from '../model'
 import { toDate } from './calendar'
+import { factor } from './modifiers'
 
 // Stats are ability scores: 8 to 15 at the start, 10 or 11 for anyone, and up to 30 with a term's work.
 // These are where one stops being ordinary, and then stops being merely good.
@@ -164,7 +165,8 @@ export function trainStat(content: ContentPack, state: GameState, stat: string, 
   const day = toDate(content.calendar, state.time).dayIndex
   const today = state.trainedOn.day === day ? state.trainedOn.points : {}
   const already = today[stat] ?? 0
-  const earned = counted(already + points) - counted(already)
+  // What he has learnt of training, and anything he has taken for it, makes the same work go further.
+  const earned = (counted(already + points) - counted(already)) * factor(content, state, 'training', { stat })
   let score = statOf(state, stat)
   let banked = (state.training[stat] ?? 0) + earned
   while (score < STAT_CAP && banked >= statCost(score)) {

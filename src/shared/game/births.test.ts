@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest'
 import { PregnancyConfigSchema, type ContentPack, type GameState } from '../model'
 import { dayAgenda } from './agenda'
 import { acceptProposal } from './appointments'
-import { attendBirth, birthAppointment, birthSlot, MISSED_BIRTH, scheduleBirths, settleBirths } from './births'
+import { attendBirth, birthAppointment, birthSlot, MISSED_BIRTH, renameNewborn, scheduleBirths, settleBirths } from './births'
 import { cancelAppointment, courierThread, hasContact, plansWith, settleAppointments, unreadNotes } from './courier'
-import { conceive } from './pregnancy'
+import { conceive, namesOf, suggestName } from './pregnancy'
 import { createInitialState } from './state'
 import { fixture } from './testFixture'
 import { nextUp } from './upcoming'
@@ -14,9 +14,9 @@ import { nextUp } from './upcoming'
 const base = fixture()
 const content: ContentPack = {
   ...base,
-  loveInterests: [{ ...base.loveInterests[0], birthPicture: 'sprites/ana/birth.png' }],
+  loveInterests: [{ ...base.loveInterests[0], birthPicture: 'sprites/ana/birth.png', childNames: { daughters: ['Mab', 'Nell'], sons: ['Tam'] } }],
   locations: base.locations.map((l) => (l.id === 'shop' ? { ...l, backgrounds: [{ id: 'default', name: 'Default', images: {} }, { id: 'ward', name: 'The ward', images: {} }] } : l)),
-  pregnancy: PregnancyConfigSchema.parse({ chance: 1, lengthDays: 3, recoveryDays: 1, birthLocationId: 'shop', birthViewId: 'ward', birthHours: 2, birthNoticeDays: 1, stages: [{ id: 'early', name: 'with child', from: 0 }] })
+  pregnancy: PregnancyConfigSchema.parse({ chance: 1, birthControlChance: 1, lengthDays: 3, recoveryDays: 1, birthLocationId: 'shop', birthViewId: 'ward', birthHours: 2, birthNoticeDays: 1, stages: [{ id: 'early', name: 'with child', from: 0 }] })
 }
 const start = createInitialState(content)
 const pregnant = conceive(content, start, 'ana')
@@ -86,6 +86,45 @@ describe('a birth on the calendar', () => {
     // What the hour did to how she feels is for the scene to say: the baseline is from before it.
     expect(scene.baseline.time).toBe(60)
     expect(settleBirths(content, after)).toEqual({ state: after, missed: [] })
+  })
+
+  it('has a name of its mother\'s, which he can change while he is there, and she takes his', () => {
+    const set = scheduleBirths(content, at(pregnant, 40)).state
+    const { state: after, scene, child } = attendBirth(content, { ...at(set, 60), locationId: 'shop' }, 'birth-ana')
+    expect(child!.daughter ? ['Mab', 'Nell'] : ['Tam']).toContain(child!.name)
+    expect(scene.newborn).toBe(60)
+    expect(scene.beats[0].description).toContain(`She would like to call ${child!.daughter ? 'her' : 'him'} ${child!.name}.`)
+    expect(scene.beats[0].direction).toContain(`You want to call ${child!.daughter ? 'her' : 'him'} ${child!.name}`)
+
+    const named = renameNewborn(content, after, scene, '  Wilhelmina   Rose ')
+    expect(named.state.children).toEqual([{ ...child, name: 'Wilhelmina Rose' }])
+    expect(named.scene.suggestedName).toBe(child!.name)
+    expect(named.scene.beats[0].direction).toContain(`You had thought of ${child!.name} for a name; Pat has chosen Wilhelmina Rose instead, and you took to it at once and gladly.`)
+    // A second thought still tells her what she first wanted.
+    const again = renameNewborn(content, named.state, named.scene, 'Ida')
+    expect(again.state.children[0].name).toBe('Ida')
+    expect(again.scene.beats[0].direction).toContain(`You had thought of ${child!.name} for a name; Pat has chosen Ida instead`)
+    // No name, the same name, and a scene that is not a birth change nothing.
+    expect(renameNewborn(content, after, scene, '   ')).toEqual({ state: after, scene })
+    expect(renameNewborn(content, after, scene, child!.name)).toEqual({ state: after, scene })
+    expect(renameNewborn(content, after, { ...scene, newborn: undefined }, 'Ida')).toEqual({ state: after, scene: { ...scene, newborn: undefined } })
+  })
+
+  it('names each child something no other has, from her names, then the pack\'s, then its own', () => {
+    const none = { children: [] }
+    expect(suggestName(content, none, 'ana', true, 0)).toBe('Mab')
+    expect(suggestName(content, none, 'ana', true, 0.99)).toBe('Nell')
+    expect(suggestName(content, none, 'ana', false, 0.5)).toBe('Tam')
+    const one = { children: [{ motherId: 'ana', bornAt: 0, daughter: true, name: 'mab' }] }
+    expect(suggestName(content, one, 'ana', true, 0)).toBe('Nell')
+    const both = { children: [...one.children, { motherId: 'ana', bornAt: 1, daughter: true, name: 'Nell' }] }
+    const pack: ContentPack = { ...content, pregnancy: { ...content.pregnancy!, names: { daughters: ['Ivy'], sons: [] } } }
+    expect(suggestName(pack, both, 'ana', true, 0)).toBe('Ivy')
+    // With nothing written anywhere, there is still a name.
+    expect(suggestName(content, both, 'ana', true, 0)).toBe('Hope')
+    expect(namesOf([])).toBe('')
+    expect(namesOf(both.children)).toBe('mab and Nell')
+    expect(namesOf([...both.children, { name: 'Ivy' }])).toBe('mab, Nell and Ivy')
   })
 
   it('missed, happens without him, and she holds it against him as she holds nothing else', () => {

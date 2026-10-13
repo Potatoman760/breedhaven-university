@@ -46,7 +46,7 @@ const course = (id: string) =>
     locationId: 'shop',
     meetings: [{ weekday: 'Two', startHour: 9, hours: 1, kind: 'lecture' }]
   })
-const grade = (letter: 'A' | 'B' | 'C' | 'D' | 'F') => ({ final: { letter, points: 0, outOf: 100, passed: letter !== 'F', time: 0 } })
+const grade = (letter: 'A' | 'B' | 'C' | 'F') => ({ final: { letter, points: 0, outOf: 100, passed: letter !== 'F', sat: true, topics: [], correct: 0, time: 0 } })
 const start: GameState = { ...createInitialState(content), courses: [course('rid'), course('log')], enrolment: ['rid', 'log'] }
 const rel = (affection: number) => ({ affection, trust: 0, desire: 0 })
 
@@ -106,7 +106,7 @@ describe('the children of the year', () => {
   it('have a screen for each mother: a girl or a boy, and how she took it', () => {
     const family = {
       ...start,
-      children: [{ motherId: 'ana', bornAt: 5, daughter: true }],
+      children: [{ motherId: 'ana', bornAt: 5, daughter: true, name: 'Ada' }],
       relationships: { ...start.relationships, ana: rel(70), bea: rel(2) },
       pregnancies: { bea: { conceivedAt: 10, dueAt: 9999 } }
     }
@@ -127,8 +127,8 @@ describe('the children of the year', () => {
       ...start,
       relationships: { ...start.relationships, ana: rel(70) },
       children: [
-        { motherId: 'ana', bornAt: 5, daughter: true },
-        { motherId: 'ana', bornAt: 90, daughter: false }
+        { motherId: 'ana', bornAt: 5, daughter: true, name: 'Ada' },
+        { motherId: 'ana', bornAt: 90, daughter: false, name: 'Bram' }
       ]
     }
     expect(buildEpilogue(content, twice).find((screen) => screen.kind === 'child')?.text).toBe(

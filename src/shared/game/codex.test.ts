@@ -22,13 +22,13 @@ describe('selectCodexEntries', () => {
     expect(ids({ recentText: 'I saw a dragonfly' })).toEqual(['town'])
   })
 
-  it('includes entries tied to the current location', () => {
-    expect(ids({ state: { ...start(), locationId: 'shop' } })).toEqual(['town', 'shop-lore'])
+  it('is not brought in by where the scene is: only by what is said', () => {
+    expect(ids({ state: { ...start(), locationId: 'shop' } })).toEqual(['town'])
   })
 
   it('keeps locked entries out until their conditions pass', () => {
     const friends = { ...start(), relationships: { ana: { affection: 30, trust: 0, desire: 0 } } }
-    expect(ids({ recentText: 'dragon', loveInterestId: 'ana' })).toEqual(['town', 'dragons'])
+    expect(ids({ recentText: 'dragon' })).toEqual(['town', 'dragons'])
     expect(ids({ state: friends, recentText: 'dragon' })).toEqual(['town', 'secret', 'dragons'])
   })
 

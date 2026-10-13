@@ -3,6 +3,7 @@ import { PregnancyConfigSchema, type ContentPack, type GameState } from '../mode
 import { evaluateCondition } from './conditions'
 import {
   canConceive,
+  periodDay,
   conceive,
   daysUntilDue,
   deliverChild,
@@ -32,6 +33,8 @@ const content: ContentPack = {
   ],
   pregnancy: PregnancyConfigSchema.parse({
     chance: 0.5,
+    birthControlChance: 0.5,
+    periodDays: 0,
     lengthDays: 10,
     recoveryDays: 3,
     daughterChance: 0.5,
@@ -43,7 +46,7 @@ const content: ContentPack = {
   })
 }
 const start = createInitialState(content)
-const certain: ContentPack = { ...content, pregnancy: { ...content.pregnancy!, chance: 1 } }
+const certain: ContentPack = { ...content, pregnancy: { ...content.pregnancy!, chance: 1, birthControlChance: 1 } }
 const pregnant = conceive(certain, start, 'ana')
 const at = (state: GameState, day: number): GameState => ({ ...state, time: day * 20 })
 
@@ -79,11 +82,14 @@ describe('conception', () => {
     expect(parseDirectives('Ana: Oh.\n[seeded: Ana]\n[SEEDED: Bea Stone]').seeded).toEqual(['Ana', 'Bea Stone'])
     expect(parseDirectives('Hello.').seeded).toEqual([])
 
-    const scene = { content, state: start, loveInterestId: 'ana', sceneBeats: [{ activityName: 'Tea' }] }
+    // They have met before: nothing can come of a scene in which she will not go to bed with him.
+    const known = { ...start, memories: { ana: [{ time: 0, summary: 'They met.', level: 'normal' as const }], bea: [{ time: 0, summary: 'They met.', level: 'normal' as const }] } }
+    const scene = { content, state: known, loveInterestId: 'ana', sceneBeats: [{ activityName: 'Tea' }] }
+    expect(buildCharacterPrompt({ ...scene, state: start })).not.toContain('## Conception')
     expect(buildCharacterPrompt(scene)).toContain('write [SEEDED] on a line of its own')
     expect(buildCharacterPrompt({ ...scene, companionIds: ['bea'] })).toContain('write [SEEDED: name]')
     // Not asked for when it could come to nothing.
-    expect(buildCharacterPrompt({ ...scene, state: pregnant })).not.toContain('## Conception')
+    expect(buildCharacterPrompt({ ...scene, state: { ...pregnant, memories: known.memories } })).not.toContain('## Conception')
     expect(buildCharacterPrompt({ ...scene, mode: 'courier' })).not.toContain('## Conception')
   })
 })
@@ -150,6 +156,32 @@ describe('carrying', () => {
   })
 })
 
+describe('her period', () => {
+  const cycling: ContentPack = { ...certain, pregnancy: { ...certain.pregnancy!, periodDays: 4 } }
+  it('comes for four days of every twenty-eight, on days of her own, and nothing can be conceived in them', () => {
+    const days = Array.from({ length: 28 }, (_, day) => periodDay(cycling, at(start, day), 'ana'))
+    expect(days.filter((day) => day !== undefined).sort()).toEqual([1, 2, 3, 4])
+    const first = days.indexOf(1)
+    const on = at(start, first)
+    expect(canConceive(cycling, on, 'ana')).toBe(false)
+    expect(conceive(cycling, on, 'ana')).toBe(on)
+    expect(describePregnancy(cycling, on, 'ana').join(' ')).toContain('You are on your period: day 1 of 4')
+    // It comes round again, and a day clear of it is as it was.
+    expect(periodDay(cycling, at(start, first + 28), 'ana')).toBe(1)
+    const clear = at(start, days.indexOf(undefined))
+    expect(canConceive(cycling, clear, 'ana')).toBe(true)
+    expect(describePregnancy(cycling, clear, 'ana').join(' ')).not.toContain('period')
+  })
+
+  it('stops while she is carrying, and is nobody\'s in a pack without one', () => {
+    const days = Array.from({ length: 28 }, (_, day) => periodDay(cycling, at(start, day), 'ana'))
+    const carrying = conceive(cycling, at(start, days.indexOf(undefined)), 'ana')
+    expect(periodDay(cycling, { ...carrying, time: days.indexOf(1) * 20 + 28 * 20 * 0 }, 'ana')).toBeUndefined()
+    const none: ContentPack = { ...cycling, pregnancy: { ...cycling.pregnancy!, periodDays: 0 } }
+    expect(Array.from({ length: 28 }, (_, day) => periodDay(none, at(start, day), 'ana')).every((day) => day === undefined)).toBe(true)
+  })
+})
+
 describe('birth', () => {
   it('comes when the time is up, records the child, and leaves her able to conceive again after a rest', () => {
     // Nobody who is not carrying is brought to bed.
@@ -162,8 +194,8 @@ describe('birth', () => {
 
     expect(canConceive(content, after, 'ana')).toBe(false)
     expect(canConceive(content, at(after, 13), 'ana')).toBe(true)
-    expect(describePregnancy(content, after, 'ana')[0]).toMatch(/^You have borne Pat a (daughter|son), born yesterday\./)
-    expect(describePregnancy(content, after, 'bea')[0]).toMatch(/^Ana has borne Pat a (daughter|son)\.$/)
+    expect(describePregnancy(content, after, 'ana')[0]).toMatch(/^You have borne Pat a (daughter|son), whose name is \w+, born yesterday\./)
+    expect(describePregnancy(content, after, 'bea')[0]).toMatch(/^Ana has borne Pat a (daughter|son), \w+\.$/)
     // A child with no house to live in is at the creche.
     expect(describePregnancy(content, after, 'ana')[0]).toContain("at the University's creche")
   })
@@ -172,7 +204,7 @@ describe('birth', () => {
     const girls = Array.from({ length: 400 }, (_, seed) => deliverChild(content, at({ ...pregnant, weatherSeed: seed }, 10), 'ana', 200).child!.daughter).filter(Boolean).length
     expect(girls).toBeGreaterThan(150)
     expect(girls).toBeLessThan(250)
-    const child = (daughter: boolean) => ({ motherId: 'ana', bornAt: 0, daughter })
+    const child = (daughter: boolean) => ({ motherId: 'ana', bornAt: 0, daughter, name: 'Ada' })
     expect(describeChildren([child(true)])).toBe('a daughter')
     expect(describeChildren([child(true), child(false), child(true)])).toBe('2 daughters and a son')
   })

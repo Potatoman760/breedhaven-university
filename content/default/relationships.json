@@ -122,5 +122,16 @@
       "affection": 35,
       "note": "Coach and champion for four years. You trust each other completely on the sand and say very little about it."
     }
-  ]
+  ],
+  "intimacy": {
+    "easyTraitIds": [
+      "promiscuous",
+      "sex-addict"
+    ],
+    "minDesire": 25,
+    "reluctantTraitIds": [
+      "prude"
+    ],
+    "reluctantMinDesire": 50
+  }
 }

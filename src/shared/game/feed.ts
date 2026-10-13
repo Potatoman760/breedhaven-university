@@ -5,6 +5,7 @@ import { describeEvent, eventsOn } from './events'
 import { locationOf, loveInterestsAt } from './map'
 import { wornOutfit } from './pregnancy'
 import { weatherOn } from './weather'
+import { seedOf } from './seed'
 
 // Nobody posts before breakfast, or once the evening is over.
 const POST_HOURS = { from: 8, until: 22 } as const
@@ -118,7 +119,7 @@ export function feedRound(content: ContentPack, state: GameState): { state: Game
   const seed = state.weatherSeed
   const draw = (index: number) => roll(seed, date.dayIndex, index)
   const known = content.loveInterests
-    .map((li, index) => ({ li, luck: draw(index) }))
+    .map((li) => ({ li, luck: draw(seedOf(li.id)) }))
     .filter(({ li }) => state.contacts.includes(li.id))
     .sort((a, b) => a.luck - b.luck)
   const authors = known.slice(0, 1 + Math.floor(draw(1000) * MAX_AUTHORS)).map(({ li }) => li)
@@ -165,9 +166,14 @@ export function buildFeedPrompt(content: ContentPack, state: GameState, plans: P
     `- Public: nothing private, nothing intimate, and never name ${player} or hint at what the two of them have done.`,
     '- No hashtags or emoji unless they suit the character, and then one at most. Do not repeat a last post, and when one character posts twice make the two different.',
     'Rules for the picture:',
-    '- One sentence, under 30 words, for an image model: the pose, the look on the face, what is held or being done, and anything of the moment in view.',
+    '- One whole sentence, under 30 words, for an image model, about the one taking the selfie: the look on her face, how she holds herself, and anything of the moment in view.',
+    '- Begin it with its subject, "She is", "He is" or "They are", and with a friend "She and her friend are". Never a fragment such as "A grinning face at the window": ' +
+      'an image model draws a face with no owner as another person standing in the picture.',
+    '- She is the one holding the phone, at arm\'s length in one hand, and looking into it. Give her only a pose she can be in while doing that: ' +
+      'no crossed arms, nothing that takes both hands, not turned away or looking elsewhere.',
+    '- A selfie alone has nobody else in it: nobody behind her, beside her, at a window or in the background, whatever the caption says of company. With a friend, only the two of them.',
     '- Only what can be seen. Name nobody: write "she", "he" or "they", and "her friend" for the friend.',
-    '- Do not describe bodies, faces, hair, clothes or the place itself: those are added for you.'
+    '- Do not describe bodies, hair, clothes or the place itself: those are added for you.'
   ].join('\n')
 
   const weather = weatherOn(content, state)

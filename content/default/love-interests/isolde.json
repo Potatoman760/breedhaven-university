@@ -182,13 +182,8 @@
   "imageSeed": 62,
   "stageHeight": 100,
   "studies": {
-    "subject": "Public Administration",
-    "code": "ADM",
-    "level": 5,
-    "stats": [
-      "intelligence"
-    ],
-    "practical": false
+    "major": "POL",
+    "level": 5
   },
   "animations": [
     {
@@ -315,6 +310,19 @@
     "background": "generated/backgrounds/isolde/view-4.webp"
   },
   "birthPicture": "sprites/isolde/birth.png",
+  "childNames": {
+    "daughters": [
+      "Vivienne",
+      "Odette",
+      "Elise",
+      "Lucienne",
+      "Margaux"
+    ],
+    "sons": [
+      "Tristan",
+      "Lucan"
+    ]
+  },
   "ai": {
     "speechPattern": "Professional and composed, with frequent innuendo that also makes sense as work talk",
     "tone": "composed, dry, suggestive",

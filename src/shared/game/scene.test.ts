@@ -14,6 +14,8 @@ import {
   meet,
   sceneCast,
   parseDirectives,
+  plainName,
+  namesHer,
   sceneBaseline,
   sceneOutcome,
   splitSceneEnd,
@@ -76,6 +78,7 @@ describe('look directives', () => {
       outfitId: 'nude',
       expression: 'Happy',
       seeded: [],
+      stopsControl: [],
       named: [],
       comfort: [],
       leaving: [],
@@ -96,6 +99,7 @@ describe('look directives', () => {
       ended: true,
       animationId: null,
       seeded: [],
+      stopsControl: [],
       named: [],
       comfort: [],
       leaving: [],
@@ -201,9 +205,13 @@ describe('look directives', () => {
 
   it('tells the LLM what it may switch to', () => {
     const content = { ...fixture(), loveInterests: [li] }
-    const state = createInitialState(content)
+    const fresh = createInitialState(content)
+    // They have met before: a woman he has only just met is told nothing of sex-acts.
+    const state = { ...fresh, memories: { ana: [{ time: 0, summary: 'They met.', level: 'normal' as const }], bea: [{ time: 0, summary: 'They met.', level: 'normal' as const }] } }
     const prompt = (look: Parameters<typeof buildCharacterPrompt>[0]['look']) =>
       buildCharacterPrompt({ content, state, loveInterestId: 'ana', look })
+    expect(buildCharacterPrompt({ content, state: fresh, loveInterestId: 'ana', look: {} })).not.toContain('[SEX-ACT: id]')
+    expect(buildCharacterPrompt({ content, state: fresh, loveInterestId: 'ana', look: {} })).not.toContain('- missionary')
 
     const start = prompt({})
     expect(start).toContain('Every reply must BEGIN with one line giving the look on your face, before anything else is written: [EXPRESSION: happy]')
@@ -214,7 +222,7 @@ describe('look directives', () => {
     expect(start).toContain('- default (Dress): what you have on now, described above\n- nude (Nude): no description')
     expect(start.split('a red dress')).toHaveLength(2)
     expect(start.trimEnd()).toContain('Reminder: begin with the [EXPRESSION] and [COMFORT] lines. Then ')
-    expect(start).toContain('- missionary (Missionary, a clip that loops): on her back, him above')
+    expect(start).toContain('- missionary (Missionary): on her back, him above')
 
     const later = prompt({ outfitId: 'nude', animationId: 'missionary' })
     expect(later).toContain('Wearing: Nude')
@@ -361,5 +369,23 @@ describe('what a character declares in a reply', () => {
     expect(parseDirectives('[ATTENDING: Bea=fair]\n[LEAVES: Cy]').attending).toEqual([{ name: 'Bea', eventId: 'fair' }])
     expect(parseDirectives('[LEAVES: Cy]\nOff she goes.')).toMatchObject({ text: 'Off she goes.', leaving: [{ name: 'Cy', feeling: 'content', reason: '' }] })
     expect(parseDirectives('Good night.')).toMatchObject({ leaving: [], attending: [], agreed: false, slept: false })
+  })
+})
+
+describe('a name the LLM wrote', () => {
+  const zelie = { id: 'zelie', name: 'Zélie Marchand' }
+
+  it('is known with or without its accents, in any case, by first name, whole name or id', () => {
+    expect(plainName('  Zélie ')).toBe('zelie')
+    for (const written of ['Zélie', 'Zelie', 'ZELIE', 'zelie', 'Zélie Marchand', 'Zelie Marchand']) expect(namesHer(written, zelie), written).toBe(true)
+    expect(namesHer('Marchand', zelie)).toBe(false)
+    expect(namesHer('Tamsin', zelie)).toBe(false)
+  })
+
+  it('gives her her lines and her looks, however the accent was written', () => {
+    expect(dialogueLines('Zelie: Bonjour.\nTamsin: Hey.', [zelie, { id: 'tamsin', name: 'Tamsin' }]).map((line) => line.speakerId)).toEqual(['zelie', 'tamsin'])
+    // Two spellings of one name are one person's look, not two people's.
+    expect(parseDirectives('[EXPRESSION: Zélie=happy]\n[OUTFIT: Zelie=nude]\nZélie: Oui.').named).toEqual([{ name: 'Zélie', expression: 'happy', outfitId: 'nude' }])
+    expect(parseDirectives('She goes.\n[LEAVES: Zelie=content the baby is crying]').leaving).toEqual([{ name: 'Zelie', feeling: 'content', reason: 'the baby is crying' }])
   })
 })

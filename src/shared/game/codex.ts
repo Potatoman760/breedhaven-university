@@ -29,29 +29,24 @@ function mentions(text: string, term: string): boolean {
 export interface CodexQuery {
   content: ContentPack
   state: GameState
-  /** The character being spoken to, if any. */
-  loveInterestId?: string
-  /** Recent conversation text to scan for keywords. */
+  /** What has been said so far, scanned for the entries' titles and keywords. */
   recentText?: string
   /** Upper bound on the combined length of the selected entries' excerpts. */
   budgetChars?: number
 }
 
 /**
- * Picks the lore worth sending to the AI for this turn: unlocked entries that are
- * always-on, tied to the current location or character, or mentioned in the recent
- * conversation, highest priority first, until the budget is spent.
+ * Picks the lore worth sending to the AI for this turn: unlocked entries that are always-on, and those the
+ * conversation so far has mentioned by title or keyword, highest priority first, until the budget is spent. Nothing
+ * else brings an entry in: where the scene is and who is in it do not, so that the prompt carries only what has come up.
  */
 export function selectCodexEntries(query: CodexQuery): CodexEntry[] {
-  const { content, state, loveInterestId, recentText = '', budgetChars = 5000 } = query
+  const { content, state, recentText = '', budgetChars = 5000 } = query
 
   const relevant = content.codex.filter(
     (entry) =>
       isCodexUnlocked(entry, state, content) &&
-      (entry.alwaysInclude ||
-        entry.relatedLocationIds.includes(state.locationId) ||
-        (loveInterestId !== undefined && entry.relatedCharacterIds.includes(loveInterestId)) ||
-        [entry.title, ...entry.keywords].some((term) => mentions(recentText, term)))
+      (entry.alwaysInclude || [entry.title, ...entry.keywords].some((term) => mentions(recentText, term)))
   )
 
   relevant.sort(

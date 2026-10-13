@@ -4,8 +4,9 @@ import { dirname, join, resolve, sep } from 'node:path'
 import { z } from 'zod'
 import { chatCompletion, listModels } from './ai/openai'
 import { completeWithFallback, NOT_CONFIGURED } from './ai/router'
-import { leavers, lookLines, parseDirectives, sceneCast, sceneWitnesses, validLook } from '../shared/game/scene'
+import { leavers, lookLines, namesHer, parseDirectives, sceneCast, sceneWitnesses, validLook } from '../shared/game/scene'
 import { canSleepOver } from '../shared/game/sleep'
+import { sexGate } from '../shared/game/intimacy'
 import { CONTENT_SCHEME, resolveContentPath, serveContent } from './content/assets'
 import { deleteLoveInterest,
   removeUnusedAssets,
@@ -17,8 +18,6 @@ import { isSafeId, type EditorInfo, type EditorResult } from '../shared/editor'
 import { SaveStore } from './saves/store'
 import { SettingsStore, type KeyCipher } from './settings/store'
 import { RenameSaveRequestSchema, SaveRequestSchema, SlotIdSchema } from '../shared/saves'
-import { buildCourseWordingPrompt, parseCourseWording, WORDING_BATCH } from '../shared/game/catalogue'
-import { CourseSchema } from '../shared/model'
 import { contactsSaid, DM_CLOSE, DM_OPEN, fallbackInvite, messageText } from '../shared/game/courier'
 import { buildFeedPrompt, draftPosts, feedReplyTokens, parseFeedReply } from '../shared/game/feed'
 import { attendableEvents, buildEventPrompt, parseGeneratedEvents } from '../shared/game/events'
@@ -71,7 +70,6 @@ import {
   type FeedPictureResponse,
   FeedRequestSchema,
   type FeedResponse,
-  type CourseWordingResponse,
   PlanOutingRequestSchema,
   type PlanOutingResponse,
   GenerateEventsRequestSchema,
@@ -92,10 +90,6 @@ const LESSON_MIN_TOKENS = 900
 const EVENT_MIN_TOKENS = 800
 // How many events the editor asks the LLM for at a time.
 const DRAFTED_EVENTS = 5
-// A whole catalogue needs more still.
-const COURSE_MIN_TOKENS = 2500
-// The player is looking at a waiting screen while the catalogue is written, so don't wait long.
-const COURSE_TIMEOUT_MS = 75_000
 // A whole character takes a while to write.
 const DRAFT_TIMEOUT_MS = 180_000
 
@@ -268,25 +262,6 @@ function registerIpc(
   ipcMain.handle(IPC.editorSavePlayer, (_event, raw: unknown) => change(() => savePlayer(info.addonDir, content, raw)))
   ipcMain.handle(IPC.editorResetPlayer, () => change(() => resetPlayer(info.addonDir)))
   ipcMain.handle(IPC.editorSaveCatalogue, (_event, raw: unknown) => change(() => saveCatalogue(info.addonDir, raw)))
-  // Never fails: without an LLM the courses keep the wording they came with.
-  ipcMain.handle(IPC.editorWriteCourseWording, async (_event, raw: unknown): Promise<CourseWordingResponse> => {
-    const courses = z.array(CourseSchema).max(WORDING_BATCH).parse(raw)
-    const profile = settings.get().main
-    if (courses.length === 0) return { courses }
-    if (!isConfigured(profile)) return { courses, error: NOT_CONFIGURED }
-    try {
-      const { system, user } = buildCourseWordingPrompt(content, courses)
-      const reply = await chatCompletion(profile, {
-        system,
-        messages: [{ role: 'user', content: user }],
-        maxTokens: Math.max(profile.maxTokens, COURSE_MIN_TOKENS),
-        timeoutMs: COURSE_TIMEOUT_MS
-      })
-      return { courses: parseCourseWording(reply, courses) }
-    } catch (error) {
-      return { courses, error: (error as Error).message }
-    }
-  })
   ipcMain.handle(IPC.editorImportAsset, async (event, raw: unknown): Promise<string | null> => {
     const { loveInterestId, kind } = z.object({ loveInterestId: z.string(), kind: z.enum(['image', 'video', 'media']) }).parse(raw)
     if (!isSafeId(loveInterestId)) throw new Error('Give the character a usable id first.')
@@ -501,10 +476,8 @@ function registerIpc(
       comfort: scene.comfort,
       gifts: scene.gifts,
       pendingProposal: scene.proposal && scene.proposal.time > state.time ? scene.proposal : undefined,
-      recentText: scene.messages
-        .slice(-CODEX_SCAN_MESSAGES)
-        .map((m) => m.content)
-        .join('\n')
+      // Everything said in the scene: lore that has come up stays for the rest of it.
+      recentText: scene.messages.map((m) => m.content).join('\n')
     })
     // Set if the character uses the scheduling tool while writing this reply.
     let proposal: Proposal | undefined
@@ -550,7 +523,7 @@ function registerIpc(
         ...(move ? [move] : [])
       ]
     })
-    const { text, ended, seeded, named, comfort: readings, leaving, attending: saidGoing, agreed, slept, ...asked } = parseDirectives(reply)
+    const { text, ended, seeded, stopsControl, named, comfort: readings, leaving, attending: saidGoing, agreed, slept, ...asked } = parseDirectives(reply)
     const li = cast.loveInterests.find((c) => c.id === scene.loveInterestId)
     // A tag without a name means the scene's love interest; with one, whoever in the scene it names.
     const present = sceneCast(scene)
@@ -558,10 +531,15 @@ function registerIpc(
       name === ''
         ? scene.loveInterestId
         : present.find((id) => {
-            const full = cast.loveInterests.find((c) => c.id === id)?.name.toLowerCase() ?? ''
-            return [id, full, full.split(' ')[0]].includes(name.toLowerCase())
+            const who = cast.loveInterests.find((c) => c.id === id)
+            return who !== undefined && namesHer(name, who)
           })
-    const seededIds = seeded.map(idOf).filter((id): id is string => id !== undefined)
+    // What she will not do is not done, whatever the reply says: no sex-act is shown and nothing can come of one.
+    const willing = (id: string) => {
+      const who = cast.loveInterests.find((c) => c.id === id)
+      return who !== undefined && sexGate(content, state, who).open
+    }
+    const seededIds = seeded.map(idOf).filter((id): id is string => id !== undefined && willing(id))
     // Who the reply says leaves: at least one has to stay, and whoever was left behind by a move has already gone.
     const goers = leavers(scene, leaving.map((one) => idOf(one.name)).filter((id): id is string => id !== undefined))
     if (!npc && goers.length > 0 && !left) {
@@ -612,7 +590,7 @@ function registerIpc(
     const shown = (showing && pose && poser?.animations.find((a) => a.id === pregnantPoseId(pose.id) && drawn(a))) || pose
     // A moment is shown once: asked for again in the very next reply, it is not put up a second time.
     const again = pose !== undefined && shown !== undefined && isMoment(basePoseId(pose.id)) && scene.animationId === shown.id && (scene.animationOf ?? scene.loveInterestId) === poser?.id
-    const posed = look.animationId === null ? { animationId: null } : pose && shown && poser && !npc && !again ? { animationId: shown.id, animationOf: poser.id } : {}
+    const posed = look.animationId === null ? { animationId: null } : pose && shown && poser && !npc && !again && willing(poser.id) ? { animationId: shown.id, animationOf: poser.id } : {}
     return {
       message: { role: 'assistant', content: text || '...', tags: lookLines(reply) || undefined },
       systemPrompt,
@@ -623,7 +601,8 @@ function registerIpc(
       proposal,
       bondProposal,
       // A pose that shows him finishing inside her says what the tag says, whether or not the tag was written. The game still decides what comes of it.
-      seededIds: npc ? [] : [...new Set([...seededIds, ...(pose && poser && isSeeding(basePoseId(pose.id)) ? [poser.id] : [])])],
+      offControlIds: npc ? [] : [...new Set(stopsControl.map(idOf).filter((id): id is string => id !== undefined))],
+      seededIds: npc ? [] : [...new Set([...seededIds, ...(pose && poser && isSeeding(basePoseId(pose.id)) && willing(poser.id) ? [poser.id] : [])])],
       rolls,
       // Setting off for his class or plan is the going: the scene is not also taken somewhere.
       moveTo: walkTo || sleptOver ? undefined : movedTo,
@@ -682,10 +661,12 @@ function registerIpc(
           .map((note) => note.text)
           .join('\n')
       })
-      // The exchange so far is in the prompt; this only says whose turn it is.
+      // The exchange so far is in the prompt; this says whose turn it is, and puts what he has just written last of all,
+      // where it cannot be passed over for the weather or the hour: a reply is to that, and to nothing else.
+      const said = [...thread].reverse().find((one) => one.from === 'player')?.text
       const cue = unprompted
         ? `(Write your message now, between ${DM_OPEN} and ${DM_CLOSE}.)`
-        : `(${state.player.name} has just messaged you. Write your answer, between ${DM_OPEN} and ${DM_CLOSE}.)`
+        : `(${state.player.name} has just messaged you${said ? `: "${said}"` : ''}. Write your answer to that, in keeping with what the two of you have already said in this thread, between ${DM_OPEN} and ${DM_CLOSE}.)`
       const { reply } = await completeWithFallback(settings.get(), false, {
         system,
         messages: [{ role: 'user', content: cue }],

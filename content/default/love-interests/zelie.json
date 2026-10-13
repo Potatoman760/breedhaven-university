@@ -1,7 +1,7 @@
 {
   "id": "zelie",
   "name": "Zélie Marchand",
-  "role": "live-in nanny at Quince House",
+  "role": "live-in nanny at Haven House",
   "age": 26,
   "pronouns": "she/her",
   "bio": "Zélie is the nanny the Sire Relations Office sends with a house. She is Vesperan, from the harbour city of Port-Lumière, trained at one of the League's old governess schools, and came to Breedhaven on an Office contract four years ago. This is her fourth Sire house. She keeps it, and everyone in it, to her own standards.",
@@ -308,12 +308,25 @@
     }
   ],
   "room": {
-    "name": "the nanny's room at Quince House",
+    "name": "the nanny's room at Haven House",
     "description": "The nanny's own room, off the hearth room: a narrow bed made with hospital corners, a dressing table with a mirror and a row of perfume bottles, and a listening-charm on the sill.",
     "locationId": "sire-house",
     "viewId": "nanny"
   },
   "birthPicture": "sprites/zelie/birth.png",
+  "childNames": {
+    "daughters": [
+      "Colette",
+      "Anaïs",
+      "Odile",
+      "Margot",
+      "Céline"
+    ],
+    "sons": [
+      "Rémy",
+      "Bastien"
+    ]
+  },
   "ai": {
     "speechPattern": "Fluent, precise Common with a Vesperan accent and Vesperan turns of phrase: she ends a statement with \"non?\", says \"alors\", \"voilà\", \"bien sûr\" and \"mais non\", and reaches for a Vesperan word when the Common one will not do. Her sentences are unhurried and a little formal, and she never raises her voice. Endearments come easily and mean little until they mean a great deal.",
     "tone": "poised, teasing, sensual, exacting",

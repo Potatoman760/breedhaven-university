@@ -10,6 +10,19 @@ import {
   amendMemory,
   addNote,
   attendBirth,
+  useItem,
+  useAbility,
+  newSkills,
+  tellSkills,
+  hasSkill,
+  intuitTaste,
+  lessonTopic,
+  spendOnFocus,
+  focusName,
+  setFocus,
+  attendViewing,
+  scheduleViewing,
+  renameNewborn,
   scheduleBirths,
   settleBirths,
   withHousing,
@@ -42,10 +55,17 @@ import {
   sleep,
   describeGrade,
   settleExams,
+  sitExam,
+  canSitExam,
+  examNow,
   viewFor,
   payShift,
   settleShifts,
   shiftPay,
+  onBirthControl,
+  stopBirthControl,
+  payBonus,
+  jobOf,
   startShift,
   feedRound,
   dramaDue,
@@ -83,7 +103,6 @@ import {
   sceneDestinations,
   attend,
   classmates,
-  carried,
   giveGift,
   approachableAt,
   perform,
@@ -100,7 +119,7 @@ import {
   toDate,
   travel
 } from '../../shared/game'
-import type { Activity, ContentPack, GameState, PostPlan, Scene } from '../../shared/model'
+import type { Activity, ContentPack, ExamKind, GameState, PostPlan, Scene } from '../../shared/model'
 import { AUTO_SLOT_ID, type SaveData } from '../../shared/saves'
 import { errorMessage } from './errors'
 import { EpilogueView } from './ui/EpilogueView'
@@ -110,14 +129,16 @@ import { TitleScreen } from './TitleScreen'
 import { CalendarPanel } from './ui/CalendarPanel'
 import { AgeGate } from './ui/AgeGate'
 import { PhonePanel } from './ui/PhonePanel'
+import { HelpPanel } from './ui/HelpPanel'
+import { Bag } from './ui/Bag'
 import { HousePanel } from './ui/HousePanel'
 import { ContentEditor } from './ui/editor/ContentEditor'
 import { CoursesView } from './ui/CoursesView'
 import { DayView } from './ui/DayView'
 import { Dialog, ToBeImplemented } from './ui/Dialog'
-import { ItemIcon } from './ui/icons'
 import { MapPanel } from './ui/MapPanel'
 import { OutingDialog } from './ui/OutingDialog'
+import { ExamDialog } from './ui/ExamDialog'
 import type { Panel } from './ui/panels'
 import { SceneView } from './ui/SceneView'
 import { SummaryView, type SceneSummary } from './ui/SummaryView'
@@ -253,6 +274,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   const [agreed, setAgreed] = useState('')
   // Something the player typed to do, worked out and waiting for a yes.
   const [outing, setOuting] = useState<Outing | null>(null)
+  // The examination whose paper is in front of him, until he puts it down: to answer, and then marked.
+  const [exam, setExam] = useState<{ courseId: string; kind: ExamKind } | null>(null)
   // What the reply on screen let the player find out, shown under it.
   const [learned, setLearned] = useState<string[]>([])
   // Dice rolled for the reply on screen, shown under it.
@@ -306,7 +329,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setPanel({ kind: 'endDay' })
   }
 
-  // An examination takes the place of a class and asks nothing of him at the time: when its hour is over he is told his grade.
+  // An examination he did not turn up for is failed when its hour is over, and he is told.
   useEffect(() => {
     const marked = settleExams(content, state)
     if (marked.graded.length === 0) return
@@ -379,6 +402,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   // In a scene with an NPC, the NPC stands among the characters for every screen that shows the scene.
   const cast = scene?.npc ? withNpc(content, scene.loveInterestId) : content
   const partner = cast.loveInterests.find((li) => li.id === partnerId)
+  const examCourse = exam ? state.courses.find((course) => course.id === exam.courseId) : undefined
 
   // A few days before a child is due, the hour of its birth is set and goes on his calendar. Only while nothing else is going on:
   // a turn taken back keeps what was written to him, and would have her write twice.
@@ -387,13 +411,28 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setState((current) => scheduleBirths(content, current).state)
   }, [idle, over, state, content])
 
+  // Getting far enough in a course teaches him something: he is told once, when it happens.
+  useEffect(() => {
+    if (!idle) return
+    const earned = newSkills(content, state)
+    if (earned.length === 0) return
+    setState((current) => tellSkills(current, earned.map((skill) => skill.id)))
+    setNotice(earned.map((skill) => `New skill: ${skill.name}. ${skill.description}`).join(' '))
+  }, [idle, state, content])
+
+  // Once he has said yes to the house, the officer sets an hour to show him round it, and sets another if he does not come.
+  useEffect(() => {
+    if (!idle || over || scheduleViewing(content, state) === state) return
+    setState((current) => scheduleViewing(content, current))
+  }, [idle, over, state, content])
+
   // A birth whose hour has gone by without him has happened without him, and she does not forget it.
   useEffect(() => {
     if (!idle) return
     const { missed } = settleBirths(content, state)
     if (missed.length === 0) return
     setState((current) => settleBirths(content, current).state)
-    setNotice(missed.map(({ motherId, child }) => `${firstNames(content, [motherId])} gave birth to your ${child.daughter ? 'daughter' : 'son'}, and you were not there. She will not forget it.`).join(' '))
+    setNotice(missed.map(({ motherId, child }) => `${firstNames(content, [motherId])} gave birth to your ${child.daughter ? 'daughter' : 'son'}, ${child.name}, and you were not there. She will not forget it.`).join(' '))
   }, [idle, state, content])
 
   // Once someone he is with is carrying his child, the Sire Relations Office writes to him about a house.
@@ -467,10 +506,14 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     try {
       const response = await window.api.chat({ state: at, scene: asked })
       // The game, not the LLM, decides whether she conceives.
-      const conceived = response.seededIds.filter((id) => conceive(content, at, id) !== at)
-      if (conceived.length > 0) {
-        setState((current) => conceived.reduce((next, id) => conceive(content, next, id), current))
+      // She may have chosen, in this reply, to stop what she takes against it: that counts from this reply on.
+      const stopped = response.offControlIds.filter((id) => onBirthControl(content, at, id))
+      const unguarded = stopped.reduce((next, id) => stopBirthControl(content, next, id), at)
+      const conceived = response.seededIds.filter((id) => conceive(content, unguarded, id) !== unguarded)
+      if (stopped.length > 0 || conceived.length > 0) {
+        setState((current) => conceived.reduce((next, id) => conceive(content, next, id), stopped.reduce((next, id) => stopBirthControl(content, next, id), current)))
       }
+      if (stopped.length > 0) setAgreed(`${firstNames(content, stopped)} ${stopped.length === 1 ? 'has' : 'have'} stopped taking birth control.`)
       // The story may have run on, or gone somewhere else: the clock and the place follow it.
       const { hours } = response
       // Where the character took the scene, checked again here against where it can go.
@@ -578,6 +621,14 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       setScene(born.scene)
       return
     }
+    // So is being shown the house: it is his as the scene opens, with the nanny in it and the officer who brought him.
+    if (at.appointments.find((plan) => plan.id === appointmentId)?.kind === 'viewing') {
+      const shown = attendViewing(content, at, appointmentId)
+      setNotice('')
+      setState(shown.state)
+      setScene(shown.scene)
+      return
+    }
     const { state: after, appointment } = keepAppointment(content, at, appointmentId)
     setNotice('')
     begin({
@@ -643,8 +694,16 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
 
   /** Takes up the next thing on his timetable: the hours until it starts go by, he is taken there, and it begins. */
   function goTo(next: Upcoming, arrivedWith: string[] = []) {
-    const there = arriveFor(state, next)
+    // The hours skipped on the way are not lost: they go on his focus, and a toast says what came of them as the next thing begins.
+    const hours = next.time - state.time
+    const worked = spendOnFocus(content, state, hours)
+    if (worked !== state) {
+      const gains = playerGains({ stats: state.player.stats, energy: state.player.energy, money: state.player.money, training: state.training, coursePoints: state.coursePoints }, worked)
+      setToast({ title: `Focus: ${focusName(state)} · ${hours} hour${hours === 1 ? '' : 's'}`, gains })
+    }
+    const there = arriveFor(worked, next)
     if (next.kind === 'class') attendClass(next.id, there, arrivedWith)
+    else if (next.kind === 'exam') sit(next.id, there)
     else if (next.kind === 'work') work(there)
     else keep(next.id, there)
   }
@@ -659,6 +718,22 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setPanel(null)
     // Already under way, he walks in on it as it is; still to come, the wait is skipped.
     keep(plan.id, { ...accepted, time: Math.max(accepted.time, plan.time), locationId: plan.locationId, inOwnRoom: false })
+  }
+
+  /** Turns up for an examination: he is at the hall with its paper in front of him. There is no scene to it. */
+  function sit(courseId: string, at: GameState = state) {
+    const course = at.courses.find((c) => c.id === courseId)
+    const kind = course && canSitExam(content, at, courseId).ok ? examNow(content, at, course)?.kind : undefined
+    if (!course || !kind) return
+    setState({ ...at, locationId: course.locationId, inOwnRoom: false })
+    setScene(null)
+    setNotice('')
+    setExam({ courseId, kind })
+  }
+
+  /** Hands the paper in: the rest of the examination's time goes by, and the paper he is looking at comes back marked. */
+  function handIn(courseId: string, answers: number[]) {
+    setState(sitExam(content, state, courseId, answers).state)
   }
 
   /** Sits a class. With love interests in it, the class is a scene with the ones the player sits by. */
@@ -688,7 +763,9 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       lesson: {
         speaker: (teacher && [leadId, ...companionIds].includes(teacher.id) ? teacher.name.split(' ')[0] : undefined) ?? course.professor,
         course: `${course.title} (${course.number})`,
-        about: course.description
+        about: course.description,
+        // What today's class is on, from before it was counted as one he has sat.
+        topic: lessonTopic(content, at, course)
       },
       gifts: [], conceived: [], departed: [], npc: false,
       baseline: sceneBaseline(at, leadId, companionIds)
@@ -720,6 +797,17 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     send(line, { ...scene, gifts: [...scene.gifts, gift] }, after)
   }
 
+  /**
+   * Something of his is used in a scene: on himself, or on someone in it. Nothing is said aloud for it. What it
+   * changes, the game works out again from the state with her next reply.
+   */
+  function useInScene(name: string, after: GameState, onId?: string) {
+    if (after === state) return
+    setState(after)
+    setPanel(null)
+    setAgreed(onId ? `${name}: used on ${firstNames(content, [onId])}.` : `${name}: used.`)
+  }
+
   /** Turns the finished scene into a memory and shows what came of it. */
   async function finishScene() {
     if (!scene || busy) return
@@ -737,6 +825,15 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       const moved = addIntimacy(Object.entries(result.feelings).reduce((current, [id, feelings]) => applyFeelings(content, current, id, feelings), state), result.intimate)
       // What he paid for along the way comes out of his pocket now.
       const felt = applySpending(moved, result.spending)
+      // With an eye for taste, time with her tells him one more thing she likes or does not, besides what came out in the talk.
+      const noticed =
+        !scene.npc && hasSkill(content, state, 'tastes')
+          ? sceneWitnesses(scene).flatMap((id) => {
+              const factId = intuitTaste(content, state, id, result.revealed.filter((r) => r.loveInterestId === id).map((r) => r.factId))
+              return factId ? [{ loveInterestId: id, factId }] : []
+            })
+          : []
+      const revealed = [...result.revealed, ...noticed]
       setSummary({
         scene,
         outcome:
@@ -754,7 +851,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
             const pair = firstNames(content, [c.a, c.b])
             return c.relation === 'neither' ? `${pair} are no longer ${relationBetween(state, c.a, c.b)}` : `${pair} are now ${c.relation}`
           }),
-          ...result.revealed.map((r) => describeLearned(content, r.loveInterestId, r.factId)).filter((line): line is string => line !== undefined)
+          ...revealed.map((r) => describeLearned(content, r.loveInterestId, r.factId)).filter((line): line is string => line !== undefined)
         ],
         reasons: Object.fromEntries(Object.entries(result.feelings).map(([id, feelings]) => [id, feelings.reason])),
         memoryError: result.error
@@ -767,7 +864,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         payShift(content, growTies(content, felt, sceneCast(scene)), scene)
       )
       // What she let out goes into what the player knows of her, and what changed between the love interests is kept.
-      const known = result.revealed.reduce((next, r) => revealFacts(content, next, r.loveInterestId, [r.factId]), after)
+      const known = revealed.reduce((next, r) => revealFacts(content, next, r.loveInterestId, [r.factId]), after)
       const awake = result.rapport.reduce((next, c) => setRelation(next, c.a, c.b, c.relation), known)
       // They fell asleep where they were: the night goes by, and he wakes there in the morning, rested.
       const settled = sleepingOver ? sleepOver(content, awake) : awake
@@ -789,11 +886,13 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           })
           .catch(() => undefined)
       }
-      const pay = shiftPay(content, scene)
+      const pay = shiftPay(content, state, scene)
+      const shiftJob = jobOf(content, scene.shift?.jobId)
+      const bonus = shiftJob ? Math.round(payBonus(content, state, shiftJob) * 100) : 0
       setScene(null)
       setEnded(false)
       setLastPrompt('')
-      setNotice(pay > 0 ? `You were paid $${pay} for your shift.` : '')
+      setNotice(pay > 0 ? `You were paid $${pay} for your shift${bonus > 0 ? `, ${bonus}% of it over the rate for your stats` : ''}.` : '')
       setPanel(null)
     } catch (error) {
       setNotice(errorMessage(error))
@@ -856,6 +955,12 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           notice={notice}
           ended={ended}
           onSend={send}
+          onNameChild={(name) => {
+            // With no name given he keeps hers. Either way it is settled, and he is not asked again.
+            const named = renameNewborn(content, state, scene, name)
+            setState(named.state)
+            setScene({ ...named.scene, nameSettled: true })
+          }}
           turnsKept={turns.length}
           onRedo={redoFrom}
           onContinue={finishScene}
@@ -901,38 +1006,30 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           busy={busy}
           onPropose={propose}
           onOuting={setOuting}
+          onFocus={(focus) => applyUpdate((current) => setFocus(current, focus))}
           onOpen={setPanel}
         />
       )}
 
       {panel?.kind === 'gifts' && scene && partner && (
-        <Dialog title={scene.companionIds.length > 0 ? 'Give a gift' : `Give ${partner.name.split(' ')[0]} a gift`} onClose={close} narrow>
-          {carried(content, state).length === 0 && (
-            <p className="hint">You aren't carrying any gifts. The market sells them.</p>
-          )}
-          {carried(content, state).map(({ item, count }) => (
-            <div key={item.id} className="ware">
-              <span className="ware-icon">
-                <ItemIcon name={item.icon} />
-              </span>
-              <div>
-                <strong>
-                  {item.name}
-                  {count > 1 && ` ×${count}`}
-                </strong>
-                <span>{item.description}</span>
-              </div>
-              {/* In a group, one button per person: the gift goes to whoever is picked. */}
-              <div className="give-to">
-                {sceneCast(scene).map((id) => (
-                  <button key={id} disabled={busy} onClick={() => give(item.id, id)}>
-                    {scene.companionIds.length > 0 ? firstNames(content, [id]) : 'Give'}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
+        <Dialog title="Your bag" onClose={close} narrow>
+          <Bag
+            content={content}
+            state={state}
+            busy={busy}
+            company={sceneCast(scene).flatMap((id) => {
+              const who = content.loveInterests.find((li) => li.id === id)
+              return who ? [{ id, name: who.name.split(' ')[0] }] : []
+            })}
+            onGive={give}
+            onUseItem={(itemId, onId) => useInScene(content.items.find((item) => item.id === itemId)?.name ?? itemId, useItem(content, state, itemId, onId), onId)}
+            onAbility={(skillId, onId) => useInScene(content.skills.find((skill) => skill.id === skillId)?.name ?? skillId, useAbility(content, state, skillId, onId), onId)}
+          />
         </Dialog>
+      )}
+
+      {exam && examCourse && !scene && (
+        <ExamDialog key={`${exam.courseId}:${exam.kind}`} content={content} state={state} course={examCourse} kind={exam.kind} onHandIn={(answers) => handIn(examCourse.id, answers)} onClose={() => setExam(null)} />
       )}
 
       {outing && !scene && (
@@ -992,6 +1089,13 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           </div>
         </Dialog>
       )}
+      {/* How the game works, a click away from anywhere in it: in the corner, over the day and over a scene alike. */}
+      {!summary && !isGameOver(content.calendar, state.time) && (
+        <button type="button" className="help-button glass" aria-label="Help" title="Help" onClick={() => setPanel({ kind: 'help' })}>
+          ?
+        </button>
+      )}
+      {panel?.kind === 'help' && <HelpPanel content={content} state={state} onClose={close} />}
       {panel?.kind === 'menu' && (
         <Dialog title="Menu" onClose={close} narrow noClose>
           <div className="pause-menu">
