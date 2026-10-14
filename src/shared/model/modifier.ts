@@ -28,7 +28,17 @@ export const MODIFIER_KINDS = [
   'comfort', // + the comfort of the house
   'care', // + how well a child at home can come to do
   'desireGate', // - the desire she needs (only reluctant women, with `only`)
-  'unguarded' // what she takes against the Bloom does not count
+  'unguarded', // what she takes against the Bloom does not count
+  // Below, in the Undercroft:
+  'might', // x what his own strike does
+  'footing', // x how much each of the party can take
+  'anchoring', // x what steadying a woman adds to her next action
+  'surge', // x how fast a pregnant woman's surge builds
+  'spoils', // x the money found
+  'grounding', // grounding her clears all of her surge
+  'ambush', // the party always acts before what it meets
+  'steady', // a hex on one of the party lasts half as long
+  'insight' // he can see what each thing below cannot stand
 ] as const
 export type ModifierKind = (typeof MODIFIER_KINDS)[number]
 

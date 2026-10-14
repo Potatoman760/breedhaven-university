@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { canEnrol, courseMatches, describeMeetings, toDate, skillFor } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { Backdrop } from './Backdrop'
+import { Button } from './Button'
+import { Dialog } from './Dialog'
 import { Portrait } from './MapPanel'
 import { WeekPlanner } from './WeekPlanner'
 
@@ -33,10 +35,66 @@ export function CoursesView({ content, state, onEnrol }: Props) {
   const classmates = content.loveInterests.filter((li) => focus?.studentIds.includes(li.id))
   const teacher = content.loveInterests.find((li) => li.id === focus?.teacherId)
 
+  // Asking for his courses to be chosen for him: what he typed, whether it is being worked out, and what came back.
+  const [helping, setHelping] = useState(false)
+  const [wish, setWish] = useState('')
+  const [asking, setAsking] = useState(false)
+  const [advice, setAdvice] = useState<{ why: string; dropped: string[] } | { error: string } | null>(null)
+
+  async function ask() {
+    if (wish.trim() === '' || asking) return
+    setAsking(true)
+    setAdvice(null)
+    try {
+      const pick = await window.api.pickCourses({ state, text: wish.trim() })
+      // What was chosen takes the place of whatever he had picked: he can still change any of it on the planner.
+      setSelected(pick.courseIds)
+      setFocusId(pick.courseIds[0] ?? null)
+      setAdvice({ why: pick.why, dropped: pick.dropped })
+    } catch (cause) {
+      setAdvice({ error: (cause as Error).message.replace(/^Error invoking remote method '[^']+': (Error: )?/, '') })
+    } finally {
+      setAsking(false)
+    }
+  }
+
   const toggle = (id: string) => setSelected(selected.includes(id) ? selected.filter((s) => s !== id) : [...selected, id])
 
   return (
     <main className="stage">
+      {helping && (
+        <Dialog title="Help me pick" onClose={() => setHelping(false)} narrow noClose>
+          <label>
+            What do you want from this term?
+            <textarea value={wish} rows={3} maxLength={500} autoFocus disabled={asking} placeholder="I want to major in biology" onChange={(e) => setWish(e.target.value)} />
+          </label>
+          {advice && 'error' in advice && <p className="notice">{advice.error}</p>}
+          {advice && 'why' in advice && (
+            <>
+              <p>{advice.why}</p>
+              <ul className="pick-list">
+                {selected.map((id) => {
+                  const course = state.courses.find((c) => c.id === id)
+                  return course ? (
+                    <li key={id}>
+                      <strong>{course.number}</strong> {course.title}
+                    </li>
+                  ) : null
+                })}
+              </ul>
+              {advice.dropped.length > 0 && <p className="hint">Left out, because they clash or are one too many: {advice.dropped.join(', ')}.</p>}
+            </>
+          )}
+          <div className="actions end">
+            <Button variant="quiet" onClick={() => setHelping(false)}>
+              {advice && 'why' in advice ? 'Done' : 'Cancel'}
+            </Button>
+            <Button variant="primary" disabled={asking || wish.trim() === ''} onClick={ask}>
+              {asking ? 'Choosing...' : advice && 'why' in advice ? 'Choose again' : 'Choose for me'}
+            </Button>
+          </div>
+        </Dialog>
+      )}
       <Backdrop screen="courses" location={location} periodId={date.period.id} light={date.period.light} />
       <div className="planner-panel glass framed">
         <div className="market-head">
@@ -55,6 +113,9 @@ export function CoursesView({ content, state, onEnrol }: Props) {
           <span className="hint">
             {selected.length} of {config?.maxCourses} courses chosen
           </span>
+          <Button variant="secondary" onClick={() => setHelping(true)}>
+            Help me pick
+          </Button>
           <button disabled={selected.length === 0} onClick={() => onEnrol(selected)}>
             Begin term
           </button>

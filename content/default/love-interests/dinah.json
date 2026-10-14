@@ -341,5 +341,6 @@
     "knowledge": [],
     "secrets": [],
     "extraInstructions": ""
-  }
+  },
+  "partyRole": "healer"
 }

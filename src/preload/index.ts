@@ -13,6 +13,7 @@ const api: RendererApi = {
   summarize: (request) => ipcRenderer.invoke(IPC.summarize, request),
   generateEvents: (request) => ipcRenderer.invoke(IPC.generateEvents, request),
   planOuting: (request) => ipcRenderer.invoke(IPC.planOuting, request),
+  pickCourses: (request) => ipcRenderer.invoke(IPC.pickCourses, request),
   courier: (request) => ipcRenderer.invoke(IPC.courier, request),
   feed: (request) => ipcRenderer.invoke(IPC.feed, request),
   feedPicture: (request) => ipcRenderer.invoke(IPC.feedPicture, request),

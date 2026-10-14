@@ -6,6 +6,7 @@ export const IPC = {
   summarize: 'ai:summarize',
   generateEvents: 'ai:generateEvents',
   planOuting: 'ai:planOuting',
+  pickCourses: 'ai:pickCourses',
   courier: 'ai:courier',
   feed: 'ai:feed',
   feedPicture: 'ai:feedPicture',

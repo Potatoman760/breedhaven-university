@@ -1,4 +1,4 @@
-import type { ContentPack, GameState } from '../model'
+import type { Appointment, ContentPack, GameState } from '../model'
 import type { PerformCheck } from './activities'
 import { timeOn } from './agenda'
 import { attendees, canKeep } from './appointments'
@@ -62,6 +62,20 @@ export function nextUp(content: ContentPack, state: GameState): Upcoming | undef
 
   // The soonest; of two that start together, the one listed first: a plan, then work, then a class.
   return found.reduce<Upcoming | undefined>((first, next) => (first === undefined || next.time < first.time ? next : first), undefined)
+}
+
+/**
+ * Something he has been summoned to and cannot put off, once it is the next thing on his day or is under way: being
+ * shown the house, or the way down. While there is one, nothing else is offered him, as on orientation day. What
+ * comes before it on his timetable is still his to go to first.
+ */
+export function summons(content: ContentPack, state: GameState): Appointment | undefined {
+  const must = (plan: Appointment) => plan.kind === 'viewing' || plan.kind === 'below'
+  const now = state.appointments.find((plan) => must(plan) && plan.time <= state.time && state.time < plan.time + plan.hours)
+  const next = now ? undefined : nextUp(content, state)
+  const plan = now ?? (next?.kind === 'plan' ? state.appointments.find((one) => one.id === next.id && must(one)) : undefined)
+  // Only while he could go through with it: one he cannot keep must not leave him with nothing he can do.
+  return plan && canGoTo(content, state, { kind: 'plan', id: plan.id, title: plan.title, time: Math.max(plan.time, state.time), locationId: plan.locationId }).ok ? plan : undefined
 }
 
 /**

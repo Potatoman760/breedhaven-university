@@ -24,6 +24,7 @@ import {
   meetingNow,
   npcsAt,
   orientationStep,
+  summons,
   hasMet,
   formatTime,
   nextUp,
@@ -53,6 +54,7 @@ import {
   ChevronIcon,
   MapIcon,
   MenuIcon,
+  BagIcon,
   PhoneIcon,
   WeatherIcon,
   JobIcon
@@ -129,6 +131,9 @@ export function DayView(props: Props) {
   // While orientation has a part left, it is the only thing to do.
   const induction = over ? undefined : orientationStep(content, state)
   const inductionPlace = content.locations.find((l) => l.id === induction?.locationId)
+  // Something he has been summoned to and is next on his day: until it is done, it is all there is to do, as with orientation.
+  const summoned = over || induction ? undefined : summons(content, state)
+  const locked = induction !== undefined || summoned !== undefined
 
 
   const ownRoom = roomBackdrop(state.inOwnRoom ? content.newGame.room : undefined, 'room-of-player')
@@ -244,7 +249,7 @@ export function DayView(props: Props) {
               key={npc.id}
               className="partner npc"
               title={`Talk to ${npc.name}${npc.role ? `, ${npc.role}` : ''}`}
-              disabled={induction !== undefined || over}
+              disabled={locked || over}
               onClick={() => props.onTalkNpc(npc.id)}
             >
               {npc.name.split(' ')[0]}
@@ -289,6 +294,11 @@ export function DayView(props: Props) {
             <strong>Orientation Day.</strong> Every student has to attend. The rest of the day is yours once it is done.
           </p>
         )}
+        {summoned && (
+          <p className="glass note">
+            <strong>{summoned.title}.</strong> You are expected, and it will not wait. The rest of the day is yours once it is done.
+          </p>
+        )}
 
         {/* The next thing on his timetable today: taking it skips the hours until it starts and takes him there. */}
         {!induction && !over && upcoming && (
@@ -313,7 +323,7 @@ export function DayView(props: Props) {
         )}
 
         {/* What is on today that he could go to: an event that keeps hours, for as much of it as he likes. */}
-        {!induction &&
+        {!locked &&
           !over &&
           eventOutings(content, state).map(({ event, outing }) => (
             <button key={event.id} className="featured" disabled={props.busy} onClick={() => props.onOuting(outing)}>
@@ -335,21 +345,33 @@ export function DayView(props: Props) {
           const who = firstNames(content, attendees(plan))
           return check.ok ? (
             <button key={plan.id} className="featured" onClick={() => props.onGoTo(item)}>
-              <span className="chip outline-light">{plan.kind === 'birth' ? 'Birth' : plan.kind === 'viewing' ? 'House' : 'Plan'}</span>
-              <span className="featured-title">{plan.kind === 'birth' ? `${who} is giving birth` : plan.kind === 'viewing' ? plan.title : `${plan.title} with ${who}`}</span>
+              <span className="chip outline-light">{plan.kind === 'birth' ? 'Birth' : plan.kind === 'viewing' ? 'House' : plan.kind === 'below' ? 'Below' : 'Plan'}</span>
+              <span className="featured-title">{plan.kind === 'birth' ? `${who} is giving birth` : plan.kind === 'viewing' ? plan.title : plan.kind === 'below' ? `${who} is waiting to show you something` : `${plan.title} with ${who}`}</span>
               <ChevronIcon size={18} />
             </button>
           ) : (
             <p key={plan.id} className="glass note">
               <strong>
-                {plan.kind === 'birth' ? `${who} is giving birth, and wants you there.` : plan.kind === 'viewing' ? `${plan.title}: the housing officer is waiting for you.` : `${who} ${plan.companionIds.length > 0 ? 'are' : 'is'} waiting for you: ${plan.title}.`}
+                {plan.kind === 'birth' ? `${who} is giving birth, and wants you there.` : plan.kind === 'viewing' ? `${plan.title}: the housing officer is waiting for you.` : plan.kind === 'below' ? `${who} is waiting to show you something.` : `${who} ${plan.companionIds.length > 0 ? 'are' : 'is'} waiting for you: ${plan.title}.`}
               </strong>{' '}
               {check.reasons.join(' · ')}
             </p>
           )
         })}
 
-        {!induction && shift && (
+        {/* The way down, where it is, once he has been told of it. */}
+        {!locked && !over && content.expedition && state.expedition.invited && state.locationId === content.expedition.entryLocationId && (
+          <button className="featured" disabled={props.busy} onClick={() => onOpen({ kind: 'below' })}>
+            <span className="chip outline-light">Below</span>
+            <span className="featured-title">Go down into {content.expedition.name}</span>
+            <span>
+              {state.expedition.cleared} of {content.expedition.depths.length} anchors set
+            </span>
+            <ChevronIcon size={18} />
+          </button>
+        )}
+
+        {!locked && shift && (
           canGoTo(content, state, underWay('work', shift.job.id, shift.job.locationId)).ok ? (
             <button className="featured" onClick={() => props.onGoTo(underWay('work', shift.job.id, shift.job.locationId))}>
               <span className="chip outline-light">Work</span>
@@ -364,7 +386,7 @@ export function DayView(props: Props) {
           )
         )}
 
-        {!induction && classes.map((course) => {
+        {!locked && classes.map((course) => {
           // An examination being sat is gone to like a class: he is taken to the hall and given its paper.
           const exam = examNow(content, state, course)
           if (exam) {
@@ -414,9 +436,9 @@ export function DayView(props: Props) {
           )
         })}
 
-        {!induction && <ActivityList content={content} state={state} partnerId={partnerId} onPick={onActivity} />}
+        {!locked && <ActivityList content={content} state={state} partnerId={partnerId} onPick={onActivity} />}
 
-        {!induction && !over && mine.length > 0 && (
+        {!locked && !over && mine.length > 0 && (
           <div className="stat-menu">
             <button
               className={studying !== null ? 'featured open' : 'featured'}
@@ -481,7 +503,7 @@ export function DayView(props: Props) {
           </div>
         )}
 
-        {!induction && !over && (
+        {!locked && !over && (
           <div className="stat-menu">
             <button className={showStats ? 'featured open' : 'featured'} aria-expanded={showStats} disabled={props.busy} onClick={() => setShowStats(!showStats)}>
               <span className="chip outline-light">Stats</span>
@@ -509,10 +531,10 @@ export function DayView(props: Props) {
         )}
 
         {!over && (
-          <button className="featured slim" disabled={props.busy || induction !== undefined} onClick={props.onEndDay}>
+          <button className="featured slim" disabled={props.busy || locked} onClick={props.onEndDay}>
             <span className="featured-title">End the day</span>
             {/* Orientation has to be sat through first: the day cannot be ended while a part of it is left. */}
-            <span>{induction ? 'once orientation is done' : `until 0${SLEEP_HOURS.until}:00`}</span>
+            <span>{induction ? 'once orientation is done' : summoned ? 'once you have been' : `until 0${SLEEP_HOURS.until}:00`}</span>
             <ChevronIcon size={18} />
           </button>
         )}
@@ -522,24 +544,26 @@ export function DayView(props: Props) {
           className="free-text"
           onSubmit={(e) => {
             e.preventDefault()
-            if (idea.trim() && !props.busy && !over && !induction) props.onPropose(idea.trim())
+            if (idea.trim() && !props.busy && !over && !locked) props.onPropose(idea.trim())
           }}
         >
           <input
             value={idea}
             onChange={(e) => setIdea(e.target.value)}
-            disabled={props.busy || over || induction !== undefined}
+            disabled={props.busy || over || locked}
             maxLength={500}
             aria-label="Describe something else to do"
             placeholder={
               induction
                 ? 'Orientation comes first today'
+                : summoned
+                  ? `${summoned.title} comes first`
                 : props.busy
                   ? 'Working it out...'
                 : 'Describe it: "spar at the tiltyard", "invite Faye and Tink to dinner", "sleep"...'
             }
           />
-          <button type="submit" disabled={props.busy || over || !idea.trim() || induction !== undefined} aria-label="Do this" className="danger icon">
+          <button type="submit" disabled={props.busy || over || !idea.trim() || locked} aria-label="Do this" className="danger icon">
             <ChevronIcon size={18} />
           </button>
         </form>
@@ -567,9 +591,14 @@ export function DayView(props: Props) {
           <CalendarIcon size={36} />
           Calendar
         </button>
-        {/* The menu, for whoever does not reach for Escape: continue, save, load, settings, and the way out. Last, so that it sits in the corner. */}
-        <button className="tile glass" title="Menu (Esc)" onClick={() => onOpen({ kind: 'menu' })}>
-          <MenuIcon size={36} />
+        {/* What he carries, can make and has brought up from below. */}
+        <button className="tile glass" onClick={() => onOpen({ kind: 'bag' })}>
+          <BagIcon size={36} />
+          Bag
+        </button>
+        {/* The menu, for whoever does not reach for Escape: continue, save, load, settings, and the way out. Small, and last, so that it sits in the corner. */}
+        <button className="tile-menu glass" title="Menu (Esc)" onClick={() => onOpen({ kind: 'menu' })}>
+          <MenuIcon size={18} />
           Menu
         </button>
       </div>

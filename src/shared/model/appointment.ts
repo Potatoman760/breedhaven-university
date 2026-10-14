@@ -23,5 +23,5 @@ export type Proposal = z.infer<typeof ProposalSchema>
  * never proposed by anyone: the game sets it, for the hour a child of his is to be born, and missing it is no ordinary
  * standing-up.
  */
-export const AppointmentSchema = ProposalSchema.extend({ id: z.string(), kind: z.enum(['birth', 'viewing']).optional() })
+export const AppointmentSchema = ProposalSchema.extend({ id: z.string(), kind: z.enum(['birth', 'viewing', 'below']).optional() })
 export type Appointment = z.infer<typeof AppointmentSchema>

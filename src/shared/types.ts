@@ -1,3 +1,4 @@
+import type { CoursePick } from './game/coursePick'
 import { z } from 'zod'
 import type { LoveInterest } from './model'
 import type { ComfyBundle, ComfyBundleCheck, ComfyDownloadList, ComfySettings, ModelDownloadProgress, ModelDownloadResult, ComfyTestResult, CutoutRequest, CutoutResult, GenerateArtRequest, GenerateArtResult, GenerateVideoRequest, WorkflowListResult } from './comfy'
@@ -106,6 +107,10 @@ export interface PlanOutingResponse {
   error?: string
 }
 
+/** What he says he wants of his term, for the LLM to choose his courses from. */
+export const PickCoursesRequestSchema = z.object({ state: GameStateSchema, text: z.string().min(1).max(500) })
+export type PickCoursesRequest = z.infer<typeof PickCoursesRequestSchema>
+
 export const CourierRequestSchema = z.object({
   state: GameStateSchema,
   loveInterestId: z.string(),
@@ -180,6 +185,8 @@ export interface RendererApi {
   /** Draws up a new game's course catalogue. Never rejects; without an LLM the wording is plain. */
   /** Works out what the player means by something they typed to do. Never rejects. */
   planOuting(request: PlanOutingRequest): Promise<PlanOutingResponse>
+  /** Has the LLM choose his courses from what he says he wants. Rejects when it cannot be reached, or names nothing he can take. */
+  pickCourses(request: PickCoursesRequest): Promise<CoursePick>
   /**
    * Has a love interest write a message in Bloomr DMs: an answer to the player's latest (rejects
    * if the LLM can't be reached), or an unprompted invitation (never rejects).

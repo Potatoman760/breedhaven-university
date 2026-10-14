@@ -55,18 +55,35 @@ export function StatsDialog({ content, state, onClose }: { content: ContentPack;
       {content.skills.length > 0 && (
         <div className="skill-list">
           <h2>Skills</h2>
-          {content.skills.map((skill) => {
-            const { has, marks, at } = skillProgress(state, skill)
-            const course = state.courses.find((one) => one.code === skill.code)
-            return (
-              <p key={skill.id} className={has ? 'skill has' : 'skill'}>
-                <strong>{skill.name}</strong> {skill.description}{' '}
-                <span className="hint">
-                  {has ? 'Learnt.' : `${course ? `${course.number}, ${course.title}` : skill.code} teaches it at ${at} marks${marks > 0 ? `: you have ${Math.round(marks)}` : ''}.`}
-                </span>
-              </p>
-            )
-          })}
+          {/* What he has learnt first, then what he is on the way to, then the rest. */}
+          <table>
+            <thead>
+              <tr>
+                <th>Skill</th>
+                <th>What it does</th>
+                <th>Taught by</th>
+                <th>Marks</th>
+              </tr>
+            </thead>
+            <tbody>
+              {content.skills
+                .map((skill) => ({ skill, ...skillProgress(state, skill) }))
+                .sort((a, b) => Number(b.has) - Number(a.has) || b.marks - a.marks)
+                .map(({ skill, has, marks, at }) => {
+                  const course = state.courses.find((one) => one.code === skill.code && (skill.level === undefined || one.level === skill.level))
+                  return (
+                    <tr key={skill.id} className={has ? 'has' : undefined}>
+                      <td>
+                        <strong>{skill.name}</strong>
+                      </td>
+                      <td>{skill.description}</td>
+                      <td title={course?.title}>{course ? course.number : `${skill.code}, not given this term`}</td>
+                      <td>{has ? 'Learnt' : `${Math.round(marks)} of ${at}`}</td>
+                    </tr>
+                  )
+                })}
+            </tbody>
+          </table>
         </div>
       )}
     </Dialog>

@@ -16,7 +16,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "clips": "jiti scripts/generate-clips.ts",
-    "births": "jiti scripts/generate-births.ts"
+    "births": "jiti scripts/generate-births.ts",
+    "below": "jiti scripts/generate-below.ts",
+    "items": "jiti scripts/generate-items.ts"
   },
   "dependencies": {
     "@fontsource/alegreya-sans": "^5.3.0",

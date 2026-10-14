@@ -1,10 +1,10 @@
 import { useState, type ReactNode } from 'react'
 import { MEMORY_LEVEL_LABELS, type ContentPack, type GameState } from '../../../shared/model'
-import { SLEEP_OVER_FROM_HOUR, STOOD_UP } from '../../../shared/game'
+import { SLEEP_OVER_FROM_HOUR, STOOD_UP, describeAction, describeChange } from '../../../shared/game'
 import { CodexBook } from './CodexBook'
 import { Dialog } from './Dialog'
 
-const TABS = ['Basics', 'Conversation', 'Stats and study', 'Relationships', 'Sex and pregnancy', 'House and children', 'Money and jobs', 'The world'] as const
+const TABS = ['Basics', 'Conversation', 'Stats and study', 'Relationships', 'Sex and pregnancy', 'House and children', 'Money and jobs', 'The Undercroft', 'The world'] as const
 type Tab = (typeof TABS)[number]
 
 interface Props {
@@ -43,9 +43,23 @@ const percent = (fraction: number) => `${Math.round(fraction * 100)}%`
  * How the game works, for the player: its rules in brief, a tab to a subject. The numbers are read from the content,
  * so that what it says is what the game does.
  */
+// What a course is worth below, in a few words, by the kind of its modifier.
+const BELOW: Record<string, string> = {
+  might: 'Your strike does more',
+  footing: 'Everyone can take more',
+  anchoring: 'Empower gives her more',
+  surge: 'A surge builds half as fast',
+  spoils: 'More money found',
+  grounding: 'Ground clears all of a surge',
+  ambush: 'You always act first',
+  steady: 'A hex on your party lasts half as long',
+  insight: 'Shows what each enemy is weak to'
+}
+
 export function HelpPanel({ content, state, onClose }: Props) {
   const [tab, setTab] = useState<Tab>('Basics')
   const { relationships, pregnancy, housing, jobs, calendar } = content
+  const below = content.expedition
   const traitName = (id: string) => content.traits.find((trait) => trait.id === id)?.name ?? id
   const names = (ids: string[]) => ids.map(traitName).join(', ') || 'none'
   const rules = relationships.intimacy
@@ -78,7 +92,8 @@ export function HelpPanel({ content, state, onClose }: Props) {
               head={['Button', 'What it does']}
               rows={[
                 ['Map', 'Go somewhere. Who is at each place is shown.'],
-                ['Phone', 'Friends, messages, the photo feed, the jobs board, the market and your bag.'],
+                ['Phone', 'Friends, messages, the photo feed, the jobs board and the market.'],
+                ['Bag', 'What you carry, what you can make, and the relics you hold.'],
                 ['Calendar', 'Your week by the hour: classes, shifts, plans, events, births, rent.'],
                 ['Home', 'Your house, once you have one.'],
                 ['Menu', 'Save, load, settings.']
@@ -119,7 +134,7 @@ export function HelpPanel({ content, state, onClose }: Props) {
               <li>She decides when a scene is over, and says goodbye in her own way.</li>
               <li>Press her on something she does not want and she grows uneasy, changes the subject, and in the end leaves. Easing off brings her back.</li>
               <li>A class she has to get to pulls her away too.</li>
-              <li>Give a gift from the Gift button in a scene. She reacts on the spot, and a gift she loves or hates tells you something about her.</li>
+              <li>Give a gift from the Bag button in a scene. She reacts on the spot, and a gift she loves or hates tells you something about her.</li>
             </ul>
             <h2>Between scenes</h2>
             <ul>
@@ -159,15 +174,106 @@ export function HelpPanel({ content, state, onClose }: Props) {
                 <ul>
                   <li>Every course teaches one thing once you have enough marks in it, for as long as you stay enrolled.</li>
                   <li>Some let you see something about a woman. Some change a number for good: wages, rent, how fast trust grows.</li>
-                  <li>Some let you make or set off something, then wait days to do it again. Find those in your Bag, on the phone or behind the Gift button in a scene.</li>
+                  <li>Some let you make or set off something, then wait days to do it again. Find those in your Bag, on the day screen or behind the Bag button in a scene.</li>
                   <li>What you brew is an item: drink it yourself, or use it on the woman you are with. The Bag shows what is in effect and for how long.</li>
                 </ul>
                 <Table
                   head={['Skill', 'Taught by', 'At', 'What it does']}
-                  rows={content.skills.map((skill) => [skill.name, state.courses.find((course) => course.code === skill.code)?.title ?? skill.code, `${skill.at} marks`, skill.description])}
+                  rows={content.skills.map((skill) => [skill.name, state.courses.find((course) => course.code === skill.code && (skill.level === undefined || course.level === skill.level))?.title ?? skill.code, `${skill.at} marks`, skill.description])}
                 />
               </>
             )}
+          </div>
+        )}
+
+        {tab === 'The Undercroft' && !below && (
+          <div className="help-page">
+            <p className="hint">There is nothing under the University in this game.</p>
+          </div>
+        )}
+        {tab === 'The Undercroft' && below && (
+          <div className="help-page">
+            <h2>Getting in</h2>
+            <ul>
+              <li>From day {below.opensOnDay} someone asks to meet you at {content.locations.find((l) => l.id === below.entryLocationId)?.name}. It cannot be put off: once it is next on your day, it is all there is to do.</li>
+              <li>After that meeting, <strong>Go down</strong> is offered there. A run takes {below.hours} hours of your day, however it ends.</li>
+              <li>Pick a depth you have opened and up to {below.partySize} women. She must have met you, trust you ({below.trustNeeded}), be free for those hours, and not be about to give birth.</li>
+            </ul>
+
+            <h2>A run</h2>
+            <Table
+              head={['Stop', 'What happens']}
+              rows={[
+                ['Fight', 'Beat what is there to pick up what it was guarding.'],
+                ['Find', 'Something lying about: picked up as you pass.'],
+                ['Checkpoint', `What you have found so far is made safe, and everyone gets back ${Math.round(below.checkpointRest * 100)}% of their footing.`],
+                ['Guardian', 'The last fight. Win it and you set the anchor.']
+              ]}
+            />
+            <ul>
+              <li>Setting an anchor for the first time gives you its relic and opens the next depth. There are {below.depths.length}.</li>
+              <li>Turning back keeps only what was made safe at a checkpoint.</li>
+              <li>Losing keeps the same, leaves you with no energy for the day, and costs the trust of whoever went down.</li>
+              <li>Whoever came remembers it, and a win raises her trust.</li>
+            </ul>
+
+            <h2>A fight</h2>
+            <ul>
+              <li>You act first, then each woman, then the enemies. Without the right course, they get a free blow about half the time as a fight begins.</li>
+              <li>Footing is health. At none she is down until the fight is over.</li>
+              <li>A ward shows as a blue band on everyone's footing: it takes the next hits meant for any of you.</li>
+              <li>The blue bar under your footing is energy, the same energy as above ground.</li>
+              <li>Her affection makes her strike true more often, for half as much again.</li>
+            </ul>
+            <Table
+              head={['On your turn', 'What it does']}
+              rows={[
+                ['Attack', 'Hits one enemy. Stronger with strength.'],
+                ['Protect', 'The next hit meant for her lands on you, and less of it for your endurance.'],
+                ['Empower', `Her next action is about ${Math.round((below.anchorPower - 1) * 100)}% stronger, more with wisdom. ${below.anchorEnergy} energy.`],
+                ['Ground', `Takes ${below.grounds} off a pregnant woman's surge. ${below.groundEnergy} energy.`],
+                ['An item', 'Something from your bag that works below.']
+              ]}
+            />
+            <Table
+              head={['Role', 'Footing', 'Action', 'What it does']}
+              rows={below.roles.flatMap((role) => role.actions.map((action, index) => [index === 0 ? role.name : '', index === 0 ? role.footing : '', action.name, describeAction(action)]))}
+            />
+
+            <h2>Pregnancy</h2>
+            <ul>
+              <li>A woman who is carrying does more: {Object.entries(below.pregnancyPower).map(([stage, power]) => `x${power} ${content.pregnancy?.stages.find((one) => one.id === stage)?.name.toLowerCase() ?? stage}`).join(', ')}.</li>
+              <li>Each thing she does adds to her surge, the orange bar under her footing. At {below.surgeLimit} it breaks loose: {below.misfire} from everyone, through any ward.</li>
+              <li>Ground her, or use something that clears a surge, before it fills. Defending and taunting add nothing to it.</li>
+            </ul>
+
+            <h2>What you meet</h2>
+            <Table
+              head={['Marked', 'Meaning']}
+              rows={[
+                ['Sweeps', 'It hits all of you at once, for less each.'],
+                ['Hexes', 'Its hit leaves her doing less for a couple of rounds.'],
+                ['Faltering', 'Weakened by a hexer: it hits less hard for now.'],
+                ['Weak to', 'One role does half as much again to it. Shown only with the right course.']
+              ]}
+            />
+
+            <h2>What you bring up</h2>
+            <ul>
+              <li>Relics are kept for good and are listed in your Bag. Each changes a number of the game, as a course skill does.</li>
+              <li>Money, and things to use in a fight, are yours once made safe.</li>
+            </ul>
+            <Table head={['Depth', 'Relic', 'What it does']} rows={below.depths.map((depth, index) => [`${index + 1}. ${depth.name}`, depth.relic.name, describeChange(depth.relic.modifier)])} />
+            <Table
+              head={['Item', 'In a fight']}
+              rows={content.items.filter((item) => item.below).map((item) => [item.name, [item.below!.footing > 0 && `+${item.below!.footing} footing`, item.below!.calms && 'clears a surge'].filter(Boolean).join(', ')])}
+            />
+
+            <h2>Courses that help below</h2>
+            <Table
+              head={['Course', 'Below']}
+              rows={content.skills.filter((skill) => skill.below).map((skill) => [state.courses.find((course) => course.code === skill.code && course.level === skill.level)?.title ?? skill.code, BELOW[skill.below!.kind] ?? skill.below!.kind])}
+            />
           </div>
         )}
 

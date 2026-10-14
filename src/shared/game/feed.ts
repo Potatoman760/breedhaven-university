@@ -1,4 +1,4 @@
-import { selfiePrompt } from '../comfy'
+import { SHOTS, postPrompt, type Shot } from '../comfy'
 import { outfitDescription, type ContentPack, type GameState, type LoveInterest, type Post, type PostPlan } from '../model'
 import { formatDate, formatTime, periodAt, toDate } from './calendar'
 import { describeEvent, eventsOn } from './events'
@@ -147,33 +147,35 @@ export function feedRound(content: ContentPack, state: GameState): { state: Game
   return { state: { ...state, feedDay: date.dayIndex, feedPlans: plans }, plans }
 }
 
-/** The prompt asking the LLM to write the day's planned posts: a caption and what the selfie shows, as a JSON array. */
+/** The prompt asking the LLM to write the day's planned posts: a caption, what kind of picture it is and what it shows, as a JSON array. */
 export function buildFeedPrompt(content: ContentPack, state: GameState, plans: PostPlan[]): { system: string; user: string } {
   const player = state.player.name
   const system = [
     'You write social media posts for the characters of a dating sim set at a modern university in a ' +
       'magitech fantasy city, where everyday magic and modern technology exist side by side. Bloomr is the ' +
       'photo feed app every student has on their phone; these are public posts anyone at the University can see. ' +
-      'Every post is a selfie with a caption: of the character alone, or with the friend named.',
+      'Every post is a picture with a caption: of the character alone, or with the friend named.',
     'Reply with only a JSON array and nothing else, with one object per post, in the order given. Each object has:',
     '- "n": the number of the post',
     '- "text": the caption',
-    '- "picture": what the selfie shows',
+    '- "shot": "selfie" or "candid"',
+    '- "picture": what the picture shows',
     'Rules for the caption:',
     "- One or two short sentences, under 40 words, in that character's own voice, typed the way they would type on their phone.",
     '- About that moment of their own day: where they are, what they are doing, eating, complaining about or looking forward to. ' +
       'Use the place, the hour, the weather and the events given where they fit. When a friend is in the picture, say so in passing.',
     `- Public: nothing private, nothing intimate, and never name ${player} or hint at what the two of them have done.`,
     '- No hashtags or emoji unless they suit the character, and then one at most. Do not repeat a last post, and when one character posts twice make the two different.',
+    'Rules for the shot:',
+    '- "selfie": she holds the phone up and looks into it. Her face and shoulders, and nothing she is doing with her hands.',
+    '- "candid": a picture of her doing something, taken by someone out of the frame. She does not hold a phone or look at one.',
+    '- Choose whichever suits the caption, and vary them.',
     'Rules for the picture:',
-    '- One whole sentence, under 30 words, for an image model, about the one taking the selfie: the look on her face, how she holds herself, and anything of the moment in view.',
-    '- Begin it with its subject, "She is", "He is" or "They are", and with a friend "She and her friend are". Never a fragment such as "A grinning face at the window": ' +
-      'an image model draws a face with no owner as another person standing in the picture.',
-    '- She is the one holding the phone, at arm\'s length in one hand, and looking into it. Give her only a pose she can be in while doing that: ' +
-      'no crossed arms, nothing that takes both hands, not turned away or looking elsewhere.',
-    '- A selfie alone has nobody else in it: nobody behind her, beside her, at a window or in the background, whatever the caption says of company. With a friend, only the two of them.',
+    '- One whole sentence, under 30 words, for an image model, beginning "She is", "He is" or "They are", and with a friend "She and her friend are".',
+    '- A selfie: the look on her face. A candid: what she is doing, and the look on her face.',
+    '- Nobody else is in it, whatever the caption says of company: alone, only her; with a friend, only the two.',
     '- Only what can be seen. Name nobody: write "she", "he" or "they", and "her friend" for the friend.',
-    '- Do not describe bodies, hair, clothes or the place itself: those are added for you.'
+    '- Do not describe bodies, hair, clothes, phones or the place itself: those are added for you.'
   ].join('\n')
 
   const weather = weatherOn(content, state)
@@ -196,7 +198,7 @@ export function buildFeedPrompt(content: ContentPack, state: GameState, plans: P
         `   Personality: ${li.personality}`,
         li.ai.speechPattern && `   Voice: ${li.ai.speechPattern}`,
         `   Where: ${where ? `${where.name}. ${where.description}` : 'at home.'}`,
-        friend ? `   A selfie with a friend: ${friend.name}. ${friend.bio}` : '   A selfie alone.',
+        friend ? `   With a friend: ${friend.name}. ${friend.bio}` : '   Alone.',
         last && `   Last post: ${last.text}`
       ]
     })
@@ -211,7 +213,9 @@ export interface WrittenPost {
   /** Which of the plans it is for, counting from 0. */
   index: number
   text: string
-  /** What the selfie shows, in words for an image model. */
+  /** How the picture was taken. A candid when the reply did not say. */
+  shot: Shot
+  /** What the picture shows, in words for an image model. */
   picture: string
 }
 
@@ -240,18 +244,19 @@ export function parseFeedReply(reply: string, plans: PostPlan[]): WrittenPost[] 
   if (!Array.isArray(parsed)) return []
   const written: WrittenPost[] = []
   for (const entry of parsed) {
-    const { n, text, picture } = (entry ?? {}) as { n?: unknown; text?: unknown; picture?: unknown }
+    const { n, text, picture, shot } = (entry ?? {}) as { n?: unknown; text?: unknown; picture?: unknown; shot?: unknown }
     const index = Number(n) - 1
     if (!Number.isInteger(index) || index < 0 || index >= plans.length || typeof text !== 'string') continue
     const wording = text.trim().replace(/^["“]|["”]$/g, '').slice(0, MAX_POST_CHARS)
     if (wording && !written.some((post) => post.index === index)) {
-      written.push({ index, text: wording, picture: typeof picture === 'string' ? picture.trim().slice(0, MAX_POST_CHARS) : '' })
+      const taken = SHOTS.find((one) => one === (typeof shot === 'string' ? shot.trim().toLowerCase() : ''))
+      written.push({ index, text: wording, shot: taken ?? 'candid', picture: typeof picture === 'string' ? picture.trim().slice(0, MAX_POST_CHARS) : '' })
     }
   }
   return written
 }
 
-/** A planned post with its caption written and the prompt its selfie is drawn from: all but the picture. */
+/** A planned post with its caption written and the prompt its picture is drawn from: all but the picture. */
 export interface PostDraft extends PostPlan {
   text: string
   prompt: string
@@ -259,7 +264,7 @@ export interface PostDraft extends PostPlan {
 
 /**
  * The posts ready to be drawn, earliest first: each written plan with the prompt for its
- * selfie, made from how she and her friend look, what they will be wearing, what the LLM
+ * picture, made from how she and her friend look, what they will be wearing, what the LLM
  * said the picture shows, and the place and the light at that hour.
  */
 export function draftPosts(content: ContentPack, state: GameState, plans: PostPlan[], written: WrittenPost[], framing: string): PostDraft[] {
@@ -269,14 +274,14 @@ export function draftPosts(content: ContentPack, state: GameState, plans: PostPl
     return who && { appearance: who.appearance, pronouns: who.pronouns, wears: outfitDescription(who.outfits, wornOutfit(content, then, who)) }
   }
   return written
-    .flatMap(({ index, text, picture }) => {
+    .flatMap(({ index, text, shot, picture }) => {
       const plan = plans[index]
       const then = { ...state, time: plan.time }
       const author = sitter(plan.authorId, then)
       if (!author) return []
       const place = content.locations.find((l) => l.id === plan.locationId)
       const light = periodAt(content.calendar, toDate(content.calendar, plan.time).hour).light
-      return [{ ...plan, text, prompt: selfiePrompt(author, sitter(plan.withId, then), picture, place, light, framing) }]
+      return [{ ...plan, text, prompt: postPrompt(author, sitter(plan.withId, then), shot, picture, place, light, framing) }]
     })
     .sort((a, b) => a.time - b.time)
 }

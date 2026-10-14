@@ -93,7 +93,7 @@ export const DEFAULT_SIZES: Record<ArtKind, { width: number; height: number }> =
 export const DEFAULT_FRAMING: Record<ArtKind, string> = {
   sprite: 'three-quarter shot from knees up, standing, facing forward\n\nplain white background',
   background: 'wide establishing shot, no people',
-  photo: 'candid phone photo, natural light',
+  photo: 'phone photo, natural light',
   nsfw: 'wide cinematic shot, bedroom, soft warm light',
   birth: 'wide cinematic shot, a bright modern hospital maternity room, soft daylight'
 }
@@ -492,36 +492,39 @@ export interface Sitter {
   wears: string
 }
 
+/** How a picture posted on Bloomr was taken: by her, of herself, or of her by someone out of the frame. Whoever writes the post says which. */
+export const SHOTS = ['selfie', 'candid'] as const
+export type Shot = (typeof SHOTS)[number]
+
 /**
- * The prompt for a selfie posted on Bloomr: that it is one, the one taking it, the friend
- * beside them when there is one, what the picture shows, the place behind them, the light,
- * and how it is framed, each a paragraph.
+ * The prompt for a picture posted on Bloomr. Whoever is in it is said in one paragraph and no more: what kind of
+ * picture it is, how she looks, what she wears and what she is doing, all of the one subject. Said in pieces, an
+ * image model takes each piece for another person and draws her twice. After it, the place behind, the light, and how
+ * it is framed.
  */
-export function selfiePrompt(
+export function postPrompt(
   author: Sitter,
   friend: Sitter | undefined,
-  shot: string,
+  shot: Shot,
+  moment: string,
   place: Pick<Location, 'appearance'> | undefined,
   light: string,
   framing: string
 ): string {
-  const clothes = (who: Sitter): string => {
+  const wearing = (who: Sitter): string => {
     const { subject } = pronounWords(who.pronouns)
     return who.wears.trim() === '' ? '' : paragraph(`${subject[0].toUpperCase()}${subject.slice(1)} ${subject === 'they' ? 'wear' : 'wears'} ${who.wears}`)
   }
-  const { subject, object } = pronounWords(author.pronouns)
-  // What the picture shows is said of the one taking it, by name of what she is in it: left as a sentence on its own,
-  // an image model takes it for someone else and draws her in.
-  const moment = shot.trim() === '' ? '' : paragraph(`${friend ? 'What the two of them are doing in the picture' : `What ${subject} ${subject === 'they' ? 'are' : 'is'} doing as ${subject} ${subject === 'they' ? 'take' : 'takes'} it, the same person as above`}: ${shot.trim()}`)
+  const lead = friend
+    ? shot === 'selfie'
+      ? 'A phone selfie of two friends close together'
+      : 'A candid phone photo of two friends together'
+    : shot === 'selfie'
+      ? 'A close-up phone selfie of one person, solo'
+      : 'A candid phone photo of one person, solo'
+  const { object } = pronounWords(author.pronouns)
   return paragraphs([
-    friend
-      ? "A selfie of two friends close together, taken at arm's length on a phone by the one in front, both looking into the camera. Only the two of them are in the picture."
-      : `A selfie taken at arm's length on a phone, looking into the camera. One person only: ${subject} ${subject === 'they' ? 'are' : 'is'} alone in the picture, with nobody else anywhere in it.`,
-    paragraph(author.appearance),
-    clothes(author),
-    friend && paragraph(`Beside ${object}, a friend: ${friend.appearance}`),
-    friend && clothes(friend),
-    moment,
+    [paragraph(lead), paragraph(author.appearance), wearing(author), friend && paragraph(`Beside ${object}, a friend: ${friend.appearance}`), friend && wearing(friend), paragraph(moment)].filter(Boolean).join(' '),
     place && place.appearance.trim() !== '' && paragraph(`In the background: ${place.appearance}`),
     LIGHT_WORDS[light.trim().toLowerCase()],
     framing.trim()

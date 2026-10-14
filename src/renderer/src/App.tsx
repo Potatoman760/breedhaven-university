@@ -28,6 +28,9 @@ import {
   withHousing,
   homeViewId,
   housingOfferDue,
+  scheduleDescent,
+  attendDescent,
+  startRun,
   sendHousingOffer,
   settleHousehold,
   conceive,
@@ -49,6 +52,7 @@ import {
   arriveFor,
   type Upcoming,
   orientationStep,
+  summons,
   isGameOver,
   dayMisses,
   isSleepTime,
@@ -139,6 +143,8 @@ import { Dialog, ToBeImplemented } from './ui/Dialog'
 import { MapPanel } from './ui/MapPanel'
 import { OutingDialog } from './ui/OutingDialog'
 import { ExamDialog } from './ui/ExamDialog'
+import { ExpeditionView } from './ui/ExpeditionView'
+import { PartyDialog } from './ui/PartyDialog'
 import type { Panel } from './ui/panels'
 import { SceneView } from './ui/SceneView'
 import { SummaryView, type SceneSummary } from './ui/SummaryView'
@@ -324,8 +330,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
 
   /** Asks whether to end the day early: everything still to come today would be let go, and he would wake in the morning. */
   function endDay() {
-    // Orientation has to be sat through first.
-    if (orientationStep(content, state)) return
+    // Orientation has to be sat through first, and so does anything he has been summoned to.
+    if (orientationStep(content, state) || summons(content, state)) return
     setPanel({ kind: 'endDay' })
   }
 
@@ -344,7 +350,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   // Once a day, when nothing else is going on, someone may write to the player unprompted.
   // Once the calendar has run out nothing more is set going: nobody writes, nothing is posted. Births still come, for the telling.
   const over = isGameOver(content.calendar, state.time)
-  const idle = !scene && !summary && (state.enrolment !== null || !content.coursework)
+  const idle = !scene && !summary && !state.expedition.run && (state.enrolment !== null || !content.coursework)
   const roundMade = useRef(-1)
   useEffect(() => {
     if (!idle || over || !courierRoundDue(content, state)) return
@@ -434,6 +440,12 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setState((current) => settleBirths(content, current).state)
     setNotice(missed.map(({ motherId, child }) => `${firstNames(content, [motherId])} gave birth to your ${child.daughter ? 'daughter' : 'son'}, ${child.name}, and you were not there. She will not forget it.`).join(' '))
   }, [idle, state, content])
+
+  // Once the way down is open, whoever knows of it sets an hour to show him, and sets it again when he does not come.
+  useEffect(() => {
+    if (!idle || over || scheduleDescent(content, state) === state) return
+    setState((current) => scheduleDescent(content, current))
+  }, [idle, over, state, content])
 
   // Once someone he is with is carrying his child, the Sire Relations Office writes to him about a house.
   useEffect(() => {
@@ -624,6 +636,14 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     // So is being shown the house: it is his as the scene opens, with the nanny in it and the officer who brought him.
     if (at.appointments.find((plan) => plan.id === appointmentId)?.kind === 'viewing') {
       const shown = attendViewing(content, at, appointmentId)
+      setNotice('')
+      setState(shown.state)
+      setScene(shown.scene)
+      return
+    }
+    // And being shown the way down: it is his to take from the scene on.
+    if (at.appointments.find((plan) => plan.id === appointmentId)?.kind === 'below') {
+      const shown = attendDescent(content, at, appointmentId)
       setNotice('')
       setState(shown.state)
       setScene(shown.scene)
@@ -922,6 +942,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           state={state}
           onEnrol={(enrolment) => setState({ ...state, enrolment })}
         />
+      ) : state.expedition.run ? (
+        <ExpeditionView content={content} state={state} onChange={setState} />
       ) : summary ? (
         <SummaryView
           content={summary.scene.npc ? withNpc(content, summary.scene.loveInterestId) : content}
@@ -1012,7 +1034,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       )}
 
       {panel?.kind === 'gifts' && scene && partner && (
-        <Dialog title="Your bag" onClose={close} narrow>
+        <Dialog title="Your bag" onClose={close}>
           <Bag
             content={content}
             state={state}
@@ -1025,6 +1047,13 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
             onUseItem={(itemId, onId) => useInScene(content.items.find((item) => item.id === itemId)?.name ?? itemId, useItem(content, state, itemId, onId), onId)}
             onAbility={(skillId, onId) => useInScene(content.skills.find((skill) => skill.id === skillId)?.name ?? skillId, useAbility(content, state, skillId, onId), onId)}
           />
+        </Dialog>
+      )}
+
+      {/* Out of a scene, a thing is used on himself: what is for a woman waits until he is with her. */}
+      {panel?.kind === 'bag' && !scene && (
+        <Dialog title="Your bag" onClose={close}>
+          <Bag content={content} state={state} onUseItem={(itemId) => setState((current) => useItem(content, current, itemId))} onAbility={(skillId) => setState((current) => useAbility(content, current, skillId))} />
         </Dialog>
       )}
 
@@ -1130,6 +1159,18 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       )}
       {panel?.kind === 'calendar' && (
         <CalendarPanel content={content} state={state} onChange={setState} onClose={close} />
+      )}
+      {panel?.kind === 'below' && (
+        <PartyDialog
+          content={content}
+          state={state}
+          onGo={(partyIds, depth) => {
+            setState(startRun(content, state, partyIds, depth))
+            setPanel(null)
+            setNotice('')
+          }}
+          onClose={close}
+        />
       )}
       {panel?.kind === 'house' && <HousePanel content={content} state={state} onChange={applyUpdate} onClose={close} />}
       {panel?.kind === 'map' && (

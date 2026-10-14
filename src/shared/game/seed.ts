@@ -12,3 +12,14 @@ export function seedOf(id: string): number {
   }
   return hash >>> 0
 }
+
+/** A repeatable source of numbers in [0, 1): the same seed gives the same numbers in the same order. */
+export function draws(seed: number): () => number {
+  let x = seed >>> 0
+  return () => {
+    x = (x + 0x6d2b79f5) >>> 0
+    let t = Math.imul(x ^ (x >>> 15), 1 | x)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 0x100000000
+  }
+}

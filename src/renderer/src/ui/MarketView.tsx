@@ -1,7 +1,9 @@
 import { useState, type ReactNode } from 'react'
 import { canBuy, priceOf } from '../../../shared/game'
 import type { ContentPack, GameState, Stall } from '../../../shared/model'
+import { Button } from './Button'
 import { ItemIcon } from './icons'
+import { ItemSquare } from './ItemSquare'
 
 interface Props {
   content: ContentPack
@@ -61,28 +63,24 @@ export function Stalls({ content, state, stalls, byPhone = false, closed, onBuy 
             </div>
             <div className="stall" role="tabpanel">
               {stall.description && <p className="hint">{stall.description}</p>}
-              {closed ??
-                stall.itemIds.map((itemId) => {
-                  const item = content.items.find((i) => i.id === itemId)
-                  if (!item) return null
-                  const check = canBuy(content, state, item.id, byPhone)
-                  const owned = state.inventory[item.id] ?? 0
-                  return (
-                    <div key={item.id} className="ware">
-                      <span className="ware-icon">
-                        <ItemIcon name={item.icon} />
-                      </span>
-                      <div>
-                        <strong>{item.name}</strong>
-                        <span>{item.description}</span>
+              {closed ?? (
+                <div className="ware-grid">
+                  {stall.itemIds.map((itemId) => {
+                    const item = content.items.find((i) => i.id === itemId)
+                    if (!item) return null
+                    const check = canBuy(content, state, item.id, byPhone)
+                    return (
+                      <div key={item.id} className="bag-cell">
+                        <ItemSquare icon={item.icon} image={item.image} count={state.inventory[item.id]} title={item.description} />
+                        <span className="bag-name">{item.name}</span>
+                        <Button variant="primary" size="small" disabled={!check.ok} title={check.reasons.join(' · ')} onClick={() => onBuy(item.id)}>
+                          ${priceOf(content, state, item)}
+                        </Button>
                       </div>
-                      {owned > 0 && <span className="chip">Carrying {owned}</span>}
-                      <button disabled={!check.ok} title={check.reasons.join(' · ')} onClick={() => onBuy(item.id)}>
-                        Buy · ${priceOf(content, state, item)}
-                      </button>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
+                </div>
+              )}
             </div>
           </>
         ) : (

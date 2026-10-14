@@ -340,5 +340,6 @@
     "knowledge": [],
     "secrets": [],
     "extraInstructions": ""
-  }
+  },
+  "partyRole": "guard"
 }

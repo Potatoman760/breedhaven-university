@@ -108,7 +108,7 @@ export function dayAgenda(content: ContentPack, state: GameState, dayIndex: numb
     timed.push({
       kind: plan.kind === 'birth' ? 'birth' : 'plan',
       id: `plan-${plan.id}`,
-      title: plan.kind === 'birth' ? `${firstNames(content, [plan.loveInterestId])} gives birth` : plan.kind === 'viewing' ? plan.title : `${plan.title} with ${firstNames(content, attendees(plan))}`,
+      title: plan.kind === 'birth' ? `${firstNames(content, [plan.loveInterestId])} gives birth` : plan.kind === 'viewing' || plan.kind === 'below' ? plan.title : `${plan.title} with ${firstNames(content, attendees(plan))}`,
       detail: place,
       startHour: date.hour,
       hours: plan.hours

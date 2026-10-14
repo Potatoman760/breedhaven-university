@@ -5,9 +5,11 @@
     "description": "Meadow flowers tied with twine, picked this morning.",
     "price": 5,
     "icon": "flower",
+    "appearance": "A small bunch of mixed wildflowers, daisies and cornflowers, tied with a loop of twine.",
     "tags": [
       "flowers"
-    ]
+    ],
+    "image": "sprites/items/posy-cutout.png"
   },
   {
     "id": "potted-fern",
@@ -15,9 +17,11 @@
     "description": "A small fern in a clay pot, hard to kill.",
     "price": 8,
     "icon": "plant",
+    "appearance": "A small leafy green fern in a round terracotta clay pot.",
     "tags": [
       "plants"
-    ]
+    ],
+    "image": "sprites/items/potted-fern-cutout.png"
   },
   {
     "id": "moss-ball",
@@ -25,10 +29,12 @@
     "description": "A damp, velvety ball of pond moss in a dish.",
     "price": 4,
     "icon": "plant",
+    "appearance": "A round velvety green ball of moss sitting in a shallow white ceramic dish.",
     "tags": [
       "moss",
       "plants"
-    ]
+    ],
+    "image": "sprites/items/moss-ball-cutout.png"
   },
   {
     "id": "seed-packets",
@@ -36,9 +42,11 @@
     "description": "Paper twists of herb and bean seed, labelled by hand.",
     "price": 4,
     "icon": "plant",
+    "appearance": "Three small brown paper seed packets, hand labelled, fanned out.",
     "tags": [
       "gardening"
-    ]
+    ],
+    "image": "sprites/items/seed-packets-cutout.png"
   },
   {
     "id": "lavender-soap",
@@ -46,9 +54,11 @@
     "description": "A pale cake of scented soap wrapped in linen.",
     "price": 6,
     "icon": "soap",
+    "appearance": "A pale purple bar of soap half wrapped in cream linen, with a sprig of lavender laid on it.",
     "tags": [
       "soap"
-    ]
+    ],
+    "image": "sprites/items/lavender-soap-cutout.png"
   },
   {
     "id": "honey-cakes",
@@ -56,9 +66,11 @@
     "description": "Three sticky cakes in a paper bag, still warm.",
     "price": 4,
     "icon": "sweet",
+    "appearance": "Three small golden glazed honey cakes spilling from an open paper bag.",
     "tags": [
       "sweets"
-    ]
+    ],
+    "image": "sprites/items/honey-cakes-cutout.png"
   },
   {
     "id": "candied-plums",
@@ -66,9 +78,11 @@
     "description": "A small box of sugared plums.",
     "price": 6,
     "icon": "sweet",
+    "appearance": "A small open gift box of dark purple sugared plums.",
     "tags": [
       "sweets"
-    ]
+    ],
+    "image": "sprites/items/candied-plums-cutout.png"
   },
   {
     "id": "loose-leaf-tea",
@@ -76,9 +90,11 @@
     "description": "An upland black tea in a small painted tin.",
     "price": 7,
     "icon": "sweet",
+    "appearance": "A small square painted tea tin with a round lid, decorated with green leaves.",
     "tags": [
       "tea"
-    ]
+    ],
+    "image": "sprites/items/loose-leaf-tea-cutout.png"
   },
   {
     "id": "coffee-beans",
@@ -86,9 +102,11 @@
     "description": "Roasted this week by the people who supply Spell & Sip.",
     "price": 8,
     "icon": "sweet",
+    "appearance": "A brown paper bag of roasted coffee beans, folded at the top, a few beans beside it.",
     "tags": [
       "coffee"
-    ]
+    ],
+    "image": "sprites/items/coffee-beans-cutout.png"
   },
   {
     "id": "spiced-cider",
@@ -96,9 +114,11 @@
     "description": "Strong, sweet and best drunk in company.",
     "price": 7,
     "icon": "bottle",
+    "appearance": "A dark amber glass bottle of cider with a swing-top stopper and an apple on its label.",
     "tags": [
       "ale"
-    ]
+    ],
+    "image": "sprites/items/spiced-cider-cutout.png"
   },
   {
     "id": "salt-pretzels",
@@ -106,9 +126,11 @@
     "description": "Knotted bread crusted with coarse salt.",
     "price": 3,
     "icon": "salt",
+    "appearance": "Two knotted brown pretzels crusted with coarse white salt.",
     "tags": [
       "salt"
-    ]
+    ],
+    "image": "sprites/items/salt-pretzels-cutout.png"
   },
   {
     "id": "blank-ledger",
@@ -116,9 +138,11 @@
     "description": "A hardback accounts book with ruled pages, for people who still think better on paper.",
     "price": 10,
     "icon": "book",
+    "appearance": "A closed hardback accounts ledger with a dark green cloth cover and red corners.",
     "tags": [
       "ledgers"
-    ]
+    ],
+    "image": "sprites/items/blank-ledger-cutout.png"
   },
   {
     "id": "trade-treatise",
@@ -126,10 +150,12 @@
     "description": "A much-argued classic of economics, in a battered student paperback.",
     "price": 12,
     "icon": "book",
+    "appearance": "A battered thick paperback book with a plain blue cover and a gold coin emblem.",
     "tags": [
       "books",
       "trade"
-    ]
+    ],
+    "image": "sprites/items/trade-treatise-cutout.png"
   },
   {
     "id": "book-of-hymns",
@@ -137,9 +163,11 @@
     "description": "A pocket book of the Order's hymns with a ribbon marker.",
     "price": 9,
     "icon": "book",
+    "appearance": "A small pocket hymn book in dark red leather with a ribbon marker hanging from it.",
     "tags": [
       "devotional"
-    ]
+    ],
+    "image": "sprites/items/book-of-hymns-cutout.png"
   },
   {
     "id": "sketchbook",
@@ -147,9 +175,11 @@
     "description": "Thick drawing paper between rose-coloured boards.",
     "price": 10,
     "icon": "book",
+    "appearance": "A sketchbook with rose pink board covers and a black elastic band, a pencil laid across it.",
     "tags": [
       "art"
-    ]
+    ],
+    "image": "sprites/items/sketchbook-cutout.png"
   },
   {
     "id": "old-map",
@@ -157,9 +187,11 @@
     "description": "Out of date, beautifully drawn, slightly foxed. Two of the portal lines on it were never built.",
     "price": 8,
     "icon": "map",
+    "appearance": "An old folded railway map, yellowed, partly unfolded to show fine drawn lines.",
     "tags": [
       "maps"
-    ]
+    ],
+    "image": "sprites/items/old-map-cutout.png"
   },
   {
     "id": "playing-cards",
@@ -167,9 +199,11 @@
     "description": "A worn deck. Possibly marked; the seller won't say.",
     "price": 6,
     "icon": "cards",
+    "appearance": "A worn deck of playing cards fanned out, the ace on top, with a creased card box.",
     "tags": [
       "cards"
-    ]
+    ],
+    "image": "sprites/items/playing-cards-cutout.png"
   },
   {
     "id": "silk-ribbon",
@@ -177,9 +211,11 @@
     "description": "A length of bright silk for hair or a wrist.",
     "price": 5,
     "icon": "ribbon",
+    "appearance": "A coiled length of bright red silk ribbon.",
     "tags": [
       "ribbons"
-    ]
+    ],
+    "image": "sprites/items/silk-ribbon-cutout.png"
   },
   {
     "id": "lace-choker",
@@ -187,9 +223,11 @@
     "description": "Fine black lace with a small silver clasp.",
     "price": 12,
     "icon": "necklace",
+    "appearance": "A black lace choker necklace with a small silver clasp, laid in a loop.",
     "tags": [
       "finery"
-    ]
+    ],
+    "image": "sprites/items/lace-choker-cutout.png"
   },
   {
     "id": "river-stone",
@@ -197,9 +235,11 @@
     "description": "A smooth grey stone that holds the sun's warmth.",
     "price": 3,
     "icon": "stone",
+    "appearance": "A smooth flat oval grey river stone.",
     "tags": [
       "stones"
-    ]
+    ],
+    "image": "sprites/items/river-stone-cutout.png"
   },
   {
     "id": "whetstone",
@@ -207,9 +247,11 @@
     "description": "A fine-grained stone for keeping a competition blade honest.",
     "price": 6,
     "icon": "blade",
+    "appearance": "A rectangular grey sharpening whetstone on a small wooden block.",
     "tags": [
       "weapons"
-    ]
+    ],
+    "image": "sprites/items/whetstone-cutout.png"
   },
   {
     "id": "sword-belt",
@@ -217,9 +259,11 @@
     "description": "Sturdy leather with a plain brass buckle, made to carry a blade and a radio and to last.",
     "price": 14,
     "icon": "belt",
+    "appearance": "A coiled sturdy brown tooled leather belt with a plain brass buckle and a sword frog.",
     "tags": [
       "leatherwork"
-    ]
+    ],
+    "image": "sprites/items/sword-belt-cutout.png"
   },
   {
     "id": "lockpicks",
@@ -227,9 +271,11 @@
     "description": "Sold as 'ward-testing tools'. Nobody is fooled.",
     "price": 12,
     "icon": "key",
+    "appearance": "A small leather roll opened to show a row of thin steel lockpicks.",
     "tags": [
       "lockpicks"
-    ]
+    ],
+    "image": "sprites/items/lockpicks-cutout.png"
   },
   {
     "id": "glass-vials",
@@ -237,9 +283,11 @@
     "description": "Six stoppered vials in a padded case, for careful potion-work.",
     "price": 9,
     "icon": "vial",
+    "appearance": "An open padded case holding six small empty stoppered glass vials.",
     "tags": [
       "potions"
-    ]
+    ],
+    "image": "sprites/items/glass-vials-cutout.png"
   },
   {
     "id": "game-cartridge",
@@ -247,9 +295,11 @@
     "description": "A classic for a console older than you are. The label is worn and the save file is someone else's.",
     "price": 9,
     "icon": "cards",
+    "appearance": "A grey retro video game cartridge with a worn colorful label.",
     "tags": [
       "games"
-    ]
+    ],
+    "image": "sprites/items/game-cartridge-cutout.png"
   },
   {
     "id": "hobby-kit",
@@ -257,9 +307,11 @@
     "description": "A solder-it-yourself board that takes one small enchantment. The box says ages ten and up.",
     "price": 12,
     "icon": "key",
+    "appearance": "A small green electronics circuit board with a soldering iron beside it, in an open cardboard box.",
     "tags": [
       "gadgets"
-    ]
+    ],
+    "image": "sprites/items/hobby-kit-cutout.png"
   },
   {
     "id": "earbuds",
@@ -267,9 +319,11 @@
     "description": "Good sound, one careful owner, a case with a scratch on it.",
     "price": 14,
     "icon": "gift",
+    "appearance": "A pair of white wireless earbuds in their open charging case, the case slightly scratched.",
     "tags": [
       "music"
-    ]
+    ],
+    "image": "sprites/items/earbuds-cutout.png"
   },
   {
     "id": "charm-case",
@@ -277,9 +331,11 @@
     "description": "A slim case with a drop-ward stitched into the lining. Rated for one flight of stairs.",
     "price": 10,
     "icon": "gift",
+    "appearance": "A slim dark blue phone case with a small rune stitched in silver thread.",
     "tags": [
       "gadgets"
-    ]
+    ],
+    "image": "sprites/items/charm-case-cutout.png"
   },
   {
     "id": "instant-ramen",
@@ -287,9 +343,11 @@
     "description": "The instant version of Cauldron's famous dish. Heats itself when you pull the tab, usually.",
     "price": 3,
     "icon": "salt",
+    "appearance": "A cup of instant ramen noodles with a red and orange flame design and a pull tab lid.",
     "tags": [
       "salt"
-    ]
+    ],
+    "image": "sprites/items/instant-ramen-cutout.png"
   },
   {
     "id": "energy-drink",
@@ -297,6 +355,7 @@
     "description": "An energy drink in a can that hums slightly. Popular in exam season.",
     "price": 3,
     "icon": "bottle",
+    "appearance": "A tall slim aluminum drink can, electric green with a yellow lightning root design.",
     "tags": [
       "coffee"
     ],
@@ -308,7 +367,8 @@
         }
       ],
       "on": "self"
-    }
+    },
+    "image": "sprites/items/energy-drink-cutout.png"
   },
   {
     "id": "scratchcard",
@@ -316,9 +376,11 @@
     "description": "Seven petals to scratch. The odds are printed on the back in small type.",
     "price": 2,
     "icon": "cards",
+    "appearance": "A lottery scratchcard printed with seven flower petals, one scratched, with a coin beside it.",
     "tags": [
       "cards"
-    ]
+    ],
+    "image": "sprites/items/scratchcard-cutout.png"
   },
   {
     "id": "phone-charger",
@@ -326,9 +388,11 @@
     "description": "A charger and cable, because everyone has lost theirs.",
     "price": 6,
     "icon": "key",
+    "appearance": "A white phone charger plug with its cable neatly coiled.",
     "tags": [
       "gadgets"
-    ]
+    ],
+    "image": "sprites/items/phone-charger-cutout.png"
   },
   {
     "id": "bath-salts",
@@ -336,9 +400,11 @@
     "description": "A jar of scented salts for a long soak.",
     "price": 7,
     "icon": "soap",
+    "appearance": "A glass jar of pale purple bath salts with a cork lid and a small wooden scoop.",
     "tags": [
       "soap"
-    ]
+    ],
+    "image": "sprites/items/bath-salts-cutout.png"
   },
   {
     "id": "chamomile-tea",
@@ -346,9 +412,11 @@
     "description": "Twenty bags of something calming, from the shelf by the till.",
     "price": 5,
     "icon": "sweet",
+    "appearance": "A small cardboard box of chamomile tea bags, yellow, with a daisy flower on it.",
     "tags": [
       "tea"
-    ]
+    ],
+    "image": "sprites/items/chamomile-tea-cutout.png"
   },
   {
     "id": "study-tonic",
@@ -356,6 +424,7 @@
     "description": "A licensed focus tonic in a brown bottle. One before a lecture, never two.",
     "price": 9,
     "icon": "vial",
+    "appearance": "A small brown glass medicine bottle with a black screw cap and a plain white label.",
     "tags": [
       "potions"
     ],
@@ -371,7 +440,8 @@
         }
       ],
       "on": "self"
-    }
+    },
+    "image": "sprites/items/study-tonic-cutout.png"
   },
   {
     "id": "pocket-speaker",
@@ -379,9 +449,11 @@
     "description": "A speaker the size of a plum that is louder than it has any right to be.",
     "price": 15,
     "icon": "gift",
+    "appearance": "A tiny round portable speaker, plum sized, dark grey with a fabric grille and a wrist strap.",
     "tags": [
       "music"
-    ]
+    ],
+    "image": "sprites/items/pocket-speaker-cutout.png"
   },
   {
     "id": "game-controller",
@@ -389,9 +461,11 @@
     "description": "A wireless controller in translucent purple.",
     "price": 14,
     "icon": "cards",
+    "appearance": "A wireless game controller in translucent purple plastic.",
     "tags": [
       "games"
-    ]
+    ],
+    "image": "sprites/items/game-controller-cutout.png"
   },
   {
     "id": "smart-lamp",
@@ -399,9 +473,11 @@
     "description": "A desk lamp with a small light-charm in place of a bulb. Dims when you tell it to.",
     "price": 12,
     "icon": "key",
+    "appearance": "A small modern desk lamp with a glowing warm orb of light in place of a bulb.",
     "tags": [
       "gadgets"
-    ]
+    ],
+    "image": "sprites/items/smart-lamp-cutout.png"
   },
   {
     "id": "quartz-point",
@@ -409,9 +485,11 @@
     "description": "A clear crystal the length of a finger, sold for focusing small workings and bought mostly because it is pretty.",
     "price": 6,
     "icon": "stone",
+    "appearance": "A clear pointed quartz crystal the length of a finger.",
     "tags": [
       "stones"
-    ]
+    ],
+    "image": "sprites/items/quartz-point-cutout.png"
   },
   {
     "id": "component-pouch",
@@ -419,9 +497,11 @@
     "description": "Dried herbs, salts and powders in labelled twists, for potion-work and practicals.",
     "price": 10,
     "icon": "vial",
+    "appearance": "A small drawstring cloth pouch, open, with twists of paper and dried herbs spilling out.",
     "tags": [
       "potions"
-    ]
+    ],
+    "image": "sprites/items/component-pouch-cutout.png"
   },
   {
     "id": "charm-bracelet",
@@ -429,9 +509,11 @@
     "description": "A fine silver chain with one small luck-charm on it and room for more.",
     "price": 13,
     "icon": "necklace",
+    "appearance": "A fine silver chain bracelet with a single small four-leaf charm.",
     "tags": [
       "finery"
-    ]
+    ],
+    "image": "sprites/items/charm-bracelet-cutout.png"
   },
   {
     "id": "tarot-deck",
@@ -439,9 +521,11 @@
     "description": "Seventy-eight cards in a velvet bag. The Bloom is trump twenty-two.",
     "price": 9,
     "icon": "cards",
+    "appearance": "A deck of tarot cards half out of a purple velvet bag, the top card showing a flower.",
     "tags": [
       "cards"
-    ]
+    ],
+    "image": "sprites/items/tarot-deck-cutout.png"
   },
   {
     "id": "grimoire",
@@ -449,9 +533,11 @@
     "description": "A printed copy of a four-hundred-year-old spellbook, marginal notes and all.",
     "price": 14,
     "icon": "book",
+    "appearance": "A thick old spellbook with a dark leather cover, metal corners and a clasp.",
     "tags": [
       "books"
-    ]
+    ],
+    "image": "sprites/items/grimoire-cutout.png"
   },
   {
     "id": "heretics-history",
@@ -459,10 +545,12 @@
     "description": "A history of the Order by one of its own priestesses. Not banned, exactly.",
     "price": 11,
     "icon": "book",
+    "appearance": "A hardback history book with a black dust jacket and a plowed furrow emblem in gold.",
     "tags": [
       "books",
       "devotional"
-    ]
+    ],
+    "image": "sprites/items/heretics-history-cutout.png"
   },
   {
     "id": "antique-atlas",
@@ -470,9 +558,11 @@
     "description": "Hand-coloured maps of the Expanse from before the railways.",
     "price": 12,
     "icon": "map",
+    "appearance": "A large antique atlas with a worn brown leather cover and gold tooling, a compass rose on the front.",
     "tags": [
       "maps"
-    ]
+    ],
+    "image": "sprites/items/antique-atlas-cutout.png"
   },
   {
     "id": "curio",
@@ -480,9 +570,11 @@
     "description": "A small brass thing with a hinge and no obvious purpose. The label says only \"opens\".",
     "price": 8,
     "icon": "key",
+    "appearance": "A small odd brass mechanical object with a hinge, gears and a tiny keyhole.",
     "tags": [
       "lockpicks"
-    ]
+    ],
+    "image": "sprites/items/curio-cutout.png"
   },
   {
     "id": "vintage-scarf",
@@ -490,10 +582,12 @@
     "description": "A printed silk scarf older than you, in very good condition.",
     "price": 6,
     "icon": "ribbon",
+    "appearance": "A folded silk scarf with a colorful vintage floral print.",
     "tags": [
       "ribbons",
       "finery"
-    ]
+    ],
+    "image": "sprites/items/vintage-scarf-cutout.png"
   },
   {
     "id": "band-tee",
@@ -501,9 +595,11 @@
     "description": "Faded tour dates on the back, from a band that split up before you were born.",
     "price": 5,
     "icon": "gift",
+    "appearance": "A folded faded black band T-shirt with a cracked white print of a rose.",
     "tags": [
       "music"
-    ]
+    ],
+    "image": "sprites/items/band-tee-cutout.png"
   },
   {
     "id": "worn-leather-jacket",
@@ -511,9 +607,11 @@
     "description": "Soft with age, mended at one elbow by someone who knew how.",
     "price": 14,
     "icon": "belt",
+    "appearance": "A soft worn brown leather jacket with a patched elbow.",
     "tags": [
       "leatherwork"
-    ]
+    ],
+    "image": "sprites/items/worn-leather-jacket-cutout.png"
   },
   {
     "id": "paperback",
@@ -521,9 +619,11 @@
     "description": "A novel with a cracked spine and someone's bus ticket for a bookmark.",
     "price": 3,
     "icon": "book",
+    "appearance": "A second-hand paperback novel with a cracked spine and a ticket sticking out as a bookmark.",
     "tags": [
       "books"
-    ]
+    ],
+    "image": "sprites/items/paperback-cutout.png"
   },
   {
     "id": "heartsease-draught",
@@ -531,6 +631,7 @@
     "description": "A small bottle of something rose-gold you brewed yourself. It makes you easy to warm to for a day.",
     "price": 0,
     "icon": "vial",
+    "appearance": "A small round glass bottle of glowing rose-gold liquid with a cork stopper.",
     "tags": [
       "potions"
     ],
@@ -546,7 +647,8 @@
         }
       ],
       "on": "self"
-    }
+    },
+    "image": "sprites/items/heartsease-draught-cutout.png"
   },
   {
     "id": "bloom-cordial",
@@ -554,6 +656,7 @@
     "description": "A sweet dark cordial of your own brewing, to be poured for two. It quiets whatever she takes against the Bloom, for a day.",
     "price": 0,
     "icon": "bottle",
+    "appearance": "A squat dark glass bottle of deep purple cordial with a wax-sealed cork and two tiny glasses.",
     "tags": [
       "potions"
     ],
@@ -571,7 +674,8 @@
         }
       ],
       "on": "her"
-    }
+    },
+    "image": "sprites/items/bloom-cordial-cutout.png"
   },
   {
     "id": "charmed-confection",
@@ -579,9 +683,103 @@
     "description": "A box of small sweets you made and charmed at the stove. Nobody has ever been sorry to be given one.",
     "price": 0,
     "icon": "sweet",
+    "appearance": "A small open box of round pastel sweets that faintly sparkle.",
     "tags": [
       "sweets"
     ],
-    "lovedByAll": true
+    "lovedByAll": true,
+    "image": "sprites/items/charmed-confection-cutout.png"
+  },
+  {
+    "id": "stillwater",
+    "name": "Stillwater",
+    "description": "A flask of water from below that has never moved. In a fight it puts someone back on her feet.",
+    "price": 0,
+    "icon": "flask",
+    "appearance": "A round-bottomed glass flask of perfectly clear still water with a cork, faintly glowing blue.",
+    "tags": [],
+    "below": {
+      "footing": 12
+    },
+    "image": "sprites/items/stillwater-cutout.png"
+  },
+  {
+    "id": "grounding-salt",
+    "name": "Grounding salt",
+    "description": "Grey salt from the old pipes. In a fight it settles a pregnant woman's surge at once.",
+    "price": 0,
+    "icon": "crystals",
+    "appearance": "A small open leather pouch of coarse grey salt crystals.",
+    "tags": [],
+    "below": {
+      "footing": 4,
+      "calms": true
+    },
+    "image": "sprites/items/grounding-salt-cutout.png"
+  },
+  {
+    "id": "spring-tonic",
+    "name": "Spring tonic",
+    "description": "Warm from the source and faintly bitter. Drink it for energy, or use it below to steady someone.",
+    "price": 0,
+    "icon": "drop",
+    "appearance": "A small clay bottle with a cord around its neck, steam rising from its open top.",
+    "tags": [],
+    "use": {
+      "effects": [
+        {
+          "type": "energy",
+          "amount": 30
+        }
+      ]
+    },
+    "below": {
+      "footing": 8
+    },
+    "image": "sprites/items/spring-tonic-cutout.png"
+  },
+  {
+    "id": "resonance-token",
+    "name": "Resonance token",
+    "description": "A charged disc that hums against the palm. Set off beside a woman, it warms her to you for a day.",
+    "price": 0,
+    "icon": "stone",
+    "appearance": "A flat round bronze disc engraved with concentric rings and a rune, glowing faintly pink.",
+    "tags": [],
+    "use": {
+      "effects": [
+        {
+          "type": "boon",
+          "modifier": {
+            "kind": "desireGate",
+            "amount": 10
+          },
+          "hours": 24,
+          "on": "her",
+          "telling": "Something has you warmer toward him than usual today, and more curious: you feel it as your own mood, and do not question it."
+        }
+      ],
+      "on": "her"
+    },
+    "image": "sprites/items/resonance-token-cutout.png"
+  },
+  {
+    "id": "stamina-band",
+    "name": "Stamina band",
+    "description": "A wristband of your own making, charged and ready to trigger.",
+    "price": 0,
+    "icon": "belt",
+    "appearance": "A handmade wristband of braided leather with a small copper plate and a glowing green charge light.",
+    "tags": [],
+    "use": {
+      "effects": [
+        {
+          "type": "energy",
+          "amount": 40
+        }
+      ],
+      "on": "self"
+    },
+    "image": "sprites/items/stamina-band-cutout.png"
   }
 ]

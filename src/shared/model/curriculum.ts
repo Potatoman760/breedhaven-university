@@ -15,7 +15,8 @@ const WrittenSkillSchema = z.object({
   at: z.number().min(0).default(30),
   grants: z.enum(SKILL_GRANTS).optional(),
   passive: ModifierSchema.optional(),
-  ability: AbilitySchema.optional()
+  ability: AbilitySchema.optional(),
+  below: ModifierSchema.optional()
 })
 
 /** A course as it is written: what it is called, what its classes are on, and what getting on in it teaches. */

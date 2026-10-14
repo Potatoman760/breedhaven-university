@@ -198,7 +198,22 @@ const ITEM_ICONS: Record<string, ReactNode> = {
       <path d="M5 4c0 8 3 11 7 11s7-3 7-11" />
       <path d="M12 15l-2 3 2 3 2-3z" />
     </>
-  )
+  ),
+  // What is brought up from below: the three things found there, and the relics.
+  flask: <path d="M10 3h4M10.500 3v5a7 7 0 103 0V3M6.500 15h11" />,
+  drop: <path d="M12 3c4 5 6 8 6 11a6 6 0 01-12 0c0-3 2-6 6-11zM9 15a3 3 0 003 3" />,
+  crystals: <path d="M5 20l2-8 3 3 2-9 3 7 2-4 2 11zM3 20h18" />,
+  magnet: <path d="M6 4v8a6 6 0 0012 0V4h-4v8a2 2 0 01-4 0V4zM6 8h4M14 8h4" />,
+  ruler: <path d="M4 16L16 4l4 4L8 20zM8 12l2 2M11 9l2 2M14 6l2 2" />,
+  seal: (
+    <>
+      <circle cx="12" cy="9" r="5" />
+      <path d="M9 13l-2 8 5-3 5 3-2-8M10 9h4" />
+    </>
+  ),
+  shell: <path d="M12 20C5 18 3 12 5 7c2-4 12-4 14 0 2 5 0 11-7 13zM12 20V6M12 20L7 7M12 20l5-13" />,
+  seed: <path d="M12 21c-5-3-6-9-3-14 1-2 2-3 3-4 1 1 2 2 3 4 3 5 2 11-3 14zM12 21v-9" />,
+  ember: <path d="M5 16c-2-5 2-10 8-9 6 1 8 6 5 10-3 3-11 3-13-1zM12 14c1-2 0-3-1-4 2 0 4 2 3 4M9 20h6" />
 }
 
 /** The icon for an item or stall. Unknown names fall back to a gift box. */
@@ -377,3 +392,13 @@ export function PlaceIcon({ name, ...p }: IconProps & { name?: string }) {
     </Icon>
   )
 }
+
+// What is at a stop on the way down, by its kind: something to fight, something to find, somewhere to rest, and what guards the anchor.
+const STOP_ICONS: Record<string, ReactNode> = {
+  fight: <path d="M8 8l14 14M28 8L14 22M19 25l6-6M11 19l6 6M9 27l4-4M27 27l-4-4" />,
+  find: <path d="M7 16h22v12H7zM7 16a11 8 0 0122 0M18 19v4" />,
+  checkpoint: <path d="M18 7c4 5 6 8 6 12a6 6 0 01-12 0c0-3 2-5 3-7 1 2 2 2 3-5zM8 30l20-5M8 25l20 5" />,
+  guardian: <path d="M7 27V12l6 6 5-9 5 9 6-6v15zM7 31h22" />
+}
+
+export const StopIcon = ({ kind, ...p }: IconProps & { kind: string }) => <Icon {...p}>{STOP_ICONS[kind] ?? STOP_ICONS.fight}</Icon>

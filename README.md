@@ -482,16 +482,18 @@ and the trait library.
   with no reason, and grows with appeal and affection (`chanceOfWriting` in
   `src/shared/game/courier.ts`). The last 2,400 characters (about 600 tokens) of the
   exchange are put into the prompt of every scene with that love interest.
-- **Bloomr** (`src/shared/game/feed.ts`) is the photo feed: selfies with a caption. It needs
+- **Bloomr** (`src/shared/game/feed.ts`) is the photo feed: pictures with a caption. It needs
   both the Main LLM (captions) and ComfyUI (pictures) set up; without both there are no
   posts. As each day begins the day is planned by rule (`feedRound`): one to three of the
   love interests whose contact the player has, one or two posts each, at hours of their
   own between 08:00 and 22:00, where each of them will be at that hour, and, four times in
   ten when another love interest will be there too, that friend in the picture. One LLM
-  request then writes every caption and a line of what each selfie shows, and each selfie
-  is drawn in the background on ComfyUI, one at a time, with the Photo workflow, size and
-  framing (`selfiePrompt` in `src/shared/comfy.ts`: her appearance and what she is wearing,
-  the friend's, the LLM's line, the place's appearance and the light at that hour). The
+  request then writes every caption, whether its picture is a selfie or a candid (`shot`),
+  and a line of what it shows, and each picture is drawn in the background on ComfyUI, one
+  at a time, with the Photo workflow, size and framing (`postPrompt` in
+  `src/shared/comfy.ts`: one paragraph saying what kind of picture it is, her appearance,
+  what she is wearing, the friend's, and the LLM's line, so that she is one subject and is
+  drawn once; then the place's appearance and the light at that hour). The
   pictures are filed under `generated/photos/<id>/` in the add-on folder. A post is saved
   as soon as its picture arrives but is not on the feed until its hour has passed; one
   whose picture could not be drawn is not made. The feed shows five posts and brings in
@@ -577,7 +579,7 @@ and the trait library.
 - **Using things** (`use` on an item, `src/shared/game/market.ts`): an item can be something
   he uses as well as gives, on himself or on a woman he is with (`canUse`, `useItem`). Two
   effects exist for it and for abilities: `boon`, and `item`, which puts things in his bag.
-  The **Bag** (`src/renderer/src/ui/Bag.tsx`) is an app on his phone and what the Gift
+  The **Bag** (`src/renderer/src/ui/Bag.tsx`) is a tile on the day screen and what the Bag
   button opens in a scene: what he carries, what he can make and when each is ready, and
   what is in effect. Used in a scene on a woman, a charm takes hold with her next reply,
   which is the one thing that moves the desire gate inside a scene.
@@ -609,6 +611,37 @@ and the trait library.
   `grades`, by course. Every love interest is told when the examinations are next week or
   on, when her own are, and what he got in a course she takes with him or teaches
   (`examNotes`).
+- **The Undercroft** (`expedition.json`, `src/shared/model/expedition.ts`,
+  `src/shared/game/expedition.ts`, `ExpeditionView.tsx`, `PartyDialog.tsx`): a turn-based
+  adventure with no LLM in its fights. From `opensOnDay` the `guideId` character sets an hour
+  to show him the way down (`scheduleDescent` in `descent.ts`, put where his day is free and
+  put down again when he misses it, as the house viewing is). Keeping it is a scene with her
+  at `entryLocationId` whose direction has her say what is below and why it must be him
+  (`attendDescent`); from then on **Go down** is offered there. He picks a depth he
+  has opened and up to `partySize` women who have a `partyRole` in their file, have been
+  met, trust him by `trustNeeded`, are free for `hours` (asked as of any outing, with
+  `checkOuting`) and are not at a stage of pregnancy missing from `pregnancyPower`. A run
+  is kept in the save under `expedition.run` and drawn in place of the day screen, so it
+  is there again after loading; its numbers come from the game's seed (`draws` in
+  `seed.ts`), counted by `run.rolls`, so the same run plays the same way. A depth is a line
+  of stops: a `fight`, a `find`, a `checkpoint` (what has been found is made safe, and
+  everyone rests) and its `guardian`. In a fight the party acts in order, him first, and
+  then the enemies (`act`, `enemiesAct`). He can Attack (strength), Protect a woman
+  (endurance), Empower her next action or Ground a pregnant woman's surge (both for energy),
+  or use an item with a `below` entry; each woman has her role's actions (`attack`,
+  `weaken`, `shield`, `heal`, `guard`, `taunt`, some on a cooldown). Her affection sets
+  how often she strikes true; a woman carrying is multiplied by `pregnancyPower` for her
+  stage and adds to her surge with each thing she does, which at `surgeLimit` breaks loose
+  on everyone. The party is drawn with its ordinary sprites, the face chosen by what last
+  happened to each (`FightEvent.faces`); an enemy without an `image` is a card with its
+  name. Winning at the guardian re-seats the anchor: the first time, its `relic` is his, a
+  `Modifier` that `modifiersOf` reads like a learnt skill's, and the next depth opens.
+  Losing keeps only what was banked, empties his energy and costs the trust of whoever
+  went down (`comeUp`); each woman who went remembers it, and ties between them grow. A
+  course's skill may carry a `below` modifier beside what it teaches (`might`, `footing`,
+  `anchoring`, `surge`, `spoils`, `grounding`, `ambush`, `steady`, `insight`).
+  `expeditionPolicy.ts` plays a run without a player, for the tests that pin the balance
+  (`src/main/content/expedition.test.ts`).
 - **Raising a stat**: each location lists what can be done there for a stat (`drills` in
   `locations.json`: a stat, a title and an opening line; edited under Locations). The day
   view's **Stats** option opens into one suggestion for each of the six stats, picked from

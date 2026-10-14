@@ -158,10 +158,10 @@ describe('a boon', () => {
 
 describe('what he carries and uses', () => {
   const items = [
-    { id: 'draught', name: 'Draught', description: '', price: 0, icon: 'vial', tags: [], lovedByAll: false, use: { on: 'self' as const, effects: [{ type: 'boon' as const, modifier: { kind: 'affection' as const, amount: 2 }, hours: 24, on: 'self' as const }] } },
-    { id: 'cordial', name: 'Cordial', description: '', price: 0, icon: 'bottle', tags: [], lovedByAll: false, use: { on: 'her' as const, effects: [{ type: 'boon' as const, modifier: { kind: 'unguarded' as const, amount: 1 }, hours: 24, on: 'her' as const }] } },
-    { id: 'sweets', name: 'Sweets', description: '', price: 0, icon: 'sweet', tags: [], lovedByAll: true },
-    { id: 'rock', name: 'Rock', description: '', price: 0, icon: 'stone', tags: [], lovedByAll: false }
+    { id: 'draught', name: 'Draught', description: '', price: 0, icon: 'vial', appearance: '', tags: [], lovedByAll: false, use: { on: 'self' as const, effects: [{ type: 'boon' as const, modifier: { kind: 'affection' as const, amount: 2 }, hours: 24, on: 'self' as const }] } },
+    { id: 'cordial', name: 'Cordial', description: '', price: 0, icon: 'bottle', appearance: '', tags: [], lovedByAll: false, use: { on: 'her' as const, effects: [{ type: 'boon' as const, modifier: { kind: 'unguarded' as const, amount: 1 }, hours: 24, on: 'her' as const }] } },
+    { id: 'sweets', name: 'Sweets', description: '', price: 0, icon: 'sweet', appearance: '', tags: [], lovedByAll: true },
+    { id: 'rock', name: 'Rock', description: '', price: 0, icon: 'stone', appearance: '', tags: [], lovedByAll: false }
   ]
   const brew: Skill = { id: 'brew', name: 'Brewing', description: '', code: 'WTC', at: 30, ability: { label: 'Brew', effects: [{ type: 'item', itemId: 'draught', count: 1 }], cooldownDays: 7, on: 'self' } }
   const { content, state, plain } = learnt(brew, { items, pregnancy: PregnancyConfigSchema.parse({ chance: 1, birthControlChance: 0, periodDays: 0, recoveryDays: 8, birthLocationId: 'shop', stages: [{ id: 'early', name: 'with child', from: 0 }] }) })

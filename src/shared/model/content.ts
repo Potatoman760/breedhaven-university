@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { DramaConfigSchema } from './drama'
+import { ExpeditionConfigSchema, HIM } from './expedition'
 import { HousingConfigSchema } from './housing'
 import { SyllabusSchema } from './syllabus'
 import { CurriculumSchema, courseId, resolveCurriculum } from './curriculum'
@@ -55,6 +56,8 @@ export const ContentPackSchema = z.object({
   pregnancy: PregnancyConfigSchema.optional(),
   /** The house a Sire is let, and what it is to keep one. Without it there is none. */
   housing: HousingConfigSchema.optional(),
+  /** The Undercroft, and the rules of going below. Without it there is nothing under the University. */
+  expedition: ExpeditionConfigSchema.optional(),
   /** What the drama engine weighs things with. Without it, nobody turns up uninvited. */
   drama: DramaConfigSchema.optional(),
   items: z.array(ItemSchema).default([]),
@@ -342,6 +345,29 @@ function checkReferences(pack: ContentPack): string[] {
     housing.babies.caps.forEach((cap, i) => {
       if (cap.level >= levels) issues.push(`housing.babies.caps[${i}]: there is no level ${cap.level}`)
     })
+  }
+
+  const below = pack.expedition
+  if (below) {
+    need(locations, below.entryLocationId, 'expedition.entryLocationId', 'location')
+    if (below.guideId) need(loveInterests, below.guideId, 'expedition.guideId', 'love interest')
+    if (loveInterests.has(HIM)) issues.push(`expedition: no character may have the id "${HIM}"`)
+    const roles = idSet(below.roles, 'expedition.roles')
+    below.roles.forEach((role) => idSet(role.actions, `expedition.roles (${role.id})`))
+    const enemies = idSet(below.enemies, 'expedition.enemies')
+    idSet(below.depths.map((depth) => depth.relic), 'expedition relics')
+    below.depths.forEach((depth, i) => {
+      const at = `expedition.depths[${i}]`
+      if (depth.nodes.at(-1)?.kind !== 'guardian') issues.push(`${at}: its last stop must be its guardian`)
+      depth.nodes.forEach((node) => {
+        node.enemyIds.forEach((id) => need(enemies, id, at, 'enemy'))
+        if ((node.kind === 'fight' || node.kind === 'guardian') && node.enemyIds.length === 0) issues.push(`${at}: a fight with nothing to fight`)
+        Object.keys(node.finds.items).forEach((id) => need(items, id, at, 'item'))
+      })
+    })
+    for (const li of pack.loveInterests) if (li.partyRole && !roles.has(li.partyRole)) issues.push(`loveInterests.${li.id}: the role "${li.partyRole}" is not one the expedition has`)
+    const stages = new Set((pack.pregnancy?.stages ?? []).map((stage) => stage.id))
+    Object.keys(below.pregnancyPower).forEach((id) => need(stages, id, 'expedition.pregnancyPower', 'stage of pregnancy'))
   }
 
   need(locations, pack.newGame.locationId, 'newGame', 'location')

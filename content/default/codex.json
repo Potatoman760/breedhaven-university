@@ -3,7 +3,7 @@
     "id": "breedhaven",
     "title": "Breedhaven",
     "category": "Places",
-    "content": "The nation the story takes place in: a green lowland kingdom of rivers and orchards, and one of the richest states of the Sown Expanse. It is a modern country. People carry phones, ride trams and trains, work in offices and laboratories, and argue about politics online. It is also a country of magic: every woman has some, wards and enchantments are built into ordinary things, and the two have grown up together for so long that nobody thinks of them as separate.\n\nWomen outnumber men seven to one, as they do everywhere, and nearly every post of power is held by a woman because nearly everyone is one. Breedhaven is a constitutional monarchy under House Dawnbloom, with an elected Assembly. The previous queen, Seraphine IV, died suddenly; her only heir, Seraphine V, is eighteen, newly crowned, and by long custom studying at Breedhaven University in the capital, Seedblossom.\n\nA saying every child learns: \"The Bloom gave women magic and men the seed. Civilization gave us everything else.\"",
+    "content": "The nation the story takes place in: a green lowland kingdom of rivers and orchards, and one of the richest states of the Sown Expanse. It is a modern country. People carry phones, ride trams and trains, work in offices and laboratories, and argue about politics online. It is also a country of magic: every woman has some, wards and enchantments are built into ordinary things, and the two have grown up together for so long that nobody thinks of them as separate.\n\nWomen outnumber men seven to one, as they do everywhere, and nearly every post of power is held by a woman because nearly everyone is one. Pregnancies last 48 days. Breedhaven is a constitutional monarchy under House Dawnbloom, with an elected Assembly. The previous queen, Seraphine IV, died suddenly; her only heir, Seraphine V, is eighteen, newly crowned, and by long custom studying at Breedhaven University in the capital, Seedblossom.\n\nA saying every child learns: \"The Bloom gave women magic and men the seed. Civilization gave us everything else.\"",
     "keywords": [],
     "alwaysInclude": true,
     "priority": 10
@@ -12,7 +12,7 @@
     "id": "primordial-bloom",
     "title": "Primordial Bloom",
     "category": "Lore",
-    "content": "The Primordial Bloom is the living magic of the world: an active force in soil, water and blood, not a distant god. Its rules are known and studied. Seven girls are born for every boy. Only women can work magic. Only about one man in ten is fertile, and those men are called True Sires. Pregnancy greatly amplifies a woman's magic.\n\nIn women the Bloom is felt as a drive toward generativity: to create, nurture, grow and protect life. Pregnancy is its strongest expression and its strongest pull. A woman near a True Sire feels it as warmth, attention and want, strongest in the young and in those who have never carried a child, and absent after menopause. It is an instinct, not a command. She chooses what to do about it. Bloom suppressants (\"dampers\") are cheap, legal and ordinary, and turn the pull down to a background hum.\n\nWhether the Bloom's wants are a woman's own is the oldest argument there is. Bloomists hold that they are sacred and fighting them is fighting nature. Freewill advocates answer that the Bloom may influence a woman but does not own her. The bloom causes women to instinctually crave breeding.",
+    "content": "The Primordial Bloom is the living magic of the world: an active force in soil, water and blood, not a distant god. Its rules are known and studied. Seven girls are born for every boy. Only women can work magic. Only about one man in ten is fertile, and those men are called Sires; the rare one with whom an unprotected woman always conceives is a True Sire. Pregnancy greatly amplifies a woman's magic.\n\nIn women the Bloom is felt as a drive toward generativity: to create, nurture, grow and protect life. Pregnancy is its strongest expression and its strongest pull. A woman near a Sire feels it as warmth, attention and want, more so near a True Sire, strongest in the young and in those who have never carried a child, and absent after menopause. It is an instinct, not a command. She chooses what to do about it. Bloom suppressants (\"dampers\") are cheap, legal and ordinary, and turn the pull down to a background hum.\n\nWhether the Bloom's wants are a woman's own is the oldest argument there is. Bloomists hold that they are sacred and fighting them is fighting nature. Freewill advocates answer that the Bloom may influence a woman but does not own her. The bloom causes women to instinctually crave breeding.",
     "keywords": [
       "The Bloom",
       "Bloomist",
@@ -27,9 +27,9 @@
   },
   {
     "id": "sires",
-    "title": "True Sires",
+    "title": "Sires and True Sires",
     "category": "Lore",
-    "content": "Women outnumber men seven to one across the Sown Expanse, and most men cannot father children. Roughly one in ten can. They are True Sires, and civilization has organized itself around how few of them there are.\n\nA True Sire is not powerful; he is valuable. The law protects him heavily: assault, kidnapping and reproductive coercion of a Sire carry the gravest penalties, and paternity, inheritance and reproductive contracts have whole courts of their own. Fertility is established by a clinical assay and recorded in the national Sire Registry. The record is private by law and a Sire's status is his to disclose. Asking someone's fertility on a first date is very rude. In practice it leaks, and a known Sire lives with constant attention, some of it flattering and much of it wearying: he is treated as a prospect before he is treated as a person.\n\nMen who are not fertile have the opposite trouble. They are a small minority in every room and of no interest to the Bloom, and many feel invisible.",
+    "content": "Women outnumber men seven to one across the Sown Expanse, and most men cannot father children. Roughly one in ten can. They are Sires, and civilization has organized itself around how few of them there are. A Sire is fertile as men have always been: with a woman who is taking nothing against it a child may come of it, and more often does not.\n\nA True Sire is rarer by far. When he finishes inside a woman who is unprotected, she conceives, every time. The assay tells the two apart, and {player} was measured a True Sire.\n\nA Sire is not powerful; he is valuable, and a True Sire more than any. The law protects him heavily: assault, kidnapping and reproductive coercion of a Sire carry the gravest penalties, and paternity, inheritance and reproductive contracts have whole courts of their own. Fertility is established by a clinical assay and recorded in the national Sire Registry. The record is private by law and a Sire's status is his to disclose. Asking someone's fertility on a first date is very rude. In practice it leaks, and a known Sire lives with constant attention, some of it flattering and much of it wearying: he is treated as a prospect before he is treated as a person.\n\nMen who are not fertile have the opposite trouble. They are a small minority in every room and of no interest to the Bloom, and many feel invisible.",
     "keywords": [
       "Sire",
       "True Sire",
@@ -45,7 +45,7 @@
     "id": "breedhaven-university",
     "title": "Breedhaven University",
     "category": "Places",
-    "content": "Breedhaven University stands in Seedblossom, on a campus whose oldest stone is seven centuries old and whose newest building is the Foundry, a magical engineering lab. It is a modern university of some thirty thousand students: lectures, labs, residence halls, a dining commons, clubs, a student government and too little parking. Every student is an adult; undergraduates are eighteen to twenty-two and graduate students run into their mid-twenties. About one student in eight is a man.\n\nIts colleges: Government and Law (which by custom educates the heir to the throne), Business, Bloom Studies and Divinity, Engineering, Life Sciences and Agriculture, Public Safety and Athletics (whose cadets staff Campus Security), and Arts and Humanities. Classes meet Solday to Hearthday; Marketday and Restday are free.\n\nThe Bloom shapes its institutions. The Reproductive Health Center provides contraception, suppressants, fertility counseling and prenatal care. Bloom Counseling is free. The Sire Relations Office looks after the few registered True Sires, who are offered secure housing. Pregnant students get accommodations and, because pregnancy multiplies their magic, extra safety rules in the labs.",
+    "content": "Breedhaven University stands in Seedblossom, on a campus whose oldest stone is seven centuries old and whose newest building is the Foundry, a magical engineering lab. It is a modern university of some thirty thousand students: lectures, labs, residence halls, a dining commons, clubs, a student government and too little parking. Every student is an adult; undergraduates are eighteen to twenty-two and graduate students run into their mid-twenties. About one student in eight is a man.\n\nIts colleges: Government and Law (which by custom educates the heir to the throne), Business, Bloom Studies and Divinity, Engineering, Life Sciences and Agriculture, Public Safety and Athletics (whose cadets staff Campus Security), and Arts and Humanities. Classes meet Solday to Hearthday; Marketday and Restday are free.\n\nThe Bloom shapes its institutions. The Reproductive Health Center provides contraception, suppressants, fertility counseling and prenatal care. Bloom Counseling is free. The Sire Relations Office looks after the few registered Sires, who are offered secure housing. Pregnant students get accommodations and, because pregnancy multiplies their magic, extra safety rules in the labs.",
     "keywords": [
       "university",
       "campus",
@@ -133,7 +133,7 @@
     "id": "magic",
     "title": "Pregnancy and magic",
     "category": "Lore",
-    "content": "Pregnancy is a magical state as much as a bodily one. From the first weeks a woman's power rises, and it keeps rising: a small lift early on, a marked one by the middle weeks, and exceptional strength near term. A middling student in her sixth week can out-cast her professor. She is hardier, senses other pregnancies, and often feels the child's moods as her own.\n\nThe surge is useful and dangerous. Workplaces and laboratories have rules for it, the most demanding circle-work in industry and medicine is led by pregnant mages, and university sport has a separate Bloom division. Birth ends it with a discharge of magic strong enough to crack masonry, so hospitals deliver in warded Bloom Chambers.\n\nCarrying a True Sire's child is no different in kind, only stronger. A pregnancy is counted in weeks, not seasons: the Bloom hurries it, and it runs seven weeks from conception to birth, forty-eight days as the clinics count it.",
+    "content": "Pregnancy is a magical state as much as a bodily one. From the first weeks a woman's power rises, and it keeps rising: a small lift early on, a marked one by the middle weeks, and exceptional strength near term. A middling student in her sixth week can out-cast her professor. She is hardier, senses other pregnancies, and often feels the child's moods as her own.\n\nThe surge is useful and dangerous. Workplaces and laboratories have rules for it, the most demanding circle-work in industry and medicine is led by pregnant mages, and university sport has a separate Bloom division. Birth ends it with a discharge of magic strong enough to crack masonry, so hospitals deliver in warded Bloom Chambers.\n\nCarrying a Sire's child is no different in kind, only stronger. A pregnancy is counted in weeks, not seasons: the Bloom hurries it, and it runs seven weeks from conception to birth, forty-eight days as the clinics count it.",
     "keywords": [
       "pregnant",
       "pregnancy",
@@ -148,7 +148,7 @@
     "id": "breeding",
     "title": "Sex and conception",
     "category": "Lore",
-    "content": "How intimate scenes are written. Every character is an adult and everything that happens is wanted by the people doing it.\n\nThe Bloom makes desire strong and close to the surface: warmth, flushed skin, a low ache, attention that keeps sliding back to him. Write that honestly and physically, from her side. It never overrides her. She chooses, says what she wants, and can stop.\n\nContraception is the default. A woman on suppressants or other birth control does not conceive, and sex is then simply sex. Conceiving is a decision: she has stopped taking it, or chooses in the moment to go without, and both of them know it. When a scene is about that choice, linger on it: the asking, the answer, the weight of it.\n\nWhen a True Sire finishes inside a woman who is not protected, the Bloom may \"lock in\". She feels it at once, as certainty and a rush of magic. Write the aftermath warmly: closeness, disbelief, what it means to each of them.\n\nBe explicit and sensory where the scene calls for it, and let the people stay themselves throughout.",
+    "content": "How intimate scenes are written. Every character is an adult and everything that happens is wanted by the people doing it.\n\nThe Bloom makes desire strong and close to the surface: warmth, flushed skin, a low ache, attention that keeps sliding back to him. Write that honestly and physically, from her side. It never overrides her. She chooses, says what she wants, and can stop.\n\nContraception is the default. A woman on suppressants or other birth control does not conceive, and sex is then simply sex. Conceiving is a decision: she has stopped taking it, or chooses in the moment to go without, and both of them know it. When a scene is about that choice, linger on it: the asking, the answer, the weight of it.\n\nWhen a Sire finishes inside a woman who is not protected, the Bloom may \"lock in\". With a True Sire, as {player} is, it does. She feels it at once, as certainty and a rush of magic. Write the aftermath warmly: closeness, disbelief, what it means to each of them.\n\nBe explicit and sensory where the scene calls for it, and let the people stay themselves throughout.",
     "keywords": [
       "sex",
       "conceive",
@@ -162,7 +162,7 @@
     "id": "households",
     "title": "Households and relationships",
     "category": "Lore",
-    "content": "With so few fertile men, the two-parent couple was never the norm. The ordinary family is a household: several adults who share a home, money and the raising of children. A common shape is one True Sire and two to five women, who may each be with him, with each other, both, or neither. A household of women with no Sire at all is just as usual, as are pairs and threes of women.\n\nSo three people together raises no eyebrows, and five under one roof is a family. Exclusive couples exist and are respected, but are thought a little austere, the way choosing to have no children might be elsewhere. Jealousy is real and so is etiquette for it: who is with whom is said plainly, and going behind a household's back is the offense, not the wanting.\n\nResidence halls at the University are arranged as suites for the same reason. Students form and re-form \"house\" groups, and learning to live in one is counted part of an education.",
+    "content": "With so few fertile men, the two-parent couple was never the norm. The ordinary family is a household: several adults who share a home, money and the raising of children. A common shape is one Sire and two to five women, who may each be with him, with each other, both, or neither. A household of women with no Sire at all is just as usual, as are pairs and threes of women.\n\nSo three people together raises no eyebrows, and five under one roof is a family. Exclusive couples exist and are respected, but are thought a little austere, the way choosing to have no children might be elsewhere. Jealousy is real and so is etiquette for it: who is with whom is said plainly, and going behind a household's back is the offense, not the wanting.\n\nResidence halls at the University are arranged as suites for the same reason. Students form and re-form \"house\" groups, and learning to live in one is counted part of an education.",
     "keywords": [
       "household",
       "households",
@@ -176,7 +176,7 @@
     "id": "residence-halls",
     "title": "Residence halls",
     "category": "Places",
-    "content": "Halls are not divided by sex; with one man in eight there would be little to divide. They are divided into suites. A standard suite is eight to twelve women sharing a kitchen and a common room. A mixed suite is several women and one or two men, placed by a compatibility form everyone lies on. Each staircase has a resident assistant, an older student who deals with lock-outs, homesickness and the kitchen rota, and each hall has a manager who has seen everything.\n\nRegistered True Sires are offered rooms in a Sire wing with its own entrance, a security desk and a logged door. It is the best housing on campus and the most argued about. One side asks why Sires get luxury rooms. The other answers that somebody tries to walk off with one most years. Both are right. Pregnant students are offered ground-floor rooms with extra warding, for the plaster's sake as much as theirs.",
+    "content": "Halls are not divided by sex; with one man in eight there would be little to divide. They are divided into suites. A standard suite is eight to twelve women sharing a kitchen and a common room. A mixed suite is several women and one or two men, placed by a compatibility form everyone lies on. Each staircase has a resident assistant, an older student who deals with lock-outs, homesickness and the kitchen rota, and each hall has a manager who has seen everything.\n\nRegistered Sires are offered rooms in a Sire wing with its own entrance, a security desk and a logged door. It is the best housing on campus and the most argued about. One side asks why Sires get luxury rooms. The other answers that somebody tries to walk off with one most years. Both are right. Pregnant students are offered ground-floor rooms with extra warding, for the plaster's sake as much as theirs.",
     "keywords": [
       "hall",
       "halls",
@@ -321,7 +321,7 @@
     "id": "the-sown-expanse",
     "title": "The Sown Expanse",
     "category": "Places",
-    "content": "The known world. The Bloom reaches all of it, and in every nation women outnumber men seven to one. Breedhaven is one prosperous state among several, linked to the rest by rail, sea, the net and a few long-range portal lines.\n\nIts neighbors: Kharad-Tor, the orc federation of the northern hills. Veyra, the beastkin democracy to the east. Iscara, where mages govern and the portal network is run. The Vesperan League, a maritime trading power. The Starkelands, the frozen north, most of whose people live in one great heated city.\n\nA True Sire of record assay is international news.",
+    "content": "The known world. The Bloom reaches all of it, and in every nation women outnumber men seven to one. Breedhaven is one prosperous state among several, linked to the rest by rail, sea, the net and a few long-range portal lines.\n\nIts neighbors: Kharad-Tor, the orc federation of the northern hills. Veyra, the beastkin democracy to the east. Iscara, where mages govern and the portal network is run. The Vesperan League, a maritime trading power. The Starkelands, the frozen north, most of whose people live in one great heated city.\n\nA Sire of record assay is international news.",
     "keywords": [
       "the Expanse",
       "abroad",
@@ -386,7 +386,7 @@
     "id": "the-starkelands",
     "title": "The Starkelands",
     "category": "Nations",
-    "content": "The Starkelands are the far north: ice, dark and one vast enclosed city, Hearthspire, where almost the whole population of humans and dark elves lives on geothermal heat and careful engineering. Its currency, the hearthmark, is a measured share of warmth. The Council of Hearths governs.\n\nFew in Breedhaven know more than the name. Those who follow such things know it is home to Joven Stormbreaker, until this year the highest-assayed True Sire alive, and that Hearthspire's prosperity is said to rest on him.",
+    "content": "The Starkelands are the far north: ice, dark and one vast enclosed city, Hearthspire, where almost the whole population of humans and dark elves lives on geothermal heat and careful engineering. Its currency, the hearthmark, is a measured share of warmth. The Council of Hearths governs.\n\nFew in Breedhaven know more than the name. Those who follow such things know it is home to Joven Stormbreaker, until this year the highest-assayed Sire alive, and that Hearthspire's prosperity is said to rest on him.",
     "keywords": [
       "Starkelands",
       "Hearthspire",
@@ -433,5 +433,19 @@
     "relatedLocationIds": [
       "tiltyard"
     ]
+  },
+  {
+    "id": "undercroft",
+    "title": "The Undercroft",
+    "category": "Secrets",
+    "content": "Under the Bathhouse, behind the hot pool, an old stair goes down into what the University was built over: drains, root cellars, a gallery of the first masons' wards, and at the bottom the spring itself. Seven centuries of ward-lines are anchored down there and they are slipping. Where they slip, raw Bloom pools and takes shape: wild slimes with no mind in them, root-growths, wards that have come loose and walk. It is nothing like the people called slimes, and nothing above ground knows of it. The Bloom settles around a True Sire, so an anchor will only re-seat under his hands, and he needs women with magic to get him to one. Working on the ward-lines without the Arcane Board's leave is illegal, so those who go down do not talk about it where they could be overheard.",
+    "keywords": [
+      "Undercroft",
+      "ward-line",
+      "old stair",
+      "hot pool"
+    ],
+    "priority": 4,
+    "relatedLocationIds": []
   }
 ]

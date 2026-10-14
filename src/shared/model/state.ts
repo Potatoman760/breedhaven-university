@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { BoonSchema } from './modifier'
+import { ExpeditionStateSchema } from './expedition'
 import { HousingStateSchema } from './housing'
 import { RoomSchema } from './loveInterest'
 import { AppointmentSchema } from './appointment'
@@ -150,7 +151,9 @@ export const GameStateSchema = z.object({
   /** Calendar events generated during this playthrough, on top of the authored ones. */
   events: z.array(CalendarEventSchema),
   /** How things stand with the house the Sire Relations Office lets him, if it has come to that. */
-  housing: HousingStateSchema.prefault({})
+  housing: HousingStateSchema.prefault({}),
+  /** The Undercroft: how deep he has got, what he has brought up for good, and a run under way. */
+  expedition: ExpeditionStateSchema.prefault({})
 })
 export type GameState = z.infer<typeof GameStateSchema>
 

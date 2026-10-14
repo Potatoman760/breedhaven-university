@@ -41,6 +41,7 @@ export function readPack(dir: string): Record<string, unknown> {
     orientation: optionalJson(join(dir, 'orientation.json')),
     jobs: optionalJson(join(dir, 'jobs.json')),
     housing: optionalJson(join(dir, 'housing.json')),
+    expedition: optionalJson(join(dir, 'expedition.json')),
     pregnancy: optionalJson(join(dir, 'pregnancy.json')),
     drama: optionalJson(join(dir, 'drama.json')),
     items: optionalJson(join(dir, 'items.json')),

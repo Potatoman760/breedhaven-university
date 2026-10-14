@@ -1,4 +1,4 @@
-import { HousingStateSchema, type ContentPack, type GameState } from '../model'
+import { ExpeditionStateSchema, HousingStateSchema, type ContentPack, type GameState } from '../model'
 import { startingCourses } from './catalogue'
 import { assignRapport } from './rapport'
 
@@ -61,7 +61,8 @@ export function createInitialState(
     feedSeen: -1,
     dramaDay: -1,
     events: [],
-    housing: HousingStateSchema.parse({})
+    housing: HousingStateSchema.parse({}),
+    expedition: ExpeditionStateSchema.parse({})
   }
 }
 

@@ -340,5 +340,6 @@
     "knowledge": [],
     "secrets": [],
     "extraInstructions": "Anwen and Elowen are identical twin sisters. Anwen warms noticeably to anyone who can tell them apart, and cools when the two are treated as interchangeable."
-  }
+  },
+  "partyRole": "warder"
 }

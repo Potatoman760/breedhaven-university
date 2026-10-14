@@ -6,6 +6,7 @@
  *   npx jiti scripts/make-test-save.ts            writes slot 8, unless there is a save there
  *   npx jiti scripts/make-test-save.ts 12 --force another slot, and over whatever is in it
  *   npx jiti scripts/make-test-save.ts 10 --midterm   the same game an hour before his first midterm, to try sitting one
+ *   npx jiti scripts/make-test-save.ts 11 --below     the same game at the way down into the Undercroft, before his first time below, with things for a fight in his bag
  */
 import { existsSync } from 'node:fs'
 import { homedir } from 'node:os'
@@ -34,6 +35,7 @@ import { GameStateSchema, type GameState } from '../src/shared/model'
 const args = process.argv.slice(2)
 const force = args.includes('--force')
 const midterm = args.includes('--midterm')
+const goBelow = args.includes('--below')
 const slot = `slot${args.find((arg) => /^\d+$/.test(arg)) ?? '8'}`
 
 const appData = process.platform === 'win32' ? (process.env.APPDATA ?? join(homedir(), 'AppData', 'Roaming')) : process.platform === 'darwin' ? join(homedir(), 'Library', 'Application Support') : (process.env.XDG_CONFIG_HOME ?? join(homedir(), '.config'))
@@ -124,9 +126,20 @@ if (midterm) {
   }
 }
 
+// For trying the Undercroft: he stands at the way down on a free morning, has been told of it, and has yet to go.
+if (goBelow && content.expedition) {
+  state = {
+    ...state,
+    locationId: content.expedition.entryLocationId,
+    inOwnRoom: false,
+    inventory: { ...state.inventory, stillwater: 2, 'grounding-salt': 2 },
+    expedition: { ...state.expedition, invited: true }
+  }
+}
+
 const checked = GameStateSchema.parse(state)
 if (!housingOfferDue(content, checked)) throw new Error('The save does not meet what the offer of a house asks: a woman carrying his child whom he has an arrangement with.')
-const saved = new SaveStore(dir).save(slot, { state: checked, scene: null }, new Date(), midterm ? 'Before a midterm' : 'Late game test')
+const saved = new SaveStore(dir).save(slot, { state: checked, scene: null }, new Date(), midterm ? 'Before a midterm' : goBelow ? 'At the way down' : 'Late game test')
 console.log(`Written to ${join(dir, `${slot}.json`)}: ${saved.unreadable ? 'unreadable' : `${saved.playerName}, day ${Math.floor(checked.time / hours) + 1}`}.`)
 console.log(`Courses: ${enrolment.map((id) => checked.courses.find((course) => course.id === id)?.number).join(', ')}. Skills: ${skillsOf(content, checked).map((skill) => skill.name).join(', ')}.`)
 console.log('The offer of the house arrives as a DM from the housing officer as soon as the save is loaded.')

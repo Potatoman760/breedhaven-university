@@ -3,6 +3,7 @@ import { ConditionSchema } from "./condition";
 import { StudiesSchema, TeachingSchema } from "./course";
 import { StatSchema } from "./stats";
 import { ChildNamesSchema } from "./pregnancy";
+import { RoleSchema } from "./expedition";
 
 /**
  * One picture of the character. Written in content either as just the image path, or as
@@ -412,6 +413,8 @@ export const LoveInterestSchema = z.object({
    * not a love interest at all. Left out, it is read off `studies` and `teaching`.
    */
   kind: z.enum(LOVE_INTEREST_KINDS).optional(),
+  /** What she does in a party that goes below. Without one she does not come. */
+  partyRole: RoleSchema.optional(),
   /** A student's own subject. Omitted for anyone who isn't one. */
   studies: StudiesSchema.optional(),
   /** What a teacher teaches. Omitted for anyone who isn't one. */

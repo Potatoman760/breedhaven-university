@@ -25,6 +25,7 @@ import { buildSpendingPrompt, buildSummaryPrompt, fallbackSummary, parseSpending
 import { npcOf, sceneExtras, withNpc } from '../shared/game/npcs'
 import { sceneHours } from '../shared/game/sceneMoves'
 import { asEventOuting, buildOutingPrompt, fallbackOuting, parseOuting } from '../shared/game/outing'
+import { buildCoursePickPrompt, parseCoursePick, type CoursePick } from '../shared/game/coursePick'
 import { personalise } from '../shared/game/personalise'
 import { withHousing } from '../shared/game/housing'
 import { createInitialState } from '../shared/game/state'
@@ -71,6 +72,7 @@ import {
   FeedRequestSchema,
   type FeedResponse,
   PlanOutingRequestSchema,
+  PickCoursesRequestSchema,
   type PlanOutingResponse,
   GenerateEventsRequestSchema,
   SceneRequestSchema,
@@ -735,6 +737,15 @@ function registerIpc(
     } catch (error) {
       return { outing: asEventOuting(content, state, fallbackOuting(content, state, text)), error: (error as Error).message }
     }
+  })
+
+  // Fails when the LLM cannot be reached or chooses nothing he can take: there is no guessing a term's courses from his words alone.
+  ipcMain.handle(IPC.pickCourses, async (_event, raw: unknown): Promise<CoursePick> => {
+    const { state, text } = PickCoursesRequestSchema.parse(raw)
+    const content = readBy(state)
+    const { system, user } = buildCoursePickPrompt(content, state, text)
+    const { reply } = await completeWithFallback(settings.get(), false, { system, messages: [{ role: 'user', content: user }], temperature: SUMMARY_TEMPERATURE })
+    return parseCoursePick(reply, content, state)
   })
 
   // Never fails: a scene that can't be summarised by the LLM still leaves a plain memory.

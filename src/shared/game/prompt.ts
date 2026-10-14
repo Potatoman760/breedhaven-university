@@ -611,7 +611,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
       sceneBeats.length > 0 &&
       fertile.length > 0 &&
       section('Conception', [
-        `${player.name} is a True Sire: when he spends himself inside a woman, the Bloom may lock in and leave her with child.`,
+        `${player.name} is a True Sire: when he spends himself inside a woman who is taking nothing against it, the Bloom locks in and leaves her with child.`,
         group
           ? `If that happens in your reply, write [SEEDED: name] on a line of its own at the end of the reply, ` +
             `once for each woman it happened to (${firstNames(content, fertile.map((c) => c.id))}).`

@@ -9,7 +9,7 @@ import {
   CalendarIcon,
   ChevronIcon,
   HideIcon,
-  ItemIcon,
+  BagIcon,
   LogIcon,
   PhoneIcon,
   MapIcon,
@@ -561,8 +561,8 @@ export function SceneView(props: Props) {
               Hide
             </button>
             <button className="util glass" disabled={busy || ended || scene.npc} onClick={() => onOpen({ kind: 'gifts' })}>
-              <ItemIcon name="gift" size={18} />
-              Gift
+              <BagIcon size={18} />
+              Bag
             </button>
           </div>
 

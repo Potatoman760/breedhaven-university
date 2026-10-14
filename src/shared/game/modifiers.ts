@@ -1,14 +1,14 @@
 import { ADDED_KINDS, type Boon, type ContentPack, type GameState, type Modifier, type ModifierKind, type Skill } from '../model'
 
 /**
- * What changes the game's numbers for him: the courses he has got far enough in, which change them for good, and
- * boons, which change them for a while. Whatever works a number out asks here what it is multiplied by or what is
+ * What changes the game's numbers for him: the courses he has got far enough in and the relics he has brought up
+ * from below, which change them for good, and boons, which change them for a while. Whatever works a number out asks here what it is multiplied by or what is
  * added to it, and need not know where that came from. This reads the content and the save and nothing else of the
  * game, so that anything may ask it.
  */
 
 type Learner = Pick<GameState, 'courses' | 'enrolment' | 'coursePoints'>
-type Holder = Learner & Pick<GameState, 'boons' | 'time'>
+type Holder = Learner & Pick<GameState, 'boons' | 'time'> & Partial<Pick<GameState, 'expedition'>>
 
 /** What a modifier is being asked about: the stat being trained, the woman it concerns. */
 export interface About {
@@ -50,10 +50,12 @@ function applies(content: Pick<ContentPack, 'relationships' | 'loveInterests'>, 
   return true
 }
 
-/** Every modifier of a kind in force for what is asked about: from what he has learnt, and from boons. */
+/** Every modifier of a kind in force for what is asked about: from what he has learnt, from the relics he holds, and from boons. */
 export function modifiersOf(content: ContentPack, state: Holder, kind: ModifierKind, about: About = {}): Modifier[] {
-  const learnt = skillsLearnt(content, state).flatMap((skill) => (skill.passive?.kind === kind ? [skill.passive] : []))
-  return [...learnt, ...liveBoons(state).filter((boon) => boon.kind === kind)].filter((modifier) => applies(content, modifier, about))
+  const learnt = skillsLearnt(content, state).flatMap((skill) => [skill.passive, skill.below].flatMap((one) => (one?.kind === kind ? [one] : [])))
+  const held = state.expedition?.relics ?? []
+  const relics = (content.expedition?.depths ?? []).flatMap((depth) => (held.includes(depth.relic.id) && depth.relic.modifier.kind === kind ? [depth.relic.modifier] : []))
+  return [...learnt, ...relics, ...liveBoons(state).filter((boon) => boon.kind === kind)].filter((modifier) => applies(content, modifier, about))
 }
 
 /** What a number of the game is multiplied by: 1 when nothing bears on it. */

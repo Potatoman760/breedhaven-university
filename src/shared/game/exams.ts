@@ -3,7 +3,7 @@ import type { PerformCheck } from './activities'
 import { toDate } from './calendar'
 import { courseMembers } from './courses'
 import { coursePoints, examNow, examSlot, examWeek, gradingOf } from './grades'
-import { seedOf } from './seed'
+import { draws, seedOf } from './seed'
 import { topicsCovered, topicsOf } from './syllabus'
 
 /**
@@ -11,17 +11,6 @@ import { topicsCovered, topicsOf } from './syllabus'
  * of it but with a pass, a C; answering everything on the paper lifts either by a letter; and under a pass, or not
  * turning up, he fails.
  */
-
-/** A repeatable source of numbers in [0, 1) for one paper of one game. */
-function draws(seed: number): () => number {
-  let x = seed >>> 0
-  return () => {
-    x = (x + 0x6d2b79f5) >>> 0
-    let t = Math.imul(x ^ (x >>> 15), 1 | x)
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
-    return ((t ^ (t >>> 14)) >>> 0) / 0x100000000
-  }
-}
 
 function shuffled<T>(items: T[], random: () => number): T[] {
   const out = [...items]

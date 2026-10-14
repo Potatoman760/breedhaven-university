@@ -42,7 +42,9 @@ export const SkillSchema = z
     at: z.number().min(0).default(30),
     grants: z.enum(SKILL_GRANTS).optional(),
     passive: ModifierSchema.optional(),
-    ability: AbilitySchema.optional()
+    ability: AbilitySchema.optional(),
+    /** What it is worth to him in the Undercroft, beside what it is above: some courses have a use down there too. */
+    below: ModifierSchema.optional()
   })
   .refine((skill) => [skill.grants, skill.passive, skill.ability].filter((one) => one !== undefined).length === 1, 'A skill is a sight, a passive or an ability: one of them, and only one.')
 export type Skill = z.infer<typeof SkillSchema>

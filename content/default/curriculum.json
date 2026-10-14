@@ -143,7 +143,7 @@
           "topics": [
             {
               "title": "The Registry as an Administrative Problem",
-              "content": "Breedhaven has roughly twenty-four million people, three million of them men and some three hundred thousand of those assayed True Sires. The Sire Registry holds every one of their records under the Registry Act, with each query logged against a named officer. Audits find that the central file seldom leaks. Clinics, employers and households do. The reform question is therefore not how to lock the file tighter, but whether the state can govern knowledge it does not hold.",
+              "content": "Breedhaven has roughly twenty-four million people, three million of them men and some three hundred thousand of those assayed Sires. The Sire Registry holds every one of their records under the Registry Act, with each query logged against a named officer. Audits find that the central file seldom leaks. Clinics, employers and households do. The reform question is therefore not how to lock the file tighter, but whether the state can govern knowledge it does not hold.",
               "question": {
                 "ask": "According to audits, where do Sire Registry leaks mostly come from?",
                 "answer": "Clinics, employers and households",
@@ -290,7 +290,7 @@
             },
             {
               "title": "Criminal Procedure and Grave Offenses",
-              "content": "A person arrested must be charged or released within forty-eight hours and may have a lawyer from the first interview. Serious charges go before a High Court jury of twelve, and the Crown must prove guilt beyond reasonable doubt. The defendant need prove nothing. Under the Sire Protection Act, assault, kidnapping and reproductive coercion of a True Sire sit in the gravest class of offense, alongside murder, and a conviction carries a sentence measured in decades.",
+              "content": "A person arrested must be charged or released within forty-eight hours and may have a lawyer from the first interview. Serious charges go before a High Court jury of twelve, and the Crown must prove guilt beyond reasonable doubt. The defendant need prove nothing. Under the Sire Protection Act, assault, kidnapping and reproductive coercion of a Sire sit in the gravest class of offense, alongside murder, and a conviction carries a sentence measured in decades.",
               "question": {
                 "ask": "Within how many hours must an arrested person be charged or released?",
                 "answer": "Forty-eight",
@@ -443,6 +443,10 @@
             "passive": {
               "kind": "prices",
               "amount": 0.8
+            },
+            "below": {
+              "kind": "spoils",
+              "amount": 1.25
             }
           }
         }
@@ -461,7 +465,7 @@
         {
           "level": 2,
           "title": "Service Operations and Guest Experience",
-          "description": "Operational systems for hotels, banquet halls, and tourist sites, including staff scheduling, enchanted inventory tracking, and complaint resolution. Students learn to design guest experiences that accommodate diverse populations, including travelling True Sires and their security needs.",
+          "description": "Operational systems for hotels, banquet halls, and tourist sites, including staff scheduling, enchanted inventory tracking, and complaint resolution. Students learn to design guest experiences that accommodate diverse populations, including travelling Sires and their security needs.",
           "topics": [
             {
               "title": "The Guest Journey and Service Design",
@@ -503,7 +507,7 @@
               }
             },
             {
-              "title": "Hosting a Traveling True Sire",
+              "title": "Hosting a Traveling Sire",
               "content": "A Sire's status is his own to disclose, so it never appears in an open booking record; the reservation carries only a private-guest flag that the duty manager can read. He is roomed near a staircase, behind a logged door, with a side entrance agreed in advance with his security. Staff are briefed not to stare, not to ask and never to post his presence on Bloomr, which is cause for dismissal. Good service treats him as a guest first: his name, his breakfast order, his preference for quiet.",
               "question": {
                 "ask": "What is the only mark a traveling Sire's reservation carries?",
@@ -872,24 +876,23 @@
           "skill": {
             "id": "resonance-token",
             "name": "Resonance token",
-            "description": "Once a week you can charge a token and set it off beside a woman you are with. For a day she needs 10 less desire.",
+            "description": "Once a week you can charge a token. Set off beside a woman you are with, it has her need 10 less desire for a day.",
             "at": 30,
             "ability": {
-              "label": "Set off",
+              "label": "Charge",
               "effects": [
                 {
-                  "type": "boon",
-                  "modifier": {
-                    "kind": "desireGate",
-                    "amount": 10
-                  },
-                  "hours": 24,
-                  "on": "her",
-                  "telling": "Something has you warmer toward him than usual today, and more curious: you feel it as your own mood, and do not question it."
+                  "type": "item",
+                  "itemId": "resonance-token",
+                  "count": 1
                 }
               ],
               "cooldownDays": 7,
-              "on": "her"
+              "on": "self"
+            },
+            "below": {
+              "kind": "anchoring",
+              "amount": 1.25
             }
           }
         }
@@ -977,9 +980,9 @@
             },
             {
               "title": "The Theodicy of Scarcity",
-              "content": "If the Bloom leans toward generation, the rarity of fertile men needs explaining: seven daughters to a son, and only one son in ten a True Sire. The Trial reading holds that scarcity teaches care and cooperation, and points to the household as its fruit. The Balance reading holds that an abundance of seed would exhaust the Bloom itself. A newer and sharper line asks what the Bloom owes the nine men in ten it passes over, and finds the tradition has almost nothing to say.",
+              "content": "If the Bloom leans toward generation, the rarity of fertile men needs explaining: seven daughters to a son, and only one son in ten a Sire. The Trial reading holds that scarcity teaches care and cooperation, and points to the household as its fruit. The Balance reading holds that an abundance of seed would exhaust the Bloom itself. A newer and sharper line asks what the Bloom owes the nine men in ten it passes over, and finds the tradition has almost nothing to say.",
               "question": {
-                "ask": "What share of sons is a True Sire?",
+                "ask": "What share of sons is a Sire?",
                 "answer": "One in ten",
                 "wrong": [
                   "One in seven",
@@ -1086,7 +1089,7 @@
             },
             {
               "title": "Hexing, Consent and the Law",
-              "content": "Breedhaven law treats a hex as it treats a blow. A working set on a person or their property without consent is an offense, however small, and intent to harm is presumed where the anchor was hidden. Three cases are tried far more severely: a working on a pregnant woman, a working that interferes with contraception, and a working aimed at a True Sire. The craft's own older rule is shorter. Nothing is cast on a person that could not be cast in front of them.",
+              "content": "Breedhaven law treats a hex as it treats a blow. A working set on a person or their property without consent is an offense, however small, and intent to harm is presumed where the anchor was hidden. Three cases are tried far more severely: a working on a pregnant woman, a working that interferes with contraception, and a working aimed at a Sire. The craft's own older rule is shorter. Nothing is cast on a person that could not be cast in front of them.",
               "question": {
                 "ask": "What does Breedhaven law treat a hex like?",
                 "answer": "A blow",
@@ -1114,6 +1117,10 @@
               ],
               "cooldownDays": 7,
               "on": "self"
+            },
+            "below": {
+              "kind": "steady",
+              "amount": 1
             }
           }
         }
@@ -1217,18 +1224,23 @@
           "skill": {
             "id": "stamina-band",
             "name": "Stamina band",
-            "description": "A wristband you built and keep charged. Every four days you can trigger it for 40 energy.",
+            "description": "Every four days you can charge a wristband you built. Triggered, it gives you 40 energy.",
             "at": 30,
             "ability": {
-              "label": "Trigger",
+              "label": "Charge",
               "effects": [
                 {
-                  "type": "energy",
-                  "amount": 40
+                  "type": "item",
+                  "itemId": "stamina-band",
+                  "count": 1
                 }
               ],
               "cooldownDays": 4,
               "on": "self"
+            },
+            "below": {
+              "kind": "insight",
+              "amount": 1
             }
           }
         }
@@ -1354,13 +1366,13 @@
         {
           "level": 1,
           "title": "Foundations of Sire Genetics",
-          "description": "Introduction to the genetics of the sex ratio and True Sire fertility, covering the Bloom's role in sex determination, the clinical assay that establishes Sire status, and the basic biology of inheritance in the Sown Expanse. Weekly lab involves microscopy, assay demonstration, and basic genetic analysis.",
+          "description": "Introduction to the genetics of the sex ratio and Sire fertility, covering the Bloom's role in sex determination, the clinical assay that establishes Sire status, and the basic biology of inheritance in the Sown Expanse. Weekly lab involves microscopy, assay demonstration, and basic genetic analysis.",
           "topics": [
             {
-              "title": "What Makes a True Sire",
-              "content": "A True Sire is a man whose seed can begin a pregnancy. About one man in ten is one, and men are one birth in eight, so a True Sire is roughly one birth in eighty. The other nine men in ten are healthy in every ordinary sense: the difference lies in the seed alone and cannot be seen or felt by the man himself. Sire Genetics asks two questions. Why are sons so few, and why are so few sons fertile? Neither has a complete answer yet.",
+              "title": "What Makes a Sire",
+              "content": "A Sire is a man whose seed can begin a pregnancy. A True Sire is the rare Sire with whom a woman who is taking nothing against it always conceives. About one man in ten is one, and men are one birth in eight, so a Sire is roughly one birth in eighty. The other nine men in ten are healthy in every ordinary sense: the difference lies in the seed alone and cannot be seen or felt by the man himself. Sire Genetics asks two questions. Why are sons so few, and why are so few sons fertile? Neither has a complete answer yet.",
               "question": {
-                "ask": "About what share of men are True Sires?",
+                "ask": "About what share of men are Sires?",
                 "answer": "One in ten",
                 "wrong": [
                   "One in three",
@@ -1384,7 +1396,7 @@
             },
             {
               "title": "The Clinical Assay",
-              "content": "Fertility is established by assay of a seed sample. Under the microscope, fertile seed takes up a Bloom-reactive stain and glows green: this is bound seed. The result is the bound fraction, the percentage of seed that is bound. Below five percent a man is recorded as not fertile. Most True Sires score between twenty and forty, and a score above ninety is a record assay and makes the news abroad. Two samples two weeks apart are required before any entry is made.",
+              "content": "Fertility is established by assay of a seed sample. Under the microscope, fertile seed takes up a Bloom-reactive stain and glows green: this is bound seed. The result is the bound fraction, the percentage of seed that is bound. Below five percent a man is recorded as not fertile. Most Sires score between twenty and forty, and a score above ninety is a record assay and makes the news abroad. Two samples two weeks apart are required before any entry is made.",
               "question": {
                 "ask": "What color does fertile seed glow under the assay's stain?",
                 "answer": "Green",
@@ -1397,9 +1409,9 @@
             },
             {
               "title": "Does Fertility Run in Families?",
-              "content": "Only weakly. The sons of True Sires are fertile about one time in six, against one in ten for men at large, and the brothers of a Sire fare little better than strangers. So fertility is not a single inherited trait passed from father to son. The working model is that many small inherited factors raise or lower the chance, and that the mother's Bloom field during the pregnancy matters as much. Assay scores among fertile kin do show a clear family resemblance.",
+              "content": "Only weakly. The sons of Sires are fertile about one time in six, against one in ten for men at large, and the brothers of a Sire fare little better than strangers. So fertility is not a single inherited trait passed from father to son. The working model is that many small inherited factors raise or lower the chance, and that the mother's Bloom field during the pregnancy matters as much. Assay scores among fertile kin do show a clear family resemblance.",
               "question": {
-                "ask": "About how often are the sons of True Sires fertile themselves?",
+                "ask": "About how often are the sons of Sires fertile themselves?",
                 "answer": "One time in six",
                 "wrong": [
                   "One time in two",
@@ -1551,6 +1563,10 @@
             "passive": {
               "kind": "recovery",
               "amount": 0.5
+            },
+            "below": {
+              "kind": "surge",
+              "amount": 0.5
             }
           }
         }
@@ -1663,6 +1679,10 @@
                 "strength",
                 "endurance"
               ]
+            },
+            "below": {
+              "kind": "might",
+              "amount": 1.25
             }
           }
         },
@@ -1758,6 +1778,10 @@
             "passive": {
               "kind": "effort",
               "amount": 0.75
+            },
+            "below": {
+              "kind": "footing",
+              "amount": 1.2
             }
           }
         }
@@ -1776,13 +1800,13 @@
         {
           "level": 4,
           "title": "Protective Operations and Sire Security",
-          "description": "Capstone course in executive and high-value protective operations, emphasising True Sire escort detail, threat assessment, and coordination with national Sire Registry enforcement. Weekly lab runs simulated protection scenarios under graduated magical and physical pressure.",
+          "description": "Capstone course in executive and high-value protective operations, emphasising Sire escort detail, threat assessment, and coordination with national Sire Registry enforcement. Weekly lab runs simulated protection scenarios under graduated magical and physical pressure.",
           "topics": [
             {
               "title": "Threat Assessment for Sire Principals",
-              "content": "Threats to a True Sire fall into five classes: abduction, reproductive coercion, fraud, crowd pressure and disclosure. Violence is the rarest. Most incidents begin with a leak of status, then fixation by people who mean no harm and still close every exit. An assessment scores each venue for the number of young women present who have never carried a child, in whom the Bloom's pull runs strongest, and for how widely the principal's status is already known. Known status doubles the detail.",
+              "content": "Threats to a Sire fall into five classes: abduction, reproductive coercion, fraud, crowd pressure and disclosure. Violence is the rarest. Most incidents begin with a leak of status, then fixation by people who mean no harm and still close every exit. An assessment scores each venue for the number of young women present who have never carried a child, in whom the Bloom's pull runs strongest, and for how widely the principal's status is already known. Known status doubles the detail.",
               "question": {
-                "ask": "What do most incidents involving a True Sire begin with?",
+                "ask": "What do most incidents involving a Sire begin with?",
                 "answer": "A leak of his status",
                 "wrong": [
                   "An act of violence",
@@ -1865,6 +1889,10 @@
             "passive": {
               "kind": "drama",
               "amount": 0.5
+            },
+            "below": {
+              "kind": "ambush",
+              "amount": 1
             }
           }
         }
@@ -1940,9 +1968,9 @@
             },
             {
               "title": "The Assay and the Right Not to Tell",
-              "content": "A clinical assay establishes whether a man is a True Sire, and the result is recorded in the national Registry. The record is private and the status is his to disclose. The ethical ground is that the fact changes how everyone treats him: a known Sire is a prospect before he is a person. So asking on a first date is rude, repeating what one was told is a serious breach, and guessing aloud is little better. The hard case is a household weighing a child, where his silence shapes others' lives.",
+              "content": "A clinical assay establishes whether a man is a Sire, and the result is recorded in the national Registry. The record is private and the status is his to disclose. The ethical ground is that the fact changes how everyone treats him: a known Sire is a prospect before he is a person. So asking on a first date is rude, repeating what one was told is a serious breach, and guessing aloud is little better. The hard case is a household weighing a child, where his silence shapes others' lives.",
               "question": {
-                "ask": "Who has the right to disclose that a man is a True Sire?",
+                "ask": "Who has the right to disclose that a man is a Sire?",
                 "answer": "The man himself",
                 "wrong": [
                   "The national Registry",
@@ -2416,7 +2444,7 @@
           "topics": [
             {
               "title": "The Household as an Institution",
-              "content": "The ordinary family of Breedhaven is a household: several adults who share a home, money and the raising of children. A common shape is one True Sire and two to five women, but households of women alone are just as usual. Most set down a house agreement when they form, a plain written list of who the members are, what each pays into the common purse, who owns which furniture, and how a member joins or leaves. It is not romantic, and households that write one last longer than those that do not.",
+              "content": "The ordinary family of Breedhaven is a household: several adults who share a home, money and the raising of children. A common shape is one Sire and two to five women, but households of women alone are just as usual. Most set down a house agreement when they form, a plain written list of who the members are, what each pays into the common purse, who owns which furniture, and how a member joins or leaves. It is not romantic, and households that write one last longer than those that do not.",
               "question": {
                 "ask": "What written document do most households set down when they form?",
                 "answer": "A house agreement",
@@ -2486,7 +2514,7 @@
                 "ask": "What should a household member who wants a new partner do first?",
                 "answer": "Raise it with the house",
                 "wrong": [
-                  "Ask the True Sire alone",
+                  "Ask the Sire alone",
                   "Tell the eldest member only",
                   "Move out for a month"
                 ]
@@ -2517,7 +2545,7 @@
         {
           "level": 1,
           "title": "Psychology of the Bloom",
-          "description": "Introduction to the psychological dimensions of the Bloom in women: the generative drive, its developmental trajectory, its intensification in pregnancy, and its absence after menopause. Covers damper effects and the psychology of True Sire proximity. No prerequisites.",
+          "description": "Introduction to the psychological dimensions of the Bloom in women: the generative drive, its developmental trajectory, its intensification in pregnancy, and its absence after menopause. Covers damper effects and the psychology of Sire proximity. No prerequisites.",
           "topics": [
             {
               "title": "The Generative Drive",
@@ -2546,8 +2574,8 @@
               }
             },
             {
-              "title": "Proximity to a True Sire",
-              "content": "Near a True Sire a woman feels the pull as warmth, heightened attention and want. It arises in the body before any thought and does not wait for her to know his status, which is one way that status leaks. The classic finding is attention drift: asked to read aloud in a shared room, subjects glance toward a Sire several times more often than toward other men, and underestimate how often they did so. The pull is a feeling. What follows it is a choice.",
+              "title": "Proximity to a Sire",
+              "content": "Near a Sire a woman feels the pull as warmth, heightened attention and want. It arises in the body before any thought and does not wait for her to know his status, which is one way that status leaks. The classic finding is attention drift: asked to read aloud in a shared room, subjects glance toward a Sire several times more often than toward other men, and underestimate how often they did so. The pull is a feeling. What follows it is a choice.",
               "question": {
                 "ask": "What is the finding that women glance more often toward a Sire called?",
                 "answer": "Attention drift",
@@ -2768,7 +2796,7 @@
             },
             {
               "title": "Probability and the Seven-to-One Ratio",
-              "content": "Probability assigns each outcome a number from 0 to 1. Seven girls are born for every boy, so the chance that a birth is a boy is 1 in 8, or 0.125. About one man in ten is a True Sire, and independent chances multiply: 1/8 times 1/10 gives 1 birth in 80. Worked example: a mother of three. The chance all three are daughters is 7/8 cubed, about 0.67, so the chance of at least one son is 0.33. The complement rule, one minus the chance of none, is the quickest route to any at-least-one question.",
+              "content": "Probability assigns each outcome a number from 0 to 1. Seven girls are born for every boy, so the chance that a birth is a boy is 1 in 8, or 0.125. About one man in ten is a Sire, and independent chances multiply: 1/8 times 1/10 gives 1 birth in 80. Worked example: a mother of three. The chance all three are daughters is 7/8 cubed, about 0.67, so the chance of at least one son is 0.33. The complement rule, one minus the chance of none, is the quickest route to any at-least-one question.",
               "question": {
                 "ask": "What is the chance that a birth is a boy?",
                 "answer": "1 in 8",
@@ -2919,7 +2947,11 @@
             "name": "Ward reading",
             "description": "You can tell whether a woman is taking anything against the Bloom: her profile says whether she is on birth control.",
             "at": 30,
-            "grants": "contraception"
+            "grants": "contraception",
+            "below": {
+              "kind": "grounding",
+              "amount": 1
+            }
           }
         }
       ]
@@ -2938,11 +2970,11 @@
         {
           "level": 1,
           "title": "Reproductive Biology of the Sown Expanse",
-          "description": "The biology of the seven-to-one sex ratio, True Sire fertility, and the mechanisms by which pregnancy amplifies a woman's magic. Weekly laboratory introduces assay techniques, basic histology, and statistical analysis of fertility data. No prerequisites.",
+          "description": "The biology of the seven-to-one sex ratio, Sire fertility, and the mechanisms by which pregnancy amplifies a woman's magic. Weekly laboratory introduces assay techniques, basic histology, and statistical analysis of fertility data. No prerequisites.",
           "topics": [
             {
               "title": "Seven Daughters to a Son",
-              "content": "In every nation and every people of the Sown Expanse, seven girls are born for each boy. A hall of two hundred therefore holds about twenty-five men. Because only one man in ten is fertile, a town of eight thousand people contains about a thousand men and about a hundred True Sires. The ratio is fixed at conception and not by losses in the womb: miscarriage rates are the same for daughters and sons. Everything else in reproductive biology follows from these figures.",
+              "content": "In every nation and every people of the Sown Expanse, seven girls are born for each boy. A hall of two hundred therefore holds about twenty-five men. Because only one man in ten is fertile, a town of eight thousand people contains about a thousand men and about a hundred Sires. The ratio is fixed at conception and not by losses in the womb: miscarriage rates are the same for daughters and sons. Everything else in reproductive biology follows from these figures.",
               "question": {
                 "ask": "How many girls are born for each boy in the Sown Expanse?",
                 "answer": "Seven",
@@ -2955,9 +2987,9 @@
             },
             {
               "title": "Fertile and Infertile Seed",
-              "content": "All men produce seed, and under an ordinary microscope a True Sire's sample looks like any other. The difference appears with a Bloom-reactive stain. Bound seed carries a trace of the Bloom and can enter an egg. Unbound seed swims normally and is turned away at the egg's surface. A Sire's sample contains a substantial share of bound seed, and other men's almost none. The standard laboratory exercise is to count the bound cells among two hundred on a prepared slide.",
+              "content": "All men produce seed, and under an ordinary microscope a Sire's sample looks like any other. The difference appears with a Bloom-reactive stain. Bound seed carries a trace of the Bloom and can enter an egg. Unbound seed swims normally and is turned away at the egg's surface. A Sire's sample contains a substantial share of bound seed, and other men's almost none. The standard laboratory exercise is to count the bound cells among two hundred on a prepared slide.",
               "question": {
-                "ask": "What shows the difference between a True Sire's seed and other men's?",
+                "ask": "What shows the difference between a Sire's seed and other men's?",
                 "answer": "A Bloom-reactive stain",
                 "wrong": [
                   "An ordinary microscope",
@@ -3157,7 +3189,7 @@
           "topics": [
             {
               "title": "The Shape of the Sown Expanse",
-              "content": "The Sown Expanse is the known world, and the Bloom reaches all of it. In every nation seven girls are born for each boy, magic belongs to women, and about one man in ten is fertile. Six states matter most. Breedhaven is a green lowland kingdom of rivers and orchards. North lies Kharad-Tor, east Veyra, with Iscara, the Vesperan League and the Starkelands beyond. Rail, shipping, the net and a few long-range portal lines join them, and a True Sire of record assay is news in all six.",
+              "content": "The Sown Expanse is the known world, and the Bloom reaches all of it. In every nation seven girls are born for each boy, magic belongs to women, and about one man in ten is fertile. Six states matter most. Breedhaven is a green lowland kingdom of rivers and orchards. North lies Kharad-Tor, east Veyra, with Iscara, the Vesperan League and the Starkelands beyond. Rail, shipping, the net and a few long-range portal lines join them, and a Sire of record assay is news in all six.",
               "question": {
                 "ask": "How many states of the Sown Expanse matter most?",
                 "answer": "Six",
@@ -3242,6 +3274,10 @@
             "passive": {
               "kind": "gifts",
               "amount": 1.5
+            },
+            "below": {
+              "kind": "spoils",
+              "amount": 1.25
             }
           }
         }

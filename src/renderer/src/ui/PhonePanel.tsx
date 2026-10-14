@@ -19,8 +19,6 @@ import {
   currentJob,
   excuseShift,
   hoursPerWeek,
-  useItem,
-  useAbility,
   hasSkill,
   skillGranting,
   courseMembers,
@@ -72,12 +70,11 @@ import {
 } from '../../../shared/game'
 import { MEMORY_LEVEL_LABELS, METERS, STATS, type ContentPack, type GameState, type Job, type LoveInterest, type SkillGrant } from '../../../shared/model'
 import { errorMessage } from '../errors'
-import { Bag } from './Bag'
 import { Overlay } from './Dialog'
 import { useConfirm } from './Confirm'
 import { JobIcon } from './icons'
 import { BackIcon, ChatIcon, ChevronIcon, FeedIcon, FriendsIcon, HeartIcon, MarketIcon,
-  BagIcon, PregnantIcon, WorkIcon } from './icons'
+  PregnantIcon, WorkIcon } from './icons'
 import { Stalls } from './MarketView'
 import { EmojiPicker } from './EmojiPicker'
 
@@ -104,8 +101,7 @@ const APPS = [
   { id: 'friends', label: 'Friends', Icon: FriendsIcon },
   { id: 'updates', label: 'Feed', Icon: FeedIcon },
   { id: 'jobs', label: 'Jobs', Icon: WorkIcon },
-  { id: 'shop', label: 'Market', Icon: MarketIcon },
-  { id: 'bag', label: 'Bag', Icon: BagIcon }
+  { id: 'shop', label: 'Market', Icon: MarketIcon }
 ] as const
 type App = (typeof APPS)[number]['id']
 
@@ -198,17 +194,6 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, onGoT
           {app === 'updates' && <Updates content={content} state={state} onChange={onChange} onMessage={message} canMessage={canMessage} />}
           {app === 'jobs' && <Jobs content={content} state={state} onChange={onChange} onMessage={message} />}
           {app === 'shop' && <Market content={content} state={state} onChange={onChange} />}
-          {/* What he carries and can make. Used here, a thing is used on himself: what is for a woman waits until he is with her. */}
-          {app === 'bag' && (
-            <div className="feed">
-              <Bag
-                content={content}
-                state={state}
-                onUseItem={(itemId) => onChange((current) => useItem(content, current, itemId))}
-                onAbility={(skillId) => onChange((current) => useAbility(content, current, skillId))}
-              />
-            </div>
-          )}
         </div>
       </div>
     </Overlay>
@@ -835,7 +820,7 @@ function About({ content, state, li }: { content: ContentPack; state: GameState;
   const can = (grant: SkillGrant) => skillGranting(content, grant) === undefined || hasSkill(content, state, grant)
   const unknown = (grant: SkillGrant, label: string) => {
     const skill = skillGranting(content, grant)
-    const course = state.courses.find((one) => one.code === skill?.code)
+    const course = state.courses.find((one) => one.code === skill?.code && (skill?.level === undefined || one.level === skill.level))
     return (
       <span className="chip unknown" title={skill ? `${skill.name} would tell you. ${course ? `${course.number}, ${course.title}` : skill.code} teaches it at ${skill.at} marks.` : undefined}>
         {label} ?

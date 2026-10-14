@@ -144,32 +144,30 @@ describe('the feed', () => {
     expect(system).toContain(`never name ${start.player.name}`)
     expect(user).toContain(`1. ${ana.name}`)
     expect(user).toContain('Where: the Shop')
-    expect(user).toContain('A selfie alone.')
-    expect(user).toContain(`A selfie with a friend: ${bea.name}`)
+    expect(user).toContain('   Alone.')
+    expect(user).toContain(`With a friend: ${bea.name}`)
+    // Whether it is a selfie or a candid is hers to say.
+    expect(system).toContain('"shot": "selfie" or "candid"')
 
-    const reply = `Here: [{"n":2,"text":"\\"Tea with B.\\"","picture":"they hold up two cups"},{"n":9,"text":"x"},{"n":2,"text":"again"},{"text":"no number"},{"n":1,"text":"Open late."}]`
+    const reply = `Here: [{"n":2,"text":"\\"Tea with B.\\"","shot":"Selfie","picture":"they hold up two cups"},{"n":9,"text":"x"},{"n":2,"text":"again"},{"text":"no number"},{"n":1,"text":"Open late."}]`
     const written = parseFeedReply(reply, plans)
     expect(written).toEqual([
-      { index: 1, text: 'Tea with B.', picture: 'they hold up two cups' },
-      { index: 0, text: 'Open late.', picture: '' }
+      { index: 1, text: 'Tea with B.', shot: 'selfie', picture: 'they hold up two cups' },
+      // Without one said, or with one there is no such thing as, it is a candid.
+      { index: 0, text: 'Open late.', shot: 'candid', picture: '' }
     ])
     expect(parseFeedReply('no json here', plans)).toEqual([])
 
-    const drafts = draftPosts(content, start, plans, written, 'candid phone photo')
+    const drafts = draftPosts(content, start, plans, written, 'phone photo')
     expect(drafts.map((draft) => draft.text)).toEqual(['Open late.', 'Tea with B.'])
-    expect(drafts[0].prompt).toContain("A selfie taken at arm's length")
-    expect(drafts[0].prompt).toContain(ana.appearance)
-    expect(drafts[0].prompt).toContain('a red dress')
-    expect(drafts[0].prompt).toContain('candid phone photo')
-    expect(drafts[1].prompt).toContain('A selfie of two friends')
-    expect(drafts[1].prompt).toContain(bea.appearance)
-    expect(drafts[1].prompt).toContain('What the two of them are doing in the picture: they hold up two cups.')
-    // A selfie alone says so, so that what it shows is not drawn as somebody else; and one with nothing said of it says nothing.
-    expect(drafts[0].prompt).toContain('One person only: she is alone in the picture, with nobody else anywhere in it.')
-    expect(drafts[0].prompt).not.toContain('doing as she takes it')
-    const alone = draftPosts(content, start, [plans[0]], [{ index: 0, text: 'x', picture: 'She is grinning at the rain' }], '')
-    expect(alone[0].prompt).toContain('What she is doing as she takes it, the same person as above: She is grinning at the rain.')
-    expect(drafts[1].prompt).toContain('Only the two of them are in the picture.')
+    // Everything about whoever is in it is one paragraph, so that she is drawn once.
+    expect(drafts[0].prompt.split('\n\n')[0]).toBe(`A candid phone photo of one person, solo. ${ana.appearance}. She wears a red dress.`)
+    expect(drafts[0].prompt).toContain('phone photo')
+    expect(drafts[1].prompt.split('\n\n')[0]).toContain('A phone selfie of two friends close together.')
+    expect(drafts[1].prompt.split('\n\n')[0]).toContain(bea.appearance)
+    expect(drafts[1].prompt.split('\n\n')[0]).toMatch(/they hold up two cups\.$/)
+    const alone = draftPosts(content, start, [plans[0]], [{ index: 0, text: 'x', shot: 'selfie', picture: 'She is grinning at the rain' }], '')
+    expect(alone[0].prompt.split('\n\n')[0]).toBe(`A close-up phone selfie of one person, solo. ${ana.appearance}. She wears a red dress. She is grinning at the rain.`)
     expect(drafts[1]).toMatchObject({ authorId: ana.id, time: 6, withId: bea.id })
   })
 })

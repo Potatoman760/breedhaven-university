@@ -1,0 +1,737 @@
+{
+  "name": "the Undercroft",
+  "entryLocationId": "bathhouse",
+  "opensOnDay": 8,
+  "guideId": "vespera",
+  "intro": {
+    "hours": 1,
+    "text": "Don't ask how I know this, and don't put it in writing. There is something under {place} you need to see, and it will only make sense standing over it. Meet me there, {date}. Come alone. An hour.",
+    "missedText": "You weren't at {place}. I can't keep going down there by myself, and I can't explain it here. Again: {date}, same place. Be there."
+  },
+  "hours": 3,
+  "partySize": 2,
+  "trustNeeded": 30,
+  "playerFooting": 20,
+  "footingPerEndurance": 3,
+  "anchorEnergy": 8,
+  "groundEnergy": 6,
+  "anchorPower": 1.5,
+  "checkpointRest": 0.4,
+  "critAffection": 100,
+  "critChance": 0.25,
+  "pregnancyPower": {
+    "early": 1.2,
+    "showing": 1.6,
+    "heavy": 2.2
+  },
+  "surgePerAction": 1,
+  "surgeLimit": 4,
+  "misfire": 4,
+  "grounds": 2,
+  "trustWon": 2,
+  "trustLost": 2,
+  "roles": [
+    {
+      "id": "guard",
+      "name": "Geomancer",
+      "footing": 34,
+      "actions": [
+        {
+          "id": "bash",
+          "name": "Stone Spike",
+          "kind": "attack",
+          "power": 4
+        },
+        {
+          "id": "hold",
+          "name": "Gravity Well",
+          "kind": "taunt",
+          "cooldown": 1
+        },
+        {
+          "id": "guard",
+          "name": "Stoneskin",
+          "kind": "guard"
+        }
+      ]
+    },
+    {
+      "id": "striker",
+      "name": "Pyromancer",
+      "footing": 22,
+      "actions": [
+        {
+          "id": "strike",
+          "name": "Firebolt",
+          "kind": "attack",
+          "power": 6
+        },
+        {
+          "id": "all-in",
+          "name": "Fireball",
+          "kind": "attack",
+          "power": 12,
+          "cooldown": 2
+        },
+        {
+          "id": "guard",
+          "name": "Flame Shield",
+          "kind": "guard"
+        }
+      ]
+    },
+    {
+      "id": "hexer",
+      "name": "Hexer",
+      "footing": 20,
+      "actions": [
+        {
+          "id": "hex",
+          "name": "Hex",
+          "kind": "weaken",
+          "power": 5
+        },
+        {
+          "id": "unravel",
+          "name": "Shadow Bolt",
+          "kind": "attack",
+          "power": 10,
+          "cooldown": 2
+        },
+        {
+          "id": "guard",
+          "name": "Shadow Veil",
+          "kind": "guard"
+        }
+      ]
+    },
+    {
+      "id": "warder",
+      "name": "Warder",
+      "footing": 22,
+      "actions": [
+        {
+          "id": "ward",
+          "name": "Ward",
+          "kind": "shield",
+          "power": 6
+        },
+        {
+          "id": "push",
+          "name": "Force Bolt",
+          "kind": "attack",
+          "power": 4
+        },
+        {
+          "id": "great-ward",
+          "name": "Greater Ward",
+          "kind": "shield",
+          "power": 14,
+          "cooldown": 3
+        }
+      ]
+    },
+    {
+      "id": "healer",
+      "name": "Healer",
+      "footing": 20,
+      "actions": [
+        {
+          "id": "mend",
+          "name": "Heal",
+          "kind": "heal",
+          "power": 7
+        },
+        {
+          "id": "jolt",
+          "name": "Smite",
+          "kind": "attack",
+          "power": 4
+        },
+        {
+          "id": "deep-mend",
+          "name": "Greater Heal",
+          "kind": "heal",
+          "power": 15,
+          "cooldown": 3
+        }
+      ]
+    }
+  ],
+  "enemies": [
+    {
+      "id": "wild-slime",
+      "name": "Wild slime",
+      "appearance": "A waist-high shapeless blob of translucent green living water, glistening, with a brighter glowing core and no face or limbs. It drips and leaves a wet trail.",
+      "footing": 14,
+      "attack": 3,
+      "weakTo": "striker",
+      "image": "sprites/undercroft/wild-slime-cutout.png"
+    },
+    {
+      "id": "root-tangle",
+      "name": "Root tangle",
+      "appearance": "A walking knot of pale writhing tree roots, hunched on four thick root legs, thorny, with small glowing violet buds along its limbs and no face.",
+      "footing": 18,
+      "attack": 4,
+      "hexes": true,
+      "weakTo": "hexer",
+      "image": "sprites/undercroft/root-tangle-cutout.png"
+    },
+    {
+      "id": "pipe-wight",
+      "name": "Pipe wight",
+      "appearance": "A hunched humanoid shape assembled from rusted copper pipes, elbows and valve wheels, steam venting from its joints, furnace-orange light glowing from inside its ribcage of pipes. No face, only a round pressure gauge for a head.",
+      "footing": 24,
+      "attack": 5,
+      "weakTo": "warder",
+      "image": "sprites/undercroft/pipe-wight-cutout.png"
+    },
+    {
+      "id": "loose-ward",
+      "name": "Loose ward",
+      "appearance": "A floating construct of magic with no body: broken concentric rings of glowing blue runes turning inside one another, with jagged shards of blue light orbiting and trailing sparks.",
+      "footing": 20,
+      "attack": 4,
+      "sweeps": true,
+      "weakTo": "hexer",
+      "image": "sprites/undercroft/loose-ward-cutout.png"
+    },
+    {
+      "id": "steam-shade",
+      "name": "Steam shade",
+      "appearance": "A tall thin wisp of white steam in the vague shape of a hooded robed figure, its lower half trailing away into vapor, with two small ember-orange points for eyes.",
+      "footing": 16,
+      "attack": 7,
+      "weakTo": "guard",
+      "image": "sprites/undercroft/steam-shade-cutout.png"
+    },
+    {
+      "id": "drowned-valve",
+      "name": "The Drowned Valve",
+      "appearance": "A huge corroded iron valve wheel, crusted with limescale and river weed, risen on a thick twisting column of dark water. Two arms of bent lead pipe hang from it, pouring water. Green light glows behind the spokes of the wheel.",
+      "footing": 42,
+      "attack": 5,
+      "weakTo": "striker",
+      "image": "sprites/undercroft/drowned-valve-cutout.png"
+    },
+    {
+      "id": "root-mother",
+      "name": "The Root Mother",
+      "appearance": "A massive bulb of roots like an upturned tree stump as tall as a doorway, with many heavy root limbs spread wide, a hollow in its center holding a glowing violet heart, and seed pods hanging from it like lanterns.",
+      "footing": 58,
+      "attack": 6,
+      "hexes": true,
+      "weakTo": "hexer",
+      "image": "sprites/undercroft/root-mother-cutout.png"
+    },
+    {
+      "id": "broken-lattice",
+      "name": "The Broken Lattice",
+      "appearance": "A large fractured lattice of glowing blue ward-lines, like a shattered stained-glass window hanging upright in the air, its panes missing, jagged shards circling it and crackling with light.",
+      "footing": 70,
+      "attack": 6,
+      "sweeps": true,
+      "weakTo": "warder",
+      "image": "sprites/undercroft/broken-lattice-cutout.png"
+    },
+    {
+      "id": "boiler-saint",
+      "name": "The Boiler Saint",
+      "appearance": "A towering figure formed by an upright copper boiler, its riveted plates hanging like a robe, a furnace door for a chest blazing orange, short heavy pipe arms, and a halo of brass pipes fanned behind where a head would be.",
+      "footing": 88,
+      "attack": 8,
+      "weakTo": "guard",
+      "image": "sprites/undercroft/boiler-saint-cutout.png"
+    },
+    {
+      "id": "chained-stack",
+      "name": "The Chained Stack",
+      "appearance": "An animated toppled bookcase reared upright, bound round and round with iron chains, its books flapping open like wings and loose pages swirling about it, violet light glowing between the shelves.",
+      "footing": 92,
+      "attack": 7,
+      "hexes": true,
+      "weakTo": "hexer",
+      "image": "sprites/undercroft/chained-stack-cutout.png"
+    },
+    {
+      "id": "stillwater",
+      "name": "The Stillwater",
+      "appearance": "A tall smooth faceless figure made of perfectly still black water with a mirror surface, standing on a disc of the same water, edged in pale blue light, featureless and symmetrical.",
+      "footing": 100,
+      "attack": 8,
+      "sweeps": true,
+      "weakTo": "striker",
+      "image": "sprites/undercroft/stillwater-cutout.png"
+    },
+    {
+      "id": "first-ward",
+      "name": "The First Ward",
+      "appearance": "A giant ancient stone ring standing upright like a wheel, carved all round with deep runes, golden light filling its center, with broken blocks of masonry orbiting slowly around it.",
+      "footing": 120,
+      "attack": 9,
+      "weakTo": "warder",
+      "image": "sprites/undercroft/first-ward-cutout.png"
+    },
+    {
+      "id": "wellspring",
+      "name": "The Wellspring",
+      "appearance": "A colossal fountain of luminous green-gold water rising into a crowned, vaguely feminine shape woven from water, roots and light, with no face, arms spread wide, mist pouring from it.",
+      "footing": 140,
+      "attack": 9,
+      "sweeps": true,
+      "hexes": true,
+      "image": "sprites/undercroft/wellspring-cutout.png"
+    }
+  ],
+  "depths": [
+    {
+      "name": "the Old Drains",
+      "appearance": "A vaulted brick storm drain under an old bathhouse. Ankle-deep warm water steams along the floor between mossy stone walkways. Rusted iron grates, dripping copper pipes along the walls, limescale. A pale green glow pools in the water and lights the brick arches from below.",
+      "nodes": [
+        {
+          "kind": "fight",
+          "name": "A flooded culvert",
+          "enemyIds": [
+            "wild-slime",
+            "wild-slime"
+          ],
+          "finds": {
+            "money": 15
+          }
+        },
+        {
+          "kind": "find",
+          "name": "A dropped satchel",
+          "finds": {
+            "money": 10,
+            "items": {
+              "stillwater": 1
+            }
+          }
+        },
+        {
+          "kind": "checkpoint"
+        },
+        {
+          "kind": "guardian",
+          "name": "The valve room",
+          "enemyIds": [
+            "drowned-valve"
+          ],
+          "finds": {
+            "money": 30
+          }
+        }
+      ],
+      "relic": {
+        "id": "spring-stone",
+        "name": "Spring-warmed stone",
+        "description": "A stone from the spring that never cools. The house is warmer for it: comfort +1.",
+        "icon": "ember",
+        "appearance": "A smooth rounded river stone, dark grey, with a warm orange glow showing through fine cracks in it.",
+        "modifier": {
+          "kind": "comfort",
+          "amount": 1
+        },
+        "image": "sprites/undercroft/relic-spring-stone-cutout.png"
+      },
+      "image": "generated/backgrounds/undercroft/the-old-drains.png"
+    },
+    {
+      "name": "the Root Cellars",
+      "appearance": "Low stone cellars broken through by enormous pale tree roots that hang from the ceiling and coil across an earth floor. Sagging shelves of forgotten dusty jars. The roots glow faintly violet where they have split the masonry. Dark, close, damp.",
+      "nodes": [
+        {
+          "kind": "fight",
+          "name": "Roots through the brick",
+          "enemyIds": [
+            "root-tangle",
+            "wild-slime"
+          ],
+          "finds": {
+            "money": 20
+          }
+        },
+        {
+          "kind": "find",
+          "name": "A gardener's cache",
+          "finds": {
+            "money": 10,
+            "items": {
+              "grounding-salt": 1
+            }
+          }
+        },
+        {
+          "kind": "checkpoint"
+        },
+        {
+          "kind": "guardian",
+          "name": "The mother root",
+          "enemyIds": [
+            "root-mother",
+            "root-tangle"
+          ],
+          "finds": {
+            "money": 40
+          }
+        }
+      ],
+      "relic": {
+        "id": "lodestone",
+        "name": "Lodestone",
+        "description": "It pulls toward whatever you are working at. Training goes 15% further.",
+        "icon": "magnet",
+        "appearance": "A rough lump of dark iron-grey lodestone with small iron nails and filings clinging to it.",
+        "modifier": {
+          "kind": "training",
+          "amount": 1.15
+        },
+        "image": "sprites/undercroft/relic-lodestone-cutout.png"
+      },
+      "image": "generated/backgrounds/undercroft/the-root-cellars.png"
+    },
+    {
+      "name": "the Ward Gallery",
+      "appearance": "A long underground stone gallery with a barrel vault and heavy pillars. The walls are carved with great concentric circles and bands of runes that glow blue; some are cracked and flicker, leaking light like mist. Loose flagstones, drifting motes of blue light.",
+      "nodes": [
+        {
+          "kind": "fight",
+          "name": "A corridor of slipped wards",
+          "enemyIds": [
+            "loose-ward",
+            "pipe-wight"
+          ],
+          "finds": {
+            "money": 25
+          }
+        },
+        {
+          "kind": "fight",
+          "name": "Wards still walking",
+          "enemyIds": [
+            "loose-ward",
+            "loose-ward"
+          ],
+          "finds": {
+            "money": 25,
+            "items": {
+              "stillwater": 1
+            }
+          }
+        },
+        {
+          "kind": "checkpoint"
+        },
+        {
+          "kind": "guardian",
+          "name": "The lattice",
+          "enemyIds": [
+            "broken-lattice"
+          ],
+          "finds": {
+            "money": 50
+          }
+        }
+      ],
+      "relic": {
+        "id": "wardwright-rule",
+        "name": "Wardwright's rule",
+        "description": "A builder's measure from the first masons. Rooms and their fitting out cost 10% less.",
+        "icon": "ruler",
+        "appearance": "An old folding brass measuring rule, half unfolded, engraved with fine tick marks and small runes.",
+        "modifier": {
+          "kind": "build",
+          "amount": 0.9
+        },
+        "image": "sprites/undercroft/relic-wardwright-rule-cutout.png"
+      },
+      "image": "generated/backgrounds/undercroft/the-ward-gallery.png"
+    },
+    {
+      "name": "the Boiler Vaults",
+      "appearance": "A vast vaulted chamber around a colossal riveted copper boiler, green with age. Brass pipes as thick as tree trunks, valve wheels, gauges, catwalks of iron grating. Steam hangs in the air, lit orange by a furnace glow from the boiler seams.",
+      "nodes": [
+        {
+          "kind": "fight",
+          "name": "Steam in the dark",
+          "enemyIds": [
+            "steam-shade",
+            "pipe-wight"
+          ],
+          "finds": {
+            "money": 30
+          }
+        },
+        {
+          "kind": "find",
+          "name": "A sealed locker",
+          "finds": {
+            "money": 30,
+            "items": {
+              "spring-tonic": 1
+            }
+          }
+        },
+        {
+          "kind": "checkpoint"
+        },
+        {
+          "kind": "guardian",
+          "name": "The great boiler",
+          "enemyIds": [
+            "boiler-saint",
+            "steam-shade"
+          ],
+          "finds": {
+            "money": 60
+          }
+        }
+      ],
+      "relic": {
+        "id": "registry-seal",
+        "name": "Old Registry seal",
+        "description": "A Sire's seal from before the scheme, which the office still honors. Rent is 10% less.",
+        "icon": "seal",
+        "appearance": "A heavy brass seal stamp with a turned wooden handle, standing beside a disc of red wax stamped with a crest.",
+        "modifier": {
+          "kind": "rent",
+          "amount": 0.9
+        },
+        "image": "sprites/undercroft/relic-registry-seal-cutout.png"
+      },
+      "image": "generated/backgrounds/undercroft/the-boiler-vaults.png"
+    },
+    {
+      "name": "the Chained Stacks",
+      "appearance": "A buried library hall far underground. Towering dark bookshelves lean into the gloom, every book bound shut with small chains, longer chains hanging slack from the ceiling. Thick dust, fallen ladders, a single cold violet lantern glow between the stacks.",
+      "nodes": [
+        {
+          "kind": "fight",
+          "name": "Shelves that should not be here",
+          "enemyIds": [
+            "root-tangle",
+            "loose-ward",
+            "steam-shade"
+          ],
+          "finds": {
+            "money": 35
+          }
+        },
+        {
+          "kind": "fight",
+          "name": "What the books were chained for",
+          "enemyIds": [
+            "pipe-wight",
+            "pipe-wight"
+          ],
+          "finds": {
+            "money": 35,
+            "items": {
+              "grounding-salt": 1
+            }
+          }
+        },
+        {
+          "kind": "checkpoint"
+        },
+        {
+          "kind": "guardian",
+          "name": "The stack",
+          "enemyIds": [
+            "chained-stack",
+            "loose-ward"
+          ],
+          "finds": {
+            "money": 70
+          }
+        }
+      ],
+      "relic": {
+        "id": "listening-shell",
+        "name": "Listening shell",
+        "description": "Held to the ear, it tells you what she left unsaid. Desire grows 15% faster.",
+        "icon": "shell",
+        "appearance": "A spiral conch seashell, cream and pink, with a faint blue glow inside its opening.",
+        "modifier": {
+          "kind": "desire",
+          "amount": 1.15
+        },
+        "image": "sprites/undercroft/relic-listening-shell-cutout.png"
+      },
+      "image": "generated/backgrounds/undercroft/the-chained-stacks.png"
+    },
+    {
+      "name": "the Still Pools",
+      "appearance": "A natural limestone cavern of perfectly still black pools like mirrors, joined by worn stepping stones. Stalactites and their exact reflections. Pale blue bioluminescence along the waterline. Utterly calm, no ripples, deep shadows.",
+      "nodes": [
+        {
+          "kind": "fight",
+          "name": "Water that watches",
+          "enemyIds": [
+            "wild-slime",
+            "wild-slime",
+            "steam-shade"
+          ],
+          "finds": {
+            "money": 40
+          }
+        },
+        {
+          "kind": "find",
+          "name": "An offering left on a ledge",
+          "finds": {
+            "money": 40,
+            "items": {
+              "stillwater": 2
+            }
+          }
+        },
+        {
+          "kind": "checkpoint"
+        },
+        {
+          "kind": "guardian",
+          "name": "The Stillwater",
+          "enemyIds": [
+            "stillwater",
+            "wild-slime"
+          ],
+          "finds": {
+            "money": 80
+          }
+        }
+      ],
+      "relic": {
+        "id": "stillwater-vial",
+        "name": "Stillwater vial",
+        "description": "Water that has never moved. A woman is ready for another child in three quarters of the time.",
+        "icon": "vial",
+        "appearance": "A small glass vial of perfectly clear water, stoppered with a cork and sealed with dark blue wax.",
+        "modifier": {
+          "kind": "recovery",
+          "amount": 0.75
+        },
+        "image": "sprites/undercroft/relic-stillwater-vial-cutout.png"
+      },
+      "image": "generated/backgrounds/undercroft/the-still-pools.png"
+    },
+    {
+      "name": "the First Foundations",
+      "appearance": "The oldest masonry under the University: cyclopean rough-hewn stone blocks fitted without mortar, carved with masons marks. A great ward-ring is cut into the floor of a round chamber and filled with dim gold light. Broken tools, stone dust, immense weight overhead.",
+      "nodes": [
+        {
+          "kind": "fight",
+          "name": "The oldest stone",
+          "enemyIds": [
+            "pipe-wight",
+            "loose-ward",
+            "root-tangle"
+          ],
+          "finds": {
+            "money": 45
+          }
+        },
+        {
+          "kind": "fight",
+          "name": "The masons' own wards",
+          "enemyIds": [
+            "loose-ward",
+            "loose-ward",
+            "steam-shade"
+          ],
+          "finds": {
+            "money": 45,
+            "items": {
+              "spring-tonic": 1
+            }
+          }
+        },
+        {
+          "kind": "checkpoint"
+        },
+        {
+          "kind": "guardian",
+          "name": "The First Ward",
+          "enemyIds": [
+            "first-ward",
+            "pipe-wight"
+          ],
+          "finds": {
+            "money": 90
+          }
+        }
+      ],
+      "relic": {
+        "id": "deep-seed",
+        "name": "Deep seed",
+        "description": "It has waited seven centuries to be planted. A child is 25% more likely while she takes something against one.",
+        "icon": "seed",
+        "appearance": "A large dark brown seed the size of a walnut, split slightly open, with a tiny glowing green shoot inside.",
+        "modifier": {
+          "kind": "fertility",
+          "amount": 1.25
+        },
+        "image": "sprites/undercroft/relic-deep-seed-cutout.png"
+      },
+      "image": "generated/backgrounds/undercroft/the-first-foundations.png"
+    },
+    {
+      "name": "the Wellspring",
+      "appearance": "A cathedral-sized cavern at the bottom of everything. A hot spring wells up in a wide stone basin, glowing green-gold and throwing light up through rising mist. Giant roots and ancient copper pipes converge on it from every side. At its center stands a weathered stone anchor pillar carved with runes.",
+      "nodes": [
+        {
+          "kind": "fight",
+          "name": "The last stair",
+          "enemyIds": [
+            "steam-shade",
+            "steam-shade",
+            "root-tangle"
+          ],
+          "finds": {
+            "money": 50
+          }
+        },
+        {
+          "kind": "find",
+          "name": "The water's edge",
+          "finds": {
+            "money": 60,
+            "items": {
+              "stillwater": 1,
+              "grounding-salt": 1
+            }
+          }
+        },
+        {
+          "kind": "checkpoint"
+        },
+        {
+          "kind": "guardian",
+          "name": "The Wellspring",
+          "enemyIds": [
+            "wellspring",
+            "loose-ward"
+          ],
+          "finds": {
+            "money": 100
+          }
+        }
+      ],
+      "relic": {
+        "id": "founders-key",
+        "name": "Founder's key",
+        "description": "The key the University was built to keep. Every woman needs 5 less desire.",
+        "icon": "key",
+        "appearance": "One antique iron skeleton key, shown whole and upright: an ornate round bow at the top worked as a ring of small flowers, a plain straight shaft, a single toothed bit at the bottom. Dark iron with worn gilding.",
+        "modifier": {
+          "kind": "desireGate",
+          "amount": 5
+        },
+        "image": "sprites/undercroft/relic-founders-key-cutout.png"
+      },
+      "image": "generated/backgrounds/undercroft/the-wellspring.png"
+    }
+  ]
+}

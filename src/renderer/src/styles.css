@@ -831,6 +831,22 @@ pre {
   color: var(--moss);
 }
 
+/* The menu: a small button under the tiles, in the corner. */
+.tile-menu {
+  grid-column: 1 / -1;
+  justify-self: end;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 12px;
+  color: var(--ink);
+  font-size: 0.9375rem;
+  font-weight: 400;
+}
+
+.tile-menu svg {
+  color: var(--moss);
+}
+
 .corner {
   position: absolute;
   right: 24px;
@@ -1502,33 +1518,6 @@ textarea.memory {
   gap: 8px;
   min-height: 0;
   overflow-y: auto;
-}
-
-.ware {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  background: var(--paper-raised);
-}
-
-.ware > div {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.ware > div span {
-  font-size: 0.9rem;
-  color: var(--ink-soft);
-}
-
-.ware button {
-  min-width: 96px;
-  white-space: nowrap;
 }
 
 .ware-icon {
@@ -5499,7 +5488,8 @@ button.house-cell.selected {
   margin: 3px 0;
 }
 
-.help-page table {
+.help-page table,
+.skill-list table {
   width: 100%;
   margin: 6px 0;
   border-collapse: collapse;
@@ -5507,14 +5497,17 @@ button.house-cell.selected {
 }
 
 .help-page th,
-.help-page td {
+.help-page td,
+.skill-list th,
+.skill-list td {
   padding: 5px 10px;
   border: 1px solid var(--rule-soft);
   text-align: left;
   vertical-align: top;
 }
 
-.help-page th {
+.help-page th,
+.skill-list th {
   background: var(--paper-raised);
   font-weight: 600;
 }
@@ -5758,8 +5751,131 @@ button.house-cell.selected {
   margin-top: 0;
 }
 
-.bag .ware .hint {
-  display: block;
+.bag .tabs {
+  margin-bottom: 10px;
+}
+
+/* The square a thing is shown in, wherever things are shown: 128 across, its picture filling it. */
+.item-square {
+  position: relative;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  width: 128px;
+  height: 128px;
+  min-height: 0;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--paper-raised);
+  color: var(--madder);
+}
+
+button.item-square {
+  cursor: pointer;
+}
+
+button.item-square:hover {
+  border-color: var(--rule-strong);
+}
+
+.item-square.empty {
+  background: var(--parchment);
+  opacity: 0.6;
+}
+
+.item-square.picked {
+  border-color: var(--moss-deep);
+  box-shadow: 0 0 0 3px var(--moss);
+}
+
+.item-square.faint .item-art,
+.item-square.faint svg {
+  opacity: 0.4;
+}
+
+.item-art {
+  object-fit: contain;
+}
+
+/* How many of it, in the corner of its square; and along the foot, when it will be ready. */
+.item-count,
+.item-tag {
+  position: absolute;
+  color: var(--ink);
+  font: 700 0.9375rem/1 var(--ui);
+}
+
+.item-count {
+  right: 8px;
+  bottom: 7px;
+  padding: 2px 6px;
+  border-radius: 9px;
+  background: var(--paper);
+}
+
+.item-tag {
+  right: 0;
+  bottom: 6px;
+  left: 0;
+  font-size: 0.75rem;
+  font-weight: 400;
+  text-align: center;
+}
+
+/* The bag, and a stall's wares: rows of those squares, as many across as there is room for. */
+.bag-grid,
+.ware-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 128px);
+  justify-content: center;
+  gap: 10px 8px;
+}
+
+/* A square and, under it, the name of what is in it. Every cell keeps room for two lines of name, so that the rows stay level. */
+.bag-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  width: 128px;
+}
+
+.bag-name {
+  display: -webkit-box;
+  min-height: 2.3em;
+  overflow: hidden;
+  font-size: 0.875rem;
+  line-height: 1.15;
+  text-align: center;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.bag-cell:not(:has(.bag-name))::after {
+  min-height: calc(0.875rem * 2.3);
+  content: '';
+}
+
+/* Under the squares: the one that is picked, and what can be done with it. */
+.bag-picked {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 52px;
+  margin-top: 10px;
+  padding: 6px 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+}
+
+.bag-picked-what {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
 }
 
 .bag-boon {
@@ -5955,4 +6071,647 @@ button.house-cell span.house-here {
   .exam-stamp {
     animation: none;
   }
+}
+
+/* Below: a run in the Undercroft, laid out as a fight in an old console game: enemies to the left, the party to the right, everyone's numbers along the bottom. */
+.below-dim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(8, 14, 12, 0.72), rgba(8, 14, 12, 0.45) 45%, rgba(8, 14, 12, 0.8));
+  pointer-events: none;
+}
+
+/* The field: everything above the panels at the bottom. Figures stand on its lower edge. */
+.below-field {
+  position: absolute;
+  /* Its lower edge is the top of the panels, so that a figure drawn to the thigh ends behind them and not in mid-air. */
+  inset: 24px 32px calc(16px + var(--below-strip));
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8%;
+}
+
+.below-foes,
+.below-party {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  width: 46%;
+  height: 100%;
+}
+
+.below-foes {
+  justify-content: flex-end;
+}
+
+/* One figure: only as big as its picture, with nothing drawn behind it. */
+.below-figure {
+  position: relative;
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 0;
+  height: 100%;
+}
+
+.below-figure img {
+  display: block;
+  flex: 0 1 auto;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  object-position: bottom;
+  transition: filter 0.2s;
+}
+
+/* An enemy stands as tall as the field allows, as the party does, less its name and its bar. Its width follows from
+   that: where several would not fit side by side at that height, their boxes narrow and the pictures overlap. */
+.below-figure.foe {
+  flex: 0 1 auto;
+  min-width: 170px;
+}
+
+.below-figure.foe img {
+  flex: 1 1 0;
+  width: auto;
+  max-width: none;
+}
+
+.below-figure.foe .below-tag {
+  position: relative;
+  min-width: 170px;
+}
+
+.below-figure.down img,
+.below-figure.down .below-card {
+  filter: grayscale(1) brightness(0.4);
+}
+
+/* Whose turn it is: lit from behind, as a figure taking her turn is. */
+.below-figure.acting img {
+  filter: drop-shadow(0 0 14px rgba(240, 200, 90, 0.9));
+}
+
+.below-figure.pick,
+.below-row.pick {
+  cursor: pointer;
+}
+
+.below-figure.pick img,
+.below-figure.pick .below-card {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.95));
+}
+
+/* An enemy with no picture yet: its name on a card. */
+.below-card {
+  display: grid;
+  place-items: center;
+  flex: 1 1 0;
+  width: 100%;
+  min-height: 0;
+  border: 2px dashed var(--rule-strong);
+  border-radius: var(--radius);
+  background: rgba(15, 19, 12, 0.7);
+  color: var(--on-wood);
+  font-family: var(--display);
+  font-size: 1.375rem;
+  text-align: center;
+}
+
+/* Under an enemy: its name and how much it has left. */
+.below-tag {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 4px;
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 6px;
+  padding: 6px 10px;
+  border-radius: var(--radius);
+  background: rgba(15, 19, 12, 0.82);
+  color: var(--on-wood);
+  text-align: center;
+}
+
+/* An enemy's footing: a bar thick enough to read at a glance, with the number on it. */
+.below-health {
+  position: relative;
+  display: block;
+  height: 18px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.below-health > span {
+  display: block;
+  height: 100%;
+  background: var(--madder);
+  transition: width 0.25s;
+}
+
+.below-health > b {
+  position: absolute;
+  inset: 0;
+  font-size: 0.8125rem;
+  line-height: 18px;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px #000;
+}
+
+.below-small {
+  font-size: 0.75rem;
+  opacity: 0.85;
+}
+
+.below-bar {
+  display: block;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--track);
+}
+
+.below-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--moss);
+  transition: width 0.25s;
+}
+
+.below-bar.foe > span {
+  background: var(--madder);
+}
+
+/* What just happened, over the middle of the field. */
+.below-toasts {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: min(720px, 80%);
+  /* The fade-in below moves each line, so the block is centered by its own offset and not by a transform on the lines. */
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.below-toasts p {
+  margin: 0;
+  padding: 10px 22px;
+  border: 1px solid var(--glass-rule);
+  border-radius: var(--radius);
+  background: rgba(15, 19, 12, 0.9);
+  color: var(--on-wood);
+  font-size: 1.25rem;
+  text-align: center;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+  animation: toast-in 0.25s ease both;
+}
+
+/* Along the bottom, to the left: a small plate of who is here and what each has left, and beside it the commands. */
+.stage.below {
+  --below-strip: 188px;
+}
+
+.below-bottom {
+  position: absolute;
+  right: 32px;
+  bottom: 16px;
+  left: 32px;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  height: var(--below-strip);
+  pointer-events: none;
+}
+
+/* The two panels under the party: together as wide as the party stands, and both the full height of the strip. */
+.below-panels {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  width: 46%;
+  height: 100%;
+}
+
+.below-bottom > * {
+  pointer-events: auto;
+}
+
+.below-status {
+  display: flex;
+  flex: 0 0 42%;
+  flex-direction: column;
+  gap: 2px;
+  box-sizing: border-box;
+  min-width: 0;
+  padding: 6px 8px;
+}
+
+.below-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  align-items: center;
+  gap: 10px;
+  min-height: 26px;
+  padding: 3px 6px;
+  border-radius: 4px;
+}
+
+.below-who {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.below-row.acting {
+  background: var(--moss-tint);
+}
+
+.below-row.pick {
+  outline: 2px solid var(--ochre);
+}
+
+.below-row.down {
+  color: var(--ink-soft);
+}
+
+.below-number {
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* What one of them has left, one bar to a line, each with its number at the end: footing, and under it his energy or her surge. */
+.below-gauges {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.below-gauge {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 76px;
+  align-items: center;
+  gap: 8px;
+}
+
+.below-gauge .below-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+.below-bar.energy {
+  height: 6px;
+}
+
+.below-bar.energy > span {
+  background: #4a7fc1;
+}
+
+/* A ward that is up: a pale band over the end of the footing it guards, as wide as what it will absorb. */
+.below-bar > .below-warded {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  border-left: 2px solid #fff;
+  background: repeating-linear-gradient(135deg, #bfe6ff 0 4px, #7fc4ff 4px 8px);
+}
+
+.below-ward {
+  color: #2f6fa8;
+}
+
+/* Her surge: one cell for each step toward breaking loose, filling across the same width as the bars above it. */
+.below-surge {
+  display: flex;
+  gap: 3px;
+}
+
+.below-surge i {
+  flex: 1 1 0;
+  height: 6px;
+  border: 1px solid var(--ochre);
+  border-radius: 3px;
+}
+
+.below-surge i.on {
+  background: var(--ochre);
+}
+
+/* The way down, at the right of the strip: where he is, and each stop as a disc with what is at it drawn inside. */
+.below-way {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  padding: 10px 20px;
+}
+
+.below-where {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-size: 1.25rem;
+}
+
+.below-stops {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.below-stops li {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border: 2px solid var(--rule-strong);
+  border-radius: 50%;
+  background: var(--paper-raised);
+  color: var(--ink-soft);
+}
+
+/* The line from one stop to the next. */
+.below-stops li + li::before {
+  position: absolute;
+  right: 100%;
+  width: 22px;
+  margin-right: 2px;
+  border-top: 2px solid var(--rule-strong);
+  content: '';
+}
+
+.below-stops li.done {
+  border-color: var(--rule-strong);
+  background: var(--track);
+  opacity: 0.6;
+}
+
+.below-stops li.here {
+  border-color: var(--moss-deep);
+  background: var(--moss);
+  color: #fff;
+  box-shadow: 0 0 0 3px var(--moss-tint);
+}
+
+/* The command window: what whoever's turn it is can do, two abreast. What each does is said when it is pointed at. */
+.below-menu {
+  display: grid;
+  flex: 1 1 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  gap: 2px 6px;
+  box-sizing: border-box;
+  min-width: 0;
+  overflow-y: auto;
+  padding: 6px 8px;
+}
+
+.below-turn {
+  grid-column: 1 / -1;
+  padding: 0 6px;
+  font-size: 0.6875rem;
+}
+
+.below-command {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-content: start;
+  gap: 0 8px;
+  min-height: 0;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.below-command:hover:not(:disabled) {
+  border-color: var(--moss-deep);
+  background: var(--moss-tint);
+}
+
+.below-command:disabled {
+  border-color: transparent;
+  background: none;
+  color: var(--ink);
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* What a stop came to, or the run: a small dialog over the middle of the field. */
+.below-dialog {
+  position: absolute;
+  top: 34%;
+  left: 50%;
+  width: min(460px, calc(100vw - 48px));
+  padding: 16px 20px;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.55);
+  animation: below-in 0.25s ease both;
+}
+
+@keyframes below-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.below-dialog h2 {
+  margin: 0 0 6px;
+  font-family: var(--display);
+}
+
+.below-dialog p {
+  margin: 0 0 6px;
+}
+
+.below-relic {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--moss-deep);
+}
+
+.below-relic svg,
+.below-relic img {
+  flex: none;
+}
+
+
+
+/* What was brought up, each thing with its picture. */
+.below-haul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+}
+
+.below-haul span,
+.below-command strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Before going below: the depths as cards, each with room for a picture of it, and the women who could come as portraits. */
+.party-heading {
+  margin: 14px 0 6px;
+  font: 600 1.0625rem/1.2 var(--display);
+}
+
+/* One depth at a time between two arrows. */
+.depth-carousel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.depth-carousel .depth-card {
+  flex: 0 1 460px;
+  cursor: default;
+}
+
+.depth-card,
+.party-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 2px;
+  min-height: 0;
+  padding: 6px;
+  border: 2px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+  color: var(--ink);
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+
+.party-card:hover:not(:disabled) {
+  border-color: var(--rule-strong);
+}
+
+.party-card.picked {
+  border-color: var(--moss-deep);
+  box-shadow: 0 0 0 3px var(--moss);
+}
+
+/* One who cannot come is still shown, greyed. */
+.party-card:disabled {
+  border-color: var(--rule);
+  background: var(--parchment);
+  color: var(--ink-soft);
+  cursor: default;
+  filter: grayscale(1);
+  opacity: 0.55;
+}
+
+/* Where a depth's picture goes. Until it has one, its number on the dark. */
+.depth-art {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 9;
+  margin-bottom: 4px;
+  border-radius: 4px;
+  background: var(--wood) center / cover no-repeat;
+}
+
+.depth-number {
+  color: var(--on-wood);
+  font: 600 2rem/1 var(--display);
+  opacity: 0.6;
+}
+
+.party-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: 8px;
+}
+
+/* Her face, cut from the top of her sprite as every portrait is. */
+.party-face {
+  aspect-ratio: 6 / 7;
+  margin-bottom: 4px;
+  border-radius: 4px;
+  background-color: var(--wood);
+  background-size: 260%;
+  background-position: 50% 4%;
+  background-repeat: no-repeat;
+}
+
+/* What she is worth while she is carrying, in the corner of her portrait. */
+.party-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: var(--ochre);
+  color: #fff;
+  font: 700 0.75rem/18px var(--ui);
+}
+
+/* The canvas a fight's effects are drawn on: over the whole stage, clear, and never in the way of a click. */
+.below-fx {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.below-fx canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The skills on his stat sheet: what he has is in ink, what he has yet to learn is paler, and the short columns keep to their width. */
+.skill-list tr:not(.has) td {
+  color: var(--ink-soft);
+}
+
+.skill-list tr.has td {
+  background: var(--moss-tint);
+}
+
+.skill-list tr.has td:last-child {
+  color: var(--moss-deep);
+  font-weight: 700;
+}
+
+.skill-list td:first-child,
+.skill-list td:nth-child(3),
+.skill-list td:nth-child(4) {
+  white-space: nowrap;
+}
+
+/* The courses that were chosen for him, listed in the dialog that chose them. */
+.pick-list {
+  margin: 0;
+  padding-left: 20px;
 }

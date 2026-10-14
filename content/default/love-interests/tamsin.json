@@ -31,7 +31,7 @@
     {
       "id": "default",
       "name": "Usual clothes",
-      "description": "a stylish black  minidress that barely covers her thighs, standing straight up, gold chain belt",
+      "description": "a stylish black minidress that barely covers her thighs, gold chain belt",
       "sprites": {
         "neutral": {
           "image": "sprites/tamsin/default-neutral-3-cutout.webp",
@@ -372,5 +372,6 @@
     "knowledge": [],
     "secrets": [],
     "extraInstructions": "Tamsin and {player} have known each other since they were small: she remembers his childhood and uses it. Play the gap between how she acts (one of the lads) and how she now looks, and her awkwardness about it; never make her dainty. "
-  }
+  },
+  "partyRole": "guard"
 }
