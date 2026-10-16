@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { act, comeUp, describeChange, describeFinds, fighterName, goOn, inForce, nodeAt, pregnancyPower, roleOf, runReport, spriteFor, toDate, turnActions, turnBack, turnOf, wornOutfit, type TurnAction } from '../../../shared/game'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { banterDue, act, comeUp, describeChange, describeFinds, fighterName, goOn, inForce, nodeAt, pregnancyPower, roleOf, runReport, spriteFor, toDate, turnActions, turnBack, turnOf, wornOutfit, type BanterLine, type TurnAction } from '../../../shared/game'
 import { HIM, type ContentPack, type Fighter, type GameState } from '../../../shared/model'
 import { BelowFx, EVENT_GAP_MS } from '../fx/BelowFx'
 import { Backdrop } from './Backdrop'
@@ -12,6 +12,11 @@ interface Props {
   state: GameState
   onChange: (state: GameState) => void
 }
+
+// How long the party is waited on for something to say before the fight begins without it, and how long each thing said stays up.
+const BANTER_WAIT_MS = 10000
+const BANTER_LINE_MS = 2600
+const BANTER_MS_PER_CHAR = 55
 
 // What each kind of stop is, said when it is pointed at.
 const STOPS: Record<string, string> = { fight: 'A fight', find: 'Something to find', checkpoint: 'A checkpoint: what you have found is made safe, and you rest', guardian: 'The guardian of the anchor' }
@@ -47,6 +52,69 @@ export function ExpeditionView({ content, state, onChange }: Props) {
   const events = fight?.events ?? []
   // Changes with every thing done, whether or not it drew a number: what was said and shown is played again only for something new.
   const stamp = `${run.node}:${fight?.round ?? 0}:${fight?.turn ?? 0}:${run.rolls}:${run.done}`
+
+  // What the party says before a fight: asked for once as it opens, and said a line at a time, each in a balloon by
+  // whoever says it. The fight does not begin until they have finished, or he waves it on, or nothing came back.
+  const fightKey = fight ? `${run.startedAt}:${run.depth}:${run.node}` : null
+  const [banter, setBanter] = useState<{ key: string; lines: BanterLine[]; at: number } | null>(null)
+  // The fight whose talk is over: until it is this one, nothing of the fight is shown or can be done.
+  const [opened, setOpened] = useState<string | null>(null)
+  const asked = useRef<string | null>(null)
+  useEffect(() => {
+    if (!fightKey || asked.current === fightKey) return
+    asked.current = fightKey
+    // One come back to part-way through, or with nobody to say anything, begins at once.
+    if (fight?.round !== 1 || !banterDue(content, state)) return setOpened(fightKey)
+    const giveUp = window.setTimeout(() => asked.current === fightKey && setOpened(fightKey), BANTER_WAIT_MS)
+    void window.api.banter({ state }).then(({ lines }) => {
+      window.clearTimeout(giveUp)
+      // One that comes back after he has moved on, or after the wait ran out, is not said.
+      if (asked.current !== fightKey) return
+      if (lines.length === 0) setOpened(fightKey)
+      else setBanter({ key: fightKey, lines, at: 0 })
+    })
+    // Asked as a fight opens and not again as it goes on: the state it is asked with is the one it opened in.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fightKey])
+  const talking = fighting && opened !== fightKey
+  // And what they say over a guardian they have beaten: asked for as the reckoning comes up, and said beside it when it arrives.
+  const wonKey = report?.outcome === 'won' ? `won:${run.startedAt}:${run.depth}` : null
+  const askedWon = useRef<string | null>(null)
+  // The win whose words are still being waited on.
+  const [wonWait, setWonWait] = useState<string | null>(null)
+  useEffect(() => {
+    if (!wonKey || askedWon.current === wonKey) return
+    askedWon.current = wonKey
+    if (!banterDue(content, state, 'won')) return
+    setWonWait(wonKey)
+    void window.api.banter({ state, moment: 'won' }).then(({ lines }) => {
+      setWonWait(null)
+      if (askedWon.current === wonKey && lines.length > 0) setBanter({ key: wonKey, lines, at: 0 })
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wonKey])
+  const line = banter && ((talking && banter.key === fightKey) || (wonKey !== null && banter.key === wonKey)) ? banter.lines[banter.at] : undefined
+  /** On to the next thing said; after the last, to the fight, or when it was said over a win, to silence. */
+  const sayNext = () => {
+    if (!banter) return
+    if (banter.at + 1 < banter.lines.length) setBanter({ ...banter, at: banter.at + 1 })
+    else if (banter.key === wonKey) setBanter(null)
+    else setOpened(fightKey)
+  }
+  // Each line stays up long enough to be read, and then gives way to the next.
+  useEffect(() => {
+    if (!line) return
+    const timer = window.setTimeout(sayNext, Math.max(BANTER_LINE_MS, line.text.length * BANTER_MS_PER_CHAR))
+    return () => window.clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [line])
+  // Where the balloon goes: beside the head of whoever is speaking, as she stands on the stage now.
+  const [balloon, setBalloon] = useState<{ left: number; top: number } | null>(null)
+  useLayoutEffect(() => {
+    const stage = document.querySelector('.stage.below')?.getBoundingClientRect()
+    const body = line && document.querySelector(`[data-fx="${CSS.escape(line.speakerId)}"] img`)?.getBoundingClientRect()
+    setBalloon(stage && body ? { left: body.left - stage.left + body.width * 0.72, top: body.top - stage.top + body.height * 0.05 } : null)
+  }, [line])
 
   /** Who an action may be pointed at among the party. */
   const allyFits = (action: TurnAction, fighter: Fighter): boolean =>
@@ -122,7 +190,7 @@ export function ExpeditionView({ content, state, onChange }: Props) {
         </div>
 
         {/* What just happened, said over the field and gone with the next thing done. */}
-        {fighting && events.length > 0 && (
+        {fighting && !talking && events.length > 0 && (
           <div key={stamp} className="below-toasts" aria-live="polite">
             {events.map((event, index) => (
               <p key={index} style={{ animationDelay: `${(index * EVENT_GAP_MS) / 1000}s` }}>
@@ -185,7 +253,22 @@ export function ExpeditionView({ content, state, onChange }: Props) {
 
         {/* What whoever's turn it is can do; pointing at one says what it does. The panel is there even with nothing in it, so that the party always has something to stand behind. */}
         <div className="below-menu glass">
-          {fighting && actor && (
+          {talking && (
+            <div className="below-waiting">
+              {/* Until something has come back to be said, that it is being thought of; after that the balloons speak for themselves. */}
+              <span className="hint">{line ? 'Talking...' : 'Thinking...'}</span>
+              <Button variant="secondary" size="small" onClick={() => setOpened(fightKey)}>
+                Skip
+              </Button>
+            </div>
+          )}
+          {/* Over a win, the same word while what they will say is waited on and said. There is nothing to skip: the reckoning is already up. */}
+          {wonKey !== null && (wonWait === wonKey || (line && banter?.key === wonKey)) && (
+            <div className="below-waiting">
+              <span className="hint">{line ? 'Talking...' : 'Thinking...'}</span>
+            </div>
+          )}
+          {fighting && !talking && actor && (
             <>
             <span className="caps below-turn">{pending ? `${pending.name}: on whom?` : actor.id === HIM ? 'Your turn' : `${fighterName(content, state, actor.id)}'s turn`}</span>
             {pending ? (
@@ -228,7 +311,15 @@ export function ExpeditionView({ content, state, onChange }: Props) {
         </div>
       </section>
 
-      <BelowFx events={events} stamp={stamp} />
+      {/* What she is saying, in a balloon by her head. A click anywhere on it goes on to the next. */}
+      {line && balloon && (
+        <button key={`${banter?.at}`} className="below-balloon" style={balloon} onClick={sayNext}>
+          {line.text}
+        </button>
+      )}
+
+      {/* Nothing of the fight is played while they are still talking: what met them as it opened is shown when they have done. */}
+      <BelowFx events={talking ? [] : events} stamp={`${talking}:${stamp}`} />
 
       {/* What a stop came to, and at the end what the run did: a small dialog over the field. */}
       {report ? (
@@ -266,16 +357,78 @@ export function ExpeditionView({ content, state, onChange }: Props) {
           </div>
         </div>
       ) : (
-        !fighting && (
-          <div className="below-dialog glass" role="dialog">
-            {fight ? events.slice(-2).map((event, index) => <p key={index}>{event.text}</p>) : <p>{run.note || node.name}</p>}
-            <div className="actions end">
+        !fighting &&
+        (run.spoils ? (
+          // A fight won, or something found lying there: what came of it, laid out to be enjoyed.
+          <div className="below-spoils glass framed" role="dialog">
+            <span className="caps">{fight ? `Round ${fight.round}` : depth.name}</span>
+            <h1>{fight ? 'Victory' : node.name || 'Something left behind'}</h1>
+            {fight && (
+              <p className="below-beaten">
+                {Object.entries(
+                  fight.foes.reduce<Record<string, number>>((count, foe) => {
+                    const name = config.enemies.find((one) => one.id === foe.enemyId)?.name ?? foe.enemyId
+                    return { ...count, [name]: (count[name] ?? 0) + 1 }
+                  }, {})
+                )
+                  .map(([name, count]) => (count > 1 ? `${name} ×${count}` : name))
+                  .join(' · ')}{' '}
+                beaten
+              </p>
+            )}
+            {fight && (
+              <div className="below-standing">
+                {run.party.map((fighter) => (
+                  <div key={fighter.id}>
+                    <span>{fighterName(content, state, fighter.id)}</span>
+                    <span className="below-health">
+                      <span style={{ width: share(fighter.footing, fighter.max) }} />
+                    </span>
+                    <span className="hint">
+                      {Math.round(fighter.footing)}/{fighter.max}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+            <span className="caps">Found</span>
+            <div className="below-loot">
+              {run.spoils.money > 0 && (
+                <div className="loot-tile">
+                  {config.moneyImage ? <img src={`content://pack/${config.moneyImage}`} alt="" /> : <ItemArt icon="coin" size={72} />}
+                  <strong>${run.spoils.money}</strong>
+                </div>
+              )}
+              {Object.entries(run.spoils.items).map(([id, count]) => {
+                const item = content.items.find((one) => one.id === id)
+                return (
+                  <div key={id} className="loot-tile" title={item?.description}>
+                    <ItemArt icon={item?.icon ?? 'gift'} image={item?.image} size={88} />
+                    <strong>
+                      {item?.name ?? id}
+                      {count > 1 && ` ×${count}`}
+                    </strong>
+                  </div>
+                )
+              })}
+              {run.spoils.money === 0 && Object.keys(run.spoils.items).length === 0 && <span className="hint">Nothing worth taking.</span>}
+            </div>
+            <div className="actions center">
               <Button variant="primary" onClick={() => onChange(goOn(content, state))}>
-                Go on
+                Confirm
               </Button>
             </div>
           </div>
-        )
+        ) : (
+          <div className="below-dialog glass" role="dialog">
+            {fight ? events.slice(-2).map((event, index) => <p key={index}>{event.text}</p>) : <p>{run.note || node.name}</p>}
+            <div className="actions center">
+              <Button variant="primary" onClick={() => onChange(goOn(content, state))}>
+                Confirm
+              </Button>
+            </div>
+          </div>
+        ))
       )}
     </main>
   )

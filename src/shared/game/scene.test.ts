@@ -19,7 +19,8 @@ import {
   sceneBaseline,
   sceneOutcome,
   splitSceneEnd,
-  validLook
+  validLook,
+  whoSpoke
 } from './scene'
 import { createInitialState } from './state'
 import { fixture } from './testFixture'
@@ -121,6 +122,10 @@ describe('look directives', () => {
       { name: 'bea', level: 1, reason: 'they are kissing in front of her' }
     ])
     expect(parseDirectives('[COMFORT: 12 nonsense]\nHello.')).toMatchObject({ text: 'Hello.', comfort: [] })
+    // A tag the model garbled is hidden all the same, but a bracket of ordinary words is not.
+    expect(parseDirectives('[COMFassessing the table dynamics]\nHello.')).toMatchObject({ text: 'Hello.', comfort: [] })
+    expect(parseDirectives('[COMF 4 fine]\nHi.')).toMatchObject({ text: 'Hi.', comfort: [{ name: '', level: 4, reason: 'fine' }] })
+    expect(parseDirectives('[Comfortable silence]').text).toBe('[Comfortable silence]')
 
     const kept = applyComfort(scene, { ana: { level: 2, reason: 'he keeps asking about my mother' } })
     expect(applyComfort(scene, {})).toBe(scene)
@@ -367,6 +372,9 @@ describe('what a character declares in a reply', () => {
     expect(read.slept).toBe(true)
     // Who it is, in a group; and a leaving with no feeling given is simply a going.
     expect(parseDirectives('[ATTENDING: Bea=fair]\n[LEAVES: Cy]').attending).toEqual([{ name: 'Bea', eventId: 'fair' }])
+    // Only someone with a line of her own in the reply can be the one who said she is going.
+    const cast = [{ id: 'bea', name: 'Bea Moss' }, { id: 'cy', name: 'Cy Lark' }]
+    expect(whoSpoke('Bea: I would love to come.\n*Cy looks away.*\nBea: Saturday, then.', cast)).toEqual(['bea'])
     expect(parseDirectives('[LEAVES: Cy]\nOff she goes.')).toMatchObject({ text: 'Off she goes.', leaving: [{ name: 'Cy', feeling: 'content', reason: '' }] })
     expect(parseDirectives('Good night.')).toMatchObject({ leaving: [], attending: [], agreed: false, slept: false })
   })

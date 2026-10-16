@@ -5,13 +5,13 @@ import { adjustStat, catalogueIsStale, createInitialState, describeModifier, des
 import { STAT_LABELS, STATS, type ContentPack, type Stat } from '../../shared/model'
 import { AUTO_SLOT_ID, latestSave, type SaveData, type SaveSummary } from '../../shared/saves'
 import { errorMessage } from './errors'
+import { useVolumes } from './sound'
 import { Overlay } from './ui/Dialog'
 import { describeSave, SavesPanel } from './SavesPanel'
 import { SettingsPanel } from './SettingsPanel'
 import { VineCorner } from './ui/icons'
 
-// How loud the menu's music is, and where it is remembered that the player turned it off.
-const MUSIC_VOLUME = 0.4
+// Where it is remembered that the player turned the menu's music off.
 const MUSIC_OFF = 'breedhaven.menuMusicOff'
 
 interface Props {
@@ -25,8 +25,8 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
   const [saves, setSaves] = useState<SaveSummary[]>([])
   const [panel, setPanel] = useState<'new' | 'load' | 'settings' | null>(null)
   const [name, setName] = useState(content.newGame.player.name)
-  // Who he is, as the characters are told it: the content's own to start from, and the player's to change.
-  const [bio, setBio] = useState(content.newGame.player.bio)
+  // Who he is, as the characters are told it: the content's own, which is fixed, and whatever the player adds to it.
+  const [about, setAbout] = useState('')
   const [notice, setNotice] = useState('')
   // His stats as he has set them so far: all at the lowest when the dialog opens, with the whole pool to spend.
   const [stats, setStats] = useState<Record<Stat, number>>(startingStats)
@@ -35,7 +35,7 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
   /** Opens the new-game dialog with nothing spent. */
   const openNew = () => {
     setStats(startingStats())
-    setBio(content.newGame.player.bio)
+    setAbout('')
     setPanel('new')
   }
 
@@ -63,15 +63,16 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
     event.preventDefault()
     // A fresh seed gives each game its own run of weather.
     const seed = Math.floor(Math.random() * 0x7fffffff)
-    onStart({ state: createInitialState(content, name, seed, stats, bio), scene: null })
+    onStart({ state: createInitialState(content, name, seed, stats, about), scene: null })
   }
 
   // The menu's music: it plays round and round while the menu is up, and stops with it. Whether it is wanted is remembered.
   const [muted, setMuted] = useState(() => window.localStorage.getItem(MUSIC_OFF) === '1')
   const player = useRef<HTMLAudioElement>(null)
+  const { music: musicVolume } = useVolumes()
   useEffect(() => {
-    if (player.current) player.current.volume = MUSIC_VOLUME
-  }, [])
+    if (player.current) player.current.volume = musicVolume
+  }, [musicVolume])
   const toggleMusic = () => {
     window.localStorage.setItem(MUSIC_OFF, muted ? '0' : '1')
     setMuted(!muted)
@@ -126,11 +127,8 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
             </label>
             <label>
               About you
-              <textarea rows={3} value={bio} onChange={(e) => setBio(e.target.value)} />
-              <span className="hint">
-                Who you are, as everyone you meet is told it: your age, where you are from, what is known of you. Write {PLAYER_TOKEN} for your name. People bring up
-                whatever is here.
-              </span>
+              <span className="new-game-bio">{content.newGame.player.bio.split(PLAYER_TOKEN).join(name.trim() || content.newGame.player.name)}</span>
+              <textarea rows={3} value={about} placeholder="Anything more about you" title={`Told to everyone you meet, after the lines above. Write ${PLAYER_TOKEN} for your name.`} onChange={(e) => setAbout(e.target.value)} />
             </label>
             <div className="field">
               <span className="field-label">

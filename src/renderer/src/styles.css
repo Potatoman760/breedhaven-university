@@ -162,6 +162,14 @@ label .hint {
   overflow-wrap: anywhere;
 }
 
+/* The part of who he is that the game gives him, above what the player adds to it. */
+.new-game-bio {
+  font-size: 0.95rem;
+  font-weight: 400;
+  font-style: italic;
+  line-height: 1.4;
+}
+
 input,
 select,
 textarea {
@@ -376,6 +384,14 @@ input:disabled {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+/* The volume sliders, a column of them no wider than a slider needs. */
+.volumes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 420px;
 }
 
 /* The settings themselves: room for the ComfyUI setup beside the LLMs. */
@@ -816,15 +832,16 @@ pre {
   bottom: 24px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  width: 300px;
+  gap: 10px;
+  width: 222px;
 }
 
+/* Square, so that the corner reads as a set of icons. */
 .tile {
   flex-direction: column;
-  height: 116px;
+  aspect-ratio: 1;
   padding: 0;
-  font-size: 1.125rem;
+  font-size: 1rem;
 }
 
 .tile svg {
@@ -832,9 +849,15 @@ pre {
 }
 
 /* The menu: a small button under the tiles, in the corner. */
-.tile-menu {
+/* The row under the tiles: the menu in the corner, and any small buttons of the screen's own to its left. */
+.tile-row {
   grid-column: 1 / -1;
-  justify-self: end;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.tile-menu {
   gap: 6px;
   min-height: 34px;
   padding: 0 12px;
@@ -969,68 +992,13 @@ pre {
   cursor: pointer;
 }
 
-.date-badge {
-  position: absolute;
-  bottom: 24px;
-  left: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  box-sizing: border-box;
-  width: 184px;
-  padding: 14px 12px 12px;
-  /* The deep green of the game's own palette, as the menus and the logo are. */
-  border: 1px solid var(--wood);
-  border-radius: var(--radius);
-  background: var(--moss-deep);
-  color: #fff;
-  text-align: center;
-}
-
-.date-badge .caps {
-  color: var(--on-wood);
-}
-
-.date-badge hr {
-  width: 56px;
-  margin: 6px 0;
-  background: var(--leaf);
-}
-
-.badge-day {
-  font: 600 3.25rem/1 var(--display);
-}
-
-.badge-date {
-  font: 600 1.25rem/1.1 var(--display);
-}
-
-.badge-place {
-  font: 600 1.125rem/1.15 var(--display);
-  overflow-wrap: anywhere;
-}
-
-.date-badge .badge-class {
-  margin-top: 4px;
-  line-height: 1.25;
-  overflow-wrap: anywhere;
-}
-
-.badge-period {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 6px;
-  color: #fff;
-}
-
 /* The text box and, standing on its top edge, the tab that names whoever is speaking. */
 .textbox-wrap {
+  /* Clear of the tiles in the corner, 222px wide. */
   position: absolute;
-  right: 208px;
+  right: 270px;
   bottom: 24px;
-  left: 232px;
+  left: 24px;
   /* On a wide screen the box stops growing and sits in the middle, so a line is never too long to read. */
   max-width: 1200px;
   margin-inline: auto;
@@ -1120,7 +1088,7 @@ pre {
   align-items: center;
   justify-content: center;
   gap: 20px;
-  /* The dark green the logo itself is drawn on, taken from its edges, so that the picture has no edge of its own. */
+  /* The dark green the logo was first drawn on. The logo itself is cut out, and would stand on any other. */
   background: #0a1817;
   color: var(--on-wood);
   animation: loading-in 0.2s ease-out;
@@ -1129,7 +1097,6 @@ pre {
 .scene-loading img {
   width: min(320px, 40vh);
   height: auto;
-  border-radius: 18px;
   /* Under the lights that fly across it. */
   position: relative;
   z-index: 1;
@@ -1233,33 +1200,10 @@ pre {
   color: var(--madder-ink);
 }
 
-.scene-utils {
-  position: absolute;
-  right: 96px;
-  bottom: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  width: 100px;
-}
-
-.scene-utils .util {
-  justify-content: flex-start;
-  padding: 0 12px;
-}
-
-.scene-tiles {
-  position: absolute;
-  right: 24px;
-  bottom: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 58px;
-}
-
-.scene-tiles .tile {
-  height: 58px;
+/* The welcome has nothing beside its text box, which sits in the middle. */
+.intro .textbox-wrap {
+  right: 208px;
+  left: 208px;
 }
 
 .continue-scene {
@@ -2130,6 +2074,12 @@ textarea.memory {
   gap: 16px;
 }
 
+.actions.center {
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
 /* Calendar dialog */
 
 .calendar {
@@ -2452,6 +2402,12 @@ textarea.memory {
   background-size: 260%;
   background-position: 50% 4%;
   background-repeat: no-repeat;
+}
+
+/* His portrait in the player editor, as it is cut from his sprite: a size up from a list's. */
+.player-portrait {
+  width: 76px;
+  height: 88px;
 }
 
 /* Saves and settings */
@@ -2947,10 +2903,20 @@ button.stat-grid:hover {
   background: none;
 }
 
-.room-art {
+/* His room's picture and his sprite, the size a view and a sprite are in a character's slots, and not the width of the row. */
+.sprite-thumb .room-art {
   width: 240px;
   aspect-ratio: 16 / 9;
   object-fit: cover;
+  border-radius: 4px;
+}
+
+.player-sprite img {
+  width: auto;
+  height: 200px;
+  object-fit: contain;
+  object-position: bottom;
+  background: rgba(42, 40, 31, 0.08);
   border-radius: 4px;
 }
 
@@ -5427,7 +5393,8 @@ button.house-cell.selected {
   grid-column: 1 / -1;
   flex-direction: row;
   gap: 10px;
-  height: 64px;
+  aspect-ratio: auto;
+  height: 56px;
 }
 
 @media (max-width: 900px) {
@@ -5436,27 +5403,7 @@ button.house-cell.selected {
   }
 }
 
-/* Help: the button in the corner, and the pages it opens. */
-.help-button {
-  position: fixed;
-  top: 6px;
-  left: 50%;
-  z-index: 5;
-  width: 28px;
-  min-width: 0;
-  height: 28px;
-  min-height: 0;
-  padding: 0;
-  border-radius: 50%;
-  font: 700 0.9375rem/1 var(--ui);
-  opacity: 0.8;
-  transform: translateX(-50%);
-}
-
-.help-button:hover {
-  opacity: 1;
-}
-
+/* Help: the pages it opens. */
 /* Every page of it is the same size, so that the window does not jump from tab to tab: what is longer scrolls. */
 .help-page,
 .help .book {
@@ -5964,10 +5911,16 @@ button.item-square:hover {
   filter: brightness(0.92);
 }
 
-/* On the plan: who is in a room this hour. */
+/* On the plan: who is in a room this hour, as her face is shown on the map, along the foot of the room. */
 button.house-cell span.house-here {
-  color: var(--moss-deep);
-  font-weight: 700;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+
+button.house-cell .house-here .portrait .caps {
+  color: var(--ink);
 }
 
 /* One question of an examination paper: what it asks, and the answers to choose among. */
@@ -6704,6 +6657,21 @@ button.house-cell span.house-here {
   font-weight: 700;
 }
 
+/* A skill one of his courses is teaching him: on its way, so it stands out from those he is not working toward. */
+.skill-list tr.studying td {
+  background: #f6ecd0;
+  color: var(--ink);
+}
+
+.skill-list tr.studying td:first-child {
+  box-shadow: inset 4px 0 0 var(--ochre);
+}
+
+.skill-list tr.studying td:last-child {
+  color: var(--ochre);
+  font-weight: 700;
+}
+
 .skill-list td:first-child,
 .skill-list td:nth-child(3),
 .skill-list td:nth-child(4) {
@@ -6715,3 +6683,565 @@ button.house-cell span.house-here {
   margin: 0;
   padding-left: 20px;
 }
+
+/* What one of the party says before a fight: a comic-book balloon beside her head, its tail pointing back at her. */
+.below-balloon {
+  position: absolute;
+  display: block;
+  max-width: 340px;
+  min-height: 0;
+  padding: 14px 20px;
+  border: 3px solid #14140f;
+  border-radius: 28px;
+  background: #fffdf5;
+  color: #14140f;
+  font: 700 1.1875rem/1.25 var(--ui);
+  text-align: center;
+  box-shadow: 4px 5px 0 rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  animation: below-balloon 0.22s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+  transform-origin: 0 60%;
+  /* Over the reckoning, when it is said beside one. */
+  z-index: 2;
+}
+
+/* The tail: a black wedge with a paper one laid over it, on the side she is standing. */
+.below-balloon::before,
+.below-balloon::after {
+  position: absolute;
+  top: 55%;
+  border-style: solid;
+  content: '';
+}
+
+.below-balloon::before {
+  left: -30px;
+  border-width: 4px 30px 18px 0;
+  border-color: transparent #14140f transparent transparent;
+}
+
+.below-balloon::after {
+  left: -21px;
+  margin-top: 3px;
+  border-width: 2px 24px 12px 0;
+  border-color: transparent #fffdf5 transparent transparent;
+}
+
+@keyframes below-balloon {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+/* While the party is still talking: a word in the middle of the command window, and under it the way past. */
+.below-waiting {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  grid-column: 1 / -1;
+  gap: 10px;
+}
+
+/* With only that in it, the window's one row is the whole of its height, so that the word sits in its middle. */
+.below-menu:has(.below-waiting) {
+  align-content: stretch;
+}
+
+.below-waiting .hint {
+  font-size: 1.0625rem;
+}
+
+/* A guided tour: the screen dimmed but for a ring around what is being shown, and the guide popping up beside it. */
+.tour {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  cursor: pointer;
+  transition: opacity 0.4s ease;
+}
+
+.tour.leaving {
+  opacity: 0;
+}
+
+.tour-ring {
+  position: fixed;
+  border: 3px solid #e8c25a;
+  border-radius: 10px;
+  /* The dimming is the ring's own shadow, so that what it rings stays bright. */
+  box-shadow:
+    0 0 0 9999px rgba(12, 16, 10, 0.55),
+    0 0 18px 4px rgba(232, 194, 90, 0.7);
+  pointer-events: none;
+  transition:
+    left 0.35s ease,
+    top 0.35s ease,
+    width 0.35s ease,
+    height 0.35s ease;
+}
+
+.tour-ring.none {
+  inset: 50% auto auto 50%;
+  width: 0;
+  height: 0;
+  border: none;
+}
+
+.tour-guide {
+  position: fixed;
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  cursor: default;
+  animation: tour-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.tour-guide.flip {
+  flex-direction: row-reverse;
+}
+
+@keyframes tour-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.tour-face {
+  flex: none;
+  width: 150px;
+  height: 172px;
+  border: 4px solid var(--paper-raised);
+  border-radius: 8px;
+  background-color: var(--wood);
+  background-size: 260%;
+  background-repeat: no-repeat;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+/* A comic book speech bubble: a thick dark outline, round corners, and a tail pointing back at her. */
+.tour-bubble {
+  position: relative;
+  width: 300px;
+  box-sizing: border-box;
+  margin-top: 14px;
+  padding: 14px 18px;
+  border: 3px solid var(--ink);
+  border-radius: 22px;
+  background: #fffdf6;
+  color: var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.tour-bubble p {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.tour-bubble::before,
+.tour-bubble::after {
+  content: '';
+  position: absolute;
+  top: 26px;
+  border-style: solid;
+}
+
+.tour-bubble::before {
+  left: -22px;
+  border-width: 10px 22px 10px 0;
+  border-color: transparent var(--ink) transparent transparent;
+}
+
+.tour-bubble::after {
+  left: -15px;
+  top: 29px;
+  border-width: 7px 16px 7px 0;
+  border-color: transparent #fffdf6 transparent transparent;
+}
+
+.tour-guide.flip .tour-bubble::before {
+  left: auto;
+  right: -22px;
+  border-width: 10px 0 10px 22px;
+  border-color: transparent transparent transparent var(--ink);
+}
+
+.tour-guide.flip .tour-bubble::after {
+  left: auto;
+  right: -15px;
+  border-width: 7px 0 7px 16px;
+  border-color: transparent transparent transparent #fffdf6;
+}
+
+.tour-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tour-guide {
+    animation: none;
+  }
+
+  .tour-ring {
+    transition: none;
+  }
+}
+
+/*
+  Cards at the back tables. The table, seen from above, is shown whole and as large as the window allows, its shape
+  kept so that the seats stand on its rim whatever the window's; the rest of the window is the same picture, blurred.
+*/
+.poker {
+  background: #120d08;
+}
+
+.poker-backdrop {
+  position: absolute;
+  inset: -40px;
+  background: center / cover no-repeat;
+  filter: blur(18px) brightness(0.55);
+}
+
+.poker-stage {
+  /* The picture's own shape, 1344 by 768. */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(100vw, calc(100vh * 1.75));
+  aspect-ratio: 1344 / 768;
+  background: center / contain no-repeat;
+  transform: translate(-50%, -50%);
+}
+
+.poker-place {
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.poker-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transform: translate(-50%, -50%);
+  color: #f4efe0;
+}
+
+.poker-board {
+  display: flex;
+  gap: 8px;
+}
+
+.poker-board .playing-card {
+  width: 60px;
+  height: 84px;
+  font-size: 1.4rem;
+}
+
+.poker-pot {
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  font-weight: 700;
+}
+
+.poker-street {
+  font-size: 0.875rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.poker-seat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px 8px 8px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background: rgba(16, 12, 8, 0.72);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  color: #f4efe0;
+  transition: opacity 0.2s ease;
+}
+
+.poker-seat.turn {
+  border-color: #e8c25a;
+  box-shadow: 0 0 16px rgba(232, 194, 90, 0.7);
+}
+
+.poker-seat.winner {
+  border-color: #e8c25a;
+  background: rgba(92, 72, 20, 0.85);
+}
+
+.poker-seat.folded {
+  opacity: 0.5;
+}
+
+/* The same crop of the full-body sprite as every portrait in the game, larger. */
+.poker-face {
+  flex: none;
+  width: 104px;
+  height: 124px;
+  border: 3px solid var(--paper-raised);
+  border-radius: 6px;
+  background-color: var(--wood);
+  background-size: 260%;
+  background-repeat: no-repeat;
+}
+
+.poker-face.initial {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--madder-deep);
+  color: var(--paper-raised);
+  font: 600 2.5rem/1 var(--display);
+}
+
+.poker-seat-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 104px;
+}
+
+.poker-seat-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.dealer-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #f4efe0;
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.poker-hole {
+  display: flex;
+  gap: 4px;
+}
+
+.poker-seat-note {
+  display: flex;
+  flex-direction: column;
+  min-height: 2.4em;
+  font-size: 0.8125rem;
+}
+
+.poker-in {
+  opacity: 0.75;
+}
+
+.playing-card {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 44px;
+  height: 62px;
+  border: 1px solid #c9c2ad;
+  border-radius: 6px;
+  background: #fffdf6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+  color: #1d1d1d;
+  font: 700 1.05rem/1.05 var(--ui);
+}
+
+.playing-card.red {
+  color: #b3262d;
+}
+
+.playing-card.down {
+  border-color: #f4efe0;
+  background: repeating-linear-gradient(45deg, var(--madder) 0 5px, var(--madder-deep) 5px 10px);
+}
+
+.playing-card.down.mucked {
+  opacity: 0.4;
+}
+
+.playing-card.slot {
+  border: 1px dashed rgba(244, 239, 224, 0.45);
+  background: rgba(0, 0, 0, 0.12);
+  box-shadow: none;
+}
+
+/* His own seat, at the foot of the table: bigger, so that his cards are easy to read. */
+.poker-place.you .poker-face {
+  width: 120px;
+  height: 144px;
+}
+
+.poker-place.you .playing-card {
+  width: 58px;
+  height: 82px;
+  font-size: 1.35rem;
+}
+
+.poker-purse {
+  margin-right: auto;
+  font: 600 1.75rem/1 var(--display);
+}
+
+.poker-actions {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  max-width: 420px;
+  padding: 12px 16px;
+}
+
+.poker-result {
+  flex: 0 0 100%;
+  margin: 0;
+}
+
+.poker-result .won {
+  color: var(--moss-deep);
+}
+
+.poker-result .lost {
+  color: var(--madder-ink);
+}
+
+/* After a fight won, or a find: a card of what came of it, popping up over the field with what was found laid out in tiles. */
+.below-spoils {
+  position: absolute;
+  top: 46%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  width: min(560px, calc(100vw - 48px));
+  padding: 22px 28px 20px;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 14px 50px rgba(0, 0, 0, 0.65);
+  animation: spoils-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes spoils-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+}
+
+.below-spoils h1 {
+  margin: 0;
+  color: var(--ochre);
+  font-size: 3rem;
+  letter-spacing: 0.04em;
+  text-shadow: 0 2px 0 rgba(122, 84, 24, 0.25);
+}
+
+.below-beaten {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+/* How the party came through: a name, a bar and what is left, for each. */
+.below-standing {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  margin: 4px 0 6px;
+}
+
+.below-standing > div {
+  display: grid;
+  grid-template-columns: 90px 1fr 56px;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+}
+
+.below-standing .below-health {
+  height: 10px;
+  background: rgba(42, 40, 31, 0.15);
+}
+
+.below-standing .below-health > span {
+  background: var(--moss);
+}
+
+.below-loot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 14px;
+  margin-bottom: 6px;
+}
+
+.loot-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 116px;
+  padding: 12px 8px 10px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--paper-raised);
+  box-shadow: inset 0 0 0 3px var(--paper-raised), inset 0 0 0 4px var(--rule-soft);
+  animation: spoils-in-tile 0.45s 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes spoils-in-tile {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.85);
+  }
+}
+
+.loot-tile img {
+  width: 88px;
+  height: 88px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.3));
+}
+
+.loot-tile strong {
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .below-spoils,
+  .loot-tile {
+    animation: none;
+  }
+}
+

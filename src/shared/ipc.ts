@@ -1,12 +1,18 @@
 // Kept free of runtime imports: the sandboxed preload script bundles this file.
+
+/** What a scene reply that the player stopped fails with, so that it is not taken for something gone wrong. */
+export const CHAT_CANCELLED = 'The reply was cancelled.'
 export const IPC = {
   chat: 'ai:chat',
+  /** Stops the scene reply being written, if one is. */
+  cancelChat: 'ai:cancelChat',
   /** Sent to the window while a reply is still being written: the scene is going somewhere, and where. */
   chatMoving: 'ai:chatMoving',
   summarize: 'ai:summarize',
   generateEvents: 'ai:generateEvents',
   planOuting: 'ai:planOuting',
   pickCourses: 'ai:pickCourses',
+  banter: 'ai:banter',
   courier: 'ai:courier',
   feed: 'ai:feed',
   feedPicture: 'ai:feedPicture',

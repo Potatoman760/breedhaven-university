@@ -10,7 +10,12 @@
       "potted-fern",
       "moss-ball",
       "seed-packets",
-      "lavender-soap"
+      "lavender-soap",
+      "first-blossom-bouquet",
+      "dawnbloom-rose",
+      "beeswax-tapers",
+      "charmed-trowel",
+      "moss-terrarium"
     ]
   },
   {
@@ -25,7 +30,11 @@
       "loose-leaf-tea",
       "coffee-beans",
       "spiced-cider",
-      "salt-pretzels"
+      "salt-pretzels",
+      "kharadi-stout",
+      "brown-ale",
+      "apple-tart",
+      "starkeland-honey-drops"
     ]
   },
   {
@@ -40,7 +49,9 @@
       "book-of-hymns",
       "sketchbook",
       "old-map",
-      "playing-cards"
+      "playing-cards",
+      "vesperan-romance",
+      "paint-set"
     ]
   },
   {
@@ -56,7 +67,11 @@
       "whetstone",
       "sword-belt",
       "lockpicks",
-      "glass-vials"
+      "glass-vials",
+      "practice-blade",
+      "banded-agate",
+      "prayer-beads",
+      "match-ball"
     ]
   },
   {
@@ -82,7 +97,9 @@
       "instant-ramen",
       "energy-drink",
       "scratchcard",
-      "phone-charger"
+      "phone-charger",
+      "lantern-row-whisper",
+      "arena-program"
     ]
   },
   {
@@ -119,7 +136,9 @@
       "quartz-point",
       "component-pouch",
       "charm-bracelet",
-      "tarot-deck"
+      "tarot-deck",
+      "ward-candles",
+      "first-rain"
     ]
   },
   {
@@ -145,7 +164,19 @@
       "vintage-scarf",
       "band-tee",
       "worn-leather-jacket",
-      "paperback"
+      "paperback",
+      "veyran-mask"
+    ]
+  },
+  {
+    "id": "spell-and-sip-counter",
+    "name": "The Spell & Sip counter",
+    "description": "Coffee and pastries to take away, rung up by whoever is nearest the till.",
+    "icon": "bottle",
+    "locationId": "spell-and-sip",
+    "itemIds": [
+      "coffee-to-go",
+      "almond-croissant"
     ]
   }
 ]

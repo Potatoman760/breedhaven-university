@@ -892,6 +892,41 @@ directly: nothing in a scene ever calls it, and it talks only to the address you
   game's own files being edited, the editor writes changes there, and otherwise a player's
   changes go into their `comfy.json`, which holds only what differs from the game's.
 
+## Cards
+
+Fixed-limit Texas hold 'em at the Honeyed Bee (`content/default/poker.json`, `src/shared/game/poker.ts`,
+`ui/PokerView.tsx`). A featured button on the day's screen there opens the table while the place is open and he has
+at least the cap on a hand (`canPlayPoker`).
+
+- **Stakes**: blinds of `smallBlind`/`bigBlind` ($1/$2), bets of `smallBet` before the turn and `bigBet` from it
+  ($2/$4), at most `maxBets` bets and raises a street (3), and nobody puts more than `handCap` ($10) into a hand. Since
+  everyone still in has matched the same amount before each street, a call never goes over the cap and there are no
+  side pots.
+- **Who sits**: him, up to `maxLoveInterests` (4, so every seat) of the love interests who are there, those he has
+  met first, and regulars from `regulars` in any of the `seats` (5) left over. Each regular has a `style` (`tight`, `aggressive`, `bluff`); a love interest's is
+  her own, made from her id (`styleOf`).
+- **How they play** (`decide`): her chance of winning against everyone still in, found by dealing the rest out 160
+  times (`equity`), against what calling costs and the pot. Only her own cards and the board go into it.
+- **Money** is settled at the end of each hand (`settlePokerHand`), and getting up takes `hours` (1) off the clock if
+  he played a hand (`leaveTable`). Escape does nothing at the table, so a hand cannot be walked away from.
+
+## Sound
+
+`content/default/sounds.json` says what the game sounds like, and swapping a sound is editing it: point an entry's
+`file` at another file under `content/default/sounds/`, and set its `volume` (0 to 1) and `credit`.
+
+- **Cues** (`cues`, the list is `CUES` in `src/shared/model/sound.ts`): `click` for any button pressed anywhere,
+  `open` and `close` for dialogs, `notice` for a toast, and the rest read off the game state as it changes
+  (`soundCues` in `src/shared/game/sound.ts`): `message` (a DM from her), `coins` (money changed), `door` (arriving
+  somewhere indoors), `skill`, `bond`, `pregnancy` and `birth`. Only the weightiest cue of one change is played, and a
+  notice that comes with an event is not heard over it.
+- **Ambience** (`ambience`, loops by an id of their own) and **places** (location id to an ambience by `day`, and
+  by `night` if it differs): the loop for where he is fades in as he arrives and changes with the dark
+  (`ambienceAt`). A place left out is silent.
+- **Volumes** for effects, ambience and the title music are the Sound tab of Settings, kept on the computer.
+- Everything shipped is CC0 (Kenney's packs for cues, Freesound for ambience), credited in each entry's `credit`.
+  `src/main/content/sounds.test.ts` fails if a cue has no sound, a file is missing or a sound is uncredited.
+
 ## Money
 
 Wages, the rent, a child's keep and the price of every room of the house are balanced

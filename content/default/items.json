@@ -547,8 +547,7 @@
     "icon": "book",
     "appearance": "A hardback history book with a black dust jacket and a plowed furrow emblem in gold.",
     "tags": [
-      "books",
-      "devotional"
+      "books"
     ],
     "image": "sprites/items/heretics-history-cutout.png"
   },
@@ -781,5 +780,270 @@
       "on": "self"
     },
     "image": "sprites/items/stamina-band-cutout.png"
+  },
+  {
+    "id": "first-blossom-bouquet",
+    "name": "First Blossom bouquet",
+    "description": "Seven white blooms and one red, tied the way everyone ties them for the festival.",
+    "price": 9,
+    "icon": "flower",
+    "appearance": "A bouquet of seven white flowers and one red flower, tied with a cream ribbon.",
+    "tags": [
+      "flowers"
+    ],
+    "image": "sprites/items/first-blossom-bouquet-cutout.png"
+  },
+  {
+    "id": "dawnbloom-rose",
+    "name": "Dawnbloom rose",
+    "description": "A single gold-edged rose of the royal strain, grown under licence in the palace nurseries.",
+    "price": 7,
+    "icon": "flower",
+    "appearance": "A single long-stemmed rose with cream petals edged in gold.",
+    "tags": [
+      "flowers"
+    ],
+    "image": "sprites/items/dawnbloom-rose-cutout.png"
+  },
+  {
+    "id": "beeswax-tapers",
+    "name": "Beeswax tapers",
+    "description": "A bundle of hand-dipped candles that smell faintly of honey.",
+    "price": 4,
+    "icon": "gift",
+    "appearance": "A small bundle of tall honey-colored beeswax candles tied with string.",
+    "tags": [
+      "candles"
+    ],
+    "image": "sprites/items/beeswax-tapers-cutout.png"
+  },
+  {
+    "id": "charmed-trowel",
+    "name": "Charmed trowel",
+    "description": "A garden trowel with a growth-charm worked into the handle. Seedlings take to it.",
+    "price": 8,
+    "icon": "plant",
+    "appearance": "A small garden trowel with a polished wooden handle carved with a green glowing rune.",
+    "tags": [
+      "gardening"
+    ],
+    "image": "sprites/items/charmed-trowel-cutout.png"
+  },
+  {
+    "id": "moss-terrarium",
+    "name": "Moss terrarium",
+    "description": "A sealed glass globe of living moss and a single fern, damp and green inside.",
+    "price": 10,
+    "icon": "plant",
+    "appearance": "A round sealed glass globe containing green moss, small stones and a tiny fern.",
+    "tags": [
+      "moss",
+      "plants"
+    ],
+    "image": "sprites/items/moss-terrarium-cutout.png"
+  },
+  {
+    "id": "kharadi-stout",
+    "name": "Bottle of Kharadi stout",
+    "description": "Black, bitter and strong enough to stand a spoon in. Brewed in the holds and proud of it.",
+    "price": 6,
+    "icon": "bottle",
+    "appearance": "A squat dark brown glass bottle of black stout with a red wax seal and a crossed-axes label.",
+    "tags": [
+      "ale"
+    ],
+    "image": "sprites/items/kharadi-stout-cutout.png"
+  },
+  {
+    "id": "brown-ale",
+    "name": "Jug of Seedblossom brown ale",
+    "description": "A stoneware jug of the city's own ale, from the brewery under the railway arches.",
+    "price": 7,
+    "icon": "bottle",
+    "appearance": "A small round stoneware jug with a cork stopper and a simple stamped label.",
+    "tags": [
+      "ale"
+    ],
+    "image": "sprites/items/brown-ale-cutout.png"
+  },
+  {
+    "id": "apple-tart",
+    "name": "Orchard apple tart",
+    "description": "A lowland apple tart in a paper case, glazed and still warm.",
+    "price": 4,
+    "icon": "sweet",
+    "appearance": "A round golden apple tart with glazed apple slices in a fluted paper case.",
+    "tags": [
+      "sweets"
+    ],
+    "image": "sprites/items/apple-tart-cutout.png"
+  },
+  {
+    "id": "starkeland-honey-drops",
+    "name": "Starkeland honey drops",
+    "description": "Hard amber sweets from Hearthspire, wrapped in wax paper. They last forever.",
+    "price": 3,
+    "icon": "sweet",
+    "appearance": "A small pile of round amber honey candies, some wrapped in twisted wax paper.",
+    "tags": [
+      "sweets"
+    ],
+    "image": "sprites/items/starkeland-honey-drops-cutout.png"
+  },
+  {
+    "id": "vesperan-romance",
+    "name": "Vesperan romance novel",
+    "description": "A pirate captain, a stolen Sire, and a great deal of heaving on the high seas. Very popular, never admitted to.",
+    "price": 5,
+    "icon": "book",
+    "appearance": "A paperback romance novel with a dramatic painted cover of a tall ship on stormy seas.",
+    "tags": [
+      "books"
+    ],
+    "image": "sprites/items/vesperan-romance-cutout.png"
+  },
+  {
+    "id": "paint-set",
+    "name": "Bloom-pigment paint set",
+    "description": "Twelve watercolor pans, two of them charged pigments that shimmer when they dry.",
+    "price": 12,
+    "icon": "gift",
+    "appearance": "A small open tin watercolor paint set with twelve colorful pans and a brush, two pans shimmering.",
+    "tags": [
+      "art"
+    ],
+    "image": "sprites/items/paint-set-cutout.png"
+  },
+  {
+    "id": "practice-blade",
+    "name": "Tiltyard practice blade",
+    "description": "A blunted training sword of the kind the cadets drill with. Heavier than it looks.",
+    "price": 13,
+    "icon": "blade",
+    "appearance": "A plain blunted steel training sword with a leather-wrapped grip, laid diagonally.",
+    "tags": [
+      "weapons"
+    ],
+    "image": "sprites/items/practice-blade-cutout.png"
+  },
+  {
+    "id": "banded-agate",
+    "name": "Banded agate",
+    "description": "A slice of agate from the river gravels, ringed like the inside of a tree.",
+    "price": 5,
+    "icon": "stone",
+    "appearance": "A polished slice of agate stone with concentric blue and white bands.",
+    "tags": [
+      "stones"
+    ],
+    "image": "sprites/items/banded-agate-cutout.png"
+  },
+  {
+    "id": "prayer-beads",
+    "name": "Furrow prayer beads",
+    "description": "A loop of seven wooden beads and one of seed-pearl, for counting the morning litany.",
+    "price": 6,
+    "icon": "necklace",
+    "appearance": "A loop of seven polished wooden beads and one pearl bead with a small tassel.",
+    "tags": [
+      "devotional"
+    ],
+    "image": "sprites/items/prayer-beads-cutout.png"
+  },
+  {
+    "id": "match-ball",
+    "name": "Match ball",
+    "description": "A regulation volleyball, signed by nobody yet.",
+    "price": 8,
+    "icon": "gift",
+    "appearance": "A white and blue volleyball.",
+    "tags": [
+      "sport"
+    ],
+    "image": "sprites/items/match-ball-cutout.png"
+  },
+  {
+    "id": "lantern-row-whisper",
+    "name": "The Lantern Row Whisper",
+    "description": "The campus gossip sheet. Half of it is true, and everyone reads all of it.",
+    "price": 1,
+    "icon": "book",
+    "appearance": "A folded cheap tabloid newspaper with the masthead \"WHISPER\" in big letters, blurry photos of women and lines of squiggles for print.",
+    "tags": [
+      "overheard gossip"
+    ],
+    "image": "sprites/items/lantern-row-whisper-cutout.png"
+  },
+  {
+    "id": "arena-program",
+    "name": "Great Arena finals program",
+    "description": "This year's finals, every bout and every fighter, with the odds pencilled in by the last owner.",
+    "price": 4,
+    "icon": "book",
+    "appearance": "A glossy event program booklet with the title \"FINALS\" on the cover above two armored women sparring.",
+    "tags": [
+      "sport"
+    ],
+    "image": "sprites/items/arena-program-cutout.png"
+  },
+  {
+    "id": "ward-candles",
+    "name": "Iscaran ward-candles",
+    "description": "Three violet candles with a small ward cast in the wax. They burn steady in any draught.",
+    "price": 9,
+    "icon": "gift",
+    "appearance": "Three violet candles with small glowing runes pressed into the wax, standing together.",
+    "tags": [
+      "candles"
+    ],
+    "image": "sprites/items/ward-candles-cutout.png"
+  },
+  {
+    "id": "first-rain",
+    "name": "Jar of first rain",
+    "description": "Rain caught in the first storm of spring, sold by the jar for workings that want it.",
+    "price": 6,
+    "icon": "vial",
+    "appearance": "A small clear glass jar of rainwater with a cork lid and a raindrop label, beads of water on the glass.",
+    "tags": [
+      "rain"
+    ],
+    "image": "sprites/items/first-rain-cutout.png"
+  },
+  {
+    "id": "veyran-mask",
+    "name": "Carved Veyran mask",
+    "description": "A painted theater mask from Veyra, fox-faced and grinning. Someone's souvenir, now yours.",
+    "price": 11,
+    "icon": "gift",
+    "appearance": "A carved and painted wooden theater mask of a grinning fox face, red and gold.",
+    "tags": [
+      "art"
+    ],
+    "image": "sprites/items/veyran-mask-cutout.png"
+  },
+  {
+    "id": "coffee-to-go",
+    "name": "Spell & Sip house roast",
+    "description": "A tall coffee to take away, the house roast, in a cup with a heat-charm in the sleeve.",
+    "price": 3,
+    "icon": "bottle",
+    "appearance": "A tall paper takeaway coffee cup with a lid and a cardboard sleeve printed with a small rune.",
+    "tags": [
+      "coffee"
+    ],
+    "image": "sprites/items/coffee-to-go-cutout.png"
+  },
+  {
+    "id": "almond-croissant",
+    "name": "Almond croissant",
+    "description": "Flaky, sticky, and gone by noon most days.",
+    "price": 3,
+    "icon": "sweet",
+    "appearance": "A golden almond croissant dusted with powdered sugar and sliced almonds.",
+    "tags": [
+      "sweets"
+    ],
+    "image": "sprites/items/almond-croissant-cutout.png"
   }
 ]

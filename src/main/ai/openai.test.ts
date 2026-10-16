@@ -91,6 +91,16 @@ describe('chatCompletion', () => {
     expect(JSON.parse(calls[0].init.body as string).temperature).toBe(0.3)
   })
 
+  it('stops when the player cancels, failing with why and not as an endpoint that could not be reached', async () => {
+    const stop = new AbortController()
+    // An endpoint that answers only when the request is given up on, as fetch does.
+    const hanging = ((_url: string, init: RequestInit) =>
+      new Promise((_resolve, reject) => init.signal?.addEventListener('abort', () => reject(new DOMException('aborted', 'AbortError'))))) as typeof fetch
+    const call = chatCompletion(profile, { ...input, signal: stop.signal }, hanging)
+    stop.abort(new Error('The reply was cancelled.'))
+    await expect(call).rejects.toThrow('The reply was cancelled.')
+  })
+
   it('reports HTTP errors with the response body', async () => {
     const { impl } = fakeFetch(401, 'bad key')
     await expect(chatCompletion(profile, input, impl)).rejects.toThrow(
@@ -348,13 +358,14 @@ describe('moving on without everyone', () => {
   it('lets the scene move while some of them stay behind, and never all of them', () => {
     const moves: [string, string[]][] = []
     const tool = moveTool(content, state, group, (d, _hours, staying) => moves.push([d.id, staying]))!
-    expect(tool.description).toContain('name who stays behind')
+    // Whoever goes off her own way is named as well as whoever stays put.
+    expect(tool.description).toContain('she stays here, or goes her own way')
     expect((tool.parameters['properties'] as { staying: { items: { enum: string[] } } }).staying.items.enum).toEqual(['ana', 'bea', 'cy'])
 
-    expect(tool.run({ place: 'shop', staying: ['Bea', 'nobody'] })).toContain('Bea stays behind and is out of the scene')
-    expect(tool.run({ place: 'shop' })).not.toContain('behind')
+    expect(tool.run({ place: 'shop', staying: ['Bea', 'nobody'] })).toContain('Bea does not come along and is out of the scene')
+    expect(tool.run({ place: 'shop' })).not.toContain('out of the scene')
     // Someone has to come along.
-    expect(tool.run({ place: 'shop', staying: ['ana', 'bea', 'cy'] })).not.toContain('behind')
+    expect(tool.run({ place: 'shop', staying: ['ana', 'bea', 'cy'] })).not.toContain('out of the scene')
     expect(moves).toEqual([['shop', ['bea']], ['shop', []], ['shop', []]])
   })
 

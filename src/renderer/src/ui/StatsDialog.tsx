@@ -1,4 +1,4 @@
-import { describeModifier, describeStat, STAT_CAP, STAT_TIERS, statOf, skillProgress, trainingToward } from '../../../shared/game'
+import { describeModifier, describeStat, STAT_CAP, STAT_TIERS, statOf, skillFor, skillProgress, trainingToward } from '../../../shared/game'
 import { STATS, type ContentPack, type GameState } from '../../../shared/model'
 import { Dialog } from './Dialog'
 
@@ -55,7 +55,7 @@ export function StatsDialog({ content, state, onClose }: { content: ContentPack;
       {content.skills.length > 0 && (
         <div className="skill-list">
           <h2>Skills</h2>
-          {/* What he has learnt first, then what he is on the way to, then the rest. */}
+          {/* What he has learnt first, then what the courses he is taking are teaching him, then the rest. */}
           <table>
             <thead>
               <tr>
@@ -67,12 +67,16 @@ export function StatsDialog({ content, state, onClose }: { content: ContentPack;
             </thead>
             <tbody>
               {content.skills
-                .map((skill) => ({ skill, ...skillProgress(state, skill) }))
-                .sort((a, b) => Number(b.has) - Number(a.has) || b.marks - a.marks)
-                .map(({ skill, has, marks, at }) => {
-                  const course = state.courses.find((one) => one.code === skill.code && (skill.level === undefined || one.level === skill.level))
+                .map((skill) => {
+                  // A course of his that teaches it, if he is taking one.
+                  const taking = state.courses.find((one) => state.enrolment?.includes(one.id) && skillFor(content, one)?.id === skill.id)
+                  return { skill, taking, ...skillProgress(state, skill) }
+                })
+                .sort((a, b) => Number(b.has) - Number(a.has) || Number(!!b.taking) - Number(!!a.taking) || b.marks - a.marks)
+                .map(({ skill, taking, has, marks, at }) => {
+                  const course = taking ?? state.courses.find((one) => one.code === skill.code && (skill.level === undefined || one.level === skill.level))
                   return (
-                    <tr key={skill.id} className={has ? 'has' : undefined}>
+                    <tr key={skill.id} className={has ? 'has' : taking ? 'studying' : undefined} title={!has && taking ? `You are learning this in ${taking.number}` : undefined}>
                       <td>
                         <strong>{skill.name}</strong>
                       </td>

@@ -4,10 +4,13 @@ import { errorMessage } from './errors'
 import { Overlay } from './ui/Dialog'
 import { ModelField } from './ModelField'
 import { ComfySetupPanel } from './ui/art/ComfySetup'
+import { setVolume, useVolumes, VOLUME_KINDS, type VolumeKind } from './sound'
 
 // What the settings are for, a tab each.
-const TABS = ['LLMs', 'ComfyUI'] as const
+const TABS = ['LLMs', 'ComfyUI', 'Sound'] as const
 type Tab = (typeof TABS)[number]
+
+const VOLUME_LABELS: Record<VolumeKind, string> = { effects: 'Effects', ambience: 'Ambience', music: 'Music' }
 
 const LABELS: Record<LlmProfileId, { title: string; hint: string }> = {
   main: { title: 'Main LLM', hint: 'Used for all scenes and memory summaries by default.' },
@@ -37,6 +40,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const [status, setStatus] = useState<Partial<Record<LlmProfileId, string>>>({})
   const [busy, setBusy] = useState(false)
   const [tab, setTab] = useState<Tab>('LLMs')
+  const volumes = useVolumes()
 
   useEffect(() => {
     window.api.getSettings().then((view) => setForm(toForm(view)))
@@ -101,6 +105,24 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
           <>
             <ComfySetupPanel connectionOnly />
             <p className="hint">The prompts, the framing of each kind of picture and what each workflow is used for are set in the content editor, under ComfyUI.</p>
+            <div className="actions">
+              <button type="button" className="secondary" onClick={onClose}>
+                Close
+              </button>
+            </div>
+          </>
+        )}
+        {/* How loud each kind of sound is, kept on this computer and applied as the slider moves. */}
+        {tab === 'Sound' && (
+          <>
+            <div className="volumes">
+              {VOLUME_KINDS.map((kind) => (
+                <label key={kind}>
+                  {VOLUME_LABELS[kind]} · {Math.round(volumes[kind] * 100)}%
+                  <input type="range" min={0} max={100} value={Math.round(volumes[kind] * 100)} onChange={(e) => setVolume(kind, Number(e.target.value) / 100)} />
+                </label>
+              ))}
+            </div>
             <div className="actions">
               <button type="button" className="secondary" onClick={onClose}>
                 Close

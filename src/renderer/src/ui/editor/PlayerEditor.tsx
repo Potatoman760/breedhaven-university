@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import type { EditorInfo, EditorResult } from '../../../../shared/editor'
 import { viewImage } from '../../../../shared/game'
-import { LIGHTS, type ContentPack, type NewGame, type Room } from '../../../../shared/model'
+import { LIGHTS, OutfitSchema, type ContentPack, type NewGame, type PlayerLook, type Room } from '../../../../shared/model'
 import { errorMessage } from '../../errors'
 import { ArtTool } from '../art/ArtTool'
 import { Button } from '../Button'
@@ -37,6 +37,9 @@ export function PlayerEditor({ content, onContent, switcher }: Props) {
   // The art tool is open on his room, or its picture is being looked at whole.
   const [drawing, setDrawing] = useState(false)
   const [viewing, setViewing] = useState(false)
+  // Likewise his own picture.
+  const [drawingHim, setDrawingHim] = useState(false)
+  const [viewingHim, setViewingHim] = useState(false)
 
   useEffect(() => {
     window.api.editor.info().then(setInfo, (error) => setStatus(errorMessage(error)))
@@ -50,6 +53,8 @@ export function PlayerEditor({ content, onContent, switcher }: Props) {
     setDraft((current) => ({ ...current, ...patch }))
   }
   const setPlayer = (patch: Partial<NewGame['player']>) => change({ player: { ...draft.player, ...patch } })
+  const look = draft.look
+  const setLook = (patch: Partial<PlayerLook>) => change({ look: { ...look, ...patch } })
   const room = draft.room
   const setRoom = (patch: Partial<Room>) => room && change({ room: { ...room, ...patch } })
   const number = (value: string, least: number) => Math.max(least, Math.floor(Number(value)) || 0)
@@ -91,9 +96,41 @@ export function PlayerEditor({ content, onContent, switcher }: Props) {
     }
   }
 
+  /** Has the user pick a picture of him, which is copied into the add-on folder. */
+  async function uploadHim() {
+    setStatus('')
+    try {
+      const sprite = await window.api.editor.importAsset({ loveInterestId: PLAYER_FILES, kind: 'image' })
+      if (sprite) setLook({ sprite })
+    } catch (error) {
+      setStatus(errorMessage(error))
+    }
+  }
+
   return (
     <main className="editor player-editor">
       {switcher(mayLeave)}
+      {viewingHim && look.sprite && <Lightbox image={look.sprite} name={draft.player.name} onClose={() => setViewingHim(false)} />}
+      {drawingHim && (
+        <ArtTool
+          target={{
+            kind: 'sprite',
+            // Drawn as a character is, from what he looks like and what he wears, in his usual clothes and with a neutral face.
+            who: {
+              id: PLAYER_FILES,
+              name: draft.player.name,
+              pronouns: 'he/him',
+              appearance: look.appearance,
+              outfits: [OutfitSchema.parse({ id: 'default', name: 'Usual clothes', description: look.clothes })],
+              imageSeed: look.imageSeed
+            },
+            outfitId: 'default',
+            expression: 'neutral',
+            onUse: (_outfit, _expression, sprite) => setLook({ sprite })
+          }}
+          onClose={() => setDrawingHim(false)}
+        />
+      )}
       {viewing && room?.background && <Lightbox image={room.background} name={room.name || 'His room'} onClose={() => setViewing(false)} />}
       {drawing && room && (
         <ArtTool
@@ -150,6 +187,57 @@ export function PlayerEditor({ content, onContent, switcher }: Props) {
               llm
               hint="The default: the player can write his own when a game begins. Write {player} for his name."
             />
+          </Group>
+
+          <Group title="His picture" hint="His neutral sprite, drawn as a character's is. His portrait is cut from it wherever one of him is shown.">
+            <Text
+              label="Appearance"
+              value={look.appearance}
+              rows={3}
+              placeholder="a young man of eighteen, tall and lean, short dark hair, grey eyes"
+              onChange={(appearance) => setLook({ appearance })}
+              hint="His body and face, as a picture: no clothes and no name. Sent to ComfyUI as the start of the prompt."
+            />
+            <Text label="Usual clothes" value={look.clothes} placeholder="a navy hoodie over a white t-shirt, dark jeans, sneakers" onChange={(clothes) => setLook({ clothes })} />
+            <div className="row checks">
+              {look.sprite ? (
+                <button type="button" className="sprite-thumb player-sprite" title="Look at the whole picture" onClick={() => setViewingHim(true)}>
+                  <img src={`content://pack/${look.sprite}`} alt={draft.player.name} />
+                </button>
+              ) : (
+                <span className="hint">No picture yet.</span>
+              )}
+              {look.sprite && (
+                <span className="portrait-face player-portrait" role="img" aria-label="His portrait" style={{ backgroundImage: `url("content://pack/${look.sprite}")`, backgroundPosition: `50% ${look.faceY}%` }} />
+              )}
+              <Button title="Draw him with your own ComfyUI, from his appearance and clothes" disabled={look.appearance.trim() === ''} onClick={() => setDrawingHim(true)}>
+                Generate a picture
+              </Button>
+              <Button onClick={uploadHim}>{look.sprite ? 'Replace the picture' : 'Add a picture'}</Button>
+              {look.sprite && (
+                <Button variant="quiet" onClick={() => setLook({ sprite: undefined })}>
+                  Remove the picture
+                </Button>
+              )}
+            </div>
+            <div className="row">
+              <label>
+                How far down the picture his face is: {look.faceY}%
+                <input type="range" min={0} max={100} value={look.faceY} onChange={(e) => setLook({ faceY: Number(e.target.value) })} />
+              </label>
+              <label className="studio-narrow">
+                ImageGen preferred seed
+                <input
+                  inputMode="numeric"
+                  value={look.imageSeed ?? ''}
+                  placeholder="Random"
+                  onChange={(e) => {
+                    const digits = e.target.value.replace(/\D/g, '')
+                    setLook({ imageSeed: digits === '' ? undefined : Number(digits) })
+                  }}
+                />
+              </label>
+            </div>
           </Group>
 
           <Group title="What he starts with" hint="His six stats are not set here: the player spends a pool of points on them when a game begins.">

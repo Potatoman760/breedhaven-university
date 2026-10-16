@@ -37,7 +37,7 @@ function crc(bytes: Buffer): number {
   return (c ^ 0xffffffff) >>> 0
 }
 
-function decodePng(file: Buffer): Raster {
+export function decodePng(file: Buffer): Raster {
   if (!file.subarray(0, 8).equals(SIGNATURE)) throw new Error('not a PNG')
   let width = 0
   let height = 0
@@ -86,7 +86,7 @@ function decodePng(file: Buffer): Raster {
   return { width, height, data: out }
 }
 
-function encodePng(image: Raster): Buffer {
+export function encodePng(image: Raster): Buffer {
   const chunk = (type: string, body: Buffer) => {
     const head = Buffer.alloc(8)
     head.writeUInt32BE(body.length, 0)

@@ -96,8 +96,9 @@ const STOPS_CONTROL = /\[\s*STOPS?[\s_-]*BIRTH[\s_-]*CONTROL\s*(?::\s*([^\]]*?)\
 // [SEX-ACT: id] is the tag for an NSFW sex-act; [POSE: id] and [ANIMATION: id] are its older names, still read.
 const LOOK_TAG = /\[\s*(OUTFIT|EXPRESSION|ANIMATION|POSE|SEX[\s_-]?ACT)\s*:\s*([^\]]*?)\s*\]/gi
 
-// [COMFORT: 3 he keeps asking] or, in a group, [COMFORT: Anwen=2 they are kissing in front of her].
-const COMFORT_TAG = /\[\s*COMFORT\s*:\s*([^\]]*?)\s*\]/gi
+// [COMFORT: 3 he keeps asking] or, in a group, [COMFORT: Anwen=2 they are kissing in front of her]. A model sometimes
+// garbles the word and drops the colon ([COMFassessing the table]); in capitals it is still the tag, and still hidden.
+const COMFORT_TAG = /\[\s*(?:[Cc][Oo][Mm][Ff][Oo][Rr][Tt]\s*:|COMF[A-Z]*\s*:?)\s*([^\]]*?)\s*\]/g
 
 /** Reads the tags the LLM may put in a reply: scene end, outfit, expression and animation. */
 /** A look asked for by name, in a scene with more than one love interest in it. */
@@ -115,7 +116,8 @@ export interface NamedLook {
 export function lookLines(reply: string): string {
   const found: { at: number; tag: string }[] = []
   for (const match of reply.matchAll(LOOK_TAG)) if (match[1].toUpperCase() === 'EXPRESSION') found.push({ at: match.index, tag: match[0] })
-  for (const match of reply.matchAll(COMFORT_TAG)) found.push({ at: match.index, tag: match[0] })
+  // A garbled one is not shown back to be copied.
+  for (const match of reply.matchAll(COMFORT_TAG)) if (/^\[\s*COMFORT\s*:/i.test(match[0])) found.push({ at: match.index, tag: match[0] })
   return found
     .sort((a, b) => a.at - b.at)
     .map(({ tag }) => tag)
@@ -307,6 +309,11 @@ export function dialogueLines(reply: string, cast: Pick<LoveInterest, 'id' | 'na
       const voice = named && voices.find((name) => name.toLowerCase() === named[1].trim().toLowerCase() || last(name) === last(named[1]))
       return voice && named ? { action: false, text: named[2], speakerName: voice } : { action: false, text: line }
     })
+}
+
+/** Who of the cast has a line of her own in a reply, by id: in a group, only she can say she will do something. */
+export function whoSpoke(reply: string, cast: Pick<LoveInterest, 'id' | 'name'>[]): string[] {
+  return [...new Set(dialogueLines(reply, cast).flatMap((line) => line.speakerId ?? []))]
 }
 
 const NO_RELATIONSHIP = { affection: 0, trust: 0, desire: 0 }

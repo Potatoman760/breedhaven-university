@@ -103,6 +103,8 @@ export type Depth = z.infer<typeof DepthSchema>
 /** The rules of going below. A content pack without this has no Undercroft. */
 export const ExpeditionConfigSchema = z.object({
   name: z.string().default('the Undercroft'),
+  /** The picture money that is found is shown with: a pouch of coins, say. */
+  moneyImage: z.string().optional(),
   /** Where the way down is. */
   entryLocationId: z.string(),
   /** The day it is first open on, counted from 1. */
@@ -231,6 +233,8 @@ export const ExpeditionRunSchema = z.object({
   done: z.boolean().default(false),
   /** What there is to say of the stop he is at. */
   note: z.string().default(''),
+  /** What the stop he is at gave up, for the screen that shows it: a fight won, or something lying there. */
+  spoils: FindsSchema.optional(),
   /** Set when it is over and only its reckoning is left. */
   over: z.enum(['won', 'lost', 'left']).optional()
 })

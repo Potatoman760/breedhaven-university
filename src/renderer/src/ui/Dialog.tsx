@@ -1,4 +1,6 @@
 import { useEffect, type ReactNode } from 'react'
+import type { Cue } from '../../../shared/model'
+import { play } from '../sound'
 
 interface DialogProps {
   title: string
@@ -7,6 +9,8 @@ interface DialogProps {
   onClose: () => void
   narrow?: boolean
   wide?: boolean
+  /** What it sounds like to open and to close, where that is not a window's: the bag's. */
+  sounds?: [Cue, Cue]
   /** Leaves out the Close button in its heading, for a dialog whose own buttons include the way out. Escape and a press outside still close it. */
   noClose?: boolean
   children: ReactNode
@@ -16,7 +20,7 @@ interface DialogProps {
  * The dimmed screen a dialog sits on. Pressing it anywhere outside the dialog closes the
  * dialog, and so does Escape.
  */
-export function Overlay({ onClose, children }: { onClose: () => void; children: ReactNode }) {
+export function Overlay({ onClose, sounds = ['open', 'close'], children }: { onClose: () => void; sounds?: [Cue, Cue]; children: ReactNode }) {
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose()
@@ -24,6 +28,11 @@ export function Overlay({ onClose, children }: { onClose: () => void; children: 
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
+  // What it sounds like to open and to close: a window by default, the phone its own.
+  useEffect(() => {
+    play(sounds[0])
+    return () => play(sounds[1])
+  }, [])
 
   return (
     // Only a press that starts on the dimmed part itself counts: one that starts inside
@@ -35,9 +44,9 @@ export function Overlay({ onClose, children }: { onClose: () => void; children: 
 }
 
 /** A framed parchment dialog over a dimmed screen. */
-export function Dialog({ title, note, onClose, narrow, wide, noClose, children }: DialogProps) {
+export function Dialog({ title, note, onClose, narrow, wide, noClose, sounds, children }: DialogProps) {
   return (
-    <Overlay onClose={onClose}>
+    <Overlay onClose={onClose} sounds={sounds}>
       <div className={narrow ? 'dialog narrow' : wide ? 'dialog wide' : 'dialog'}>
         <div className="dialog-head">
           <h1>

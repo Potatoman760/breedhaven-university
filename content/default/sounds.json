@@ -1,0 +1,261 @@
+{
+  "cues": {
+    "click": {
+      "file": "sounds/ui/click.ogg",
+      "volume": 0.4,
+      "credit": "Kenney, Interface Sounds: click_001 (CC0), kenney.nl"
+    },
+    "open": {
+      "file": "sounds/ui/open.ogg",
+      "volume": 0.5,
+      "credit": "Kenney, RPG Audio: cloth2 (CC0), kenney.nl"
+    },
+    "close": {
+      "file": "sounds/ui/close.ogg",
+      "volume": 0.7,
+      "credit": "Kenney, RPG Audio: cloth4 (CC0), kenney.nl"
+    },
+    "phoneOn": {
+      "file": "sounds/ui/phone-on.ogg",
+      "volume": 0.6,
+      "credit": "thegoose09, \"Iphone.wav\" (CC0), https://freesound.org/people/thegoose09/sounds/125384/, the first unlock"
+    },
+    "phoneOff": {
+      "file": "sounds/ui/phone-off.ogg",
+      "volume": 0.6,
+      "credit": "thegoose09, \"Iphone.wav\" (CC0), https://freesound.org/people/thegoose09/sounds/125384/, the first lock"
+    },
+    "bagOpen": {
+      "file": "sounds/ui/bag-open.ogg",
+      "volume": 0.6,
+      "credit": "Fission9, \"Inventory Open\" (CC0), https://freesound.org/people/Fission9/sounds/568992/"
+    },
+    "bagClose": {
+      "file": "sounds/ui/bag-close.ogg",
+      "volume": 0.6,
+      "credit": "Fission9, \"Inventory Close\" (CC0), https://freesound.org/people/Fission9/sounds/568991/"
+    },
+    "cards": {
+      "file": "sounds/poker/cards.ogg",
+      "volume": 0.5,
+      "credit": "Kenney, Casino Audio: card-slide-1 (CC0), kenney.nl"
+    },
+    "chips": {
+      "file": "sounds/poker/chips.ogg",
+      "volume": 0.5,
+      "credit": "Kenney, Casino Audio: chips-stack-1 (CC0), kenney.nl"
+    },
+    "notice": {
+      "file": "sounds/ui/notice.ogg",
+      "volume": 0.5,
+      "credit": "qubodup, \"Good Phone Notification Sound\" (CC0), https://freesound.org/people/qubodup/sounds/782969/"
+    },
+    "message": {
+      "file": "sounds/ui/message.ogg",
+      "volume": 0.7,
+      "credit": "Kenney, Interface Sounds: glass_001 (CC0), kenney.nl"
+    },
+    "coins": {
+      "file": "sounds/ui/coins.ogg",
+      "volume": 0.6,
+      "credit": "Kenney, RPG Audio: handleCoins (CC0), kenney.nl"
+    },
+    "door": {
+      "file": "sounds/ui/door.ogg",
+      "volume": 0.5,
+      "credit": "Kenney, RPG Audio: doorOpen_1 (CC0), kenney.nl"
+    },
+    "skill": {
+      "file": "sounds/events/skill.ogg",
+      "volume": 0.7,
+      "credit": "Kenney, Music Jingles: jingles_PIZZI10 (CC0), kenney.nl"
+    },
+    "bond": {
+      "file": "sounds/events/bond.ogg",
+      "volume": 0.7,
+      "credit": "Kenney, Music Jingles: jingles_PIZZI03 (CC0), kenney.nl"
+    },
+    "pregnancy": {
+      "file": "sounds/events/pregnancy.ogg",
+      "volume": 0.7,
+      "credit": "Kenney, Music Jingles: jingles_PIZZI07 (CC0), kenney.nl"
+    },
+    "birth": {
+      "file": "sounds/events/birth.ogg",
+      "volume": 0.7,
+      "credit": "Kenney, Music Jingles: jingles_PIZZI12 (CC0), kenney.nl"
+    }
+  },
+  "ambience": {
+    "courtyard": {
+      "file": "sounds/ambience/courtyard.ogg",
+      "volume": 0.6,
+      "credit": "larsn.wav, \"Ambient_university_campus.wav\" (CC0), https://freesound.org/people/larsn.wav/sounds/707068/"
+    },
+    "night-outdoor": {
+      "file": "sounds/ambience/night-outdoor.ogg",
+      "volume": 0.4,
+      "credit": "SukritSen, \"Night time crickets, distant dogs and traffic ambience.WAV\" (CC0), https://freesound.org/people/SukritSen/sounds/482687/"
+    },
+    "library": {
+      "file": "sounds/ambience/library.ogg",
+      "volume": 0.6,
+      "credit": "morosopher, \"Library ambience\" (CC0), https://freesound.org/people/morosopher/sounds/173344/"
+    },
+    "dining-hall": {
+      "file": "sounds/ambience/dining-hall.ogg",
+      "volume": 0.6,
+      "credit": "maatre, \"College_Cafeteria\" (CC0), https://freesound.org/people/maatre/sounds/735432/"
+    },
+    "chapel": {
+      "file": "sounds/ambience/chapel.ogg",
+      "volume": 0.6,
+      "credit": "JW_Audio, \"AMBPubl_Lichfield Catherdral, Interior_Recording_02_JW Audio\" (CC0), https://freesound.org/people/JW_Audio/sounds/841923/"
+    },
+    "arena": {
+      "file": "sounds/ambience/arena.ogg",
+      "volume": 0.6,
+      "credit": "bmadore, \"Crowd and field noise before and during homerun hit at MLB baseball stadium\" (CC0), https://freesound.org/people/bmadore/sounds/691975/"
+    },
+    "garden": {
+      "file": "sounds/ambience/garden.ogg",
+      "volume": 0.6,
+      "credit": "puZZelZ, \"AMBIENCESuburban-EXT_Suburban Ambience Took In Garden With Various Birds, Light Traffic_ZT_NONE_24BIT48KHz-STEREO\" (CC0), https://freesound.org/people/puZZelZ/sounds/538598/"
+    },
+    "bathhouse": {
+      "file": "sounds/ambience/bathhouse.ogg",
+      "volume": 0.6,
+      "credit": "xkeril, \"Entrance thermal baths 01\" (CC0), https://freesound.org/people/xkeril/sounds/677262/"
+    },
+    "workshop": {
+      "file": "sounds/ambience/workshop.ogg",
+      "volume": 0.6,
+      "credit": "kyles, \"General Fusion industrial workshop office ambience1 computer room with conversation and heavy workshop bg.wav\" (CC0), https://freesound.org/people/kyles/sounds/450129/"
+    },
+    "clinic": {
+      "file": "sounds/ambience/clinic.ogg",
+      "volume": 0.6,
+      "credit": "gladkiy, \"Suburban hospital ambience - Moscow region, mostly old ladies & gents calmly talking and walking around, door closes, general noises OMNI mics.wav\" (CC0), https://freesound.org/people/gladkiy/sounds/348110/"
+    },
+    "street": {
+      "file": "sounds/ambience/street.ogg",
+      "volume": 0.6,
+      "credit": "SignatureSoundsOrg, \"Giza_Street_Walking_Cairo_Egypt_2\" (CC0), https://freesound.org/people/SignatureSoundsOrg/sounds/869028/"
+    },
+    "pub": {
+      "file": "sounds/ambience/pub.ogg",
+      "volume": 0.6,
+      "credit": "domasmo, \"Pub in Cambridge\" (CC0), https://freesound.org/people/domasmo/sounds/376456/"
+    },
+    "market": {
+      "file": "sounds/ambience/market.ogg",
+      "volume": 0.6,
+      "credit": "ilmari_freesound, \"2022-11-12-binaural-london-market-ambience.wav\" (CC0), https://freesound.org/people/ilmari_freesound/sounds/659634/"
+    },
+    "store": {
+      "file": "sounds/ambience/store.ogg",
+      "volume": 0.6,
+      "credit": "waweee, \"supermarket ambience\" (CC0), https://freesound.org/people/waweee/sounds/370969/"
+    },
+    "cafe": {
+      "file": "sounds/ambience/cafe.ogg",
+      "volume": 0.6,
+      "credit": "samyi, \"Ambience-cafe001.wav\" (CC0), https://freesound.org/people/samyi/sounds/382314/"
+    },
+    "arcade": {
+      "file": "sounds/ambience/arcade.ogg",
+      "volume": 0.6,
+      "credit": "maxstcroix, \"Arcade Ambience 2\" (CC0), https://freesound.org/people/maxstcroix/sounds/343150/"
+    },
+    "gym": {
+      "file": "sounds/ambience/gym.ogg",
+      "volume": 0.6,
+      "credit": "Rinaldobowles56, \"Gym ambience, sound of a gym. recorded on  H6Zoom XY capsule\" (CC0), https://freesound.org/people/Rinaldobowles56/sounds/708087/"
+    },
+    "cinema": {
+      "file": "sounds/ambience/cinema.ogg",
+      "volume": 0.6,
+      "credit": "guidofm, \"AMBPubic_Cinematis_CinemaLobby_Crowd_Hungarian_5_Freebie\" (CC0), https://freesound.org/people/guidofm/sounds/826013/"
+    },
+    "club": {
+      "file": "sounds/ambience/club.ogg",
+      "volume": 0.6,
+      "credit": "LampEight, \"NightclubEntrance_quiet\" (CC0), https://freesound.org/people/LampEight/sounds/178016/"
+    },
+    "river": {
+      "file": "sounds/ambience/river.ogg",
+      "volume": 0.6,
+      "credit": "ykozy, \"forest-river-ambience\" (CC0), https://freesound.org/people/ykozy/sounds/710263/"
+    }
+  },
+  "places": {
+    "great-court": {
+      "day": "courtyard",
+      "night": "night-outdoor"
+    },
+    "library": {
+      "day": "library"
+    },
+    "commons": {
+      "day": "dining-hall"
+    },
+    "chapel": {
+      "day": "chapel"
+    },
+    "tiltyard": {
+      "day": "arena",
+      "night": "night-outdoor"
+    },
+    "physic-garden": {
+      "day": "garden",
+      "night": "night-outdoor"
+    },
+    "bathhouse": {
+      "day": "bathhouse"
+    },
+    "foundry": {
+      "day": "workshop"
+    },
+    "health-centre": {
+      "day": "clinic"
+    },
+    "lantern-row": {
+      "day": "street"
+    },
+    "honeyed-bee-inn": {
+      "day": "pub"
+    },
+    "market": {
+      "day": "market",
+      "night": "night-outdoor"
+    },
+    "bloom-and-co": {
+      "day": "store"
+    },
+    "spell-and-sip": {
+      "day": "cafe"
+    },
+    "pixel-and-rune": {
+      "day": "arcade"
+    },
+    "boba-blossom": {
+      "day": "cafe"
+    },
+    "cauldron": {
+      "day": "cafe"
+    },
+    "ironroot": {
+      "day": "gym"
+    },
+    "lumen": {
+      "day": "cinema"
+    },
+    "undergrowth": {
+      "day": "club"
+    },
+    "riverside-park": {
+      "day": "river",
+      "night": "night-outdoor"
+    }
+  }
+}

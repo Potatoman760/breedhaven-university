@@ -1,21 +1,13 @@
 import { Button } from './Button'
 import { useRef, useState, type FormEvent, type CSSProperties, type KeyboardEvent } from 'react'
-import { MAX_CHILD_NAME, COMFORT_WORDS, hasSkill, attendees, bondLifts, describeBond, describeWhen, statusOf, dialogueLines, firstNames, sceneCast, sceneClock, toDate, weatherOn, wornOutfit, lookOf, spriteFor, npcAsCharacter, playerRoom, roomBackdrop, roomOwner, sceneExtras, unreadNotes } from '../../../shared/game'
+import { MAX_CHILD_NAME, COMFORT_WORDS, hasSkill, attendees, bondLifts, describeBond, describeWhen, statusOf, dialogueLines, firstNames, sceneCast, sceneClock, toDate, weatherOn, wornOutfit, lookOf, spriteFor, npcAsCharacter, playerRoom, roomBackdrop, roomOwner, sceneExtras } from '../../../shared/game'
 import { poseMedia, type ContentPack, type GameState, type LoveInterest, type Scene } from '../../../shared/model'
 import logo from '../../../assets/logo.png'
 import { Wisps } from '../fx/Wisps'
 import { Backdrop } from './Backdrop'
-import {
-  CalendarIcon,
-  ChevronIcon,
-  HideIcon,
-  BagIcon,
-  LogIcon,
-  PhoneIcon,
-  MapIcon,
-  MenuIcon,
-  WeatherIcon
-} from './icons'
+import { DateBanner } from './DateBanner'
+import { NavTiles } from './NavTiles'
+import { ChevronIcon, HaltIcon, HideIcon, LogIcon } from './icons'
 import type { Panel } from './panels'
 
 // What he is taken to say when he ends a shift with the button: enough for the scene to be closed on.
@@ -31,6 +23,9 @@ interface Props {
   /** Where the scene is going, while the reply that takes it there is being written. */
   movingTo: string | null
   notice: string
+  /** Something from outside the scene, put away without leaving it. */
+  aside?: string
+  onDismissAside?: () => void
   /** The character has closed the scene; all that is left is to move on. */
   ended: boolean
   onSend: (text: string) => void
@@ -59,7 +54,7 @@ interface Props {
 }
 
 /** Renders *asterisked* runs inside a spoken line as emphasis. */
-function emphasise(text: string) {
+export function emphasise(text: string) {
   return text
     .split(/(\*[^*]+\*)/)
     .map((part, i) => (/^\*[^*]+\*$/.test(part) ? <em key={i}>{part.slice(1, -1)}</em> : part))
@@ -210,7 +205,9 @@ export function SceneView(props: Props) {
   // scene is with. Nobody, for narration, an action, or a group that has yet to answer.
   // A line said by someone with a voice and no place in the cast, such as the professor of a class: a name on the tab, and no face.
   const voice = waiting ? undefined : line?.speakerName
-  const talking = waiting ? (group ? undefined : partner) : line && !line.action && !voice ? (speaker ?? partner) : undefined
+  // In a group every spoken line names whoever says it, so one that names nobody is narration. Alone with him, it can only be hers.
+  const unnamed = group && line !== undefined && !line.action && !speaker && !voice
+  const talking = waiting ? (group ? undefined : partner) : line && !line.action && !voice && !unnamed ? (speaker ?? partner) : undefined
   const weather = weatherOn(content, state)
   const owner = roomOwner(content, scene)
   // Or the player's own room.
@@ -237,10 +234,12 @@ export function SceneView(props: Props) {
 
 
   return (
-    // A right click anywhere hides the interface to look at the picture, and another brings it back.
+    // A right click anywhere hides the interface to look at the picture, and another brings it back. Not in what he is
+    // typing: there it is the usual menu, with the spelling checker's suggestions.
     <main
       className="stage"
       onContextMenu={(event) => {
+        if (event.target instanceof Element && event.target.closest('input, textarea, [contenteditable="true"]')) return
         event.preventDefault()
         setHidden(!hidden)
       }}
@@ -314,28 +313,13 @@ export function SceneView(props: Props) {
         <button className="unhide" aria-label="Show the interface" onClick={() => setHidden(false)} />
       ) : (
         <>
-          <div className="date-badge">
-            <div className="caps">Day</div>
-            <div className="badge-day">{cardDate.dayIndex + 1}</div>
-            <hr />
-            <div className="badge-date">
-              {cardDate.day} {cardDate.month.name}
-            </div>
-            <div className="caps">{cardDate.weekday}</div>
-            <div className="caps badge-period" title={weather?.name}>
-              {String(cardDate.hour).padStart(2, '0')}:{String(shownAt.minute).padStart(2, '0')}
-              <WeatherIcon kind={weather?.icon} size={20} />
-            </div>
-            {/* Where the scene is, and the class it is when it is one. */}
-            {placeName && (
-              <>
-                <hr />
-                <div className="badge-place">{placeName}</div>
-              </>
-            )}
-            {/* Only while the scene is still in the classroom it began in. */}
-            {scene.lesson && scene.beats.length === 1 && <div className="caps badge-class">{scene.lesson.course}</div>}
-          </div>
+          {/* Where the scene is, and the class it is while it is still in the classroom it began in. */}
+          <DateBanner
+            date={cardDate}
+            minute={shownAt.minute}
+            weather={weather}
+            notes={[`Day ${cardDate.dayIndex + 1} of ${content.calendar.lengthDays}`, placeName, scene.lesson && scene.beats.length === 1 && scene.lesson.course]}
+          />
 
           <div className="textbox-wrap">
             {/* Whoever is speaking, on a tab that stands on the box's top edge. Narration has no speaker, and no tab. */}
@@ -431,6 +415,14 @@ export function SceneView(props: Props) {
                 </Button>
               </form>
             )}
+            {props.aside && (
+              <div className="notice">
+                {props.aside}
+                <Button variant="quiet" size="small" onClick={props.onDismissAside}>
+                  Dismiss
+                </Button>
+              </div>
+            )}
             {notice && (
               <div className="notice">
                 {notice}
@@ -451,6 +443,8 @@ export function SceneView(props: Props) {
               </div>
             ) : line?.action ? (
               <p className="narration action">{line.text}</p>
+            ) : line && unnamed ? (
+              <p className="narration">{emphasise(line.text)}</p>
             ) : line ? (
               <div className="speech">
                 <p>{emphasise(line.text)}</p>
@@ -537,9 +531,25 @@ export function SceneView(props: Props) {
                   placeholder={back > 0 ? 'Say something else here to redo the scene from this point' : `Say something to ${together}, or say goodbye to end the scene`}
                   autoFocus
                 />
-                <button type="submit" disabled={busy} aria-label="Send" className="icon">
-                  <ChevronIcon size={18} />
-                </button>
+                {/* While her reply is being written, the way to stop it: his line comes back to say again or differently. */}
+                {waiting ? (
+                  <button
+                    type="button"
+                    aria-label="Stop the reply"
+                    title="Stop the reply"
+                    className="icon"
+                    onClick={() => {
+                      void window.api.cancelChat()
+                      if (playerLine) setInput(playerLine.content)
+                    }}
+                  >
+                    <HaltIcon size={18} />
+                  </button>
+                ) : (
+                  <button type="submit" disabled={busy} aria-label="Send" className="icon">
+                    <ChevronIcon size={18} />
+                  </button>
+                )}
                 {/* At work, the shift can be brought to its end in a press: he says he is done, and whoever he works for sees him off. */}
                 {scene.shift && back === 0 && (
                   <button type="button" className="secondary end-shift" disabled={busy} onClick={() => onSend(END_SHIFT_LINE)}>
@@ -551,41 +561,27 @@ export function SceneView(props: Props) {
           </div>
           </div>
 
-          <div className="scene-utils">
-            <button className="util glass" onClick={() => onOpen({ kind: 'log' })}>
-              <LogIcon size={18} />
-              Log
-            </button>
-            <button className="util glass" onClick={() => setHidden(true)}>
-              <HideIcon size={18} />
-              Hide
-            </button>
-            <button className="util glass" disabled={busy || ended || scene.npc} onClick={() => onOpen({ kind: 'gifts' })}>
-              <BagIcon size={18} />
-              Bag
-            </button>
-          </div>
-
-          <div className="scene-tiles">
-            <button
-              className="tile glass"
-              aria-label="Phone"
-              onClick={() => onOpen({ kind: 'courier', id: scene.npc ? undefined : partner.id })}
-            >
-              <PhoneIcon size={28} />
-              {unreadNotes(state) > 0 && <span className="badge">{unreadNotes(state)}</span>}
-            </button>
-            <button className="tile glass" aria-label="Calendar" onClick={() => onOpen({ kind: 'calendar' })}>
-              <CalendarIcon size={28} />
-            </button>
-            {/* The map, to see where everyone is: nothing on it can be gone to from inside a scene. */}
-            <button className="tile glass" aria-label="Map" title="Map" onClick={() => onOpen({ kind: 'map' })}>
-              <MapIcon size={28} />
-            </button>
-            <button className="tile glass" aria-label="Menu" title="Menu (Esc)" onClick={() => onOpen({ kind: 'menu' })}>
-              <MenuIcon size={26} />
-            </button>
-          </div>
+          <NavTiles
+            content={content}
+            state={state}
+            onOpen={onOpen}
+            phoneId={scene.npc ? undefined : partner.id}
+            bag={{ kind: 'gifts' }}
+            bagDisabled={busy || ended || scene.npc}
+            extras={
+              <>
+                {/* The scene so far, and the picture without the interface over it. */}
+                <button className="tile-menu glass" onClick={() => onOpen({ kind: 'log' })}>
+                  <LogIcon size={16} />
+                  Log
+                </button>
+                <button className="tile-menu glass" onClick={() => setHidden(true)}>
+                  <HideIcon size={16} />
+                  Hide
+                </button>
+              </>
+            }
+          />
         </>
       )}
       {/* While the scene's opening is being written there is nothing to read yet: the logo stands over it, and goes when the first line is in.

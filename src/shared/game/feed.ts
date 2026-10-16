@@ -256,6 +256,24 @@ export function parseFeedReply(reply: string, plans: PostPlan[]): WrittenPost[] 
   return written
 }
 
+/**
+ * When the reply wrote fewer posts than were asked for, what to tell the player: how many, whose are missing, and
+ * what seems to have happened to them. Nothing when it wrote them all.
+ */
+export function feedShortfall(content: ContentPack, reply: string, plans: PostPlan[], written: WrittenPost[]): string | undefined {
+  if (written.length >= plans.length) return undefined
+  const everyone = [...content.loveInterests, ...content.npcs]
+  const missing = plans.filter((_, index) => !written.some((post) => post.index === index)).map((plan) => everyone.find((c) => c.id === plan.authorId)?.name.split(' ')[0] ?? plan.authorId)
+  const start = reply.indexOf('[')
+  const why =
+    start < 0
+      ? 'its reply had no list of posts in it'
+      : !/\]\s*$/.test(reply.trim())
+        ? 'its reply stopped before the end, most likely out of room'
+        : 'it left some out, or wrote them in a shape that could not be read'
+  return `The LLM wrote ${written.length} of ${plans.length} posts (missing: ${missing.join(', ')}): ${why}.`
+}
+
 /** A planned post with its caption written and the prompt its picture is drawn from: all but the picture. */
 export interface PostDraft extends PostPlan {
   text: string

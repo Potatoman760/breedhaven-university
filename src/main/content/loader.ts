@@ -46,6 +46,8 @@ export function readPack(dir: string): Record<string, unknown> {
     drama: optionalJson(join(dir, 'drama.json')),
     items: optionalJson(join(dir, 'items.json')),
     stalls: optionalJson(join(dir, 'stalls.json')),
+    poker: optionalJson(join(dir, 'poker.json')),
+    sounds: optionalJson(join(dir, 'sounds.json')),
     // What is said under the logo while a scene loads.
     tips: optionalJson(join(dir, 'tips.json')),
     // The course catalogue, once one has been built for the pack.

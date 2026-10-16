@@ -17,8 +17,10 @@ import { LoveInterestSchema } from './loveInterest'
 import { MapSchema } from './map'
 import { NpcSchema, type Npc } from './npc'
 import { OrientationSchema } from './orientation'
+import { PokerConfigSchema } from './poker'
 import { PregnancyConfigSchema } from './pregnancy'
 import { RelationshipConfigSchema } from './relationship'
+import { SoundsSchema } from './sound'
 import { NewGameSchema } from './state'
 import { TraitSchema } from './trait'
 
@@ -62,6 +64,10 @@ export const ContentPackSchema = z.object({
   drama: DramaConfigSchema.optional(),
   items: z.array(ItemSchema).default([]),
   stalls: z.array(StallSchema).default([]),
+  /** Cards for money, at one place. Without it there is no game. */
+  poker: PokerConfigSchema.optional(),
+  /** What the game sounds like: the files played for its cues, and the loops behind each place. */
+  sounds: SoundsSchema.prefault({}),
   /** Without a map the player can't travel, so every activity must be at the starting location. */
   map: MapSchema.optional()
 })
@@ -230,6 +236,15 @@ function checkReferences(pack: ContentPack): string[] {
 
   for (const pin of pack.map?.pins ?? []) need(locations, pin.locationId, 'map.pins', 'location')
 
+  const intro = pack.orientation?.intro
+  if (intro) {
+    if (![...pack.npcs, ...pack.loveInterests].some((character) => character.id === intro.speakerId)) issues.push(`orientation.intro.speakerId: unknown character "${intro.speakerId}"`)
+    intro.scenes.forEach((scene, i) => {
+      const place = pack.locations.find((l) => l.id === scene.locationId)
+      if (!place) issues.push(`orientation.intro.scenes[${i}]: unknown location "${scene.locationId}"`)
+      else if (scene.backgroundId !== undefined && !place.backgrounds.some((view) => view.id === scene.backgroundId)) issues.push(`orientation.intro.scenes[${i}]: "${place.id}" has no view "${scene.backgroundId}"`)
+    })
+  }
   pack.orientation?.steps.forEach((step, i) => {
     need(locations, step.locationId, `orientation.steps[${i}]`, 'location')
     checkHour(step.startHour, `orientation.steps[${i}].startHour`)
@@ -310,6 +325,19 @@ function checkReferences(pack: ContentPack): string[] {
   for (const item of pack.items) made(item.use?.effects ?? [], `items.${item.id}`)
   for (const skill of pack.skills) {
     made(skill.ability?.effects ?? [], `skills.${skill.id}`)
+  }
+
+  if (pack.poker) {
+    need(locations, pack.poker.locationId, 'poker.locationId', 'location')
+    idSet(pack.poker.regulars, 'poker.regulars')
+    if (pack.poker.smallBlind > pack.poker.bigBlind || pack.poker.bigBlind > pack.poker.handCap) issues.push('poker: the blinds must rise and fit under the cap on a hand')
+  }
+
+  const ambience = new Set(Object.keys(pack.sounds.ambience))
+  for (const [locationId, place] of Object.entries(pack.sounds.places)) {
+    need(locations, locationId, `sounds.places.${locationId}`, 'location')
+    need(ambience, place.day, `sounds.places.${locationId}.day`, 'ambience')
+    if (place.night !== undefined) need(ambience, place.night, `sounds.places.${locationId}.night`, 'ambience')
   }
 
   if (pack.pregnancy) {

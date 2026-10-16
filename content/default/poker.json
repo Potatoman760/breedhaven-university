@@ -1,0 +1,89 @@
+{
+  "locationId": "honeyed-bee-inn",
+  "name": "Cards at the back tables",
+  "description": "Fixed-limit hold 'em for small stakes: blinds of $1 and $2, and nobody puts more than $10 into a hand.",
+  "table": "generated/backgrounds/poker/table.webp",
+  "smallBlind": 1,
+  "bigBlind": 2,
+  "smallBet": 2,
+  "bigBet": 4,
+  "maxBets": 3,
+  "handCap": 10,
+  "seats": 5,
+  "maxLoveInterests": 4,
+  "hours": 1,
+  "regulars": [
+    {
+      "id": "old-marta",
+      "name": "Old Marta",
+      "style": {
+        "tight": 0.8,
+        "aggressive": 0.3,
+        "bluff": 0.05
+      }
+    },
+    {
+      "id": "nessa-crane",
+      "name": "Nessa",
+      "style": {
+        "tight": 0.3,
+        "aggressive": 0.8,
+        "bluff": 0.25
+      }
+    },
+    {
+      "id": "juno-ashby",
+      "name": "Juno",
+      "style": {
+        "tight": 0.5,
+        "aggressive": 0.5,
+        "bluff": 0.1
+      }
+    },
+    {
+      "id": "big-tova",
+      "name": "Big Tova",
+      "style": {
+        "tight": 0.2,
+        "aggressive": 0.6,
+        "bluff": 0.15
+      }
+    },
+    {
+      "id": "sister-brannagh",
+      "name": "Sister Brannagh",
+      "style": {
+        "tight": 0.7,
+        "aggressive": 0.2,
+        "bluff": 0.02
+      }
+    },
+    {
+      "id": "dace",
+      "name": "Dace",
+      "style": {
+        "tight": 0.4,
+        "aggressive": 0.7,
+        "bluff": 0.2
+      }
+    },
+    {
+      "id": "professor-holm",
+      "name": "Prof. Holm",
+      "style": {
+        "tight": 0.9,
+        "aggressive": 0.6,
+        "bluff": 0.05
+      }
+    },
+    {
+      "id": "kit-ferrow",
+      "name": "Kit",
+      "style": {
+        "tight": 0.3,
+        "aggressive": 0.3,
+        "bluff": 0.1
+      }
+    }
+  ]
+}

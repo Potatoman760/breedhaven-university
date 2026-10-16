@@ -14,6 +14,8 @@ export interface CompletionInput {
   timeoutMs?: number
   /** Things the model may do before it answers. */
   tools?: LlmTool[]
+  /** Stops the call when the player gives up on it. It then fails with this signal's reason. */
+  signal?: AbortSignal
 }
 
 /** A function the model can call mid-reply. Its result goes back to the model, which then answers. */
@@ -126,9 +128,10 @@ export async function chatCompletion(
             }))
           })
         }),
-        signal: AbortSignal.timeout(input.timeoutMs ?? REQUEST_TIMEOUT_MS)
+        signal: AbortSignal.any([AbortSignal.timeout(input.timeoutMs ?? REQUEST_TIMEOUT_MS), ...(input.signal ? [input.signal] : [])])
       })
     } catch (error) {
+      if (input.signal?.aborted) throw input.signal.reason
       if ((error as Error).name === 'TimeoutError') throw new Error('The LLM took too long to answer')
       const cause = (error as { cause?: Error }).cause
       throw new Error(`Could not reach ${url}: ${cause?.message ?? (error as Error).message}`)
@@ -166,6 +169,8 @@ export async function chatCompletion(
   }
 
   for (let round = 0; ; round++) {
+    // Stopped between rounds, while a tool was being run, it goes no further.
+    input.signal?.throwIfAborted()
     const message = await request()
     const calls = message.tool_calls ?? []
     if (!tools || calls.length === 0) {

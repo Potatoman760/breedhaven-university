@@ -99,7 +99,7 @@ export function HousePanel({ content, state, onChange, onClose }: Props) {
     ...residents.filter(([, key]) => key === r.key).map(([id]) => firstOf(id))
   ]
   /** Who is in a room this hour, wherever she sleeps: the house as it is being lived in. */
-  const present = (r: HouseRoom): string[] => inRoom(content, state, r.key).map((li) => li.name.split(' ')[0])
+  const present = (r: HouseRoom) => inRoom(content, state, r.key)
 
   return (
     <Dialog title={config.name} note={atHome ? 'You are at home' : undefined} onClose={onClose} wide>
@@ -177,9 +177,20 @@ export function HousePanel({ content, state, onChange, onClose }: Props) {
                               style={{ gridColumn: `${r.plan.x + 1} / span ${r.plan.w}`, gridRow: `${r.plan.y + 1} / span ${r.plan.h}` }}
                               onClick={() => setPicked(r.key)}
                             >
-                              <strong>{r.name}</strong>
-                              {tier > 0 && present(r).length > 0 && <span className="house-here">Here now: {present(r).join(', ')}</span>}
-                              <span>{tier < 1 ? `Not built · $${Math.round(r.cost * factor(content, state, 'build'))}` : here.length > 0 ? here.join(', ') : tier > 1 ? r.tiers[tier - 2]?.name : ''}</span>
+                              {/* Whose room it is goes with its name: "The east bedroom (Faye)". */}
+                              <strong>
+                                {r.name}
+                                {tier > 0 && here.length > 0 && ` (${here.join(', ')})`}
+                              </strong>
+                              <span>{tier < 1 ? `Not built · $${Math.round(r.cost * factor(content, state, 'build'))}` : tier > 1 ? r.tiers[tier - 2]?.name : ''}</span>
+                              {/* Who is in it this hour, wherever she sleeps: her face, as on the map. */}
+                              {tier > 0 && present(r).length > 0 && (
+                                <span className="house-here">
+                                  {present(r).map((li) => (
+                                    <Portrait key={li.id} li={li} />
+                                  ))}
+                                </span>
+                              )}
                             </button>
                           )
                         })}

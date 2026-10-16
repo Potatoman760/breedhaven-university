@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   acceptBond,
+  ambienceAt,
+  leaveTable,
+  settlePokerHand,
+  soundCues,
   acceptProposal,
   applyFeelings,
   leaveScene,
@@ -124,8 +128,10 @@ import {
   travel
 } from '../../shared/game'
 import type { Activity, ContentPack, ExamKind, GameState, PostPlan, Scene } from '../../shared/model'
+import { CHAT_CANCELLED } from '../../shared/ipc'
 import { AUTO_SLOT_ID, type SaveData } from '../../shared/saves'
 import { errorMessage } from './errors'
+import { play, setAmbience, useSounds } from './sound'
 import { EpilogueView } from './ui/EpilogueView'
 import { SavesPanel } from './SavesPanel'
 import { SettingsPanel } from './SettingsPanel'
@@ -144,6 +150,8 @@ import { MapPanel } from './ui/MapPanel'
 import { OutingDialog } from './ui/OutingDialog'
 import { ExamDialog } from './ui/ExamDialog'
 import { ExpeditionView } from './ui/ExpeditionView'
+import { IntroView } from './ui/IntroView'
+import { PokerView } from './ui/PokerView'
 import { PartyDialog } from './ui/PartyDialog'
 import type { Panel } from './ui/panels'
 import { SceneView } from './ui/SceneView'
@@ -168,6 +176,7 @@ export function App() {
   useEffect(() => {
     window.api.getContent().then(setContent, (e) => setError(String(e)))
   }, [])
+  useSounds(content?.sounds)
 
   // Each started or loaded game gets a new id so the Game component starts afresh.
   const [session, setSession] = useState<{ id: number; data: SaveData } | null>(null)
@@ -233,6 +242,10 @@ interface GameProps {
   onExit: () => void
 }
 
+// Kept in the save once he has been shown round the course planner, and once he has been welcomed, so that each is shown once a game.
+const COURSES_TOURED = 'toured-courses'
+const WELCOMED = 'welcomed'
+
 // How long a toast stays up, and a notice shown as one.
 const TOAST_MS = 6000
 const NOTICE_MS = 9000
@@ -256,6 +269,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   const [summary, setSummary] = useState<SceneSummary | null>(null)
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState('')
+  // Something to tell him that happened in the background, the feed's posts: never a reason to end a scene, so it is only ever put away.
+  const [aside, setAside] = useState('')
   // The game and the scene as they stood before each line he has said in this scene, newest last, so that a turn can be taken back.
   const [turns, setTurns] = useState<Turn[]>(() => (initial.scene ? unpackTurns(initial.turns ?? [], initial.state, initial.scene) : []))
   useEffect(() => {
@@ -268,6 +283,20 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     const timer = window.setTimeout(() => setToast(null), TOAST_MS)
     return () => window.clearTimeout(timer)
   }, [toast])
+  // What the game sounds like as it goes: a cue for what has just happened, the weightiest of them, and then any notice that came with it.
+  const heard = useRef(state)
+  useEffect(() => {
+    const [cue] = soundCues(content, heard.current, state)
+    heard.current = state
+    if (cue) play(cue)
+  }, [state])
+  useEffect(() => {
+    if (notice || aside || toast) play('notice')
+  }, [notice, aside, toast])
+  // The loop behind where he is, which changes with the place and the dark, and stops when the game is left.
+  const ambience = ambienceAt(content, state)
+  useEffect(() => setAmbience(ambience), [ambience])
+  useEffect(() => () => setAmbience(undefined), [])
   // Outside a scene, a notice is a toast too, since nothing else on the screen would be read: up for a while, and gone at a click.
   useEffect(() => {
     if (!notice || scene) return
@@ -388,18 +417,18 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     drawing.current = true
     for (const plan of plans) triedPlans.current.add(tryKey(plan))
     void (async () => {
-      const { drafts, error } = await window.api.feed({ state, plans })
-      let failed = error ?? (drafts.length < plans.length ? 'the LLM did not write them all.' : undefined)
+      const { drafts, error, shortfall } = await window.api.feed({ state, plans })
+      let failed = error ?? shortfall ?? (drafts.length < plans.length ? `${plans.length - drafts.length} of ${plans.length} posts could not be written.` : undefined)
       for (const draft of drafts) {
         const date = toDate(content.calendar, draft.time)
         const made = await window.api.feedPicture({ authorId: draft.authorId, name: `bloomr-day-${date.dayIndex + 1}-${date.hour}`, prompt: draft.prompt })
         // A post is its picture: one that could not be drawn is not made. Nor is one whose game has been left since.
         if (made.image) setState((current) => (current.weatherSeed === weatherSeed ? postMade(current, { ...draft, image: made.image ?? undefined }) : current))
-        else failed ??= made.error ?? 'a selfie could not be drawn.'
+        else failed ??= `A picture could not be drawn: ${made.error ?? 'ComfyUI gave nothing back'}.`
       }
-      if (failed) setNotice(`Bloomr: some of today's posts could not be made. ${failed}`)
+      if (failed) setAside(`Bloomr: some of today's posts could not be made. ${failed}`)
     })()
-      .catch((error: unknown) => setNotice(`Bloomr: today's posts could not be made. ${(error as Error).message}`))
+      .catch((error: unknown) => setAside(`Bloomr: today's posts could not be made. ${(error as Error).message}`))
       .finally(() => {
         drawing.current = false
         setDrawn((count) => count + 1)
@@ -591,7 +620,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       // Drop the unanswered line so the conversation stays in step.
       if (text !== undefined) setTurns((kept) => kept.slice(0, -1))
       setScene(from)
-      setNotice(text === undefined ? errorMessage(error) : `${errorMessage(error)} Your line was: "${text}"`)
+      // Stopped by the player, it is no failure: his line goes back in the box to say again or differently.
+      if (!errorMessage(error).includes(CHAT_CANCELLED)) setNotice(text === undefined ? errorMessage(error) : `${errorMessage(error)} Your line was: "${text}"`)
     } finally {
       setBusy(false)
       setMovingTo(null)
@@ -922,10 +952,11 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   }
 
   const close = () => setPanel(null)
-  // Escape opens the menu from anywhere in the game. With a dialog up it closes that dialog and no more.
+  // Escape opens the menu from anywhere in the game. With a dialog up it closes that dialog and no more. At the card
+  // table it does nothing, since leaving mid-hand would take back what he had put in.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape' || event.repeat || document.querySelector('.overlay, .lightbox')) return
+      if (event.key !== 'Escape' || event.repeat || document.querySelector('.overlay, .lightbox, .poker')) return
       setPanel({ kind: 'menu' })
     }
     window.addEventListener('keydown', onKey)
@@ -941,6 +972,15 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           content={content}
           state={state}
           onEnrol={(enrolment) => setState({ ...state, enrolment })}
+          toured={state.flags[COURSES_TOURED] === true}
+          onToured={() => setState((current) => ({ ...current, flags: { ...current.flags, [COURSES_TOURED]: true } }))}
+        />
+      ) : content.orientation?.intro && state.orientationStep === 0 && !state.flags[WELCOMED] ? (
+        <IntroView
+          content={content}
+          state={state}
+          intro={content.orientation.intro}
+          onDone={() => setState((current) => ({ ...current, flags: { ...current.flags, [WELCOMED]: true } }))}
         />
       ) : state.expedition.run ? (
         <ExpeditionView content={content} state={state} onChange={setState} />
@@ -975,6 +1015,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           busy={busy}
           movingTo={movingTo}
           notice={notice}
+          aside={aside}
+          onDismissAside={() => setAside('')}
           ended={ended}
           onSend={send}
           onNameChild={(name) => {
@@ -1014,6 +1056,16 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       ) : isGameOver(content.calendar, state.time) ? (
         // The last day of the calendar is over: what became of him.
         <EpilogueView content={content} state={state} onExit={onExit} />
+      ) : panel?.kind === 'poker' && content.poker ? (
+        <PokerView
+          content={content}
+          state={state}
+          onSettle={(hand) => setState((current) => settlePokerHand(current, hand))}
+          onLeave={(hands) => {
+            setState((current) => leaveTable(content, current, hands))
+            setPanel(null)
+          }}
+        />
       ) : (
         <DayView
           content={content}
@@ -1034,7 +1086,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       )}
 
       {panel?.kind === 'gifts' && scene && partner && (
-        <Dialog title="Your bag" onClose={close}>
+        <Dialog title="Your bag" onClose={close} sounds={['bagOpen', 'bagClose']}>
           <Bag
             content={content}
             state={state}
@@ -1052,7 +1104,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
 
       {/* Out of a scene, a thing is used on himself: what is for a woman waits until he is with her. */}
       {panel?.kind === 'bag' && !scene && (
-        <Dialog title="Your bag" onClose={close}>
+        <Dialog title="Your bag" onClose={close} sounds={['bagOpen', 'bagClose']}>
           <Bag content={content} state={state} onUseItem={(itemId) => setState((current) => useItem(content, current, itemId))} onAbility={(skillId) => setState((current) => useAbility(content, current, skillId))} />
         </Dialog>
       )}
@@ -1072,6 +1124,11 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       {!scene && notice && (
         <div className="toast plain" role="status" onClick={() => setNotice('')}>
           <span>{notice}</span>
+        </div>
+      )}
+      {!scene && aside && (
+        <div className="toast plain" role="status" onClick={() => setAside('')}>
+          <span>{aside}</span>
         </div>
       )}
       {toast && (
@@ -1117,12 +1174,6 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
             </button>
           </div>
         </Dialog>
-      )}
-      {/* How the game works, a click away from anywhere in it: in the corner, over the day and over a scene alike. */}
-      {!summary && !isGameOver(content.calendar, state.time) && (
-        <button type="button" className="help-button glass" aria-label="Help" title="Help" onClick={() => setPanel({ kind: 'help' })}>
-          ?
-        </button>
       )}
       {panel?.kind === 'help' && <HelpPanel content={content} state={state} onClose={close} />}
       {panel?.kind === 'menu' && (

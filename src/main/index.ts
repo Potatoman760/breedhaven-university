@@ -1,10 +1,10 @@
-import { app, BrowserWindow, dialog, ipcMain, protocol, safeStorage, shell } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, Menu, protocol, safeStorage, shell, type MenuItemConstructorOptions } from 'electron'
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve, sep } from 'node:path'
 import { z } from 'zod'
 import { chatCompletion, listModels } from './ai/openai'
 import { completeWithFallback, NOT_CONFIGURED } from './ai/router'
-import { leavers, lookLines, namesHer, parseDirectives, sceneCast, sceneWitnesses, validLook } from '../shared/game/scene'
+import { leavers, lookLines, namesHer, parseDirectives, sceneCast, sceneWitnesses, validLook, whoSpoke } from '../shared/game/scene'
 import { canSleepOver } from '../shared/game/sleep'
 import { sexGate } from '../shared/game/intimacy'
 import { CONTENT_SCHEME, resolveContentPath, serveContent } from './content/assets'
@@ -19,18 +19,19 @@ import { SaveStore } from './saves/store'
 import { SettingsStore, type KeyCipher } from './settings/store'
 import { RenameSaveRequestSchema, SaveRequestSchema, SlotIdSchema } from '../shared/saves'
 import { contactsSaid, DM_CLOSE, DM_OPEN, fallbackInvite, messageText } from '../shared/game/courier'
-import { buildFeedPrompt, draftPosts, feedReplyTokens, parseFeedReply } from '../shared/game/feed'
+import { buildFeedPrompt, draftPosts, feedReplyTokens, feedShortfall, parseFeedReply } from '../shared/game/feed'
 import { attendableEvents, buildEventPrompt, parseGeneratedEvents } from '../shared/game/events'
 import { buildSpendingPrompt, buildSummaryPrompt, fallbackSummary, parseSpending, parseSummary, PLAIN_FEELINGS, sceneRapport, sceneRevelations, type Spending, type Summary } from '../shared/game/memory'
 import { npcOf, sceneExtras, withNpc } from '../shared/game/npcs'
 import { sceneHours } from '../shared/game/sceneMoves'
 import { asEventOuting, buildOutingPrompt, fallbackOuting, parseOuting } from '../shared/game/outing'
 import { buildCoursePickPrompt, parseCoursePick, type CoursePick } from '../shared/game/coursePick'
+import { banterDue, buildBanterPrompt, parseBanter } from '../shared/game/banter'
 import { personalise } from '../shared/game/personalise'
 import { withHousing } from '../shared/game/housing'
 import { createInitialState } from '../shared/game/state'
 import { buildCharacterPrompt, clockNote, sceneTurns } from '../shared/game/prompt'
-import { IPC } from '../shared/ipc'
+import { CHAT_CANCELLED, IPC } from '../shared/ipc'
 import {
   CutoutRequestSchema,
   GenerateArtRequestSchema,
@@ -73,6 +74,8 @@ import {
   type FeedResponse,
   PlanOutingRequestSchema,
   PickCoursesRequestSchema,
+  BanterRequestSchema,
+  type BanterResponse,
   type PlanOutingResponse,
   GenerateEventsRequestSchema,
   SceneRequestSchema,
@@ -147,6 +150,31 @@ function createWindow(): void {
   })
 
   win.once('ready-to-show', () => win.show())
+
+  // A window has no right-click menu of its own. Where something is typed, or text is picked out, it gets the usual
+  // one: the spelling checker's suggestions for a misspelt word, then cut, copy and paste.
+  win.webContents.on('context-menu', (_event, params) => {
+    if (!params.isEditable && params.selectionText.trim() === '') return
+    const items: MenuItemConstructorOptions[] = []
+    if (params.misspelledWord) {
+      for (const word of params.dictionarySuggestions) items.push({ label: word, click: () => win.webContents.replaceMisspelling(word) })
+      if (params.dictionarySuggestions.length === 0) items.push({ label: 'No suggestions', enabled: false })
+      items.push(
+        { label: 'Add to dictionary', click: () => win.webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord) },
+        { type: 'separator' }
+      )
+    }
+    if (params.isEditable) {
+      items.push(
+        { role: 'cut', enabled: params.editFlags.canCut },
+        { role: 'copy', enabled: params.editFlags.canCopy },
+        { role: 'paste', enabled: params.editFlags.canPaste },
+        { type: 'separator' },
+        { role: 'selectAll' }
+      )
+    } else items.push({ role: 'copy' })
+    Menu.buildFromTemplate(items).popup({ window: win })
+  })
 
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith('https://')) shell.openExternal(url)
@@ -450,8 +478,13 @@ function registerIpc(
     }
   )
 
+  // The scene reply being written, so that the player can stop it. There is only ever one: he waits for each before saying more.
+  let sceneReply: AbortController | undefined
+  ipcMain.handle(IPC.cancelChat, () => sceneReply?.abort(new Error(CHAT_CANCELLED)))
+
   ipcMain.handle(IPC.chat, async (event, raw: unknown): Promise<ChatResponse> => {
     const { state, scene } = SceneRequestSchema.parse(raw)
+    const stop = (sceneReply = new AbortController())
     // Said to the window the moment a move is called for, while the leaving and arriving are still to be written: it has something to show meanwhile.
     const moving = (where: string) => !event.sender.isDestroyed() && event.sender.send(IPC.chatMoving, where)
     // The content as this game reads it, with the player's name where the content wrote the token.
@@ -510,6 +543,7 @@ function registerIpc(
         })
     const { reply, profileId } = await completeWithFallback(settings.get(), scene.nsfw, {
       system: systemPrompt,
+      signal: stop.signal,
       // With nothing said yet, the character opens the scene.
       messages: sceneTurns(scene.messages, state.player.name, scene.lesson, clockNote(content, state)),
       // The lecture a class opens with is several times the length of an ordinary reply.
@@ -548,12 +582,15 @@ function registerIpc(
       const said = leaving.find((one) => idOf(one.name) === goers[0])
       left = { ids: goers, feeling: said?.feeling ?? 'content', reason: said?.reason ?? '' }
     }
-    // Who the reply says will be at an event: only events that can be gone to, by people who are here.
+    // Who the reply says will be at an event: only events that can be gone to, by people who are here. In a group, only
+    // by those who said so themselves: a model asked whether one of them is coming writes the tag for all of them.
     const goable = attendableEvents(content, state)
+    const spoke = whoSpoke(text, present.flatMap((id) => cast.loveInterests.find((c) => c.id === id) ?? []))
     const attending = npc
       ? []
       : saidGoing.flatMap((one) => {
           const id = idOf(one.name)
+          if (id && present.length > 1 && !spoke.includes(id)) return []
           const event = goable.find((e) => e.id.toLowerCase() === one.eventId || e.name.toLowerCase().replace(/^the /, '') === one.eventId.replace(/^the /, ''))
           return id && event ? [{ eventId: event.id, ids: [id] }] : []
         })
@@ -707,7 +744,8 @@ function registerIpc(
     try {
       const { system, user } = buildFeedPrompt(content, state, planned)
       const reply = await chatCompletion(profile, { system, messages: [{ role: 'user', content: user }], maxTokens: Math.max(profile.maxTokens, feedReplyTokens(planned)) })
-      return { drafts: draftPosts(content, state, planned, parseFeedReply(reply, planned), framingFor(comfy.get(), 'photo')) }
+      const written = parseFeedReply(reply, planned)
+      return { drafts: draftPosts(content, state, planned, written, framingFor(comfy.get(), 'photo')), shortfall: feedShortfall(content, reply, planned, written) }
     } catch (error) {
       return { drafts: [], error: (error as Error).message }
     }
@@ -736,6 +774,20 @@ function registerIpc(
       return { outing: asEventOuting(content, state, parseOuting(reply, content, state, text)) }
     } catch (error) {
       return { outing: asEventOuting(content, state, fallbackOuting(content, state, text)), error: (error as Error).message }
+    }
+  })
+
+  // Never fails: a fight below begins whether or not anyone has anything to say about it.
+  ipcMain.handle(IPC.banter, async (_event, raw: unknown): Promise<BanterResponse> => {
+    const { state, moment } = BanterRequestSchema.parse(raw)
+    const content = readBy(state)
+    if (!banterDue(content, state, moment)) return { lines: [] }
+    try {
+      const { system, user } = buildBanterPrompt(content, state, moment)
+      const { reply } = await completeWithFallback(settings.get(), false, { system, messages: [{ role: 'user', content: user }] })
+      return { lines: parseBanter(reply, content, state) }
+    } catch {
+      return { lines: [] }
     }
   })
 

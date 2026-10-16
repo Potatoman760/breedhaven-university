@@ -23,7 +23,9 @@ export const PlayerSchema = z.object({
    * him. The content has one to start from, and the player may write his own when a game
    * begins; a game keeps the one it began with. `{player}` in it stands for his name.
    */
-  bio: z.string().default('')
+  bio: z.string().default(''),
+  /** What the player added to it when the game began, told along with it. `{player}` stands for his name here too. */
+  about: z.string().default('')
 })
 export type Player = z.infer<typeof PlayerSchema>
 
@@ -158,8 +160,27 @@ export const GameStateSchema = z.object({
 export type GameState = z.infer<typeof GameStateSchema>
 
 /** The starting player and location for a new game. */
+/**
+ * What he looks like, for pictures of him: written as an image model is given a character, and his neutral sprite,
+ * from which his portrait is cut wherever one is shown.
+ */
+export const PlayerLookSchema = z.object({
+  /** His body and face, as a picture: no clothes, no name. */
+  appearance: z.string().default(''),
+  /** What he usually wears. */
+  clothes: z.string().default(''),
+  /** His neutral sprite: a picture in the pack. */
+  sprite: z.string().optional(),
+  /** How far down the sprite his face is, for the portrait cut from it. */
+  faceY: z.number().min(0).max(100).default(4),
+  /** The seed the art tool draws him with, so that one picture of him looks like the next. */
+  imageSeed: z.number().int().optional()
+})
+export type PlayerLook = z.infer<typeof PlayerLookSchema>
+
 export const NewGameSchema = z.object({
   player: PlayerSchema,
+  look: PlayerLookSchema.prefault({}),
   locationId: z.string(),
   /** His own room: somewhere private a scene can go, with artwork of its own, as a love interest's is. */
   room: RoomSchema.optional()

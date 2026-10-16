@@ -11,7 +11,7 @@ import {
   handleOf,
   markFeedSeen,
   unreadPosts,
-  parseFeedReply,
+  feedShortfall, parseFeedReply,
   postMade,
   recentPostsBy,
   toggleLike
@@ -179,6 +179,15 @@ function toHour(time: number): number {
 
 describe('a reply that ran out of room', () => {
   const plans = [1, 2, 3, 4, 5].map((time) => ({ authorId: 'ana', time }))
+
+  it('says how many were written, whose are missing and what seems to have happened', () => {
+    const cut = '[{"n":1,"text":"Rain again.","picture":"she holds up a cup"}, {"n":2,"text":"Half'
+    expect(feedShortfall(content, cut, plans.slice(0, 2), parseFeedReply(cut, plans.slice(0, 2)))).toBe('The LLM wrote 1 of 2 posts (missing: Ana): its reply stopped before the end, most likely out of room.')
+    const short = '[{"n":1,"text":"Rain again."}]'
+    expect(feedShortfall(content, short, plans.slice(0, 2), parseFeedReply(short, plans.slice(0, 2)))).toContain('it left some out')
+    expect(feedShortfall(content, 'Sorry, I cannot.', plans.slice(0, 1), [])).toContain('its reply had no list of posts in it')
+    expect(feedShortfall(content, short, plans.slice(0, 1), parseFeedReply(short, plans.slice(0, 1)))).toBeUndefined()
+  })
 
   it('is given room for every post asked for, and still gives the posts it finished', () => {
     expect(feedReplyTokens(plans)).toBeGreaterThanOrEqual(1800)

@@ -46,7 +46,7 @@ describe('the player in the content', () => {
 })
 
 describe('who the player is', () => {
-  it('is his bio, told to every character under his own name, and nothing when there is none', () => {
+  it('is his bio and what the player added to it, told to every character under his own name, and nothing when there is none', () => {
     const base = fixture()
     const written = { ...base, newGame: { ...base.newGame, player: { ...base.newGame.player, bio: `${PLAYER_TOKEN} is nineteen and new in town.` } } }
     // The content's own, under the name he chose when the game began.
@@ -55,12 +55,10 @@ describe('who the player is', () => {
     const prompt = buildCharacterPrompt({ content: read, state, loveInterestId: 'ana' })
     expect(prompt).toContain('## About Wren\nWren is nineteen and new in town.')
     expect(buildCharacterPrompt({ content: base, state: createInitialState(base), loveInterestId: 'ana' })).not.toContain('## About')
-    // What the player wrote of himself when the game began takes the place of the content's own, for that game.
+    // What the player wrote of himself when the game began is told after the content's own, which stays.
     const own = createInitialState(written, 'Wren', 0, undefined, ` ${PLAYER_TOKEN} grew up on a barge. `)
-    expect(own.player.bio).toBe(`${PLAYER_TOKEN} grew up on a barge.`)
-    expect(buildCharacterPrompt({ content: read, state: own, loveInterestId: 'ana' })).toContain('## About Wren\nWren grew up on a barge.')
-    // Cleared, nothing is said of him.
-    expect(buildCharacterPrompt({ content: read, state: createInitialState(written, 'Wren', 0, undefined, ''), loveInterestId: 'ana' })).not.toContain('## About')
+    expect(own.player).toMatchObject({ bio: `${PLAYER_TOKEN} is nineteen and new in town.`, about: `${PLAYER_TOKEN} grew up on a barge.` })
+    expect(buildCharacterPrompt({ content: read, state: own, loveInterestId: 'ana' })).toContain('## About Wren\nWren is nineteen and new in town.\nWren grew up on a barge.')
   })
 
   it('is said in his bio and not in the codex, which every character is given whole', () => {

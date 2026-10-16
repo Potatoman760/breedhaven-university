@@ -218,9 +218,9 @@ export function moveTool(
       `${doing ? `"${doing}"` : 'what you were doing'} here. It moves you and ${player} only: you cannot send ` +
       `${player} off alone or bring anyone who is not already with you. ` +
       (group
-        ? `Everyone in the scene comes along unless you name who stays behind in "staying": when ${player} leaves with ` +
-          `only one or some of you ("I leave with Ana"), call this and name every one of the others there. ` +
-          `Whoever stays behind is out of the scene from then on and you stop writing for her. `
+        ? `Everyone in the scene comes along unless you name in "staying" whoever does not: she stays here, or goes her own way ` +
+          `(to class, to practice, home). When ${player} leaves with only one or some of you ("I leave with Ana"), name every one of the others. ` +
+          `Whoever is named is out of the scene from then on and you stop writing for her. `
         : '') +
       `Call it before you write the reply, ` +
       `then write the two of you leaving and arriving. Never say you have gone somewhere without calling it. ` +
@@ -252,7 +252,7 @@ export function moveTool(
                 type: 'array',
                 maxItems: cast.length - 1,
                 items: { type: 'string', enum: cast },
-                description: `Who does not come along and is left behind here, out of the scene. Leave out when everyone goes. Whoever ${player} is leaving with is never named here.`
+                description: `Who does not come along, whether she stays here or goes off elsewhere: out of the scene. Leave out when everyone goes. Whoever ${player} is leaving with is never named here.`
               }
             }
           : {})
@@ -301,7 +301,7 @@ export function moveTool(
         `It is ${destination.indoors ? 'indoors' : 'out of doors'}` +
         `${weather ? `, and the weather is: ${weather.name}` : ''}. ` +
         `${doing ? `"${doing}" is over. ` : ''}` +
-        (behind.length > 0 ? `${firstNames(content, behind)} stay${behind.length === 1 ? 's' : ''} behind and ${behind.length === 1 ? 'is' : 'are'} out of the scene: give ${behind.length === 1 ? 'her' : 'them'} a last line as you go, and no more after it. ` : '') +
+        (behind.length > 0 ? `${firstNames(content, behind)} ${behind.length === 1 ? 'does' : 'do'} not come along and ${behind.length === 1 ? 'is' : 'are'} out of the scene: give ${behind.length === 1 ? 'her' : 'them'} a last line as you go, and no more after it. ` : '') +
         `Write leaving and arriving, in character.`
       )
     }

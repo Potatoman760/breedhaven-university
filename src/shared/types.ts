@@ -1,3 +1,4 @@
+import { BANTER_MOMENTS, type BanterLine } from './game/banter'
 import type { CoursePick } from './game/coursePick'
 import { z } from 'zod'
 import type { LoveInterest } from './model'
@@ -111,6 +112,15 @@ export interface PlanOutingResponse {
 export const PickCoursesRequestSchema = z.object({ state: GameStateSchema, text: z.string().min(1).max(500) })
 export type PickCoursesRequest = z.infer<typeof PickCoursesRequestSchema>
 
+/** The game as a fight below begins, for the party's few words before it. */
+export const BanterRequestSchema = z.object({ state: GameStateSchema, moment: z.enum(BANTER_MOMENTS).default('before') })
+export type BanterRequest = z.input<typeof BanterRequestSchema>
+
+export interface BanterResponse {
+  /** What was said, in order. None when the LLM could not be used, or said nothing that could be read. */
+  lines: BanterLine[]
+}
+
 export const CourierRequestSchema = z.object({
   state: GameStateSchema,
   loveInterestId: z.string(),
@@ -149,6 +159,8 @@ export interface FeedResponse {
   drafts: PostDraft[]
   /** Why there are none: the Main LLM or ComfyUI is not set up, or the LLM could not be reached. */
   error?: string
+  /** Why there are fewer than were planned, when some were written and some were not. */
+  shortfall?: string
 }
 
 export const FeedPictureRequestSchema = z.object({
@@ -174,6 +186,8 @@ export interface TestConnectionResponse {
 export interface RendererApi {
   getContent(): Promise<ContentPack>
   chat(request: SceneRequest): Promise<ChatResponse>
+  /** Stops the scene reply being written. The call to chat then fails with CHAT_CANCELLED. */
+  cancelChat(): Promise<void>
   /**
    * Hears, while a reply is still being written, that the scene is going somewhere: the character has called for the move and
    * the leaving and arriving are being written. Given what to say of it: "Going to the Library". Returns what stops the listening.
@@ -187,6 +201,8 @@ export interface RendererApi {
   planOuting(request: PlanOutingRequest): Promise<PlanOutingResponse>
   /** Has the LLM choose his courses from what he says he wants. Rejects when it cannot be reached, or names nothing he can take. */
   pickCourses(request: PickCoursesRequest): Promise<CoursePick>
+  /** Has the party say a few words as a fight below begins. Never rejects: without an LLM they say nothing. */
+  banter(request: BanterRequest): Promise<BanterResponse>
   /**
    * Has a love interest write a message in Bloomr DMs: an answer to the player's latest (rejects
    * if the LLM can't be reached), or an unprompted invitation (never rejects).

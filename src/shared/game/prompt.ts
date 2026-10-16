@@ -326,7 +326,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
     ]),
 
     // Who he is, as anyone who has heard of him knows it.
-    section(`About ${player.name}`, [player.bio.split(PLAYER_TOKEN).join(player.name)]),
+    section(`About ${player.name}`, [player.bio, player.about].map((text) => text.split(PLAYER_TOKEN).join(player.name))),
 
     !isNpc && section(`Your relationship with ${player.name}`, [
       `Stage: ${stage.name}. ${stage.description}`.trim(),
@@ -580,7 +580,8 @@ export function buildCharacterPrompt(input: PromptInput): string {
         }),
         group
           ? `At 3 she lets it show; at 2 she says so. At 1, or at 2 twice running with nothing better, she leaves: write her going and add [LEAVES: Name=feeling a few words why] on a line of its own at the end, ` +
-            `the feeling being content, hurt or angry: [LEAVES: ${cast[1]?.name.split(' ')[0] ?? 'Name'}=hurt saw she was not wanted]. The scene goes on with whoever stays. If it is all of you, end the scene instead.`
+            `the feeling being content, hurt or angry: [LEAVES: ${cast[1]?.name.split(' ')[0] ?? 'Name'}=hurt saw she was not wanted]. The scene goes on with whoever stays. If it is all of you, end the scene instead. ` +
+            `Whenever one of you goes for any other reason (a class, practice, home), the same: [LEAVES: Name=content a few words why].`
           : `At 3 let it show; at 2 say so. At 1, or at 2 twice running with nothing better, leave: make your excuse and end the scene.`,
         'Never mention these lines or the number.'
       ]),
@@ -633,7 +634,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
             `If he turns it down, let it go. Do not call propose_meeting again for the same thing.`,
         attendableEvents(content, state).length > 0 &&
           `Telling ${player.name} you will be at an event is not a plan and needs no tool: when you say you are going, or agree when he asks whether you will be there, write [ATTENDING: id]` +
-            `${group ? ' (in a group, [ATTENDING: Name=id])' : ''} on a line of its own at the end of the reply, and you will be there when he goes. The ids: ` +
+            `${group ? ' (in a group, [ATTENDING: Name=id] for each who says she is going herself; asked one of you, only she answers)' : ''} on a line of its own at the end of the reply, and you will be there when he goes. The ids: ` +
             `${attendableEvents(content, state).map((event) => `${event.id} is ${event.name}`).join('; ')}.`
       ]),
 

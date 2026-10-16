@@ -166,7 +166,7 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, onGoT
   }
 
   return (
-    <Overlay onClose={onClose}>
+    <Overlay onClose={onClose} sounds={['phoneOn', 'phoneOff']}>
       <div className="phone">
         <nav className="phone-rail" role="tablist" aria-orientation="vertical">
           <button className="phone-back" aria-label="Put the phone away" onClick={onClose}>

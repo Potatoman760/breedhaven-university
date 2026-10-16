@@ -142,6 +142,20 @@ export const ChevronIcon = (p: IconProps) => (
   </Icon>
 )
 
+export const HelpIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 18 18" strokeWidth={1.8} {...p}>
+    <circle cx="9" cy="9" r="7.5" />
+    <path d="M6.8 7a2.3 2.3 0 014.4.9c0 1.5-2.2 1.9-2.2 3.2" />
+    <circle cx="9" cy="13.4" r="0.4" fill="currentColor" />
+  </Icon>
+)
+
+export const HaltIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 18 18" {...p}>
+    <rect x="4" y="4" width="10" height="10" rx="1.5" fill="currentColor" />
+  </Icon>
+)
+
 // Item and stall icons, drawn on a 24-unit grid and looked up by the name used in content.
 const ITEM_ICONS: Record<string, ReactNode> = {
   gift: (

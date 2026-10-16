@@ -5,6 +5,7 @@ import type { RendererApi } from '../shared/types'
 const api: RendererApi = {
   getContent: () => ipcRenderer.invoke(IPC.getContent),
   chat: (request) => ipcRenderer.invoke(IPC.chat, request),
+  cancelChat: () => ipcRenderer.invoke(IPC.cancelChat),
   onSceneMoving: (listener) => {
     const heard = (_event: unknown, where: string) => listener(where)
     ipcRenderer.on(IPC.chatMoving, heard)
@@ -14,6 +15,7 @@ const api: RendererApi = {
   generateEvents: (request) => ipcRenderer.invoke(IPC.generateEvents, request),
   planOuting: (request) => ipcRenderer.invoke(IPC.planOuting, request),
   pickCourses: (request) => ipcRenderer.invoke(IPC.pickCourses, request),
+  banter: (request) => ipcRenderer.invoke(IPC.banter, request),
   courier: (request) => ipcRenderer.invoke(IPC.courier, request),
   feed: (request) => ipcRenderer.invoke(IPC.feed, request),
   feedPicture: (request) => ipcRenderer.invoke(IPC.feedPicture, request),

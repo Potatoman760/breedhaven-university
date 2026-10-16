@@ -42,23 +42,16 @@ import {
   type Upcoming,
   stageFor,
   toDate,
-  unreadNotes,
+  canPlayPoker,
   weatherOn,
   roomBackdrop
 } from '../../../shared/game'
 import { MAX_SCENE_CAST, STAT_LABELS, STATS, type Activity, type ContentPack, type Focus, type GameState } from '../../../shared/model'
 import { ActivityList } from './ActivityList'
 import { Backdrop } from './Backdrop'
-import {
-  CalendarIcon,
-  ChevronIcon,
-  MapIcon,
-  MenuIcon,
-  BagIcon,
-  PhoneIcon,
-  WeatherIcon,
-  JobIcon
-} from './icons'
+import { DateBanner } from './DateBanner'
+import { NavTiles } from './NavTiles'
+import { ChevronIcon } from './icons'
 import type { Panel } from './panels'
 
 interface Props {
@@ -171,21 +164,7 @@ export function DayView(props: Props) {
         </div>
       )}
 
-      <div className="date-banner glass framed">
-        <div className="weather" title={weather?.name}>
-          <WeatherIcon kind={weather?.icon} size={28} />
-        </div>
-        <div>
-          <div className="date-line">
-            {date.weekday}, {date.day} {date.month.name} · {formatTime(date)}
-          </div>
-          <div className="caps">
-            Day {date.dayIndex + 1} of {calendar.lengthDays}
-            {today.map((e) => ` · ${e.name}`)}
-            {location && ` · ${location.name}`}
-          </div>
-        </div>
-      </div>
+      <DateBanner date={date} weather={weather} notes={[`Day ${date.dayIndex + 1} of ${calendar.lengthDays}`, ...today.map((e) => e.name), location?.name]} />
 
       <div className="plaque glass">
         <div className="caps underline">Money</div>
@@ -195,9 +174,6 @@ export function DayView(props: Props) {
         </div>
         <div className="meter">
           <div style={{ width: `${(player.energy / player.maxEnergy) * 100}%` }} />
-        </div>
-        <div className="caps">
-          Carrying {Object.values(state.inventory).reduce((total, count) => total + count, 0)}
         </div>
         <button type="button" className="stat-grid" aria-label="Your stats in full" onClick={() => setStatSheet(true)}>
           {STATS.map((stat) => (
@@ -358,6 +334,18 @@ export function DayView(props: Props) {
             </p>
           )
         })}
+
+        {/* Cards for money, where there is a game. */}
+        {!locked && !over && content.poker && state.locationId === content.poker.locationId && (
+          <button className="featured" disabled={props.busy || !canPlayPoker(content, state).ok} title={canPlayPoker(content, state).reasons.join(' · ') || content.poker.description} onClick={() => onOpen({ kind: 'poker' })}>
+            <span className="chip outline-light">Cards</span>
+            <span className="featured-title">{content.poker.name}</span>
+            <span>
+              ${content.poker.smallBlind}/${content.poker.bigBlind} · ${content.poker.handCap} a hand at most
+            </span>
+            <ChevronIcon size={18} />
+          </button>
+        )}
 
         {/* The way down, where it is, once he has been told of it. */}
         {!locked && !over && content.expedition && state.expedition.invited && state.locationId === content.expedition.entryLocationId && (
@@ -569,39 +557,7 @@ export function DayView(props: Props) {
         </form>
       </div>
 
-      <div className="tiles">
-        {/* His house, once he has one: its plan, who lives in it, and its accounts. */}
-        {content.housing && state.housing.status === 'resident' && (
-          <button className="tile glass home" onClick={() => onOpen({ kind: 'house' })}>
-            <JobIcon name="house" size={30} />
-            {content.housing.name}
-            {state.housing.arrears > 0 && <span className="badge">!</span>}
-          </button>
-        )}
-        <button className="tile glass" onClick={() => onOpen({ kind: 'map' })}>
-          <MapIcon size={36} />
-          Map
-        </button>
-        <button className="tile glass" onClick={() => onOpen({ kind: 'courier' })}>
-          <PhoneIcon size={36} />
-          Phone
-          {unreadNotes(state) > 0 && <span className="badge">{unreadNotes(state)}</span>}
-        </button>
-        <button className="tile glass" onClick={() => onOpen({ kind: 'calendar' })}>
-          <CalendarIcon size={36} />
-          Calendar
-        </button>
-        {/* What he carries, can make and has brought up from below. */}
-        <button className="tile glass" onClick={() => onOpen({ kind: 'bag' })}>
-          <BagIcon size={36} />
-          Bag
-        </button>
-        {/* The menu, for whoever does not reach for Escape: continue, save, load, settings, and the way out. Small, and last, so that it sits in the corner. */}
-        <button className="tile-menu glass" title="Menu (Esc)" onClick={() => onOpen({ kind: 'menu' })}>
-          <MenuIcon size={18} />
-          Menu
-        </button>
-      </div>
+      <NavTiles content={content} state={state} onOpen={onOpen} home />
 
     </main>
   )

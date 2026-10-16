@@ -145,7 +145,7 @@ export function describeFinds(content: ContentPack, finds: Finds): string {
 function arrive(content: ContentPack, state: GameState, run: ExpeditionRun): ExpeditionRun {
   const config = content.expedition!
   const node = depthAt(config, run).nodes[run.node]
-  if (node.kind === 'find') return { ...run, fight: undefined, done: true, found: add(run.found, node.finds), note: `${node.name || 'Something left behind'}: ${describeFinds(content, node.finds)}.` }
+  if (node.kind === 'find') return { ...run, fight: undefined, done: true, found: add(run.found, node.finds), spoils: node.finds, note: `${node.name || 'Something left behind'}: ${describeFinds(content, node.finds)}.` }
   if (node.kind === 'checkpoint') {
     const rested = run.party.map((fighter) => ({ ...fighter, footing: Math.min(fighter.max, Math.round(fighter.footing + fighter.max * config.checkpointRest)) }))
     return { ...run, fight: undefined, done: true, party: rested, banked: add(run.banked, run.found), found: NOTHING, note: `${node.name || 'A dry ledge'}. You catch your breath, and what you have found is safe.` }
@@ -188,7 +188,7 @@ export function startRun(content: ContentPack, state: GameState, partyIds: strin
 export function goOn(content: ContentPack, state: GameState): GameState {
   const run = state.expedition.run
   if (!run || !run.done || run.over) return state
-  return { ...state, expedition: { ...state.expedition, run: arrive(content, state, { ...run, node: run.node + 1 }) } }
+  return { ...state, expedition: { ...state.expedition, run: arrive(content, state, { ...run, node: run.node + 1, spoils: undefined }) } }
 }
 
 /** Something one of the party can do on her turn, and whether she can do it now. */
@@ -480,7 +480,7 @@ export function act(content: ContentPack, state: GameState, move: Move): GameSta
     const spoils: Finds = { money: Math.round(node.finds.money * factor(content, state, 'spoils')), items: node.finds.items }
     const helpedUp = run.party.map((fighter) => (standing(fighter) ? fighter : { ...fighter, footing: Math.max(1, Math.round(fighter.max * HELPED_UP)) }))
     const faces = Object.fromEntries(run.party.filter((fighter) => fighter.id !== HIM).map((fighter) => [fighter.id, 'happy']))
-    const won = { ...run, party: helpedUp, done: true, found: add(run.found, spoils), fight: { ...fight, events: [...events, { text: `It is over. You find ${describeFinds(content, spoils)}.`, faces, fx: [] }] } }
+    const won = { ...run, party: helpedUp, done: true, found: add(run.found, spoils), spoils, fight: { ...fight, events: [...events, { text: `It is over. You find ${describeFinds(content, spoils)}.`, faces, fx: [] }] } }
     const guardian = node.kind === 'guardian'
     return {
       ...after,

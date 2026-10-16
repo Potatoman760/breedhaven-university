@@ -5,6 +5,7 @@ import { Backdrop } from './Backdrop'
 import { Button } from './Button'
 import { Dialog } from './Dialog'
 import { Portrait } from './MapPanel'
+import { Tour, type TourStep } from './Tour'
 import { WeekPlanner } from './WeekPlanner'
 
 interface Props {
@@ -12,13 +13,19 @@ interface Props {
   state: GameState
   /** Called with the chosen course ids. */
   onEnrol: (courseIds: string[]) => void
+  /** Whether he has been shown round the screen already. */
+  toured: boolean
+  onToured: () => void
 }
+
+// Who shows him round the screen at the start of his first term.
+const GUIDE_ID = 'tamsin'
 
 /**
  * The start of term: the catalogue this game began with, laid out as a week planner, a
  * column per day and a row per hour, for the player to pick from.
  */
-export function CoursesView({ content, state, onEnrol }: Props) {
+export function CoursesView({ content, state, onEnrol, toured, onToured }: Props) {
   const config = content.coursework
   const [selected, setSelected] = useState<string[]>([])
   // The course whose details are shown beside the planner.
@@ -58,6 +65,41 @@ export function CoursesView({ content, state, onEnrol }: Props) {
     }
   }
 
+  // The tour of the screen, the first time it is seen: what each part is for, said by someone he knows.
+  const guide = content.loveInterests.find((li) => li.id === GUIDE_ID)
+  const taught = state.courses.find((course) => skillFor(content, course) && course.studentIds.includes(GUIDE_ID)) ?? state.courses.find((course) => skillFor(content, course))
+  const tour: TourStep[] = config
+    ? [
+        {
+          target: '.planner',
+          expression: 'happy',
+          text:
+            `Right, ${state.player.name}, this is your week. Every block's a class: point at one to read about it, click it to sign up. ` +
+            `Lectures come round ${config.lecturesPerWeek} times a week and labs eat ${config.labHours} hours. Up to ${config.maxCourses} courses, and none that clash.`
+        },
+        ...(taught
+          ? [
+              {
+                target: '.course-skill',
+                before: () => setFocusId(taught.id),
+                text: `See that? Get your marks high enough in a class and it teaches you something you can actually use. Worth more than the grade, if you ask me.`
+              }
+            ]
+          : []),
+        {
+          target: '.planner-search',
+          expression: 'embarrassed',
+          before: () => setFocusId(null),
+          text: `After someone in particular? Put her name in here and it shows you every class she's in. Don't look at me like that. I know why you're asking.`
+        },
+        {
+          target: '[data-tour="help"]',
+          text: `Too lazy to do it yourself? Hit this, tell it what you're after, and it'll pick the lot for you. Can't say I'm surprised.`
+        },
+        { expression: 'happy', text: `Good luck, ${state.player.name}!` }
+      ]
+    : []
+
   const toggle = (id: string) => setSelected(selected.includes(id) ? selected.filter((s) => s !== id) : [...selected, id])
 
   return (
@@ -95,6 +137,7 @@ export function CoursesView({ content, state, onEnrol }: Props) {
           </div>
         </Dialog>
       )}
+      {!toured && guide && tour.length > 0 && state.courses.length > 0 && <Tour guide={guide} steps={tour} onDone={onToured} />}
       <Backdrop screen="courses" location={location} periodId={date.period.id} light={date.period.light} />
       <div className="planner-panel glass framed">
         <div className="market-head">
@@ -113,7 +156,7 @@ export function CoursesView({ content, state, onEnrol }: Props) {
           <span className="hint">
             {selected.length} of {config?.maxCourses} courses chosen
           </span>
-          <Button variant="secondary" onClick={() => setHelping(true)}>
+          <Button variant="secondary" data-tour="help" onClick={() => setHelping(true)}>
             Help me pick
           </Button>
           <button disabled={selected.length === 0} onClick={() => onEnrol(selected)}>

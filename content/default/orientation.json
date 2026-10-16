@@ -28,5 +28,30 @@
       "description": "The afternoon goes on unpacking. At dusk the Cloister Halls hold their first-night supper: folding tables down the cloister, stacked pizza boxes, a keg of the Honeyed Bee's house ale, and everyone told to sit with someone they don't know.",
       "direction": "It is the evening of the first day. The Cloister Halls, the main residence halls, hold a first-night supper in the cloister so that those who live there, and friends from Lantern Row who have wandered in, get to know each other. Everyone has been told to sit with someone they do not know, and you have sat down opposite {player}. If you have not met him, introduce yourself. Talk about where you are from, your suite or flat and who you share it with, what you make of the first day and what you are hoping or dreading from the term."
     }
-  ]
+  ],
+  "intro": {
+    "speakerId": "edda",
+    "scenes": [
+      {
+        "locationId": "dormitories",
+        "lines": [
+          "*A brisk knock at your door. The woman outside wears a scholar's coat and carries a folder under one arm.*",
+          "{player}? Edda Lorne. I teach Bloom History, and the Sire Relations Office has asked me to see you in. Welcome to Breedhaven.",
+          "You know what you are, I assume. A True Sire: with a woman who is taking nothing against it, you do not miss. Every time. Your assay was the highest ever recorded.",
+          "Walk with me. Orientation begins at nine."
+        ]
+      },
+      {
+        "locationId": "great-court",
+        "lines": [
+          "*She leads you out into the Great Court, where the terraces are already filling.*",
+          "You have chosen your courses; attend them. Lectures, labs, a midterm and a final. Do well enough in a course and it teaches you more than a grade.",
+          "You will want money, so you will want work. The cafés and shops on Lantern Row take students on, and so do one or two of us.",
+          "Sex is not frowned upon in Breedhaven, and children are welcome and provided for. If you expect a child, the university will reach out and help you with it.",
+          "Today is orientation: the Chancellor's assembly here at nine, the campus tour at eleven, and your hall's supper tonight. Nothing else.",
+          "Welcome to Breedhaven University, {player}."
+        ]
+      }
+    ]
+  }
 }
