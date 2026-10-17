@@ -122,6 +122,15 @@ export const HousingConfigSchema = z.object({
     .optional(),
   /** The floors, from the ground up, by name. */
   floors: z.array(z.string()).min(1),
+  /** What is seen around the house on its own screen, by day and by night: pictures in the pack, with room in the middle for the house. */
+  exterior: z.object({ day: z.string().optional(), night: z.string().optional() }).optional(),
+  /**
+   * The pieces the house is drawn with on its screen, pictures in the pack: the roof over the top floor, the stone footing
+   * under the first, the beam between floors, and the wall and shingles tiled where no room is.
+   */
+  art: z
+    .object({ roof: z.string().optional(), footing: z.string().optional(), beam: z.string().optional(), wall: z.string().optional(), shingles: z.string().optional() })
+    .prefault({}),
   /** How many columns and rows each floor's plan is drawn on. */
   grid: z.object({ columns: z.number().int().min(1), rows: z.number().int().min(1) }),
   rooms: z.array(HouseRoomSchema).min(1)

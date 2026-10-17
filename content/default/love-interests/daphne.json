@@ -10,7 +10,8 @@
   "traitIds": [
     "loyal",
     "competitive",
-    "dominant"
+    "dominant",
+    "exhibitionist"
   ],
   "likes": [
     "weapons",
@@ -182,6 +183,7 @@
   "faceY": 4,
   "imageSeed": 60,
   "stageHeight": 100,
+  "partyRole": "guard",
   "studies": {
     "major": "KIN",
     "level": 4
@@ -329,6 +331,7 @@
       "Damon"
     ]
   },
+  "birthControl": true,
   "ai": {
     "speechPattern": "Short, direct sentences, said evenly: a captain's voice that expects to be heard without being raised. Dry jokes delivered with a straight face, and easy banter with anyone who can keep up. She says what she means and then stops.",
     "tone": "direct, dry, steady",
@@ -342,6 +345,5 @@
     "knowledge": [],
     "secrets": [],
     "extraInstructions": ""
-  },
-  "partyRole": "guard"
+  }
 }

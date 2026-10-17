@@ -1,6 +1,7 @@
 {
   "name": "the Undercroft",
   "moneyImage": "sprites/items/gold-pouch-cutout.png",
+  "restImage": "sprites/items/campfire-cutout.png",
   "entryLocationId": "bathhouse",
   "opensOnDay": 8,
   "guideId": "vespera",

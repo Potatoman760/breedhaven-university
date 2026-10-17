@@ -20,9 +20,13 @@ export function DateBanner({ date, minute = 0, weather, notes }: Props) {
       </div>
       <div>
         <div className="date-line">
-          {date.weekday}, {date.day} {date.month.name} · {String(date.hour).padStart(2, '0')}:{String(minute).padStart(2, '0')}
+          {date.weekday}, {date.day} {date.month.name}
         </div>
         <div className="caps">{notes.filter(Boolean).join(' · ')}</div>
+      </div>
+      {/* The time, on its own at the right: the thing most often looked for. */}
+      <div className="date-time">
+        {String(date.hour).padStart(2, '0')}:{String(minute).padStart(2, '0')}
       </div>
     </div>
   )

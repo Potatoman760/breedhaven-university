@@ -66,7 +66,7 @@ export function HelpPanel({ content, state, onClose }: Props) {
   const max = relationships.meterMax
 
   return (
-    <Dialog title="Help" onClose={onClose} wide>
+    <Dialog title="Help" onClose={onClose} wide ornate>
       <div className="help">
         <div className="tabs" role="tablist">
           {TABS.map((name) => (
@@ -79,7 +79,7 @@ export function HelpPanel({ content, state, onClose }: Props) {
         {tab === 'The world' && <CodexBook content={content} state={state} />}
 
         {tab === 'Basics' && (
-          <div className="help-page">
+          <div className="help-page sheet">
             <h2>The term</h2>
             <ul>
               <li>The game runs for one term of {calendar.lengthDays} days. When the last day ends, the epilogue tells what became of you.</li>
@@ -91,11 +91,12 @@ export function HelpPanel({ content, state, onClose }: Props) {
             <Table
               head={['Button', 'What it does']}
               rows={[
-                ['Map', 'Go somewhere. Who is at each place is shown.'],
+                ['Map', `The town, with who is at each place beside it. Press Go on a place to walk there.${below ? ` Once you know of it, the way down into ${below.name} glows.` : ''}`],
                 ['Phone', 'Friends, messages, the photo feed, the jobs board and the market.'],
+                ['Calendar', 'Your week by the hour, or the month. Press anything on it to read about it; a class shows who is in it.'],
                 ['Bag', 'What you carry, what you can make, and the relics you hold.'],
-                ['Calendar', 'Your week by the hour: classes, shifts, plans, events, births, rent.'],
-                ['Home', 'Your house, once you have one.'],
+                ...(housing ? [[housing.name, 'Your house, once you have one.']] : []),
+                ['Help', 'How the game works.'],
                 ['Menu', 'Save, load, settings.']
               ]}
             />
@@ -104,13 +105,14 @@ export function HelpPanel({ content, state, onClose }: Props) {
               <li>Doing something with someone opens a scene. You type; she answers in her own voice.</li>
               <li>She decides when a scene ends, and can leave early if she is uncomfortable.</li>
               <li>Scroll up over the text box to go back to an earlier turn and say something else.</li>
+              <li>While she is answering, the stop button beside the text box halts it.</li>
               <li>When a scene ends, a summary shows how her feelings changed and what she will remember.</li>
             </ul>
           </div>
         )}
 
         {tab === 'Conversation' && (
-          <div className="help-page">
+          <div className="help-page sheet">
             <h2>What talking gets you</h2>
             <ul>
               <li>Nearly everything between you and a woman is settled in what is said. There are no buttons for it: ask, offer, suggest, and she answers as herself.</li>
@@ -146,7 +148,7 @@ export function HelpPanel({ content, state, onClose }: Props) {
         )}
 
         {tab === 'Stats and study' && (
-          <div className="help-page">
+          <div className="help-page sheet">
             <h2>Stats</h2>
             <ul>
               <li>Six stats: strength, dexterity, endurance, intelligence, charisma, wisdom. 10 is ordinary; the cap is 30.</li>
@@ -168,6 +170,22 @@ export function HelpPanel({ content, state, onClose }: Props) {
               <li>Midterms and finals replace a class in their week, and ask about the classes you sat.</li>
               <li>80% of the marks is a B and 60% a C. Every answer right lifts either by a letter. Under 60%, or not turning up, is an F.</li>
             </ul>
+            {content.societies && (
+              <>
+                <h2>Societies</h2>
+                <ul>
+                  <li>
+                    Student clubs, each meeting for {content.societies.hours === 1 ? 'an hour' : `${content.societies.hours} hours`} once a week after classes. They open at{' '}
+                    {content.calendar.events.find((event) => event.id === content.societies!.fairId)?.name ?? 'their fair'}; join or leave them on the phone after that.
+                  </li>
+                  <li>You can belong to {content.societies.maxJoined} at a time, and not two that meet at the same hour. A meeting can clash with a shift.</li>
+                  {content.societies.fair && (
+                    <li>At the fair, every student is at one of her society's tables. Saying hello costs nothing and counts as meeting her; stopping to talk takes an hour. Each table gives something away the first time you stop.</li>
+                  )}
+                  <li>A meeting is a scene with the students in it, and trains what the society is about, like a short class with no marks.</li>
+                </ul>
+              </>
+            )}
             {content.skills.length > 0 && (
               <>
                 <h2>Skills</h2>
@@ -187,12 +205,12 @@ export function HelpPanel({ content, state, onClose }: Props) {
         )}
 
         {tab === 'The Undercroft' && !below && (
-          <div className="help-page">
+          <div className="help-page sheet">
             <p className="hint">There is nothing under the University in this game.</p>
           </div>
         )}
         {tab === 'The Undercroft' && below && (
-          <div className="help-page">
+          <div className="help-page sheet">
             <h2>Getting in</h2>
             <ul>
               <li>From day {below.opensOnDay} someone asks to meet you at {content.locations.find((l) => l.id === below.entryLocationId)?.name}. It cannot be put off: once it is next on your day, it is all there is to do.</li>
@@ -278,7 +296,7 @@ export function HelpPanel({ content, state, onClose }: Props) {
         )}
 
         {tab === 'Relationships' && (
-          <div className="help-page">
+          <div className="help-page sheet">
             <h2>Her three feelings</h2>
             <Table
               head={['Feeling', 'What it is for']}
@@ -311,7 +329,7 @@ export function HelpPanel({ content, state, onClose }: Props) {
         )}
 
         {tab === 'Sex and pregnancy' && (
-          <div className="help-page">
+          <div className="help-page sheet">
             <h2>When she will</h2>
             <Table
               head={['Her nature', 'What it takes']}
@@ -361,7 +379,7 @@ export function HelpPanel({ content, state, onClose }: Props) {
         )}
 
         {tab === 'House and children' && (
-          <div className="help-page">
+          <div className="help-page sheet">
             {housing ? (
               <>
                 <h2>Getting the house</h2>
@@ -397,7 +415,7 @@ export function HelpPanel({ content, state, onClose }: Props) {
                 <h2>Who can move in</h2>
                 <ul>
                   <li>
-                    A woman who is carrying your child or has borne one, has an arrangement with you, and has affection of {housing.invite.minAffection} or more. Offer her a bedroom from the plan.
+                    A woman who is carrying your child or has borne one, has an arrangement with you, and has affection of {housing.invite.minAffection} or more. Pick a bedroom in the house and offer it to her.
                   </li>
                   <li>Asked to leave, she does not forgive it and does not come back.</li>
                 </ul>
@@ -417,7 +435,7 @@ export function HelpPanel({ content, state, onClose }: Props) {
         )}
 
         {tab === 'Money and jobs' && (
-          <div className="help-page">
+          <div className="help-page sheet">
             {jobs ? (
               <>
                 <h2>Jobs</h2>
@@ -444,6 +462,16 @@ export function HelpPanel({ content, state, onClose }: Props) {
               <li>What you spend during a scene is settled when it ends.</li>
               {housing && <li>The house is the main thing to save for: rent, the children&apos;s keep, and every room.</li>}
             </ul>
+            {content.poker && (
+              <>
+                <h2>Cards</h2>
+                <ul>
+                  <li>
+                    {content.poker.name} at {content.locations.find((l) => l.id === content.poker!.locationId)?.name}: Texas hold&apos;em with whoever is there, ${content.poker.smallBlind}/${content.poker.bigBlind}, and no more than ${content.poker.handCap} in a hand.
+                  </li>
+                </ul>
+              </>
+            )}
           </div>
         )}
       </div>

@@ -97,13 +97,24 @@
     "missedText": "{player}, you were not at {place} at the hour we set. The house is not yours until you have been shown it. I have put the viewing down again: {date}, at {place}. Please be there this time."
   },
   "floors": [
-    "Ground floor",
     "First floor",
+    "Second floor",
     "Attic"
   ],
   "grid": {
     "columns": 12,
     "rows": 10
+  },
+  "exterior": {
+    "day": "generated/backgrounds/sire-house/exterior-day.webp",
+    "night": "generated/backgrounds/sire-house/exterior-night.webp"
+  },
+  "art": {
+    "roof": "sprites/house/roof.webp",
+    "footing": "sprites/house/footing.webp",
+    "beam": "sprites/house/beam.webp",
+    "wall": "sprites/house/wall.webp",
+    "shingles": "sprites/house/shingles.webp"
   },
   "rooms": [
     {

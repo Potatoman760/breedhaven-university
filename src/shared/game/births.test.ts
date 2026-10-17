@@ -37,7 +37,7 @@ describe('the hour of a birth', () => {
   })
 
   it('gives way to what matters more: an event is missed sooner than a plan', () => {
-    const fair = { id: 'fair', name: 'The fair', description: '', month: 'b', day: 2, durationDays: 1, startHour: 5, hours: 10, noClasses: false, generated: true }
+    const fair = { id: 'fair', name: 'The fair', description: '', month: 'b', day: 2, durationDays: 1, startHour: 5, hours: 10, noClasses: false, generated: true, program: [], secret: false }
     const busy = acceptProposal({ ...at(pregnant, 40), events: [fair] }, plan(60))
     expect(dayAgenda(content, busy, 3).filter((item) => item.startHour !== undefined).map((item) => item.kind)).toEqual(['event', 'plan'])
     // Every hour has the fair in it; the first two have the plan as well.

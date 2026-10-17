@@ -57,9 +57,10 @@ left unsigned.
   the Main LLM can also invent upcoming ones during play, which are stored in the save.
   Characters are told about today's events and those in the next week, and activities can
   require an authored event with an `event` condition.
-- **The map** (`map.json`) has a pin per location, placed over an `image` or, without one,
-  on a plain chart with labelled `regions` (the default pack's campus and city). It shows which love
-  interests their schedules place at each location right now. Going to a location takes
+- **The map** (`map.json`) is one painted `image` filling the screen, with a gold medallion pin
+  per location at `x`/`y` (percent of the picture) and `regions` as names lettered over it. Faces
+  beside a pin show which love interests their schedules place there right now; clicking a pin
+  opens its card with Go. Locations with no pin (his house) are listed in a corner. Going to a location takes
   no time. Activities tied to a location can only be done there, and
   shared activities only with someone who is at the player's location.
 - **The market and the shops** (`stalls.json`, `items.json`) sell gifts. A stall belongs to
@@ -275,6 +276,11 @@ and the trait library.
   step that names its own `castIds` keeps the first of them). Whoever is left over is met
   some other way. A step with nobody to meet just passes the time. The game's has three steps on day 1:
   the Assembly, the Campus Tour and the Hall Supper.
+- **Guided tours** (`ui/Tour.tsx`): a character pops up beside one part of the screen after another and says what it
+  is for; Skip or Escape ends it. Tamsin shows the course planner the first time it opens (`CoursesView.tsx`), and
+  on day 1, once the welcome is over, its speaker shows the day's screen (`ui/InterfaceTour.tsx`): the player opens
+  the phone, the map, the bag and the calendar himself when she asks, she shows each (turning to every app of the
+  phone), and she ends on Help. Each is shown once a game, kept by a flag in the save.
 - **Kinds of love interest** (`kind`): a **student** has `studies`, takes the course in her
   major at her year, and has the rest of her timetable dealt out by rule when the catalogue is built; a **teacher**
   has `teaching` (a department, a style such as Magistra, and one or more subjects), each
@@ -425,13 +431,20 @@ and the trait library.
     `cost`, whether it `startsBuilt`, what it adds (`beds` for love interests, `cots`,
     `comfort`, `study` toward the own-room study bonus), at most a few `tiers` to fit it out
     further, a rectangle on the `plan` of its floor, and the `viewId` of the house
-    location's view that is its picture. The plan on the House screen
-    (`src/renderer/src/ui/HousePanel.tsx`) is drawn from those rectangles; there is no plan
-    image. A room's picture is generated in the Locations editor like any other view, each
-    view having its own `appearance`. Built common rooms are places a scene at home can move
+    location's view that is its picture. The House screen (`src/renderer/src/ui/house/`)
+    draws the house from those rectangles as a cutaway (`houseLayout` stacks the floors, each
+    as tall as its rooms take): every room is a window onto its own picture, by day or by
+    night, dark and locked with its price until built, under a drawn roof. More rooms and
+    floors draw themselves; there is no picture of the whole house. A room whose plan is
+    `outdoors` (the garden) is not among the front's rooms: it is a square built on against
+    the left wall of its floor, as tall as that floor's rooms, and its rectangle is not used. It is put together from
+    pieces in `art` (`sprites/house/`): the `roof` over the top floor, a `beam` along each
+    floor, the `wall` and `shingles` tiled where no room is, and the stone `footing`. Around
+    it is `exterior` (`day`, `night`), or failing that the hearth room blurred. A room's picture is generated
+    in the Locations editor like any other view, each view having its own `appearance`. Built common rooms are places a scene at home can move
     to (`home-<key>`).
   - **Who lives there**: the nanny (`nannyId`, a love interest who comes with the house),
-    and whoever he offers a bedroom to from the plan: a love interest who is carrying his
+    and whoever he offers a bedroom to from its room card: a love interest who is carrying his
     child or has borne one, is in a relationship with him, is at `invite.minAffection` or
     more, where a bed is free. She accepts, remembers it as a core memory, and can be asked
     to leave, which she does not forgive and does not come back from.
@@ -589,8 +602,9 @@ and the trait library.
   them whatever the course's hours; the rest is studied for. The day view's **Study**
   option opens into his courses and then into where: the places in `studyLocationIds`,
   his own room, and the room of any love interest he has met who takes the course. A
-  session is two hours for energy and `studyPerHour` points an hour, one more in his own
-  room; somewhere public it is a scene with whoever is there, in a classmate's room a scene
+  session is two hours, which he may make longer (up to eight), for energy and `studyPerHour`
+  points an hour, and one more in his own room however long it is (a drill from the Stats
+  menu can be made longer the same way); somewhere public it is a scene with whoever is there, in a classmate's room a scene
   with her, and in his own room no scene. The midterm and the final fall in `midtermWeek`
   and `finalWeek` and each takes the place of the course's last class of that week. Those
   two weeks have no lectures or labs at all: every course meets only in that one slot, for
@@ -671,6 +685,28 @@ and the trait library.
   clear of the teaching day: shifts are on weekday evenings, after the last class, and on the
   two days no classes meet (`economy.test.ts` pins it). An add-on's may overlap his classes;
   the board says where they do.
+- **Societies** (`societies.json`, `src/shared/game/societies.ts`): student clubs, each meeting
+  once a week for an hour (`hours`) at a place of its own after classes, with up to `maxMembers`
+  (2) students in it, and perhaps a teacher who sponsors it (`sponsorId`), who comes to its meetings and stands at its
+  fair table but is not a member. Only students belong, and every student belongs to at least one
+  (`societies.test.ts` pins both, and that each meets after `coursework.dayEnd` somewhere
+  open). Nothing meets, and none can be joined, until their fair (`fairId`, the Societies
+  Fair) begins; at the fair the day view offers its tables, and after it he joins or leaves
+  them on the phone's Societies app, up to `maxJoined` (2) at once and never two that meet
+  in the same hour. A meeting can clash with a shift. While one meets its members are at
+  its place (`locationOf`, after classes and before work), it is on his calendar and is
+  the next thing on his day like a class, and going is a scene with whichever of them are
+  there, which trains its `stats` (`statGain` an hour, shared between them) for `energy`.
+  Her societies, and whether he is in them, are in her profile for the LLM. The editor's
+  Societies side writes the file, from source only, as Jobs does.
+- **The Societies Fair** (`fair` in `societies.json`, `src/shared/game/fair.ts`, `ui/FairView.tsx`): while its tables are
+  out (the event's hours on each of its days) every student stands at a table of hers, taking turns by half-day when
+  she belongs to two, and a few `visitors` wander it; they are at the fair on the map. Its first day holds his day as
+  orientation does (`fairDue`) until he has been. The fair is a screen laid out as the town map is, over the Great
+  Court's view whose id is the fair's (also its backdrop while it is on): a panel per table with who is at it now, Join,
+  and Talk, an hour's scene at the table. Saying hello is free: her `hellos` lines are read as a cutscene, it counts as
+  meeting her, she keeps a fleeting memory of it, and it is said once. Stopping at a table the first time gives its
+  `gift`. Once he has stopped at both `rivalry` tables (Bloomist and Freewill) their scene is read, once.
 - **The lecture**: a class scene opens with the teacher teaching. The first reply of a
   class is asked for with a prompt of its own (`lessonCue` in `src/shared/game/prompt.ts`):
   five to eight beats, most of them the teacher speaking to the room about the course's
@@ -891,6 +927,43 @@ directly: nothing in a scene ever calls it, and it talks only to the address you
   picture or a clip are the game's, in `content/default/comfy/bundle.json`: with the
   game's own files being edited, the editor writes changes there, and otherwise a player's
   changes go into their `comfy.json`, which holds only what differs from the game's.
+
+## Events
+
+An event in `calendar.json` is talked about by everyone while it is coming up, and one with a place and hours can be
+gone to as an outing. Two things make one more than that:
+
+- **The day and the hours.** An event's days are the whole of each day it is on; its hours (`startHour`, `hours`), or
+  the hours of its program's parts, are when something happens at it. Places and people are dressed for the whole
+  day; scenes, and where those who said they would come are (`eventKeeping`), follow the hours. A holiday with a
+  dinner is an event with no hours of its own and the dinner in its program, as the Feast of First Frost is.
+- **A dressed place.** A view of a location whose `id` is the event's id, or whose `name` is the event's name, is shown
+  there while the event is on, by day and by night (`backgroundFor`). Its `description` tells the characters what the
+  place looks like dressed. The Commons has one for the Feast of First Frost (`first-frost`).
+- **Dressed people.** A character with an outfit whose `id` is the event's id wears it from morning to night while it
+  is on (`wornOutfit`), unless a scene has put her in something else. Dorrit has one for First Frost. A cutscene can
+  also name its speaker's outfit (`outfitId`).
+- **A program** (`program`, `src/shared/game/eventParts.ts`): scripted parts of the event, each on one of its days
+  (`day`, from 1) at an hour, for some hours, at the event's place or its own. While a part is to come or under way it
+  is a card on the day's screen; going takes him there at its hour, plays its `cutscene` if it has one (written lines
+  by one speaker, read as the welcome is, `ui/IntroView.tsx`), and then opens a scene with its `description` as the
+  narration and its `direction` told to the LLM. Who is in it: `castIds` if it names them; else whoever said she would
+  be at the event (`[ATTENDING]`, which an event with a program can be said yes to whether or not it keeps hours of its
+  own); else, up to `castSize`, the love interests he has met and is closest to. A part
+  marked `required` holds the day until it is attended or over, as orientation does. Each is gone to once
+  (`partsAttended` in the save). An event with a part on today is offered by its part, not as an outing as well.
+- **Story beats** are events marked `secret`, usually with a `year` so they happen once: they are left off the
+  calendar and out of everything the characters are told beforehand, and their program still plays, usually as one
+  `required` part with a fixed `castIds`. A part can set the view its scene is in (`viewId`). A step of orientation can
+  open on a cutscene too, and name everyone in it (`castIds`, every student named is kept): the Assembly opens on Tamsin
+  finding him, and the end of the Campus Tour on the Queen's arrival, where Seraphine first meets him with Tamsin there.
+  On orientation day nobody can have been met yet, so a first meeting written there is always the first.
+- **Cutscenes** (`IntroSchema`): each place in one says who stands on the stage (`castIds`, the speaker alone when left
+  out, nobody for a picture that has them in it already); a line that starts with a name ("Seraphine: ...") is hers,
+  any other the speaker's, and one in asterisks is narration.
+- The load check refuses a part on a day the event does not have, a place or cast that does not exist, and a cutscene
+  by nobody or at a view a place does not have.
+- The editor's Events tab does not edit programs yet: they are written in `calendar.json`.
 
 ## Cards
 

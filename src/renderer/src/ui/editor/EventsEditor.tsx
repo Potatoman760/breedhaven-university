@@ -6,6 +6,7 @@ import { errorMessage } from '../../errors'
 import { Button } from '../Button'
 import { useConfirm } from '../Confirm'
 import { EditorFoot, Group, LlmMark, Text } from './fields'
+import { EventProgram } from './EventProgram'
 
 interface Props {
   content: ContentPack
@@ -33,7 +34,7 @@ function freeId(wanted: string, events: CalendarEvent[]): string {
  */
 export function EventsEditor({ content, onContent, switcher }: Props) {
   const { calendar } = content
-  const blank = (): CalendarEvent => ({ id: '', name: '', description: '', month: calendar.start.month, day: 1, durationDays: 1, noClasses: false, generated: false })
+  const blank = (): CalendarEvent => ({ id: '', name: '', description: '', month: calendar.start.month, day: 1, durationDays: 1, noClasses: false, generated: false, program: [], secret: false })
   const [info, setInfo] = useState<EditorInfo | null>(null)
   const [original, setOriginal] = useState<CalendarEvent | null>(calendar.events[0] ?? null)
   const [draft, setDraft] = useState<CalendarEvent>(calendar.events[0] ?? blank())
@@ -234,9 +235,18 @@ export function EventsEditor({ content, onContent, switcher }: Props) {
                 <input type="checkbox" checked={draft.noClasses} onChange={(e) => set({ noClasses: e.target.checked })} />
                 No classes meet while it lasts
               </label>
+              <label className="inline" title="A story beat: it is not on the calendar and nobody talks about it beforehand. Its program still happens.">
+                <input type="checkbox" checked={draft.secret} onChange={(e) => set({ secret: e.target.checked })} />
+                Secret
+              </label>
             </div>
-            <span className="hint">It comes round every year on that date. A view of a place named exactly as the event is shown there while it lasts.</span>
+            <span className="hint">
+              It comes round every year on that date. While it lasts, a view of a place whose id or name is the event's is shown there, and anyone with an outfit
+              whose id is the event's ({draft.id || 'its id'}) wears it, all day.
+            </span>
           </Group>
+
+          <EventProgram content={content} event={draft} onChange={(program) => set({ program })} />
         </div>
 
         <EditorFoot

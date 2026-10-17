@@ -105,6 +105,8 @@ export const ExpeditionConfigSchema = z.object({
   name: z.string().default('the Undercroft'),
   /** The picture money that is found is shown with: a pouch of coins, say. */
   moneyImage: z.string().optional(),
+  /** The picture a checkpoint is shown with: a campfire, say. */
+  restImage: z.string().optional(),
   /** Where the way down is. */
   entryLocationId: z.string(),
   /** The day it is first open on, counted from 1. */
@@ -235,6 +237,8 @@ export const ExpeditionRunSchema = z.object({
   note: z.string().default(''),
   /** What the stop he is at gave up, for the screen that shows it: a fight won, or something lying there. */
   spoils: FindsSchema.optional(),
+  /** At a checkpoint: what each of the party got back, by id, and what was made safe there. */
+  rest: z.object({ healed: z.record(z.string(), z.number()), secured: FindsSchema }).optional(),
   /** Set when it is over and only its reckoning is left. */
   over: z.enum(['won', 'lost', 'left']).optional()
 })

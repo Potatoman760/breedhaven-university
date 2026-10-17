@@ -31,6 +31,77 @@ export function roomOf(config: HousingConfig, key: string | undefined): HouseRoo
   return config.rooms.find((room) => room.key === key)
 }
 
+/** Where a room is drawn on the front of the house: its box, in percent of the whole front, and the floor it is on. */
+export interface RoomBox {
+  key: string
+  floor: number
+  left: number
+  top: number
+  width: number
+  height: number
+}
+
+/** How much of the front a floor takes: its band from top to bottom, and the width its rooms span, in percent. */
+export interface FloorBand {
+  floor: number
+  name: string
+  top: number
+  height: number
+  left: number
+  width: number
+}
+
+/**
+ * The house as it is drawn: every room's box on its front, floors stacked from the ground up, each floor only as tall as
+ * the rows its rooms take, so that a floor of a few rooms is not a wall of empty space. Any number of floors and rooms
+ * lays itself out from the plan. `rows` is how many grid rows tall the front is, for the shape it is drawn at. What is
+ * out of doors is not in the house at all: `grounds` are those rooms, drawn on the lawn beside it.
+ */
+export function houseLayout(config: Pick<HousingConfig, 'floors' | 'grid' | 'rooms'>): { rooms: RoomBox[]; floors: FloorBand[]; rows: number; columns: number; grounds: string[] } {
+  const { columns } = config.grid
+  const indoors = config.rooms.filter((room) => !room.plan.outdoors)
+  // Each floor's rows, from the top of its first room to the bottom of its lowest, top floor first.
+  const spans = config.floors
+    .map((name, floor) => {
+      const on = indoors.filter((room) => room.plan.floor === floor)
+      const from = on.length > 0 ? Math.min(...on.map((room) => room.plan.y)) : 0
+      const to = on.length > 0 ? Math.max(...on.map((room) => room.plan.y + room.plan.h)) : 0
+      const left = on.length > 0 ? Math.min(...on.map((room) => room.plan.x)) : 0
+      const right = on.length > 0 ? Math.max(...on.map((room) => room.plan.x + room.plan.w)) : 0
+      return { floor, name, from, rows: to - from, left, right }
+    })
+    .reverse()
+  const rows = spans.reduce((sum, span) => sum + span.rows, 0)
+  const offset = new Map<number, number>()
+  let at = 0
+  for (const span of spans) {
+    offset.set(span.floor, at)
+    at += span.rows
+  }
+  const percent = (part: number, whole: number) => (whole > 0 ? (part / whole) * 100 : 0)
+  const floors = spans.map((span) => ({
+    floor: span.floor,
+    name: span.name,
+    top: percent(offset.get(span.floor)!, rows),
+    height: percent(span.rows, rows),
+    left: percent(span.left, columns),
+    width: percent(span.right - span.left, columns)
+  }))
+  const rooms = indoors.map((room) => {
+    const span = spans.find((one) => one.floor === room.plan.floor)!
+    return {
+      key: room.key,
+      floor: room.plan.floor,
+      left: percent(room.plan.x, columns),
+      top: percent(offset.get(room.plan.floor)! + room.plan.y - span.from, rows),
+      width: percent(room.plan.w, columns),
+      height: percent(room.plan.h, rows)
+    }
+  })
+  const grounds = config.rooms.filter((room) => room.plan.outdoors).map((room) => room.key)
+  return { rooms, floors, rows, columns, grounds }
+}
+
 /** Whether he lives in the house now. */
 export function isResident(content: ContentPack, state: Pick<GameState, 'housing'>): boolean {
   return content.housing !== undefined && state.housing.status === 'resident'

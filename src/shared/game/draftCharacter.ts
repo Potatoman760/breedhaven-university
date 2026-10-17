@@ -2,8 +2,8 @@ import { z } from 'zod'
 import { slugify } from '../editor'
 import { DEFAULT_IMAGE_SEED, LoveInterestSchema, STANDARD_OUTFITS, STATS, type ContentPack, type LoveInterest } from '../model'
 
-// A whole profile is a good deal longer than a line of dialogue.
-export const DRAFT_MIN_TOKENS = 3500
+// Room for her whole profile, and for the thinking a reasoning model does first, which counts against it.
+export const DRAFT_MIN_TOKENS = 12000
 export const DRAFT_MAX_IDEA_CHARS = 2000
 
 /**
@@ -41,6 +41,12 @@ export function draftSchema(content: ContentPack) {
     likes: z.array(z.string()).max(5).describe('Kinds of gift she loves. Use the gift tags given where they fit; others are allowed.'),
     dislikes: z.array(z.string()).max(4).describe('Kinds of gift she dislikes, likewise.'),
     admires: z.array(z.enum(STATS)).max(3).describe('The stats she is drawn to in the player.'),
+    childNames: z
+      .object({
+        daughters: z.array(z.string()).min(5).max(5).describe('Five first names she would choose for a daughter.'),
+        sons: z.array(z.string()).min(2).max(2).describe('Two first names she would choose for a son.')
+      })
+      .describe('Names she would give her children, in keeping with her and where she comes from.'),
     kind: z.enum(['student', 'teacher', 'outsider']).describe('What she is to the University.'),
     studies: subject.optional().describe('For a student only: her own subject.'),
     teaching: z
@@ -118,15 +124,39 @@ export function buildDraftPrompt(content: ContentPack, idea: string): { system: 
   return { system, user }
 }
 
-/** The first JSON object in a reply, whatever was written around it. */
+/**
+ * The first whole JSON object in a reply, whatever was written around it: read to the brace that closes it, and not
+ * to the last brace there is, which in a reply cut off part way is one of its own. A comma left before a closing brace
+ * is forgiven.
+ */
 function extractObject(reply: string): unknown {
-  const start = reply.indexOf('{')
-  const end = reply.lastIndexOf('}')
-  if (start < 0 || end < start) throw new Error('The reply held no character.')
+  const text = reply.replace(/<think>[\s\S]*?<\/think>/g, '')
+  const start = text.indexOf('{')
+  if (start < 0) throw new Error('The reply held no character.')
+  let depth = 0
+  let inString = false
+  let escaped = false
+  let end = -1
+  for (let i = start; i < text.length && end < 0; i++) {
+    const ch = text[i]
+    if (inString) {
+      if (escaped) escaped = false
+      else if (ch === '\\') escaped = true
+      else if (ch === '"') inString = false
+    } else if (ch === '"') inString = true
+    else if (ch === '{') depth++
+    else if (ch === '}' && --depth === 0) end = i
+  }
+  if (end < 0) throw new Error('The reply was cut off before the character was finished. Try again, or give the Main LLM more max tokens.')
+  const body = text.slice(start, end + 1)
   try {
-    return JSON.parse(reply.slice(start, end + 1))
+    return JSON.parse(body)
   } catch {
-    throw new Error('The reply was not readable as a character.')
+    try {
+      return JSON.parse(body.replace(/,(\s*[}\]])/g, '$1'))
+    } catch (error) {
+      throw new Error(`The reply was not readable as a character: ${(error as Error).message}`)
+    }
   }
 }
 

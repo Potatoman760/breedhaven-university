@@ -31,21 +31,21 @@ export function NavTiles({ content, state, onOpen, phoneId, bag = { kind: 'bag' 
           {state.housing.arrears > 0 && <span className="badge">!</span>}
         </button>
       )}
-      <button className="tile glass" onClick={() => onOpen({ kind: 'map' })}>
+      <button className="tile glass" data-tour="map" onClick={() => onOpen({ kind: 'map' })}>
         <MapIcon size={32} />
         Map
       </button>
-      <button className="tile glass" onClick={() => onOpen({ kind: 'courier', id: phoneId })}>
+      <button className="tile glass" data-tour="phone" onClick={() => onOpen({ kind: 'courier', id: phoneId })}>
         <PhoneIcon size={32} />
         Phone
         {unreadNotes(state) > 0 && <span className="badge">{unreadNotes(state)}</span>}
       </button>
-      <button className="tile glass" onClick={() => onOpen({ kind: 'calendar' })}>
+      <button className="tile glass" data-tour="calendar" onClick={() => onOpen({ kind: 'calendar' })}>
         <CalendarIcon size={32} />
         Calendar
       </button>
       {/* What he carries, can make and has brought up from below. */}
-      <button className="tile glass" disabled={bagDisabled} onClick={() => onOpen(bag)}>
+      <button className="tile glass" data-tour="bag" disabled={bagDisabled} onClick={() => onOpen(bag)}>
         <BagIcon size={32} />
         Bag
       </button>
@@ -53,7 +53,7 @@ export function NavTiles({ content, state, onOpen, phoneId, bag = { kind: 'bag' 
       <div className="tile-row">
         {extras}
         {/* How the game works, a click away from the day and from a scene alike. */}
-        <button className="tile-menu glass" onClick={() => onOpen({ kind: 'help' })}>
+        <button className="tile-menu glass" data-tour="help-menu" onClick={() => onOpen({ kind: 'help' })}>
           <HelpIcon size={18} />
           Help
         </button>

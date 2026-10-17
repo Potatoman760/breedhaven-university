@@ -43,8 +43,14 @@ import {
   stageFor,
   toDate,
   canPlayPoker,
+  eventPartsToday,
+  requiredEventPart,
   weatherOn,
-  roomBackdrop
+  roomBackdrop,
+  joinedSocieties,
+  fairNow,
+  fairDue,
+  societyMeetingNow
 } from '../../../shared/game'
 import { MAX_SCENE_CAST, STAT_LABELS, STATS, type Activity, type ContentPack, type Focus, type GameState } from '../../../shared/model'
 import { ActivityList } from './ActivityList'
@@ -73,12 +79,16 @@ interface Props {
   onTalkNpc: (npcId: string) => void
   /** Go to the next part of orientation. */
   onOrientation: () => void
+  /** Go to a scripted part of an event that is on now. */
+  onEventPart: (eventId: string, partId: string) => void
   /** Takes up a class, shift or plan of his: one that is on now, or the next to come today, skipping the time until it starts. He is taken to it. */
   onGoTo: (next: Upcoming) => void
   /** Ends the day early: the rest of it is let go, and he sleeps until morning. */
   onEndDay: () => void
   /** Browse the shops here, or go to the market (if there are none here) and browse its stalls. */
   onOpen: (panel: Panel) => void
+  /** Goes to the societies' fair, while it is on. */
+  onFair: () => void
 }
 
 /** Between scenes: where and when you are, and the choice of what to do next. */
@@ -94,7 +104,7 @@ export function DayView(props: Props) {
   const [studying, setStudying] = useState<string | null>(null)
   const date = toDate(calendar, state.time)
   const location = content.locations.find((l) => l.id === state.locationId)
-  const today = eventsOn(content, state)
+  const today = eventsOn(content, state).filter((event) => !event.secret)
   const over = isGameOver(calendar, state.time)
   const weather = weatherOn(content, state)
   // Whoever is here and can be gone up to: someone in class is left out, and met only by sitting it with her.
@@ -105,6 +115,10 @@ export function DayView(props: Props) {
   // The courses he takes, and the one he has picked to study for (empty while he is still choosing; null with the menu shut).
   const mine = state.courses.filter((c) => state.enrolment?.includes(c.id))
   const studied = mine.find((c) => c.id === studying)
+  // The societies' fair, while its tables are out.
+  const fair = fairNow(content, state)
+  // The meetings of his societies that are on right now.
+  const meetings = joinedSocieties(content, state).filter((society) => societyMeetingNow(content, state, society))
   // The shift of his that is under way, if he has not clocked in for it.
   const shift = shiftNow(content, state)
   const { player } = state
@@ -114,6 +128,7 @@ export function DayView(props: Props) {
   // Whether something of his is on right now that he can still take up: a class that has just begun counts from its first hour.
   const onNow =
     classes.some((course) => canGoTo(content, state, underWay(examNow(content, state, course) ? 'exam' : 'class', course.id, course.locationId)).ok) ||
+    meetings.some((society) => canGoTo(content, state, underWay('society', society.id, society.locationId)).ok) ||
     (shift !== undefined && canGoTo(content, state, underWay('work', shift.job.id, shift.job.locationId)).ok) ||
     appointmentsNow(state).some((plan) => canGoTo(content, state, underWay('plan', plan.id, plan.locationId)).ok)
   // The next class, shift or plan of his still to come today. Only one thing is put forward at a time: with something
@@ -126,7 +141,12 @@ export function DayView(props: Props) {
   const inductionPlace = content.locations.find((l) => l.id === induction?.locationId)
   // Something he has been summoned to and is next on his day: until it is done, it is all there is to do, as with orientation.
   const summoned = over || induction ? undefined : summons(content, state)
-  const locked = induction !== undefined || summoned !== undefined
+  // A part of an event he has to go to holds the day as orientation does, until he has been or it is over.
+  const mustAttend = over || induction ? undefined : requiredEventPart(content, state)
+  // The first day of the societies' fair holds the day as orientation does, until he has been.
+  const fairCall = over || induction ? false : fairDue(content, state)
+  const locked = induction !== undefined || summoned !== undefined || mustAttend !== undefined || fairCall
+  const parts = over || induction ? [] : eventPartsToday(content, state)
 
 
   const ownRoom = roomBackdrop(state.inOwnRoom ? content.newGame.room : undefined, 'room-of-player')
@@ -301,7 +321,10 @@ export function DayView(props: Props) {
         {/* What is on today that he could go to: an event that keeps hours, for as much of it as he likes. */}
         {!locked &&
           !over &&
-          eventOutings(content, state).map(({ event, outing }) => (
+          // An event with a part on today is gone to by its part: it is not offered a second time.
+          eventOutings(content, state)
+            .filter(({ event }) => !parts.some((now) => now.event.id === event.id))
+            .map(({ event, outing }) => (
             <button key={event.id} className="featured" disabled={props.busy} onClick={() => props.onOuting(outing)}>
               <span className="chip outline-light">Event</span>
               <span className="featured-title">{event.name}</span>
@@ -334,6 +357,32 @@ export function DayView(props: Props) {
             </p>
           )
         })}
+
+        {/* The scripted parts of today's events: a card each while it is still to come or under way. */}
+        {parts.map(({ event, part }) => (
+          <button key={`${event.id}:${part.id}`} className="featured" disabled={props.busy} onClick={() => props.onEventPart(event.id, part.id)}>
+            <span className="chip outline-light">{part.required ? 'Now' : 'Event'}</span>
+            <span className="featured-title">
+              {event.name}: {part.name}
+            </span>
+            <span>
+              {String(part.startHour).padStart(2, '0')}:00 · {content.locations.find((l) => l.id === (part.locationId ?? event.locationId))?.name}
+            </span>
+            <ChevronIcon size={18} />
+          </button>
+        ))}
+
+        {/* The societies' fair: on its first day it is all there is to do until he has been; after that, it is there to go back to. */}
+        {fair && (fairCall || (!locked && !over)) && (
+          <button className="featured" disabled={props.busy} onClick={props.onFair}>
+            <span className="chip outline-light">{fairCall ? 'Event' : 'Societies'}</span>
+            <span className="featured-title">{fairCall ? `Go to ${fair.name}` : 'Browse the societies'}</span>
+            <span>
+              {content.locations.find((l) => l.id === fair.locationId)?.name} · {state.societies.length} of {content.societies?.maxJoined} joined
+            </span>
+            <ChevronIcon size={18} />
+          </button>
+        )}
 
         {/* Cards for money, where there is a game. */}
         {!locked && !over && content.poker && state.locationId === content.poker.locationId && (
@@ -423,6 +472,26 @@ export function DayView(props: Props) {
             </p>
           )
         })}
+
+        {!locked &&
+          meetings.map((society) => {
+            const item = underWay('society', society.id, society.locationId)
+            const check = canGoTo(content, state, item)
+            return check.ok ? (
+              <button key={society.id} className="featured" disabled={props.busy} onClick={() => props.onGoTo(item)}>
+                <span className="chip outline-light">Society</span>
+                <span className="featured-title">Go to {society.name}</span>
+                <span>
+                  until {String(society.startHour + (content.societies?.hours ?? 1)).padStart(2, '0')}:00 · {content.locations.find((l) => l.id === society.locationId)?.name}
+                </span>
+                <ChevronIcon size={18} />
+              </button>
+            ) : (
+              <p key={society.id} className="glass note">
+                <strong>{society.name} is meeting now.</strong> {check.reasons.join(' · ')}
+              </p>
+            )
+          })}
 
         {!locked && <ActivityList content={content} state={state} partnerId={partnerId} onPick={onActivity} />}
 

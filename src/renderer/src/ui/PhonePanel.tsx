@@ -66,8 +66,14 @@ import {
   toggleLike,
   unreadNotes,
   unreadPosts,
-  markFeedSeen
+  markFeedSeen,
+  canJoinSociety,
+  joinSociety,
+  leaveSociety
 } from '../../../shared/game'
+import { Button } from './Button'
+import type { PhoneApp } from './panels'
+import { Portrait } from './Portrait'
 import { MEMORY_LEVEL_LABELS, METERS, STATS, type ContentPack, type GameState, type Job, type LoveInterest, type SkillGrant } from '../../../shared/model'
 import { errorMessage } from '../errors'
 import { Overlay } from './Dialog'
@@ -86,6 +92,8 @@ interface Props {
   onClose: () => void
   /** Who to open on, in Friends. Left out, the phone opens on his DMs. */
   initialId?: string
+  /** The app to open on, and to turn to whenever it changes: as a tour of the phone does. */
+  app?: PhoneApp
   /** Goes straight to the plan an invitation is for, accepting it first if it is still to be answered. Left out when he cannot leave: in a scene. */
   onGoToInvite?: (loveInterestId: string, noteIndex: number) => void
   /** Whether something offered to him in a message can be taken up now: not in the middle of a scene. */
@@ -101,30 +109,10 @@ const APPS = [
   { id: 'friends', label: 'Friends', Icon: FriendsIcon },
   { id: 'updates', label: 'Feed', Icon: FeedIcon },
   { id: 'jobs', label: 'Jobs', Icon: WorkIcon },
+  { id: 'societies', label: 'Societies', Icon: (p: { size?: number }) => <JobIcon name="columns" {...p} /> },
   { id: 'shop', label: 'Market', Icon: MarketIcon }
 ] as const
 type App = (typeof APPS)[number]['id']
-
-/**
- * Her face, from her neutral sprite: the same upright portrait as everywhere else, six wide
- * to seven tall, so that where the editor puts her face is where it is here. `size` is its height.
- */
-function Avatar({ li, size = 56 }: { li: LoveInterest; size?: number }) {
-  const outfit = li.outfits.find((o) => o.id === li.defaultOutfitId)
-  const sprite = (outfit?.sprites['neutral'] ?? Object.values(outfit?.sprites ?? {})[0])?.image
-  return (
-    <span
-      className="avatar"
-      role="img"
-      aria-label={li.name}
-      style={{
-        width: Math.round((size * 6) / 7),
-        height: size,
-        ...(sprite ? { backgroundImage: `url("content://pack/${sprite}")`, backgroundPosition: `50% ${li.faceY}%` } : {})
-      }}
-    />
-  )
-}
 
 /** Everyone a conversation can be had with: the love interests, and NPCs, who are written to as their boss's or anyone's would be. */
 function messageable(content: ContentPack): LoveInterest[] {
@@ -146,10 +134,13 @@ function Presence({ content, state, li }: { content: ContentPack; state: GameSta
  * The player's phone: his Bloomr DMs for messages, Friends to keep track of everyone he is
  * getting to know, the Bloomr feed for what they post, and Jobs for work.
  */
-export function PhonePanel({ content, state, onChange, onClose, initialId, onGoToInvite, canAct = true }: Props) {
+export function PhonePanel({ content, state, onChange, onClose, initialId, app: shown, onGoToInvite, canAct = true }: Props) {
   // Everyone who can be in his DMs: the love interests, and any NPC he has worked for.
   const people = messageable(content)
-  const [app, setApp] = useState<App>(initialId === undefined ? 'chats' : 'friends')
+  const [app, setApp] = useState<App>(shown ?? (initialId === undefined ? 'chats' : 'friends'))
+  useEffect(() => {
+    if (shown) setApp(shown)
+  }, [shown])
   // Looking at the feed is seeing what is on it: its count is cleared while it is open, and whatever goes up meanwhile with it.
   const newPosts = unreadPosts(state)
   useEffect(() => {
@@ -178,6 +169,10 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, onGoT
               role="tab"
               aria-selected={app === id}
               className={app === id ? 'phone-tab selected' : 'phone-tab'}
+              data-tour={`phone-${id}`}
+              // Nothing is bought in the middle of a scene.
+              disabled={id === 'shop' && !canAct}
+              title={id === 'shop' && !canAct ? 'Disabled during a scene' : undefined}
               onClick={() => setApp(id)}
             >
               <Icon size={26} />
@@ -193,6 +188,7 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, onGoT
           {app === 'friends' && <Friends content={content} state={state} selectedId={friendId} onSelect={setFriendId} onMessage={message} canMessage={canMessage} />}
           {app === 'updates' && <Updates content={content} state={state} onChange={onChange} onMessage={message} canMessage={canMessage} />}
           {app === 'jobs' && <Jobs content={content} state={state} onChange={onChange} onMessage={message} />}
+          {app === 'societies' && <Societies content={content} state={state} onChange={onChange} />}
           {app === 'shop' && <Market content={content} state={state} onChange={onChange} />}
         </div>
       </div>
@@ -234,7 +230,7 @@ function Chats({ content, state, onChange, selectedId, onSelect, onGoToInvite, c
             const unread = unreadNotes(state, li.id)
             return (
               <button key={li.id} className={li.id === selectedId ? 'chat-row selected' : 'chat-row'} onClick={() => onSelect(li.id)}>
-                <Avatar li={li} />
+                <Portrait who={li} size={56} className="avatar" />
                 <span className="chat-row-text">
                   <strong>{li.name}</strong>
                   <span className={unread > 0 ? 'preview unread' : 'preview'}>
@@ -252,7 +248,7 @@ function Chats({ content, state, onChange, selectedId, onSelect, onGoToInvite, c
         {selected ? (
           <>
             <div className="chat-head">
-              <Avatar li={selected} size={48} />
+              <Portrait who={selected} size={48} className="avatar" />
               <div>
                 <strong>{selected.name}</strong>
                 <span className="handle">{handleOf(selected)}</span>
@@ -499,7 +495,7 @@ function Friends({ content, state, selectedId, onSelect, onMessage, canMessage }
           )}
         </div>
         <div className="friend-banner">
-          <Avatar li={selected} size={88} />
+          <Portrait who={selected} size={88} className="avatar" />
           <div>
             <h1>{selected.name}</h1>
             <span className="handle">{handleOf(selected)}</span>
@@ -527,7 +523,7 @@ function Friends({ content, state, selectedId, onSelect, onMessage, canMessage }
           return (
             <div key={li.id} className="friend-card">
               <button className="friend-open" onClick={() => onSelect(li.id)}>
-                <Avatar li={li} size={96} />
+                <Portrait who={li} size={96} className="avatar" />
                 <span className="friend-card-text">
                   <strong>{li.name}</strong>
                   <span className="handle">{handleOf(li)}</span>
@@ -594,7 +590,7 @@ function Updates({ content, state, onChange, onMessage, canMessage }: UpdatesPro
         return (
           <article key={post.id} className="post">
             <header>
-              <Avatar li={author} size={44} />
+              <Portrait who={author} size={44} className="avatar" />
               <div>
                 <strong>{author.name}</strong>
                 <span className="handle">
@@ -798,6 +794,75 @@ function Jobs({ content, state, onChange, onMessage }: JobsProps) {
               <CalendarCompare content={content} state={state} job={job} />
             </div>
             {!check.ok && <span className="pin-note">{check.reasons.join(' · ')}</span>}
+          </article>
+        )
+      })}
+    </div>
+  )
+}
+
+/** The student societies: the ones he belongs to first, each with who is in it, when and where it meets, and the way to join or leave. */
+function Societies({ content, state, onChange }: { content: ContentPack; state: GameState; onChange: (update: (state: GameState) => GameState) => void }) {
+  const config = content.societies
+  const place = (id: string) => content.locations.find((l) => l.id === id)?.name ?? id
+  const { ask, dialog } = useConfirm()
+  const all = [...(config?.societies ?? [])].sort((a, b) => Number(state.societies.includes(b.id)) - Number(state.societies.includes(a.id)))
+  return (
+    <div className="feed jobs">
+      {dialog}
+      <h1 className="phone-title">Societies</h1>
+      {!config || all.length === 0 ? (
+        <p className="hint phone-empty">There are no societies.</p>
+      ) : (
+        <span className="caps">
+          {state.societies.length} of {config.maxJoined} joined
+        </span>
+      )}
+      {all.map((society) => {
+        const mine = state.societies.includes(society.id)
+        const check = canJoinSociety(content, state, society.id)
+        const members = society.memberIds.flatMap((id) => content.loveInterests.find((li) => li.id === id) ?? [])
+        const sponsor = content.loveInterests.find((li) => li.id === society.sponsorId)
+        return (
+          <article key={society.id} className={mine ? 'post job mine society' : 'post job society'}>
+            <header>
+              <span className="job-icon">
+                <JobIcon name="columns" size={26} />
+              </span>
+              <div>
+                {mine && <span className="caps">Your society</span>}
+                <strong>
+                  {society.name} · {place(society.locationId)}
+                </strong>
+                <span className="handle">
+                  {society.weekday}s at {String(society.startHour).padStart(2, '0')}:00 · builds {society.stats.join(' and ')}
+                  {sponsor && ` · sponsored by ${sponsor.name}`}
+                </span>
+              </div>
+              {mine ? (
+                <Button
+                  variant="quiet"
+                  size="small"
+                  onClick={async () =>
+                    (await ask({ title: `Leave ${society.name}?`, confirm: 'Leave', cancel: 'Stay' })) && onChange((current) => leaveSociety(current, society.id))
+                  }
+                >
+                  Leave
+                </Button>
+              ) : (
+                <Button variant="primary" size="small" disabled={!check.ok} title={check.reasons.join(' · ') || undefined} onClick={() => onChange((current) => joinSociety(content, current, society.id))}>
+                  Join
+                </Button>
+              )}
+            </header>
+            <p>{society.description}</p>
+            {members.length + (sponsor ? 1 : 0) > 0 && (
+              <div className="portraits">
+                {[...members, ...(sponsor ? [sponsor] : [])].map((li) => (
+                  <Portrait key={li.id} who={li} caption />
+                ))}
+              </div>
+            )}
           </article>
         )
       })}

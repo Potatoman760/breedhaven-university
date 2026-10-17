@@ -6,10 +6,11 @@ import { eventGoers, eventsOn } from './events'
 import { examOn } from './grades'
 import { householdCost, isHouseholdDay, rentOn } from './housing'
 import { firstNames } from './scene'
+import { joinedSocieties, societyMeetingNow } from './societies'
 
 /** One thing on a day of the calendar. */
 export interface AgendaItem {
-  kind: 'class' | 'work' | 'plan' | 'event' | 'orientation' | 'birth' | 'rent' | 'household'
+  kind: 'class' | 'society' | 'work' | 'plan' | 'event' | 'orientation' | 'birth' | 'rent' | 'household'
   /** Unique within the day. */
   id: string
   title: string
@@ -40,6 +41,7 @@ export function dayAgenda(content: ContentPack, state: GameState, dayIndex: numb
   // Events are asked for at the hour the game starts each day, which every day has.
   const morning = timeOn(content, dayIndex, calendar.start.hour)
   const whole: AgendaItem[] = eventsOn(content, state, Math.max(morning, 0))
+    .filter((event) => !event.secret)
     .filter(() => morning >= 0)
     // An event with hours of its own is drawn at them, with where it is; a holiday is the whole day.
     .map((event) => ({
@@ -91,6 +93,12 @@ export function dayAgenda(content: ContentPack, state: GameState, dayIndex: numb
         hours: meeting.hours
       })
     }
+  }
+  for (const society of joinedSocieties(content, state)) {
+    const then = { ...state, time: timeOn(content, dayIndex, society.startHour) }
+    if (then.time < 0 || !societyMeetingNow(content, then, society)) continue
+    const place = content.locations.find((l) => l.id === society.locationId)?.name
+    timed.push({ kind: 'society', id: `society-${society.id}`, title: society.name, detail: place, description: society.description, startHour: society.startHour, hours: content.societies!.hours })
   }
   const job = content.jobs?.jobs.find((j) => j.id === state.job?.jobId)
   if (job && state.job) {

@@ -20,6 +20,7 @@ const written = (patch: Record<string, unknown> = {}) => ({
   likes: ['books'],
   dislikes: [],
   admires: ['wisdom'],
+  childNames: { daughters: ['Ada', 'Bea', 'Cora', 'Dell', 'Etta'], sons: ['Finn', 'Gus'] },
   kind: 'student',
   studies: { subject: 'Journalism', code: 'JRN', level: 2, stats: ['charisma'] },
   teaching: { department: 'the College of Arts', title: 'Dr', subjects: [{ subject: 'Rhetoric', code: 'RHT', level: 1, stats: ['charisma'] }] },
@@ -60,6 +61,8 @@ describe('writing a new love interest', () => {
     // A student has studies and nothing a teacher has.
     expect(li.studies?.code).toBe('JRN')
     expect(li.teaching).toBeUndefined()
+    // The names she would give her children come with her.
+    expect(li.childNames).toEqual({ daughters: ['Ada', 'Bea', 'Cora', 'Dell', 'Etta'], sons: ['Finn', 'Gus'] })
     expect(li.ai.secrets).toEqual([{ text: 'She already knows who leaked it.', revealWhen: [{ type: 'stage', min: stages.at(-2)!.id }] }])
   })
 
@@ -69,6 +72,12 @@ describe('writing a new love interest', () => {
     expect(() => parseDraft(content, JSON.stringify(written({ age: 17 })))).toThrow('did not fit: age')
     expect(() => parseDraft(content, JSON.stringify(written({ room: { name: 'x', description: 'y', locationId: 'nowhere' } })))).toThrow('room.locationId')
     expect(() => parseDraft(content, 'Sorry, I cannot.')).toThrow('held no character')
+    // Read to the brace that closes her, whatever comes after it, and forgiving a comma left before one.
+    const json = JSON.stringify(written())
+    expect(parseDraft(content, `Here she is:\n\`\`\`json\n${json}\n\`\`\`\nI hope {she} suits.`).name).toBe(written().name)
+    expect(parseDraft(content, json.replace(/}$/, ',}')).name).toBe(written().name)
+    // A reply cut off part way says so.
+    expect(() => parseDraft(content, json.slice(0, json.length / 2))).toThrow('cut off')
     expect(draftSchema(content).safeParse(written()).success).toBe(true)
   })
 })

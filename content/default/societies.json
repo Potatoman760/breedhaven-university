@@ -1,0 +1,375 @@
+{
+  "fairId": "societies-fair",
+  "hours": 1,
+  "maxJoined": 2,
+  "maxMembers": 2,
+  "statGain": 1,
+  "energy": 6,
+  "societies": [
+    {
+      "id": "debating-union",
+      "name": "the Debating Union",
+      "description": "The oldest society in the University, and the Assembly's nursery: a motion is put, two sides argue it in the corner of the Student Commons, and the room votes. The queen sits on the government bench, and the Goldvine heiress has never once agreed with her.",
+      "locationId": "commons",
+      "weekday": "Solday",
+      "startHour": 18,
+      "stats": [
+        "charisma",
+        "intelligence"
+      ],
+      "memberIds": [
+        "seraphine",
+        "yelena"
+      ],
+      "sponsorId": "caelwen"
+    },
+    {
+      "id": "volleyball-club",
+      "name": "the Volleyball Club",
+      "description": "Open training on the sand courts at the Tiltyard: drills, then a scrimmage that the captain takes far too seriously. Anyone can join; spellwork is allowed on the Mage court only.",
+      "locationId": "tiltyard",
+      "weekday": "Moonday",
+      "startHour": 18,
+      "stats": [
+        "strength",
+        "dexterity"
+      ],
+      "memberIds": [
+        "daphne",
+        "tamsin"
+      ],
+      "sponsorId": "grushka"
+    },
+    {
+      "id": "physic-garden-society",
+      "name": "the Physic Garden Society",
+      "description": "Volunteers who weed, water and plant the walled teaching garden after the College has gone home, and take cuttings home for their trouble. Its oldest member has been tending the ponds since before the garden had walls.",
+      "locationId": "physic-garden",
+      "weekday": "Tidesday",
+      "startHour": 18,
+      "stats": [
+        "wisdom",
+        "endurance"
+      ],
+      "memberIds": [
+        "lira",
+        "tamsin"
+      ]
+    },
+    {
+      "id": "furrow-choir",
+      "name": "the Furrow Choir",
+      "description": "The chapel choir of the Order of the First Furrow, which takes anyone who can hold a note and a few who cannot. Rehearsal is an hour of old sowing hymns and one modern song the choirmaster pretends not to like.",
+      "locationId": "chapel",
+      "weekday": "Windsday",
+      "startHour": 19,
+      "stats": [
+        "charisma",
+        "wisdom"
+      ],
+      "memberIds": [
+        "maren",
+        "morwenna"
+      ]
+    },
+    {
+      "id": "bloomist-fellowship",
+      "name": "the Bloomist Fellowship",
+      "description": "Students who hold that what the Bloom wants is sacred, and that a Sire is a gift to be honored. They meet in the chapel's side room for readings, tea and earnest discussion, and they are very glad to see a man.",
+      "locationId": "chapel",
+      "weekday": "Moonday",
+      "startHour": 19,
+      "stats": [
+        "wisdom"
+      ],
+      "memberIds": [
+        "dinah"
+      ],
+      "sponsorId": "lola-hopworth"
+    },
+    {
+      "id": "freewill-society",
+      "name": "the Freewill Society",
+      "description": "The Bloomists' opposite number: students who argue that a woman's will is her own, whatever the Bloom stirs in her. They meet in the upstairs room of the Honeyed Bee, drink, and pick apart the week's news. A Sire at a meeting is a subject of study.",
+      "locationId": "honeyed-bee-inn",
+      "weekday": "Hearthday",
+      "startHour": 19,
+      "stats": [
+        "intelligence"
+      ],
+      "memberIds": [
+        "morwenna",
+        "elowen"
+      ],
+      "sponsorId": "ottilie"
+    },
+    {
+      "id": "card-and-dice-society",
+      "name": "the Card and Dice Society",
+      "description": "Board games, card games and dice in the back room of Pixel and Rune, for no money at all, officially. One member works out the odds of every hand; another makes sure they are wrong.",
+      "locationId": "pixel-and-rune",
+      "weekday": "Tidesday",
+      "startHour": 20,
+      "stats": [
+        "dexterity",
+        "intelligence"
+      ],
+      "memberIds": [
+        "tink",
+        "isolde"
+      ]
+    },
+    {
+      "id": "merchants-society",
+      "name": "the Merchants' Society",
+      "description": "Business students and anyone who wants to be rich, meeting over coffee at Spell & Sip: a guest speaker from the Broodmarket or Lantern Row, then pitches, bargaining practice and gossip about who is hiring.",
+      "locationId": "spell-and-sip",
+      "weekday": "Hearthday",
+      "startHour": 18,
+      "stats": [
+        "charisma",
+        "intelligence"
+      ],
+      "memberIds": [
+        "faye",
+        "anwen"
+      ]
+    },
+    {
+      "id": "needle-and-thread",
+      "name": "Needle and Thread",
+      "description": "A sewing circle in the common room of the Cloister Halls: dressmaking, embroidery and alterations, with patterns passed round and opinions on everyone's clothes given freely.",
+      "locationId": "dormitories",
+      "weekday": "Windsday",
+      "startHour": 18,
+      "stats": [
+        "dexterity"
+      ],
+      "memberIds": [
+        "maren",
+        "yelena"
+      ]
+    },
+    {
+      "id": "midnight-circle",
+      "name": "the Midnight Circle",
+      "description": "A witchcraft society that meets after dark in the Physic Garden: candles, chalk circles and practical hexing, the kind they do not teach until third year. Professor Midnight sponsors it, and is the reason it has never once been shut down.",
+      "locationId": "physic-garden",
+      "weekday": "Windsday",
+      "startHour": 20,
+      "stats": [
+        "wisdom",
+        "intelligence"
+      ],
+      "memberIds": [
+        "faye",
+        "yulia"
+      ],
+      "sponsorId": "vespera"
+    }
+  ],
+  "fair": {
+    "tables": [
+      {
+        "societyId": "debating-union",
+        "x": 24,
+        "y": 44,
+        "gift": "lantern-row-whisper"
+      },
+      {
+        "societyId": "volleyball-club",
+        "x": 32,
+        "y": 74,
+        "gift": "energy-drink"
+      },
+      {
+        "societyId": "physic-garden-society",
+        "x": 37,
+        "y": 44,
+        "gift": "seed-packets"
+      },
+      {
+        "societyId": "furrow-choir",
+        "x": 71,
+        "y": 44,
+        "gift": "book-of-hymns"
+      },
+      {
+        "societyId": "bloomist-fellowship",
+        "x": 7,
+        "y": 50,
+        "gift": "prayer-beads"
+      },
+      {
+        "societyId": "freewill-society",
+        "x": 80,
+        "y": 70,
+        "gift": "heretics-history"
+      },
+      {
+        "societyId": "card-and-dice-society",
+        "x": 17,
+        "y": 62,
+        "gift": "playing-cards"
+      },
+      {
+        "societyId": "merchants-society",
+        "x": 48,
+        "y": 44,
+        "gift": "coffee-to-go"
+      },
+      {
+        "societyId": "needle-and-thread",
+        "x": 60,
+        "y": 76,
+        "gift": "silk-ribbon"
+      },
+      {
+        "societyId": "midnight-circle",
+        "x": 59,
+        "y": 45,
+        "gift": "ward-candles"
+      }
+    ],
+    "visitors": [
+      {
+        "id": "edda",
+        "x": 84,
+        "y": 52
+      }
+    ],
+    "hellos": {
+      "seraphine": [
+        "*Behind the Debating Union's table, under a banner of crossed quills, the queen is handing out leaflets as though she does this every day. Her protection officer stands a careful pace behind her.*",
+        "Good morning. Do you have a minute for the Debating Union? We meet on Soldays, in the Commons. Anyone may propose a motion.",
+        "Even you, {player}. Especially you, perhaps. I should like to hear what a man thinks, for once, without it being written down first."
+      ],
+      "yelena": [
+        "*Yelena Goldvine has arranged her leaflets in a perfect fan and is not, as far as anyone can tell, enjoying herself.*",
+        "You look like someone with opinions. Good. Most of the people at this fair have none, and the rest have Mother's.",
+        "I'm Yelena. If you can stand an argument, the Union. If you can stand pins and gossip, Needle and Thread. I do both. Don't ask me which is worse."
+      ],
+      "daphne": [
+        "*A volleyball bounces off the edge of the table and Daphne catches it one-handed without looking.*",
+        "Volleyball Club. Moondays at six, Tiltyard sand courts. You don't need to be good. You need to show up.",
+        "Daphne. Captain. If you can jump, I'll find a use for you."
+      ],
+      "tamsin": [
+        "*Tamsin is sitting on the table, not behind it, swinging her legs and eating a free pretzel from someone else's stall.*",
+        "{player}! Finally. I've been stuck here all morning telling people a net is not a hammock.",
+        "Sign up. Go on. It's me, it's sand, it's Moondays. And I do the garden lot on Tidesdays too, so you've no excuse."
+      ],
+      "lira": [
+        "*At the Physic Garden Society's table, between the seedlings, a pale blue girl is sitting very still in a basin of water and smiling at everyone who passes.*",
+        "Hello! I'm Lira. I have looked after the ponds since the garden had no walls. That was a long time ago. It was a Tuesday.",
+        "We plant things on Tidesdays and they grow. Mostly. Would you like a seed? They are free, and I have not eaten any of them."
+      ],
+      "elowen": [
+        "*Elowen has covered the Freewill Society's end of the table in ribbons and is handing out cider that is definitely not on the approved list.*",
+        "Hi! Hi. You're new, I can tell, you've got the face. Elowen. Have a cup, it's spiced.",
+        "Hearthdays at seven, upstairs at the Bee. We drink, we argue, Morwenna says something devastating, everyone claps. It's the best night of the week."
+      ],
+      "maren": [
+        "*Maren is behind the table in a froth of pink lace, holding a parasol and a clipboard with equal seriousness.*",
+        "Bonjour, bonjour! Oh, sorry, wrong country. Hello! I'm Maren!",
+        "Do you sing? Do you sew? Say yes to one, it's very good for you. Windsdays, both of them. I'll save you a seat, mon coeur. That means my heart. I'm being friendly."
+      ],
+      "dinah": [
+        "*At the white and gold table of the Bloomist Fellowship, a young woman in a postulant's gray rises to greet you before you have quite decided to stop.*",
+        "You're welcome here. I'm Dinah. We read, we pray a little, and we talk about what the Bloom asks of us. Moondays, after supper, in the chapel's side room.",
+        "And we'd be glad to have a Sire with us. Not to study you. Just to listen, if you'd like to."
+      ],
+      "morwenna": [
+        "*Far across the court from the Bloomists, Morwenna Thriceborn sits at a black table like a widow at her own wake, and does not get up.*",
+        "Ah. Fresh meat with a pulse. How novel.",
+        "The Freewill Society meets on Hearthdays, upstairs at the Honeyed Bee, to discuss whether a woman's will is her own. You would be a fascinating exhibit. And on Windsdays I sing, which nobody believes."
+      ],
+      "tink": [
+        "*Tink is shuffling a deck at the Card and Dice table with a speed that suggests the deck has no say in the matter.*",
+        "Pick a card. No, not that one. Fine, that one. Was it the queen of cups? It was. You're welcome.",
+        "Card and Dice Society, Tidesdays at eight, back room at Pixel and Rune. No money. Officially. I'm Tink. I'll be robbing you."
+      ],
+      "isolde": [
+        "*Isolde Verrane sits at the end of the Card and Dice table, keeping the sign-up sheet in a ledger with ruled columns.*",
+        "Good morning. I calculate the odds for the Card and Dice Society. Someone has to.",
+        "Tidesdays at eight. Bring a pencil. I find a man is much more interesting once you know his figures."
+      ],
+      "faye": [
+        "*At the Merchants' Society table, Faye Fertillay is pouring coffee for a queue that seems to have formed around her rather than the urn.*",
+        "Well, hello. You're the one everyone's whispering about. That makes you an asset, darling.",
+        "Merchants' Society, Hearthdays at six, Spell & Sip: speakers, pitches, deals. And on Windsday nights, the Midnight Circle, for the other kind of power. I'm Faye. Come and learn what you're worth."
+      ],
+      "anwen": [
+        "*Anwen is behind the urn, quietly taking money for the coffee Faye is giving away.*",
+        "Hello. Anwen. Not the other one. She's at the Freewill table, wearing too many ribbons.",
+        "We meet Hearthdays at six. I keep the books. If you join, I'll know whether you paid."
+      ],
+      "grushka": [
+        "*Behind the Volleyball Club's table, the orc head coach stands with her arms folded, like a general reviewing a regiment.*",
+        "You. Sire. You've got shoulders. Use them.",
+        "I sponsor this lot. Moondays, Tiltyard. Daphne runs it, I make sure nobody is soft. Come when you've decided you aren't."
+      ],
+      "edda": [
+        "*Professor Lorne is walking the tables with her folder, making notes on everyone, you included.*",
+        "{player}. You came. Good. Most of these societies are harmless, a few are useful, and two of them will try to recruit you for the same reason.",
+        "Choose by the people, not the leaflets. And do not let either of those two tables make up your mind about the Bloom for you."
+      ],
+      "caelwen": [
+        "*An elf in a scholar's coat sits a little apart from the Debating Union's table, a cup of tea in her hand, watching the arguing with every sign of enjoyment.*",
+        "Good morning. I'm Professor Ashgrove. I sponsor the Union, which means I sit at the back and refuse to tell them who won.",
+        "Do come on a Solday, {player}. In sixty years I have heard every argument about the Bloom but one. Yours."
+      ],
+      "lola-hopworth": [
+        "*At the Bloomist Fellowship's table, a stout, flour-dusted woman is cutting a seed cake into squares faster than anyone can take them.*",
+        "Cake. Take a piece. Take two, you look underfed. Professor Hopworth, Culinary Arts. I sponsor this lot.",
+        "Bloom's a gift, I say. Same as yeast. You don't argue with it, you feed it and see what rises. Moondays. Bring an appetite."
+      ],
+      "ottilie": [
+        "*A sharp-faced woman in a lab coat is sitting at the end of the Freewill table, reading a journal and ignoring the fair entirely, until she notices you.*",
+        "You're the assay. Highest ever recorded. I'm Marrow. Sire Genetics.",
+        "I sponsor the Freewill Society because someone at this University should be on the side of evidence. Hearthdays. Come and tell us whether you feel blessed."
+      ],
+      "vespera": [
+        "*At a table draped in black velvet and set with lit candles in broad daylight, a woman in a pointed hat leans back in her chair and looks you over.*",
+        "Well, now. The famous one. Vespera Midnight. I teach hexes, and I sponsor the only society on this court worth staying up late for.",
+        "The Midnight Circle. Windsdays, in the garden, after dark. Come along, sugar. I promise to curse you only a little."
+      ],
+      "yulia": [
+        "*At the Midnight Circle's table, a platinum-blonde girl is sitting on the edge of it rather than behind it, stirring something that glows in a paper cup.*",
+        "Heyyy. You're the Sire, right? Everyone's been pointing. I'm Yulia. Starkelands, third year, Magical Engineering, but don't hold that against me.",
+        "Midnight Circle, Windsdays, after dark in the garden. Candles, potions, Professor Midnight being scary. Honestly it's the best party on campus. Want a sip?"
+      ]
+    },
+    "rivalry": {
+      "societyIds": [
+        "bloomist-fellowship",
+        "freewill-society"
+      ],
+      "intro": {
+        "speakerId": "dinah",
+        "scenes": [
+          {
+            "locationId": "great-court",
+            "castIds": [
+              "dinah",
+              "morwenna"
+            ],
+            "backgroundId": "societies-fair",
+            "lines": [
+              "*You have barely stepped back from the second of the two tables when you find both of their women at your side, having crossed the whole court to get there.*",
+              "Dinah: Morwenna. You came all the way over.",
+              "Morwenna: I could hardly let you have him to yourself, Sister. You'd only tell him he was blessed.",
+              "Dinah: He is. That's not a threat, it's a fact. The Bloom made him what he is, and it made you what you are.",
+              "Morwenna: And there it is. The Bloom made me. The Bloom wants. Nobody in your fellowship has ever wanted anything for herself.",
+              "Dinah: Everyone in mine knows what she wants. We just don't pretend it came from nowhere.",
+              "*They both turn to you at once.*",
+              "Morwenna: Well? Sacred duty or free will, {player}. You have the rare privilege of being the question.",
+              "Dinah: You don't have to answer her. Come on Moonday and see. Or don't. Either way, you're welcome.",
+              "Morwenna: Hearthday. Upstairs. Bring an opinion."
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

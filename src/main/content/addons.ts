@@ -10,10 +10,14 @@ import {
   STANDARD_OUTFITS,
   TraitSchema,
   JobSchema,
+  SocietySchema,
+  kindOf,
   poseMedia,
   validateContentPack,
   type CalendarEvent,
   type Job,
+  type Society,
+  type SocietiesFair,
   type ContentPack,
   type Location,
   type LoveInterest,
@@ -339,6 +343,50 @@ export function deleteJob(packDir: string, id: string): string[] {
   const config = (existsSync(file) ? readJsonFile(file) : {}) as { jobs?: Job[] }
   if (!(config.jobs ?? []).some((job) => job.id === id)) return ['There is no such job.']
   writeFileSync(file, `${JSON.stringify({ ...config, jobs: (config.jobs ?? []).filter((job) => job.id !== id) }, null, 2)}\n`)
+  return []
+}
+
+const SOCIETIES_FILE = 'societies.json'
+
+/**
+ * Adds a society to the game, or changes one, after checking the game would still load with it. Societies are the game's
+ * own, as jobs are: written to its own file, and edited only when it is run from source.
+ */
+export function saveSociety(packDir: string, content: ContentPack, raw: unknown): string[] {
+  const parsed = SocietySchema.safeParse(raw)
+  if (!parsed.success) return parsed.error.issues.map((issue) => `${issue.path.join('.') || 'society'}: ${issue.message}`)
+  const society = parsed.data
+  if (!isSafeId(society.id)) return ['The id may only have lower-case letters, digits and hyphens, and must start with a letter or digit.']
+  if (society.name.trim() === '') return ['A name is needed.']
+  if (!content.locations.some((l) => l.id === society.locationId)) return ['Choose where it meets.']
+  const notStudents = society.memberIds.filter((id) => {
+    const li = content.loveInterests.find((one) => one.id === id)
+    return !li || kindOf(li) !== 'student'
+  })
+  if (notStudents.length > 0) return ['Only students can belong to a society.']
+  const sponsor = content.loveInterests.find((one) => one.id === society.sponsorId)
+  if (society.sponsorId && (!sponsor || kindOf(sponsor) !== 'teacher')) return ['Only a teacher can sponsor a society.']
+  const file = join(packDir, SOCIETIES_FILE)
+  const config = (existsSync(file) ? readJsonFile(file) : {}) as { fairId?: string; societies?: Society[]; fair?: SocietiesFair }
+  const societies = overlay(config.societies ?? [], [society])
+  try {
+    // Checked as the file will be: with its own fair, if it has one, and not the one loaded.
+    validateContentPack({ ...content, societies: { ...content.societies!, ...config, fair: config.fair, societies } })
+  } catch (error) {
+    return (error as { issues?: string[] }).issues ?? [(error as Error).message]
+  }
+  writeFileSync(file, `${JSON.stringify({ ...config, societies }, null, 2)}\n`)
+  return []
+}
+
+/** Takes a society out of the game. */
+export function deleteSociety(packDir: string, id: string): string[] {
+  const file = join(packDir, SOCIETIES_FILE)
+  const config = (existsSync(file) ? readJsonFile(file) : {}) as { societies?: Society[]; fair?: SocietiesFair }
+  if (!(config.societies ?? []).some((society) => society.id === id)) return ['There is no such society.']
+  // Its table at the fair goes with it.
+  const fair = config.fair && { ...config.fair, tables: config.fair.tables.filter((table) => table.societyId !== id) }
+  writeFileSync(file, `${JSON.stringify({ ...config, ...(fair && { fair }), societies: (config.societies ?? []).filter((society) => society.id !== id) }, null, 2)}\n`)
   return []
 }
 

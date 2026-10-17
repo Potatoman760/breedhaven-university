@@ -4,6 +4,8 @@ import { isGameOver, toDate } from './calendar'
 import { courseMembers, coursesInSession } from './courses'
 import { eventKeeping } from './events'
 import { isOpen, scheduledLocationId } from './schedule'
+import { societiesInSession, societyPeople } from './societies'
+import { atFair } from './fair'
 import type { PerformCheck } from './activities'
 
 /**
@@ -30,9 +32,13 @@ export function locationOf(
   const waiting = appointmentsNow(state).find((a) => attendees(a).includes(li.id))
   if (waiting) return waiting.locationId
   const inClass = coursesInSession(content, state).find((c) => courseMembers(c).includes(li.id))
+  // A meeting of a society of hers is the hour after classes she keeps each week.
+  const atSociety = inClass ? undefined : societiesInSession(content, state).find((society) => societyPeople(society).includes(li.id))
   // Somewhere she said she would be comes before her ordinary day, though not before a class or her work.
   // With nothing on her schedule she is nowhere he can walk up to her: she is in her own room, and shown so on the map. She can still be asked out.
-  return inClass?.locationId ?? workplaceNow(content, state, li.id) ?? eventKeeping(content, state, li.id)?.locationId ?? scheduledLocationId(li, toDate(content.calendar, state.time))
+  // The societies' fair has every student at a table, and a few others wandering it.
+  const fair = inClass || atSociety || !atFair(content, state, li.id) ? undefined : content.calendar.events.find((event) => event.id === content.societies?.fairId)?.locationId
+  return inClass?.locationId ?? atSociety?.locationId ?? fair ?? workplaceNow(content, state, li.id) ?? eventKeeping(content, state, li.id)?.locationId ?? scheduledLocationId(li, toDate(content.calendar, state.time))
 }
 
 /** Love interests who are at the given location right now. */

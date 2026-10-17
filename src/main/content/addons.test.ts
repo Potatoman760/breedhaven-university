@@ -284,3 +284,26 @@ describe('jobs, which are the game\'s own', () => {
     expect(deleteJob(pack, 'night-porter')).toEqual(['There is no such job.'])
   })
 })
+
+describe('societies, which are the game\'s own', () => {
+  it('are added, changed and taken out in the game\'s societies file, and hold students only, and no more than they may', async () => {
+    const { deleteSociety, saveSociety } = await import('./addons')
+    const pack = mkdtempSync(join(tmpdir(), 'bh-societies-'))
+    const shipped = base.content.societies!
+    writeFileSync(join(pack, 'societies.json'), JSON.stringify({ fairId: shipped.fairId, societies: [shipped.societies[0]] }))
+    const read = () => JSON.parse(readFileSync(join(pack, 'societies.json'), 'utf8')) as { fairId: string; societies: { id: string; memberIds: string[] }[] }
+
+    const chess = { ...shipped.societies[0], id: 'chess-club', name: 'the Chess Club', memberIds: ['tamsin'] }
+    expect(saveSociety(pack, base.content, chess)).toEqual([])
+    expect(read().societies.map((society) => society.id)).toEqual([shipped.societies[0].id, 'chess-club'])
+    expect(read().fairId).toBe(shipped.fairId)
+
+    expect(saveSociety(pack, base.content, { ...chess, memberIds: ['tamsin', 'vespera'] })).toEqual(['Only students can belong to a society.'])
+    expect(saveSociety(pack, base.content, { ...chess, memberIds: ['tamsin', 'daphne', 'lira'] })[0]).toMatch(/a society holds 2/)
+    expect(saveSociety(pack, base.content, { ...chess, locationId: 'nowhere' })).toEqual(['Choose where it meets.'])
+    expect(read().societies.find((society) => society.id === 'chess-club')?.memberIds).toEqual(['tamsin'])
+
+    expect(deleteSociety(pack, 'chess-club')).toEqual([])
+    expect(deleteSociety(pack, 'chess-club')).toEqual(['There is no such society.'])
+  })
+})

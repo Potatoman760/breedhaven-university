@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { canGoBelow, depthsOpen, describeChange, outingMisses, partyChoices, pregnancyPower, relicsHeld, spriteFor, wornOutfit } from '../../../shared/game'
+import { Portrait } from './Portrait'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { Button } from './Button'
 import { Dialog } from './Dialog'
 import { Facts } from './Facts'
-import { ChevronIcon } from './icons'
+import { GrandButton } from './GrandButton'
+import { BackIcon, ChevronIcon, StopIcon } from './icons'
 
 interface Props {
   content: ContentPack
@@ -29,7 +31,7 @@ export function PartyDialog({ content, state, onGo, onClose }: Props) {
   const toggle = (id: string) => setParty(party.includes(id) ? party.filter((one) => one !== id) : party.length < config.partySize ? [...party, id] : party)
 
   return (
-    <Dialog title="Go below" note={config.name} onClose={onClose} noClose wide>
+    <Dialog title="Go below" note={config.name} onClose={onClose} noClose wide ornate>
       <Facts
         facts={[
           { label: 'Takes', value: `${config.hours} hours` },
@@ -70,7 +72,7 @@ export function PartyDialog({ content, state, onGo, onClose }: Props) {
           const sprite = spriteFor(li, wornOutfit(content, state, li), 'neutral')
           return (
             <button key={li.id} type="button" aria-pressed={chosen} className={`party-card${chosen ? ' picked' : ''}`} disabled={reason !== undefined || full} title={reason ?? (full ? `No more than ${config.partySize} can come` : power > 1 ? `Carrying: x${power} power, and a surge to ground` : undefined)} onClick={() => toggle(li.id)}>
-              <span className="party-face" style={sprite ? { backgroundImage: `url("content://pack/${sprite}")`, backgroundPosition: `50% ${li.faceY}%` } : undefined} />
+              <Portrait who={li} image={sprite} size="fill" className="party-face" />
               <strong>{li.name.split(' ')[0]}</strong>
               <span className="caps">{role.name}</span>
               {power > 1 && !reason && <span className="party-badge">x{power}</span>}
@@ -83,12 +85,15 @@ export function PartyDialog({ content, state, onGo, onClose }: Props) {
       {!check.ok && <p className="notice">{check.reasons.join(' · ')}</p>}
       {check.ok && missed.length > 0 && <p className="notice">You would miss {missed.join('; ')}.</p>}
       <div className="actions end">
-        <Button variant="quiet" onClick={onClose}>
-          Not now
-        </Button>
-        <Button variant="primary" disabled={!check.ok} onClick={() => onGo(party, depth)}>
-          Go down
-        </Button>
+        <GrandButton label="Not now" icon={<BackIcon size={22} />} chevron={false} onClick={onClose} />
+        <GrandButton
+          label="Go down"
+          note={`${party.length} of ${config.partySize} with you · ${config.hours} hours`}
+          icon={<StopIcon kind="guardian" size={24} />}
+          disabled={!check.ok}
+          tip={check.reasons.join(' · ') || undefined}
+          onClick={() => onGo(party, depth)}
+        />
       </div>
     </Dialog>
   )

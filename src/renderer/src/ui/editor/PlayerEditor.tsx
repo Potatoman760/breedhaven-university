@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import type { EditorInfo, EditorResult } from '../../../../shared/editor'
 import { viewImage } from '../../../../shared/game'
+import { Portrait } from '../Portrait'
 import { LIGHTS, OutfitSchema, type ContentPack, type NewGame, type PlayerLook, type Room } from '../../../../shared/model'
 import { errorMessage } from '../../errors'
 import { ArtTool } from '../art/ArtTool'
@@ -208,7 +209,7 @@ export function PlayerEditor({ content, onContent, switcher }: Props) {
                 <span className="hint">No picture yet.</span>
               )}
               {look.sprite && (
-                <span className="portrait-face player-portrait" role="img" aria-label="His portrait" style={{ backgroundImage: `url("content://pack/${look.sprite}")`, backgroundPosition: `50% ${look.faceY}%` }} />
+                <Portrait who={{ name: 'His portrait', faceY: look.faceY }} image={look.sprite} size={88} />
               )}
               <Button title="Draw him with your own ComfyUI, from his appearance and clothes" disabled={look.appearance.trim() === ''} onClick={() => setDrawingHim(true)}>
                 Generate a picture

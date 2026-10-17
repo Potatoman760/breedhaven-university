@@ -176,7 +176,7 @@ export function sceneView(content: ContentPack, state: GameState, backgroundId?:
  * give it a view with the occasion's name.
  */
 export function viewFor(content: ContentPack, state: GameState, location: Location | undefined, chosenId?: string): Background | undefined {
-  return location && backgroundFor(location, chosenId, eventsOn(content, state).map((event) => event.name))
+  return location && backgroundFor(location, chosenId, eventsOn(content, state).flatMap((event) => [event.name, event.id]))
 }
 
 /** Told to a character: exactly where they are, and whether there is a roof over them. */

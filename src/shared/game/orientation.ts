@@ -1,4 +1,4 @@
-import { kindOf, type ContentPack, type GameState, type OrientationStep, type Scene } from '../model'
+import { kindOf, type ContentPack, type GameState, type Intro, type OrientationStep, type Scene } from '../model'
 import { toDate } from './calendar'
 import { courseMembers } from './courses'
 import { sceneBaseline } from './scene'
@@ -25,7 +25,7 @@ export function orientationStep(content: ContentPack, state: GameState): Orienta
  * introduced to people one at a time. Orientation is there for those he would not otherwise
  * run into: only someone he shares no class with is dealt out, one to a step. Classmates
  * are left for class, and whoever is left over is met some other way. A step that names
- * its own keeps her, if she is a student.
+ * its own keeps every one it names who is a student: a story beat can bring two together.
  */
 export function orientationCasts(content: ContentPack, state: GameState): string[][] {
   const steps = content.orientation?.steps ?? []
@@ -35,7 +35,7 @@ export function orientationCasts(content: ContentPack, state: GameState): string
   // Orientation is for the new intake: only fellow students are there to be met, not teachers or people from outside.
   const students = content.loveInterests.filter((li) => kindOf(li) === 'student').map((li) => li.id)
   const strangers = students.filter((id) => !named.has(id) && !classmate(id))
-  const casts = steps.map((step) => (step.castIds ?? []).filter((id) => students.includes(id)).slice(0, MET_AT_A_STEP))
+  const casts = steps.map((step) => (step.castIds ?? []).filter((id) => students.includes(id)))
   // One to each open step in turn. Anyone left when every step has someone is met some other way.
   const open = steps.map((_step, i) => i).filter((i) => (steps[i].castIds ?? []).length === 0)
   for (let turn = 0; strangers.length > 0 && turn < MET_AT_A_STEP; turn++) {
@@ -53,7 +53,7 @@ export function orientationCasts(content: ContentPack, state: GameState): string
  * lasts as long as it lasts. With anyone to meet, it is a scene with them; with nobody, it
  * only passes the time.
  */
-export function attendOrientation(content: ContentPack, state: GameState): { state: GameState; scene: Scene | null } {
+export function attendOrientation(content: ContentPack, state: GameState): { state: GameState; cutscene?: Intro; scene: Scene | null } {
   const step = orientationStep(content, state)
   if (!step) throw new Error('There is no orientation to attend now')
   const index = state.orientationStep
@@ -66,6 +66,7 @@ export function attendOrientation(content: ContentPack, state: GameState): { sta
   const after = there
   return {
     state: after,
+    cutscene: step.cutscene,
     scene: leadId
       ? {
           loveInterestId: leadId,

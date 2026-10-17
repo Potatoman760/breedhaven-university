@@ -135,16 +135,26 @@ export function buildCharacterPrompt(input: PromptInput): string {
   const kind = kindOf(li)
   const hers = state.courses.filter((c) => c.teacherId === li.id)
   const inHerClass = hers.some((c) => state.enrolment?.includes(c.id))
+  // The societies she belongs to, or sponsors as a teacher, and whether he belongs to them too.
+  const societies = (content.societies?.societies ?? []).filter((society) => society.memberIds.includes(li.id) || society.sponsorId === li.id)
+  const clubs =
+    societies.length === 0
+      ? ''
+      : ` You ${kind === 'teacher' ? 'sponsor' : 'belong to'} ${societies
+          .map((society) => `${society.name}, which meets ${society.weekday}s at ${String(society.startHour).padStart(2, '0')}:00${state.societies.includes(society.id) ? ` (${player.name} is a member)` : ''}`)
+          .join(', and ')}.`
   const place =
     isNpc || !content.coursework
       ? undefined
       : kind === 'student' && li.studies
         ? `You are a student at the University, reading ${li.studies.subject}` +
-          `${li.studies.level >= 5 ? ' as a graduate' : `, in your year ${li.studies.level}`}.`
+          `${li.studies.level >= 5 ? ' as a graduate' : `, in your year ${li.studies.level}`}.` +
+          clubs
         : kind === 'teacher' && li.teaching
           ? `You teach at the University: ${li.teaching.title} of ${li.teaching.department}, giving ` +
             `${li.teaching.subjects.map((s) => s.subject).join(' and ')}. ${player.name} is a student there` +
-            `${inHerClass ? `, and sits in your ${hers.find((c) => state.enrolment?.includes(c.id))?.title} class.` : ', though not in any class of yours.'}`
+            `${inHerClass ? `, and sits in your ${hers.find((c) => state.enrolment?.includes(c.id))?.title} class.` : ', though not in any class of yours.'}` +
+            clubs
           : `You are not part of the University: you do not study or teach there, and know it from outside.`
   const extras = input.extras ?? []
   // With anyone else to write for, every spoken line says whose it is.
@@ -396,7 +406,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
       describeHour(content, date),
       weather &&
         describeWeather(weather, byCourier ? (whereabouts ? isIndoors(whereabouts, herView) : true) : owner !== undefined || his !== undefined || isIndoors(location, view)),
-      ...eventsOn(content, state).map((e) => `Today is ${e.name}. ${describeEvent(content, e)}${eventGoers(state, e.id).includes(li.id) ? ` You told ${player.name} you would be there.` : ''}`.trim()),
+      ...eventsOn(content, state).filter((e) => !e.secret).map((e) => `Today is ${e.name}. ${describeEvent(content, e)}${eventGoers(state, e.id).includes(li.id) ? ` You told ${player.name} you would be there.` : ''}`.trim()),
       ...upcomingEvents(content, state, UPCOMING_EVENT_DAYS).map(({ event, inDays }) =>
         `${event.name} is ${inDays === 1 ? 'tomorrow' : `in ${inDays} days`}. ${describeEvent(content, event)}${eventGoers(state, event.id).includes(li.id) ? ` You told ${player.name} you would be there.` : ''}`.trim()
       ),

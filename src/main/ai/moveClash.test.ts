@@ -153,7 +153,7 @@ describe('spending the night together', () => {
 })
 
 describe('saying she will be at an event', () => {
-  const fair = { id: 'fair', name: 'the Fair', description: 'Stalls.', month: 'a', day: 2, durationDays: 1, locationId: 'shop', startHour: 8, hours: 6, noClasses: false, generated: false }
+  const fair = { id: 'fair', name: 'the Fair', description: 'Stalls.', month: 'a', day: 2, durationDays: 1, locationId: 'shop', startHour: 8, hours: 6, noClasses: false, generated: false, program: [], secret: false }
   const fairground = { ...content, calendar: { ...content.calendar, events: [fair] } }
   const state = createInitialState(fairground)
 

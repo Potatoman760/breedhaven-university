@@ -30,6 +30,13 @@ export function eventsOn(content: ContentPack, state: GameState, time = state.ti
   )
 }
 
+/** Which day of an event it is, counting from 1, or nothing when it is not on. */
+export function eventDay(content: ContentPack, event: CalendarEvent, time: number): number | undefined {
+  const { year, dayIndex } = toDate(content.calendar, time)
+  const start = startDays(content, event, [year - 1, year]).find((day) => day <= dayIndex && dayIndex < day + event.durationDays)
+  return start === undefined ? undefined : dayIndex - start + 1
+}
+
 /** The hours an event keeps, when it keeps any: "10:00 to 16:00". */
 export function eventHours(event: Pick<CalendarEvent, 'startHour' | 'hours'>): string | undefined {
   return event.startHour === undefined ? undefined : `${clock(event.startHour)} to ${clock(event.startHour + (event.hours ?? 1))}`
@@ -62,20 +69,32 @@ export function addEventGoers(state: GameState, eventId: string, ids: string[]):
   return going.length === eventGoers(state, eventId).length ? state : { ...state, eventGoers: { ...state.eventGoers, [eventId]: going } }
 }
 
-/** The events someone could say she will be at: those somewhere, keeping hours, that are on today or begin within a fortnight. */
+/**
+ * The events someone could say she will be at: those somewhere, keeping hours of their own or with something in their
+ * program, that are on today or begin within a fortnight.
+ */
 export function attendableEvents(content: ContentPack, state: GameState): CalendarEvent[] {
-  const goable = (event: CalendarEvent) => event.startHour !== undefined && content.locations.some((l) => l.id === event.locationId)
-  const all = [...eventsOn(content, state), ...upcomingEvents(content, state, ATTEND_WITHIN_DAYS).map(({ event }) => event)]
+  const goable = (event: CalendarEvent) => (event.startHour !== undefined || event.program.length > 0) && content.locations.some((l) => l.id === event.locationId)
+  const all = [...eventsOn(content, state).filter((event) => !event.secret), ...upcomingEvents(content, state, ATTEND_WITHIN_DAYS).map(({ event }) => event)]
   // One that is on today and comes round again soon is still one event.
   return all.filter((event, i) => goable(event) && all.findIndex((other) => other.id === event.id) === i)
 }
 
-/** The event someone has said she will be at that is open at this hour, if there is one: where she is, unless something of her own keeps her. */
-export function eventKeeping(content: ContentPack, state: GameState, loveInterestId: string): CalendarEvent | undefined {
+/**
+ * The event someone has said she will be at that has something on at this hour, and where: its own hours at its place,
+ * or a part of its program today at the part's. An event can be the whole day for how places and people are dressed,
+ * and only some hours of it for where she goes. It is where she is, unless something of her own keeps her.
+ */
+export function eventKeeping(content: ContentPack, state: GameState, loveInterestId: string): { event: CalendarEvent; locationId: string } | undefined {
   const { hour } = toDate(content.calendar, state.time)
-  return eventsOn(content, state).find(
-    (event) => event.startHour !== undefined && event.locationId !== undefined && hour >= event.startHour && hour < event.startHour + (event.hours ?? 1) && eventGoers(state, event.id).includes(loveInterestId)
-  )
+  const during = (from: number, hours: number) => hour >= from && hour < from + hours
+  for (const event of eventsOn(content, state)) {
+    if (!eventGoers(state, event.id).includes(loveInterestId)) continue
+    const part = event.program.find((one) => one.day === eventDay(content, event, state.time) && during(one.startHour, one.hours))
+    const locationId = part ? (part.locationId ?? event.locationId) : event.startHour !== undefined && during(event.startHour, event.hours ?? 1) ? event.locationId : undefined
+    if (locationId !== undefined) return { event, locationId }
+  }
+  return undefined
 }
 
 export interface UpcomingEvent {
@@ -91,7 +110,9 @@ export function upcomingEvents(
   withinDays: number
 ): UpcomingEvent[] {
   const { year, dayIndex } = toDate(content.calendar, state.time)
+  // A story beat is not seen coming.
   return allEvents(content, state)
+    .filter((event) => !event.secret)
     .flatMap((event) => {
       const waits = startDays(content, event, [year, year + 1])
         .map((start) => start - dayIndex)
@@ -153,7 +174,7 @@ export function buildEventPrompt(input: EventGenerationInput): { system: string;
     ...content.locations.map((l) => `- ${l.id} (${l.name})`),
     '',
     'Events that already exist; do not repeat them or share their dates:',
-    ...allEvents(content, state).map(describe),
+    ...allEvents(content, state).filter((event) => !event.secret).map(describe),
     '',
     `Today is ${formatDate(today)}.`,
     `Invent ${count} new events that start after today and no later than ${formatDate(latest)}.`
@@ -243,7 +264,9 @@ export function parseGeneratedEvents(
       locationId: content.locations.some((l) => l.id === locationId) ? locationId! : undefined,
       startHour: opens,
       hours: opens === undefined ? undefined : Math.min(hours ?? 2, calendar.hoursPerDay - opens),
-      generated: true
+      generated: true,
+      program: [],
+      secret: false
     })
   }
   return events

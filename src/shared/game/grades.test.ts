@@ -73,6 +73,8 @@ describe("a course's points", () => {
     expect(own).toMatchObject({ locationId: 'home', ownRoom: true, dropIn: false })
     expect(studyPoints(content, shop)).toBe(4)
     expect(studyPoints(content, own)).toBe(5)
+    // Made longer, it is worth more by the hour; the quiet of his own room is worth the same once.
+    expect(studyPoints(content, { ...own, hours: 4 })).toBe(9)
 
     const quiet = { ...start, locationId: 'home', time: 2 }
     const after = startOuting(content, quiet, own)

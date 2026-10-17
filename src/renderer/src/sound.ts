@@ -35,6 +35,10 @@ export function setVolume(kind: VolumeKind, value: number): void {
     window.clearInterval(fades.get(ambience.audio))
     ambience.audio.volume = ambience.sound.volume * volumes.ambience
   }
+  if (poseLoop) {
+    window.clearInterval(fades.get(poseLoop.audio))
+    poseLoop.audio.volume = poseLoop.sound.volume * volumes.effects
+  }
   listeners.forEach((listener) => listener(volumes))
 }
 
@@ -104,6 +108,42 @@ export function setAmbience(sound: Sound | undefined): void {
   audio.play().catch(() => undefined)
   fade(audio, sound.volume * volumes.ambience)
   ambience = { sound, audio }
+}
+
+// The loop behind an NSFW pose while it is up: on the effects volume, and quick to come and go with the picture.
+let poseLoop: { sound: Sound; audio: HTMLAudioElement } | null = null
+const POSE_FADE_MS = 300
+
+/** Sets the loop behind the pose that is up, or stops it. The same file carries on where it was. */
+export function setPoseLoop(sound: Sound | undefined): void {
+  if (poseLoop && sound && poseLoop.sound.file === sound.file) return
+  if (poseLoop) {
+    const { audio } = poseLoop
+    fadeFor(audio, 0, POSE_FADE_MS, () => audio.pause())
+  }
+  poseLoop = null
+  if (!sound || volumes.effects === 0) return
+  const audio = new Audio(url(sound.file))
+  audio.loop = true
+  audio.volume = 0
+  audio.play().catch(() => undefined)
+  fadeFor(audio, sound.volume * volumes.effects, POSE_FADE_MS)
+  poseLoop = { sound, audio }
+}
+
+function fadeFor(audio: HTMLAudioElement, to: number, ms: number, done?: () => void): void {
+  window.clearInterval(fades.get(audio))
+  const steps = Math.max(1, ms / FADE_STEP_MS)
+  const step = (to - audio.volume) / steps
+  const timer = window.setInterval(() => {
+    const next = audio.volume + step
+    if (step === 0 || (step > 0 ? next >= to : next <= to)) {
+      audio.volume = Math.max(0, Math.min(1, to))
+      window.clearInterval(timer)
+      done?.()
+    } else audio.volume = Math.max(0, Math.min(1, next))
+  }, FADE_STEP_MS)
+  fades.set(audio, timer)
 }
 
 /**

@@ -10,7 +10,7 @@ import { sexGate } from '../shared/game/intimacy'
 import { CONTENT_SCHEME, resolveContentPath, serveContent } from './content/assets'
 import { deleteLoveInterest,
   removeUnusedAssets,
-  deleteTrait, deleteEvent, deleteJob, saveJob, importAsset, loadBase, saveEvent, loadWithAddons, saveCatalogue, saveLocation, deleteLocation, saveLoveInterest, saveTrait,
+  deleteTrait, deleteEvent, deleteJob, saveJob, deleteSociety, saveSociety, importAsset, loadBase, saveEvent, loadWithAddons, saveCatalogue, saveLocation, deleteLocation, saveLoveInterest, saveTrait,
   resetPlayer,
   savePlayer
 } from './content/addons'
@@ -259,7 +259,14 @@ function registerIpc(
         maxTokens: Math.max(profile.maxTokens, DRAFT_MIN_TOKENS),
         timeoutMs: DRAFT_TIMEOUT_MS
       })
-      return { loveInterest: parseDraft(content, reply) }
+      try {
+        return { loveInterest: parseDraft(content, reply) }
+      } catch (error) {
+        // What came back is kept, so that a reply that could not be read can be looked at.
+        const kept = join(app.getPath('userData'), 'last-draft-reply.txt')
+        writeFileSync(kept, reply)
+        return { error: `${(error as Error).message} (The reply is saved in ${kept}.)` }
+      }
     } catch (error) {
       return { error: (error as Error).message }
     }
@@ -272,10 +279,12 @@ function registerIpc(
   ipcMain.handle(IPC.editorDeleteLocation, (_event, raw: unknown) => change(() => deleteLocation(info.addonDir, z.string().parse(raw))))
   ipcMain.handle(IPC.editorSaveEvent, (_event, raw: unknown) => change(() => saveEvent(info.addonDir, content, raw, info.base)))
   ipcMain.handle(IPC.editorDeleteEvent, (_event, raw: unknown) => change(() => deleteEvent(info.addonDir, z.string().parse(raw), info.base)))
-  // Jobs are the game's own: there to be changed only when it is run from source.
-  const ownOnly = (apply: () => string[]) => change(() => (info.base ? apply() : ['Jobs can only be changed in the game\'s own files.']))
+  // Jobs and societies are the game's own: there to be changed only when it is run from source.
+  const ownOnly = (apply: () => string[]) => change(() => (info.base ? apply() : ['This can only be changed in the game\'s own files.']))
   ipcMain.handle(IPC.editorSaveJob, (_event, raw: unknown) => ownOnly(() => saveJob(packDir, content, raw)))
   ipcMain.handle(IPC.editorDeleteJob, (_event, raw: unknown) => ownOnly(() => deleteJob(packDir, z.string().parse(raw))))
+  ipcMain.handle(IPC.editorSaveSociety, (_event, raw: unknown) => ownOnly(() => saveSociety(packDir, content, raw)))
+  ipcMain.handle(IPC.editorDeleteSociety, (_event, raw: unknown) => ownOnly(() => deleteSociety(packDir, z.string().parse(raw))))
   // Never fails: the LLM thinks of events for the whole of the calendar, as it stands at the start of a game. Nothing is saved here.
   ipcMain.handle(IPC.editorDraftEvents, async (): Promise<{ events?: CalendarEvent[]; error?: string }> => {
     const profile = settings.get().main

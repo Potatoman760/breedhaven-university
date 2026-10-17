@@ -1,8 +1,11 @@
 import { Button } from './Button'
-import { useRef, useState, type FormEvent, type CSSProperties, type KeyboardEvent } from 'react'
+import { useConfirm } from './Confirm'
+import { useEffect, useRef, useState, type FormEvent, type CSSProperties, type KeyboardEvent } from 'react'
 import { MAX_CHILD_NAME, COMFORT_WORDS, hasSkill, attendees, bondLifts, describeBond, describeWhen, statusOf, dialogueLines, firstNames, sceneCast, sceneClock, toDate, weatherOn, wornOutfit, lookOf, spriteFor, npcAsCharacter, playerRoom, roomBackdrop, roomOwner, sceneExtras } from '../../../shared/game'
-import { poseMedia, type ContentPack, type GameState, type LoveInterest, type Scene } from '../../../shared/model'
+import { Portrait } from './Portrait'
+import { basePoseId, poseMedia, type ContentPack, type GameState, type LoveInterest, type Scene } from '../../../shared/model'
 import logo from '../../../assets/logo.png'
+import { setPoseLoop } from '../sound'
 import { Wisps } from '../fx/Wisps'
 import { Backdrop } from './Backdrop'
 import { DateBanner } from './DateBanner'
@@ -11,7 +14,6 @@ import { ChevronIcon, HaltIcon, HideIcon, LogIcon } from './icons'
 import type { Panel } from './panels'
 
 // What he is taken to say when he ends a shift with the button: enough for the scene to be closed on.
-const END_SHIFT_LINE = '*My shift is over. I finish what I am doing, say goodbye and clock out.*'
 
 interface Props {
   content: ContentPack
@@ -29,6 +31,8 @@ interface Props {
   /** The character has closed the scene; all that is left is to move on. */
   ended: boolean
   onSend: (text: string) => void
+  /** Ends a class or a shift at once, with nothing said, remembered or felt about it: what it earns is earned all the same. */
+  onSkip: () => void
   /** Settles the name of the child just born: another than the one its mother thought of, or with nothing given, hers. */
   onNameChild: (name: string) => void
   /** How many of his turns in this scene can be redone, counting back from the last. */
@@ -75,7 +79,8 @@ function standing(li: Pick<LoveInterest, 'stageHeight'>, before = ''): CSSProper
 
 /** A scene with a love interest, or up to three: background, sprites, and the text box. */
 export function SceneView(props: Props) {
-  const { content, state, scene, busy, notice, ended, onSend, onContinue, onOpen } = props
+  const { content, state, scene, busy, notice, ended, onSend, onSkip, onContinue, onOpen } = props
+  const { ask, dialog: confirming } = useConfirm()
   // The child this scene is the birth of, which he may name while it lasts.
   const newborn = scene.newborn === undefined ? undefined : state.children.find((child) => child.motherId === scene.loveInterestId && child.bornAt === scene.newborn)
   const [childName, setChildName] = useState('')
@@ -137,6 +142,12 @@ export function SceneView(props: Props) {
   // What of it is shown: the first of its clip, its picture and its first frame that will load.
   const media = animation && poseMedia(animation).find((file) => !lost.includes(file))
   const playing = animation !== undefined && media !== undefined
+  // What the pose sounds like, for as long as it is up.
+  const poseSound = playing ? (content.sounds.poses[animation.id] ?? content.sounds.poses[basePoseId(animation.id)]) : undefined
+  useEffect(() => {
+    setPoseLoop(poseSound)
+  }, [poseSound?.file])
+  useEffect(() => () => setPoseLoop(undefined), [])
   const beat = scene.beats[scene.beats.length - 1]
 
   // What the text box shows: the latest exchange, or the activity's description as
@@ -244,6 +255,7 @@ export function SceneView(props: Props) {
         setHidden(!hidden)
       }}
     >
+      {confirming}
       <Backdrop
         screen="scene"
         room={staged.room}
@@ -325,16 +337,7 @@ export function SceneView(props: Props) {
             {/* Whoever is speaking, on a tab that stands on the box's top edge. Narration has no speaker, and no tab. */}
             {talking && (
               <div className="speaker-tab">
-                <span
-                  className="speaker-face"
-                  role="img"
-                  aria-label={talking.name}
-                  style={
-                    spriteOf(talking)
-                      ? { backgroundImage: `url("content://pack/${spriteOf(talking)}")`, backgroundPosition: `50% ${talking.faceY}%` }
-                      : undefined
-                  }
-                />
+                <Portrait who={talking} image={spriteOf(talking)} size={88} className="speaker-face" />
                 <span className="speaker-name">{talking.name.split(' ')[0]}</span>
               </div>
             )}
@@ -550,11 +553,26 @@ export function SceneView(props: Props) {
                     <ChevronIcon size={18} />
                   </button>
                 )}
-                {/* At work, the shift can be brought to its end in a press: he says he is done, and whoever he works for sees him off. */}
-                {scene.shift && back === 0 && (
-                  <button type="button" className="secondary end-shift" disabled={busy} onClick={() => onSend(END_SHIFT_LINE)}>
-                    End shift
-                  </button>
+                {/* A class, a society's meeting or a shift can be brought to its end in a press, once he has said he is sure. Once
+                    the scene has moved on somewhere else it is no longer that, and ends as any scene does. */}
+                {(scene.shift || scene.lesson || scene.societyId) && back === 0 && !scene.beats.some((beat) => beat.finished) && (
+                  <Button
+                    className="end-shift"
+                    disabled={busy}
+                    onClick={async () =>
+                      (await ask({
+                        title: 'Are you sure?',
+                        detail: scene.shift
+                          ? 'You will earn money but no relationship changes.'
+                          : scene.lesson
+                            ? 'You will earn marks but no relationship changes.'
+                            : 'You will still train, but no relationship changes.',
+                        confirm: scene.shift ? 'End shift' : scene.lesson ? 'End class' : 'End meeting'
+                      })) && onSkip()
+                    }
+                  >
+                    {scene.shift ? 'End shift' : scene.lesson ? 'End class' : 'End meeting'}
+                  </Button>
                 )}
               </form>
             )}

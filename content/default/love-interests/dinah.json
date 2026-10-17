@@ -5,7 +5,7 @@
   "age": 25,
   "pronouns": "she/her",
   "bio": "Graduate student in Bloom Theology, a postulant of the Order of the First Furrow, and the counsellor frightened first-years get sent to.",
-  "appearance": "A beautiful 25-year-old elven woman. She has a striking, angular face with pale white skin, high cheekbones, a narrow jaw, arched dark brows, and large almond-shaped amber-brown eyes emphasized by heavy black liner. Her full lips are softly parted, with a small nose and subtly pointed ears. Her extremely long chestnut-brown hair falls past her waist in thick, flowing waves, swept back from the forehead with abundant volume.",
+  "appearance": "A beautiful 25-year-old elven woman. She has a striking, angular face with pale white skin, high cheekbones, a narrow jaw, arched dark brows, and large almond-shaped green eyes emphasized by heavy black liner. Her full lips are softly parted, with a small nose and subtly pointed ears. Her extremely long chestnut-brown hair falls past her waist in thick, flowing waves, swept back from the forehead with abundant volume.",
   "personality": "Torn between duty and personal desire, with a compassionate heart. Already wise in the ways of the world. Calm, observant, and experienced rather than naive or cold.",
   "traitIds": [
     "bookish",
@@ -36,31 +36,31 @@
       "description": "A cream or ivory fitted blouse with slightly puffed sleeves and cleavage.\nover it: a sleeveless sage-green cardigan/vest\nHer blouse has a small decorative clasp at the throat shaped like a seed.\nA high-waisted pleated midi skirt in dark green color",
       "sprites": {
         "neutral": {
-          "image": "sprites/dinah/default-neutral-5-cutout.webp",
+          "image": "sprites/dinah/default-neutral-cutout.png",
           "description": ""
         },
         "happy": {
-          "image": "sprites/dinah/default-happy-cutout.webp",
+          "image": "sprites/dinah/default-happy-cutout.png",
           "description": ""
         },
         "sad": {
-          "image": "sprites/dinah/default-sad-cutout.webp",
+          "image": "sprites/dinah/default-sad-cutout.png",
           "description": ""
         },
         "angry": {
-          "image": "sprites/dinah/default-angry-cutout.webp",
+          "image": "sprites/dinah/default-angry-cutout.png",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/dinah/default-surprised-cutout.webp",
+          "image": "sprites/dinah/default-surprised-cutout.png",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/dinah/default-embarrassed-cutout.webp",
+          "image": "sprites/dinah/default-embarrassed-cutout.png",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/dinah/default-aroused-cutout.webp",
+          "image": "sprites/dinah/default-aroused-cutout.png",
           "description": ""
         }
       },
@@ -73,31 +73,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/dinah/pregnant-neutral-cutout.webp",
+          "image": "sprites/dinah/pregnant-neutral-cutout.png",
           "description": ""
         },
         "happy": {
-          "image": "sprites/dinah/pregnant-happy-cutout.webp",
+          "image": "sprites/dinah/pregnant-happy-cutout.png",
           "description": ""
         },
         "sad": {
-          "image": "sprites/dinah/pregnant-sad-cutout.webp",
+          "image": "sprites/dinah/pregnant-sad-cutout.png",
           "description": ""
         },
         "angry": {
-          "image": "sprites/dinah/pregnant-angry-cutout.webp",
+          "image": "sprites/dinah/pregnant-angry-cutout.png",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/dinah/pregnant-surprised-cutout.webp",
+          "image": "sprites/dinah/pregnant-surprised-cutout.png",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/dinah/pregnant-embarrassed-cutout.webp",
+          "image": "sprites/dinah/pregnant-embarrassed-cutout.png",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/dinah/pregnant-aroused-cutout.webp",
+          "image": "sprites/dinah/pregnant-aroused-cutout.png",
           "description": ""
         }
       },
@@ -109,31 +109,31 @@
       "description": "nothing at all, completely nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/dinah/nude-neutral-3-cutout.webp",
+          "image": "sprites/dinah/nude-neutral-cutout.png",
           "description": ""
         },
         "happy": {
-          "image": "sprites/dinah/nude-happy-cutout.webp",
+          "image": "sprites/dinah/nude-happy-cutout.png",
           "description": ""
         },
         "sad": {
-          "image": "sprites/dinah/nude-sad-cutout.webp",
+          "image": "sprites/dinah/nude-sad-cutout.png",
           "description": ""
         },
         "angry": {
-          "image": "sprites/dinah/nude-angry-cutout.webp",
+          "image": "sprites/dinah/nude-angry-cutout.png",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/dinah/nude-surprised-cutout.webp",
+          "image": "sprites/dinah/nude-surprised-cutout.png",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/dinah/nude-embarrassed-cutout.webp",
+          "image": "sprites/dinah/nude-embarrassed-cutout.png",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/dinah/nude-aroused-cutout.webp",
+          "image": "sprites/dinah/nude-aroused-cutout.png",
           "description": ""
         }
       },
@@ -146,31 +146,31 @@
       "inherits": "nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/dinah/nude-pregnant-neutral-cutout.webp",
+          "image": "sprites/dinah/nude-pregnant-neutral-cutout.png",
           "description": ""
         },
         "happy": {
-          "image": "sprites/dinah/nude-pregnant-happy-cutout.webp",
+          "image": "sprites/dinah/nude-pregnant-happy-cutout.png",
           "description": ""
         },
         "sad": {
-          "image": "sprites/dinah/nude-pregnant-sad-cutout.webp",
+          "image": "sprites/dinah/nude-pregnant-sad-cutout.png",
           "description": ""
         },
         "angry": {
-          "image": "sprites/dinah/nude-pregnant-angry-cutout.webp",
+          "image": "sprites/dinah/nude-pregnant-angry-cutout.png",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/dinah/nude-pregnant-surprised-cutout.webp",
+          "image": "sprites/dinah/nude-pregnant-surprised-cutout.png",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/dinah/nude-pregnant-embarrassed-cutout.webp",
+          "image": "sprites/dinah/nude-pregnant-embarrassed-cutout.png",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/dinah/nude-pregnant-aroused-cutout.webp",
+          "image": "sprites/dinah/nude-pregnant-aroused-cutout.png",
           "description": ""
         }
       },
@@ -188,10 +188,45 @@
   },
   "animations": [
     {
+      "id": "pregnant-blowjob",
+      "name": "Blowjob, pregnant",
+      "description": "",
+      "image": "sprites/dinah/nsfw-pregnant-blowjob.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-missionary",
+      "name": "Missionary, pregnant",
+      "description": "",
+      "image": "sprites/dinah/nsfw-pregnant-missionary.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-doggy",
+      "name": "Doggy, pregnant",
+      "description": "",
+      "image": "sprites/dinah/nsfw-pregnant-doggy.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-cowgirl",
+      "name": "Cowgirl, pregnant",
+      "description": "",
+      "image": "sprites/dinah/nsfw-pregnant-cowgirl.png",
+      "loop": true
+    },
+    {
+      "id": "pregnant-creampie",
+      "name": "Creampie, pregnant",
+      "description": "",
+      "image": "sprites/dinah/nsfw-pregnant-creampie.png",
+      "loop": true
+    },
+    {
       "id": "blowjob",
       "name": "Blowjob",
       "description": "",
-      "image": "sprites/dinah/nsfw-blowjob.webp",
+      "image": "sprites/dinah/nsfw-blowjob.png",
       "clip": "sprites/dinah/nsfw-blowjob.mp4",
       "loop": true
     },
@@ -199,7 +234,7 @@
       "id": "missionary",
       "name": "Missionary",
       "description": "",
-      "image": "sprites/dinah/nsfw-missionary.webp",
+      "image": "sprites/dinah/nsfw-missionary.png",
       "clip": "sprites/dinah/nsfw-missionary.mp4",
       "loop": true
     },
@@ -207,7 +242,7 @@
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/dinah/nsfw-doggy-2.webp",
+      "image": "sprites/dinah/nsfw-doggy.png",
       "clip": "sprites/dinah/nsfw-doggy.mp4",
       "loop": true
     },
@@ -215,15 +250,15 @@
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
-      "image": "sprites/dinah/nsfw-cowgirl-4.webp",
-      "clip": "sprites/dinah/nsfw-cowgirl-2.mp4",
+      "image": "sprites/dinah/nsfw-cowgirl.png",
+      "clip": "sprites/dinah/nsfw-cowgirl.mp4",
       "loop": true
     },
     {
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/dinah/nsfw-creampie.webp",
+      "image": "sprites/dinah/nsfw-creampie-3.png",
       "clip": "sprites/dinah/nsfw-creampie.mp4",
       "loop": true
     },
@@ -231,50 +266,8 @@
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/dinah/nsfw-facial.webp",
+      "image": "sprites/dinah/nsfw-facial-3.png",
       "clip": "sprites/dinah/nsfw-facial.mp4",
-      "loop": true
-    },
-    {
-      "id": "pregnant-blowjob",
-      "name": "Blowjob, pregnant",
-      "description": "",
-      "image": "sprites/dinah/nsfw-pregnant-blowjob.webp",
-      "loop": true
-    },
-    {
-      "id": "pregnant-missionary",
-      "name": "Missionary, pregnant",
-      "description": "",
-      "image": "sprites/dinah/nsfw-pregnant-missionary.webp",
-      "loop": true
-    },
-    {
-      "id": "pregnant-doggy",
-      "name": "Doggy, pregnant",
-      "description": "",
-      "image": "sprites/dinah/nsfw-pregnant-doggy.webp",
-      "loop": true
-    },
-    {
-      "id": "pregnant-cowgirl",
-      "name": "Cowgirl, pregnant",
-      "description": "",
-      "image": "sprites/dinah/nsfw-pregnant-cowgirl.webp",
-      "loop": true
-    },
-    {
-      "id": "pregnant-creampie",
-      "name": "Creampie, pregnant",
-      "description": "",
-      "image": "sprites/dinah/nsfw-pregnant-creampie.webp",
-      "loop": true
-    },
-    {
-      "id": "pregnant-facial",
-      "name": "Facial, pregnant",
-      "description": "",
-      "image": "sprites/dinah/nsfw-pregnant-facial.webp",
       "loop": true
     }
   ],
@@ -314,7 +307,7 @@
     "locationId": "chapel",
     "background": "generated/backgrounds/dinah/view.webp"
   },
-  "birthPicture": "sprites/dinah/birth.png",
+  "birthPicture": "sprites/dinah/birth-2.png",
   "childNames": {
     "daughters": [
       "Elarie",
@@ -338,7 +331,7 @@
       "Pauses and lowers her eyes before saying anything she is not sure she should want."
     ],
     "exampleDialogue": [],
-    "backstory": "Deeply religious and believes a woman's calling in life is to be bred and pregnant\n\nPost: Volunteer at Bloom Counseling, in the rooms over the campus chapel\n\nAn elven woman of striking pallor, Dinah was born into a minor noble house and promised to the Order as a girl. The Order asks its priestesses to finish a graduate degree before ordination, and she is in her last years of it: learned in doctrine, unshakable in debate, and gentle with people. She spends her evenings at Bloom Counseling with students who are frightened by what they want, or by not wanting it. She expects to take vows when her thesis is accepted, and has not let herself ask whether she wants to.\n\nShe is a sincere Bloomist. The Sower's covenant is living truth to her, not metaphor. She has also sat with enough Freewill students to know the Order's answers do not fit everyone, and that knowledge is the crack in her certainty.\n\nHer magic is a healer's: a hand on a shoulder slows a racing pulse and eases pain. She is careful never to do it uninvited.",
+    "backstory": "Deeply religious and believes a woman's main purpose in life is to be bred and pregnant\n\nPost: Volunteer at Bloom Counseling, in the rooms over the campus chapel\n\nAn elven woman of striking pallor, Dinah was born into a minor noble house and promised to the Order as a girl. The Order asks its priestesses to finish a graduate degree before ordination, and she is in her last years of it: learned in doctrine, unshakable in debate, and gentle with people. She spends her evenings at Bloom Counseling with students who are frightened by what they want, or by not wanting it.\n\nShe is a sincere Bloomist. The Sower's covenant is living truth to her, not metaphor. She has also sat with enough Freewill students to know the Order's answers do not fit everyone, and that knowledge is the crack in her certainty.\n\nHer magic is a healer's: a hand on a shoulder slows a racing pulse and eases pain. She is careful never to do it uninvited.",
     "knowledge": [],
     "secrets": [],
     "extraInstructions": ""

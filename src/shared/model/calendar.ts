@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { IntroSchema } from './orientation'
 
 export const MonthSchema = z.object({
   id: z.string(),
@@ -23,6 +24,39 @@ export type Period = z.infer<typeof PeriodSchema>
  * somewhere, between certain hours of each day it lasts: a fair, a match, a supper. A
  * holiday is the whole day and nowhere in particular, and has neither.
  */
+/**
+ * One scripted part of an event: somewhere to be, at an hour of one of its days, with people. It opens, if it has one,
+ * on a cutscene of written lines, and goes on as a scene with its cast, as a step of orientation does. Each is
+ * attended once.
+ */
+export const EventPartSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  /** Which day of the event it is on, counting from 1. */
+  day: z.number().int().min(1).default(1),
+  startHour: z.number().int().min(0),
+  hours: z.number().int().min(1).default(2),
+  /** Left out, the event's own place. */
+  locationId: z.string().optional(),
+  /** The view of the place its scene is set in. Left out, the place as the day has it. */
+  viewId: z.string().optional(),
+  /** Narration that opens the scene. */
+  description: z.string().default(''),
+  /** Told to the LLM: what is going on, and what the scene is for. */
+  direction: z.string().default(''),
+  /**
+   * Who is there. Left out, whoever said she would be at the event; failing that, the love interests he is closest to
+   * are dealt in, up to `castSize`.
+   */
+  castIds: z.array(z.string()).optional(),
+  castSize: z.number().int().min(1).max(3).default(2),
+  /** Nothing else can be done on its day until it has been attended or is over, as on orientation day. */
+  required: z.boolean().default(false),
+  /** Lines read before the scene, with nothing to answer: who says them, and where. */
+  cutscene: IntroSchema.optional()
+})
+export type EventPart = z.infer<typeof EventPartSchema>
+
 export const CalendarEventSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -41,7 +75,14 @@ export const CalendarEventSchema = z.object({
   /** No classes meet while it lasts: a holiday, or a break between terms. */
   noClasses: z.boolean().default(false),
   /** True for events invented by the LLM. */
-  generated: z.boolean().default(false)
+  generated: z.boolean().default(false),
+  /**
+   * A story beat: kept off the calendar and out of what anyone says beforehand. It still dresses places and people, and
+   * its program still happens.
+   */
+  secret: z.boolean().default(false),
+  /** What happens at it, scripted, in the order it happens. */
+  program: z.array(EventPartSchema).default([])
 })
 export type CalendarEvent = z.infer<typeof CalendarEventSchema>
 

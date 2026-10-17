@@ -20,6 +20,18 @@
         }
       },
       "pregnant": false
+    },
+    {
+      "id": "first-frost",
+      "name": "First Frost",
+      "description": "a deep red knitted wool jumper with a white snowflake pattern, a green and white striped apron tied over it, a dark wool skirt, a sprig of holly and a red ribbon tied in her bun",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/dorrit/festive-neutral-cutout.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
     }
   ],
   "defaultOutfitId": "default",

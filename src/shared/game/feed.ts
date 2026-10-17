@@ -179,7 +179,7 @@ export function buildFeedPrompt(content: ContentPack, state: GameState, plans: P
   ].join('\n')
 
   const weather = weatherOn(content, state)
-  const events = eventsOn(content, state)
+  const events = eventsOn(content, state).filter((event) => !event.secret)
   const everyone = [...content.loveInterests, ...content.npcs]
   const user = [
     `Today is ${formatDate(toDate(content.calendar, state.time))}.`,

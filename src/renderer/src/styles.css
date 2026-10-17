@@ -21,6 +21,12 @@
   --madder-tint: #eed9d3;
   --madder-ink: #5e2226;
   --ochre: #7a5418;
+  /* Gold, for what is ornate: the trim of a framed panel, a title on a dark ground, what can be had and is worth having. */
+  --gold: #d4af5a;
+  --gold-deep: #9c7a2e;
+  --gold-soft: #f2e2a0;
+  --gold-glow: rgba(232, 194, 90, 0.65);
+  --wood-deep: #1a2216;
   /* Panels that sit over artwork: see-through, but solid enough to read on. */
   --glass: rgba(248, 242, 226, 0.88);
   --glass-rule: rgba(207, 192, 160, 0.9);
@@ -126,6 +132,51 @@ button:disabled {
 button.quiet:disabled {
   border-color: transparent;
   background: transparent;
+}
+
+/* What can be pressed answers to the hand: it brightens and lifts under the pointer, and settles when pressed. */
+button,
+.tile,
+.featured {
+  transition:
+    filter 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+button:not(:disabled):hover {
+  filter: brightness(1.07);
+  transform: translateY(-1px);
+}
+
+button:not(:disabled):active {
+  filter: brightness(0.97);
+  transform: translateY(0) scale(0.98);
+}
+
+button.quiet:not(:disabled):hover {
+  transform: none;
+}
+
+button.tile:not(:disabled):hover,
+button.tile-menu:not(:disabled):hover,
+button.featured:not(:disabled):hover {
+  box-shadow:
+    0 0 0 2px var(--gold),
+    0 6px 18px var(--gold-glow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button,
+  .tile,
+  .featured {
+    transition: none;
+  }
+
+  button:not(:disabled):hover,
+  button:not(:disabled):active {
+    transform: none;
+  }
 }
 
 button:focus-visible,
@@ -639,6 +690,18 @@ pre {
   font: 600 1.875rem/1.1 var(--display);
 }
 
+.date-time {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+  padding-left: 20px;
+  border-left: 1px solid var(--rule);
+  color: var(--madder-deep);
+  font: 700 2.75rem/1 var(--display);
+  font-variant-numeric: tabular-nums;
+}
+
 .plaque {
   position: absolute;
   top: 24px;
@@ -1008,6 +1071,17 @@ pre {
   max-height: calc(100vh - 120px);
 }
 
+/*
+  The row of small buttons under the tiles (Log, Hide, Help, Menu in a scene) is wider than the tiles and reaches left
+  under the box. Where the box is not narrowed enough by a wide screen to clear it, it stands level with the foot of
+  the tiles instead, above that row: the menu's 34px and the tiles' 10px gap.
+*/
+@media (max-width: 1700px) {
+  .stage:has(.tile-row) .textbox-wrap {
+    bottom: calc(24px + 34px + 10px);
+  }
+}
+
 .speaker-tab {
   position: relative;
   z-index: 1;
@@ -1022,20 +1096,14 @@ pre {
   position: relative;
   z-index: 1;
   flex: none;
-  width: 76px;
-  height: 88px;
   border: 3px solid var(--paper-raised);
   border-radius: 4px;
-  background-color: var(--wood);
-  /* The same crop as the portrait everywhere else: the top of the full-body sprite, where the face is. */
-  background-size: 260%;
-  background-position: 50% 4%;
-  background-repeat: no-repeat;
 }
 
 .speaker-name {
   margin: 0 0 6px -10px;
   padding: 6px 26px 8px 24px;
+  border-bottom: 2px solid var(--gold);
   background: var(--moss);
   color: #fff;
   font: 700 1.75rem/1.1 var(--display);
@@ -2162,222 +2230,21 @@ textarea.memory {
   gap: 10px;
 }
 
-/* Map dialog */
+/* Wide dialogs, and the portraits used everywhere */
 
 .dialog.wide {
   width: min(1200px, 100%);
 }
-
-.map {
-  position: relative;
-  align-self: center;
-}
-
-.map > img {
-  display: block;
-  max-width: 100%;
-  /* Leave room for the dialog's heading and footer so the whole map is visible. */
-  max-height: calc(100vh - 210px);
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--radius);
-}
-
-/* Over a drawn map the cards are kept small, so they label the buildings without hiding them. */
-.map:not(.plain) .pin {
-  box-sizing: border-box;
-  width: 132px;
-  min-width: 0;
-  gap: 4px;
-  padding: 5px 7px;
-}
-
-.map:not(.plain) .pin-head {
-  gap: 6px;
-}
-
-.map:not(.plain) .pin-head .caps {
-  font-size: 0.6875rem;
-  line-height: 1.2;
-  white-space: normal;
-}
-
-/* The way there, or why there is none, on a line of its own. */
-.pin-go {
-  display: flex;
-}
-
-/* Go, Closed and You are here are all one size. */
-.pin .pin-go > * {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  height: 28px;
-  min-height: 0;
-  padding: 0 10px;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  line-height: 1;
-}
-
-.map:not(.plain) .pin-note {
-  font-size: 0.6875rem;
-  line-height: 1.2;
-}
-
-.map:not(.plain) .portraits {
-  gap: 4px;
-}
-
-.map:not(.plain) .portrait .caps {
-  display: none;
-}
-
-.map:not(.plain) .portrait-face {
-  width: 32px;
-  height: 36px;
-}
-
-/* A map with no image: a parchment chart with outlined regions. */
-.map.plain {
-  align-self: stretch;
-  /* Room is left under it for the row of those in their rooms. */
-  height: calc(100vh - 300px);
-  min-height: 430px;
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--radius);
-  background: var(--parchment);
-}
-
-.region {
-  position: absolute;
-  box-sizing: border-box;
-  padding: 6px 12px;
-  border: 1px dashed var(--rule-strong);
-  border-radius: var(--radius);
-  background: rgba(221, 229, 204, 0.35);
-}
-
-.map.plain .pin {
-  box-sizing: border-box;
-  /* Wide enough for three people side by side. */
-  width: 230px;
-  min-width: 0;
-  /* Hung from its top edge, so that a card made tall by the people in it grows downward and never up over the name of its region. */
-  transform: translate(-50%, -44px);
-}
-
-/* A region with a picture: the picture fills it, faded back so the places on it are what is read. */
-.region.pictured {
-  background: var(--parchment);
-}
-
-.region-art {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.32;
-  pointer-events: none;
-}
-
-.region.pictured > .caps {
-  padding: 2px 8px;
-  border-radius: 4px;
-  background: rgba(248, 242, 226, 0.85);
-  color: var(--ink);
-}
-
-/* The name of a region stays readable over anything near it. */
-.region > .caps {
-  position: relative;
-  z-index: 1;
-}
-
-/* Under the map: those in their own rooms, who are not anywhere to go to. */
-.map-rooms {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 8px 12px;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  background: var(--paper-raised);
-}
-
-.map-rooms > .caps {
-  flex: none;
-}
-
-.map.plain .pin-head .caps {
-  white-space: normal;
-}
-
-.portraits {
-  align-items: center;
-}
-
-.pin {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 150px;
-  padding: 8px 10px;
-  border: 1px solid var(--rule-strong);
-  border-radius: var(--radius);
-  background: rgba(248, 242, 226, 0.94);
-}
-
-.pin.here {
-  border: 2px solid var(--moss);
-}
-
-.pin-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.pin .pin-name {
-  /* Takes the room between the icon and the way there. */
-  flex: 1;
-  color: var(--ink);
-  white-space: nowrap;
-}
-
-/* What kind of place it is, in a small tile at the left of its name. */
-.pin-icon {
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  background: var(--moss-tint);
-  color: var(--moss-deep);
-}
-
 
 .pin-note {
   font-size: 0.8125rem;
   color: var(--madder-ink);
 }
 
-/* A place that is shut: a red label above its name, and nothing to press. */
-.pin .pin-closed {
-  /* Where the Go button would be. */
-  background: var(--madder);
-  color: #fff;
-}
-
 .portraits {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
 }
 
@@ -2392,9 +2259,13 @@ textarea.memory {
   font-size: 0.6875rem;
 }
 
-.portrait-face {
-  width: 48px;
-  height: 56px;
+/* Low in specificity, so that where a portrait stands can frame it its own way. */
+:where(.portrait-face) {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
   border: 1px solid var(--rule-strong);
   border-radius: 4px;
   background-color: var(--wood);
@@ -2404,11 +2275,15 @@ textarea.memory {
   background-repeat: no-repeat;
 }
 
-/* His portrait in the player editor, as it is cut from his sprite: a size up from a list's. */
-.player-portrait {
-  width: 76px;
-  height: 88px;
+/* No picture of her: her initial. */
+:where(.portrait-face.initial) {
+  background: var(--madder-deep);
+  color: var(--paper-raised);
+  font-family: var(--display);
+  font-weight: 600;
+  line-height: 1;
 }
+
 
 /* Saves and settings */
 
@@ -3073,6 +2948,11 @@ button.stat-grid:hover {
   background: rgba(76, 106, 58, 0.18);
 }
 
+.entry.society {
+  border-left-color: #2f6f6a;
+  background: rgba(47, 111, 106, 0.18);
+}
+
 .entry.plan {
   border-left-color: var(--madder, #8a3a3f);
   background: rgba(138, 58, 63, 0.16);
@@ -3344,6 +3224,15 @@ button.stat-grid:hover {
   text-transform: uppercase;
 }
 
+/* An app that cannot be opened just now: faded and flat, with why on its tooltip. */
+.phone-tab:disabled {
+  background: var(--paper-raised);
+  box-shadow: none;
+  color: var(--moss-deep);
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
 .phone-tab.selected {
   width: 96px;
   background: var(--moss);
@@ -3381,14 +3270,8 @@ button.stat-grid:hover {
 
 .avatar {
   flex: none;
-  display: block;
   border: 2px solid var(--moss);
   border-radius: 4px;
-  background-color: var(--wood);
-  /* The same crop as the portrait everywhere else: the top of the full-body sprite, where the face is. */
-  background-size: 260%;
-  background-position: 50% 4%;
-  background-repeat: no-repeat;
 }
 
 .handle {
@@ -4889,6 +4772,10 @@ button.entry:hover,
   border-left-color: var(--moss);
 }
 
+.card.picked.society {
+  border-left-color: #2f6f6a;
+}
+
 .card.picked.plan {
   border-left-color: var(--madder);
 }
@@ -4983,7 +4870,7 @@ button.entry:hover,
   flex: none;
 }
 
-/* Beside the send arrow, at work: the way to end the shift. */
+/* Beside the send arrow, in class or at work: the way to end it at once. */
 .end-shift {
   flex: none;
   white-space: nowrap;
@@ -5135,200 +5022,17 @@ button.entry:hover,
   word-break: break-all;
 }
 
-/* The map is given more of the screen than other wide dialogs, so that each place has room for three people in a row. */
-.dialog.wide:has(> .map.plain) {
-  width: min(1560px, 100%);
-}
+/* ---- His house: who lives in it and its accounts, in their dialogs (the house itself is under the ornate kit). */
 
-/* On the plain map everyone takes the same room, whatever the length of her name: three to a row. */
-.map.plain .pin .portraits {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
-}
-
-.map.plain .pin .portrait {
-  min-width: 0;
-}
-
-.map.plain .pin .portrait .caps {
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.map.plain .pin .portraits > .chip {
-  justify-self: start;
-  align-self: center;
-}
-
-/* On a screen too narrow for the chart as drawn, the map scrolls: the regions stay side by side, and each lays its places out in a single column. */
-@media (max-width: 1640px) {
-  .map.plain {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 12px;
-    box-sizing: border-box;
-    overflow-y: auto;
-  }
-
-  .map.plain .region {
-    position: relative;
-    flex: 1 1 0;
-    min-width: 0;
-    left: auto !important;
-    top: auto !important;
-    width: auto !important;
-    height: auto !important;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 40px 12px 12px;
-  }
-
-  .map.plain .region > .caps {
-    position: absolute;
-    top: 8px;
-    left: 12px;
-  }
-
-  .map.plain .pin {
-    position: relative;
-    left: auto !important;
-    top: auto !important;
-    transform: none;
-    width: auto;
-  }
-}
-
-/* ---- His house: a plan of it drawn from its rooms, who lives in it, and its accounts. */
-
-/* One height whichever tab is showing, so that the panel does not jump: what is longer scrolls inside it. */
-.house {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  box-sizing: border-box;
-  height: min(74vh, 760px);
-  min-height: 0;
-  overflow-y: auto;
-}
-
-
-.house .tabs .house-go {
-  margin-left: auto;
-}
-
-.house-plan {
-  display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
-  gap: 20px;
-  align-items: start;
-}
-
-.house-floors,
-.house-floor-block,
 .house-people,
 .house-ledger {
   display: flex;
   flex-direction: column;
 }
 
-.house-floors {
-  gap: 14px;
-}
-
-.house-floor-block {
-  gap: 4px;
-}
-
-/* One floor: the walls of the house, and its rooms set out on a grid inside them. */
-.house-floor {
-  display: grid;
-  grid-auto-rows: 26px;
-  padding: 3px;
-  border: 2px solid var(--ink);
-  border-radius: 4px;
-  background: var(--paper);
-}
-
-/* A room on the plan. It is a button, but drawn as a room: the page's own buttons are filled and tall. */
-button.house-cell {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 2px;
-  min-height: 0;
-  margin: 1px;
-  padding: 4px 8px;
-  overflow: hidden;
-  border: 1.5px solid var(--ink);
-  border-radius: 2px;
-  background: var(--paper-raised);
-  color: var(--ink);
-  font: 700 0.9rem var(--ui);
-  text-align: left;
-}
-
-button.house-cell span {
-  color: var(--ink-soft);
-  font-size: 0.75rem;
-  font-weight: 400;
-}
-
-button.house-cell.outdoors {
-  background: var(--moss-tint);
-}
-
-/* Not built yet: marked out, and nothing in it. */
-button.house-cell.unbuilt {
-  border-style: dashed;
-  border-color: var(--rule-strong);
-  background: repeating-linear-gradient(45deg, transparent 0 8px, rgba(140, 127, 95, 0.14) 8px 9px);
-  color: var(--ink-soft);
-}
-
-button.house-cell.selected {
-  outline: 3px solid var(--moss);
-  outline-offset: -3px;
-  background-color: var(--moss-tint);
-}
-
-.house-room {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.house-room h2,
-.house-room p {
-  margin: 0;
-}
-
-.house-room img,
-.house-room-blank {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border-radius: 4px;
-  object-fit: cover;
-}
-
-.house-room-blank {
-  display: grid;
-  place-items: center;
-  background: var(--track);
-  color: var(--ink-soft);
-  font-style: italic;
-}
-
 .house-work {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
+  flex-direction: column;
   gap: 8px;
 }
 
@@ -5397,11 +5101,6 @@ button.house-cell.selected {
   height: 56px;
 }
 
-@media (max-width: 900px) {
-  .house-plan {
-    grid-template-columns: 1fr;
-  }
-}
 
 /* Help: the pages it opens. */
 /* Every page of it is the same size, so that the window does not jump from tab to tab: what is longer scrolls. */
@@ -5829,16 +5528,6 @@ button.item-square:hover {
   margin: 4px 0;
 }
 
-/* The plan of the house is laid over a cottage interior: the picture is behind the plan and what is chosen on it,
-   under a wash of parchment so that both can be read, and nowhere else on the screen. */
-.house-plan {
-  padding: 16px;
-  border-radius: var(--radius);
-  background:
-    linear-gradient(rgba(248, 242, 226, 0.7), rgba(248, 242, 226, 0.7)),
-    var(--paper) url('../../assets/Cozy Rustic Cottage Interior.png') center / cover no-repeat;
-}
-
 /* A row of figures under their names (ui/Facts.tsx): the standing of something, read across. */
 .facts {
   display: flex;
@@ -5888,10 +5577,6 @@ button.item-square:hover {
 }
 
 /* What can be done with a room: its buttons and what they need said beside them, evenly apart. */
-.house-room {
-  gap: 10px;
-}
-
 .house-work {
   gap: 8px 10px;
 }
@@ -5909,18 +5594,6 @@ button.item-square:hover {
 .home-cast img {
   max-width: 34vw;
   filter: brightness(0.92);
-}
-
-/* On the plan: who is in a room this hour, as her face is shown on the map, along the foot of the room. */
-button.house-cell span.house-here {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: auto;
-}
-
-button.house-cell .house-here .portrait .caps {
-  color: var(--ink);
 }
 
 /* One question of an examination paper: what it asks, and the answers to choose among. */
@@ -6609,13 +6282,8 @@ button.house-cell .house-here .portrait .caps {
 
 /* Her face, cut from the top of her sprite as every portrait is. */
 .party-face {
-  aspect-ratio: 6 / 7;
   margin-bottom: 4px;
   border-radius: 4px;
-  background-color: var(--wood);
-  background-size: 260%;
-  background-position: 50% 4%;
-  background-repeat: no-repeat;
 }
 
 /* What she is worth while she is carrying, in the corner of her portrait. */
@@ -6766,14 +6434,24 @@ button.house-cell .house-here .portrait .caps {
   opacity: 0;
 }
 
+/* A step he does himself: the screen under it can be pressed, all but her and what she says. */
+.tour.waiting {
+  cursor: default;
+  pointer-events: none;
+}
+
+.tour.waiting .tour-guide {
+  pointer-events: auto;
+}
+
 .tour-ring {
   position: fixed;
-  border: 3px solid #e8c25a;
+  border: 3px solid var(--gold);
   border-radius: 10px;
   /* The dimming is the ring's own shadow, so that what it rings stays bright. */
   box-shadow:
     0 0 0 9999px rgba(12, 16, 10, 0.55),
-    0 0 18px 4px rgba(232, 194, 90, 0.7);
+    0 0 18px 4px var(--gold-glow);
   pointer-events: none;
   transition:
     left 0.35s ease,
@@ -6815,13 +6493,8 @@ button.house-cell .house-here .portrait .caps {
 
 .tour-face {
   flex: none;
-  width: 150px;
-  height: 172px;
   border: 4px solid var(--paper-raised);
   border-radius: 8px;
-  background-color: var(--wood);
-  background-size: 260%;
-  background-repeat: no-repeat;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
 }
 
@@ -6947,9 +6620,9 @@ button.house-cell .house-here .portrait .caps {
 }
 
 .poker-board .playing-card {
-  width: 60px;
-  height: 84px;
-  font-size: 1.4rem;
+  width: 78px;
+  height: 110px;
+  font-size: 1.8rem;
 }
 
 .poker-pot {
@@ -6978,12 +6651,12 @@ button.house-cell .house-here .portrait .caps {
 }
 
 .poker-seat.turn {
-  border-color: #e8c25a;
-  box-shadow: 0 0 16px rgba(232, 194, 90, 0.7);
+  border-color: var(--gold);
+  box-shadow: 0 0 16px var(--gold-glow);
 }
 
 .poker-seat.winner {
-  border-color: #e8c25a;
+  border-color: var(--gold);
   background: rgba(92, 72, 20, 0.85);
 }
 
@@ -6994,23 +6667,10 @@ button.house-cell .house-here .portrait .caps {
 /* The same crop of the full-body sprite as every portrait in the game, larger. */
 .poker-face {
   flex: none;
-  width: 104px;
-  height: 124px;
   border: 3px solid var(--paper-raised);
   border-radius: 6px;
-  background-color: var(--wood);
-  background-size: 260%;
-  background-repeat: no-repeat;
 }
 
-.poker-face.initial {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--madder-deep);
-  color: var(--paper-raised);
-  font: 600 2.5rem/1 var(--display);
-}
 
 .poker-seat-info {
   display: flex;
@@ -7052,24 +6712,20 @@ button.house-cell .house-here .portrait .caps {
   font-size: 0.8125rem;
 }
 
-.poker-in {
-  opacity: 0.75;
-}
-
 .playing-card {
   display: inline-flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  width: 44px;
-  height: 62px;
+  width: 56px;
+  height: 80px;
   border: 1px solid #c9c2ad;
-  border-radius: 6px;
+  border-radius: 7px;
   background: #fffdf6;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
   color: #1d1d1d;
-  font: 700 1.05rem/1.05 var(--ui);
+  font: 700 1.35rem/1.05 var(--ui);
 }
 
 .playing-card.red {
@@ -7091,16 +6747,11 @@ button.house-cell .house-here .portrait .caps {
   box-shadow: none;
 }
 
-/* His own seat, at the foot of the table: bigger, so that his cards are easy to read. */
-.poker-place.you .poker-face {
-  width: 120px;
-  height: 144px;
-}
 
 .poker-place.you .playing-card {
-  width: 58px;
-  height: 82px;
-  font-size: 1.35rem;
+  width: 74px;
+  height: 104px;
+  font-size: 1.7rem;
 }
 
 .poker-purse {
@@ -7238,10 +6889,1734 @@ button.house-cell .house-here .portrait .caps {
   line-height: 1.2;
 }
 
+/* The fire at a checkpoint, flickering a little. */
+.below-rest-art {
+  width: 132px;
+  height: 132px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 18px rgba(255, 150, 40, 0.55));
+  animation: rest-flicker 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes rest-flicker {
+  to {
+    filter: drop-shadow(0 0 28px rgba(255, 170, 60, 0.8));
+    transform: scale(1.03);
+  }
+}
+
+.below-healed {
+  color: var(--moss-deep);
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .below-rest-art,
   .below-spoils,
   .loot-tile {
     animation: none;
   }
 }
 
+
+/* The parts of an event's program in the editor: a card each, its cutscene set in under a rule. */
+.event-part {
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 14px 16px;
+}
+
+.event-cutscene {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 14px;
+  border-left: 3px solid var(--rule);
+}
+
+/*
+  The ornate kit: a dark panel of moss and wood trimmed in gold, for what the game frames as something to be proud of
+  (the household, a room, a summary). Its rule is the parchment frame's, drawn in gold.
+*/
+/* Placed as the screen it is on places it; where nothing does, its corners are set from it. */
+:where(.ornate) {
+  position: relative;
+}
+
+.ornate {
+  box-sizing: border-box;
+  padding: 22px 24px;
+  border: 1px solid var(--gold-deep);
+  border-radius: 10px;
+  background: linear-gradient(160deg, var(--moss-deep) 0%, var(--wood) 55%, var(--wood-deep) 100%);
+  box-shadow:
+    inset 0 0 0 4px rgba(26, 34, 22, 0.6),
+    inset 0 0 0 5px rgba(212, 175, 90, 0.55),
+    0 14px 40px rgba(0, 0, 0, 0.5);
+  color: var(--on-wood);
+}
+
+.ornate h1,
+.ornate h2,
+.ornate h3 {
+  margin: 0;
+  color: var(--gold-soft);
+  font-family: var(--display);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+}
+
+.ornate .caps,
+.ornate .hint {
+  color: var(--on-wood);
+}
+
+.ornate .ornate-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(212, 175, 90, 0.4);
+}
+
+/* Its corners are the title screen's vines, in gold, small and tucked into the corners, with room kept for them. */
+.ornate .vine {
+  width: 26px;
+  height: 26px;
+  color: var(--gold);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.ornate .vine-tl,
+.ornate .vine-tr {
+  top: 6px;
+}
+
+.ornate .vine-bl,
+.ornate .vine-br {
+  bottom: 6px;
+}
+
+.ornate .vine-tl,
+.ornate .vine-bl {
+  left: 6px;
+}
+
+.ornate .vine-tr,
+.ornate .vine-br {
+  right: 6px;
+}
+
+.ornate.cornered {
+  padding: 30px 32px;
+}
+
+/* Figures on a dark ground. */
+.ornate .facts {
+  border-color: rgba(212, 175, 90, 0.35);
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.ornate .facts dd,
+.ornate .fact strong {
+  color: var(--gold-soft);
+}
+
+/* A bar of how far along something is, in gold. */
+.gold-bar {
+  display: block;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.gold-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold), var(--gold-soft));
+  transition: width 0.6s ease;
+}
+
+/* Gold trim on what stands over the stage everywhere: the date and the purse. */
+.date-banner,
+.plaque {
+  box-shadow:
+    inset 0 0 0 4px rgba(248, 242, 226, 0.6),
+    inset 0 0 0 5px var(--gold);
+}
+
+
+/*
+  His house, on its own screen: the house in the middle, seen from the front with its wall cut away, every room a window
+  onto its own picture; the household at the side and the room picked on a card. Built from the plan, so that more
+  rooms and floors draw themselves.
+*/
+.house-screen {
+  background: var(--wood-deep);
+}
+
+.house-backdrop {
+  position: absolute;
+  inset: 0;
+  background: center / cover no-repeat;
+}
+
+/* With no picture of its own around it, the hearth room stands in, out of focus and dimmed. */
+.house-backdrop.blurred {
+  inset: -30px;
+  filter: blur(16px) brightness(0.5);
+}
+
+.house-side {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 300px;
+  /* Clear of the Close button in the corner below it. */
+  max-height: calc(100% - 120px);
+  overflow-y: auto;
+}
+
+button.btn.grand.house-close {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  z-index: 4;
+}
+
+.house-progress,
+.house-household {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.house-faces {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.house-children {
+  padding: 2px 10px;
+  border: 1px solid var(--gold-deep);
+  border-radius: 999px;
+  color: var(--gold-soft);
+  font-weight: 700;
+}
+
+/* The figures of the house down the side, a name and its figure to a line. */
+.house-side .facts {
+  flex-direction: column;
+}
+
+.house-side .fact {
+  flex: none;
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 6px 12px;
+  border-top: 1px solid rgba(212, 175, 90, 0.18);
+  border-left: 0;
+}
+
+.house-side .fact:first-child {
+  border-top: 0;
+}
+
+.house-side .fact dd {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.house-side-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* The space the house is drawn in: it gives way to the room card when one is open. */
+.house-stage {
+  position: absolute;
+  top: 20px;
+  right: 90px;
+  /* The house stands well forward on the lawn, in front of the garden wall, so that it can be as large as the screen allows. */
+  bottom: 3%;
+  left: 360px;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  container-type: size;
+  transition: right 0.3s ease;
+}
+
+.house-screen:has(.house-card) .house-stage {
+  right: 470px;
+}
+
+.house-building {
+  /* As large as the stage allows with what is built on at its left, and set right by that much, so the two together are centred. */
+  --house-width: min(100cqw / (1 + var(--house-yard, 0)), 100cqh * var(--house-shape));
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: var(--house-width);
+  margin-left: calc(var(--house-width) * var(--house-yard, 0));
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.55));
+}
+
+.house-roof {
+  position: relative;
+}
+
+.house-roof img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
+/* Smoke from the chimneys of the roof's picture. */
+.house-smoke {
+  position: absolute;
+  top: 1%;
+  width: 4%;
+}
+
+.house-smoke i {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgba(235, 232, 225, 0.55);
+  filter: blur(3px);
+  opacity: 0;
+  animation: house-smoke 5s ease-out infinite;
+}
+
+.house-smoke i:nth-child(2) {
+  animation-delay: 1.7s;
+}
+
+.house-smoke i:nth-child(3) {
+  animation-delay: 3.4s;
+}
+
+@keyframes house-smoke {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.6);
+  }
+  20% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(40%, -260%) scale(2.2);
+  }
+}
+
+.house-front {
+  position: relative;
+  width: 100%;
+}
+
+/* A floor's wall, the half-timbered wall picture tiled, seen wherever no room is cut into it. */
+.house-floor-band {
+  position: absolute;
+  box-sizing: border-box;
+  border: 3px solid #2c1d14;
+  background: var(--house-wall) repeat top left / 7cqw auto, #d9c7a2;
+}
+
+/* A beam along the top of each floor: the floor above sits on it. */
+.house-beam {
+  position: absolute;
+  z-index: 3;
+  object-fit: fill;
+  pointer-events: none;
+}
+
+
+/* Where a floor is wider than the one on it, a slope of shingles covers the part open to the sky. */
+.house-pent {
+  position: absolute;
+  z-index: 0;
+  height: 5%;
+  background: var(--house-shingles) repeat top left / 5cqw auto, #6e4b33;
+}
+
+.house-pent.left {
+  clip-path: polygon(0 100%, 0 75%, 100% 0, 100% 100%);
+}
+
+.house-pent.right {
+  clip-path: polygon(0 0, 100% 75%, 100% 100%, 0 100%);
+}
+
+/* The stone footing the house stands on. */
+.house-footing {
+  display: block;
+  width: 104%;
+  margin: -0.6% 0 0 -2%;
+  object-fit: fill;
+}
+
+button.room-window {
+  position: absolute;
+  z-index: 1;
+  box-sizing: border-box;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 4px solid #3b2a1c;
+  border-radius: 2px;
+  background: #1d140d;
+  color: #f4efe0;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+/* A room is set back into the house: its picture shaded in from the frame. */
+.room-window::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  box-shadow:
+    inset 0 0 24px 6px rgba(0, 0, 0, 0.55),
+    inset 0 14px 16px -8px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+.room-window.outdoors::after {
+  box-shadow: inset 0 0 18px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* A room is not a button that lifts: it lights up instead. */
+button.room-window:not(:disabled):hover,
+button.room-window:not(:disabled):active {
+  filter: none;
+  transform: none;
+}
+
+.room-window img,
+.room-blank {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: filter 0.2s ease;
+}
+
+.room-window.lit:hover img {
+  filter: brightness(1.14) saturate(1.05);
+}
+
+/* Lamplight inside a lived-in room, never quite still. */
+.room-window.lit .room-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 30%, rgba(255, 196, 120, 0.22), transparent 70%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  animation: house-flicker 4s ease-in-out infinite alternate;
+}
+
+@keyframes house-flicker {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  40% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.8;
+  }
+}
+
+.room-window.locked img {
+  filter: grayscale(0.85) brightness(0.3) blur(1px);
+}
+
+.room-window.locked:hover img {
+  filter: grayscale(0.6) brightness(0.48) blur(0.5px);
+}
+
+.room-lock {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  color: var(--gold-soft);
+  opacity: 0.85;
+  transform: translate(-50%, -50%);
+}
+
+/* What can be built now and paid for glints. */
+.room-window.affordable .room-lock {
+  animation: house-shimmer 2.2s ease-in-out infinite;
+}
+
+@keyframes house-shimmer {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 0 transparent);
+  }
+  50% {
+    filter: drop-shadow(0 0 8px var(--gold)) brightness(1.3);
+  }
+}
+
+.room-window.outdoors {
+  border-color: transparent;
+  border-top: 5px solid var(--leaf);
+}
+
+/* What is out of doors, built on against the house's side: a frame of its own, with the grass along its top. */
+.room-window.outdoors.lit,
+.room-window.outdoors.locked {
+  border: 4px solid #3b2a1c;
+  border-top: 5px solid var(--leaf);
+}
+
+.room-window.selected {
+  z-index: 2;
+  outline: 3px solid var(--gold);
+  outline-offset: -3px;
+  box-shadow: 0 0 22px var(--gold-glow);
+}
+
+.room-plate {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  max-width: calc(100% - 12px);
+  padding: 3px 8px;
+  border: 1px solid rgba(212, 175, 90, 0.5);
+  border-radius: 4px;
+  background: rgba(20, 16, 10, 0.75);
+  font-size: 0.78rem;
+  text-align: left;
+}
+
+.room-plate strong {
+  font: 600 0.95rem/1.15 var(--display);
+}
+
+.room-price {
+  color: var(--gold-soft);
+  font-weight: 700;
+}
+
+/* What cannot be paid for shakes its head. */
+.room-price.refused {
+  color: #e8908a;
+  animation: house-shake 0.45s ease;
+}
+
+@keyframes house-shake {
+  20%,
+  60% {
+    transform: translateX(-4px);
+  }
+  40%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+.room-faces {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  display: flex;
+  gap: 4px;
+}
+
+.room-face {
+  flex: none;
+  border: 2px solid var(--paper-raised);
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.room-face.arrived {
+  animation: house-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+
+
+@keyframes house-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.3) translateY(10px);
+  }
+}
+
+.room-you {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--gold);
+  color: var(--wood-deep);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* A room just built: scaffolding sweeps across, the room lights up, and gold sparks fly. */
+.room-window.building img {
+  animation: house-raise 1.4s ease both;
+}
+
+@keyframes house-raise {
+  from {
+    filter: grayscale(1) brightness(0.25);
+  }
+  60% {
+    filter: grayscale(0.2) brightness(1.4);
+  }
+  to {
+    filter: none;
+  }
+}
+
+.room-raise {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.room-raise .scaffold {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(45deg, rgba(122, 84, 40, 0.9) 0 6px, transparent 6px 26px),
+    repeating-linear-gradient(-45deg, rgba(122, 84, 40, 0.9) 0 6px, transparent 6px 26px);
+  animation: house-scaffold 1.1s ease forwards;
+}
+
+@keyframes house-scaffold {
+  from {
+    opacity: 1;
+    clip-path: inset(0 100% 0 0);
+  }
+  45% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    opacity: 0;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.room-raise .spark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  box-shadow: 0 0 10px var(--gold);
+  opacity: 0;
+  animation: house-spark 1s 0.55s ease-out forwards;
+}
+
+@keyframes house-spark {
+  from {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(-80px) scale(0.4);
+  }
+}
+
+/* Someone has moved in: her window glows. */
+.room-window.moving-in {
+  animation: house-moved 1.6s ease-in-out 2 alternate;
+}
+
+@keyframes house-moved {
+  to {
+    box-shadow:
+      0 0 0 3px var(--gold),
+      0 0 30px var(--gold-glow);
+  }
+}
+
+.house-banner {
+  position: absolute;
+  top: 28px;
+  left: 50%;
+  z-index: 10;
+  padding: 10px 30px;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  background: linear-gradient(var(--moss-deep), var(--wood));
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  color: var(--gold-soft);
+  font: 600 1.6rem/1.2 var(--display);
+  transform: translateX(-50%);
+  animation: house-banner 3.2s ease both;
+}
+
+@keyframes house-banner {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -30px);
+  }
+  12%,
+  80% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -16px);
+  }
+}
+
+/* The room picked, on a card that slides in from the side. */
+.house-card {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  bottom: 24px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 400px;
+  overflow-y: auto;
+  animation: house-card-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes house-card-in {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+}
+
+.house-card p {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.house-card-picture {
+  position: relative;
+}
+
+.house-card-picture img,
+.house-card-picture .room-blank {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border: 1px solid var(--gold-deep);
+  border-radius: 6px;
+}
+
+.house-card-picture img.locked {
+  filter: grayscale(0.8) brightness(0.5);
+}
+
+button.house-card-close {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-height: 30px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 1.2rem;
+  text-decoration: none;
+}
+
+.house-tiers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .house-smoke i,
+  .room-window.lit .room-glow,
+  .room-window.affordable .room-lock,
+  .room-price.refused,
+  .room-face.arrived,
+  .room-window.building img,
+  .room-window.moving-in,
+  .house-banner,
+  .house-card {
+    animation: none;
+  }
+
+  .room-raise {
+    display: none;
+  }
+
+  .house-stage {
+    transition: none;
+  }
+}
+
+/*
+  The grand button: a substantial dark panel trimmed in gold, an icon in a gold ring, a large label with a line under it,
+  and a chevron. For the actions a screen is about (ui/GrandButton.tsx).
+*/
+button.btn.grand {
+  justify-content: flex-start;
+  gap: 14px;
+  min-height: 64px;
+  padding: 8px 18px 8px 8px;
+  border: 2px solid var(--gold);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #4f6f3c 0%, var(--moss-deep) 55%, var(--wood) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 200, 0.25),
+    inset 0 0 0 3px rgba(26, 34, 22, 0.35),
+    inset 0 0 0 4px rgba(212, 175, 90, 0.45),
+    0 6px 16px rgba(0, 0, 0, 0.45);
+  color: var(--gold-soft);
+  text-align: left;
+  white-space: normal;
+}
+
+button.btn.grand > svg:last-child {
+  flex: none;
+  margin-left: auto;
+  color: var(--gold);
+}
+
+button.btn.grand:not(:disabled):hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 200, 0.3),
+    inset 0 0 0 3px rgba(26, 34, 22, 0.35),
+    inset 0 0 0 4px rgba(212, 175, 90, 0.7),
+    0 0 0 2px var(--gold-glow),
+    0 8px 22px rgba(0, 0, 0, 0.5);
+}
+
+button.btn.grand:disabled {
+  border-color: var(--gold-deep);
+  background: linear-gradient(180deg, #4a4a40, #2c2c26);
+  color: rgba(242, 226, 160, 0.55);
+  filter: saturate(0.4);
+}
+
+.grand-icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #3a4d2c, var(--wood-deep));
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.35);
+  color: var(--gold-soft);
+}
+
+.grand-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.grand-label {
+  font: 600 1.3rem/1.15 var(--display);
+}
+
+/* Room is kept at its right as wide as the icon at its left, so the label sits in the button's middle. */
+button.btn.grand.centred {
+  padding-right: 8px;
+}
+
+button.btn.grand.centred .grand-text {
+  flex: 1;
+  align-items: center;
+}
+
+button.btn.grand.centred:has(.grand-icon) .grand-text {
+  margin-right: 46px;
+}
+
+.grand-note {
+  color: var(--on-wood);
+  font: 400 0.85rem/1.25 var(--ui);
+}
+
+/* ---- The ornate kit, inside: what sits on its dark ground. */
+
+/* Buttons that are not grand ones, on the dark: dark too, with gold. */
+.ornate button.btn.secondary {
+  border-color: var(--gold-deep);
+  background: rgba(0, 0, 0, 0.28);
+  color: var(--gold-soft);
+}
+
+.ornate button.btn.quiet {
+  color: var(--gold-soft);
+}
+
+.ornate .notice {
+  border-color: var(--gold-deep);
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--on-wood);
+}
+
+/* A dialog drawn in the kit. */
+.dialog.ornate .dialog-note {
+  color: var(--on-wood);
+}
+
+.dialog.ornate .actions {
+  gap: 12px;
+}
+
+/* The way down: how deep, as a framed picture between two gold-ringed arrows, and who comes, as dark portraits. */
+.ornate .party-heading {
+  color: var(--gold-soft);
+}
+
+.ornate .depth-card,
+.ornate .party-card {
+  border: 2px solid rgba(212, 175, 90, 0.35);
+  background: rgba(0, 0, 0, 0.28);
+  color: var(--on-wood);
+}
+
+.ornate .depth-card strong,
+.ornate .party-card strong {
+  color: var(--gold-soft);
+  font-family: var(--display);
+  font-size: 1.1rem;
+}
+
+.ornate .depth-card {
+  border-color: var(--gold);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+}
+
+.ornate .party-card:hover:not(:disabled) {
+  border-color: var(--gold);
+}
+
+.ornate .party-card.picked {
+  border-color: var(--gold);
+  box-shadow:
+    0 0 0 2px var(--gold),
+    0 0 18px var(--gold-glow);
+}
+
+.ornate .party-card:disabled {
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--on-wood);
+}
+
+.ornate .party-face,
+.ornate .depth-art {
+  border: 1px solid rgba(212, 175, 90, 0.4);
+}
+
+.ornate .depth-carousel button.btn {
+  width: 52px;
+  min-height: 52px;
+  padding: 0;
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #3a4d2c, var(--wood-deep));
+  color: var(--gold-soft);
+}
+
+.ornate .depth-carousel button.btn:disabled {
+  border-color: var(--gold-deep);
+  opacity: 0.45;
+}
+
+/* Below: the panels along the bottom, kept tight, on the dark. */
+.below-bottom .ornate {
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.ornate .below-row.acting {
+  background: rgba(212, 175, 90, 0.16);
+}
+
+.ornate .below-row.down {
+  color: rgba(217, 222, 200, 0.5);
+}
+
+.ornate .below-bar {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.ornate .below-bar > span {
+  background: linear-gradient(90deg, var(--leaf), #8fae66);
+}
+
+.ornate .below-where strong {
+  color: var(--gold-soft);
+  font-family: var(--display);
+}
+
+.ornate .below-stops li {
+  border-color: var(--gold-deep);
+  background: radial-gradient(circle at 35% 30%, #3a4d2c, var(--wood-deep));
+  color: var(--on-wood);
+}
+
+.ornate .below-stops li + li::before {
+  border-top-color: var(--gold-deep);
+}
+
+.ornate .below-stops li.done {
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0.5;
+}
+
+.ornate .below-stops li.here {
+  border-color: var(--gold);
+  background: radial-gradient(circle at 35% 30%, #5f8247, var(--moss-deep));
+  color: var(--gold-soft);
+  box-shadow: 0 0 14px var(--gold-glow);
+}
+
+/* The commands: each a dark plate that takes a gold edge under the pointer. */
+.ornate .below-command {
+  border: 1px solid rgba(212, 175, 90, 0.22);
+  background: rgba(0, 0, 0, 0.22);
+  color: var(--on-wood);
+}
+
+.ornate .below-command strong {
+  color: var(--gold-soft);
+  font-family: var(--display);
+  font-size: 1.05rem;
+}
+
+.ornate .below-command:hover:not(:disabled) {
+  border-color: var(--gold);
+  background: rgba(212, 175, 90, 0.14);
+  box-shadow: 0 0 10px var(--gold-glow);
+}
+
+.ornate .below-command:disabled {
+  border-color: transparent;
+  background: none;
+  color: var(--on-wood);
+}
+
+/* The summaries over the field: victory, a rest, the run. */
+.ornate.below-spoils .below-beaten {
+  color: var(--on-wood);
+}
+
+.ornate .below-standing .below-health {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.ornate .below-standing .below-health > span {
+  background: linear-gradient(90deg, var(--leaf), #8fae66);
+}
+
+.ornate .below-healed {
+  color: #a8d080;
+}
+
+.ornate .loot-tile {
+  border-color: rgba(212, 175, 90, 0.45);
+  background: rgba(0, 0, 0, 0.28);
+  box-shadow: none;
+}
+
+.ornate .loot-tile strong {
+  color: var(--gold-soft);
+}
+
+.ornate .below-relic {
+  color: var(--gold-soft);
+}
+
+/* What a stop or the run came to, in the kit: centered, with room around it and between its parts. */
+.ornate.below-dialog {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: min(540px, calc(100vw - 48px));
+  padding: 30px 40px 28px;
+  text-align: center;
+}
+
+.ornate.below-dialog h2 {
+  margin: 0 0 4px;
+  font-size: 2rem;
+}
+
+.ornate.below-dialog p {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.ornate.below-dialog .actions {
+  margin-top: 10px;
+}
+
+.ornate.below-dialog .below-haul,
+.ornate.below-dialog .below-relic {
+  justify-content: center;
+}
+
+
+/* ---- The town map: one painted map filling the screen, each place a gold medallion on it. */
+
+.map-screen {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--wood-deep);
+}
+
+/* The whole screen, at the map's own shape: as much of it is cut off at the edges as the screen is of another shape. */
+.map-board {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  width: max(100vw, 100vh * var(--map-shape));
+  aspect-ratio: var(--map-shape);
+  animation: map-unfold 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.map-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+@keyframes map-unfold {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+
+/* The name of a part of the map, lettered over it like an old chart's. */
+.map-region {
+  position: absolute;
+  z-index: 1;
+  transform: translateX(-50%);
+  padding: 2px 14px;
+  border-radius: 4px;
+  background: rgba(20, 26, 16, 0.55);
+  color: var(--gold-soft);
+  font-family: var(--display);
+  font-size: clamp(0.8rem, 1.1vw, 1.1rem);
+  font-style: italic;
+  letter-spacing: 0.08em;
+  text-shadow: 0 1px 3px #000;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* A place: a dark panel trimmed in gold, its medallion centred on the spot with its name beside it, and under them the portraits of who is there. */
+.map-pin {
+  --pin: clamp(28px, 2.3vw, 40px);
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  min-height: 0;
+  /* Pulled back by half the medallion and the plaque's edge, so the medallion's centre is the spot. */
+  margin-top: calc(var(--pin) / -2 - 4px);
+  margin-left: calc(var(--pin) / -2 - 4px);
+  padding: 3px 10px 3px 3px;
+  border: 1px solid var(--gold-deep);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(44, 58, 36, 0.94), rgba(20, 26, 16, 0.94));
+  box-shadow: inset 0 0 0 1px rgba(242, 226, 160, 0.15), 0 3px 10px rgba(0, 0, 0, 0.6);
+  color: var(--gold-soft);
+  font: inherit;
+  text-align: left;
+}
+
+/* With people in it the panel is a box, not a pill. */
+.map-pin:has(.map-pin-people) {
+  padding-bottom: 6px;
+  border-radius: 10px;
+}
+
+.map-pin-head {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.map-pin-people {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  padding-left: 3px;
+}
+
+
+/* Pointed at, it comes to the front and lights up where it is, without moving out from under the pointer. */
+.map-pin:hover {
+  z-index: 3;
+  border-color: var(--gold-soft);
+  box-shadow:
+    inset 0 0 0 1px rgba(242, 226, 160, 0.3),
+    0 0 0 2px var(--gold-glow),
+    0 4px 14px rgba(0, 0, 0, 0.6);
+}
+
+.map-medallion {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--pin);
+  height: var(--pin);
+  aspect-ratio: 1;
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #3d4f30, var(--wood-deep) 70%);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.5), inset 0 0 0 3px rgba(242, 226, 160, 0.35);
+}
+
+
+
+/* Go, or why there is no going, at the end of the name. */
+.map-board button.btn.map-go {
+  min-height: 0;
+  height: 24px;
+  margin-left: 4px;
+  padding: 0 12px;
+  border-color: var(--gold);
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--gold-soft), var(--gold) 55%, var(--gold-deep));
+  color: var(--wood-deep);
+  font-size: 0.75rem;
+}
+
+.map-board button.btn.map-go:not(:disabled):hover {
+  transform: none;
+  filter: brightness(1.1);
+}
+
+/* No going: greyed and flat, as every button that cannot be pressed is. */
+.map-board button.btn.map-go:disabled {
+  border-color: rgba(212, 175, 90, 0.35);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(242, 226, 160, 0.45);
+  cursor: not-allowed;
+}
+
+
+.map-state {
+  margin-left: 4px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.map-plate {
+  font-size: clamp(0.66rem, 0.78vw, 0.82rem);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+
+/* Where he is: the medallion in gold, with a pulse around it. */
+.map-pin.here {
+  border-color: var(--gold);
+}
+
+.map-pin.here .map-medallion {
+  border-color: var(--gold-soft);
+  background: radial-gradient(circle at 35% 30%, #e8cf7a, var(--gold-deep) 75%);
+  color: var(--wood-deep);
+}
+
+.map-pin.here .map-medallion::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border: 2px solid var(--gold-soft);
+  border-radius: 50%;
+  animation: map-here 1.8s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes map-here {
+  from {
+    opacity: 0.9;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+/* A place that is shut is dimmed, though it can still be looked at. */
+.map-pin.closed {
+  filter: grayscale(0.7) brightness(0.7);
+}
+
+.map-faces {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.map-face {
+  flex: none;
+  border: 1.5px solid var(--gold);
+}
+
+.map-more {
+  margin-left: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+/* Those in their own rooms, in the screen's top right corner. */
+.map-rooms {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 30%;
+  padding: 12px 16px;
+}
+
+.map-rooms .portrait .caps {
+  color: var(--gold-soft);
+}
+
+/* Places on no map, his house, at the bottom right. */
+.map-elsewhere {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: min(420px, 40vw);
+  padding: 12px 16px;
+}
+
+.map-off {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--gold-soft);
+}
+
+.map-off strong {
+  white-space: nowrap;
+}
+
+.map-off .map-faces {
+  flex: 1;
+  flex-wrap: wrap;
+  row-gap: 4px;
+  padding-left: 4px;
+}
+
+.map-off button.btn.grand {
+  flex: none;
+  min-height: 0;
+  padding: 6px 12px;
+}
+
+button.btn.grand.map-close {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  z-index: 3;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-board,
+  .map-pin.here .map-medallion::after {
+    animation: none;
+  }
+}
+
+/* The way down into the Undercroft, once he knows of it: the place glows with old magic, a ring of runes turning
+   around its medallion, so that it reads as more than a bathhouse. */
+.map-pin.portal {
+  --arcane: #9d7bff;
+  --arcane-soft: #d6c8ff;
+  border-color: var(--arcane);
+  background:
+    radial-gradient(120% 140% at 0% 50%, rgba(157, 123, 255, 0.35), transparent 60%),
+    linear-gradient(180deg, rgba(40, 30, 70, 0.95), rgba(18, 14, 34, 0.95));
+  box-shadow:
+    inset 0 0 0 1px rgba(214, 200, 255, 0.25),
+    0 0 18px rgba(157, 123, 255, 0.55),
+    0 3px 10px rgba(0, 0, 0, 0.6);
+  animation: map-portal-glow 3.2s ease-in-out infinite;
+}
+
+.map-pin.portal .map-medallion {
+  border-color: var(--arcane-soft);
+  background: radial-gradient(circle at 50% 50%, #6b4fd8, #1c1438 72%);
+  color: #fff;
+  box-shadow:
+    inset 0 0 10px rgba(214, 200, 255, 0.6),
+    0 0 12px rgba(157, 123, 255, 0.9);
+}
+
+.map-runes {
+  position: absolute;
+  inset: -9px;
+  border: 2px dashed var(--arcane-soft);
+  border-radius: 50%;
+  opacity: 0.85;
+  animation: map-runes-turn 12s linear infinite;
+  pointer-events: none;
+}
+
+.map-runes::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px dotted rgba(214, 200, 255, 0.7);
+  border-radius: 50%;
+  animation: map-runes-turn 8s linear infinite reverse;
+}
+
+.map-below {
+  margin-left: 2px;
+  padding: 1px 7px;
+  border: 1px solid var(--arcane);
+  border-radius: 999px;
+  background: rgba(157, 123, 255, 0.25);
+  color: var(--arcane-soft);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.map-pin.portal .map-plate {
+  color: var(--arcane-soft);
+}
+
+@keyframes map-runes-turn {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes map-portal-glow {
+  50% {
+    box-shadow:
+      inset 0 0 0 1px rgba(214, 200, 255, 0.4),
+      0 0 30px rgba(157, 123, 255, 0.85),
+      0 3px 10px rgba(0, 0, 0, 0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-pin.portal,
+  .map-runes,
+  .map-runes::after {
+    animation: none;
+  }
+}
+
+/* ---- The ornate kit, for what a dialog drawn in it holds: tabs, cards, the bag's squares and the calendar. */
+
+/* The way out of a dialog in the kit, at its foot. */
+.dialog-foot {
+  display: flex;
+  justify-content: center;
+  padding-top: 16px;
+}
+
+.ornate .tabs {
+  border-bottom-color: rgba(212, 175, 90, 0.35);
+}
+
+.ornate .tab {
+  color: var(--on-wood);
+}
+
+.ornate .tab:hover {
+  color: var(--gold-soft);
+}
+
+.ornate .tab.selected {
+  border-bottom-color: var(--gold);
+  background: rgba(212, 175, 90, 0.14);
+  color: var(--gold-soft);
+}
+
+.ornate .card {
+  border-color: rgba(212, 175, 90, 0.35);
+  background: rgba(0, 0, 0, 0.22);
+  color: var(--on-wood);
+}
+
+.ornate .card strong {
+  color: var(--gold-soft);
+}
+
+.ornate .portrait .caps {
+  color: var(--gold-soft);
+}
+
+/* The bag: each square a dark recess in the wood, ringed in gold. */
+.ornate .item-square {
+  border-color: rgba(212, 175, 90, 0.45);
+  background: radial-gradient(circle at 50% 38%, #3a4d2c, var(--wood-deep) 78%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45), inset 0 6px 14px rgba(0, 0, 0, 0.35);
+  color: var(--gold-soft);
+}
+
+.ornate button.item-square:not(:disabled):hover {
+  border-color: var(--gold);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45), 0 0 0 2px var(--gold-glow);
+}
+
+.ornate .item-square.picked {
+  border-color: var(--gold-soft);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45), 0 0 0 3px var(--gold);
+}
+
+.ornate .item-square.empty {
+  background: rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.3);
+  opacity: 0.55;
+}
+
+.ornate .item-count {
+  border: 1px solid var(--gold-deep);
+  background: var(--wood-deep);
+  color: var(--gold-soft);
+}
+
+.ornate .item-tag {
+  color: var(--gold-soft);
+  text-shadow: 0 1px 2px #000;
+}
+
+.ornate .bag-name {
+  color: var(--on-wood);
+}
+
+.ornate .bag-picked {
+  border-color: rgba(212, 175, 90, 0.45);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.ornate .bag-picked strong {
+  color: var(--gold-soft);
+}
+
+.ornate .bag-boon strong {
+  color: var(--gold-soft);
+}
+
+/* A parchment sheet in the dark frame, for what is read at length: the calendar itself, the help's pages. What is on it
+   is drawn as it is anywhere. */
+.sheet {
+  padding: 12px 16px;
+  border: 1px solid var(--gold-deep);
+  border-radius: 8px;
+  background: var(--parchment);
+  box-shadow: inset 0 0 0 3px rgba(212, 175, 90, 0.35), 0 4px 14px rgba(0, 0, 0, 0.4);
+  color: var(--ink);
+}
+
+.ornate .sheet h2,
+.ornate .sheet h3 {
+  color: var(--ink);
+  text-shadow: none;
+}
+
+.ornate .sheet .caps,
+.ornate .sheet .hint {
+  color: var(--ink-soft);
+}
+
+button.btn.grand.calendar-close {
+  margin-top: auto;
+}
+
+.calendar-sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+}
+
+.ornate .card.picked {
+  border-left-color: var(--on-wood);
+}
+
+.ornate .card.picked.class {
+  border-left-color: #93c46c;
+}
+
+.ornate .card.picked.society {
+  border-left-color: #6fc4bc;
+}
+
+.ornate .card.picked.plan {
+  border-left-color: #e0838a;
+}
+
+.ornate .card.picked.event {
+  border-left-color: #e6b85a;
+}
+
+.ornate .card.picked.orientation {
+  border-left-color: #86b0d4;
+}
+
+.ornate .card.picked.birth {
+  border-left-color: #d496c4;
+}
+
+/* The kit's headings sit flush; the bag's keep their room above and below. */
+.ornate .bag h2 {
+  margin: 12px 0 6px;
+}
+
+.ornate .bag h2:first-child {
+  margin-top: 0;
+}
+
+/* The codex keeps its own book, inked as it is anywhere, inside the dark frame of the help. */
+.ornate .book {
+  color: var(--ink);
+}
+
+.ornate .book h2 {
+  color: var(--ink);
+  text-shadow: none;
+}
+
+.ornate .book-contents h3 {
+  color: var(--madder);
+  text-shadow: none;
+}
+
+.ornate .book .caps,
+.ornate .book .hint {
+  color: var(--ink-soft);
+}
+
+/* The societies editor: each student as a portrait to press, picked when she belongs. */
+.society-members {
+  gap: 10px;
+}
+
+button.society-member {
+  min-height: 0;
+  padding: 6px;
+  border: 2px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: inherit;
+}
+
+button.society-member.picked {
+  border-color: var(--moss);
+  background: var(--moss-tint);
+}
+
+button.society-member:disabled {
+  border-color: transparent;
+  background: transparent;
+  opacity: 0.35;
+}
+
+/* ---- The societies' fair: the town map's pins, as tables with who is at them. */
+.fair-screen {
+  z-index: 5;
+}
+
+.fair-when {
+  display: block;
+  font-size: 0.85em;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.fair-person {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.fair-person .portrait .caps {
+  color: var(--gold-soft);
+}
+
+.map-board button.btn.fair-hello {
+  min-height: 0;
+  height: 22px;
+  padding: 0 10px;
+  border-color: var(--gold-deep);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--gold-soft);
+  font-size: 0.7rem;
+}
+
+.map-pin.fair-table.joined {
+  border-color: var(--gold-soft);
+}
+
+.fair-plaque {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 18px;
+}

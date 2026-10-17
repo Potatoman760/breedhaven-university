@@ -13,6 +13,7 @@ import {
   describeHousehold,
   goToRoom,
   healthCap,
+  houseLayout,
   houseTotals,
   housingFacts,
   housingOfferDue,
@@ -361,5 +362,45 @@ describe('what the house costs', () => {
     const screens = buildEpilogue(seen(home), at(home, 7))
     expect(screens.find((screen) => screen.kind === 'home')).toMatchObject({ text: 'You kept Quince House, and Ana made her home there with you.', loveInterestIds: ['ana'] })
     expect(screens.find((screen) => screen.kind === 'child')?.text).toContain('the two of you raised them together at Quince House')
+  })
+})
+
+describe('the house as it is drawn', () => {
+  it('stacks the floors from the ground up, each as tall as its rooms, and puts every room in its box', () => {
+    const layout = houseLayout(written.housing!)
+    // The ground floor's rooms take four rows, the upper floor's two.
+    expect(layout.rows).toBe(6)
+    expect(layout.floors.map((floor) => [floor.name, floor.top, floor.height])).toEqual([
+      ['Upper', 0, (2 / 6) * 100],
+      ['Ground', (2 / 6) * 100, (4 / 6) * 100]
+    ])
+    const box = (key: string) => layout.rooms.find((room) => room.key === key)!
+    expect(box('master')).toMatchObject({ left: 0, top: 0, width: 50 })
+    expect(box('study')).toMatchObject({ left: 50, top: (4 / 6) * 100, width: 50, height: (2 / 6) * 100 })
+  })
+
+  it('lays out another floor and another room without anything overlapping', () => {
+    const config = written.housing!
+    const grown = {
+      ...config,
+      floors: [...config.floors, 'Attic'],
+      rooms: [...config.rooms, { ...config.rooms[5], key: 'loft', plan: { floor: 2, x: 1, y: 1, w: 2, h: 1, outdoors: false } }]
+    }
+    const layout = houseLayout(grown)
+    expect(layout.floors[0]).toMatchObject({ name: 'Attic', top: 0, left: 25, width: 50 })
+    const boxes = layout.rooms
+    const overlap = (a: (typeof boxes)[number], b: (typeof boxes)[number]) =>
+      a.left < b.left + b.width - 1e-9 && b.left < a.left + a.width - 1e-9 && a.top < b.top + b.height - 1e-9 && b.top < a.top + a.height - 1e-9
+    for (const a of boxes) for (const b of boxes) if (a !== b) expect(overlap(a, b), `${a.key} and ${b.key}`).toBe(false)
+    expect(Math.max(...boxes.map((room) => room.top + room.height))).toBeCloseTo(100)
+  })
+
+  it('leaves what is out of doors off the front, to stand beside the house', () => {
+    const config = written.housing!
+    const yard = { ...config.rooms[0], key: 'yard', plan: { floor: 0, x: 0, y: 9, w: 4, h: 3, outdoors: true } }
+    const layout = houseLayout({ ...config, rooms: [...config.rooms, yard] })
+    expect(layout.grounds).toEqual(['yard'])
+    expect(layout.rooms.map((room) => room.key)).not.toContain('yard')
+    expect(layout.rows).toBe(houseLayout(config).rows)
   })
 })

@@ -13,6 +13,22 @@
           "day": "generated/backgrounds/great-court/default-day.webp",
           "night": "generated/backgrounds/great-court/default-night.webp"
         }
+      },
+      {
+        "id": "queen-steps-out",
+        "name": "The Queen steps out",
+        "images": {
+          "day": "generated/backgrounds/great-court/queen-steps-out.webp"
+        },
+        "description": "The Queen's car has just come down at the foot of the steps: a long pearl-white limousine hovering over the paving on a ring of violet runes, and the Queen stepping out of it."
+      },
+      {
+        "id": "societies-fair",
+        "name": "The Societies Fair",
+        "images": {
+          "day": "generated/backgrounds/great-court/societies-fair.webp"
+        },
+        "description": "The court is given over to the Societies Fair: a ring of trestle tables under banners and bunting, one for every society, with leaflets, sign-up sheets and free things on them, the Bloomist and Freewill tables set at opposite ends."
       }
     ],
     "indoors": false,
@@ -104,6 +120,15 @@
         "images": {
           "day": "generated/backgrounds/commons/view.webp"
         }
+      },
+      {
+        "id": "first-frost",
+        "name": "the Feast of First Frost",
+        "images": {
+          "day": "generated/backgrounds/commons/first-frost-day.webp",
+          "night": "generated/backgrounds/commons/first-frost-night.webp"
+        },
+        "description": "The Commons is dressed for the Feast of First Frost: evergreen garlands and holly along the beams, the long tables joined under white cloths and laden with food, candles and frost-blue ward-lights strung overhead, a tall tree hung with glass ornaments in the corner, and the great hearth roaring."
       }
     ],
     "open": {

@@ -24,6 +24,8 @@ const atDay = (dayIndex: number): GameState => ({ ...start(), time: dayIndex * 2
 const ids = (events: CalendarEvent[]) => events.map((e) => e.id)
 const event = (extra: Partial<CalendarEvent>): CalendarEvent => ({
   noClasses: false,
+  program: [],
+  secret: false,
   id: 'fair',
   name: 'the Fair',
   description: '',
@@ -136,6 +138,8 @@ describe('parseGeneratedEvents', () => {
         durationDays: 2,
         locationId: 'shop',
         generated: true,
+        program: [],
+        secret: false,
         noClasses: false
       }
     ])
@@ -182,8 +186,8 @@ describe('parseGeneratedEvents', () => {
 describe('an event with a place and hours, and a holiday with neither', () => {
   const content = fixture()
   const state = createInitialState(content)
-  const fair: CalendarEvent = { id: 'fair', name: 'the Fair', description: 'Stalls and cider.', month: 'a', day: 1, durationDays: 2, locationId: 'shop', startHour: 10, hours: 4, noClasses: false, generated: false }
-  const holiday: CalendarEvent = { id: 'rest', name: 'Rest Day', description: 'Nobody works.', month: 'a', day: 2, durationDays: 1, noClasses: true, generated: false }
+  const fair: CalendarEvent = { id: 'fair', name: 'the Fair', description: 'Stalls and cider.', month: 'a', day: 1, durationDays: 2, locationId: 'shop', startHour: 10, hours: 4, noClasses: false, generated: false, program: [], secret: false }
+  const holiday: CalendarEvent = { id: 'rest', name: 'Rest Day', description: 'Nobody works.', month: 'a', day: 2, durationDays: 1, noClasses: true, generated: false, program: [], secret: false }
   const both = { ...content, calendar: { ...content.calendar, events: [fair, holiday] } }
 
   it('are told apart wherever they are told: to a character, and on the calendar', () => {

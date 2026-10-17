@@ -45,6 +45,11 @@
       "volume": 0.5,
       "credit": "Kenney, Casino Audio: chips-stack-1 (CC0), kenney.nl"
     },
+    "build": {
+      "file": "sounds/ui/build.ogg",
+      "volume": 0.6,
+      "credit": "Kenney, Impact Sounds: impactWood_medium_000, impactWood_medium_002, impactWood_heavy_001 (CC0), kenney.nl"
+    },
     "notice": {
       "file": "sounds/ui/notice.ogg",
       "volume": 0.5,
@@ -256,6 +261,38 @@
     "riverside-park": {
       "day": "river",
       "night": "night-outdoor"
+    }
+  },
+  "poses": {
+    "blowjob": {
+      "file": "sounds/scenes/oral.ogg",
+      "volume": 0.6,
+      "credit": "SnowFightStudios, \"Slurping 2\" (CC0), freesound.org/people/SnowFightStudios/sounds/666319"
+    },
+    "missionary": {
+      "file": "sounds/scenes/thrusting.ogg",
+      "volume": 0.6,
+      "credit": "khenshom, \"Skin to skin slams and contact\" (CC0), freesound.org/people/khenshom/sounds/481202"
+    },
+    "cowgirl": {
+      "file": "sounds/scenes/thrusting.ogg",
+      "volume": 0.6,
+      "credit": "khenshom, \"Skin to skin slams and contact\" (CC0), freesound.org/people/khenshom/sounds/481202"
+    },
+    "doggy": {
+      "file": "sounds/scenes/thrusting.ogg",
+      "volume": 0.6,
+      "credit": "khenshom, \"Skin to skin slams and contact\" (CC0), freesound.org/people/khenshom/sounds/481202"
+    },
+    "creampie": {
+      "file": "sounds/scenes/breathing.ogg",
+      "volume": 0.5,
+      "credit": "khenshom, \"Woman breathing heavily 01\" (CC0), freesound.org/people/khenshom/sounds/534473"
+    },
+    "facial": {
+      "file": "sounds/scenes/breathing.ogg",
+      "volume": 0.5,
+      "credit": "khenshom, \"Woman breathing heavily 01\" (CC0), freesound.org/people/khenshom/sounds/534473"
     }
   }
 }

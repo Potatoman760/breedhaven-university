@@ -21,6 +21,8 @@ const DEFAULT_HOURS = 2
 const MAX_HOURS = 4
 // A night's sleep is longer than anything else the player might do.
 const MAX_REST_HOURS = 8
+// The longest he can make a session of study or a drill: a working day's worth, if he has the energy.
+const MAX_SESSION_HOURS = 8
 // An event can be stayed at for as long as it runs, which may be most of a day.
 const MAX_EVENT_HOURS = 16
 // What an hour of working on yourself gives and costs, and what an hour of rest restores.
@@ -78,10 +80,14 @@ export type Outing = z.infer<typeof OutingSchema>
 
 /**
  * The fewest and the most hours an outing can be made to take by the player, when its length is his to choose: something he
- * typed to do, or an event he is going to. An hour at the least. A session of study or a drill is as long as it is, and has none.
+ * typed to do, or an event he is going to, an hour at the least; or a session of study or a drill, which can be made
+ * longer than it is but not shorter. Something else he drops in on is as long as it is, and has none.
  */
 export function outingHourRange(state: GameState, outing: Outing): { min: number; max: number } | undefined {
-  if (outing.studyCourseId || (outing.dropIn && !outing.eventId)) return undefined
+  if (outing.studyCourseId || (outing.dropIn && !outing.eventId && outing.trains !== undefined && outing.trains !== 'rest')) {
+    return { min: outing.hours, max: Math.max(outing.hours, MAX_SESSION_HOURS) }
+  }
+  if (outing.dropIn && !outing.eventId) return undefined
   if (outing.window) return { min: 1, max: Math.max(1, Math.min(MAX_EVENT_HOURS, outing.window.until - Math.max(state.time, outing.window.from))) }
   return { min: 1, max: outing.trains === 'rest' ? MAX_REST_HOURS : MAX_HOURS }
 }
@@ -407,7 +413,7 @@ export interface EventOuting {
  */
 export function eventOutings(content: ContentPack, state: GameState): EventOuting[] {
   const { dayIndex, hour } = toDate(content.calendar, state.time)
-  return eventsOn(content, state).flatMap((event) => {
+  return eventsOn(content, state).filter((event) => !event.secret).flatMap((event) => {
     const place = content.locations.find((l) => l.id === event.locationId)
     if (event.startHour === undefined || !place) return []
     const from = timeOn(content, dayIndex, event.startHour)

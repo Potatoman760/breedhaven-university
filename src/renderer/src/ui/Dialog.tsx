@@ -1,6 +1,8 @@
 import { useEffect, type ReactNode } from 'react'
 import type { Cue } from '../../../shared/model'
 import { play } from '../sound'
+import { GrandButton } from './GrandButton'
+import { BackIcon } from './icons'
 
 interface DialogProps {
   title: string
@@ -11,6 +13,8 @@ interface DialogProps {
   wide?: boolean
   /** What it sounds like to open and to close, where that is not a window's: the bag's. */
   sounds?: [Cue, Cue]
+  /** Drawn in the ornate kit, dark and trimmed in gold, for a dialog that is a moment of the game and not a form. */
+  ornate?: boolean
   /** Leaves out the Close button in its heading, for a dialog whose own buttons include the way out. Escape and a press outside still close it. */
   noClose?: boolean
   children: ReactNode
@@ -44,22 +48,28 @@ export function Overlay({ onClose, sounds = ['open', 'close'], children }: { onC
 }
 
 /** A framed parchment dialog over a dimmed screen. */
-export function Dialog({ title, note, onClose, narrow, wide, noClose, sounds, children }: DialogProps) {
+export function Dialog({ title, note, onClose, narrow, wide, noClose, ornate, sounds, children }: DialogProps) {
   return (
     <Overlay onClose={onClose} sounds={sounds}>
-      <div className={narrow ? 'dialog narrow' : wide ? 'dialog wide' : 'dialog'}>
+      <div className={['dialog', narrow ? 'narrow' : wide ? 'wide' : '', ornate && 'ornate'].filter(Boolean).join(' ')}>
         <div className="dialog-head">
           <h1>
             {title}
             {note && <span className="dialog-note">{note}</span>}
           </h1>
-          {!noClose && (
+          {!noClose && !ornate && (
             <button className="secondary" onClick={onClose}>
               Close
             </button>
           )}
         </div>
         {children}
+        {/* In the kit the way out is a grand button of its own at the foot, where it is found at once. */}
+        {!noClose && ornate && (
+          <div className="dialog-foot">
+            <GrandButton label="Close" icon={<BackIcon size={22} />} chevron={false} onClick={onClose} />
+          </div>
+        )}
       </div>
     </Overlay>
   )

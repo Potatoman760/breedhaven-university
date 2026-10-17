@@ -19,14 +19,14 @@ export function scheduledLocationId(li: LoveInterest, date: GameDate): string | 
 
 /**
  * The view of a location to show: the preferred one if it exists; else one named for
- * something going on today (a view called "Midwinter" on Midwinter), whatever the case of
- * the letters; else the first, its default.
+ * something going on today (a view called "Midwinter", or with the event's id, on Midwinter),
+ * whatever the case of the letters; else the first, its default.
  */
 export function backgroundFor(location: Location, preferredId?: string, occasions: string[] = []): Background | undefined {
   const today = occasions.map((name) => name.trim().toLowerCase())
   return (
     location.backgrounds.find((b) => b.id === preferredId) ??
-    location.backgrounds.find((b) => today.includes(b.name.trim().toLowerCase())) ??
+    location.backgrounds.find((b) => today.includes(b.name.trim().toLowerCase()) || today.includes(b.id.toLowerCase())) ??
     location.backgrounds[0]
   )
 }

@@ -4,7 +4,7 @@ import type { ContentPack, GameState } from '../../../shared/model'
 import { Backdrop } from './Backdrop'
 import { Button } from './Button'
 import { Dialog } from './Dialog'
-import { Portrait } from './MapPanel'
+import { Portrait } from './Portrait'
 import { Tour, type TourStep } from './Tour'
 import { WeekPlanner } from './WeekPlanner'
 
@@ -205,9 +205,9 @@ export function CoursesView({ content, state, onEnrol, toured, onToured }: Props
                   <span className="caps">In this class</span>
                   {classmates.length === 0 && !teacher && <span className="hint">No one you know.</span>}
                   <div className="portraits">
-                    {teacher && <Portrait li={teacher} />}
+                    {teacher && <Portrait who={teacher} caption />}
                     {classmates.map((li) => (
-                      <Portrait key={li.id} li={li} />
+                      <Portrait key={li.id} who={li} caption />
                     ))}
                   </div>
                   <button

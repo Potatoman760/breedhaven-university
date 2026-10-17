@@ -318,9 +318,34 @@
       "month": "mistmoon",
       "day": 22,
       "locationId": "commons",
-      "startHour": 18,
-      "hours": 3,
-      "description": "The Commons lays on a hot supper to mark the turn of the weather: roast roots, spiced wine, and every hearth lit."
+      "description": "The Commons lays on a hot supper to mark the turn of the weather: roast roots, spiced wine, and every hearth lit.",
+      "program": [
+        {
+          "id": "feast",
+          "name": "The supper",
+          "day": 1,
+          "startHour": 18,
+          "hours": 3,
+          "description": "The Feast of First Frost fills the Commons: long tables under white cloths, garlands on every beam, the hearth roaring, and the whole University in from the cold. You find a place at the end of a bench.",
+          "direction": "It is the Feast of First Frost, the University's supper for the first cold night of the year, in the Commons dressed for winter: garlands, candles, a tree hung with glass, the hearth roaring, spiced wine in jugs. By custom nobody eats alone: you share a table and the warmth. You are at the feast with {player}, sharing his table. Eat, drink, toast the winter, talk about the year so far and the break to come, and let the warmth and the wine loosen things.",
+          "castSize": 2,
+          "cutscene": {
+            "speakerId": "dorrit",
+            "scenes": [
+              {
+                "locationId": "commons",
+                "backgroundId": "first-frost",
+                "lines": [
+                  "*The Commons is unrecognizable: garlands on every beam, candles down every table, the hearth roaring, and half the University in out of the cold. Dorrit Hale is working the serving counter like a general.*",
+                  "You. {player}. Plate. Go on, take one. It's First Frost, and nobody eats alone tonight.",
+                  "Roast roots, black bread, and the spiced wine's in the jugs. It's strong, so pace yourself.",
+                  "That's the whole custom: first cold night of the year, you share a table and you share the warmth. Go and find someone to sit with."
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     {
       "id": "examinations",

@@ -5,7 +5,6 @@ export const TraitSchema = z.object({
   name: z.string(),
   /** What the trait is and how it shows in what the character says and does. Given to the LLM as written. */
   definition: z.string(),
-  category: z.string().optional(),
   /**
    * What the trait does to the drama engine's reckoning of someone who has it: `jealousy`
    * is added to how likely she is to walk in on the player with someone else (negative for

@@ -8,7 +8,24 @@
       "startHour": 9,
       "hours": 2,
       "description": "The bell and a notification from the University app call every new student to the Great Court. You find a place on the terrace steps as the Chancellor climbs to the lectern, and the people beside you shuffle up to make room.",
-      "direction": "It is the first morning of term. Every new and returning student has been called to the Great Court for the Chancellor's assembly: a long welcome, the University's rules, where to find the Health Center and Bloom Counseling, and the term's notices. You have ended up next to {player} in the crowd. If you have not met him, introduce yourself naturally (your name, what you study, a first impression of him), whisper under the speech, and react to what is being said from the lectern."
+      "direction": "It is the first morning of term, at the Chancellor's assembly in the Great Court. You and {player}, your best friend from when you were children, have just been reunited after six years, and you are excited to see him.",
+      "castIds": [
+        "tamsin"
+      ],
+      "cutscene": {
+        "speakerId": "tamsin",
+        "scenes": [
+          {
+            "locationId": "great-court",
+            "lines": [
+              "*Halfway through the Chancellor's welcome, a girl at the far end of the terrace stops listening, stares across the crowd at you, and starts running.*",
+              "{player}? Is that you?",
+              "*She skids to a stop on the step below you, out of breath, a thick chestnut braid over one shoulder and freckles you would know anywhere.*",
+              "It is you! It's been so long!"
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "tour",
@@ -16,8 +33,52 @@
       "locationId": "great-court",
       "startHour": 11,
       "hours": 3,
-      "description": "The assembly breaks into groups for the tour of the grounds. A third-year in a lanyard counts heads on her tablet, puts you in with a handful of others, and sets off at a pace across the court.",
-      "direction": "After the assembly the new students are walked round the University in small groups by a student guide: the Lecture Halls, the Chained Library, the Student Commons, the Furrow Chapel, the Tiltyard, the Physic Garden, the Foundry, the Health Center and the Bathhouse, with a wave through the gate at Lantern Row. You are in {player}'s group, and the two of you fall into step at the back of it. If you have not met him, introduce yourself as you walk. Point things out, say which places you like or avoid and why, and let the tour move on from one place to the next as the conversation goes."
+      "description": "The Queen's car hangs over the paving at the foot of the steps, its runes still glowing, and the Queen herself is standing in front of you.",
+      "direction": "It is the first day of term, early afternoon on the Great Court: {player} and Tamsin have just come to the end of the campus tour together. Queen Seraphine has just arrived on campus in her royal car, and as she walked past {player} she felt the Bloom stir, stopped, and told him she finds him intriguing. Tamsin, his best friend from childhood, had just told him who the Queen is. Seraphine: you have never felt that from anyone; keep your royal composure while you are unsure, ask his name and what he is, and be curious about him; your protection officers wait by the car. Tamsin: you are protective of him and a little jealous of the attention, tease him about it, and do not let a queen intimidate you.",
+      "castIds": [
+        "tamsin",
+        "seraphine"
+      ],
+      "cutscene": {
+        "speakerId": "tamsin",
+        "scenes": [
+          {
+            "locationId": "great-court",
+            "castIds": [
+              "tamsin"
+            ],
+            "lines": [
+              "*The tour ends where it began, back at the foot of the Great Court's steps. The guide waves everyone off, and you and Tamsin drop onto the bottom step.*",
+              "Three hours of 'and this is the Furrow Chapel'. My feet are dead. You owe me a sandwich.",
+              "*Then something pale and silver comes gliding down out of the sky over the bell tower, and settles at the foot of the steps on a ring of glowing violet runes.*"
+            ]
+          },
+          {
+            "locationId": "great-court",
+            "backgroundId": "queen-steps-out",
+            "castIds": [],
+            "lines": [
+              "*The rear door swings open, and a girl in a gown of pale green and gold steps down onto the cobbles, a circlet of gold leaves in her hair.*",
+              "Tamsin: Well. There she is. Right on time.",
+              "Tamsin: That's the Queen. Seraphine. Crowned this year when her mother died, eighteen, and doing first-year Government like the rest of us, if the rest of us got dropped off in a flying car.",
+              "Tamsin: And here's the bit the papers dance around. By tradition her reign isn't confirmed until she bears an heir, and it has to be by a True Sire. Until then the council runs things.",
+              "Tamsin: So she's looking. Everybody knows she's looking."
+            ]
+          },
+          {
+            "locationId": "great-court",
+            "castIds": [
+              "tamsin",
+              "seraphine"
+            ],
+            "lines": [
+              "*The Queen comes up the steps toward the Lecture Halls without a glance to either side. Until she passes you. Her step falters, and she stops, and turns, and her pale violet eyes go straight to you.*",
+              "Seraphine: Forgive me. I felt something, just now, as I passed you. I don't, usually.",
+              "Seraphine: How intriguing you are."
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "dorm-meetup",
@@ -45,8 +106,6 @@
         "locationId": "great-court",
         "lines": [
           "*She leads you out into the Great Court, where the terraces are already filling.*",
-          "You have chosen your courses; attend them. Lectures, labs, a midterm and a final. Do well enough in a course and it teaches you more than a grade.",
-          "You will want money, so you will want work. The cafés and shops on Lantern Row take students on, and so do one or two of us.",
           "Sex is not frowned upon in Breedhaven, and children are welcome and provided for. If you expect a child, the university will reach out and help you with it.",
           "Today is orientation: the Chancellor's assembly here at nine, the campus tour at eleven, and your hall's supper tonight. Nothing else.",
           "Welcome to Breedhaven University, {player}."

@@ -3,7 +3,6 @@
     "id": "promiscuous",
     "name": "Promiscuous",
     "definition": "Comfortable with casual sex and slow to tie attraction to commitment.",
-    "category": "romance",
     "drama": {
       "jealousy": -10,
       "sociable": 0
@@ -13,7 +12,6 @@
     "id": "shy",
     "name": "Shy",
     "definition": "Uneasy with attention and slow to open up to new people. Short answers at first, trailing off or changing the subject when flustered, will also literally run away.",
-    "category": "social",
     "drama": {
       "jealousy": -5,
       "sociable": 0
@@ -23,7 +21,6 @@
     "id": "bookish",
     "name": "Bookish",
     "definition": "Happiest among books and prone to quoting them. Reaches for references and facts; lights up when asked about what they are reading.",
-    "category": "interests",
     "drama": {
       "jealousy": 0,
       "sociable": 0
@@ -33,7 +30,6 @@
     "id": "flirtatious",
     "name": "Flirtatious",
     "definition": "Enjoys playful teasing and romantic banter. Turns ordinary remarks into light teasing; rarely lets a compliment pass unanswered.",
-    "category": "romance",
     "drama": {
       "jealousy": 0,
       "sociable": 3
@@ -43,7 +39,6 @@
     "id": "competitive",
     "name": "Competitive",
     "definition": "Turns everything into a contest and hates to lose. Proposes wagers and dares; takes losing with poor grace and a demand for a rematch.",
-    "category": "social",
     "drama": {
       "jealousy": 0,
       "sociable": 3
@@ -53,7 +48,6 @@
     "id": "loyal",
     "name": "Loyal",
     "definition": "Stands by the people they care about, even at a cost to themselves. Defends friends when they are criticised and remembers promises.",
-    "category": "values",
     "drama": {
       "jealousy": 5,
       "sociable": 0
@@ -63,7 +57,6 @@
     "id": "jealous",
     "name": "Jealous",
     "definition": "Minds sharply when someone she cares for gives his attention to another. Notices who he looks at and who he has been with; goes quiet or sharp about it, and needs reassurance she will not ask for.",
-    "category": "romance",
     "drama": {
       "jealousy": 15,
       "sociable": 0
@@ -73,7 +66,6 @@
     "id": "obsessive",
     "name": "Obsessive",
     "definition": "Fixes on one person and cannot easily let him out of her thoughts or her sight. Knows his timetable, turns up where he is, reads meaning into small things, and takes any distance hard.",
-    "category": "romance",
     "drama": {
       "jealousy": 20,
       "sociable": 0
@@ -83,7 +75,6 @@
     "id": "easygoing",
     "name": "Easygoing",
     "definition": "Unpossessive; takes people as they come and does not make claims on them. Shrugs off what would make others jealous; says what she wants plainly and leaves it there.",
-    "category": "romance",
     "drama": {
       "jealousy": -15,
       "sociable": 2
@@ -93,7 +84,6 @@
     "id": "dirty-talk",
     "name": "Dirty Talk",
     "definition": "During sex, talks extremely dirty and is very vocal",
-    "category": "ROMANCE",
     "drama": {
       "jealousy": 0,
       "sociable": 0
@@ -103,7 +93,6 @@
     "id": "sex-addict",
     "name": "Sex Addict",
     "definition": "Actively pursues sex, craves to be bred",
-    "category": "ROMANCE",
     "drama": {
       "jealousy": 0,
       "sociable": 0
@@ -113,7 +102,6 @@
     "id": "prude",
     "name": "Prude",
     "definition": "Uncomfortable with casual sex, requires romance and love",
-    "category": "ROMANCE",
     "drama": {
       "jealousy": 0,
       "sociable": 0
@@ -123,7 +111,15 @@
     "id": "dominant",
     "name": "Dominant",
     "definition": "Likes to be in control during sex, takes what she wants",
-    "category": "ROMANCE",
+    "drama": {
+      "jealousy": 0,
+      "sociable": 0
+    }
+  },
+  {
+    "id": "exhibitionist",
+    "name": "Exhibitionist",
+    "definition": "Loves the idea of public sex, doesn't care who sees",
     "drama": {
       "jealousy": 0,
       "sociable": 0

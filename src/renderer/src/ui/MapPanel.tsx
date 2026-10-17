@@ -1,47 +1,46 @@
-import { canTravel, isOpen, loveInterestsAt, toDate, whereaboutsUnknown } from '../../../shared/game'
-import type { ContentPack, GameState, LoveInterest } from '../../../shared/model'
-import { Dialog, ToBeImplemented } from './Dialog'
-import { PlaceIcon } from './icons'
+import { useLayoutEffect, useRef, type CSSProperties } from 'react'
+import { canTravel, isOpen, loveInterestsAt, toDate, wayDownAt, whereaboutsUnknown } from '../../../shared/game'
+import type { ContentPack, GameState, Location, MapPin } from '../../../shared/model'
+import { Button } from './Button'
+import { Dialog, Overlay, ToBeImplemented } from './Dialog'
+import { GrandButton } from './GrandButton'
+import { BackIcon, PlaceIcon } from './icons'
+import { Ornate } from './Ornate'
+import { Portrait } from './Portrait'
+import { settle } from './pinLayout'
 
-// Faces shown on one pin before the rest collapse into a "+2".
-const MAX_PORTRAITS = 6
+// Faces shown beside a pin before the rest collapse into a "+2".
+const MAX_FACES = 3
+// The shape of the map's picture, for it to be drawn as large as the screen allows.
+const MAP_SHAPE = 1920 / 1088
 
 interface Props {
   content: ContentPack
   state: GameState
   /** Goes to a place. Left out, the map is only to be looked at: nothing on it can be gone to, as in the middle of a scene. */
   onTravel?: (locationId: string) => void
+  /** Who is in the scene that is open: they are with him, wherever their own day would have them. */
+  withHim?: string[]
   onClose: () => void
 }
 
-/** A face-sized crop of the character's neutral sprite. */
-export function Portrait({ li }: { li: Pick<LoveInterest, 'name' | 'outfits' | 'defaultOutfitId' | 'faceY'> }) {
-  const outfit = li.outfits.find((o) => o.id === li.defaultOutfitId)
-  const sprite = (outfit?.sprites['neutral'] ?? Object.values(outfit?.sprites ?? {})[0])?.image
-  const firstName = li.name.split(' ')[0]
-  return (
-    <div className="portrait">
-      <div
-        className="portrait-face"
-        role="img"
-        aria-label={li.name}
-        style={
-          sprite
-            ? {
-                backgroundImage: `url("content://pack/${sprite}")`,
-                backgroundPosition: `50% ${li.faceY}%`
-              }
-            : undefined
-        }
-      />
-      <span className="caps">{firstName}</span>
-    </div>
-  )
-}
+const placeName = (location: Location) => location.name.replace(/^the /, '')
 
 /** The town map: where everyone is right now, and a way to go there. */
-export function MapPanel({ content, state, onTravel, onClose }: Props) {
+export function MapPanel({ content, state, onTravel, withHim = [], onClose }: Props) {
   const { map } = content
+  const board = useRef<HTMLDivElement>(null)
+  // Laid out again after every change to what is on it, and whenever the map is drawn at another size.
+  useLayoutEffect(() => {
+    if (board.current) settle(board.current)
+  })
+  useLayoutEffect(() => {
+    const element = board.current
+    if (!element) return
+    const watcher = new ResizeObserver(() => settle(element))
+    watcher.observe(element)
+    return () => watcher.disconnect()
+  }, [])
   if (!map) {
     return (
       <Dialog title="Map" onClose={onClose} narrow>
@@ -50,137 +49,133 @@ export function MapPanel({ content, state, onTravel, onClose }: Props) {
     )
   }
 
-  const unknown = whereaboutsUnknown(content, state)
+  const hour = toDate(content.calendar, state.time).hour
+  // Those in the scene are where he is, and nowhere else; everyone else is where her day has her.
+  const unknown = whereaboutsUnknown(content, state).filter((li) => !withHim.includes(li.id))
+  const peopleAt = (locationId: string) => [
+    ...loveInterestsAt(content, state, locationId).filter((li) => !withHim.includes(li.id)),
+    ...(locationId === state.locationId ? content.loveInterests.filter((li) => withHim.includes(li.id)) : [])
+  ]
+  const wayDown = wayDownAt(content, state)
+  const elsewhere = content.locations.filter((location) => !map.pins.some((pin) => pin.locationId === location.id))
 
-  /** The card of one place: where it is put is given, as a share of whatever it is put in. */
-  const pinCard = (pin: (typeof map.pins)[number], at: { x: number; y: number }) => {
-    const location = content.locations.find((l) => l.id === pin.locationId)
+  /** Where a place stands for him now: here, shut, or somewhere to go (and if not, why not). */
+  const standing = (location: Location) => {
+    const here = location.id === state.locationId
+    const check = canTravel(content, state, location.id)
+    return {
+      here,
+      closed: !here && !isOpen(location, hour),
+      ok: Boolean(onTravel) && check.ok,
+      why: onTravel ? check.reasons.join(' · ') : 'You are in the middle of something'
+    }
+  }
+
+  const go = (locationId: string) => onTravel?.(locationId)
+
+  const pin = (spot: MapPin) => {
+    const location = content.locations.find((l) => l.id === spot.locationId)
     if (!location) return null
-    const here = pin.locationId === state.locationId
-    const check = canTravel(content, state, pin.locationId)
-    // Shut by the time he would get there: it cannot be gone to, and says so above its name.
-    const closed = !here && !isOpen(location, toDate(content.calendar, state.time).hour)
-    const people = loveInterestsAt(content, state, pin.locationId)
+    const { here, closed, ok, why } = standing(location)
+    const people = peopleAt(location.id)
+    const portal = location.id === wayDown
+    const classes = ['map-pin', here && 'here', closed && 'closed', portal && 'portal']
     return (
-      <div
-        key={pin.locationId}
-        className={here ? 'pin here' : closed ? 'pin closed' : 'pin'}
-        style={{ left: `${at.x}%`, top: `${at.y}%` }}
-      >
-        {/* What kind of place it is and its name on one line; the way there on the next. */}
-        <div className="pin-head">
-          <span className="pin-icon">
-            <PlaceIcon name={location.icon} size={22} />
+      <div key={location.id} className={classes.filter(Boolean).join(' ')} style={{ left: `${spot.x}%`, top: `${spot.y}%` }}>
+        <span className="map-pin-head">
+          <span className="map-medallion" title={portal ? `${location.name}: the way down into ${content.expedition?.name}` : location.name}>
+            {/* The way down: a ring of runes turning around it. */}
+            {portal && <span className="map-runes" aria-hidden="true" />}
+            <PlaceIcon name={location.icon} size={20} />
           </span>
-          <span className="caps pin-name">{location.name.replace(/^the /, '')}</span>
-        </div>
-        <div className="pin-go">
+          <span className="map-plate">{placeName(location)}</span>
+          {portal && <span className="map-below">{content.expedition?.name.replace(/^the /, '')}</span>}
           {here ? (
-            <span className="chip">You are here</span>
+            <span className="map-state">Here</span>
           ) : closed ? (
-            <span className="caps pin-closed">Closed</span>
+            <span className="map-state">Closed</span>
           ) : (
-            <button
-              disabled={!onTravel || !check.ok}
-              title={onTravel ? check.reasons.join(' · ') : 'You are in the middle of something'}
-              onClick={() => onTravel?.(pin.locationId)}
-            >
+            <Button variant="primary" size="small" className="map-go" disabled={!ok} title={why || undefined} onClick={() => go(location.id)}>
               Go
-            </button>
+            </Button>
           )}
-        </div>
+        </span>
         {people.length > 0 && (
-          <div className="portraits">
-            {people.slice(0, MAX_PORTRAITS).map((li) => (
-              <Portrait key={li.id} li={li} />
+          <span className="map-pin-people">
+            {people.slice(0, MAX_FACES).map((li) => (
+              <Portrait key={li.id} who={li} size="clamp(44px, 3.2vw, 64px)" className="map-face" />
             ))}
-            {people.length > MAX_PORTRAITS && (
+            {people.length > MAX_FACES && (
               <span
-                className="chip"
+                className="map-more"
                 title={people
-                  .slice(MAX_PORTRAITS)
+                  .slice(MAX_FACES)
                   .map((li) => li.name)
                   .join(', ')}
               >
-                +{people.length - MAX_PORTRAITS}
+                +{people.length - MAX_FACES}
               </span>
             )}
-          </div>
+          </span>
         )}
       </div>
     )
   }
 
-  // On the plain chart each place belongs to the region it stands in, so that on a narrow screen a region can lay its places out in rows.
-  const regionOf = (pin: { x: number; y: number }) => (map.image ? undefined : map.regions.find((r) => pin.x >= r.x && pin.x <= r.x + r.w && pin.y >= r.y && pin.y <= r.y + r.h))
-  // Top to bottom and left to right, which is the order they are read in when laid out in rows.
-  const inOrder = [...map.pins].sort((p, q) => p.y - q.y || p.x - q.x)
-
   return (
-    <Dialog title={map.name} onClose={onClose} wide>
-      <div className={map.image ? 'map' : 'map plain'}>
-        {map.image && <img src={`content://pack/${map.image}`} alt={`Map of ${map.name}`} />}
-        {map.regions.map((region) => (
-          <div
-            key={region.name}
-            className={region.image ? 'region pictured' : 'region'}
-            style={{
-              left: `${region.x}%`,
-              top: `${region.y}%`,
-              width: `${region.w}%`,
-              height: `${region.h}%`
-            }}
-          >
-            {/* Its picture, faded, behind everything in it. */}
-            {region.image && <img className="region-art" src={`content://pack/${region.image}`} alt="" />}
-            <span className="caps">{region.name}</span>
-            {/* The places in it, each put where it stands within the region. */}
-            {inOrder
-              .filter((pin) => regionOf(pin) === region)
-              .map((pin) => pinCard(pin, { x: ((pin.x - region.x) / region.w) * 100, y: ((pin.y - region.y) / region.h) * 100 }))}
-          </div>
-        ))}
-        {/* A place that stands in no region, and every place on a drawn map, is put on the map itself. */}
-        {inOrder.filter((pin) => !regionOf(pin)).map((pin) => pinCard(pin, pin))}
-      </div>
-      {/* A place that is on no map but can be gone to all the same: his own house. */}
-      {content.locations
-        .filter((location) => !map.pins.some((pin) => pin.locationId === location.id))
-        .map((location) => {
-          const here = location.id === state.locationId
-          const check = canTravel(content, state, location.id)
-          const people = loveInterestsAt(content, state, location.id)
-          return (
-            <div key={location.id} className="map-rooms">
-              <span className="caps">
-                <PlaceIcon name={location.icon} size={18} /> {location.name}
-              </span>
-              {here ? (
-                <span className="chip">You are here</span>
-              ) : (
-                <button disabled={!onTravel || !check.ok} title={onTravel ? check.reasons.join(' · ') : 'You are in the middle of something'} onClick={() => onTravel?.(location.id)}>
-                  Go
-                </button>
-              )}
-              <div className="portraits">
-                {people.map((li) => (
-                  <Portrait key={li.id} li={li} />
-                ))}
-              </div>
-            </div>
-          )
-        })}
-      {/* Those with nothing on their schedule are in their own rooms: shown, but not somewhere to go. */}
-      {unknown.length > 0 && (
-        <div className="map-rooms">
-          <span className="caps">In her room</span>
-          <div className="portraits">
-            {unknown.map((li) => (
-              <Portrait key={li.id} li={li} />
-            ))}
-          </div>
+    <Overlay onClose={onClose}>
+      <div className="map-screen">
+        <div
+          ref={board}
+          className="map-board"
+          style={{ '--map-shape': MAP_SHAPE } as CSSProperties}
+          // It opens a little small: measured again once it is at its size.
+          onAnimationEnd={(event) => event.target === event.currentTarget && settle(event.currentTarget)}
+        >
+          <img className="map-art" src={`content://pack/${map.image}`} alt={`Map of ${map.name}`} />
+          {map.regions.map((region) => (
+            <span key={region.name} className="map-region" style={{ left: `${region.x}%`, top: `${region.y}%` }}>
+              {region.name}
+            </span>
+          ))}
+          {map.pins.map(pin)}
         </div>
-      )}
-    </Dialog>
+
+        {/* Those with nothing on their schedule are in their own rooms: shown, but not somewhere to go. */}
+        {unknown.length > 0 && (
+          <Ornate title="In her room" className="map-rooms">
+            <div className="portraits">
+              {unknown.map((li) => (
+                <Portrait key={li.id} who={li} size="clamp(56px, 4vw, 80px)" caption />
+              ))}
+            </div>
+          </Ornate>
+        )}
+
+        {elsewhere.length > 0 && (
+          <Ornate className="map-elsewhere">
+            {/* A place that is on no map but can be gone to all the same: his own house. */}
+            {elsewhere.map((location) => {
+              const { here, ok, why } = standing(location)
+              const people = peopleAt(location.id)
+              return (
+                <div key={location.id} className="map-off">
+                  <PlaceIcon name={location.icon} size={18} />
+                  <strong>{location.name}</strong>
+                  <span className="map-faces">
+                    {people.map((li) => (
+                      <Portrait key={li.id} who={li} size="clamp(34px, 2.5vw, 50px)" className="map-face" />
+                    ))}
+                  </span>
+                  {here ? <span className="chip">You are here</span> : <GrandButton label="Go" chevron disabled={!ok} tip={why} onClick={() => go(location.id)} />}
+                </div>
+              )
+            })}
+          </Ornate>
+        )}
+
+        <GrandButton label="Close" icon={<BackIcon size={22} />} chevron={false} className="map-close" onClick={onClose} />
+      </div>
+    </Overlay>
   )
 }

@@ -40,6 +40,8 @@ export const IPC = {
   editorDraftEvents: 'editor:draftEvents',
   editorSaveJob: 'editor:saveJob',
   editorDeleteJob: 'editor:deleteJob',
+  editorSaveSociety: 'editor:saveSociety',
+  editorDeleteSociety: 'editor:deleteSociety',
   editorSavePlayer: 'editor:savePlayer',
   editorResetPlayer: 'editor:resetPlayer',
   editorImportAsset: 'editor:importAsset',

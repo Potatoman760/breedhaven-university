@@ -47,7 +47,6 @@ export function TraitsTab({ content, info, draft, set, onResult }: Props) {
       <div className="row">
         <Text label="Name" value={trait.name} onChange={(name) => patch(editing.isNew ? { name, id: slugify(name) } : { name })} />
         <Text label="Id" value={trait.id} disabled={!editing.isNew} onChange={(id) => patch({ id: slugify(id) })} />
-        <Text label="Category" value={trait.category ?? ''} onChange={(category) => patch({ category: category || undefined })} />
       </div>
       <Text
         label="Definition"
@@ -112,10 +111,7 @@ export function TraitsTab({ content, info, draft, set, onResult }: Props) {
               <label className="trait-pick">
                 <input type="checkbox" checked={has(t.id)} onChange={() => toggle(t.id)} />
                 <span className="trait-text">
-                  <strong>
-                    {t.name}
-                    {t.category && <span className="caps"> {t.category}</span>}
-                  </strong>
+                  <strong>{t.name}</strong>
                   <span>{t.definition}</span>
                 </span>
               </label>

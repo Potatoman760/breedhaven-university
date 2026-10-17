@@ -40,6 +40,7 @@ export function readPack(dir: string): Record<string, unknown> {
     coursework: optionalJson(join(dir, 'coursework.json')),
     orientation: optionalJson(join(dir, 'orientation.json')),
     jobs: optionalJson(join(dir, 'jobs.json')),
+    societies: optionalJson(join(dir, 'societies.json')),
     housing: optionalJson(join(dir, 'housing.json')),
     expedition: optionalJson(join(dir, 'expedition.json')),
     pregnancy: optionalJson(join(dir, 'pregnancy.json')),

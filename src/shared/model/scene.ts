@@ -126,6 +126,8 @@ export const SceneSchema = z.object({
   shift: SceneShiftSchema.optional(),
   /** The scene is a class: who teaches it and what, for the lecture it opens with. */
   lesson: LessonSchema.optional(),
+  /** The scene is a meeting of a society he belongs to, by its id. */
+  societyId: z.string().optional(),
   /** How comfortable each love interest in the scene last said she was, by id. For the LLM only. */
   comfort: z.record(z.string(), ComfortSchema).optional(),
   /** The scene is in this love interest's own room. */

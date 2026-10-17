@@ -1,10 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { banterDue, act, comeUp, describeChange, describeFinds, fighterName, goOn, inForce, nodeAt, pregnancyPower, roleOf, runReport, spriteFor, toDate, turnActions, turnBack, turnOf, wornOutfit, type BanterLine, type TurnAction } from '../../../shared/game'
-import { HIM, type ContentPack, type Fighter, type GameState } from '../../../shared/model'
+import { HIM, type ContentPack, type Fighter, type Finds, type GameState } from '../../../shared/model'
 import { BelowFx, EVENT_GAP_MS } from '../fx/BelowFx'
 import { Backdrop } from './Backdrop'
 import { Button } from './Button'
-import { StopIcon } from './icons'
+import { BackIcon, ChevronIcon, StopIcon } from './icons'
+import { GrandButton } from './GrandButton'
 import { ItemArt } from './ItemSquare'
 
 interface Props {
@@ -203,7 +204,7 @@ export function ExpeditionView({ content, state, onChange }: Props) {
 
       <section className="below-bottom">
         <div className="below-panels">
-        <div className="below-status glass">
+        <div className="below-status ornate">
           {run.party.map((fighter) => {
             const pick = pending !== null && allyFits(pending, fighter)
             const carrying = fighter.id !== HIM && (pregnancyPower(content, state, fighter.id) ?? 1) > 1
@@ -252,7 +253,7 @@ export function ExpeditionView({ content, state, onChange }: Props) {
         </div>
 
         {/* What whoever's turn it is can do; pointing at one says what it does. The panel is there even with nothing in it, so that the party always has something to stand behind. */}
-        <div className="below-menu glass">
+        <div className="below-menu ornate">
           {talking && (
             <div className="below-waiting">
               {/* Until something has come back to be said, that it is being thought of; after that the balloons speak for themselves. */}
@@ -291,7 +292,7 @@ export function ExpeditionView({ content, state, onChange }: Props) {
         </div>
 
         {/* Where he is on the way down, and what each stop of it is. */}
-        <div className="below-way glass">
+        <div className="below-way ornate">
           <span className="below-where">
             <span className="caps">{config.name}</span>
             <strong>{depth.name}</strong>
@@ -323,7 +324,7 @@ export function ExpeditionView({ content, state, onChange }: Props) {
 
       {/* What a stop came to, and at the end what the run did: a small dialog over the field. */}
       {report ? (
-        <div className="below-dialog glass" role="dialog">
+        <div className="below-dialog ornate" role="dialog">
           <h2>{report.outcome === 'won' ? 'The anchor holds' : report.outcome === 'lost' ? 'Carried back up' : 'Back up the stair'}</h2>
           <p>{run.note}</p>
           <p>You come up with {describeFinds(content, report.kept)}.</p>
@@ -350,17 +351,29 @@ export function ExpeditionView({ content, state, onChange }: Props) {
             </p>
           )}
           {report.outcome === 'lost' && <p>You have nothing left in you for the day.</p>}
-          <div className="actions end">
-            <Button variant="primary" onClick={() => onChange(comeUp(content, state))}>
-              Come up
-            </Button>
+          <div className="actions center">
+            <GrandButton label="Come up" icon={<BackIcon size={22} />} chevron={false} onClick={() => onChange(comeUp(content, state))} />
           </div>
         </div>
       ) : (
         !fighting &&
-        (run.spoils ? (
+        (run.rest ? (
+          // A checkpoint: a fire, everyone the better for it, and what was carried made safe.
+          <div className="below-spoils ornate" role="dialog">
+            <span className="caps">{depth.name}</span>
+            <h1>{node.name || 'A dry ledge'}</h1>
+            {config.restImage && <img className="below-rest-art" src={`content://pack/${config.restImage}`} alt="" />}
+            <p className="below-beaten">You catch your breath.</p>
+            <PartyBars content={content} state={state} party={run.party} healed={run.rest.healed} />
+            <span className="caps">Made safe</span>
+            <LootTiles content={content} finds={run.rest.secured} empty="Nothing carried yet." />
+            <div className="actions center">
+              <GrandButton label="Confirm" icon={<ChevronIcon size={20} />} chevron={false} onClick={() => onChange(goOn(content, state))} />
+            </div>
+          </div>
+        ) : run.spoils ? (
           // A fight won, or something found lying there: what came of it, laid out to be enjoyed.
-          <div className="below-spoils glass framed" role="dialog">
+          <div className="below-spoils ornate" role="dialog">
             <span className="caps">{fight ? `Round ${fight.round}` : depth.name}</span>
             <h1>{fight ? 'Victory' : node.name || 'Something left behind'}</h1>
             {fight && (
@@ -376,56 +389,18 @@ export function ExpeditionView({ content, state, onChange }: Props) {
                 beaten
               </p>
             )}
-            {fight && (
-              <div className="below-standing">
-                {run.party.map((fighter) => (
-                  <div key={fighter.id}>
-                    <span>{fighterName(content, state, fighter.id)}</span>
-                    <span className="below-health">
-                      <span style={{ width: share(fighter.footing, fighter.max) }} />
-                    </span>
-                    <span className="hint">
-                      {Math.round(fighter.footing)}/{fighter.max}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
+            {fight && <PartyBars content={content} state={state} party={run.party} />}
             <span className="caps">Found</span>
-            <div className="below-loot">
-              {run.spoils.money > 0 && (
-                <div className="loot-tile">
-                  {config.moneyImage ? <img src={`content://pack/${config.moneyImage}`} alt="" /> : <ItemArt icon="coin" size={72} />}
-                  <strong>${run.spoils.money}</strong>
-                </div>
-              )}
-              {Object.entries(run.spoils.items).map(([id, count]) => {
-                const item = content.items.find((one) => one.id === id)
-                return (
-                  <div key={id} className="loot-tile" title={item?.description}>
-                    <ItemArt icon={item?.icon ?? 'gift'} image={item?.image} size={88} />
-                    <strong>
-                      {item?.name ?? id}
-                      {count > 1 && ` ×${count}`}
-                    </strong>
-                  </div>
-                )
-              })}
-              {run.spoils.money === 0 && Object.keys(run.spoils.items).length === 0 && <span className="hint">Nothing worth taking.</span>}
-            </div>
+            <LootTiles content={content} finds={run.spoils} empty="Nothing worth taking." />
             <div className="actions center">
-              <Button variant="primary" onClick={() => onChange(goOn(content, state))}>
-                Confirm
-              </Button>
+              <GrandButton label="Confirm" icon={<ChevronIcon size={20} />} chevron={false} onClick={() => onChange(goOn(content, state))} />
             </div>
           </div>
         ) : (
-          <div className="below-dialog glass" role="dialog">
+          <div className="below-dialog ornate" role="dialog">
             {fight ? events.slice(-2).map((event, index) => <p key={index}>{event.text}</p>) : <p>{run.note || node.name}</p>}
             <div className="actions center">
-              <Button variant="primary" onClick={() => onChange(goOn(content, state))}>
-                Confirm
-              </Button>
+              <GrandButton label="Confirm" icon={<ChevronIcon size={20} />} chevron={false} onClick={() => onChange(goOn(content, state))} />
             </div>
           </div>
         ))
@@ -433,3 +408,52 @@ export function ExpeditionView({ content, state, onChange }: Props) {
     </main>
   )
 }
+
+/** How the party stands: a name, a bar and what is left for each, and what a rest gave back where there was one. */
+function PartyBars({ content, state, party, healed }: { content: ContentPack; state: GameState; party: Fighter[]; healed?: Record<string, number> }) {
+  return (
+    <div className="below-standing">
+      {party.map((fighter) => (
+        <div key={fighter.id}>
+          <span>{fighterName(content, state, fighter.id)}</span>
+          <span className="below-health">
+            <span style={{ width: share(fighter.footing, fighter.max) }} />
+          </span>
+          <span className="hint">
+            {Math.round(fighter.footing)}/{fighter.max}
+            {healed?.[fighter.id] ? <b className="below-healed"> +{Math.round(healed[fighter.id])}</b> : null}
+          </span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+/** What was found, a tile each: the money as a pouch of coins, and each thing as its own picture. */
+function LootTiles({ content, finds, empty }: { content: ContentPack; finds: Finds; empty: string }) {
+  const money = content.expedition?.moneyImage
+  return (
+    <div className="below-loot">
+      {finds.money > 0 && (
+        <div className="loot-tile">
+          {money ? <img src={`content://pack/${money}`} alt="" /> : <ItemArt icon="coin" size={72} />}
+          <strong>${finds.money}</strong>
+        </div>
+      )}
+      {Object.entries(finds.items).map(([id, count]) => {
+        const item = content.items.find((one) => one.id === id)
+        return (
+          <div key={id} className="loot-tile" title={item?.description}>
+            <ItemArt icon={item?.icon ?? 'gift'} image={item?.image} size={88} />
+            <strong>
+              {item?.name ?? id}
+              {count > 1 && ` ×${count}`}
+            </strong>
+          </div>
+        )
+      })}
+      {finds.money === 0 && Object.keys(finds.items).length === 0 && <span className="hint">{empty}</span>}
+    </div>
+  )
+}
+

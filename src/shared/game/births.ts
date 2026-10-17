@@ -19,7 +19,7 @@ import { isOpen } from './schedule'
 export const MISSED_BIRTH = { affection: -25, trust: -30, desire: -15 } as const
 
 // How much each thing in the way of a birth is worth leaving clear, least first: he may miss a fair for it sooner than a shift, and a shift sooner than a class.
-const IN_THE_WAY: Record<AgendaItem['kind'], number> = { event: 1, rent: 0, household: 0, work: 2, class: 3, orientation: 3, plan: 4, birth: 5 }
+const IN_THE_WAY: Record<AgendaItem['kind'], number> = { event: 1, rent: 0, household: 0, society: 1, work: 2, class: 3, orientation: 3, plan: 4, birth: 5 }
 // Nobody is brought to bed before the day has begun.
 const EARLIEST_HOUR = 6
 

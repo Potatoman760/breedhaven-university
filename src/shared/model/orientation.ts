@@ -1,5 +1,32 @@
 import { z } from 'zod'
 
+/**
+ * One place in a cutscene, and what is said there, a line at a time. A line in *asterisks* is narration; one that
+ * starts with a name ("Seraphine: ...") is hers; any other is the speaker's.
+ */
+export const IntroSceneSchema = z.object({
+  locationId: z.string(),
+  /** Who stands on the stage while it is read. Left out, the speaker alone. */
+  castIds: z.array(z.string()).optional(),
+  /** Which of the place's views is shown. Left out, its first. */
+  backgroundId: z.string().optional(),
+  lines: z.array(z.string()).min(1)
+})
+export type IntroScene = z.infer<typeof IntroSceneSchema>
+
+/**
+ * A cutscene: lines written out in full and read with nothing to answer, as the welcome a new player is given before
+ * orientation is, and as a story beat opens.
+ */
+export const IntroSchema = z.object({
+  /** Who gives it: a character, NPC or love interest. */
+  speakerId: z.string(),
+  /** What she wears in it: one of her outfits. Left out, what she would wear anyway. */
+  outfitId: z.string().optional(),
+  scenes: z.array(IntroSceneSchema).min(1)
+})
+export type Intro = z.infer<typeof IntroSchema>
+
 /** One part of orientation day: somewhere to be, for a while, in company. */
 export const OrientationStepSchema = z.object({
   id: z.string(),
@@ -16,29 +43,11 @@ export const OrientationStepSchema = z.object({
    * The love interests the player is thrown together with. Left out, they are dealt out
    * across the steps, those he shares no class with first, so he meets everyone.
    */
-  castIds: z.array(z.string()).optional()
+  castIds: z.array(z.string()).optional(),
+  /** Lines read before its scene, with nothing to answer. */
+  cutscene: IntroSchema.optional()
 })
 export type OrientationStep = z.infer<typeof OrientationStepSchema>
-
-/** One place in the welcome before orientation, and what is said there, a line at a time. A line in *asterisks* is narration. */
-export const IntroSceneSchema = z.object({
-  locationId: z.string(),
-  /** Which of the place's views is shown. Left out, its first. */
-  backgroundId: z.string().optional(),
-  lines: z.array(z.string()).min(1)
-})
-export type IntroScene = z.infer<typeof IntroSceneSchema>
-
-/**
- * The welcome a new player is given once his courses are chosen and before orientation day: written out in full, and
- * read, with nothing to answer.
- */
-export const IntroSchema = z.object({
-  /** Who gives it: a character, NPC or love interest. */
-  speakerId: z.string(),
-  scenes: z.array(IntroSceneSchema).min(1)
-})
-export type Intro = z.infer<typeof IntroSchema>
 
 /**
  * An induction the player has to go through before anything else: on its day there are

@@ -5,6 +5,7 @@ import { HousingConfigSchema } from './housing'
 import { SyllabusSchema } from './syllabus'
 import { CurriculumSchema, courseId, resolveCurriculum } from './curriculum'
 import { SkillSchema } from './skill'
+import { SocietiesConfigSchema } from './society'
 import { ActivitySchema } from './activity'
 import { CalendarConfigSchema } from './calendar'
 import { CodexEntrySchema } from './codex'
@@ -13,10 +14,10 @@ import { CatalogueSchema, CourseworkConfigSchema } from './course'
 import { ItemSchema, StallSchema } from './item'
 import { JobsConfigSchema } from './job'
 import { LocationSchema } from './location'
-import { LoveInterestSchema } from './loveInterest'
+import { LoveInterestSchema, kindOf } from './loveInterest'
 import { MapSchema } from './map'
 import { NpcSchema, type Npc } from './npc'
-import { OrientationSchema } from './orientation'
+import { OrientationSchema, type Intro } from './orientation'
 import { PokerConfigSchema } from './poker'
 import { PregnancyConfigSchema } from './pregnancy'
 import { RelationshipConfigSchema } from './relationship'
@@ -55,6 +56,8 @@ export const ContentPackSchema = z.object({
   orientation: OrientationSchema.optional(),
   /** The jobs the player can hold, and the rules for them. Without it there are none. */
   jobs: JobsConfigSchema.optional(),
+  /** The student societies, and the rules for joining them. Without it there are none. */
+  societies: SocietiesConfigSchema.optional(),
   pregnancy: PregnancyConfigSchema.optional(),
   /** The house a Sire is let, and what it is to keep one. Without it there is none. */
   housing: HousingConfigSchema.optional(),
@@ -170,10 +173,35 @@ function checkReferences(pack: ContentPack): string[] {
     for (const m of w.months ?? []) need(monthIds, m, `calendar.weather.${w.id}`, 'month')
     for (const m of Object.keys(w.chance ?? {})) need(monthIds, m, `calendar.weather.${w.id}.chance`, 'month')
   }
+  // Written lines read with nothing to answer: who says them has to be someone, and where, somewhere with that view.
+  const checkCutscene = (intro: Intro, where: string): void => {
+    const speaker = [...pack.npcs, ...pack.loveInterests].find((character) => character.id === intro.speakerId)
+    if (!speaker) issues.push(`${where}.speakerId: unknown character "${intro.speakerId}"`)
+    else if (intro.outfitId !== undefined && !speaker.outfits.some((outfit) => outfit.id === intro.outfitId)) issues.push(`${where}.outfitId: "${speaker.id}" has no outfit "${intro.outfitId}"`)
+    intro.scenes.forEach((scene, i) => {
+      for (const id of scene.castIds ?? []) if (![...pack.npcs, ...pack.loveInterests].some((character) => character.id === id)) issues.push(`${where}.scenes[${i}].castIds: unknown character "${id}"`)
+      const place = pack.locations.find((l) => l.id === scene.locationId)
+      if (!place) issues.push(`${where}.scenes[${i}]: unknown location "${scene.locationId}"`)
+      else if (scene.backgroundId !== undefined && !place.backgrounds.some((view) => view.id === scene.backgroundId)) issues.push(`${where}.scenes[${i}]: "${place.id}" has no view "${scene.backgroundId}"`)
+    })
+  }
+
   for (const e of calendar.events) {
     checkMonthDay(e.month, e.day, `calendar.events.${e.id}`)
     if (e.locationId !== undefined) {
       need(locations, e.locationId, `calendar.events.${e.id}`, 'location')
+    }
+    idSet(e.program, `calendar.events.${e.id}.program`)
+    for (const part of e.program) {
+      const where = `calendar.events.${e.id}.program.${part.id}`
+      if (part.day > e.durationDays) issues.push(`${where}: day ${part.day} is after the event is over`)
+      checkHour(part.startHour, where)
+      if (part.locationId !== undefined) need(locations, part.locationId, where, 'location')
+      else if (e.locationId === undefined) issues.push(`${where}: needs a place, since the event has none`)
+      const partPlace = pack.locations.find((l) => l.id === (part.locationId ?? e.locationId))
+      if (part.viewId !== undefined && partPlace && !partPlace.backgrounds.some((view) => view.id === part.viewId)) issues.push(`${where}.viewId: "${partPlace.id}" has no view "${part.viewId}"`)
+      for (const id of part.castIds ?? []) if (!pack.loveInterests.some((li) => li.id === id)) issues.push(`${where}: unknown love interest "${id}"`)
+      if (part.cutscene) checkCutscene(part.cutscene, `${where}.cutscene`)
     }
   }
 
@@ -236,19 +264,50 @@ function checkReferences(pack: ContentPack): string[] {
 
   for (const pin of pack.map?.pins ?? []) need(locations, pin.locationId, 'map.pins', 'location')
 
-  const intro = pack.orientation?.intro
-  if (intro) {
-    if (![...pack.npcs, ...pack.loveInterests].some((character) => character.id === intro.speakerId)) issues.push(`orientation.intro.speakerId: unknown character "${intro.speakerId}"`)
-    intro.scenes.forEach((scene, i) => {
-      const place = pack.locations.find((l) => l.id === scene.locationId)
-      if (!place) issues.push(`orientation.intro.scenes[${i}]: unknown location "${scene.locationId}"`)
-      else if (scene.backgroundId !== undefined && !place.backgrounds.some((view) => view.id === scene.backgroundId)) issues.push(`orientation.intro.scenes[${i}]: "${place.id}" has no view "${scene.backgroundId}"`)
-    })
-  }
+  if (pack.orientation?.intro) checkCutscene(pack.orientation.intro, 'orientation.intro')
+  pack.orientation?.steps.forEach((step, i) => step.cutscene && checkCutscene(step.cutscene, `orientation.steps[${i}].cutscene`))
   pack.orientation?.steps.forEach((step, i) => {
     need(locations, step.locationId, `orientation.steps[${i}]`, 'location')
     checkHour(step.startHour, `orientation.steps[${i}].startHour`)
   })
+  if (pack.societies) {
+    const { societies } = pack
+    need(events, societies.fairId, 'societies.fairId', 'calendar event')
+    idSet(societies.societies, 'societies')
+    for (const society of societies.societies) {
+      const where = `societies (${society.id})`
+      need(locations, society.locationId, where, 'location')
+      need(weekdays, society.weekday, where, 'weekday')
+      checkHour(society.startHour + societies.hours - 1, where)
+      // A society is a students' club, and as small as a class, so that a meeting is time with the few in it.
+      for (const id of society.memberIds) {
+        need(loveInterests, id, where, 'love interest')
+        const li = pack.loveInterests.find((one) => one.id === id)
+        if (li && kindOf(li) !== 'student') issues.push(`${where}: ${li.name} is not a student`)
+      }
+      if (new Set(society.memberIds).size !== society.memberIds.length) issues.push(`${where}: a member is listed twice`)
+      if (society.sponsorId) {
+        need(loveInterests, society.sponsorId, where, 'love interest')
+        const sponsor = pack.loveInterests.find((one) => one.id === society.sponsorId)
+        if (sponsor && kindOf(sponsor) !== 'teacher') issues.push(`${where}: its sponsor, ${sponsor.name}, is not a teacher`)
+      }
+      if (society.memberIds.length > societies.maxMembers) issues.push(`${where}: ${society.memberIds.length} members, and a society holds ${societies.maxMembers}`)
+    }
+    if (societies.fair) {
+      const { fair } = societies
+      const known = new Set(societies.societies.map((society) => society.id))
+      const items = new Set(pack.items.map((item) => item.id))
+      const people = new Set([...pack.loveInterests, ...pack.npcs].map((one) => one.id))
+      for (const table of fair.tables) {
+        need(known, table.societyId, 'societies.fair.tables', 'society')
+        if (table.gift) need(items, table.gift, `societies.fair.tables (${table.societyId})`, 'item')
+      }
+      for (const visitor of fair.visitors) need(people, visitor.id, 'societies.fair.visitors', 'character')
+      for (const id of Object.keys(fair.hellos)) need(people, id, 'societies.fair.hellos', 'character')
+      for (const id of fair.rivalry?.societyIds ?? []) need(known, id, 'societies.fair.rivalry', 'society')
+      if (fair.rivalry) checkCutscene(fair.rivalry.intro, 'societies.fair.rivalry.intro')
+    }
+  }
   if (pack.coursework) {
     need(locations, pack.coursework.locationId, 'coursework', 'location')
     checkWhen({ weekdays: pack.coursework.weekdays }, 'coursework')

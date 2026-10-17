@@ -19,11 +19,12 @@ import {
   type ContentPack,
   type LoveInterest,
   type LoveInterestKind,
+  type Role,
   type Studies,
 } from "../../../../shared/model";
 import { errorMessage } from "../../errors";
 import { describeShift } from "../../../../shared/game";
-import { Portrait } from "../MapPanel";
+import { Portrait } from "../Portrait";
 import { EditorFoot, PickList, Group, List, Text, LlmMark } from "./fields";
 import { ArtTool } from "../art/ArtTool";
 import { ComfyEditor } from "./ComfyEditor";
@@ -31,6 +32,7 @@ import { NewCharacterDialog } from "./NewCharacterDialog";
 import { CatalogueEditor } from "./CatalogueEditor";
 import { EventsEditor } from "./EventsEditor";
 import { JobsEditor } from "./JobsEditor";
+import { SocietiesEditor } from "./SocietiesEditor";
 import { LocationEditor } from "./LocationEditor";
 import { PlayerEditor } from "./PlayerEditor";
 import { ScheduleTab } from "./ScheduleTab";
@@ -87,10 +89,10 @@ function firstSubject(content: ContentPack, teaching: boolean): Studies {
 const same = (a: unknown, b: unknown) =>
   JSON.stringify(a) === JSON.stringify(b);
 
-const SIDES = ["Characters", "Player", "Locations", "Events", "Courses", "Jobs", "ComfyUI"] as const;
+const SIDES = ["Characters", "Player", "Locations", "Events", "Courses", "Societies", "Jobs", "ComfyUI"] as const;
 type Side = (typeof SIDES)[number];
 // The sides that change the game itself and not what a player adds to it: there only when the game's own files are being edited.
-const AUTHORING: readonly Side[] = ["Player", "Locations", "Jobs"];
+const AUTHORING: readonly Side[] = ["Player", "Locations", "Societies", "Jobs"];
 
 /**
  * The editor: the characters (love interests and NPCs, who are written the same way and
@@ -143,6 +145,8 @@ export function ContentEditor(props: Props) {
     <EventsEditor {...props} switcher={switcher} />
   ) : side === "Jobs" ? (
     <JobsEditor {...props} switcher={switcher} />
+  ) : side === "Societies" ? (
+    <SocietiesEditor {...props} switcher={switcher} />
   ) : side === "Player" ? (
     <PlayerEditor {...props} switcher={switcher} />
   ) : side === "ComfyUI" ? (
@@ -350,7 +354,7 @@ function LoveInterestEditor({
               }
               onClick={() => open(li)}
             >
-              <Portrait li={li} />
+              <Portrait who={li} caption />
               <span>
                 <strong>{li.name}</strong>
                 <span className="hint">
@@ -484,6 +488,23 @@ function LoveInterestEditor({
                   onChange={(role) => set({ role })}
                   placeholder="hall manager of the Cloister Halls"
                 />
+              )}
+              {/* What she does in the Undercroft, when he takes her down with him. */}
+              {!isNpc && content.expedition && (
+                <label>
+                  Role below
+                  <select
+                    value={draft.partyRole ?? ""}
+                    onChange={(e) => set({ partyRole: (e.target.value || undefined) as Role | undefined })}
+                  >
+                    <option value="">None</option>
+                    {content.expedition.roles.map((role) => (
+                      <option key={role.id} value={role.id}>
+                        {role.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
               )}
               <div className="row">
                 <label>

@@ -7,11 +7,12 @@ import { canAttend, courseMembers, meetingNow } from './courses'
 import { canSitExam } from './exams'
 import { examOn } from './grades'
 import { canWork, shiftLaterToday, shiftNow } from './jobs'
+import { canAttendSociety, joinedSocieties, societyMeetingNow, societyPeople } from './societies'
 
-/** Something on his timetable still to come today: a class he takes, a shift at his job, or a plan he has made. */
+/** Something on his timetable still to come today: a class he takes, a meeting of a society of his, a shift at his job, or a plan he has made. */
 export interface Upcoming {
-  kind: 'class' | 'work' | 'plan' | 'exam'
-  /** The course, the job or the plan. */
+  kind: 'class' | 'society' | 'work' | 'plan' | 'exam'
+  /** The course, the society, the job or the plan. */
   id: string
   title: string
   /** Game time at which it starts. */
@@ -60,7 +61,13 @@ export function nextUp(content: ContentPack, state: GameState): Upcoming | undef
     }
   }
 
-  // The soonest; of two that start together, the one listed first: a plan, then work, then a class.
+  for (const society of joinedSocieties(content, state)) {
+    if (society.startHour <= hour) continue
+    const time = timeOn(content, dayIndex, society.startHour)
+    if (societyMeetingNow(content, { ...state, time }, society)) found.push({ kind: 'society', id: society.id, title: society.name, time, locationId: society.locationId })
+  }
+
+  // The soonest; of two that start together, the one listed first: a plan, then work, then a class, then a society.
   return found.reduce<Upcoming | undefined>((first, next) => (first === undefined || next.time < first.time ? next : first), undefined)
 }
 
@@ -98,6 +105,7 @@ export function canGoTo(content: ContentPack, state: GameState, next: Upcoming):
   if (next.kind === 'class') return canAttend(content, there, next.id)
   if (next.kind === 'exam') return canSitExam(content, there, next.id)
   if (next.kind === 'work') return canWork(content, there)
+  if (next.kind === 'society') return canAttendSociety(content, there, next.id)
   return canKeep(content, there, next.id)
 }
 
@@ -112,7 +120,8 @@ export function sharedUpcoming(content: ContentPack, state: GameState, withIds: 
   if (!next || next.kind === 'work') return undefined
   const course = next.kind === 'class' ? state.courses.find((c) => c.id === next.id) : undefined
   const plan = next.kind === 'plan' ? state.appointments.find((a) => a.id === next.id) : undefined
-  const inIt = course ? courseMembers(course) : plan ? attendees(plan) : []
+  const society = next.kind === 'society' ? joinedSocieties(content, state).find((one) => one.id === next.id) : undefined
+  const inIt = course ? courseMembers(course) : plan ? attendees(plan) : (society ? societyPeople(society) : [])
   const sharedBy = withIds.filter((id) => inIt.includes(id))
   if (sharedBy.length === 0 || !canGoTo(content, state, next).ok) return undefined
   return { next, sharedBy }

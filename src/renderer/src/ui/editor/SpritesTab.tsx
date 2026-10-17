@@ -1,15 +1,15 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { framingFor, nsfwPrompt, sizeFor, spritePrompt } from '../../../../shared/comfy'
 import { ADDON_PREFIX, isSafeId, slugify } from '../../../../shared/editor'
 import { EXPRESSIONS, isPregnantPose, NSFW_POSES, NSFW_PREGNANT_POSES, STANDARD_POSES, outfitDescription, STANDARD_OUTFITS, type Animation, type LoveInterest, type Outfit } from '../../../../shared/model'
 import { errorMessage } from '../../errors'
 import { ArtTool } from '../art/ArtTool'
-import { BatchProgress, useBatch } from '../art/batch'
+import { BatchProgress, useBatch, type BatchOutcome } from '../art/batch'
 import { fileName, pngsIn, renamed, toWebp } from '../art/optimize'
 import { Button } from '../Button'
 import { VideoIcon } from '../icons'
 import { Lightbox } from '../Lightbox'
-import { Portrait } from '../MapPanel'
+import { Portrait } from '../Portrait'
 import { Group, Text } from './fields'
 import { EmptySlot, PictureSlot, SlotGrid } from './slots'
 
@@ -83,6 +83,16 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
   // The draft as it stands now, for a run that outlives the render it was started from.
   const latest = useRef(draft)
   latest.current = draft
+  // A run belongs to the character it was started for. Another opened while it runs ends it, and whatever of it was
+  // still on its way is let go, never put on the one now open: that is how one character's pictures became another's.
+  useEffect(() => {
+    if (batch) stop()
+  }, [draft.id])
+  /** What a run started for one character writes with: nothing, once another is open. */
+  const forOwner = (owner: string) => (patch: Partial<SpriteOwner>) => {
+    if (latest.current.id === owner) set(patch)
+  }
+  const gone = (owner: string): BatchOutcome | undefined => (latest.current.id === owner ? undefined : { ok: false, message: 'another character was opened', fatal: true })
 
   /**
    * Draws every face an outfit lacks, one after another, and puts each on the outfit as it
@@ -96,7 +106,11 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
     setNotice('')
     const settings = await window.api.comfy.getSettings()
     const size = sizeFor(settings, 'sprite')
+    const owner = latest.current.id
+    const put = forOwner(owner)
     const { failed } = await run(outfitId, 'Drawing', missing, (face) => face, async (face) => {
+      const stopped = gone(owner)
+      if (stopped) return stopped
       const who = latest.current
       const result = await window.api.comfy.generate({
         kind: 'sprite',
@@ -111,7 +125,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
       if (!result.ok || !result.path) return { ok: false, message: result.message, fatal: true }
       const image = result.path
       // Onto the draft as it is now, so nothing edited while this ran is lost.
-      set({
+      put({
         outfits: latest.current.outfits.map((outfit) =>
           outfit.id === outfitId ? { ...outfit, sprites: { ...outfit.sprites, [face]: { image, description: '' } } } : outfit
         )
@@ -132,10 +146,11 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
     const paths = pngsIn({ outfits: latest.current.outfits, animations: latest.current.animations, birthPicture: latest.current.birthPicture })
     if (paths.length === 0 || batch) return
     setNotice('')
+    const put = forOwner(latest.current.id)
     const { failed } = await run(OPTIMIZE_BATCH, 'Optimizing', paths, fileName, async (path) => {
       try {
         const to = await toWebp(path)
-        set({ outfits: renamed(latest.current.outfits, path, to), animations: renamed(latest.current.animations, path, to), birthPicture: renamed(latest.current.birthPicture, path, to) })
+        put({ outfits: renamed(latest.current.outfits, path, to), animations: renamed(latest.current.animations, path, to), birthPicture: renamed(latest.current.birthPicture, path, to) })
         return { ok: true }
       } catch (error) {
         return { ok: false, message: errorMessage(error) }
@@ -154,7 +169,11 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
       .map(([name]) => name)
     if (names.length === 0 || batch) return
     setNotice('')
+    const owner = latest.current.id
+    const put = forOwner(owner)
     const { failed } = await run(outfitId, 'Cutting out', names, (name) => name, async (name) => {
+      const stopped = gone(owner)
+      if (stopped) return stopped
       const from = latest.current.outfits.find((o) => o.id === outfitId)?.sprites[name]?.image
       if (!from) return { ok: true }
       const cut = await window.api.comfy.cutout({ path: from })
@@ -162,7 +181,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
       if (!cut.ok || !cut.path) return { ok: false, message: cut.message }
       const to = cut.path
       // Every sprite on the old file moves, since that file is gone.
-      set({
+      put({
         outfits: latest.current.outfits.map((o) => ({
           ...o,
           sprites: Object.fromEntries(Object.entries(o.sprites).map(([key, sprite]) => [key, sprite.image === from ? { ...sprite, image: to } : sprite]))
@@ -282,11 +301,11 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
   // The poses that have a picture, in the order they are shown, for stepping through them.
   const withPictures = [...poses, ...pregnantPoses].filter((pose) => pose.image !== undefined)
 
-  /** Changes a pose, making its entry if she has none for it yet. Written onto the draft as it is now. */
-  function setPose(id: string, patch: Partial<Animation>) {
+  /** Changes a pose, making its entry if she has none for it yet. Written onto the draft as it is now, by `put` when a run does it. */
+  function setPose(id: string, patch: Partial<Animation>, put: (patch: Partial<SpriteOwner>) => void = set) {
     const have = latest.current.animations
     const standard = STANDARD_POSES.find((pose) => pose.id === id)
-    set({
+    put({
       animations: have.some((a) => a.id === id)
         ? have.map((a) => (a.id === id ? { ...a, ...patch } : a))
         : [...have, { id, name: standard?.name ?? id, description: '', loop: true, ...patch }]
@@ -318,7 +337,11 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
     setNotice('')
     const settings = await window.api.comfy.getSettings()
     const size = sizeFor(settings, 'nsfw')
+    const owner = latest.current.id
+    const put = forOwner(owner)
     const { failed } = await run(at, 'Drawing', missing, (pose) => pose.name, async (pose) => {
+      const stopped = gone(owner)
+      if (stopped) return stopped
       const who = latest.current
       const result = await window.api.comfy.generate({
         kind: 'nsfw',
@@ -332,7 +355,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
       })
       // Without a working ComfyUI the rest would fail the same way.
       if (!result.ok || !result.path) return { ok: false, message: result.message, fatal: true }
-      setPose(pose.id, { image: result.path })
+      setPose(pose.id, { image: result.path }, put)
       return { ok: true }
     })
     if (failed.length > 0) setNotice(`Stopped at ${failed[0]}`)
@@ -497,7 +520,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
 
       <Group title="Portrait" hint="The small round picture used on the map and in lists is cut from the default outfit's first sprite.">
         <div className="portrait-crop">
-          <Portrait li={draft} />
+          <Portrait who={draft} caption />
           <label>
             How far down the picture the face is: {draft.faceY}%
             <input type="range" min={0} max={100} value={draft.faceY} onChange={(e) => set({ faceY: Number(e.target.value) })} />

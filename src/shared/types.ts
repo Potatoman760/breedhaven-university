@@ -251,6 +251,10 @@ export interface RendererApi {
     saveJob(job: unknown): Promise<EditorResult>
     /** Takes a job out of the game. Only when the game's own files are being edited. */
     deleteJob(id: string): Promise<EditorResult>
+    /** Adds a society to the game, or changes one. Only when the game's own files are being edited. */
+    saveSociety(society: unknown): Promise<EditorResult>
+    /** Takes a society out of the game. Only when the game's own files are being edited. */
+    deleteSociety(id: string): Promise<EditorResult>
     /** Writes the player a new game starts with: his default name, what he starts with, and his room. */
     savePlayer(newGame: unknown): Promise<EditorResult>
     /** Puts the player back as the game shipped him. */

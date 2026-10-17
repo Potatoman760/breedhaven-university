@@ -1,0 +1,362 @@
+{
+  "id": "yulia",
+  "name": "Yulia Starkfelt",
+  "role": "",
+  "age": 21,
+  "pronouns": "she/her",
+  "bio": "A third-year transfer from the Starkelands who studies Magical Engineering and treats every night like a festival. She is here for the parties, the potions, and a good time, in roughly that order.",
+  "appearance": "A tall young woman of twenty-one with pale skin, high cheekbones, a heart-shaped face, and bright green eyes with winged eyeliners. Her lips are full and glossy pink. Her platinum blonde hair falls past her shoulders in thick, tousled waves. She has a curvaceous hourglass figure, big breasts, long legs",
+  "personality": "Bold, hedonistic, and utterly without shame about what she enjoys. She is louder and sharper than she looks, and underneath the party-girl act she is lonely in a country that is not her own.",
+  "traitIds": [
+    "promiscuous",
+    "easygoing",
+    "exhibitionist"
+  ],
+  "likes": [
+    "potions",
+    "ale",
+    "sweets",
+    "music",
+    "gadgets"
+  ],
+  "dislikes": [
+    "books",
+    "devotional",
+    "ledgers",
+    "maps"
+  ],
+  "admires": [
+    "charisma",
+    "endurance",
+    "strength"
+  ],
+  "friends": [],
+  "enemies": [],
+  "handle": "yulababy",
+  "outfits": [
+    {
+      "id": "default",
+      "name": "Usual clothes",
+      "description": "a bubblegum-pink cropped cardigan, white sweetheart top, white pleated mini skirt,  gold hoop earrings, and a tiny black shoulder bag.",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/default-neutral-cutout.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/yulia/default-happy-cutout.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/yulia/default-sad-cutout.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/yulia/default-angry-cutout.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/yulia/default-surprised-cutout.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/yulia/default-embarrassed-cutout.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/yulia/default-aroused-cutout.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "pregnant",
+      "name": "Pregnant",
+      "description": "She has a round, uncovered pregnant belly.",
+      "inherits": "default",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/pregnant-neutral-2-cutout.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/yulia/pregnant-happy-cutout.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/yulia/pregnant-sad-cutout.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/yulia/pregnant-angry-cutout.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/yulia/pregnant-surprised-cutout.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/yulia/pregnant-embarrassed-cutout.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/yulia/pregnant-aroused-cutout.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "nude",
+      "name": "Nude",
+      "description": "nothing at all, completely nude",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/nude-neutral-cutout.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/yulia/nude-happy-cutout.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/yulia/nude-sad-cutout.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/yulia/nude-angry-cutout.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/yulia/nude-surprised-cutout.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/yulia/nude-embarrassed-cutout.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/yulia/nude-aroused-cutout.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "nude-pregnant",
+      "name": "Nude, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "nude",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/nude-pregnant-neutral-cutout.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/yulia/nude-pregnant-happy-cutout.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/yulia/nude-pregnant-sad-cutout.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/yulia/nude-pregnant-angry-cutout.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/yulia/nude-pregnant-surprised-cutout.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/yulia/nude-pregnant-embarrassed-cutout.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/yulia/nude-pregnant-aroused-cutout.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    }
+  ],
+  "defaultOutfitId": "default",
+  "faceY": 4,
+  "imageSeed": 60,
+  "stageHeight": 100,
+  "kind": "student",
+  "partyRole": "striker",
+  "studies": {
+    "major": "MEN",
+    "level": 3
+  },
+  "animations": [
+    {
+      "id": "blowjob",
+      "name": "Blowjob",
+      "description": "",
+      "image": "sprites/yulia/nsfw-blowjob.webp",
+      "clip": "sprites/yulia/nsfw-blowjob.mp4",
+      "loop": true
+    },
+    {
+      "id": "facial",
+      "name": "Facial",
+      "description": "",
+      "image": "sprites/yulia/nsfw-facial.webp",
+      "clip": "sprites/yulia/nsfw-facial.mp4",
+      "loop": true
+    },
+    {
+      "id": "missionary",
+      "name": "Missionary",
+      "description": "",
+      "image": "sprites/yulia/nsfw-missionary.webp",
+      "clip": "sprites/yulia/nsfw-missionary.mp4",
+      "loop": true
+    },
+    {
+      "id": "doggy",
+      "name": "Doggy",
+      "description": "",
+      "image": "sprites/yulia/nsfw-doggy.webp",
+      "clip": "sprites/yulia/nsfw-doggy.mp4",
+      "loop": true
+    },
+    {
+      "id": "cowgirl",
+      "name": "Cowgirl",
+      "description": "",
+      "image": "sprites/yulia/nsfw-cowgirl.webp",
+      "clip": "sprites/yulia/nsfw-cowgirl.mp4",
+      "loop": true
+    },
+    {
+      "id": "creampie",
+      "name": "Creampie",
+      "description": "",
+      "image": "sprites/yulia/nsfw-creampie.webp",
+      "clip": "sprites/yulia/minimax-h3-00086.mp4",
+      "loop": true
+    },
+    {
+      "id": "pregnant-blowjob",
+      "name": "Blowjob, pregnant",
+      "description": "",
+      "image": "sprites/yulia/nsfw-pregnant-blowjob.webp",
+      "loop": true
+    },
+    {
+      "id": "pregnant-missionary",
+      "name": "Missionary, pregnant",
+      "description": "",
+      "image": "sprites/yulia/nsfw-pregnant-missionary.webp",
+      "loop": true
+    },
+    {
+      "id": "pregnant-doggy",
+      "name": "Doggy, pregnant",
+      "description": "",
+      "image": "sprites/yulia/nsfw-pregnant-doggy.webp",
+      "loop": true
+    },
+    {
+      "id": "pregnant-cowgirl",
+      "name": "Cowgirl, pregnant",
+      "description": "",
+      "image": "sprites/yulia/nsfw-pregnant-cowgirl.webp",
+      "loop": true
+    },
+    {
+      "id": "pregnant-creampie",
+      "name": "Creampie, pregnant",
+      "description": "",
+      "image": "sprites/yulia/nsfw-pregnant-creampie.webp",
+      "loop": true
+    }
+  ],
+  "schedule": [
+    {
+      "weekdays": [
+        "Moonday",
+        "Tidesday",
+        "Windsday"
+      ],
+      "periods": [
+        "morning"
+      ],
+      "locationId": "lecture-halls"
+    },
+    {
+      "weekdays": [
+        "Moonday",
+        "Tidesday"
+      ],
+      "periods": [
+        "afternoon"
+      ],
+      "locationId": "foundry"
+    },
+    {
+      "periods": [
+        "evening"
+      ],
+      "locationId": "honeyed-bee-inn"
+    },
+    {
+      "weekdays": [
+        "Marketday",
+        "Restday"
+      ],
+      "periods": [
+        "night"
+      ],
+      "locationId": "undergrowth"
+    },
+    {
+      "weekdays": [
+        "Solday"
+      ],
+      "periods": [
+        "afternoon"
+      ],
+      "locationId": "market"
+    }
+  ],
+  "room": {
+    "name": "a flat above Byte & Bloom on Lantern Row",
+    "description": "A studio flat small and cluttered and lit by strings of coloured charms. The bed is unmade and heaped with cushions and coats. A shelf holds half-dead houseplants, a speaker stack, and a tray of vials and powders beside a cracked mirror. The window stands open to the street noise and the lantern-light, and the air smells of perfume and smoke.",
+    "locationId": "lantern-row",
+    "background": "generated/backgrounds/yulia/view.png"
+  },
+  "birthPicture": "sprites/yulia/birth.webp",
+  "childNames": {
+    "daughters": [
+      "Saga",
+      "Ingrid",
+      "Liv",
+      "Svea",
+      "Runa"
+    ],
+    "sons": [
+      "Joven",
+      "Torvald"
+    ]
+  },
+  "birthControl": true,
+  "ai": {
+    "speechPattern": "She talks fast and loose, dropping contractions and trailing off into laughs. She code-switches between normal and valley girl when excited or angry, slipping in words nobody else uses. She asks questions she already knows the answers to, because she likes hearing people talk.",
+    "tone": "Loud, teasing, careless, warm.",
+    "verbalQuirks": [
+      "Calls everyone 'babe'  regardless of how well she knows them",
+      "Clicks her tongue when she thinks someone is lying",
+      "Says 'that's so Breedhaven' as a gentle tease about anything dull or proper"
+    ],
+    "exampleDialogue": [],
+    "backstory": "Yulia grew up in Hjalmark, a wind-bitten university town in the northern Starkelands, where the magic is older and rougher and the winters are six months long. Her mother is an elemental surveyor who maps storm-lines across the tundra; her older sister followed the same path. Yulia was the disappointment who preferred house parties to fieldwork and got through school on charm and last-minute cramming.\n\nShe transferred to Breedhaven University in her third year, nominally to finish her Magical Engineering degree at a better-equipped college, really because her mother told her to stop embarrassing the family in Hjalmark. The Starkelands are poorer and colder than Breedhaven, and Yulia arrived in Seedblossom with two bags, a fake ID that fooled nobody, and a determination to find out what a rich country feels like from the inside.\n\nShe rents a studio above Byte & Bloom, works the occasional bar shift at the Undergrowth when rent is due, and has built a wide and shallow network of friends across every college. She takes recreational potions the way other students take coffee: openly, often, and with strong opinions about which alchemist does the best work. The Bloom pulls at her the way it pulls at every woman, and she handles it by not handling it, by staying out late and staying close to whoever is closest.",
+    "knowledge": [],
+    "secrets": [],
+    "extraInstructions": "Play her as genuinely fun, not as a joke. She is careless, not stupid, and she notices more than she lets on. Let her Starklandish pride surface when someone assumes she is just a pretty face. She should flirt as easily as breathing but go still and quiet if someone is actually kind to her without wanting something."
+  }
+}

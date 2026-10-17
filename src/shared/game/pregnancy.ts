@@ -1,5 +1,6 @@
 import type { Child, ContentPack, GameState, LoveInterest, Outfit, Pregnancy, PregnancyStage } from '../model'
 import { toDate } from './calendar'
+import { eventsOn } from './events'
 import { onBirthControl } from './intimacy'
 import { factor, inForce } from './modifiers'
 import { seedOf } from './seed'
@@ -145,7 +146,9 @@ export function deliverChild(content: ContentPack, state: GameState, motherId: s
  */
 export function wornOutfit(content: ContentPack, state: GameState, li: LoveInterest, chosenId?: string): Outfit | undefined {
   const has = (id: string) => li.outfits.find((o) => o.id === id)
-  const chosen = (chosenId !== undefined ? has(chosenId) : undefined) ?? has(li.defaultOutfitId)
+  // On the day of an event she is dressed for it, if she has an outfit with its id: from morning to night, until a scene puts her in something else.
+  const dressed = eventsOn(content, state).map((event) => has(event.id)).find((outfit) => outfit !== undefined)
+  const chosen = (chosenId !== undefined ? has(chosenId) : undefined) ?? dressed ?? has(li.defaultOutfitId)
   if (!chosen) return undefined
   const showing = pregnancyStage(content, state, li.id)?.showing === true
   if (chosen.pregnant === showing) return chosen

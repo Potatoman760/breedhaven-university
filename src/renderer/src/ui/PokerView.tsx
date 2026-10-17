@@ -18,6 +18,7 @@ import {
   type PokerMove,
   type PokerSeat
 } from '../../../shared/game'
+import { Portrait } from './Portrait'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { play } from '../sound'
 import { Button } from './Button'
@@ -166,11 +167,7 @@ function Seat({ content, state, seat, hand }: { content: ContentPack; state: Gam
   const dealer = hand && hand.seats[hand.dealer]?.id === seat.id
   return (
     <div className={['poker-seat', seat.folded && 'folded', turn && 'turn', winner && 'winner'].filter(Boolean).join(' ')}>
-      {sprite ? (
-        <span className="poker-face" role="img" aria-label={seat.name} style={{ backgroundImage: `url("content://pack/${sprite}")`, backgroundPosition: `50% ${faceY}%` }} />
-      ) : (
-        <span className="poker-face initial">{seat.name[0]}</span>
-      )}
+      <Portrait who={{ name: seat.name, faceY }} image={sprite} size={you ? 144 : 124} className="poker-face" />
       <div className="poker-seat-info">
         <div className="poker-seat-name">
           {you ? 'You' : seat.name}
@@ -181,7 +178,6 @@ function Seat({ content, state, seat, hand }: { content: ContentPack; state: Gam
         </div>
         <div className="poker-seat-note">
           {hand?.outcome?.shown[seat.id] ?? seat.last ?? ' '}
-          {seat.committed > 0 && <span className="poker-in">${seat.committed} in</span>}
         </div>
       </div>
     </div>

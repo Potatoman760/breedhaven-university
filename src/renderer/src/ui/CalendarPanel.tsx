@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { dayAgenda, dayIndexOf, eventHours, eventsOn, removeEvent, toDate, upcomingEvents, type AgendaItem } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
+import { Button } from './Button'
 import { Dialog } from './Dialog'
-import { ChevronIcon } from './icons'
+import { GrandButton } from './GrandButton'
+import { BackIcon, ChevronIcon } from './icons'
+import { Portrait } from './Portrait'
 
-// How far ahead the "Coming up" list looks.
-const UPCOMING_DAYS = 30
+// How far ahead the "Coming up" list looks: the week ahead, and no further.
+const UPCOMING_DAYS = 7
 // The hours the week view lays out. Anything outside them is still listed, at the edge.
 const FIRST_HOUR = 7
 const LAST_HOUR = 22
@@ -53,7 +56,7 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
   // What has been picked out of the calendar to be read about, and the day it was picked on.
   const [picked, setPicked] = useState<{ item: AgendaItem; dayIndex: number } | null>(null)
   const placeName = (locationId: string | undefined) => content.locations.find((l) => l.id === locationId)?.name
-  const onNow = eventsOn(content, state)
+  const onNow = eventsOn(content, state).filter((event) => !event.secret)
 
   const week = calendar.weekdays.length
   const weekdayOf = (dayIndex: number) => (((calendar.startWeekday + dayIndex) % week) + week) % week
@@ -103,22 +106,22 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
         : 'Before term'
 
   return (
-    <Dialog title="Calendar" note={`Day ${today.dayIndex + 1} of ${calendar.lengthDays}`} onClose={onClose} wide>
+    <Dialog title="Calendar" note={`Day ${today.dayIndex + 1} of ${calendar.lengthDays}`} onClose={onClose} wide ornate noClose>
       <div className="calendar">
         <div className="calendar-main">
           <div className="month-nav">
-            <button className="secondary icon flip" aria-label={mode === 'week' ? 'Previous week' : 'Previous month'} onClick={() => setOffset(offset - 1)}>
+            <Button className="icon flip" aria-label={mode === 'week' ? 'Previous week' : 'Previous month'} onClick={() => setOffset(offset - 1)}>
               <ChevronIcon size={16} />
-            </button>
+            </Button>
             <div>
               <h2>{title}</h2>
             </div>
-            <button className="secondary icon" disabled={atEnd} aria-label={mode === 'week' ? 'Next week' : 'Next month'} onClick={() => setOffset(offset + 1)}>
+            <Button className="icon" disabled={atEnd} aria-label={mode === 'week' ? 'Next week' : 'Next month'} onClick={() => setOffset(offset + 1)}>
               <ChevronIcon size={16} />
-            </button>
-            <button className="quiet" disabled={offset === 0} onClick={() => setOffset(0)}>
+            </Button>
+            <Button variant="quiet" disabled={offset === 0} onClick={() => setOffset(0)}>
               Today
-            </button>
+            </Button>
             <div className="tabs" role="tablist">
               <button role="tab" aria-selected={mode === 'week'} className={mode === 'week' ? 'tab selected' : 'tab'} onClick={() => switchTo('week')}>
                 Week
@@ -129,124 +132,135 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
             </div>
           </div>
 
-          {mode === 'week' ? (
-            <div className="week" style={{ gridTemplateColumns: `52px repeat(${week}, minmax(0, 1fr))` }}>
-              <span />
-              {weekDays.map((d) => (
-                <div
-                  key={d.dayIndex}
-                  className={['week-head', d.dayIndex === today.dayIndex && 'today', (d.dayIndex < today.dayIndex || d.dayIndex >= calendar.lengthDays) && 'faded']
-                    .filter(Boolean)
-                    .join(' ')}
-                >
-                  <span className="caps">{calendar.weekdays[weekdayOf(d.dayIndex)].replace(/day$/, '')}</span>
-                  <strong>{d.date ? d.date.day : ''}</strong>
-                </div>
-              ))}
+          {/* The calendar itself is a parchment sheet in the dark frame, so what is on it reads as it always has. */}
+          <div className="calendar-sheet sheet">
+            {mode === 'week' ? (
+              <div
+                className="week"
+                style={{
+                  gridTemplateColumns: `52px repeat(${week}, minmax(0, 1fr))`
+                }}
+              >
+                <span />
+                {weekDays.map((d) => (
+                  <div
+                    key={d.dayIndex}
+                    className={['week-head', d.dayIndex === today.dayIndex && 'today', (d.dayIndex < today.dayIndex || d.dayIndex >= calendar.lengthDays) && 'faded'].filter(Boolean).join(' ')}
+                  >
+                    <span className="caps">{calendar.weekdays[weekdayOf(d.dayIndex)].replace(/day$/, '')}</span>
+                    <strong>{d.date ? d.date.day : ''}</strong>
+                  </div>
+                ))}
 
-              <span className="week-time">All day</span>
-              {weekDays.map((d) => (
-                <div key={d.dayIndex} className="week-whole">
-                  {d.whole.map((item) => (
-                    <button key={item.id} type="button" className={`entry ${item.kind}`} title={item.detail} onClick={() => setPicked({ item, dayIndex: d.dayIndex })}>
-                      {item.title}
-                    </button>
+                <span className="week-time">All day</span>
+                {weekDays.map((d) => (
+                  <div key={d.dayIndex} className="week-whole">
+                    {d.whole.map((item) => (
+                      <button key={item.id} type="button" className={`entry ${item.kind}`} title={item.detail} onClick={() => setPicked({ item, dayIndex: d.dayIndex })}>
+                        {item.title}
+                      </button>
+                    ))}
+                  </div>
+                ))}
+
+                <div className="week-hours">
+                  {hours.map((hour) => (
+                    <span key={hour} className="week-time">
+                      {clock(hour)}
+                    </span>
                   ))}
                 </div>
-              ))}
-
-              <div className="week-hours">
-                {hours.map((hour) => (
-                  <span key={hour} className="week-time">
-                    {clock(hour)}
-                  </span>
+                {weekDays.map((d) => (
+                  <div key={d.dayIndex} className={d.dayIndex === today.dayIndex ? 'week-day today' : 'week-day'} style={{ gridTemplateRows: `repeat(${hours.length}, 1fr)` }}>
+                    {d.dayIndex === today.dayIndex && today.hour >= FIRST_HOUR && today.hour < LAST_HOUR && (
+                      <span
+                        className="now"
+                        style={{
+                          top: `${((today.hour - FIRST_HOUR) / hours.length) * 100}%`
+                        }}
+                      />
+                    )}
+                    {d.timed.map(({ item, lane, of }) => {
+                      // Kept within the hours shown, so something very early or late is still there to see.
+                      const start = Math.min(Math.max(item.startHour ?? FIRST_HOUR, FIRST_HOUR), LAST_HOUR - 1)
+                      const end = Math.min(Math.max((item.startHour ?? FIRST_HOUR) + (item.hours ?? 1), start + 1), LAST_HOUR)
+                      return (
+                        <div
+                          key={item.id}
+                          role="button"
+                          tabIndex={0}
+                          onClick={() => setPicked({ item, dayIndex: d.dayIndex })}
+                          onKeyDown={(e) => e.key === 'Enter' && setPicked({ item, dayIndex: d.dayIndex })}
+                          className={`entry timed ${item.kind}`}
+                          title={[`${clock(item.startHour ?? 0)} to ${clock((item.startHour ?? 0) + (item.hours ?? 1))}`, item.title, item.detail].filter(Boolean).join(' · ')}
+                          style={{
+                            top: `${((start - FIRST_HOUR) / hours.length) * 100}%`,
+                            height: `${((end - start) / hours.length) * 100}%`,
+                            left: `${(lane / of) * 100}%`,
+                            width: `${100 / of}%`
+                          }}
+                        >
+                          <strong>{item.title}</strong>
+                          {item.detail && <span>{item.detail}</span>}
+                        </div>
+                      )
+                    })}
+                  </div>
                 ))}
               </div>
-              {weekDays.map((d) => (
-                <div
-                  key={d.dayIndex}
-                  className={d.dayIndex === today.dayIndex ? 'week-day today' : 'week-day'}
-                  style={{ gridTemplateRows: `repeat(${hours.length}, 1fr)` }}
-                >
-                  {d.dayIndex === today.dayIndex && today.hour >= FIRST_HOUR && today.hour < LAST_HOUR && (
-                    <span className="now" style={{ top: `${((today.hour - FIRST_HOUR) / hours.length) * 100}%` }} />
-                  )}
-                  {d.timed.map(({ item, lane, of }) => {
-                    // Kept within the hours shown, so something very early or late is still there to see.
-                    const start = Math.min(Math.max(item.startHour ?? FIRST_HOUR, FIRST_HOUR), LAST_HOUR - 1)
-                    const end = Math.min(Math.max((item.startHour ?? FIRST_HOUR) + (item.hours ?? 1), start + 1), LAST_HOUR)
-                    return (
-                      <div
-                        key={item.id}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => setPicked({ item, dayIndex: d.dayIndex })}
-                        onKeyDown={(e) => e.key === 'Enter' && setPicked({ item, dayIndex: d.dayIndex })}
-                        className={`entry timed ${item.kind}`}
-                        title={[`${clock(item.startHour ?? 0)} to ${clock((item.startHour ?? 0) + (item.hours ?? 1))}`, item.title, item.detail].filter(Boolean).join(' · ')}
-                        style={{
-                          top: `${((start - FIRST_HOUR) / hours.length) * 100}%`,
-                          height: `${((end - start) / hours.length) * 100}%`,
-                          left: `${(lane / of) * 100}%`,
-                          width: `${100 / of}%`
-                        }}
-                      >
-                        <strong>{item.title}</strong>
-                        {item.detail && <span>{item.detail}</span>}
-                      </div>
-                    )
-                  })}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="month-grid" style={{ gridTemplateColumns: `repeat(${week}, minmax(0, 1fr))` }}>
-              {calendar.weekdays.map((name) => (
-                <div key={name} className="caps weekday">
-                  {name.replace(/day$/, '')}
-                </div>
-              ))}
-              {Array.from({ length: lead }, (_, i) => (
-                <div key={`lead-${i}`} />
-              ))}
-              {Array.from({ length: month.days }, (_, i) => {
-                const dayIndex = firstDay + i
-                const items = dayAgenda(content, state, dayIndex)
-                const weeksAway = Math.floor((dayIndex - (today.dayIndex - weekdayOf(today.dayIndex))) / week)
-                return (
-                  <button
-                    key={i}
-                    className={['day', dayIndex === today.dayIndex && 'today', (dayIndex < today.dayIndex || dayIndex >= calendar.lengthDays) && 'faded']
-                      .filter(Boolean)
-                      .join(' ')}
-                    title="See this week"
-                    onClick={() => switchTo('week', weeksAway)}
-                  >
-                    <span className="day-number">{i + 1}</span>
-                    {items.slice(0, MONTH_LINES).map((item) => (
-                      <span key={item.id} className={`entry ${item.kind}`}>
-                        {item.startHour !== undefined && `${clock(item.startHour)} `}
-                        {item.title}
-                      </span>
-                    ))}
-                    {items.length > MONTH_LINES && <span className="hint">+{items.length - MONTH_LINES} more</span>}
-                  </button>
-                )
-              })}
-            </div>
-          )}
-          <div className="legend">
-            <span className="entry class">Class</span>
-            <span className="entry plan">Plan</span>
-            <span className="entry event">Event</span>
-            <span className="entry orientation">Orientation</span>
-            <span className="entry birth">Birth</span>
-            {content.housing && state.housing.status === 'resident' && (
-              <>
-                <span className="entry rent">Rent</span>
-                <span className="entry household">Children's week</span>
-              </>
+            ) : (
+              <div
+                className="month-grid"
+                style={{
+                  gridTemplateColumns: `repeat(${week}, minmax(0, 1fr))`
+                }}
+              >
+                {calendar.weekdays.map((name) => (
+                  <div key={name} className="caps weekday">
+                    {name.replace(/day$/, '')}
+                  </div>
+                ))}
+                {Array.from({ length: lead }, (_, i) => (
+                  <div key={`lead-${i}`} />
+                ))}
+                {Array.from({ length: month.days }, (_, i) => {
+                  const dayIndex = firstDay + i
+                  const items = dayAgenda(content, state, dayIndex)
+                  const weeksAway = Math.floor((dayIndex - (today.dayIndex - weekdayOf(today.dayIndex))) / week)
+                  return (
+                    <button
+                      key={i}
+                      className={['day', dayIndex === today.dayIndex && 'today', (dayIndex < today.dayIndex || dayIndex >= calendar.lengthDays) && 'faded'].filter(Boolean).join(' ')}
+                      title="See this week"
+                      onClick={() => switchTo('week', weeksAway)}
+                    >
+                      <span className="day-number">{i + 1}</span>
+                      {items.slice(0, MONTH_LINES).map((item) => (
+                        <span key={item.id} className={`entry ${item.kind}`}>
+                          {item.startHour !== undefined && `${clock(item.startHour)} `}
+                          {item.title}
+                        </span>
+                      ))}
+                      {items.length > MONTH_LINES && <span className="hint">+{items.length - MONTH_LINES} more</span>}
+                    </button>
+                  )
+                })}
+              </div>
             )}
+            <div className="legend">
+              <span className="entry class">Class</span>
+            {state.societies.length > 0 && <span className="entry society">Society</span>}
+              <span className="entry plan">Plan</span>
+              <span className="entry event">Event</span>
+              <span className="entry orientation">Orientation</span>
+              <span className="entry birth">Birth</span>
+              {content.housing && state.housing.status === 'resident' && (
+                <>
+                  <span className="entry rent">Rent</span>
+                  <span className="entry household">Children's week</span>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
@@ -264,9 +278,26 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
               <strong>{picked.item.title}</strong>
               {picked.item.detail && <span className="caps">{picked.item.detail}</span>}
               {picked.item.description && <span>{picked.item.description}</span>}
-              <button className="quiet" onClick={() => setPicked(null)}>
-                Close
-              </button>
+              {/* A class: who he will find in it. */}
+              {(() => {
+                const course = picked.item.kind === 'class' ? state.courses.find((one) => picked.item.id === `class-${one.id}`) : undefined
+                if (!course) return null
+                const people = [course.teacherId, ...course.studentIds].flatMap((id) => content.loveInterests.find((li) => li.id === id) ?? [])
+                return (
+                  <>
+                    <span className="caps">In this class</span>
+                    {people.length > 0 ? (
+                      <div className="portraits">
+                        {people.map((li) => (
+                          <Portrait key={li.id} who={li} caption />
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="hint">No one you know.</span>
+                    )}
+                  </>
+                )
+              })()}
             </div>
           )}
           {onNow.length > 0 && <h2>On today</h2>}
@@ -290,15 +321,15 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
               <strong>{event.name}</strong>
               {event.description && <span>{event.description}</span>}
               {event.generated && (
-                <button className="quiet" onClick={() => onChange(removeEvent(state, event.id))}>
+                <Button variant="quiet" size="small" onClick={() => onChange(removeEvent(state, event.id))}>
                   Remove
-                </button>
+                </Button>
               )}
             </div>
           ))}
-          {upcomingEvents(content, state, UPCOMING_DAYS).length === 0 && (
-            <p className="hint">Nothing in the next {UPCOMING_DAYS} days.</p>
-          )}
+          {upcomingEvents(content, state, UPCOMING_DAYS).length === 0 && <p className="hint">Nothing in the next {UPCOMING_DAYS} days.</p>}
+          {/* The way out, at the foot of this column, level with the foot of the calendar. */}
+          <GrandButton label="Close" icon={<BackIcon size={22} />} chevron={false} className="calendar-close" onClick={onClose} />
         </div>
       </div>
     </Dialog>

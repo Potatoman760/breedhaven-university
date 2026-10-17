@@ -83,6 +83,9 @@ export const GameStateSchema = z.object({
   enrolment: z.array(z.string()).nullable(),
   /** Keyed by course id. */
   attendance: z.record(z.string(), AttendanceSchema),
+  /** The societies he belongs to, and the meetings of them he has been to, each as `<society id>:<day>`. */
+  societies: z.array(z.string()),
+  societyMeetings: z.array(z.string()),
   /** Training points banked toward the next point of each stat, by stat. */
   training: z.record(z.string(), z.number()),
   /** How much he has trained each stat on one day of the game, so that a day's work on one thing counts for less and less. */
@@ -132,6 +135,8 @@ export const GameStateSchema = z.object({
   offBirthControl: z.array(z.string()).default([]),
   /** Who has said she will be at an event, by the event's id: she is there when he goes to it. */
   eventGoers: z.record(z.string(), z.array(z.string())).default({}),
+  /** The parts of events he has been to, each as the event's id and the part's, joined with a colon. */
+  partsAttended: z.array(z.string()).default([]),
   /** He is in his own room, in the place it is in, and not merely somewhere in that place: what is shown behind him is the room. */
   inOwnRoom: z.boolean().default(false),
   /** Jobs he has quit or been let go from. None of them will have him back. */

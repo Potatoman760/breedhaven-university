@@ -3,149 +3,141 @@
   "regions": [
     {
       "name": "Breedhaven University",
-      "image": "map/university.webp",
-      "x": 1,
-      "y": 2,
-      "w": 48.5,
-      "h": 96
+      "x": 13,
+      "y": 2
     },
     {
       "name": "Lantern Row",
-      "image": "map/lantern-row.webp",
-      "x": 50.5,
-      "y": 2,
-      "w": 32,
-      "h": 96
+      "x": 57,
+      "y": 2
     },
     {
       "name": "Seedblossom",
-      "image": "map/seedblossom.webp",
-      "x": 83.3,
-      "y": 2,
-      "w": 15.7,
-      "h": 96
+      "x": 90,
+      "y": 60
     }
   ],
   "pins": [
     {
-      "locationId": "library",
-      "x": 9,
-      "y": 14
-    },
-    {
-      "locationId": "lecture-halls",
-      "x": 25,
-      "y": 14
-    },
-    {
-      "locationId": "dawnbloom-house",
-      "x": 41,
-      "y": 14
-    },
-    {
       "locationId": "chapel",
-      "x": 9,
-      "y": 37
+      "x": 25,
+      "y": 7
+    },
+    {
+      "locationId": "library",
+      "x": 37,
+      "y": 13
     },
     {
       "locationId": "great-court",
-      "x": 25,
-      "y": 37
+      "x": 34,
+      "y": 24
     },
     {
-      "locationId": "tiltyard",
-      "x": 41,
-      "y": 37
+      "locationId": "lecture-halls",
+      "x": 47,
+      "y": 30
     },
     {
-      "locationId": "physic-garden",
-      "x": 9,
-      "y": 60
-    },
-    {
-      "locationId": "commons",
-      "x": 25,
-      "y": 60
-    },
-    {
-      "locationId": "dormitories",
-      "x": 41,
-      "y": 60
+      "locationId": "dawnbloom-house",
+      "x": 11,
+      "y": 28
     },
     {
       "locationId": "foundry",
-      "x": 9,
-      "y": 83
+      "x": 5,
+      "y": 42
+    },
+    {
+      "locationId": "commons",
+      "x": 31,
+      "y": 48
+    },
+    {
+      "locationId": "physic-garden",
+      "x": 15,
+      "y": 55
+    },
+    {
+      "locationId": "dormitories",
+      "x": 36,
+      "y": 64
+    },
+    {
+      "locationId": "tiltyard",
+      "x": 12,
+      "y": 80
     },
     {
       "locationId": "bathhouse",
-      "x": 25,
-      "y": 83
+      "x": 27,
+      "y": 89
     },
     {
       "locationId": "health-centre",
-      "x": 41,
-      "y": 83
+      "x": 42,
+      "y": 80
     },
     {
       "locationId": "lantern-row",
-      "x": 58.5,
-      "y": 14
-    },
-    {
-      "locationId": "spell-and-sip",
-      "x": 74.5,
-      "y": 14
-    },
-    {
-      "locationId": "honeyed-bee-inn",
-      "x": 58.5,
-      "y": 37
-    },
-    {
-      "locationId": "boba-blossom",
-      "x": 74.5,
-      "y": 37
-    },
-    {
-      "locationId": "pixel-and-rune",
-      "x": 58.5,
-      "y": 60
+      "x": 59,
+      "y": 30
     },
     {
       "locationId": "cauldron",
-      "x": 74.5,
-      "y": 60
-    },
-    {
-      "locationId": "ironroot",
-      "x": 58.5,
-      "y": 83
+      "x": 55,
+      "y": 11
     },
     {
       "locationId": "undergrowth",
-      "x": 74.5,
-      "y": 83
+      "x": 64,
+      "y": 16
+    },
+    {
+      "locationId": "spell-and-sip",
+      "x": 55,
+      "y": 55
+    },
+    {
+      "locationId": "honeyed-bee-inn",
+      "x": 50,
+      "y": 76
+    },
+    {
+      "locationId": "boba-blossom",
+      "x": 62,
+      "y": 78
+    },
+    {
+      "locationId": "ironroot",
+      "x": 46,
+      "y": 93
+    },
+    {
+      "locationId": "pixel-and-rune",
+      "x": 58,
+      "y": 88
     },
     {
       "locationId": "market",
-      "x": 91,
-      "y": 14
+      "x": 72,
+      "y": 36
     },
     {
       "locationId": "bloom-and-co",
-      "x": 91,
-      "y": 37
+      "x": 70,
+      "y": 55
     },
     {
       "locationId": "lumen",
-      "x": 91,
-      "y": 60
+      "x": 85,
+      "y": 48
     },
     {
       "locationId": "riverside-park",
-      "x": 91,
-      "y": 83
+      "x": 85,
+      "y": 76
     }
-  ]
+  ],
+  "image": "generated/backgrounds/map/town.webp"
 }

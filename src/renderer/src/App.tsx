@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   acceptBond,
   ambienceAt,
+  attendEventPart,
   leaveTable,
   settlePokerHand,
   soundCues,
@@ -125,9 +126,22 @@ import {
   startOuting,
   type Outing,
   toDate,
-  travel
+  travel,
+  attendSociety,
+  locationOf,
+  societyOf,
+  fairNow,
+  visitFair,
+  helloIntro,
+  sayHello,
+  canTalkAtFair,
+  stopAtTable,
+  rivalryDue,
+  sawRivalry,
+  joinSociety,
+  societyPeople
 } from '../../shared/game'
-import type { Activity, ContentPack, ExamKind, GameState, PostPlan, Scene } from '../../shared/model'
+import { MAX_SCENE_CAST, type Activity, type ContentPack, type ExamKind, type GameState, type Intro, type PostPlan, type Scene } from '../../shared/model'
 import { CHAT_CANCELLED } from '../../shared/ipc'
 import { AUTO_SLOT_ID, type SaveData } from '../../shared/saves'
 import { errorMessage } from './errors'
@@ -141,11 +155,13 @@ import { AgeGate } from './ui/AgeGate'
 import { PhonePanel } from './ui/PhonePanel'
 import { HelpPanel } from './ui/HelpPanel'
 import { Bag } from './ui/Bag'
-import { HousePanel } from './ui/HousePanel'
+import { HouseView } from './ui/house/HouseView'
 import { ContentEditor } from './ui/editor/ContentEditor'
 import { CoursesView } from './ui/CoursesView'
 import { DayView } from './ui/DayView'
 import { Dialog, ToBeImplemented } from './ui/Dialog'
+import { FairView } from './ui/FairView'
+import { InterfaceTour } from './ui/InterfaceTour'
 import { MapPanel } from './ui/MapPanel'
 import { OutingDialog } from './ui/OutingDialog'
 import { ExamDialog } from './ui/ExamDialog'
@@ -242,9 +258,10 @@ interface GameProps {
   onExit: () => void
 }
 
-// Kept in the save once he has been shown round the course planner, and once he has been welcomed, so that each is shown once a game.
+// Kept in the save once he has been shown round the course planner, once he has been welcomed, and once he has been shown round his day, so that each is shown once a game.
 const COURSES_TOURED = 'toured-courses'
 const WELCOMED = 'welcomed'
+const INTERFACE_TOURED = 'toured-interface'
 
 // How long a toast stays up, and a notice shown as one.
 const TOAST_MS = 6000
@@ -723,12 +740,26 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     }
   }
 
-  /** Goes to the next part of orientation, which is a scene with whoever the player is put with. */
+  /** Goes to the next part of orientation, which is a scene with whoever the player is put with, after its cutscene if it has one. */
   function attendNext() {
     const result = attendOrientation(content, state)
     setState(result.state)
-    setScene(result.scene)
     setNotice('')
+    const begin = () => setScene(result.scene)
+    if (result.cutscene) setCutscene({ intro: result.cutscene, then: begin })
+    else begin()
+  }
+
+  // The cutscene a part of an event opens with, read before its scene begins.
+  const [cutscene, setCutscene] = useState<{ intro: Intro; then: () => void } | null>(null)
+  /** Goes to a part of an event: he is taken there, reads its cutscene if it has one, and its scene begins. */
+  function attendPart(eventId: string, partId: string) {
+    const result = attendEventPart(content, state, eventId, partId)
+    setState(result.state)
+    setNotice('')
+    const begin = () => setScene(result.scene)
+    if (result.cutscene) setCutscene({ intro: result.cutscene, then: begin })
+    else begin()
   }
 
   /** Has a word with someone who is here and is not a love interest. */
@@ -753,6 +784,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     }
     const there = arriveFor(worked, next)
     if (next.kind === 'class') attendClass(next.id, there, arrivedWith)
+    else if (next.kind === 'society') attendMeeting(next.id, there, arrivedWith)
     else if (next.kind === 'exam') sit(next.id, there)
     else if (next.kind === 'work') work(there)
     else keep(next.id, there)
@@ -822,6 +854,100 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     })
   }
 
+  /** Goes to a meeting of a society of his: with members of it there, the meeting is a scene with them. */
+  function attendMeeting(societyId: string, at: GameState = state, arrivedWith: string[] = []) {
+    const society = societyOf(content, societyId)
+    const after = attendSociety(content, at, societyId)
+    setState(after)
+    setNotice('')
+    if (!society) return
+    // Those of it who are there, and whoever came with him; the rest of the cast is left out, as in a class.
+    const there = societyPeople(society).filter((id) => locationOf(content, at, content.loveInterests.find((li) => li.id === id)!) === society.locationId)
+    const [leadId, ...companionIds] = [...new Set([...there, ...arrivedWith])].slice(0, MAX_SCENE_CAST)
+    if (!leadId) {
+      setNotice(`Nobody you know came to ${society.name} tonight.`)
+      return
+    }
+    setScene({
+      loveInterestId: leadId,
+      companionIds,
+      nsfw: false,
+      beats: [
+        {
+          activityName: `A meeting of ${society.name}`,
+          locationName: placeName(at),
+          description: society.description,
+          direction:
+            `This is the weekly meeting of ${society.name}, which ${at.player.name} has joined; it runs for an hour, and by the end of this ` +
+            `scene it is over and everyone is free to go.`
+        }
+      ],
+      messages: [],
+      societyId,
+      gifts: [], conceived: [], departed: [], npc: false,
+      baseline: sceneBaseline(at, leadId, companionIds)
+    })
+  }
+
+  /** Goes to the societies' fair: he is taken to it, and it counts as been to. */
+  function goToFair() {
+    const event = fairNow(content, state)
+    if (!event?.locationId) return
+    setState((current) => visitFair({ ...current, locationId: event.locationId!, inOwnRoom: false }))
+    setNotice('')
+    setPanel({ kind: 'fair' })
+  }
+
+  /** Says hello to someone at the fair: her few lines, read as a cutscene, and back to the fair. It takes no time. */
+  function sayHelloAtFair(id: string, societyId?: string) {
+    const intro = helloIntro(content, id)
+    const result = sayHello(content, state, id, societyId)
+    setState(result.state)
+    const gift = result.gift ? content.items.find((item) => item.id === result.gift)?.name : undefined
+    if (gift) setNotice(`You were given: ${gift}.`)
+    if (intro) setCutscene({ intro, then: () => undefined })
+  }
+
+  /** Stops to talk at the fair: an hour's scene with whoever is at the table, or with someone wandering it. */
+  function talkAtFair(ids: string[], societyId?: string) {
+    const society = societyOf(content, societyId ?? '')
+    const [leadId, ...companionIds] = ids.filter((id) => content.loveInterests.some((li) => li.id === id)).slice(0, MAX_SCENE_CAST)
+    if (!leadId || !canTalkAtFair(content, state, ids).ok) return
+    const stopped = society ? stopAtTable(content, state, society.id) : { state }
+    const at = { ...stopped.state, time: stopped.state.time + 1 }
+    setState(at)
+    setPanel(null)
+    setNotice(stopped.gift ? `You were given: ${content.items.find((item) => item.id === stopped.gift)?.name}.` : '')
+    setScene({
+      loveInterestId: leadId,
+      companionIds,
+      nsfw: false,
+      backgroundId: content.societies?.fairId,
+      beats: [
+        {
+          activityName: society ? `Stopping at the ${society.name.replace(/^the /, '')} table at the Societies Fair` : 'Talking at the Societies Fair',
+          locationName: placeName(at),
+          description: society?.description,
+          direction: society
+            ? `It is the Societies Fair. ${firstNames(content, [leadId, ...companionIds])} ${companionIds.length > 0 ? 'are' : 'is'} at the ${society.name.replace(/^the /, '')} table, signing up new members, and ${at.player.name} has stopped to talk. It lasts about an hour.`
+            : `It is the Societies Fair, and ${at.player.name} has stopped to talk. It lasts about an hour.`
+        }
+      ],
+      messages: [],
+      gifts: [], conceived: [], departed: [], npc: false,
+      baseline: sceneBaseline(state, leadId, companionIds)
+    })
+  }
+
+  // Once he has stopped at both of the rival tables, they come to him: their scene is read, once, at the fair.
+  useEffect(() => {
+    if (panel?.kind !== 'fair' || cutscene || scene) return
+    const intro = rivalryDue(content, state)
+    if (!intro) return
+    setState((current) => sawRivalry(current))
+    setCutscene({ intro, then: () => undefined })
+  }, [panel, cutscene, scene, state.flags])
+
   /** Clocks in for the shift that is under way: a scene at work, paid when it ends. */
   function work(at: GameState = state) {
     const result = startShift(content, at)
@@ -859,6 +985,22 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   }
 
   /** Turns the finished scene into a memory and shows what came of it. */
+  /**
+   * Ends a class or a shift at once, with no summary: nobody remembers it and nobody feels differently about him. The
+   * class's marks were earned as it began; a shift is paid now, as it would have been.
+   */
+  function skipScene() {
+    if (!scene || busy) return
+    const pay = shiftPay(content, state, scene)
+    setState(payShift(content, state, scene))
+    setSleepingOver(false)
+    setScene(null)
+    setEnded(false)
+    setLastPrompt('')
+    setNotice(pay > 0 ? `You were paid $${pay} for your shift.` : '')
+    setPanel(null)
+  }
+
   async function finishScene() {
     if (!scene || busy) return
     setBusy(true)
@@ -956,7 +1098,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   // table it does nothing, since leaving mid-hand would take back what he had put in.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape' || event.repeat || document.querySelector('.overlay, .lightbox, .poker')) return
+      if (event.key !== 'Escape' || event.repeat || document.querySelector('.overlay, .lightbox, .poker, .house-screen, .fair-screen, .tour')) return
       setPanel({ kind: 'menu' })
     }
     window.addEventListener('keydown', onKey)
@@ -981,6 +1123,16 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           state={state}
           intro={content.orientation.intro}
           onDone={() => setState((current) => ({ ...current, flags: { ...current.flags, [WELCOMED]: true } }))}
+        />
+      ) : cutscene ? (
+        <IntroView
+          content={content}
+          state={state}
+          intro={cutscene.intro}
+          onDone={() => {
+            cutscene.then()
+            setCutscene(null)
+          }}
         />
       ) : state.expedition.run ? (
         <ExpeditionView content={content} state={state} onChange={setState} />
@@ -1019,6 +1171,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           onDismissAside={() => setAside('')}
           ended={ended}
           onSend={send}
+          onSkip={skipScene}
           onNameChild={(name) => {
             // With no name given he keeps hers. Either way it is settled, and he is not asked again.
             const named = renameNewborn(content, state, scene, name)
@@ -1056,6 +1209,10 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       ) : isGameOver(content.calendar, state.time) ? (
         // The last day of the calendar is over: what became of him.
         <EpilogueView content={content} state={state} onExit={onExit} />
+      ) : panel?.kind === 'fair' ? (
+        <FairView content={content} state={state} onHello={sayHelloAtFair} onTalk={talkAtFair} onJoin={(id) => setState((current) => joinSociety(content, current, id))} onLeave={close} />
+      ) : panel?.kind === 'house' ? (
+        <HouseView content={content} state={state} onChange={applyUpdate} onClose={close} />
       ) : panel?.kind === 'poker' && content.poker ? (
         <PokerView
           content={content}
@@ -1067,26 +1224,34 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           }}
         />
       ) : (
-        <DayView
-          content={content}
-          state={state}
-          partnerId={partnerId}
-          backgroundId={backgroundId}
-          onActivity={doActivity}
-          onGoTo={goTo}
-          onEndDay={endDay}
-          onOrientation={attendNext}
-          onTalkNpc={talkNpc}
-          busy={busy}
-          onPropose={propose}
-          onOuting={setOuting}
-          onFocus={(focus) => applyUpdate((current) => setFocus(current, focus))}
-          onOpen={setPanel}
-        />
+        <>
+          <DayView
+            content={content}
+            state={state}
+            partnerId={partnerId}
+            backgroundId={backgroundId}
+            onActivity={doActivity}
+            onGoTo={goTo}
+            onEndDay={endDay}
+            onOrientation={attendNext}
+            onEventPart={attendPart}
+            onTalkNpc={talkNpc}
+            busy={busy}
+            onPropose={propose}
+            onOuting={setOuting}
+            onFocus={(focus) => applyUpdate((current) => setFocus(current, focus))}
+            onOpen={setPanel}
+          onFair={goToFair}
+          />
+          {/* The first time he sees his day, on the first day of the game, whoever welcomed him shows him round it. */}
+          {state.flags[WELCOMED] && !state.flags[INTERFACE_TOURED] && toDate(content.calendar, state.time).dayIndex === 0 && (
+            <InterfaceTour content={content} state={state} panel={panel} onOpen={setPanel} onDone={() => setState((current) => ({ ...current, flags: { ...current.flags, [INTERFACE_TOURED]: true } }))} />
+          )}
+        </>
       )}
 
       {panel?.kind === 'gifts' && scene && partner && (
-        <Dialog title="Your bag" onClose={close} sounds={['bagOpen', 'bagClose']}>
+        <Dialog title="Your bag" onClose={close} sounds={['bagOpen', 'bagClose']} ornate>
           <Bag
             content={content}
             state={state}
@@ -1104,7 +1269,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
 
       {/* Out of a scene, a thing is used on himself: what is for a woman waits until he is with her. */}
       {panel?.kind === 'bag' && !scene && (
-        <Dialog title="Your bag" onClose={close} sounds={['bagOpen', 'bagClose']}>
+        <Dialog title="Your bag" onClose={close} sounds={['bagOpen', 'bagClose']} ornate>
           <Bag content={content} state={state} onUseItem={(itemId) => setState((current) => useItem(content, current, itemId))} onAbility={(skillId) => setState((current) => useAbility(content, current, skillId))} />
         </Dialog>
       )}
@@ -1118,7 +1283,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       )}
 
       {panel?.kind === 'courier' && (
-        <PhonePanel content={content} state={state} onChange={applyUpdate} onClose={close} initialId={panel.id} onGoToInvite={scene || summary ? undefined : goToInvite} canAct={!scene && !summary} />
+        <PhonePanel content={content} state={state} onChange={applyUpdate} onClose={close} initialId={panel.id} app={panel.app} onGoToInvite={scene || summary ? undefined : goToInvite} canAct={!scene && !summary} />
       )}
       <div className="toasts">
       {!scene && notice && (
@@ -1223,11 +1388,11 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           onClose={close}
         />
       )}
-      {panel?.kind === 'house' && <HousePanel content={content} state={state} onChange={applyUpdate} onClose={close} />}
       {panel?.kind === 'map' && (
         <MapPanel
           content={content}
           state={state}
+          withHim={scene ? sceneCast(scene) : undefined}
           // In a scene, or while one is being summed up, the map is only to be looked at.
           onTravel={
             scene || summary

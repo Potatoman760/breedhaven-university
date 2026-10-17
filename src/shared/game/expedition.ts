@@ -48,6 +48,11 @@ export function belowOpen(content: ContentPack, state: Pick<GameState, 'time'>):
   return content.expedition !== undefined && toDate(content.calendar, state.time).dayIndex + 1 >= content.expedition.opensOnDay
 }
 
+/** Where the way down is, once it is open and he has been told of it: the place the map marks as more than it seems. */
+export function wayDownAt(content: ContentPack, state: Pick<GameState, 'time' | 'expedition'>): string | undefined {
+  return belowOpen(content, state) && state.expedition.invited ? content.expedition?.entryLocationId : undefined
+}
+
 /** The depths he can go to: every one he has cleared, and the next. */
 export function depthsOpen(content: ContentPack, state: Pick<GameState, 'expedition'>): number {
   return Math.min(state.expedition.cleared + 1, content.expedition?.depths.length ?? 0)
@@ -148,7 +153,8 @@ function arrive(content: ContentPack, state: GameState, run: ExpeditionRun): Exp
   if (node.kind === 'find') return { ...run, fight: undefined, done: true, found: add(run.found, node.finds), spoils: node.finds, note: `${node.name || 'Something left behind'}: ${describeFinds(content, node.finds)}.` }
   if (node.kind === 'checkpoint') {
     const rested = run.party.map((fighter) => ({ ...fighter, footing: Math.min(fighter.max, Math.round(fighter.footing + fighter.max * config.checkpointRest)) }))
-    return { ...run, fight: undefined, done: true, party: rested, banked: add(run.banked, run.found), found: NOTHING, note: `${node.name || 'A dry ledge'}. You catch your breath, and what you have found is safe.` }
+    const healed = Object.fromEntries(rested.map((fighter, index) => [fighter.id, fighter.footing - run.party[index].footing]))
+    return { ...run, fight: undefined, done: true, party: rested, banked: add(run.banked, run.found), found: NOTHING, rest: { healed, secured: run.found }, note: `${node.name || 'A dry ledge'}. You catch your breath, and what you have found is safe.` }
   }
   const foes: Foe[] = node.enemyIds.map((enemyId, index) => {
     const enemy = config.enemies.find((one) => one.id === enemyId)!
@@ -188,7 +194,7 @@ export function startRun(content: ContentPack, state: GameState, partyIds: strin
 export function goOn(content: ContentPack, state: GameState): GameState {
   const run = state.expedition.run
   if (!run || !run.done || run.over) return state
-  return { ...state, expedition: { ...state.expedition, run: arrive(content, state, { ...run, node: run.node + 1, spoils: undefined }) } }
+  return { ...state, expedition: { ...state.expedition, run: arrive(content, state, { ...run, node: run.node + 1, spoils: undefined, rest: undefined }) } }
 }
 
 /** Something one of the party can do on her turn, and whether she can do it now. */

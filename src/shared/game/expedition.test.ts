@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { ExpeditionConfigSchema, HIM, PregnancyConfigSchema, validateContentPack, type ContentPack, type Course, type ExpeditionRun, type GameState } from '../model'
-import { act, canGoBelow, comeUp, depthsOpen, goOn, partyChoices, pregnancyPower, relicsHeld, runReport, startRun, turnActions, turnBack, turnOf } from './expedition'
+import { act, canGoBelow, comeUp, depthsOpen, goOn, partyChoices, pregnancyPower, relicsHeld, runReport, startRun, turnActions, turnBack, turnOf, wayDownAt } from './expedition'
 import { playOut } from './expeditionPolicy'
 import { factor } from './modifiers'
 import { meet } from './scene'
@@ -66,6 +66,13 @@ const below = (party: string[] = ['ana', 'bea'], from: GameState = start, depthI
 const run = (state: GameState): ExpeditionRun => state.expedition.run!
 const fighter = (state: GameState, id: string) => run(state).party.find((one) => one.id === id)!
 const carrying = (state: GameState, id: string, progress: number): GameState => ({ ...state, pregnancies: { [id]: { conceivedAt: 0, dueAt: Math.round(state.time / progress) || 100 } } })
+
+describe('where the way down is', () => {
+  it('is marked once he has been told of it', () => {
+    expect(wayDownAt(content, start)).toBe('shop')
+    expect(wayDownAt(content, { ...start, expedition: { ...start.expedition, invited: false } })).toBeUndefined()
+  })
+})
 
 describe('who can come below', () => {
   it('is those he has met who have a part to play, trust him, and are not near their time', () => {

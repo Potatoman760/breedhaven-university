@@ -284,8 +284,8 @@ describe('what is told of his training', () => {
 
 describe('going to an event', () => {
   // The fixture's game starts at 06:00 on 2 a. A fair at home from 08:00 for six hours, on that day and the next.
-  const fair = { id: 'fair', name: 'the Fair', description: 'Stalls and cider.', month: 'a', day: 2, durationDays: 2, locationId: 'home', startHour: 8, hours: 6, noClasses: false, generated: false }
-  const holiday = { id: 'rest', name: 'Rest Day', description: '', month: 'a', day: 2, durationDays: 1, noClasses: true, generated: false }
+  const fair = { id: 'fair', name: 'the Fair', description: 'Stalls and cider.', month: 'a', day: 2, durationDays: 2, locationId: 'home', startHour: 8, hours: 6, noClasses: false, generated: false, program: [], secret: false }
+  const holiday = { id: 'rest', name: 'Rest Day', description: '', month: 'a', day: 2, durationDays: 1, noClasses: true, generated: false, program: [], secret: false }
   const fairground = { ...content, calendar: { ...content.calendar, events: [fair, holiday] } }
   const at = (time: number) => ({ ...state, time })
 
@@ -327,7 +327,7 @@ describe('being in his own room', () => {
 
 describe('someone who said she would be at an event', () => {
   // A fair at the shop from 08:00 for six hours, on the day the game starts.
-  const fair = { id: 'fair', name: 'the Fair', description: 'Stalls and cider.', month: 'a', day: 2, durationDays: 1, locationId: 'shop', startHour: 8, hours: 6, noClasses: false, generated: false }
+  const fair = { id: 'fair', name: 'the Fair', description: 'Stalls and cider.', month: 'a', day: 2, durationDays: 1, locationId: 'shop', startHour: 8, hours: 6, noClasses: false, generated: false, program: [], secret: false }
   const fairground = { ...content, calendar: { ...content.calendar, events: [fair] } }
   const open = { ...state, time: 3 }
 
@@ -363,7 +363,7 @@ describe('someone who said she would be at an event', () => {
 })
 
 describe('something typed that is going to an event', () => {
-  const fair = { id: 'fair', name: 'the Fair', description: 'Stalls.', month: 'a', day: 2, durationDays: 1, locationId: 'shop', startHour: 8, hours: 6, noClasses: false, generated: false }
+  const fair = { id: 'fair', name: 'the Fair', description: 'Stalls.', month: 'a', day: 2, durationDays: 1, locationId: 'shop', startHour: 8, hours: 6, noClasses: false, generated: false, program: [], secret: false }
   const fairground = { ...content, calendar: { ...content.calendar, events: [fair] } }
 
   it('keeps the hours of the event, and is told once who it is with', () => {
@@ -385,9 +385,11 @@ describe('how long something takes', () => {
     const talk = { title: 'Talk', description: '', withIds: ['ana'], locationId: 'home', hours: 2 }
     expect(outingHourRange(state, talk)).toEqual({ min: 1, max: 4 })
     expect(outingHourRange(state, { ...talk, trains: 'rest' as const })).toEqual({ min: 1, max: 8 })
-    // A session of study and a drill are as long as they are.
-    expect(outingHourRange(state, { ...talk, studyCourseId: 'c1' })).toBeUndefined()
-    expect(outingHourRange(state, { ...talk, withIds: [], dropIn: true, trains: 'strength' as const })).toBeUndefined()
+    // A session of study and a drill can be made longer than they are, not shorter.
+    expect(outingHourRange(state, { ...talk, studyCourseId: 'c1' })).toEqual({ min: 2, max: 8 })
+    expect(outingHourRange(state, { ...talk, withIds: [], dropIn: true, trains: 'strength' as const })).toEqual({ min: 2, max: 8 })
+    // Something else dropped in on is as long as it is.
+    expect(outingHourRange(state, { ...talk, withIds: [], dropIn: true })).toBeUndefined()
   })
 })
 

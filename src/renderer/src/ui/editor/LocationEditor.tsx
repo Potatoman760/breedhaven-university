@@ -362,7 +362,13 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
               return (
                 <div key={view.id} className="outfit card">
                   <div className="row">
-                    <Text label="Name" value={view.name} disabled={isDefault} onChange={(name) => changeView(view.id, (v) => ({ ...v, name }))} />
+                    <Text
+                      label="Name"
+                      value={view.name}
+                      disabled={isDefault}
+                      onChange={(name) => changeView(view.id, (v) => ({ ...v, name }))}
+                      hint={isDefault ? undefined : content.calendar.events.some((event) => event.name.toLowerCase() === view.name.trim().toLowerCase() || event.id === view.id) ? 'Shown all day while that event is on.' : 'Named after an event, it is shown all day while the event is on.'}
+                    />
                     <label>
                       Under a roof
                       <select

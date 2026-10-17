@@ -1,4 +1,6 @@
 import { useEffect, useLayoutEffect, useState, type CSSProperties } from 'react'
+import { createPortal } from 'react-dom'
+import { Portrait } from './Portrait'
 import type { LoveInterest } from '../../../shared/model'
 import { Button } from './Button'
 
@@ -10,6 +12,9 @@ export interface TourStep {
   expression?: string
   /** Done as the step begins, to bring what it points at onto the screen. */
   before?: () => void
+  /** The player does it himself: what she points at can be pressed, and the tour goes on once `done` is true. */
+  waits?: boolean
+  done?: boolean
 }
 
 // How big she is, and the room her bubble takes beside her, so that she can be put where both fit.
@@ -20,6 +25,8 @@ const MARGIN = 16
 // How long the last step stays up before she goes.
 const FAREWELL_MS = 2200
 const LEAVE_MS = 400
+// Long enough for a window opened by a step to have finished opening.
+const SETTLE_MS = 500
 
 /**
  * A guided tour of a screen: a character pops up beside one part of it after another, rings it, and says what it is
@@ -44,9 +51,12 @@ export function Tour({ guide, steps, onDone }: { guide: LoveInterest; steps: Tou
       if (step.target) document.querySelector(step.target)?.scrollIntoView({ block: 'nearest' })
       frame = requestAnimationFrame(measure)
     })
+    // A window it has just opened may still be settling into place: found again once it has.
+    const settled = window.setTimeout(measure, SETTLE_MS)
     window.addEventListener('resize', measure)
     return () => {
       cancelAnimationFrame(frame)
+      window.clearTimeout(settled)
       window.removeEventListener('resize', measure)
     }
   }, [index])
@@ -56,6 +66,10 @@ export function Tour({ guide, steps, onDone }: { guide: LoveInterest; steps: Tou
     window.setTimeout(onDone, LEAVE_MS)
   }
   const next = () => (last ? finish() : setIndex(index + 1))
+  // A step he does himself is over once it is done.
+  useEffect(() => {
+    if (step.waits && step.done) next()
+  }, [step.waits, step.done, index])
 
   useEffect(() => {
     if (!last) return
@@ -74,16 +88,12 @@ export function Tour({ guide, steps, onDone }: { guide: LoveInterest; steps: Tou
   const sprite = (outfit?.sprites[step.expression ?? 'neutral'] ?? outfit?.sprites['neutral'])?.image
   const { place, flip } = placeBeside(rect)
 
-  return (
-    <div className={leaving ? 'tour leaving' : 'tour'} onClick={next}>
+  // Put over everything, dialogs it opens included, whatever screen it is started from.
+  return createPortal(
+    <div className={['tour', leaving && 'leaving', step.waits && 'waiting'].filter(Boolean).join(' ')} onClick={step.waits ? undefined : next}>
       <div className={rect ? 'tour-ring' : 'tour-ring none'} style={rect ? { left: rect.left - 6, top: rect.top - 6, width: rect.width + 12, height: rect.height + 12 } : undefined} />
       <div key={index} className={flip ? 'tour-guide flip' : 'tour-guide'} style={place}>
-        <div
-          className="tour-face"
-          role="img"
-          aria-label={guide.name}
-          style={sprite ? { backgroundImage: `url("content://pack/${sprite}")`, backgroundPosition: `50% ${guide.faceY}%` } : undefined}
-        />
+        <Portrait who={guide} image={sprite} size={172} className="tour-face" />
         <div className="tour-bubble">
           <p>{step.text}</p>
           {!last && (
@@ -91,14 +101,17 @@ export function Tour({ guide, steps, onDone }: { guide: LoveInterest; steps: Tou
               <Button variant="quiet" size="small" onClick={(event) => (event.stopPropagation(), finish())}>
                 Skip
               </Button>
-              <Button size="small" onClick={(event) => (event.stopPropagation(), next())}>
-                {index === steps.length - 2 ? 'Got it' : 'Next'}
-              </Button>
+              {!step.waits && (
+                <Button size="small" onClick={(event) => (event.stopPropagation(), next())}>
+                  {index === steps.length - 2 ? 'Got it' : 'Next'}
+                </Button>
+              )}
             </div>
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   )
 }
 
