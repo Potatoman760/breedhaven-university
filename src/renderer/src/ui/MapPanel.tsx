@@ -4,7 +4,8 @@ import type { ContentPack, GameState, Location, MapPin } from '../../../shared/m
 import { Button } from './Button'
 import { Dialog, Overlay, ToBeImplemented } from './Dialog'
 import { GrandButton } from './GrandButton'
-import { BackIcon, PlaceIcon } from './icons'
+import { PlaceIcon } from './icons'
+import { BackButton } from './BackButton'
 import { Ornate } from './Ornate'
 import { Portrait } from './Portrait'
 import { settle } from './pinLayout'
@@ -86,7 +87,7 @@ export function MapPanel({ content, state, onTravel, withHim = [], onClose }: Pr
           <span className="map-medallion" title={portal ? `${location.name}: the way down into ${content.expedition?.name}` : location.name}>
             {/* The way down: a ring of runes turning around it. */}
             {portal && <span className="map-runes" aria-hidden="true" />}
-            <PlaceIcon name={location.icon} size={20} />
+            <PlaceIcon name={location.icon} image={location.iconImage} size={20} />
           </span>
           <span className="map-plate">{placeName(location)}</span>
           {portal && <span className="map-below">{content.expedition?.name.replace(/^the /, '')}</span>}
@@ -160,7 +161,7 @@ export function MapPanel({ content, state, onTravel, withHim = [], onClose }: Pr
               const people = peopleAt(location.id)
               return (
                 <div key={location.id} className="map-off">
-                  <PlaceIcon name={location.icon} size={18} />
+                  <PlaceIcon name={location.icon} image={location.iconImage} size={18} />
                   <strong>{location.name}</strong>
                   <span className="map-faces">
                     {people.map((li) => (
@@ -174,7 +175,7 @@ export function MapPanel({ content, state, onTravel, withHim = [], onClose }: Pr
           </Ornate>
         )}
 
-        <GrandButton label="Close" icon={<BackIcon size={22} />} chevron={false} className="map-close" onClick={onClose} />
+        <BackButton className="map-close pin-keepout" onClick={onClose} />
       </div>
     </Overlay>
   )

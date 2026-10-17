@@ -125,7 +125,8 @@
         "frostveil": 18,
         "deepwinter": 20,
         "icebreak": 22
-      }
+      },
+      "iconImage": "sprites/icons/weather-clear-cutout.png"
     },
     {
       "id": "overcast",
@@ -146,7 +147,8 @@
         "frostveil": 32,
         "deepwinter": 30,
         "icebreak": 30
-      }
+      },
+      "iconImage": "sprites/icons/weather-overcast-cutout.png"
     },
     {
       "id": "drizzle",
@@ -167,7 +169,8 @@
         "frostveil": 14,
         "deepwinter": 8,
         "icebreak": 10
-      }
+      },
+      "iconImage": "sprites/icons/weather-drizzle-cutout.png"
     },
     {
       "id": "downpour",
@@ -188,7 +191,8 @@
         "frostveil": 4,
         "deepwinter": 2,
         "icebreak": 2
-      }
+      },
+      "iconImage": "sprites/icons/weather-downpour-cutout.png"
     },
     {
       "id": "windy",
@@ -209,7 +213,8 @@
         "frostveil": 8,
         "deepwinter": 8,
         "icebreak": 10
-      }
+      },
+      "iconImage": "sprites/icons/weather-windy-cutout.png"
     },
     {
       "id": "mist",
@@ -229,7 +234,8 @@
         "frostveil": 8,
         "deepwinter": 6,
         "icebreak": 6
-      }
+      },
+      "iconImage": "sprites/icons/weather-mist-cutout.png"
     },
     {
       "id": "snow",
@@ -243,7 +249,8 @@
         "frostveil": 16,
         "deepwinter": 26,
         "icebreak": 20
-      }
+      },
+      "iconImage": "sprites/icons/weather-snow-cutout.png"
     },
     {
       "id": "heat",
@@ -257,7 +264,8 @@
         "highsun": 18,
         "goldenhay": 14,
         "emberfall": 2
-      }
+      },
+      "iconImage": "sprites/icons/weather-heat-cutout.png"
     }
   ],
   "events": [

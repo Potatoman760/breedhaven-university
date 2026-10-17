@@ -50,6 +50,7 @@ import {
   joinedSocieties,
   fairNow,
   fairDue,
+  fairOpensLater,
   societyMeetingNow
 } from '../../../shared/game'
 import { MAX_SCENE_CAST, STAT_LABELS, STATS, type Activity, type ContentPack, type Focus, type GameState } from '../../../shared/model'
@@ -59,6 +60,7 @@ import { DateBanner } from './DateBanner'
 import { NavTiles } from './NavTiles'
 import { ChevronIcon } from './icons'
 import type { Panel } from './panels'
+import { useBack } from '../mouseBack'
 
 interface Props {
   content: ContentPack
@@ -102,6 +104,7 @@ export function DayView(props: Props) {
   const [statSheet, setStatSheet] = useState(false)
   // The course picked to study for; an empty string while the list of courses is open, and null with the menu shut.
   const [studying, setStudying] = useState<string | null>(null)
+  useBack(studying === null ? undefined : () => setStudying(studying === '' ? null : ''))
   const date = toDate(calendar, state.time)
   const location = content.locations.find((l) => l.id === state.locationId)
   const today = eventsOn(content, state).filter((event) => !event.secret)
@@ -115,8 +118,9 @@ export function DayView(props: Props) {
   // The courses he takes, and the one he has picked to study for (empty while he is still choosing; null with the menu shut).
   const mine = state.courses.filter((c) => state.enrolment?.includes(c.id))
   const studied = mine.find((c) => c.id === studying)
-  // The societies' fair, while its tables are out.
-  const fair = fairNow(content, state)
+  // The societies' fair, while its tables are out, or later today.
+  const later = fairOpensLater(content, state)
+  const fair = fairNow(content, state) ?? later?.event
   // The meetings of his societies that are on right now.
   const meetings = joinedSocieties(content, state).filter((society) => societyMeetingNow(content, state, society))
   // The shift of his that is under way, if he has not clocked in for it.
@@ -378,7 +382,8 @@ export function DayView(props: Props) {
             <span className="chip outline-light">{fairCall ? 'Event' : 'Societies'}</span>
             <span className="featured-title">{fairCall ? `Go to ${fair.name}` : 'Browse the societies'}</span>
             <span>
-              {content.locations.find((l) => l.id === fair.locationId)?.name} · {state.societies.length} of {content.societies?.maxJoined} joined
+              {content.locations.find((l) => l.id === fair.locationId)?.name} ·{' '}
+              {later ? `opens ${String(fair.startHour ?? 0).padStart(2, '0')}:00` : `${state.societies.length} of ${content.societies?.maxJoined} joined`}
             </span>
             <ChevronIcon size={18} />
           </button>

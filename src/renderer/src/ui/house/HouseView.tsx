@@ -208,7 +208,6 @@ export function HouseView({ content, state, onChange, onClose }: Props) {
             onChange((s) => goToRoom(content, s, room.key))
             onClose()
           }}
-          onClose={() => setPicked(undefined)}
         />
       )}
 
@@ -295,11 +294,10 @@ interface RoomCardProps {
   onBuild: () => void
   onInvite: (id: string) => void
   onGo: () => void
-  onClose: () => void
 }
 
 /** The room picked: its picture, what it is and adds, who is in it, and what can be done with it. */
-function RoomCard({ content, state, config, room, image, atHome, onBuild, onInvite, onGo, onClose }: RoomCardProps) {
+function RoomCard({ content, state, config, room, image, atHome, onBuild, onInvite, onGo }: RoomCardProps) {
   const tier = builtTier(state, room.key)
   const work = nextWork(config, state, room.key, factor(content, state, 'build'))
   const check = canBuild(content, state, room.key)
@@ -321,9 +319,6 @@ function RoomCard({ content, state, config, room, image, atHome, onBuild, onInvi
     <Ornate className="house-card">
       <div className="house-card-picture">
         {image ? <img src={`content://pack/${image}`} alt={room.name} className={tier < 1 ? 'locked' : undefined} /> : <div className="room-blank" />}
-        <Button variant="quiet" size="small" className="house-card-close" title="Close" onClick={onClose}>
-          ×
-        </Button>
       </div>
       <h2>{room.name}</h2>
       {tier < 1 && <span className="caps">Not built yet</span>}

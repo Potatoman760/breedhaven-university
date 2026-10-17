@@ -47,7 +47,7 @@ export function meetingTool(
       (together
         ? `It is for another time only: it books something on the calendar and nobody goes anywhere. ` +
           `For going somewhere together right now, call move_scene and not this. They are never both called for the same thing: ` +
-          `"let's go and get a coffee" is move_scene alone, "coffee on Friday?" is this alone.`
+          `"let's go and get a coffee" is move_scene alone, "coffee on Hearthday?" is this alone.`
         : `You are writing to each other, not together, so this is the only way anything is arranged: call it for any meeting, ` +
           `whether for later today ("come over now", "see you in an hour": ask for "today") or for another day. ` +
           `Agreeing to meet without calling it puts nothing on ${player}'s calendar.`),

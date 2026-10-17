@@ -27,7 +27,8 @@
           "startHour": 8,
           "hours": 6
         }
-      ]
+      ],
+      "iconImage": "sprites/icons/jobs-market-stallhand-cutout.png"
     },
     {
       "id": "commons-kitchen",
@@ -55,7 +56,8 @@
           "startHour": 8,
           "hours": 4
         }
-      ]
+      ],
+      "iconImage": "sprites/icons/jobs-commons-kitchen-cutout.png"
     },
     {
       "id": "halls-desk",
@@ -83,7 +85,8 @@
           "startHour": 18,
           "hours": 3
         }
-      ]
+      ],
+      "iconImage": "sprites/icons/jobs-halls-desk-cutout.png"
     },
     {
       "id": "store-tills",
@@ -116,7 +119,8 @@
           "startHour": 13,
           "hours": 4
         }
-      ]
+      ],
+      "iconImage": "sprites/icons/jobs-store-tills-cutout.png"
     },
     {
       "id": "lumen-usher",
@@ -144,7 +148,8 @@
           "startHour": 18,
           "hours": 4
         }
-      ]
+      ],
+      "iconImage": "sprites/icons/jobs-lumen-usher-cutout.png"
     },
     {
       "id": "bathhouse-attendant",
@@ -174,7 +179,8 @@
           "startHour": 8,
           "hours": 4
         }
-      ]
+      ],
+      "iconImage": "sprites/icons/jobs-bathhouse-attendant-cutout.png"
     },
     {
       "id": "boba-maker",
@@ -204,7 +210,8 @@
           "startHour": 18,
           "hours": 4
         }
-      ]
+      ],
+      "iconImage": "sprites/icons/jobs-boba-maker-cutout.png"
     },
     {
       "id": "garden-hand",
@@ -229,7 +236,8 @@
           "startHour": 8,
           "hours": 5
         }
-      ]
+      ],
+      "iconImage": "sprites/icons/jobs-garden-hand-cutout.png"
     },
     {
       "id": "library-page",
@@ -264,7 +272,8 @@
           "startHour": 9,
           "hours": 3
         }
-      ]
+      ],
+      "iconImage": "sprites/icons/jobs-library-page-cutout.png"
     },
     {
       "id": "arcade-floor",
@@ -299,7 +308,8 @@
           "startHour": 18,
           "hours": 4
         }
-      ]
+      ],
+      "iconImage": "sprites/icons/jobs-arcade-floor-cutout.png"
     },
     {
       "id": "barista",
@@ -335,7 +345,8 @@
           "startHour": 8,
           "hours": 4
         }
-      ]
+      ],
+      "iconImage": "sprites/icons/jobs-barista-cutout.png"
     },
     {
       "id": "armoury-assistant",
@@ -360,7 +371,8 @@
           "startHour": 13,
           "hours": 6
         }
-      ]
+      ],
+      "iconImage": "sprites/icons/jobs-armoury-assistant-cutout.png"
     },
     {
       "id": "bar-staff",
@@ -396,7 +408,8 @@
           "startHour": 18,
           "hours": 4
         }
-      ]
+      ],
+      "iconImage": "sprites/icons/jobs-bar-staff-cutout.png"
     },
     {
       "id": "clinic-reception",
@@ -432,7 +445,8 @@
           "startHour": 9,
           "hours": 4
         }
-      ]
+      ],
+      "iconImage": "sprites/icons/jobs-clinic-reception-cutout.png"
     },
     {
       "id": "gym-floor",
@@ -468,7 +482,8 @@
           "startHour": 8,
           "hours": 3
         }
-      ]
+      ],
+      "iconImage": "sprites/icons/jobs-gym-floor-cutout.png"
     },
     {
       "id": "club-door",
@@ -499,7 +514,8 @@
           "startHour": 20,
           "hours": 4
         }
-      ]
+      ],
+      "iconImage": "sprites/icons/jobs-club-door-cutout.png"
     },
     {
       "id": "waiter",
@@ -535,7 +551,8 @@
           "startHour": 18,
           "hours": 4
         }
-      ]
+      ],
+      "iconImage": "sprites/icons/jobs-waiter-cutout.png"
     },
     {
       "id": "foundry-technician",
@@ -566,7 +583,8 @@
           "startHour": 18,
           "hours": 4
         }
-      ]
+      ],
+      "iconImage": "sprites/icons/jobs-foundry-technician-cutout.png"
     },
     {
       "id": "research-assistant",
@@ -592,7 +610,8 @@
           "startHour": 9,
           "hours": 4
         }
-      ]
+      ],
+      "iconImage": "sprites/icons/jobs-research-assistant-cutout.png"
     }
   ]
 }

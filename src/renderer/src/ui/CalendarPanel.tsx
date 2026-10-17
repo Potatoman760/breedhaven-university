@@ -3,8 +3,8 @@ import { dayAgenda, dayIndexOf, eventHours, eventsOn, removeEvent, toDate, upcom
 import type { ContentPack, GameState } from '../../../shared/model'
 import { Button } from './Button'
 import { Dialog } from './Dialog'
-import { GrandButton } from './GrandButton'
-import { BackIcon, ChevronIcon } from './icons'
+import { BackButton } from './BackButton'
+import { ChevronIcon } from './icons'
 import { Portrait } from './Portrait'
 
 // How far ahead the "Coming up" list looks: the week ahead, and no further.
@@ -328,8 +328,8 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
             </div>
           ))}
           {upcomingEvents(content, state, UPCOMING_DAYS).length === 0 && <p className="hint">Nothing in the next {UPCOMING_DAYS} days.</p>}
-          {/* The way out, at the foot of this column, level with the foot of the calendar. */}
-          <GrandButton label="Close" icon={<BackIcon size={22} />} chevron={false} className="calendar-close" onClick={onClose} />
+          {/* The way out, at the foot of this column: the bottom left corner, as on every main screen. */}
+          <BackButton className="calendar-close" onClick={onClose} />
         </div>
       </div>
     </Dialog>

@@ -210,7 +210,12 @@ and the trait library.
   with keys encrypted by the OS keychain where available. Keys never reach the renderer.
 - **Scenes** start with an activity shared with a love interest. The character ends the
   scene from within the conversation: the prompt tells the LLM to finish its parting line
-  with `[END SCENE]` when the player says goodbye or the moment has run its course. The
+  with `[END SCENE]` when the player says goodbye or the moment has run its course. Left
+  to itself a model never ends one, so once a scene has run past its usual length in the
+  player's turns (`SCENE_LENGTHS` in `src/shared/game/windDown.ts`: a class 12, a shift 8, a
+  society meeting 10, a date 16, anything else 8) the prompt asks her to find a reason to
+  go within a reply or two, naming her class if she has one within two hours. It does not
+  while a sex-act is up, while she is at comfort 5, or at a birth. The
   tag is stripped, the player presses Continue, and a summary screen shows what changed
   for the player, how the relationship moved, and the memory that was kept. Each memory is
   in a text box on that screen: the player can reword it, or clear it so that nothing is
@@ -704,8 +709,10 @@ and the trait library.
   she belongs to two, and a few `visitors` wander it; they are at the fair on the map. Its first day holds his day as
   orientation does (`fairDue`) until he has been. The fair is a screen laid out as the town map is, over the Great
   Court's view whose id is the fair's (also its backdrop while it is on): a panel per table with who is at it now, Join,
-  and Talk, an hour's scene at the table. Saying hello is free: her `hellos` lines are read as a cutscene, it counts as
-  meeting her, she keeps a fleeting memory of it, and it is said once. Stopping at a table the first time gives its
+  and Talk, an hour's scene at the table. Saying hello is free: `hellos` holds, per booth (a society's id or a visitor's),
+  a written exchange for each company that stands at it (`boothHello` picks the one for whoever is there), read as a
+  cutscene. It counts as meeting them, each keeps a fleeting memory of a first meeting, and a booth's hello is said
+  once by each who stands at it; a test checks every company at a table during the fair has one. Stopping at a table the first time gives its
   `gift`. Once he has stopped at both `rivalry` tables (Bloomist and Freewill) their scene is read, once.
 - **The lecture**: a class scene opens with the teacher teaching. The first reply of a
   class is asked for with a prompt of its own (`lessonCue` in `src/shared/game/prompt.ts`):

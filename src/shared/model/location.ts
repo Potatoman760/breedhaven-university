@@ -47,6 +47,8 @@ export const LocationSchema = z.object({
   id: z.string(),
   /** The picture beside it on the map, by name: "book", "coffee", "bed". Left out, a map pin. */
   icon: z.string().optional(),
+  /** Its emblem: a picture in the pack, shown in place of the drawn icon. */
+  iconImage: z.string().optional(),
   name: z.string(),
   /** Told to the LLM in a scene there: what the place is, what goes on in it, and what a scene can draw on. */
   description: z.string().default(''),

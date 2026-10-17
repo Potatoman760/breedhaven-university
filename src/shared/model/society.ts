@@ -20,7 +20,9 @@ export const SocietySchema = z.object({
   /** The students who belong to it. */
   memberIds: z.array(z.string()).default([]),
   /** The teacher who sponsors it: at its meetings and its table at the fair, but not one of its members. */
-  sponsorId: z.string().optional()
+  sponsorId: z.string().optional(),
+  /** Its emblem: a picture in the pack, shown in place of the drawn icon. */
+  iconImage: z.string().optional()
 })
 export type Society = z.infer<typeof SocietySchema>
 
@@ -35,8 +37,11 @@ const SpotSchema = z.object({ x: z.number().min(0).max(100), y: z.number().min(0
 export const SocietiesFairSchema = z.object({
   tables: z.array(SpotSchema.extend({ societyId: z.string(), gift: z.string().optional() })),
   visitors: z.array(SpotSchema.extend({ id: z.string() })).default([]),
-  /** By who says them: a few lines, read as a cutscene is, in which she says hello. */
-  hellos: z.record(z.string(), z.array(z.string()).min(1)),
+  /**
+   * By booth (a society's id, or a visitor's): the hello read there as a cutscene, one for each company that stands at
+   * it, since the students take turns at their tables. Lines start with the speaker's name or are *narration*.
+   */
+  hellos: z.record(z.string(), z.array(z.object({ cast: z.array(z.string()).min(1), lines: z.array(z.string()).min(1) })).min(1)),
   rivalry: z.object({ societyIds: z.tuple([z.string(), z.string()]), intro: IntroSchema }).optional()
 })
 export type SocietiesFair = z.infer<typeof SocietiesFairSchema>

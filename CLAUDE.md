@@ -24,6 +24,7 @@ Run `npm run typecheck` and `npm test` after every change and say what they repo
 | `build-catalogue.ts` | Lay out the term again after a character is added or changes what she reads or teaches. `--dry` to preview. |
 | `prompt-size.ts` | Size of the opening scene prompt per character; `<id> --print` dumps it; `--class <courseId>` shows a lecture's opening instruction. |
 | `make-test-save.ts` | Write a late-game save to a slot (`8` by default) for trying the house, births and skills. Needs `--force` to overwrite. |
+| `generate-icons.ts` | Paint the emblems shown in place of drawn icons for jobs, places, societies, stalls, weather and Undercroft stops (`npm run icons`, `-- <group or id>`, `--overwrite`, `--dry`). Run it after adding one. |
 | `generate-clips.ts`, `generate-births.ts` | Batch media generation through the user's ComfyUI (`npm run clips`, `npm run births`). Long-running. |
 
 ## Layout

@@ -100,7 +100,7 @@ export function buildSummaryPrompt(input: SummaryInput): { system: string; user:
             : '- "learned": always [].',
           ...unknown.map((fact) => `  - ${fact.id}: ${fact.telling}`),
           group &&
-            `- "rapport": how ${name} now stands with any of the others, only where this scene truly changed it: a quarrel that will not be forgotten, a peace made, a friendship struck up. ` +
+            `- "rapport": how ${name} stands with any of the others where this scene truly changed it from how they stood before (said below): a quarrel that will not be forgotten, a peace made, a friendship struck up. ` +
               `Not for a passing mood or one sharp remark; [] when nothing changed. Each entry: "with" is one of ${otherIds.join(', ')}, and "relation" is one of ${RELATIONS.join(', ')}.`
         ]
       : [])
@@ -127,6 +127,14 @@ export function buildSummaryPrompt(input: SummaryInput): { system: string; user:
         li.admires.length > 0 ? `- She is drawn to ${li.admires.join(' and ')} in a man. ${describeAppeal(state, li).join(' ') || `${player} is ordinary in that so far.`}` : '',
         `- With ${player} she is at the stage "${stageFor(content.relationships, rel.affection).name}": affection ${rel.affection}, trust ${rel.trust}, desire ${rel.desire}, each of ${max}.`,
         ...describeBonds(content, state, forId, otherIds).map((line) => `- ${line}`),
+        // How she stood with each of the others before this scene, so that what changed is told from what did not.
+        ...(group
+          ? otherIds.map((id) => {
+              const relation = relationBetween(state, forId, id)
+              const other = firstNames(content, [id])
+              return `- Before this scene she and ${other} were ${relation === 'neither' ? 'neither friends nor enemies' : relation}.`
+            })
+          : []),
         comfort ? `- By the end she put how much she wanted to be there at ${comfort.level} of 5${comfort.reason ? `: ${comfort.reason}` : ''}.` : '',
         ''
       ].filter((line, i, all) => line !== '' || i === all.length - 1)
@@ -236,18 +244,21 @@ export function sceneRevelations(content: ContentPack, state: GameState, said: {
 
 /**
  * How those in a scene now stand with each other, from what each one's summary said had changed: only between two
- * who were both there, only a change from how they stood, and one verdict for each pair, the first given.
+ * who were both there, only a change from how they stood, and only where both of them say the same. One summary on
+ * its own does not end a feud or make a friend.
  */
 export function sceneRapport(state: GameState, presentIds: string[], said: { id: string; rapport: { with: string; relation: string }[] }[]): { a: string; b: string; relation: Relation }[] {
+  // What each said of each other one: her verdict on the pair, the first she gave.
+  const verdict = (id: string, other: string): Relation | undefined => {
+    const entry = said.find((one) => one.id === id)?.rapport.find((one) => presentIds.find((present) => present.toLowerCase() === one.with) === other)
+    return RELATIONS.find((r) => r === entry?.relation)
+  }
   const changes: { a: string; b: string; relation: Relation }[] = []
-  for (const { id, rapport } of said) {
-    for (const entry of rapport) {
-      const other = presentIds.find((present) => present.toLowerCase() === entry.with)
-      const relation = RELATIONS.find((r) => r === entry.relation)
-      if (!other || other === id || !presentIds.includes(id) || !relation) continue
-      if (relationBetween(state, id, other) === relation) continue
-      if (changes.some((c) => (c.a === id && c.b === other) || (c.a === other && c.b === id))) continue
-      changes.push({ a: id, b: other, relation })
+  for (const [i, a] of presentIds.entries()) {
+    for (const b of presentIds.slice(i + 1)) {
+      const relation = verdict(a, b)
+      if (!relation || verdict(b, a) !== relation || relationBetween(state, a, b) === relation) continue
+      changes.push({ a, b, relation })
     }
   }
   return changes

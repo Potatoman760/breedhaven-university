@@ -67,6 +67,9 @@ describe('who speaks first', () => {
     expect(sceneTurns([hers, his], 'Pat', undefined, 'It is now 12:00 (Afternoon), daytime.').at(-1)).toEqual({ role: 'user', content: `${his.content}\n[It is now 12:00 (Afternoon), daytime.]` })
     expect(sceneTurns([], 'Pat', undefined, 'It is now 22:00 (Night), dark out.')[0].content).toMatch(/\[It is now 22:00 \(Night\), dark out\.\]$/)
     expect(sceneTurns([his, hers], 'Pat', undefined, 'noon')).toEqual([his, hers])
+    // Someone walking in as he speaks goes in front of his line, and stays there in what is sent after.
+    const walkedIn = { ...his, cue: 'Bea walks in.' }
+    expect(sceneTurns([walkedIn, hers], 'Pat')[0]).toEqual({ role: 'user', content: '[Bea walks in.]\nI did.' })
   })
 })
 

@@ -42,6 +42,7 @@ export function createInitialState(
     bonds: [],
     ties: {},
     rapport: assignRapport(content, weatherSeed),
+    seenTogether: [],
     revealed: {},
     courier: {},
     job: null,

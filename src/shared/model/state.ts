@@ -113,6 +113,8 @@ export const GameStateSchema = z.object({
    * Settled when the game begins, and changed by what happens in it.
    */
   rapport: z.record(z.string(), RapportSchema),
+  /** Each pair of love interests he has seen in a scene together, by tie key: what they are to each other is his to know from then on. */
+  seenTogether: z.array(z.string()),
   /** What the player has found out about each love interest: fact ids, by love interest id. */
   revealed: z.record(z.string(), z.array(z.string())),
   /** Messages exchanged in Bloomr DMs, by love interest id, oldest first. */

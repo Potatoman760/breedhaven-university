@@ -24,6 +24,7 @@ import { attendableEvents, buildEventPrompt, parseGeneratedEvents } from '../sha
 import { buildSpendingPrompt, buildSummaryPrompt, fallbackSummary, parseSpending, parseSummary, PLAIN_FEELINGS, sceneRapport, sceneRevelations, type Spending, type Summary } from '../shared/game/memory'
 import { npcOf, sceneExtras, withNpc } from '../shared/game/npcs'
 import { sceneHours } from '../shared/game/sceneMoves'
+import { exchanges, windingDown } from '../shared/game/windDown'
 import { asEventOuting, buildOutingPrompt, fallbackOuting, parseOuting } from '../shared/game/outing'
 import { buildCoursePickPrompt, parseCoursePick, type CoursePick } from '../shared/game/coursePick'
 import { banterDue, buildBanterPrompt, parseBanter } from '../shared/game/banter'
@@ -510,6 +511,7 @@ function registerIpc(
       roomOf: scene.roomOf,
       departed: scene.departed,
       hoursSoFar: sceneHours(state, scene),
+      windDown: windingDown(scene) ? exchanges(scene) : undefined,
       loveInterestId: scene.loveInterestId,
       companionIds: scene.companionIds,
       sceneBeats: scene.beats,

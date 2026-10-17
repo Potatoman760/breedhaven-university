@@ -5,14 +5,14 @@ import { Dialog } from './Dialog'
 /** The player's stats in full: each score, how far he is toward its next point, and where it stands on the scale of what a score is called. */
 export function StatsDialog({ content, state, onClose }: { content: ContentPack; state: GameState; onClose: () => void }) {
   return (
-    <Dialog title="Stats" onClose={onClose}>
+    <Dialog title="Stats" onClose={onClose} wide ornate>
       <div className="stat-sheet">
         {STATS.map((stat) => {
           const score = statOf(state, stat)
           const capped = score >= STAT_CAP
           const { banked, needed } = trainingToward(state, stat)
           return (
-            <section key={stat} className="stat-row">
+            <section key={stat} className="stat-row sheet">
               <header>
                 <strong className="stat-name">{stat}</strong>
                 <span className="stat-score">{score}</span>
@@ -56,6 +56,7 @@ export function StatsDialog({ content, state, onClose }: { content: ContentPack;
         <div className="skill-list">
           <h2>Skills</h2>
           {/* What he has learnt first, then what the courses he is taking are teaching him, then the rest. */}
+          <div className="sheet">
           <table>
             <thead>
               <tr>
@@ -88,6 +89,7 @@ export function StatsDialog({ content, state, onClose }: { content: ContentPack;
                 })}
             </tbody>
           </table>
+          </div>
         </div>
       )}
     </Dialog>

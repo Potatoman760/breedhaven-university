@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { canGoBelow, createInitialState, startRun, timeOn } from '../../shared/game'
@@ -8,6 +9,12 @@ import { loadContentPack } from './loader'
 /** The Undercroft as it ships: who can go, and that its depths are neither given away nor out of reach. */
 describe('the Undercroft of the default pack', () => {
   const content = loadContentPack(join(process.cwd(), 'content', 'default'))
+
+  it('has a file for every picture its fights are drawn with', () => {
+    const effects = Object.entries(content.expedition!.effects)
+    expect(effects.length).toBeGreaterThan(0)
+    expect(effects.filter(([, path]) => !existsSync(join(process.cwd(), 'content', 'default', path))).map(([name]) => name)).toEqual([])
+  })
   const config = content.expedition!
   const begun = createInitialState(content)
 

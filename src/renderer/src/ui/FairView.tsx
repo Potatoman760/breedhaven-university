@@ -1,9 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, type CSSProperties } from 'react'
-import { atTable, canJoinSociety, canTalkAtFair, fairCloses, fairNow, fairTables, saidHello, toDate } from '../../../shared/game'
+import { atTable, canJoinSociety, canTalkAtFair, fairCloses, fairNow, fairTables, helloDue, toDate } from '../../../shared/game'
 import type { ContentPack, GameState, LoveInterest } from '../../../shared/model'
 import { Button } from './Button'
-import { GrandButton } from './GrandButton'
-import { BackIcon, JobIcon } from './icons'
+import { BackButton } from './BackButton'
+import { JobIcon } from './icons'
 import { Ornate } from './Ornate'
 import { Portrait } from './Portrait'
 import { settle } from './pinLayout'
@@ -14,8 +14,8 @@ const PICTURE_SHAPE = 1920 / 1080
 interface Props {
   content: ContentPack
   state: GameState
-  /** Says hello to someone, at a society's table or wandering the fair. */
-  onHello: (id: string, societyId?: string) => void
+  /** Says hello to everyone at a society's table, or to someone wandering the fair. */
+  onHello: (ids: string[], societyId?: string) => void
   /** Stops to talk, for an hour, with those at a table or with someone wandering it. */
   onTalk: (ids: string[], societyId?: string) => void
   onJoin: (societyId: string) => void
@@ -57,21 +57,20 @@ export function FairView({ content, state, onHello, onTalk, onJoin, onLeave }: P
   const who = (id: string) => people.find((one) => one.id === id)
   const { hour } = toDate(content.calendar, state.time)
 
-  /** Someone at a table or wandering: her portrait, and Hello under it while she has not said it. */
-  const face = (id: string, societyId?: string) => {
+  /** Someone at a table or wandering: her portrait, with her name. */
+  const face = (id: string) => {
     const one = who(id)
     if (!one) return null
-    return (
-      <span key={id} className="fair-person">
-        <Portrait who={one} size="clamp(44px, 3.2vw, 64px)" className="map-face" caption />
-        {fair?.hellos[id] && !saidHello(state, id) && (
-          <Button size="small" className="fair-hello" onClick={() => onHello(id, societyId)}>
-            Hello
-          </Button>
-        )}
-      </span>
-    )
+    return <Portrait key={id} who={one} size="clamp(44px, 3.2vw, 64px)" className="map-face" caption />
   }
+
+  /** Hello from the whole booth at once, while it has one for whoever is there. */
+  const hello = (ids: string[], societyId?: string) =>
+    helloDue(content, state, ids, societyId ?? ids[0]) && (
+      <Button size="small" className="map-go" onClick={() => onHello(ids, societyId)}>
+        Hello
+      </Button>
+    )
 
   const talk = (ids: string[], societyId?: string) => {
     const check = canTalkAtFair(content, state, ids)
@@ -84,7 +83,13 @@ export function FairView({ content, state, onHello, onTalk, onJoin, onLeave }: P
 
   return (
     <main className="fair-screen map-screen">
-      <div ref={board} className="map-board" style={{ '--map-shape': PICTURE_SHAPE } as CSSProperties}>
+      <div
+        ref={board}
+        className="map-board"
+        style={{ '--map-shape': PICTURE_SHAPE } as CSSProperties}
+        // It opens a little small: the tables are spread apart again once it is at its size, so none lies over another.
+        onAnimationEnd={(event) => event.target === event.currentTarget && settle(event.currentTarget)}
+      >
         {picture && <img className="map-art" src={`content://pack/${picture}`} alt={event?.name ?? 'The fair'} />}
         {fairTables(content).map(({ society, x, y }) => {
           const staff = atTable(content, state, society.id)
@@ -94,7 +99,7 @@ export function FairView({ content, state, onHello, onTalk, onJoin, onLeave }: P
             <div key={society.id} className={mine ? 'map-pin fair-table joined' : 'map-pin fair-table'} style={{ left: `${x}%`, top: `${y}%` }}>
               <span className="map-pin-head">
                 <span className="map-medallion" title={society.description}>
-                  <JobIcon name="columns" size={20} />
+                  <JobIcon name="columns" image={society.iconImage} size={20} />
                 </span>
                 <span className="map-plate" title={society.description}>
                   {society.name.replace(/^the /, '')}
@@ -109,9 +114,10 @@ export function FairView({ content, state, onHello, onTalk, onJoin, onLeave }: P
                     Join
                   </Button>
                 )}
+                {hello(staff, society.id)}
                 {staff.length > 0 && talk(staff, society.id)}
               </span>
-              {staff.length > 0 && <span className="map-pin-people">{staff.map((id) => face(id, society.id))}</span>}
+              {staff.length > 0 && <span className="map-pin-people">{staff.map((id) => face(id))}</span>}
             </div>
           )
         })}
@@ -123,6 +129,7 @@ export function FairView({ content, state, onHello, onTalk, onJoin, onLeave }: P
             <div key={id} className="map-pin fair-visitor" style={{ left: `${x}%`, top: `${y}%` }}>
               <span className="map-pin-head">
                 <span className="map-plate">{one.name}</span>
+                {hello([id])}
                 {isLoveInterest && talk([id])}
               </span>
               <span className="map-pin-people">{face(id)}</span>
@@ -139,7 +146,7 @@ export function FairView({ content, state, onHello, onTalk, onJoin, onLeave }: P
         </span>
       </Ornate>
 
-      <GrandButton label="Leave" icon={<BackIcon size={22} />} chevron={false} className="map-close" onClick={onLeave} />
+      <BackButton label="Leave" className="map-close pin-keepout" onClick={onLeave} />
     </main>
   )
 }

@@ -23,7 +23,7 @@ import {
   type Studies,
 } from "../../../../shared/model";
 import { errorMessage } from "../../errors";
-import { describeShift } from "../../../../shared/game";
+import { describeShift, handleOf } from "../../../../shared/game";
 import { Portrait } from "../Portrait";
 import { EditorFoot, PickList, Group, List, Text, LlmMark } from "./fields";
 import { ArtTool } from "../art/ArtTool";
@@ -440,6 +440,15 @@ function LoveInterestEditor({
                   }
                 />
               </div>
+              {/* Her name on Bloomr; left empty, one is made from her name, which is shown as the placeholder. */}
+              {!isNpc && (
+                <Text
+                  label="Bloomr handle"
+                  value={draft.handle ?? ""}
+                  placeholder={handleOf({ ...draft, handle: undefined }).replace(/^@/, "")}
+                  onChange={(handle) => set({ handle: handle.replace(/^@/, "").trim() || undefined })}
+                />
+              )}
               <label>
                 Kind
                 <select

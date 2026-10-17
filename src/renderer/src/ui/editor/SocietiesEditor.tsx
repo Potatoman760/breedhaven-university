@@ -95,7 +95,7 @@ export function SocietiesEditor({ content, onContent, switcher }: Props) {
         <div className="editor-people">
           {listed.map((society) => (
             <button key={society.id} className={!isNew && society.id === original?.id ? 'courier-person selected' : 'courier-person'} onClick={() => open(society)}>
-              <JobIcon name="columns" size={22} />
+              <JobIcon name="columns" image={society.iconImage} size={22} />
               <span>
                 <strong>{society.name}</strong>
                 <span className="hint">

@@ -2,7 +2,7 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { loadContentPack } from '../../main/content/loader'
 import type { GameState, Scene } from '../model'
-import { describeDrama, dramaChance, dramaDue, dramaHooks, fireDrama, inPrivate, planDrama } from './drama'
+import { arrivalCue, describeDrama, dramaChance, dramaDue, dramaHooks, fireDrama, inPrivate, planDrama } from './drama'
 import { buildCharacterPrompt } from './prompt'
 import { setRelation } from './rapport'
 import { sceneBaseline } from './scene'
@@ -193,7 +193,10 @@ describe('planning and firing', () => {
     expect(direction).toBe(describeDrama(content, state, said, drama))
     expect(direction).toContain('has just walked in and found Pat here with Faye')
     expect(direction).toContain('on what is plainly a date')
-    expect(direction).toContain('arrival first')
+    expect(direction).toContain('is in the scene now and speaks as herself')
+    expect(direction).not.toContain('..')
+    // Her entrance is asked for beside his line as she walks in, where it is not missed.
+    expect(arrivalCue(content, drama)).toContain('walks in on them as he says this. Open your reply with her arrival')
     // It reaches whoever writes the scene, which is now one with two of them in it.
     const prompt = buildCharacterPrompt({
       content,

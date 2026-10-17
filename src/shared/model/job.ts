@@ -20,6 +20,8 @@ export const JobSchema = z.object({
   title: z.string(),
   /** The picture beside it on the job board, by name: "coffee", "book", "dumbbell". Left out, a briefcase. */
   icon: z.string().optional(),
+  /** Its emblem: a picture in the pack, shown in place of the drawn icon. */
+  iconImage: z.string().optional(),
   /** A line or two for the job board: what the work is. */
   description: z.string().default(''),
   locationId: z.string(),

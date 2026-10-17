@@ -107,6 +107,14 @@ export const ExpeditionConfigSchema = z.object({
   moneyImage: z.string().optional(),
   /** The picture a checkpoint is shown with: a campfire, say. */
   restImage: z.string().optional(),
+  /** The emblem of each kind of stop on the way down (fight, find, checkpoint, guardian): pictures in the pack. */
+  stopImages: z.record(z.string(), z.string()).default({}),
+  /**
+   * Pictures the fights' effects are drawn with, by name: "firebolt", "explosion", "shadow-orb", "hex-sigil", "force-orb",
+   * "smite", "heal", "ward", "stone-spikes". Each glowing one is on black, laid over the fight so that the black drops
+   * away. One left out is drawn in lines and circles instead.
+   */
+  effects: z.record(z.string(), z.string()).default({}),
   /** Where the way down is. */
   entryLocationId: z.string(),
   /** The day it is first open on, counted from 1. */
@@ -192,7 +200,11 @@ export const FightFxSchema = z.object({
   /** Whom it is on: the id of one of the party, or an enemy's key. */
   on: z.string(),
   /** The number that goes up with it, when it has one. */
-  amount: z.number().optional()
+  amount: z.number().optional(),
+  /** Who did it, for what flies from her to whom it is on: the id of one of the party, or an enemy's key. */
+  by: z.string().optional(),
+  /** What it looks like: the role and action that did it ("striker:strike"), or how an enemy hits ("sweep", "claw"). Left out, as its kind is drawn. */
+  style: z.string().optional()
 })
 export type FightFx = z.infer<typeof FightFxSchema>
 

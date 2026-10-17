@@ -1,8 +1,7 @@
 import { useEffect, type ReactNode } from 'react'
 import type { Cue } from '../../../shared/model'
 import { play } from '../sound'
-import { GrandButton } from './GrandButton'
-import { BackIcon } from './icons'
+import { BackButton } from './BackButton'
 
 interface DialogProps {
   title: string
@@ -64,10 +63,10 @@ export function Dialog({ title, note, onClose, narrow, wide, noClose, ornate, so
           )}
         </div>
         {children}
-        {/* In the kit the way out is a grand button of its own at the foot, where it is found at once. */}
+        {/* In the kit the way out is the round back button in the bottom left corner, as on every main screen. */}
         {!noClose && ornate && (
           <div className="dialog-foot">
-            <GrandButton label="Close" icon={<BackIcon size={22} />} chevron={false} onClick={onClose} />
+            <BackButton onClick={onClose} />
           </div>
         )}
       </div>

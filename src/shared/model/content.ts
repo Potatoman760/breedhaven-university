@@ -303,7 +303,11 @@ function checkReferences(pack: ContentPack): string[] {
         if (table.gift) need(items, table.gift, `societies.fair.tables (${table.societyId})`, 'item')
       }
       for (const visitor of fair.visitors) need(people, visitor.id, 'societies.fair.visitors', 'character')
-      for (const id of Object.keys(fair.hellos)) need(people, id, 'societies.fair.hellos', 'character')
+      const booths = new Set([...known, ...fair.visitors.map((visitor) => visitor.id)])
+      for (const [booth, hellos] of Object.entries(fair.hellos)) {
+        need(booths, booth, 'societies.fair.hellos', 'booth')
+        for (const hello of hellos) for (const id of hello.cast) need(people, id, `societies.fair.hellos (${booth})`, 'character')
+      }
       for (const id of fair.rivalry?.societyIds ?? []) need(known, id, 'societies.fair.rivalry', 'society')
       if (fair.rivalry) checkCutscene(fair.rivalry.intro, 'societies.fair.rivalry.intro')
     }

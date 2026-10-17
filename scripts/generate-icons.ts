@@ -1,0 +1,248 @@
+/**
+ * Paints the emblems that stand for things in the interface: each job, place on the map, society, market stall, kind
+ * of weather and kind of stop on the way down. Drawn as the item pictures are (big on a white card, cut out, made
+ * small) and in their style, so that the two sit together. Each is put in its content file as `iconImage` as it is
+ * made (`stopImages` in expedition.json). Not part of the app: run it from the project folder with `npm run icons`:
+ *
+ *   npm run icons                        every emblem not yet made
+ *   npm run icons -- jobs places         only these groups (jobs, places, societies, stalls, weather, stops)
+ *   npm run icons -- barista             only these, by id
+ *   npm run icons -- --overwrite         make them again even where there is one already
+ *   npm run icons -- --dry               print the prompts, and make nothing
+ *
+ * It can be stopped and run again: whatever has its emblem is passed over.
+ */
+import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { join } from 'node:path'
+import { ComfyStore, generateArt } from '../src/main/comfy/studio'
+import { PACK, cutOut, minutes, settingsFile } from './lib/pictures'
+
+const SUBJECT = 'icons'
+const GIVE_UP_AFTER = 2
+const SIZE = { width: 1024, height: 1024 }
+const SHOWN = 256
+const FRAMING = 'a single object, shown whole, centered, filling the frame, game inventory icon, thick clean outline, simple shapes, no people, no hands, no text\n\nplain white background'
+
+// What each emblem shows. One that is missing here is drawn from its name.
+const SUBJECTS: Record<string, Record<string, string>> = {
+  jobs: {
+    'market-stallhand': 'A wooden market crate piled with apples and turnips, a little price tag tied to it.',
+    'commons-kitchen': 'A big steaming iron cooking pot with a ladle resting in it.',
+    'halls-desk': 'A brass reception desk bell beside a small stack of letters and a ring of keys.',
+    'store-tills': 'A paper shopping bag with a flower stamped on it, a receipt sticking out of the top.',
+    'lumen-usher': 'A striped paper bag of popcorn with a torn red cinema ticket leaning against it.',
+    'bathhouse-attendant': 'A folded stack of fluffy white towels with a sprig of eucalyptus on top.',
+    'boba-maker': 'A tall plastic cup of pink bubble tea with tapioca pearls and a fat straw.',
+    'garden-hand': 'A wooden-handled garden trowel and a small watering can.',
+    'library-page': 'A neat stack of old leather-bound books with a ribbon bookmark.',
+    'arcade-floor': 'A retro arcade joystick and two round buttons on a small panel, with a gold token.',
+    'barista': 'A white coffee cup of latte with leaf latte art on a saucer, steam rising.',
+    'armoury-assistant': 'A steel sword crossed over a round wooden shield.',
+    'bar-staff': 'A foaming glass tankard of amber ale.',
+    'clinic-reception': 'A white clipboard with a red cross on it and a pen clipped to it.',
+    'gym-floor': 'A heavy iron dumbbell.',
+    'club-door': 'A velvet rope on two brass posts in front of a glowing purple door.',
+    'waiter': 'A silver serving cloche on a tray, a little flame peeking from under it.',
+    'foundry-technician': 'A glass alchemy flask of glowing blue liquid with a brass gauge on its neck.',
+    'research-assistant': 'An open archive box of rolled scrolls and papers with a magnifying glass.'
+  },
+  places: {
+    'great-court': 'A grand stone university gatehouse with an arched entrance and two towers.',
+    'lecture-halls': 'A black graduation mortarboard cap with a gold tassel resting on a book.',
+    library: 'An old library building with tall arched windows, made of pale stone.',
+    commons: 'A long wooden dining table set with bread, a pie and a jug, under a hanging lantern.',
+    chapel: 'A small stone chapel with a bell tower and a round rose window.',
+    tiltyard: 'A tournament pennant banner on a lance beside a round target.',
+    'physic-garden': 'A walled garden gate of wrought iron, overgrown with herbs and flowers.',
+    bathhouse: 'A round steaming bathhouse pool of turquoise water with stone steps.',
+    foundry: 'A brick foundry chimney with a glowing magical furnace mouth and a brass gear.',
+    'health-centre': 'A small white cottage with a red cross over its door.',
+    dormitories: 'A cozy wooden bed with a patchwork quilt and a pillow.',
+    'lantern-row': 'A row of glowing red paper lanterns strung on a cord.',
+    'honeyed-bee-inn': 'A wooden tavern sign shaped like a fat bee, hanging from an iron bracket.',
+    market: 'A striped market stall awning over a table of fruit.',
+    'bloom-and-co': 'A shop front with a pink awning and a flower in the window.',
+    'dawnbloom-house': 'A large timber-framed townhouse with flower boxes on its windows.',
+    'spell-and-sip': 'A coffee cup with a little sparkling magic star rising out of it instead of steam.',
+    'pixel-and-rune': 'A carved twenty-sided die glowing with a rune, beside a game cartridge.',
+    'boba-blossom': 'A cup of bubble tea with a cherry blossom flower on its lid.',
+    cauldron: 'A black iron cauldron bubbling with green soup over a small fire.',
+    ironroot: 'An iron kettlebell wrapped in a living green root.',
+    lumen: 'An old cinema film reel with a strip of film unspooling.',
+    undergrowth: 'A glowing neon mushroom in purple and teal with a music note floating above it.',
+    'riverside-park': 'A leafy oak tree beside a small stone footbridge over a stream.',
+    'sire-house': 'A cozy cottage with a thatched roof, a red door and a smoking chimney.'
+  },
+  societies: {
+    'debating-union': 'Two crossed feather quills over a scroll with a red wax seal.',
+    'volleyball-club': 'A white and yellow volleyball.',
+    'physic-garden-society': 'A terracotta pot with a seedling sprouting two leaves.',
+    'furrow-choir': 'An open hymn book with golden music notes rising from its pages and a sprig of wheat.',
+    'bloomist-fellowship': 'A white lily flower blooming with a soft golden glow.',
+    'freewill-society': 'Two iron chain links snapped apart, a red ribbon tied to one of them, with white space all around.',
+    'card-and-dice-society': 'A fan of three playing cards with two ivory dice in front of them.',
+    'merchants-society': 'A small leather coin purse spilling gold coins beside a brass scale.',
+    'needle-and-thread': 'A pincushion shaped like a tomato with a needle and a spool of pink thread.',
+    'midnight-circle': 'A black candle burning beside a crescent moon and a chalk pentacle circle.'
+  },
+  stalls: {
+    'petal-and-posy': 'A bouquet of roses and daisies wrapped in brown paper.',
+    'the-sweet-tooth': 'A small round glass jar of colorful wrapped sweets, with white space all around.',
+    'quill-and-binding': 'An inkpot with a feather quill and a leather notebook.',
+    'tinkers-tray': 'A wooden tray of trinkets: a silver necklace, a ring and a small brooch.',
+    'second-circuit': 'A secondhand smartphone with a cracked corner and a tangled cable.',
+    'seven-petals': 'A small pink pastry box tied with ribbon, with seven petals on the lid.',
+    'petal-and-pill': 'A small apothecary bottle of pills with a pink flower label.',
+    'byte-and-bloom': 'A small gadget with a glowing screen and a flower sticker.',
+    arcana: 'A glowing purple crystal on a little brass stand.',
+    'forbidden-shelf': 'A dark leather book bound with a chain and a padlock, glowing faintly.',
+    'second-bloom': 'A folded vintage silk scarf with a ribbon and a lace trim.',
+    'spell-and-sip-counter': 'A bottle of sparkling potion soda with a cork and a star label.'
+  },
+  weather: {
+    clear: 'A bright golden sun with soft rays.',
+    overcast: 'A thick gray cloud.',
+    drizzle: 'A small gray cloud with a few light raindrops falling.',
+    downpour: 'A dark storm cloud pouring heavy rain with a lightning bolt.',
+    windy: 'Swirling gusts of wind blowing a few autumn leaves.',
+    mist: 'Soft white layered bands of mist.',
+    snow: 'A white snowflake crystal with a small snow cloud.',
+    heat: 'A blazing orange sun with wavy heat lines.'
+  },
+  stops: {
+    fight: 'Two crossed steel swords.',
+    find: 'A small wooden treasure chest, its lid ajar, golden light inside.',
+    checkpoint: 'A small campfire with a bedroll beside it.',
+    guardian: 'A menacing horned monster skull with glowing red eyes.'
+  }
+}
+
+interface Target {
+  group: string
+  id: string
+  name: string
+  image?: string
+}
+
+// Where each group is kept: its file, how to reach its list in it, and how to put a picture on one of them.
+interface Group {
+  file: string
+  list: (data: any) => { id: string; name?: string; title?: string; iconImage?: string }[]
+  /** Stops are kept as a map on the expedition, not on a list of their own. */
+  stops?: boolean
+}
+const GROUPS: Record<string, Group> = {
+  jobs: { file: 'jobs.json', list: (data) => data.jobs },
+  places: { file: 'locations.json', list: (data) => data },
+  societies: { file: 'societies.json', list: (data) => data.societies },
+  stalls: { file: 'stalls.json', list: (data) => data },
+  weather: { file: 'calendar.json', list: (data) => data.weather },
+  stops: { file: 'expedition.json', list: (data) => Object.keys(SUBJECTS.stops).map((id) => ({ id, name: id, iconImage: data.stopImages?.[id] })), stops: true }
+}
+
+function read(file: string): { data: any; eol: string } {
+  const raw = readFileSync(join(PACK, file), 'utf8')
+  return { data: JSON.parse(raw), eol: raw.includes('\r\n') ? '\r\n' : '\n' }
+}
+
+function targets(): Target[] {
+  return Object.entries(GROUPS).flatMap(([group, { file, list }]) =>
+    list(read(file).data).map((one) => ({ group, id: one.id, name: one.name ?? one.title ?? one.id, image: one.iconImage }))
+  )
+}
+
+/** Puts a picture on one of them in its file as it is now, so that nothing changed in it meanwhile is undone; what it replaced. */
+function put(target: Target, path: string): string | undefined {
+  const group = GROUPS[target.group]
+  const { data, eol } = read(group.file)
+  let replaced: string | undefined
+  if (group.stops) {
+    replaced = data.stopImages?.[target.id]
+    data.stopImages = { ...data.stopImages, [target.id]: path }
+  } else {
+    const entry = group.list(data).find((one) => one.id === target.id)
+    if (!entry) throw new Error(`it is no longer in ${group.file}`)
+    replaced = entry.iconImage
+    entry.iconImage = path
+  }
+  writeFileSync(join(PACK, group.file), `${JSON.stringify(data, null, 2)}\n`.replaceAll('\n', eol))
+  return replaced
+}
+
+async function main(): Promise<void> {
+  const args = process.argv.slice(2)
+  const flags = args.filter((arg) => arg.startsWith('--'))
+  const unknown = flags.filter((flag) => !['--dry', '--overwrite'].includes(flag))
+  if (unknown.length > 0) throw new Error(`There is no ${unknown.join(', ')}. Use --dry or --overwrite.`)
+  const [dry, overwrite] = [flags.includes('--dry'), flags.includes('--overwrite')]
+  const only = args.filter((arg) => !arg.startsWith('--')).map((arg) => arg.toLowerCase())
+
+  const all = targets()
+  const missing = only.filter((one) => !GROUPS[one] && !all.some((target) => target.id === one))
+  if (missing.length > 0) throw new Error(`There is no group or id called: ${missing.join(', ')}`)
+  const todo = all.filter((target) => (only.length === 0 || only.includes(target.group) || only.includes(target.id)) && (overwrite || !target.image))
+
+  const settingsPath = settingsFile()
+  if (!existsSync(settingsPath)) throw new Error(`No ComfyUI settings at ${settingsPath}. Set ComfyUI up in the app first.`)
+  const readSettings = () => new ComfyStore(settingsPath, PACK).get()
+  const promptOf = (target: Target) => `${SUBJECTS[target.group]?.[target.id] ?? `An emblem of ${target.name}.`}\n\n${FRAMING}`
+
+  console.log(`ComfyUI at ${readSettings().baseUrl}. ${todo.length} to make of ${all.length}${overwrite ? ', replacing those there are' : ''}.`)
+  if (dry) {
+    for (const target of todo) console.log(`\n== ${target.group}: ${target.name} (${target.id})\n${promptOf(target)}`)
+    return
+  }
+  if (todo.length === 0) return
+
+  const cancel = new AbortController()
+  process.on('SIGINT', () => {
+    if (cancel.signal.aborted) process.exit(130)
+    console.log('\nStopping: cancelling the picture being made. Run again to carry on. (Ctrl+C again to quit at once.)')
+    cancel.abort()
+  })
+
+  const started = Date.now()
+  let failedInARow = 0
+  for (const [i, target] of todo.entries()) {
+    if (cancel.signal.aborted) break
+    const began = Date.now()
+    process.stdout.write(`[${i + 1}/${todo.length}] ${target.group}: ${target.name}... `)
+    // Filed by group, so that a stall and a place of the same id do not overwrite each other.
+    const result = await generateArt(readSettings(), PACK, PACK, { kind: 'sprite', subjectId: SUBJECT, name: `${target.group}-${target.id}`, workflow: '', positive: promptOf(target), negative: '', ...SIZE }, cancel.signal, '')
+    if (cancel.signal.aborted) {
+      console.log('cancelled.')
+      break
+    }
+    if (!result.ok || !result.path) {
+      console.log(`failed: ${result.message}`)
+      if (++failedInARow >= GIVE_UP_AFTER) {
+        console.log(`${GIVE_UP_AFTER} failures in a row: stopping. Fix what is wrong and run again.`)
+        process.exitCode = 1
+        break
+      }
+      continue
+    }
+    failedInARow = 0
+
+    let made = { path: result.path, note: '' }
+    try {
+      made = cutOut(result.path, SHOWN)
+    } catch (cause) {
+      made = { path: result.path, note: `left on its card: ${(cause as Error).message}` }
+    }
+    try {
+      const replaced = put(target, made.path)
+      if (replaced && replaced !== made.path) rmSync(join(PACK, replaced), { force: true })
+    } catch (cause) {
+      console.log(`made (${made.path}), but ${(cause as Error).message}.`)
+      continue
+    }
+    const left = todo.length - i - 1
+    console.log(`done in ${minutes(Date.now() - began)}: ${made.path}${made.note ? ` (${made.note})` : ''}${left > 0 ? ` (about ${minutes(((Date.now() - started) / (i + 1)) * left)} to go)` : ''}`)
+  }
+}
+
+main().catch((error: unknown) => {
+  console.error((error as Error).message)
+  process.exitCode = 1
+})

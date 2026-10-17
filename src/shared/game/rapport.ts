@@ -1,4 +1,5 @@
 import { kindOf, type ContentPack, type GameState, type Rapport } from '../model'
+import { tieKey } from './bonds'
 
 /** What two love interests are to each other, apart from anything either is to the player. */
 export const RELATIONS = ['friends', 'enemies', 'neither'] as const
@@ -25,6 +26,18 @@ const none = (): Rapport => ({ friends: [], enemies: [] })
 export function relationBetween(state: Pick<GameState, 'rapport'>, a: string, b: string): Relation {
   const mine = state.rapport[a]
   return mine?.friends.includes(b) ? 'friends' : mine?.enemies.includes(b) ? 'enemies' : 'neither'
+}
+
+/** Notes that he has seen these love interests in a scene together, every pair of them. The same state when nothing is new. */
+export function noteTogether<S extends Pick<GameState, 'seenTogether'>>(state: S, ids: string[]): S {
+  const pairs = ids.flatMap((a, i) => ids.slice(i + 1).filter((b) => b !== a).map((b) => tieKey(a, b)))
+  const fresh = pairs.filter((key, i) => !state.seenTogether.includes(key) && pairs.indexOf(key) === i)
+  return fresh.length === 0 ? state : { ...state, seenTogether: [...state.seenTogether, ...fresh] }
+}
+
+/** What two love interests are to each other as far as he knows it: nothing, until he has seen them together. */
+export function knownRelation(state: Pick<GameState, 'rapport' | 'seenTogether'>, a: string, b: string): Relation | undefined {
+  return state.seenTogether.includes(tieKey(a, b)) ? relationBetween(state, a, b) : undefined
 }
 
 /** Makes two love interests friends, enemies or neither, on both sides at once. */

@@ -88,7 +88,6 @@ export function PartyDialog({ content, state, onGo, onClose }: Props) {
         <GrandButton label="Not now" icon={<BackIcon size={22} />} chevron={false} onClick={onClose} />
         <GrandButton
           label="Go down"
-          note={`${party.length} of ${config.partySize} with you · ${config.hours} hours`}
           icon={<StopIcon kind="guardian" size={24} />}
           disabled={!check.ok}
           tip={check.reasons.join(' · ') || undefined}

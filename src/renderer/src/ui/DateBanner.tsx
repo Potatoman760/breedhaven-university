@@ -16,7 +16,7 @@ export function DateBanner({ date, minute = 0, weather, notes }: Props) {
   return (
     <div className="date-banner glass framed">
       <div className="weather" title={weather?.name}>
-        <WeatherIcon kind={weather?.icon} size={28} />
+        <WeatherIcon kind={weather?.icon} image={weather?.iconImage} size={28} />
       </div>
       <div>
         <div className="date-line">

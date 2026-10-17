@@ -1,7 +1,8 @@
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { isOpen } from '../../shared/game'
-import { kindOf } from '../../shared/model'
+import { atTable, boothHello, fairNow, fairTables, isOpen } from '../../shared/game'
+import { kindOf, type GameState } from '../../shared/model'
+import { createInitialState } from '../../shared/game/state'
 import { loadContentPack } from './loader'
 
 // The societies are hand-written: whoever is added to the cast has to be put in one, and every meeting has to be somewhere open after classes.
@@ -22,5 +23,24 @@ describe('the societies of the default pack', () => {
       expect(society.startHour, society.id).toBeGreaterThanOrEqual(coursework.dayEnd)
       for (let hour = society.startHour; hour < society.startHour + config.hours; hour++) expect(isOpen(place, hour), `${society.id} at ${hour}`).toBe(true)
     }
+  })
+
+  it('has a hello written for every company that stands at a table during the fair', () => {
+    const fair = content.calendar.events.find((event) => event.id === config.fairId)!
+    const start = createInitialState(content)
+    const missing: string[] = []
+    let open = 0
+    for (let time = 0; time < 24 * 120; time++) {
+      const state: GameState = { ...start, time }
+      if (!fairNow(content, state)) continue
+      open++
+      for (const { society } of fairTables(content)) {
+        const staff = atTable(content, state, society.id)
+        const hello = staff.length > 0 && boothHello(content, staff, society.id)
+        if (staff.length > 0 && (!hello || hello.cast.length !== staff.length)) missing.push(`${society.id}: ${staff.join(', ')}`)
+      }
+    }
+    expect(open).toBe(2 * (fair.hours ?? 1))
+    expect([...new Set(missing)]).toEqual([])
   })
 })

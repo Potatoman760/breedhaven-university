@@ -2039,11 +2039,11 @@ textarea.memory {
 .pause-menu {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
-.pause-menu button {
-  min-height: 44px;
+.pause-menu button.btn.grand {
+  width: 100%;
 }
 
 /* A search picks out the courses that answer it, and lets the rest fade. */
@@ -2913,9 +2913,13 @@ button.stat-grid:hover {
   z-index: 40;
 }
 
-/* The calendar: a week by the hour, or a month at a glance. */
+/* The calendar: a week by the hour, or a month at a glance, with what is coming up in a column on its left. */
 .calendar {
-  grid-template-columns: minmax(0, 1fr) 260px;
+  grid-template-columns: 260px minmax(0, 1fr);
+}
+
+.calendar > .upcoming {
+  order: -1;
 }
 
 .calendar-main {
@@ -3171,95 +3175,264 @@ button.stat-grid:hover {
   white-space: nowrap;
 }
 
-/* The phone: a dark wood case with its apps down the left edge and one screen open beside them. */
+/* The phone: a tablet in a black bezel, its apps down a vine-hung rail on the left and the open one beside it on parchment. */
 .phone {
-  display: grid;
-  grid-template-columns: 104px minmax(0, 1fr);
   box-sizing: border-box;
-  width: min(1240px, 100%);
-  height: min(800px, 100%);
-  padding: 14px 14px 14px 0;
-  border-radius: 72px 14px 14px 72px;
-  background: var(--wood);
-  box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.35);
+  width: min(1280px, 100%);
+  height: min(820px, 100%);
+  padding: 16px;
+  border-radius: 56px;
+  background: linear-gradient(145deg, #3a3d40, #121314 30%, #050506 70%, #2a2c2e);
+  box-shadow:
+    inset 0 0 0 2px #55595d,
+    inset 0 0 0 5px #0b0b0c,
+    0 30px 60px rgba(0, 0, 0, 0.55);
+}
+
+.phone-glass {
+  position: relative;
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  height: 100%;
+  overflow: hidden;
+  border-radius: 40px;
+  background: var(--paper);
+}
+
+/* The status bar across the top of the glass: the signal and battery at the right. The time is in the head's date. */
+.phone-status {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 34px;
+  padding: 0 30px 0 44px;
+  pointer-events: none;
+  color: var(--ink);
+  font: 600 0.9375rem var(--ui);
+}
+
+.phone-status-marks {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .phone-rail {
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 14px;
-  /* The tabs reach over the edge of the screen, like index tabs on a folder. */
-  margin-right: -10px;
-  z-index: 1;
+  align-items: center;
+  gap: 8px;
+  padding: 46px 10px 18px;
+  overflow: hidden;
+  background:
+    url('../../assets/phone/vine.png') right -26px top 150px / 64px auto no-repeat,
+    url('../../assets/phone/vine.png') left -30px bottom -40px / 70px auto no-repeat,
+    linear-gradient(180deg, #2c4127, var(--wood-deep));
+  box-shadow: inset -1px 0 0 rgba(212, 175, 90, 0.5);
 }
 
-.phone-back {
-  align-self: center;
-  width: 52px;
-  min-height: 52px;
+.phone-crest {
+  width: 76px;
+  height: 76px;
   margin-bottom: 10px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: var(--paper-raised);
-  color: var(--moss-deep);
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.45));
 }
 
 .phone-tab {
   position: relative;
   flex-direction: column;
-  gap: 6px;
-  width: 88px;
-  min-height: 84px;
-  padding: 0;
+  gap: 4px;
+  width: 100px;
+  min-height: 78px;
+  padding: 6px 0;
   border: 0;
-  border-radius: 18px 6px 6px 18px;
-  background: var(--paper-raised);
-  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
-  color: var(--moss-deep);
-  font: 700 0.6875rem var(--ui);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  border-radius: 14px;
+  background: transparent;
+  box-shadow: none;
+  color: #f3eedb;
+  font: 600 1rem var(--ui);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-/* An app that cannot be opened just now: faded and flat, with why on its tooltip. */
+.phone-tab:hover:not(:disabled):not(.selected) {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  transform: none;
+}
+
+/* An app that cannot be opened just now: faded, with why on its tooltip. */
 .phone-tab:disabled {
-  background: var(--paper-raised);
+  background: transparent;
   box-shadow: none;
-  color: var(--moss-deep);
-  opacity: 0.4;
+  color: #f3eedb;
+  opacity: 0.35;
   cursor: not-allowed;
 }
 
+/* The open app: a cream tile raised off the rail, with a gold bead at its edge. */
 .phone-tab.selected {
-  width: 96px;
-  background: var(--moss);
-  box-shadow: none;
-  color: #fff;
+  background: linear-gradient(180deg, #fbf5e3, #eadfc2);
+  box-shadow:
+    inset 0 0 0 1px var(--gold),
+    0 4px 10px rgba(0, 0, 0, 0.4);
+  color: var(--moss-deep);
+  text-shadow: none;
+}
+
+.phone-tab.selected::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 50%;
+  background: var(--gold);
 }
 
 .phone-tab .badge {
   position: absolute;
-  top: 6px;
-  right: 8px;
+  top: 4px;
+  right: 14px;
+}
+
+button.btn.back-button.phone-back {
+  margin-top: auto;
+}
+
+.phone-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* The head of every app: its name on the castle banner, with his money and the day at the right. */
+.phone-head {
+  flex: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 128px;
+  padding: 36px 30px 6px 40px;
+  box-sizing: border-box;
+  background: url('../../assets/phone/banner.jpg') right center / cover no-repeat;
+}
+
+/* The banner fades into the parchment below it and behind the title, so the words sit on paper. */
+.phone-head::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, var(--paper) 18%, rgba(248, 242, 226, 0.75) 40%, rgba(248, 242, 226, 0) 70%),
+    linear-gradient(0deg, var(--paper) 0%, rgba(248, 242, 226, 0) 45%);
+  pointer-events: none;
+}
+
+.phone-head > * {
+  position: relative;
+}
+
+.phone-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 auto 0 0;
+  color: var(--wood-deep);
+  font: 600 3rem/1 var(--display);
+}
+
+.phone-title img {
+  width: 42px;
+  height: 42px;
+}
+
+.phone-money {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 46px;
+  padding: 0 20px 0 12px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #33492a, var(--wood-deep));
+  box-shadow:
+    inset 0 0 0 1px var(--gold-deep),
+    0 3px 8px rgba(0, 0, 0, 0.3);
+  color: #fff;
+  font: 600 1.25rem var(--ui);
+}
+
+.phone-money svg {
+  color: var(--gold);
+}
+
+.phone-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: 50px;
+  padding: 0 14px;
+  border-radius: 16px;
+  background: rgba(252, 248, 236, 0.92);
+  box-shadow:
+    inset 0 0 0 1px var(--rule),
+    0 3px 8px rgba(0, 0, 0, 0.15);
+  color: var(--ink);
+  font: 500 0.875rem/1.2 var(--ui);
+}
+
+.phone-date > span {
+  display: flex;
+  flex-direction: column;
+}
+
+.phone-date strong {
+  font-size: 0.9375rem;
+}
+
+.phone-date > svg:first-child {
+  color: var(--moss-deep);
 }
 
 .phone-screen {
+  position: relative;
+  flex: 1;
   display: flex;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
-  border-radius: 60px 6px 6px 60px;
-  background: var(--paper-raised);
 }
 
-/* An app's name. */
-.phone-title {
-  align-self: flex-start;
-  margin: 0 0 6px;
-  font-size: 2.5rem;
+/* A heading across a list: a sprig, the words, and a gold rule running out after them. */
+.section-rule {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 6px 0 0;
+  color: var(--wood-deep);
+  font: 600 1.5rem var(--display);
+}
+
+.section-rule::before {
+  content: '';
+  flex: none;
+  width: 44px;
+  height: 30px;
+  background: url('../../assets/phone/sprig.png') center / contain no-repeat;
+}
+
+.section-rule::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold), rgba(212, 175, 90, 0));
 }
 
 .phone-empty {
@@ -3306,9 +3479,9 @@ button.stat-grid:hover {
   flex-direction: column;
   gap: 12px;
   box-sizing: border-box;
-  width: 380px;
-  padding: 36px 14px 0 44px;
-  background: var(--paper);
+  width: 360px;
+  padding: 8px 14px 0 30px;
+  background: transparent;
 }
 
 .chat-rows {
@@ -3513,7 +3686,7 @@ button.stat-grid:hover {
   gap: 12px;
   min-width: 0;
   overflow-y: auto;
-  padding: 36px 40px 28px 56px;
+  padding: 8px 30px 28px 40px;
 }
 
 .friend-grid {
@@ -4333,31 +4506,171 @@ select.pill-add {
   min-width: 0;
 }
 
-/* Jobs: the board of openings, and the job he holds at the top of it. */
-.post.job header {
-  justify-content: space-between;
+/* Jobs and societies: a card each, with the place's picture on the left and its facts beside it. */
+.feed.jobs {
+  align-items: stretch;
 }
 
-.post.job header > div {
+.feed.jobs > * {
+  width: 100%;
+}
+
+.post.job {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 16px 20px 16px 16px;
+  border: 1px solid var(--rule-soft);
+  border-radius: 16px;
+  background: var(--paper-raised);
+  box-shadow: 0 2px 6px rgba(60, 45, 20, 0.08);
+}
+
+.post.job.mine {
+  border-color: rgba(76, 106, 58, 0.45);
+  background: linear-gradient(180deg, #e7eed8, #dfe8cc);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+    0 4px 12px rgba(51, 73, 42, 0.18);
+}
+
+.post.job.gone {
+  opacity: 0.6;
+}
+
+/* The place, in a white mount, with a ribbon under it when it is his. */
+.job-thumb {
+  position: relative;
+  flex: none;
+  width: 120px;
+  height: 120px;
+  margin: 0;
+  padding: 4px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.22);
+}
+
+.post.job.mine .job-thumb {
+  width: 150px;
+  height: 140px;
+  transform: rotate(-2deg);
+}
+
+.job-thumb > img:first-child {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+.job-emblem {
+  position: absolute;
+  right: -10px;
+  bottom: -10px;
+  width: 52px;
+  height: 52px;
+  padding: 4px;
+  border-radius: 50%;
+  background: var(--paper-raised);
+  box-shadow:
+    inset 0 0 0 2px var(--gold),
+    0 2px 6px rgba(0, 0, 0, 0.25);
+  object-fit: contain;
+}
+
+.job-thumb figcaption {
+  position: absolute;
+  left: 50%;
+  bottom: -12px;
+  transform: translateX(-50%);
+  padding: 4px 18px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--moss), var(--moss-deep));
+  box-shadow:
+    inset 0 0 0 1px var(--gold),
+    0 2px 5px rgba(0, 0, 0, 0.3);
+  color: #fff;
+  font: 600 0.875rem var(--display);
+  white-space: nowrap;
+}
+
+.job-body {
   flex: 1;
-  gap: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   min-width: 0;
 }
 
-/* The picture of the job, at the head of its card. */
-.job-icon {
+.post.job header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.post.job h3 {
+  margin: 0;
+  color: var(--wood-deep);
+  font: 700 1.375rem/1.2 var(--display);
+}
+
+.post.job h3 span {
+  font-weight: 600;
+}
+
+.post.job header .btn {
   flex: none;
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: var(--moss-tint);
+  min-width: 110px;
+}
+
+.post.job .job-body > p {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.job-note {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.6);
+  box-shadow: inset 0 0 0 1px rgba(76, 106, 58, 0.25);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
+
+/* Pay, hours and what it builds, each with its mark. */
+.job-facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 18px;
+  color: var(--ink-soft);
+  font-size: 0.9375rem;
+}
+
+.job-facts span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.job-facts svg {
   color: var(--moss-deep);
 }
 
-.post.job.mine .job-icon {
-  background: var(--paper-raised);
+.job-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.job-actions .compare {
+  margin-left: auto;
 }
 
 /* What a job asks and when it is: pills of one height on one line. */
@@ -4370,36 +4683,19 @@ select.pill-add {
   align-items: center;
   box-sizing: border-box;
   height: 30px;
-  padding: 0 12px;
+  padding: 0 14px;
+  border-radius: 999px;
   font-size: 0.875rem;
   line-height: 1;
 }
 
 .job-asks .compare {
   align-self: center;
+  margin-left: auto;
 }
 
-.post.job.mine > .compare {
-  align-self: flex-start;
-}
-
-/* The title of a feed stands at the head of its cards, not at the edge of the screen, with the brush behind the words alone. */
-.feed > .phone-title {
-  width: auto;
-  margin-left: calc((100% - min(640px, 100%)) / 2);
-}
-
-.post.job.mine {
-  border-color: var(--moss);
-  background: var(--moss-tint);
-}
-
-.post.job.gone {
-  opacity: 0.6;
-}
-
-.post.job footer button {
-  min-height: 40px;
+.post.job .portraits {
+  gap: 10px;
 }
 
 .entry.work {
@@ -4620,9 +4916,9 @@ select.pill-add {
 
 /* His stats in full: a row each, with the way to the next point and the scale of what a score is called. */
 .stat-sheet {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 14px;
 }
 
 .stat-row {
@@ -5973,7 +6269,7 @@ button.item-square:hover {
 }
 
 .below-number {
-  font-size: 0.8125rem;
+  font-size: 0.95rem;
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
@@ -5987,9 +6283,10 @@ button.item-square:hover {
 
 .below-gauge {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 76px;
+  /* As wide as "100/100" and no wider, so the number sits by its bar. */
+  grid-template-columns: minmax(0, 1fr) 4.6em;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .below-gauge .below-bar {
@@ -7638,17 +7935,6 @@ button.room-window:not(:disabled):active {
   filter: grayscale(0.8) brightness(0.5);
 }
 
-button.house-card-close {
-  position: absolute;
-  top: 6px;
-  right: 6px;
-  min-height: 30px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.5);
-  color: #fff;
-  font-size: 1.2rem;
-  text-decoration: none;
-}
 
 .house-tiers {
   display: flex;
@@ -7874,6 +8160,11 @@ button.btn.grand.centred:has(.grand-icon) .grand-text {
 
 .ornate .below-bar > span {
   background: linear-gradient(90deg, var(--leaf), #8fae66);
+}
+
+/* His energy, in blue, so it is never taken for footing. */
+.ornate .below-bar.energy > span {
+  background: linear-gradient(90deg, #3d78c4, #7fb1e8);
 }
 
 .ornate .below-where strong {
@@ -8265,7 +8556,7 @@ button.btn.grand.centred:has(.grand-icon) .grand-text {
   padding: 6px 12px;
 }
 
-button.btn.grand.map-close {
+button.btn.back-button.map-close {
   position: absolute;
   bottom: 24px;
   left: 24px;
@@ -8369,8 +8660,28 @@ button.btn.grand.map-close {
 /* The way out of a dialog in the kit, at its foot. */
 .dialog-foot {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   padding-top: 16px;
+}
+
+/* The way out of a main screen: a round button ringed in gold, dark under the gold arrow, in its bottom left corner. */
+button.btn.back-button {
+  flex: none;
+  width: 56px;
+  min-height: 56px;
+  height: 56px;
+  padding: 0;
+  border: 1px solid var(--gold-deep);
+  border-radius: 50%;
+  background: rgba(14, 20, 12, 0.72);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  color: var(--gold-soft);
+}
+
+button.btn.back-button:hover:not(:disabled) {
+  border-color: var(--gold);
+  background: rgba(14, 20, 12, 0.9);
+  color: #fff;
 }
 
 .ornate .tabs {
@@ -8479,7 +8790,8 @@ button.btn.grand.map-close {
   color: var(--ink-soft);
 }
 
-button.btn.grand.calendar-close {
+button.btn.back-button.calendar-close {
+  align-self: flex-start;
   margin-top: auto;
 }
 
@@ -8584,27 +8896,8 @@ button.society-member:disabled {
   opacity: 0.8;
 }
 
-.fair-person {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-}
 
-.fair-person .portrait .caps {
-  color: var(--gold-soft);
-}
 
-.map-board button.btn.fair-hello {
-  min-height: 0;
-  height: 22px;
-  padding: 0 10px;
-  border-color: var(--gold-deep);
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.35);
-  color: var(--gold-soft);
-  font-size: 0.7rem;
-}
 
 .map-pin.fair-table.joined {
   border-color: var(--gold-soft);
@@ -8619,4 +8912,224 @@ button.society-member:disabled {
   flex-direction: column;
   gap: 2px;
   padding: 12px 18px;
+}
+
+/* ---- The Undercroft's command window, all of it game controls: targets, the way back, waiting, turning back. */
+
+/* A target: its face or picture by its name, and what it has left. */
+.below-target-art {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+}
+
+.below-target .portrait-face {
+  border-color: var(--gold-deep);
+}
+
+.ornate .below-target .below-small {
+  color: var(--gold-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Back: a plate like the rest, set apart by its colder edge. */
+.ornate .below-command.below-back {
+  border-color: rgba(242, 226, 160, 0.4);
+  background: rgba(0, 0, 0, 0.35);
+}
+
+/* Something being waited on: the word in gold, and three dots that come and go after it. */
+.below-thinking {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  color: var(--gold-soft);
+  font: 600 1.4rem/1 var(--display);
+  letter-spacing: 0.04em;
+}
+
+.below-thinking i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  animation: below-dot 1.2s ease-in-out infinite;
+}
+
+.below-thinking i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.below-thinking i:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes below-dot {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+}
+
+.below-command.below-skip,
+.below-command.below-leave {
+  min-width: 140px;
+  justify-content: center;
+}
+
+.below-skip strong,
+.below-leave strong {
+  justify-content: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .below-thinking i {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
+/* How close two of them are, and what they are to each other, at the end of the bar. */
+.tie-said {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.meter-row:has(.tie-said) {
+  grid-template-columns: 84px minmax(0, 1fr) auto;
+}
+
+.fair-table .portrait .caps,
+.fair-visitor .portrait .caps {
+  color: var(--gold-soft);
+}
+
+/* A painted emblem in place of a drawn icon: kept whole in its square, and never squashed by the row it sits in. */
+.icon-art {
+  display: block;
+  flex: none;
+  object-fit: contain;
+  user-select: none;
+}
+
+/* The stats in the kit: each on a parchment card on the dark, its score large, and the skills on a sheet of their own. */
+.ornate .stat-row {
+  gap: 8px;
+}
+
+.ornate .stat-name {
+  font: 700 1.25rem var(--display);
+}
+
+.ornate .stat-score {
+  color: var(--gold-deep);
+  font-size: 2rem;
+}
+
+.ornate .skill-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.ornate .skill-list h2 {
+  font-size: 1.75rem;
+}
+
+/* ---- The tiles in the bottom right corner in the kit: each a dark panel trimmed in gold, its icon in a gold-ringed disc,
+   and the small buttons under them (help, the menu, a scene's own) as gold-edged pills of the same make. */
+
+.tiles .tile {
+  gap: 6px;
+  border: 2px solid var(--gold);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #4f6f3c 0%, var(--moss-deep) 55%, var(--wood) 100%);
+  backdrop-filter: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 200, 0.25),
+    inset 0 0 0 3px rgba(26, 34, 22, 0.35),
+    inset 0 0 0 4px rgba(212, 175, 90, 0.45),
+    0 6px 16px rgba(0, 0, 0, 0.45);
+  color: var(--gold-soft);
+  font: 600 1.125rem var(--display);
+}
+
+/* The thing itself, drawn, standing over its name. */
+.tile-art {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.5));
+  user-select: none;
+}
+
+.tiles .tile:not(:disabled):hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 240, 200, 0.3),
+    inset 0 0 0 3px rgba(26, 34, 22, 0.35),
+    inset 0 0 0 4px rgba(212, 175, 90, 0.7),
+    0 0 0 2px var(--gold-glow),
+    0 8px 22px rgba(0, 0, 0, 0.5);
+}
+
+.tiles .tile:disabled {
+  border-color: var(--gold-deep);
+  background: linear-gradient(180deg, #4a4a40, #2c2c26);
+  color: rgba(242, 226, 160, 0.55);
+  filter: saturate(0.4);
+}
+
+/* The house's tile is wide and short: its picture smaller, beside its name. */
+.tiles .tile.home .tile-art {
+  width: 40px;
+  height: 40px;
+}
+
+.tiles .tile-menu {
+  border: 1px solid var(--gold-deep);
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--moss-deep), var(--wood-deep));
+  backdrop-filter: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  color: var(--gold-soft);
+  font-weight: 600;
+}
+
+.tiles .tile-menu svg {
+  color: var(--gold);
+}
+
+.tiles button.tile-menu:not(:disabled):hover {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px var(--gold-glow), 0 6px 14px rgba(0, 0, 0, 0.45);
+}
+
+/* The phone's apps as app icons: a rounded square of art over each name. */
+.app-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 22%;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.25),
+    0 3px 6px rgba(0, 0, 0, 0.45);
+  user-select: none;
+}
+
+.phone-tab.selected .app-icon {
+  box-shadow:
+    0 0 0 2px var(--gold),
+    0 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.phone-tab:disabled .app-icon {
+  filter: grayscale(1);
 }

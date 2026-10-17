@@ -318,12 +318,19 @@ describe('what came out over a scene, and what changed between those in it', () 
 
     const read = parseSummary(`{"memory":"m","affection":1,"trust":0,"desire":0,"reason":"r","sex":false,"learned":["${open[0].id.toUpperCase()}","made-up"],"rapport":[{"with":"BEA","relation":"Friends"},{"with":"nobody","relation":"enemies"}]}`)
     expect(sceneRevelations(content, state, [{ id: 'ana', learned: read.learned ?? [] }])).toEqual([{ loveInterestId: 'ana', factId: open[0].id }])
-    const changes = sceneRapport(state, ['ana', 'bea'], [
+    // Only where both say the same: one alone, or the two at odds, changes nothing; nothing for someone who was not there.
+    expect(sceneRapport(state, ['ana', 'bea'], [{ id: 'ana', rapport: read.rapport ?? [] }])).toEqual([])
+    expect(sceneRapport(state, ['ana', 'bea'], [
       { id: 'ana', rapport: read.rapport ?? [] },
       { id: 'bea', rapport: [{ with: 'ana', relation: 'enemies' }] }
-    ])
-    // One verdict for the pair, the first given; nothing for someone who was not there.
-    expect(changes).toEqual([{ a: 'ana', b: 'bea', relation: 'friends' }])
+    ])).toEqual([])
+    expect(sceneRapport(state, ['ana', 'bea'], [
+      { id: 'ana', rapport: read.rapport ?? [] },
+      { id: 'bea', rapport: [{ with: 'ana', relation: 'friends' }] }
+    ])).toEqual([{ a: 'ana', b: 'bea', relation: 'friends' }])
+    // Each is told how she stood with the others before the scene.
+    const { system: _s, user } = buildSummaryPrompt({ content, state, scene, forId: 'ana' })
+    expect(user).toContain('Before this scene she and Bea were')
   })
 })
 

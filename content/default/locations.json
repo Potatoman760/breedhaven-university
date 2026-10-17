@@ -39,7 +39,8 @@
         "title": "Work the crowd on the steps",
         "description": "You take a spot on the terrace steps and start talking to whoever sits down near you."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-great-court-cutout.png"
   },
   {
     "id": "lecture-halls",
@@ -69,7 +70,8 @@
         "title": "Sit in on an open lecture",
         "description": "You slip into the back of a lecture that is not yours and take notes anyway."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-lecture-halls-cutout.png"
   },
   {
     "id": "library",
@@ -105,7 +107,8 @@
         "title": "Read the old philosophers",
         "description": "You take down something chained and difficult and read it slowly."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-library-cutout.png"
   },
   {
     "id": "commons",
@@ -148,7 +151,8 @@
         "title": "Eat like an athlete at the hot counter",
         "description": "Two trays, three helpings, and a kitchen manager who approves."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-commons-cutout.png"
   },
   {
     "id": "chapel",
@@ -177,7 +181,8 @@
         "title": "Sit in silence in the chapel",
         "description": "You take a pew near the back and let the quiet do its work."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-chapel-cutout.png"
   },
   {
     "id": "tiltyard",
@@ -217,7 +222,8 @@
         "title": "Laps of the track",
         "description": "You set off round the track at a pace you mean to keep."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-tiltyard-cutout.png"
   },
   {
     "id": "physic-garden",
@@ -248,7 +254,8 @@
         "title": "Dig and haul compost",
         "description": "A fork, a barrow and a heap that needs to be somewhere else."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-physic-garden-cutout.png"
   },
   {
     "id": "bathhouse",
@@ -278,7 +285,8 @@
         "title": "Swim lengths",
         "description": "You lower yourself into the warm pool and start counting lengths."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-bathhouse-cutout.png"
   },
   {
     "id": "foundry",
@@ -313,7 +321,8 @@
         "title": "Fine soldering at the benches",
         "description": "A magnifier, a steady hand, and a board of joints the size of pinheads."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-foundry-cutout.png"
   },
   {
     "id": "health-centre",
@@ -351,7 +360,8 @@
         "title": "Sit in on a counseling talk",
         "description": "An open session in a quiet room, on living with the Bloom and with each other."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-health-centre-cutout.png"
   },
   {
     "id": "dormitories",
@@ -372,7 +382,8 @@
     ],
     "indoors": true,
     "private": true,
-    "drills": []
+    "drills": [],
+    "iconImage": "sprites/icons/places-dormitories-cutout.png"
   },
   {
     "id": "lantern-row",
@@ -398,7 +409,8 @@
         "title": "Charm the shopkeepers of Lantern Row",
         "description": "You work your way down the row, one counter and one conversation at a time."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-lantern-row-cutout.png"
   },
   {
     "id": "honeyed-bee-inn",
@@ -434,7 +446,8 @@
         "title": "Cards at the back table",
         "description": "You are dealt in at the back table, where the stakes are small and the fingers are quick."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-honeyed-bee-inn-cutout.png"
   },
   {
     "id": "market",
@@ -469,7 +482,8 @@
         "title": "Carry crates for the stalls",
         "description": "The morning deliveries are stacked at the kerb and somebody has to shift them."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-market-cutout.png"
   },
   {
     "id": "bloom-and-co",
@@ -493,7 +507,8 @@
     },
     "indoors": true,
     "private": false,
-    "drills": []
+    "drills": [],
+    "iconImage": "sprites/icons/places-bloom-and-co-cutout.png"
   },
   {
     "id": "dawnbloom-house",
@@ -514,7 +529,8 @@
     ],
     "indoors": true,
     "private": false,
-    "drills": []
+    "drills": [],
+    "iconImage": "sprites/icons/places-dawnbloom-house-cutout.png"
   },
   {
     "id": "spell-and-sip",
@@ -549,7 +565,8 @@
         "title": "Join a study group's argument",
         "description": "The table next to yours is arguing about the reading, and you have opinions."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-spell-and-sip-cutout.png"
   },
   {
     "id": "pixel-and-rune",
@@ -579,7 +596,8 @@
         "title": "The rhythm game",
         "description": "You feed the machine and step onto the pad as the first track starts."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-pixel-and-rune-cutout.png"
   },
   {
     "id": "boba-blossom",
@@ -609,7 +627,8 @@
         "title": "Chat up the queue",
         "description": "The queue is long, slow and bored, which is an audience."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-boba-blossom-cutout.png"
   },
   {
     "id": "cauldron",
@@ -644,7 +663,8 @@
         "title": "Dine like you belong",
         "description": "You take a table for one and behave as though you do this every week."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-cauldron-cutout.png"
   },
   {
     "id": "ironroot",
@@ -679,7 +699,8 @@
         "title": "The treadmill and the circuit",
         "description": "An hour of running that goes nowhere, and then the circuit."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-ironroot-cutout.png"
   },
   {
     "id": "lumen",
@@ -709,7 +730,8 @@
         "title": "Watch an old film closely",
         "description": "A matinee of something old and slow, in a nearly empty house."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-lumen-cutout.png"
   },
   {
     "id": "undergrowth",
@@ -744,7 +766,8 @@
         "title": "Dance until closing",
         "description": "The floor is packed, the bass is in your ribs, and you are not stopping first."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-undergrowth-cutout.png"
   },
   {
     "id": "riverside-park",
@@ -775,7 +798,8 @@
         "title": "Sit by the water and think",
         "description": "You take a bench facing the river and let your thoughts run out."
       }
-    ]
+    ],
+    "iconImage": "sprites/icons/places-riverside-park-cutout.png"
   },
   {
     "id": "sire-house",
@@ -887,6 +911,7 @@
     ],
     "indoors": true,
     "private": true,
-    "drills": []
+    "drills": [],
+    "iconImage": "sprites/icons/places-sire-house-cutout.png"
   }
 ]

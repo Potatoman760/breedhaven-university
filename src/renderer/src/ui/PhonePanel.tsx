@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import {
   addNote,
   answerInvite,
@@ -67,7 +67,10 @@ import {
   unreadNotes,
   unreadPosts,
   markFeedSeen,
+  viewImage,
+  weatherOn,
   canJoinSociety,
+  knownRelation,
   joinSociety,
   leaveSociety
 } from '../../../shared/game'
@@ -78,10 +81,18 @@ import { MEMORY_LEVEL_LABELS, METERS, STATS, type ContentPack, type GameState, t
 import { errorMessage } from '../errors'
 import { Overlay } from './Dialog'
 import { useConfirm } from './Confirm'
-import { JobIcon } from './icons'
-import { BackIcon, ChatIcon, ChevronIcon, FeedIcon, FriendsIcon, HeartIcon, MarketIcon,
-  PregnantIcon, WorkIcon } from './icons'
+import { BackIcon, BatteryIcon, CalendarIcon, ChatIcon, ChevronIcon, ClockIcon, CoinIcon, HeartIcon, PregnantIcon, SignalIcon, TagIcon, WeatherIcon, WifiIcon } from './icons'
+import crest from '../../../assets/phone/crest.png'
+import star from '../../../assets/phone/star.png'
+import chatsArt from '../../../assets/phone/apps/chats.png'
+import friendsArt from '../../../assets/phone/apps/friends.png'
+import updatesArt from '../../../assets/phone/apps/updates.png'
+import jobsArt from '../../../assets/phone/apps/jobs.png'
+import societiesArt from '../../../assets/phone/apps/societies.png'
+import shopArt from '../../../assets/phone/apps/shop.png'
 import { Stalls } from './MarketView'
+import { BackButton } from './BackButton'
+import { useBack } from '../mouseBack'
 import { EmojiPicker } from './EmojiPicker'
 
 interface Props {
@@ -105,12 +116,12 @@ interface Props {
  * apps are drawn.
  */
 const APPS = [
-  { id: 'chats', label: 'DMs', Icon: ChatIcon },
-  { id: 'friends', label: 'Friends', Icon: FriendsIcon },
-  { id: 'updates', label: 'Feed', Icon: FeedIcon },
-  { id: 'jobs', label: 'Jobs', Icon: WorkIcon },
-  { id: 'societies', label: 'Societies', Icon: (p: { size?: number }) => <JobIcon name="columns" {...p} /> },
-  { id: 'shop', label: 'Market', Icon: MarketIcon }
+  { id: 'chats', label: 'DMs', title: 'Bloomr DMs', art: chatsArt },
+  { id: 'friends', label: 'Friends', title: 'Friends', art: friendsArt },
+  { id: 'updates', label: 'Feed', title: 'Bloomr', art: updatesArt },
+  { id: 'jobs', label: 'Jobs', title: 'Jobs', art: jobsArt },
+  { id: 'societies', label: 'Societies', title: 'Societies', art: societiesArt },
+  { id: 'shop', label: 'Market', title: 'Market', art: shopArt }
 ] as const
 type App = (typeof APPS)[number]['id']
 
@@ -151,19 +162,29 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, app: 
   // Only someone who has given him her Bloomr can be messaged.
   const canMessage = (id: string) => hasContact(state, id)
   const [friendId, setFriendId] = useState<string | undefined>(initialId)
+  useBack(app === 'friends' && friendId !== undefined ? () => setFriendId(undefined) : undefined, 1)
   const message = (id: string) => {
     setChatId(id)
     setApp('chats')
   }
+  const date = toDate(content.calendar, state.time)
+  const weather = weatherOn(content, state)
+  const clock = `${String(date.hour).padStart(2, '0')}:00`
 
   return (
     <Overlay onClose={onClose} sounds={['phoneOn', 'phoneOff']}>
       <div className="phone">
+        <div className="phone-glass">
+        <div className="phone-status" aria-hidden="true">
+          <span className="phone-status-marks">
+            <SignalIcon size={16} />
+            <WifiIcon size={16} />
+            <BatteryIcon size={14} />
+          </span>
+        </div>
         <nav className="phone-rail" role="tablist" aria-orientation="vertical">
-          <button className="phone-back" aria-label="Put the phone away" onClick={onClose}>
-            <BackIcon size={22} />
-          </button>
-          {APPS.map(({ id, label, Icon }) => (
+          <img className="phone-crest" src={crest} alt="" draggable={false} />
+          {APPS.map(({ id, label, art }) => (
             <button
               key={id}
               role="tab"
@@ -175,13 +196,33 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, app: 
               title={id === 'shop' && !canAct ? 'Disabled during a scene' : undefined}
               onClick={() => setApp(id)}
             >
-              <Icon size={26} />
+              <img className="app-icon" src={art} alt="" draggable={false} />
               {label}
               {id === 'chats' && unreadNotes(state) > 0 && <span className="badge">{unreadNotes(state)}</span>}
               {id === 'updates' && unreadPosts(state) > 0 && <span className="badge">{unreadPosts(state)}</span>}
             </button>
           ))}
+          <BackButton className="phone-back" label="Put the phone away" onClick={onClose} />
         </nav>
+
+        <div className="phone-main">
+        <header className="phone-head">
+          <h1 className="phone-title">
+            <img src={star} alt="" draggable={false} />
+            {APPS.find((one) => one.id === app)?.title}
+          </h1>
+          <span className="phone-money" title="Money">
+            <CoinIcon size={20} />${state.player.money}
+          </span>
+          <span className="phone-date" title={weather?.name}>
+            <CalendarIcon size={20} />
+            <span>
+              {date.weekday}, {date.day} {date.month.name}
+              <strong>{clock}</strong>
+            </span>
+            <WeatherIcon kind={weather?.icon} image={weather?.iconImage} size={26} />
+          </span>
+        </header>
 
         <div className={`phone-screen ${app}`}>
           {app === 'chats' && <Chats content={content} state={state} onChange={onChange} selectedId={chatId} onSelect={setChatId} onGoToInvite={onGoToInvite} canAct={canAct} />}
@@ -190,6 +231,8 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, app: 
           {app === 'jobs' && <Jobs content={content} state={state} onChange={onChange} onMessage={message} />}
           {app === 'societies' && <Societies content={content} state={state} onChange={onChange} />}
           {app === 'shop' && <Market content={content} state={state} onChange={onChange} />}
+        </div>
+        </div>
         </div>
       </div>
     </Overlay>
@@ -222,7 +265,6 @@ function Chats({ content, state, onChange, selectedId, onSelect, onGoToInvite, c
   return (
     <>
       <div className="chat-list">
-        <h1 className="phone-title">Bloomr DMs</h1>
         <div className="chat-rows">
           {listed.length === 0 && <p className="hint">Nobody has given you their Bloomr yet. Ask someone for it when you are with them.</p>}
           {listed.map((li) => {
@@ -510,7 +552,6 @@ function Friends({ content, state, selectedId, onSelect, onMessage, canMessage }
 
   return (
     <div className="friend-list">
-      <h1 className="phone-title">Friends</h1>
       <span className="caps">Contacts · {listed.length}</span>
       {listed.length === 0 && <p className="hint phone-empty">You have not met anyone yet. People appear here once you have spent time with them.</p>}
       <div className="friend-grid">
@@ -577,7 +618,6 @@ function Updates({ content, state, onChange, onMessage, canMessage }: UpdatesPro
   const everyone = [...content.loveInterests, ...content.npcs]
   return (
     <div className="feed" ref={list}>
-      <h1 className="phone-title">Bloomr</h1>
       {posts.length === 0 && (
         <p className="hint phone-empty">
           Nobody has posted yet. Posts come from people whose contact you have, through the day, and need both the Main LLM and ComfyUI set up.
@@ -713,71 +753,60 @@ function Jobs({ content, state, onChange, onMessage }: JobsProps) {
   return (
     <div className="feed jobs">
       {dialog}
-      <h1 className="phone-title">Jobs</h1>
       {held && state.job && config && (
         <article className="post job mine">
-          <header>
-            <span className="job-icon">
-              <JobIcon name={held.icon} size={26} />
-            </span>
-            <div>
-              <span className="caps">Your job</span>
-              <strong>
-                {held.title} · {place(held.locationId)}
-              </strong>
-              <span className="handle">
-                ${held.hourlyRate} an hour{bonusNote(held)} · {hoursPerWeek(held)} hours a week{held.trains ? ` · builds ${held.trains}` : ''} · {bossOf(content, held)?.name ?? 'the boss'}
+          <PlaceThumb content={content} locationId={held.locationId} ribbon="Your job" />
+          <div className="job-body">
+            <header>
+              <h3>
+                {held.title} <span>· {place(held.locationId)}</span>
+              </h3>
+              <span className={state.job.strikes > 0 ? 'chip madder' : 'chip'}>
+                {state.job.strikes} of {config.strikes} strikes
               </span>
+            </header>
+            <JobFacts pay={`$${held.hourlyRate} / hour${bonusNote(held)}`} hours={hoursPerWeek(held)} builds={held.trains} extra={bossOf(content, held)?.name} />
+            <p className="job-note">
+              Go to {place(held.locationId)} during a shift to clock in. A shift missed without a word is a strike. If you can't make one, message{' '}
+              {bossOf(content, held)?.name.split(' ')[0] ?? 'your boss'} that day before it starts and it counts for half.
+            </p>
+            <div className="job-actions">
+              <Button size="small" onClick={() => onMessage(held.bossId)}>
+                <ChatIcon size={18} />
+                Message {bossOf(content, held)?.name.split(' ')[0] ?? 'the boss'}
+              </Button>
+              <Button
+                size="small"
+                onClick={async () =>
+                  (await ask({ title: `Quit as ${held.title.toLowerCase()}?`, detail: `${place(held.locationId)} will not take you back.`, confirm: 'Quit', cancel: 'Stay', grave: true })) &&
+                  onChange((current) => quitJob(content, current))
+                }
+              >
+                Quit
+              </Button>
+              <CalendarCompare content={content} state={state} job={held} />
             </div>
-            <span className={state.job.strikes > 0 ? 'chip madder' : 'chip'}>
-              {state.job.strikes} of {config.strikes} strikes
-            </span>
-          </header>
-          <CalendarCompare content={content} state={state} job={held} />
-          <p className="hint">
-            Go to {place(held.locationId)} during a shift to clock in. A shift missed without a word is a strike. If you can't make one, message{' '}
-            {bossOf(content, held)?.name.split(' ')[0] ?? 'your boss'} that day before it starts and it counts for half.
-          </p>
-          <footer>
-            <button className="quiet" onClick={() => onMessage(held.bossId)}>
-              <ChatIcon size={20} />
-              Message {bossOf(content, held)?.name.split(' ')[0] ?? 'the boss'}
-            </button>
-            <button
-              className="quiet"
-              onClick={async () =>
-                (await ask({ title: `Quit as ${held.title.toLowerCase()}?`, detail: `${place(held.locationId)} will not take you back.`, confirm: 'Quit', cancel: 'Stay', grave: true })) &&
-                onChange((current) => quitJob(content, current))
-              }
-            >
-              Quit
-            </button>
-          </footer>
+          </div>
         </article>
       )}
-      {!config || config.jobs.length === 0 ? <p className="hint phone-empty">Nobody is hiring.</p> : <span className="caps">Openings · {openings.length}</span>}
+      {!config || config.jobs.length === 0 ? <p className="hint phone-empty">Nobody is hiring.</p> : <SectionRule>Openings · {openings.length}</SectionRule>}
       {openings.map((job) => {
         const check = canApply(content, state, job.id)
         const gone = state.formerJobs.includes(job.id)
         const needs = STATS.filter((stat) => job.requirements[stat] !== undefined)
         return (
           <article key={job.id} className={gone ? 'post job gone' : 'post job'}>
+            <PlaceThumb content={content} locationId={job.locationId} />
+            <div className="job-body">
             <header>
-              <span className="job-icon">
-                <JobIcon name={job.icon} size={26} />
-              </span>
-              <div>
-                <strong>
-                  {job.title} · {place(job.locationId)}
-                </strong>
-                <span className="handle">
-                  ${job.hourlyRate} an hour{bonusNote(job)} · {hoursPerWeek(job)} hours a week{job.trains ? ` · builds ${job.trains}` : ''}
-                </span>
-              </div>
-              <button disabled={!check.ok} onClick={() => onChange((current) => (canApply(content, current, job.id).ok ? applyForJob(content, current, job.id) : current))}>
+              <h3>
+                {job.title} <span>· {place(job.locationId)}</span>
+              </h3>
+              <Button variant="primary" size="small" disabled={!check.ok} onClick={() => onChange((current) => (canApply(content, current, job.id).ok ? applyForJob(content, current, job.id) : current))}>
                 Apply
-              </button>
+              </Button>
             </header>
+            <JobFacts pay={`$${job.hourlyRate} / hour${bonusNote(job)}`} hours={hoursPerWeek(job)} builds={job.trains} />
             <p>{job.description}</p>
             <div className="chips job-asks">
               {needs.length === 0 && <span className="chip">No requirements</span>}
@@ -794,10 +823,65 @@ function Jobs({ content, state, onChange, onMessage }: JobsProps) {
               <CalendarCompare content={content} state={state} job={job} />
             </div>
             {!check.ok && <span className="pin-note">{check.reasons.join(' · ')}</span>}
+            </div>
           </article>
         )
       })}
     </div>
+  )
+}
+
+/** The picture of where a job or a society is, at the head of its card: the place's first view, by day. */
+function PlaceThumb({ content, locationId, ribbon, emblem }: { content: ContentPack; locationId: string; ribbon?: string; emblem?: string }) {
+  const picture = viewImage(content.locations.find((l) => l.id === locationId)?.backgrounds[0], 'day')
+  return (
+    <figure className="job-thumb">
+      {picture && <img src={`content://pack/${picture}`} alt="" draggable={false} />}
+      {emblem && <img className="job-emblem" src={`content://pack/${emblem}`} alt="" draggable={false} />}
+      {ribbon && <figcaption>{ribbon}</figcaption>}
+    </figure>
+  )
+}
+
+/** A card's figures in a row, each with its mark: pay, hours, what it builds. */
+function JobFacts({ pay, hours, builds, when, extra }: { pay?: string; hours?: number; builds?: string; when?: string; extra?: string }) {
+  return (
+    <div className="job-facts">
+      {pay && (
+        <span>
+          <CoinIcon size={16} />
+          {pay}
+        </span>
+      )}
+      {hours !== undefined && (
+        <span>
+          <ClockIcon size={16} />
+          {hours} hours / week
+        </span>
+      )}
+      {when && (
+        <span>
+          <ClockIcon size={16} />
+          {when}
+        </span>
+      )}
+      {builds && (
+        <span>
+          <TagIcon size={16} />
+          Builds {builds}
+        </span>
+      )}
+      {extra && <span>{extra}</span>}
+    </div>
+  )
+}
+
+/** A heading across a list, with a sprig before it and a rule after. */
+function SectionRule({ children }: { children: ReactNode }) {
+  return (
+    <h2 className="section-rule">
+      <span>{children}</span>
+    </h2>
   )
 }
 
@@ -810,13 +894,12 @@ function Societies({ content, state, onChange }: { content: ContentPack; state: 
   return (
     <div className="feed jobs">
       {dialog}
-      <h1 className="phone-title">Societies</h1>
       {!config || all.length === 0 ? (
         <p className="hint phone-empty">There are no societies.</p>
       ) : (
-        <span className="caps">
+        <SectionRule>
           {state.societies.length} of {config.maxJoined} joined
-        </span>
+        </SectionRule>
       )}
       {all.map((society) => {
         const mine = state.societies.includes(society.id)
@@ -825,20 +908,12 @@ function Societies({ content, state, onChange }: { content: ContentPack; state: 
         const sponsor = content.loveInterests.find((li) => li.id === society.sponsorId)
         return (
           <article key={society.id} className={mine ? 'post job mine society' : 'post job society'}>
+            <PlaceThumb content={content} locationId={society.locationId} ribbon={mine ? 'Joined' : undefined} emblem={society.iconImage} />
+            <div className="job-body">
             <header>
-              <span className="job-icon">
-                <JobIcon name="columns" size={26} />
-              </span>
-              <div>
-                {mine && <span className="caps">Your society</span>}
-                <strong>
-                  {society.name} · {place(society.locationId)}
-                </strong>
-                <span className="handle">
-                  {society.weekday}s at {String(society.startHour).padStart(2, '0')}:00 · builds {society.stats.join(' and ')}
-                  {sponsor && ` · sponsored by ${sponsor.name}`}
-                </span>
-              </div>
+              <h3>
+                {society.name.replace(/^the /, '')} <span>· {place(society.locationId)}</span>
+              </h3>
               {mine ? (
                 <Button
                   variant="quiet"
@@ -855,14 +930,16 @@ function Societies({ content, state, onChange }: { content: ContentPack; state: 
                 </Button>
               )}
             </header>
+            <JobFacts when={`${society.weekday}s at ${String(society.startHour).padStart(2, '0')}:00`} builds={society.stats.join(' and ')} extra={sponsor && `Sponsor: ${sponsor.name}`} />
             <p>{society.description}</p>
             {members.length + (sponsor ? 1 : 0) > 0 && (
               <div className="portraits">
                 {[...members, ...(sponsor ? [sponsor] : [])].map((li) => (
-                  <Portrait key={li.id} who={li} caption />
+                  <Portrait key={li.id} who={li} size={64} caption />
                 ))}
               </div>
             )}
+            </div>
           </article>
         )
       })}
@@ -894,9 +971,10 @@ function About({ content, state, li }: { content: ContentPack; state: GameState;
   }
   const classes = state.courses.filter((course) => courseMembers(course).includes(li.id))
   const periodName = (id: string) => content.calendar.periods.find((period) => period.id === id)?.name ?? id
+  // Everyone she is close to, and everyone he has seen her with: what they are to each other shows once he has.
   const ties = content.loveInterests
-    .filter((other) => other.id !== li.id && tieOf(content, state, li.id, other.id) > 0)
-    .map((other) => ({ other, value: tieOf(content, state, li.id, other.id) }))
+    .filter((other) => other.id !== li.id && (tieOf(content, state, li.id, other.id) > 0 || knownRelation(state, li.id, other.id) !== undefined))
+    .map((other) => ({ other, value: tieOf(content, state, li.id, other.id), relation: knownRelation(state, li.id, other.id) }))
     .sort((a, b) => b.value - a.value)
 
   return (
@@ -1005,13 +1083,17 @@ function About({ content, state, li }: { content: ContentPack; state: GameState;
       </p>
 
       {ties.length > 0 && <h2>With the others</h2>}
-      {ties.map(({ other, value }) => (
+      {ties.map(({ other, value, relation }) => (
         <div key={other.id} className="meter-row">
           <span>{other.name.split(' ')[0]}</span>
           <div className="meter affection">
             <div style={{ width: `${(value / content.relationships.meterMax) * 100}%` }} />
           </div>
-          <strong title={`${value}`}>{tieLevel(content, value)?.name ?? value}</strong>
+          <span className="tie-said">
+            <strong title={`${value}`}>{tieLevel(content, value)?.name ?? value}</strong>
+            {relation === 'friends' && <span className="chip fact">Friends</span>}
+            {relation === 'enemies' && <span className="chip fact disliked">Enemies</span>}
+          </span>
         </div>
       ))}
 

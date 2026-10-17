@@ -18,7 +18,8 @@
     "clips": "jiti scripts/generate-clips.ts",
     "births": "jiti scripts/generate-births.ts",
     "below": "jiti scripts/generate-below.ts",
-    "items": "jiti scripts/generate-items.ts"
+    "items": "jiti scripts/generate-items.ts",
+    "icons": "jiti scripts/generate-icons.ts"
   },
   "dependencies": {
     "@fontsource/alegreya-sans": "^5.3.0",

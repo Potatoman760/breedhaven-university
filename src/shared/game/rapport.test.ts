@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { loadContentPack } from '../../main/content/loader'
 import { kindOf } from '../model'
 import { buildCharacterPrompt } from './prompt'
-import { assignRapport, describeRapport, relationBetween, setRelation } from './rapport'
+import { assignRapport, describeRapport, knownRelation, noteTogether, relationBetween, setRelation } from './rapport'
 import { createInitialState } from './state'
 
 const content = loadContentPack(join(process.cwd(), 'content', 'default'))
@@ -57,5 +57,18 @@ describe('friends and enemies', () => {
     expect(together).toContain('## How the women here stand with each other')
     expect(together).toContain('Seraphine and Yelena are enemies')
     expect(buildCharacterPrompt({ content, state, loveInterestId: 'seraphine', sceneBeats: [{ activityName: 'Tea' }] })).not.toContain('stand with each other')
+  })
+})
+
+describe('what he knows of them', () => {
+  it('is nothing until he has seen two of them in a scene together, and then what they are', () => {
+    const state = setRelation(setRelation({ rapport: {}, seenTogether: [] as string[] }, 'ana', 'bea', 'friends'), 'ana', 'cy', 'enemies')
+    expect(knownRelation(state, 'ana', 'bea')).toBeUndefined()
+    const seen = noteTogether(state, ['ana', 'bea', 'cy'])
+    expect(knownRelation(seen, 'bea', 'ana')).toBe('friends')
+    expect(knownRelation(seen, 'ana', 'cy')).toBe('enemies')
+    expect(knownRelation(seen, 'bea', 'cy')).toBe('neither')
+    // Seen again, nothing changes.
+    expect(noteTogether(seen, ['cy', 'ana'])).toBe(seen)
   })
 })

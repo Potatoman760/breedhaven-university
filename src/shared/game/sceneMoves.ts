@@ -117,7 +117,7 @@ export function moveState(state: GameState, destination: Destination): GameState
  * The scene after it has moved. What was being done where it was is over and marked so;
  * arriving is the new beat; and it is, or is no longer, in someone's room.
  */
-export function movedScene<S extends Pick<Scene, 'beats' | 'roomOf' | 'backgroundId' | 'viewId' | 'picture'>>(scene: S, destination: Destination): S {
+export function movedScene<S extends Pick<Scene, 'beats' | 'roomOf' | 'backgroundId' | 'viewId' | 'picture' | 'returnTo'>>(scene: S, destination: Destination): S {
   return {
     ...scene,
     beats: [
@@ -128,10 +128,12 @@ export function movedScene<S extends Pick<Scene, 'beats' | 'roomOf' | 'backgroun
       }
     ],
     roomOf: destination.roomOf,
-    // A view picked for the old place means nothing in the new one, and neither does one it insisted on or a picture it was set in.
+    // A view picked for the old place means nothing in the new one, and neither does one it insisted on, a picture it was
+    // set in, or the screen it was come into from.
     backgroundId: undefined,
     viewId: undefined,
-    picture: undefined
+    picture: undefined,
+    returnTo: undefined
   }
 }
 

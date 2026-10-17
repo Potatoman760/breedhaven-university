@@ -735,5 +735,22 @@
       },
       "image": "generated/backgrounds/undercroft/the-wellspring.png"
     }
-  ]
+  ],
+  "effects": {
+    "firebolt": "sprites/fx/firebolt.webp",
+    "explosion": "sprites/fx/explosion.webp",
+    "shadow-orb": "sprites/fx/shadow-orb.webp",
+    "hex-sigil": "sprites/fx/hex-sigil.webp",
+    "force-orb": "sprites/fx/force-orb.webp",
+    "smite": "sprites/fx/smite.webp",
+    "heal": "sprites/fx/heal.webp",
+    "ward": "sprites/fx/ward.webp",
+    "stone-spikes": "sprites/fx/stone-spikes.webp"
+  },
+  "stopImages": {
+    "fight": "sprites/icons/stops-fight-cutout.png",
+    "find": "sprites/icons/stops-find-cutout.png",
+    "checkpoint": "sprites/icons/stops-checkpoint-cutout.png",
+    "guardian": "sprites/icons/stops-guardian-cutout.png"
+  }
 }

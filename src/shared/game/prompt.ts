@@ -77,6 +77,8 @@ export interface PromptInput {
   departed?: Departure[]
   /** How many hours the scene has taken so far. */
   hoursSoFar?: number
+  /** Set once the scene has run past its usual length, to how many times he has spoken in it: she is asked to wind it down. */
+  windDown?: number
   /** The love interest whose own room the scene is in, if it is in one. */
   roomOf?: string
   /** The view of the place the player has picked, if any. */
@@ -674,7 +676,13 @@ export function buildCharacterPrompt(input: PromptInput): string {
           `${SCENE_END_TAG} on a line of its own at the very end of your reply.`,
         `It has reached a close when ${player.name} says goodbye, leaves, or asks to wrap up ` +
           `or finish; or when the moment has run its course and you have a reason to take your leave.`,
-        'Never write the tag at any other time, and never mention it.'
+        input.windDown !== undefined &&
+          `This scene has gone on for ${input.windDown} exchanges, longer than one like it usually runs. Within your next reply or two, find a reason of your own to go, ` +
+            `give ${group ? 'the parting lines' : 'your parting line'} and end the scene.` +
+            (() => {
+              const soon = classSoon(content, state, li.id, CLASS_SOON_HOURS)
+              return soon ? ` You have ${soon.course.number} at ${String(soon.startHour).padStart(2, '0')}:00: that is reason enough.` : ''
+            })()
       ]),
 
     // Repeated last, where it is least likely to be forgotten.
@@ -710,7 +718,11 @@ export function openingCue(playerName: string): string {
  */
 export function sceneTurns(messages: ChatMessage[], playerName: string, lesson?: Lesson, now?: string): ChatMessage[] {
   // Each of her replies goes back as she wrote it, hidden lines and all: one sent without them would teach her to leave them out.
-  const turns = messages.map(({ role, content, tags }): ChatMessage => ({ role, content: role === 'assistant' && tags ? `${tags}\n${content}` : content }))
+  // A stage note he did not say (someone walking in) goes in front of his line, where it is not missed.
+  const turns = messages.map(({ role, content, tags, cue }): ChatMessage => ({
+    role,
+    content: role === 'assistant' && tags ? `${tags}\n${content}` : cue ? `[${cue}]\n${content}` : content
+  }))
   const all: ChatMessage[] = turns[0]?.role === 'user' ? turns : [{ role: 'user', content: lesson ? lessonCue(playerName, lesson) : openingCue(playerName) }, ...turns]
   // The time is said again beside the latest thing said to her, where it is hardest to lose sight of: told once, far above, it is forgotten for "tonight".
   const last = all[all.length - 1]

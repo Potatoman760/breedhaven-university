@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { Portrait } from './Portrait'
 import type { LoveInterest } from '../../../shared/model'
 import { Button } from './Button'
+import { isMouseBack } from '../mouseBack'
 
 export interface TourStep {
   /** What she points at, as a selector. Left out, she speaks from the middle of the screen. */
@@ -78,7 +79,7 @@ export function Tour({ guide, steps, onDone }: { guide: LoveInterest; steps: Tou
   }, [last])
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') finish()
+      if (event.key === 'Escape' && !isMouseBack(event)) finish()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)

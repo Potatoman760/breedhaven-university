@@ -98,7 +98,7 @@ export function JobsEditor({ content, onContent, switcher }: Props) {
         <div className="editor-people">
           {listed.map((job) => (
             <button key={job.id} className={!isNew && job.id === original?.id ? 'courier-person selected' : 'courier-person'} onClick={() => open(job)}>
-              <JobIcon name={job.icon} size={22} />
+              <JobIcon name={job.icon} image={job.iconImage} size={22} />
               <span>
                 <strong>{job.title}</strong>
                 <span className="hint">
@@ -151,7 +151,7 @@ export function JobsEditor({ content, onContent, switcher }: Props) {
               <label>
                 Icon
                 <span className="row checks">
-                  <JobIcon name={draft.icon} size={26} />
+                  <JobIcon name={draft.icon} image={draft.iconImage} size={26} />
                   <select value={draft.icon ?? ''} onChange={(e) => set({ icon: e.target.value || undefined })}>
                     <option value="">Briefcase</option>
                     {Object.keys(JOB_ICON_PATHS).map((name) => (

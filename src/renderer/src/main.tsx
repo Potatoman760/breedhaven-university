@@ -8,7 +8,10 @@ import '@fontsource/cormorant-garamond/600.css'
 import '@fontsource/cormorant-garamond/700.css'
 import { App } from './App'
 import { CrashScreen } from './ui/CrashScreen'
+import { installMouseBack } from './mouseBack'
 import './styles.css'
+
+installMouseBack()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

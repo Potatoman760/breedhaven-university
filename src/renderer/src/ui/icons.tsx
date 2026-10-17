@@ -24,6 +24,11 @@ function Icon({ size = 24, viewBox = '0 0 36 36', children, ...rest }: IconProps
 
 type IconProps = { size?: number } & SVGProps<SVGSVGElement>
 
+/** A painted emblem in place of a drawn icon, at the icon's size. */
+function Emblem({ image, size = 24 }: { image: string; size?: number }) {
+  return <img className="icon-art" src={`content://pack/${image}`} alt="" width={size} height={size} draggable={false} />
+}
+
 const CLOUD = 'M8 17a5 5 0 01.6-10 6.5 6.5 0 0112.4 2A4 4 0 0120 17z'
 
 // Weather icons by the name used in content, drawn on a 28-unit grid.
@@ -58,7 +63,8 @@ const WEATHER_ICONS: Record<string, ReactNode> = {
 }
 
 /** The icon for a kind of weather. Unknown or missing kinds show a plain cloud. */
-export const WeatherIcon = ({ kind, ...p }: IconProps & { kind?: string }) => (
+export const WeatherIcon = ({ kind, image, ...p }: IconProps & { kind?: string; image?: string }) =>
+  image ? <Emblem image={image} size={p.size} /> : (
   <Icon viewBox="0 0 28 28" {...p}>
     {WEATHER_ICONS[kind ?? ''] ?? WEATHER_ICONS['cloudy']}
   </Icon>
@@ -231,7 +237,8 @@ const ITEM_ICONS: Record<string, ReactNode> = {
 }
 
 /** The icon for an item or stall. Unknown names fall back to a gift box. */
-export function ItemIcon({ name, size = 28 }: { name: string; size?: number }) {
+export function ItemIcon({ name, image, size = 28 }: { name: string; image?: string; size?: number }) {
+  if (image) return <Emblem image={image} size={size} />
   return (
     <Icon size={size} viewBox="0 0 24 24" strokeWidth={1.6}>
       {ITEM_ICONS[name] ?? ITEM_ICONS['gift']}
@@ -388,7 +395,8 @@ export const JOB_ICON_PATHS: Record<string, string> = {
 /** The names a job's data may give its picture. */
 export const JOB_ICONS = Object.keys(JOB_ICON_PATHS)
 
-export function JobIcon({ name, ...p }: IconProps & { name?: string }) {
+export function JobIcon({ name, image, ...p }: IconProps & { name?: string; image?: string }) {
+  if (image) return <Emblem image={image} size={p.size} />
   const path = name ? JOB_ICON_PATHS[name] : undefined
   if (!path) return <WorkIcon {...p} />
   return (
@@ -399,7 +407,8 @@ export function JobIcon({ name, ...p }: IconProps & { name?: string }) {
 }
 
 /** The picture of a place on the map, by the name its data gives. One that names none, or one not drawn here, gets a map pin. */
-export function PlaceIcon({ name, ...p }: IconProps & { name?: string }) {
+export function PlaceIcon({ name, image, ...p }: IconProps & { name?: string; image?: string }) {
+  if (image) return <Emblem image={image} size={p.size} />
   return (
     <Icon viewBox="0 0 24 24" {...p}>
       <path d={(name && JOB_ICON_PATHS[name]) || JOB_ICON_PATHS['pin']} />
@@ -415,4 +424,75 @@ const STOP_ICONS: Record<string, ReactNode> = {
   guardian: <path d="M7 27V12l6 6 5-9 5 9 6-6v15zM7 31h22" />
 }
 
-export const StopIcon = ({ kind, ...p }: IconProps & { kind: string }) => <Icon {...p}>{STOP_ICONS[kind] ?? STOP_ICONS.fight}</Icon>
+export const StopIcon = ({ kind, image, ...p }: IconProps & { kind: string; image?: string }) =>
+  image ? <Emblem image={image} size={p.size} /> : <Icon {...p}>{STOP_ICONS[kind] ?? STOP_ICONS.fight}</Icon>
+
+// The tablet's own small marks: its status bar, and the facts on a card.
+
+export const SignalIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 24 24" {...p}>
+    <path d="M4 20v-3M9 20v-6M14 20v-9M19 20V5" strokeWidth={3} />
+  </Icon>
+)
+
+export const WifiIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 24 24" {...p}>
+    <path d="M2 9a15 15 0 0120 0M5.500 12.500a10 10 0 0113 0M9 16a5 5 0 016 0M12 19.500h.010" strokeWidth={2.400} />
+  </Icon>
+)
+
+export const BatteryIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 30 16" {...p} width={(p.size ?? 24) * 1.6}>
+    <rect x="1" y="2" width="25" height="12" rx="3" />
+    <rect x="3.500" y="4.500" width="20" height="7" rx="1.500" fill="currentColor" stroke="none" />
+    <path d="M28.500 6v4" />
+  </Icon>
+)
+
+export const CoinIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 24 24" {...p}>
+    <ellipse cx="12" cy="7" rx="7" ry="3" />
+    <path d="M5 7v5c0 1.700 3.100 3 7 3s7-1.300 7-3V7M5 12v5c0 1.700 3.100 3 7 3s7-1.300 7-3v-5" />
+  </Icon>
+)
+
+export const ClockIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 24 24" {...p}>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3 2" />
+  </Icon>
+)
+
+export const TagIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 24 24" {...p}>
+    <path d="M3 12V4a1 1 0 011-1h8l9 9-9 9z" />
+    <circle cx="7.500" cy="7.500" r="1.500" />
+  </Icon>
+)
+
+// The menu's own marks.
+
+export const SaveIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 24 24" {...p}>
+    <path d="M5 3h11l3 3v15H5z M8 3v5h7V3 M8 21v-7h8v7" />
+  </Icon>
+)
+
+export const LoadIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 24 24" {...p}>
+    <path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z M12 11v6 M9 14l3 3 3-3" />
+  </Icon>
+)
+
+export const GearIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 24 24" {...p}>
+    <circle cx="12" cy="12" r="3" />
+    <path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.900 4.900l2.100 2.100M17 17l2.100 2.100M4.900 19.100L7 17M17 7l2.100-2.100" />
+  </Icon>
+)
+
+export const PowerIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 24 24" {...p}>
+    <path d="M12 3v9 M6.300 6.300a8 8 0 1011.400 0" />
+  </Icon>
+)

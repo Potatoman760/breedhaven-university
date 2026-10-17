@@ -1,7 +1,12 @@
 import type { ReactNode } from 'react'
 import { unreadNotes } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
-import { BagIcon, CalendarIcon, HelpIcon, JobIcon, MapIcon, MenuIcon, PhoneIcon } from './icons'
+import { HelpIcon, MenuIcon } from './icons'
+import bagArt from '../../../assets/tiles/bag.png'
+import calendarArt from '../../../assets/tiles/calendar.png'
+import houseArt from '../../../assets/tiles/house.png'
+import mapArt from '../../../assets/tiles/map.png'
+import phoneArt from '../../../assets/tiles/phone.png'
 import type { Panel } from './panels'
 
 interface Props {
@@ -20,33 +25,36 @@ interface Props {
 }
 
 /** The big buttons in the bottom right corner, the same on the day's screen and in a scene. */
+/** A tile's picture, drawn and not an icon: the thing itself. */
+const Art = ({ src }: { src: string }) => <img className="tile-art" src={src} alt="" draggable={false} />
+
 export function NavTiles({ content, state, onOpen, phoneId, bag = { kind: 'bag' }, bagDisabled, home, extras }: Props) {
   return (
     <div className="tiles">
       {/* His house, once he has one: its plan, who lives in it, and its accounts. */}
       {home && content.housing && state.housing.status === 'resident' && (
         <button className="tile glass home" onClick={() => onOpen({ kind: 'house' })}>
-          <JobIcon name="house" size={30} />
+          <Art src={houseArt} />
           {content.housing.name}
           {state.housing.arrears > 0 && <span className="badge">!</span>}
         </button>
       )}
       <button className="tile glass" data-tour="map" onClick={() => onOpen({ kind: 'map' })}>
-        <MapIcon size={32} />
+        <Art src={mapArt} />
         Map
       </button>
       <button className="tile glass" data-tour="phone" onClick={() => onOpen({ kind: 'courier', id: phoneId })}>
-        <PhoneIcon size={32} />
+        <Art src={phoneArt} />
         Phone
         {unreadNotes(state) > 0 && <span className="badge">{unreadNotes(state)}</span>}
       </button>
       <button className="tile glass" data-tour="calendar" onClick={() => onOpen({ kind: 'calendar' })}>
-        <CalendarIcon size={32} />
+        <Art src={calendarArt} />
         Calendar
       </button>
       {/* What he carries, can make and has brought up from below. */}
       <button className="tile glass" data-tour="bag" disabled={bagDisabled} onClick={() => onOpen(bag)}>
-        <BagIcon size={32} />
+        <Art src={bagArt} />
         Bag
       </button>
       {/* The menu, for whoever does not reach for Escape: continue, save, load, settings, and the way out. Small, and last, so that it sits in the corner. */}

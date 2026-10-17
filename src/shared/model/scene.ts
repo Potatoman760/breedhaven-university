@@ -15,7 +15,9 @@ export const ChatMessageSchema = z.object({
    * she wrote them. Never shown, but sent back with the reply in later turns, so that what
    * she has written before keeps showing her how a reply begins.
    */
-  tags: z.string().optional()
+  tags: z.string().optional(),
+  /** A stage note sent just before what he said, and never shown: someone walking in as he says it. */
+  cue: z.string().optional()
 })
 export type ChatMessage = z.infer<typeof ChatMessageSchema>
 
@@ -128,6 +130,8 @@ export const SceneSchema = z.object({
   lesson: LessonSchema.optional(),
   /** The scene is a meeting of a society he belongs to, by its id. */
   societyId: z.string().optional(),
+  /** The scene is a plan he made with her, kept: a date. */
+  planned: z.boolean().optional(),
   /** How comfortable each love interest in the scene last said she was, by id. For the LLM only. */
   comfort: z.record(z.string(), ComfortSchema).optional(),
   /** The scene is in this love interest's own room. */
@@ -136,6 +140,8 @@ export const SceneSchema = z.object({
   backgroundId: z.string().optional(),
   /** A view of the place the scene insists on, whatever the day would show: the maternity room, for a birth. Gone when the scene moves. */
   viewId: z.string().optional(),
+  /** The screen he came into it from and goes back out to once it is over: the fair's map, for a talk at a table. Gone when the scene moves. */
+  returnTo: z.enum(['fair']).optional(),
   /** A picture that is the whole stage for this scene, in place of the background and with nobody standing over it. Gone when the scene moves. */
   picture: z.string().optional(),
   /** An NPC who is there for this scene whatever her day says: the one showing him round. */

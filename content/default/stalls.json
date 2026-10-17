@@ -16,7 +16,8 @@
       "beeswax-tapers",
       "charmed-trowel",
       "moss-terrarium"
-    ]
+    ],
+    "iconImage": "sprites/icons/stalls-petal-and-posy-cutout.png"
   },
   {
     "id": "the-sweet-tooth",
@@ -35,7 +36,8 @@
       "brown-ale",
       "apple-tart",
       "starkeland-honey-drops"
-    ]
+    ],
+    "iconImage": "sprites/icons/stalls-the-sweet-tooth-cutout.png"
   },
   {
     "id": "quill-and-binding",
@@ -52,7 +54,8 @@
       "playing-cards",
       "vesperan-romance",
       "paint-set"
-    ]
+    ],
+    "iconImage": "sprites/icons/stalls-quill-and-binding-cutout.png"
   },
   {
     "id": "tinkers-tray",
@@ -72,7 +75,8 @@
       "banded-agate",
       "prayer-beads",
       "match-ball"
-    ]
+    ],
+    "iconImage": "sprites/icons/stalls-tinkers-tray-cutout.png"
   },
   {
     "id": "second-circuit",
@@ -85,7 +89,8 @@
       "hobby-kit",
       "earbuds",
       "charm-case"
-    ]
+    ],
+    "iconImage": "sprites/icons/stalls-second-circuit-cutout.png"
   },
   {
     "id": "seven-petals",
@@ -100,7 +105,8 @@
       "phone-charger",
       "lantern-row-whisper",
       "arena-program"
-    ]
+    ],
+    "iconImage": "sprites/icons/stalls-seven-petals-cutout.png"
   },
   {
     "id": "petal-and-pill",
@@ -112,7 +118,8 @@
       "bath-salts",
       "chamomile-tea",
       "study-tonic"
-    ]
+    ],
+    "iconImage": "sprites/icons/stalls-petal-and-pill-cutout.png"
   },
   {
     "id": "byte-and-bloom",
@@ -124,7 +131,8 @@
       "pocket-speaker",
       "game-controller",
       "smart-lamp"
-    ]
+    ],
+    "iconImage": "sprites/icons/stalls-byte-and-bloom-cutout.png"
   },
   {
     "id": "arcana",
@@ -139,7 +147,8 @@
       "tarot-deck",
       "ward-candles",
       "first-rain"
-    ]
+    ],
+    "iconImage": "sprites/icons/stalls-arcana-cutout.png"
   },
   {
     "id": "forbidden-shelf",
@@ -152,7 +161,8 @@
       "heretics-history",
       "antique-atlas",
       "curio"
-    ]
+    ],
+    "iconImage": "sprites/icons/stalls-forbidden-shelf-cutout.png"
   },
   {
     "id": "second-bloom",
@@ -166,7 +176,8 @@
       "worn-leather-jacket",
       "paperback",
       "veyran-mask"
-    ]
+    ],
+    "iconImage": "sprites/icons/stalls-second-bloom-cutout.png"
   },
   {
     "id": "spell-and-sip-counter",
@@ -177,6 +188,7 @@
     "itemIds": [
       "coffee-to-go",
       "almond-croissant"
-    ]
+    ],
+    "iconImage": "sprites/icons/stalls-spell-and-sip-counter-cutout.png"
   }
 ]

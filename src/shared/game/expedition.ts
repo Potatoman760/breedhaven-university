@@ -330,7 +330,7 @@ function enemiesAct(content: ContentPack, state: GameState, before: ExpeditionRu
         faces: target.id === HIM ? {} : { [target.id]: result.down ? 'sad' : 'surprised' },
         fx: [
           ...(result.warded > 0 ? [{ kind: 'absorb' as const, on: target.id, amount: result.warded }] : []),
-          ...(result.taken > 0 ? [{ kind: 'hit' as const, on: target.id, amount: result.taken }] : []),
+          ...(result.taken > 0 ? [{ kind: 'hit' as const, on: target.id, amount: result.taken, style: enemy.sweeps ? 'sweep' : 'claw' }] : []),
           ...(hexed ? [{ kind: 'hex' as const, on: target.id }] : []),
           ...(result.down ? [{ kind: 'fall' as const, on: target.id }] : [])
         ]
@@ -396,8 +396,8 @@ export function act(content: ContentPack, state: GameState, move: Move): GameSta
     return now.footing === 0 ? ' It comes apart.' : ''
   }
   // What is seen of a blow on an enemy: the cut, and its coming apart if that finished it.
-  const cut = (target: Foe, amount: number, kind: 'slash' | 'crit' = 'slash'): FightFx[] => [
-    { kind, on: target.key, amount },
+  const cut = (target: Foe, amount: number, kind: 'slash' | 'crit' = 'slash', look: Pick<FightFx, 'by' | 'style'> = {}): FightFx[] => [
+    { kind, on: target.key, amount, ...look },
     ...(run.fight!.foes.find((one) => one.key === target.key)!.footing === 0 ? [{ kind: 'fall' as const, on: target.key }] : [])
   ]
 
@@ -442,6 +442,8 @@ export function act(content: ContentPack, state: GameState, move: Move): GameSta
     const worth = (action.power + roll.die(4)) * carrying * anchored * (actor.hexed > 0 ? HEXED : 1) * (trueStrike ? CRIT : 1)
     const who = name(actor.id)
     const face = { [actor.id]: 'angry' }
+    // What it looks like: this role's take on this action, flying from her.
+    const look = { by: actor.id, style: `${role.id}:${action.id}` }
     if (action.kind === 'attack' || action.kind === 'weaken') {
       const weak = enemyOf(config, foe).weakTo === role.id ? WEAKNESS : 1
       const taken = strike(foe, worth * weak * (action.kind === 'weaken' ? 0.5 : 1), action.kind === 'weaken' ? { weakened: WEAKEN_ROUNDS } : {})
@@ -449,19 +451,19 @@ export function act(content: ContentPack, state: GameState, move: Move): GameSta
       events.push({
         text: `${who}'s ${action.name} hits ${enemyOf(config, foe).name} for ${taken}${why.length > 0 ? `, ${why.join(', ')}` : ''}.${left(foe)}${action.kind === 'weaken' && run.fight!.foes.find((one) => one.key === foe.key)!.footing > 0 ? ` Weakened for ${WEAKEN_ROUNDS} rounds.` : ''}`,
         faces: face,
-        fx: [...cut(foe, taken, trueStrike ? 'crit' : 'slash'), ...(action.kind === 'weaken' && run.fight!.foes.find((one) => one.key === foe.key)!.footing > 0 ? [{ kind: 'weaken' as const, on: foe.key }] : [])]
+        fx: [...cut(foe, taken, trueStrike ? 'crit' : 'slash', look), ...(action.kind === 'weaken' && run.fight!.foes.find((one) => one.key === foe.key)!.footing > 0 ? [{ kind: 'weaken' as const, on: foe.key }] : [])]
       })
     } else if (action.kind === 'heal') {
       const to = ally ?? run.party.filter(standing).sort((a, b) => a.footing / a.max - b.footing / b.max)[0]
       const mended = Math.min(to.max, Math.round(to.footing + worth))
       setFighter(to.id, { footing: mended })
-      events.push({ text: `${who}'s ${action.name} restores ${mended - to.footing} to ${to.id === actor.id ? 'herself' : name(to.id)}.`, faces: { [actor.id]: 'happy' }, fx: [{ kind: 'heal', on: to.id, amount: mended - to.footing }] })
+      events.push({ text: `${who}'s ${action.name} restores ${mended - to.footing} to ${to.id === actor.id ? 'herself' : name(to.id)}.`, faces: { [actor.id]: 'happy' }, fx: [{ kind: 'heal', on: to.id, amount: mended - to.footing, ...look }] })
     } else if (action.kind === 'shield') {
       run = { ...run, ward: run.ward + Math.round(worth) }
-      events.push({ text: `${who}'s ${action.name} adds ${Math.round(worth)} to the ward.`, faces: { [actor.id]: 'neutral' }, fx: run.party.filter(standing).map((fighter) => ({ kind: 'ward' as const, on: fighter.id })) })
+      events.push({ text: `${who}'s ${action.name} adds ${Math.round(worth)} to the ward.`, faces: { [actor.id]: 'neutral' }, fx: run.party.filter(standing).map((fighter) => ({ kind: 'ward' as const, on: fighter.id, ...look })) })
     } else {
       setFighter(actor.id, { guarding: true, taunting: action.kind === 'taunt' })
-      events.push({ text: `${who} uses ${action.name}.`, faces: { [actor.id]: 'neutral' }, fx: [{ kind: 'guard', on: actor.id }] })
+      events.push({ text: `${who} uses ${action.name}.`, faces: { [actor.id]: 'neutral' }, fx: [{ kind: 'guard', on: actor.id, ...look }] })
     }
     setFighter(actor.id, { anchored: false, cooldowns: action.cooldown > 0 ? { ...actor.cooldowns, [action.id]: action.cooldown + 1 } : actor.cooldowns })
 

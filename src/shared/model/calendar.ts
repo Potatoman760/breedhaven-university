@@ -98,6 +98,8 @@ export const WeatherTypeSchema = z.object({
   description: z.string().default(''),
   /** Name of a built-in weather icon: clear, cloudy, rain, storm, fog, snow or wind. */
   icon: z.string().default('cloudy'),
+  /** Its emblem: a picture in the pack, shown in place of the drawn icon. */
+  iconImage: z.string().optional(),
   /**
    * What is drawn over outdoor views while it lasts: rain, a storm with lightning, snow,
    * drifting mist, leaves on the wind, or motes hanging in still air.

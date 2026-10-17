@@ -78,6 +78,8 @@ import {
   startShift,
   feedRound,
   dramaDue,
+  noteTogether,
+  arrivalCue,
   fireDrama,
   giveContact,
   planDrama,
@@ -131,9 +133,10 @@ import {
   locationOf,
   societyOf,
   fairNow,
+  fairOpensLater,
   visitFair,
   helloIntro,
-  sayHello,
+  sayHelloAll,
   canTalkAtFair,
   stopAtTable,
   rivalryDue,
@@ -159,6 +162,9 @@ import { HouseView } from './ui/house/HouseView'
 import { ContentEditor } from './ui/editor/ContentEditor'
 import { CoursesView } from './ui/CoursesView'
 import { DayView } from './ui/DayView'
+import { GrandButton } from './ui/GrandButton'
+import { isMouseBack } from './mouseBack'
+import { GearIcon, JobIcon, LoadIcon, PowerIcon, SaveIcon } from './ui/icons'
 import { Dialog, ToBeImplemented } from './ui/Dialog'
 import { FairView } from './ui/FairView'
 import { InterfaceTour } from './ui/InterfaceTour'
@@ -508,6 +514,14 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     if (settled.notices.length > 0) setNotice(settled.notices.join(' '))
   }, [idle, state, content])
 
+  // Two of them in a scene together, however they came to be (brought along, walking in, a class): from then on he
+  // knows what they are to each other.
+  useEffect(() => {
+    if (!scene || scene.npc) return
+    const ids = sceneCast(scene)
+    if (ids.length > 1) setState((current) => noteTogether(current, ids))
+  }, [scene?.loveInterestId, scene?.companionIds.join(',')])
+
   /**
    * Opens a scene the player has started, after the drama engine has had its say: someone
    * may be on her way, and a friend who was brought along is there from the first moment.
@@ -554,7 +568,9 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     const at = arrival?.state ?? when
     if (arrival) setState((current) => ({ ...current, dramaDay: arrival.state.dramaDay }))
     // The view the player has picked goes along, so the character knows exactly where they are.
-    const asked: Scene = { ...from, backgroundId: from.viewId ?? backgroundId ?? from.backgroundId, messages: text === undefined ? from.messages : [...from.messages, { role: 'user', content: text }] }
+    // Someone walking in as he speaks is told to the model beside his line, where it is not lost among the rest.
+    const cue = arrival && from.drama ? arrivalCue(content, from.drama) : undefined
+    const asked: Scene = { ...from, backgroundId: from.viewId ?? backgroundId ?? from.backgroundId, messages: text === undefined ? from.messages : [...from.messages, { role: 'user', content: text, ...(cue && { cue }) }] }
     setScene(asked)
     setNotice('')
     setAgreed(arrival?.notice ?? '')
@@ -704,6 +720,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       nsfw: false,
       beats: [{ activityName: appointment.title, locationName: placeName(at) }],
       messages: [],
+      planned: true,
       gifts: [], conceived: [], departed: [], npc: false,
       baseline: sceneBaseline(at, appointment.loveInterestId, appointment.companionIds)
     }, after)
@@ -891,17 +908,19 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
 
   /** Goes to the societies' fair: he is taken to it, and it counts as been to. */
   function goToFair() {
-    const event = fairNow(content, state)
+    // Before it opens, the hours until it does go by first.
+    const later = fairOpensLater(content, state)
+    const event = fairNow(content, state) ?? later?.event
     if (!event?.locationId) return
-    setState((current) => visitFair({ ...current, locationId: event.locationId!, inOwnRoom: false }))
+    setState((current) => visitFair({ ...current, time: later?.at ?? current.time, locationId: event.locationId!, inOwnRoom: false }))
     setNotice('')
     setPanel({ kind: 'fair' })
   }
 
   /** Says hello to someone at the fair: her few lines, read as a cutscene, and back to the fair. It takes no time. */
-  function sayHelloAtFair(id: string, societyId?: string) {
-    const intro = helloIntro(content, id)
-    const result = sayHello(content, state, id, societyId)
+  function sayHelloAtFair(ids: string[], societyId?: string) {
+    const intro = helloIntro(content, state, ids, societyId ?? ids[0])
+    const result = sayHelloAll(content, state, ids, societyId)
     setState(result.state)
     const gift = result.gift ? content.items.find((item) => item.id === result.gift)?.name : undefined
     if (gift) setNotice(`You were given: ${gift}.`)
@@ -910,6 +929,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
 
   /** Stops to talk at the fair: an hour's scene with whoever is at the table, or with someone wandering it. */
   function talkAtFair(ids: string[], societyId?: string) {
+    // Not while what someone said in hello is still being read.
+    if (cutscene) return
     const society = societyOf(content, societyId ?? '')
     const [leadId, ...companionIds] = ids.filter((id) => content.loveInterests.some((li) => li.id === id)).slice(0, MAX_SCENE_CAST)
     if (!leadId || !canTalkAtFair(content, state, ids).ok) return
@@ -923,6 +944,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       companionIds,
       nsfw: false,
       backgroundId: content.societies?.fairId,
+      returnTo: 'fair',
       beats: [
         {
           activityName: society ? `Stopping at the ${society.name.replace(/^the /, '')} table at the Societies Fair` : 'Talking at the Societies Fair',
@@ -1094,11 +1116,11 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   }
 
   const close = () => setPanel(null)
-  // Escape opens the menu from anywhere in the game. With a dialog up it closes that dialog and no more. At the card
+  // Escape opens the menu from anywhere in the game (the mouse's back button does not). With a dialog up it closes that dialog and no more. At the card
   // table it does nothing, since leaving mid-hand would take back what he had put in.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape' || event.repeat || document.querySelector('.overlay, .lightbox, .poker, .house-screen, .fair-screen, .tour')) return
+      if (event.key !== 'Escape' || event.repeat || isMouseBack(event) || document.querySelector('.overlay, .lightbox, .poker, .house-screen, .fair-screen, .tour')) return
       setPanel({ kind: 'menu' })
     }
     window.addEventListener('keydown', onKey)
@@ -1156,6 +1178,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
             const shared = walkingWith ? sharedUpcoming(content, state, walkingWith) : undefined
             setWalkingWith(null)
             if (shared) goTo(shared.next, shared.sharedBy)
+            // A talk at the fair goes back out to its map, while its tables are still out.
+            else if (summary.scene.returnTo === 'fair' && fairNow(content, state)) setPanel({ kind: 'fair' })
           }}
         />
       ) : scene ? (
@@ -1342,24 +1366,14 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       )}
       {panel?.kind === 'help' && <HelpPanel content={content} state={state} onClose={close} />}
       {panel?.kind === 'menu' && (
-        <Dialog title="Menu" onClose={close} narrow noClose>
+        // The way back to the game is the back button at its foot, as on every main screen.
+        <Dialog title="Menu" onClose={close} narrow ornate>
           <div className="pause-menu">
-            <button onClick={close}>Continue</button>
-            <button className="secondary" onClick={() => setPanel({ kind: 'save' })}>
-              Save
-            </button>
-            <button className="secondary" onClick={() => setPanel({ kind: 'load' })}>
-              Load
-            </button>
-            <button className="secondary" onClick={() => setPanel({ kind: 'settings' })}>
-              Settings
-            </button>
-            <button className="secondary" onClick={onExit}>
-              Exit to title
-            </button>
-            <button className="secondary" onClick={() => window.close()}>
-              Quit to desktop
-            </button>
+            <GrandButton label="Save" icon={<SaveIcon size={22} />} onClick={() => setPanel({ kind: 'save' })} />
+            <GrandButton label="Load" icon={<LoadIcon size={22} />} onClick={() => setPanel({ kind: 'load' })} />
+            <GrandButton label="Settings" icon={<GearIcon size={22} />} onClick={() => setPanel({ kind: 'settings' })} />
+            <GrandButton label="Exit to title" icon={<JobIcon name="door" size={22} />} onClick={onExit} />
+            <GrandButton label="Quit to desktop" icon={<PowerIcon size={22} />} onClick={() => window.close()} />
           </div>
         </Dialog>
       )}

@@ -1,12 +1,13 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { banterDue, act, comeUp, describeChange, describeFinds, fighterName, goOn, inForce, nodeAt, pregnancyPower, roleOf, runReport, spriteFor, toDate, turnActions, turnBack, turnOf, wornOutfit, type BanterLine, type TurnAction } from '../../../shared/game'
 import { HIM, type ContentPack, type Fighter, type Finds, type GameState } from '../../../shared/model'
 import { BelowFx, EVENT_GAP_MS } from '../fx/BelowFx'
 import { Backdrop } from './Backdrop'
-import { Button } from './Button'
 import { BackIcon, ChevronIcon, StopIcon } from './icons'
 import { GrandButton } from './GrandButton'
 import { ItemArt } from './ItemSquare'
+import { Portrait } from './Portrait'
+import { useBack } from '../mouseBack'
 
 interface Props {
   content: ContentPack
@@ -42,6 +43,7 @@ export function ExpeditionView({ content, state, onChange }: Props) {
   const fighting = fight !== undefined && !run.done && !run.over
   // The action he has picked that still wants pointing at something.
   const [pending, setPending] = useState<TurnAction | null>(null)
+  useBack(pending ? () => setPending(null) : undefined)
   const date = toDate(content.calendar, state.time)
   const sees = inForce(content, state, 'insight')
 
@@ -127,6 +129,28 @@ export function ExpeditionView({ content, state, onChange }: Props) {
     // With nothing to choose between, it is done at once.
     if (!action.aim || targets.length <= 1) return go(action, targets[0])
     setPending(action)
+  }
+
+  /** What an action can be pointed at, as the command window offers them: each with its face and what it has left. */
+  function targetsFor(action: TurnAction): { id: string; name: string; face: ReactNode; footing: number; max: number }[] {
+    if (action.aim === 'foe') {
+      const alive = foes.filter((foe) => foe.footing > 0)
+      return alive.map((foe) => {
+        const enemy = config.enemies.find((one) => one.id === foe.enemyId)!
+        // Two of a kind are told apart by a letter, in the order they stand.
+        const twins = alive.filter((other) => other.enemyId === foe.enemyId)
+        const name = twins.length > 1 ? `${enemy.name} ${String.fromCharCode(65 + twins.indexOf(foe))}` : enemy.name
+        return { id: foe.key, name, face: enemy.image ? <img className="below-target-art" src={`content://pack/${enemy.image}`} alt="" /> : null, footing: foe.footing, max: foe.max }
+      })
+    }
+    return run.party
+      .filter((fighter) => allyFits(action, fighter))
+      .map((fighter) => {
+        const li = content.loveInterests.find((one) => one.id === fighter.id)
+        const look = content.newGame.look
+        const face = li ? <Portrait who={li} image={spriteFor(li, wornOutfit(content, state, li), undefined)} size={34} /> : look.sprite ? <Portrait who={{ name: state.player.name, faceY: look.faceY }} image={look.sprite} size={34} /> : null
+        return { id: fighter.id, name: fighterName(content, state, fighter.id), face, footing: fighter.footing, max: fighter.max }
+      })
   }
 
   function go(action: TurnAction, target?: string) {
@@ -257,25 +281,42 @@ export function ExpeditionView({ content, state, onChange }: Props) {
           {talking && (
             <div className="below-waiting">
               {/* Until something has come back to be said, that it is being thought of; after that the balloons speak for themselves. */}
-              <span className="hint">{line ? 'Talking...' : 'Thinking...'}</span>
-              <Button variant="secondary" size="small" onClick={() => setOpened(fightKey)}>
-                Skip
-              </Button>
+              <Thinking word={line ? 'Talking' : 'Thinking'} />
+              <button className="below-command below-skip" onClick={() => setOpened(fightKey)}>
+                <strong>
+                  Skip <ChevronIcon size={16} />
+                </strong>
+              </button>
             </div>
           )}
           {/* Over a win, the same word while what they will say is waited on and said. There is nothing to skip: the reckoning is already up. */}
           {wonKey !== null && (wonWait === wonKey || (line && banter?.key === wonKey)) && (
             <div className="below-waiting">
-              <span className="hint">{line ? 'Talking...' : 'Thinking...'}</span>
+              <Thinking word={line ? 'Talking' : 'Thinking'} />
             </div>
           )}
           {fighting && !talking && actor && (
             <>
             <span className="caps below-turn">{pending ? `${pending.name}: on whom?` : actor.id === HIM ? 'Your turn' : `${fighterName(content, state, actor.id)}'s turn`}</span>
             {pending ? (
-              <Button variant="quiet" size="small" onClick={() => setPending(null)}>
-                Back
-              </Button>
+              <>
+                {targetsFor(pending).map((target) => (
+                  <button key={target.id} className="below-command below-target" onClick={() => go(pending, target.id)}>
+                    <strong>
+                      {target.face}
+                      {target.name}
+                    </strong>
+                    <span className="below-small">
+                      {Math.round(target.footing)}/{target.max}
+                    </span>
+                  </button>
+                ))}
+                <button className="below-command below-back" onClick={() => setPending(null)}>
+                  <strong>
+                    <BackIcon size={18} /> Back
+                  </strong>
+                </button>
+              </>
             ) : (
               turnActions(content, state).map((action) => (
                 <button key={action.id} className="below-command" title={action.description} disabled={!action.ready} onClick={() => choose(action)}>
@@ -300,14 +341,16 @@ export function ExpeditionView({ content, state, onChange }: Props) {
           <ol className="below-stops" aria-label={`Stop ${run.node + 1} of ${depth.nodes.length}`}>
             {depth.nodes.map((stop, index) => (
               <li key={index} className={index < run.node ? 'done' : index === run.node ? 'here' : undefined} title={STOPS[stop.kind]}>
-                <StopIcon kind={stop.kind} size={30} />
+                <StopIcon kind={stop.kind} image={config.stopImages[stop.kind]} size={30} />
               </li>
             ))}
           </ol>
           {!report && (
-            <Button variant="quiet" size="small" title="Keeps only what was made safe at a checkpoint" onClick={() => onChange(turnBack(state))}>
-              Turn back
-            </Button>
+            <button className="below-command below-leave" title="Keeps only what was made safe at a checkpoint" onClick={() => onChange(turnBack(state))}>
+              <strong>
+                <BackIcon size={18} /> Turn back
+              </strong>
+            </button>
           )}
         </div>
       </section>
@@ -320,7 +363,7 @@ export function ExpeditionView({ content, state, onChange }: Props) {
       )}
 
       {/* Nothing of the fight is played while they are still talking: what met them as it opened is shown when they have done. */}
-      <BelowFx events={talking ? [] : events} stamp={`${talking}:${stamp}`} />
+      <BelowFx events={talking ? [] : events} stamp={`${talking}:${stamp}`} effects={config.effects} />
 
       {/* What a stop came to, and at the end what the run did: a small dialog over the field. */}
       {report ? (
@@ -406,6 +449,18 @@ export function ExpeditionView({ content, state, onChange }: Props) {
         ))
       )}
     </main>
+  )
+}
+
+/** That something is being waited on, as a word in gold with dots that come and go. */
+function Thinking({ word }: { word: string }) {
+  return (
+    <span className="below-thinking" role="status">
+      {word}
+      <i />
+      <i />
+      <i />
+    </span>
   )
 }
 

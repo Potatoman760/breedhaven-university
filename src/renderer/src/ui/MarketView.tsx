@@ -29,13 +29,12 @@ export function Stalls({ content, state, stalls, byPhone = false, closed, onBuy 
   return (
     <>
       <div className="chat-list">
-        <h1 className="phone-title">Market</h1>
         <div className="chat-rows">
           {stalls.length === 0 && <p className="hint">No stalls are trading.</p>}
           {stalls.map((s) => (
             <button key={s.id} className={s.id === stall?.id ? 'chat-row selected' : 'chat-row'} onClick={() => setStallId(s.id)}>
               <span className="ware-icon">
-                <ItemIcon name={s.icon} />
+                <ItemIcon name={s.icon} image={s.iconImage} />
               </span>
               <span className="chat-row-text">
                 <strong>{s.name}</strong>

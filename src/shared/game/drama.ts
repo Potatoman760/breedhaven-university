@@ -233,7 +233,7 @@ export function describeDrama(content: ContentPack, state: GameState, scene: Pic
   if (drama.kind === 'friend' && drama.afterLines === 0) {
     return [
       `${lead} has brought ${actor} along: the three of you are here together from the start.`,
-      ...drama.reasons.map((reason) => `${reason}.`),
+      ...drama.reasons.map((reason) => (/[.!?]$/.test(reason) ? reason : `${reason}.`)),
       `${actor} is easy, friendly and curious about ${player}, and takes part as herself throughout. Nobody is wronged by her being here.`
     ].join(' ')
   }
@@ -242,19 +242,27 @@ export function describeDrama(content: ContentPack, state: GameState, scene: Pic
     rival: `${actor} has just turned up, uninvited, where ${player} is with ${here}.`,
     friend: `${actor} has just come over to where ${player} is with ${here}.`
   }[drama.kind]
+  // How she carries on once she is here. Her entrance itself is asked for beside his line as she walks in (`arrivalCue`).
   const playing = {
     confrontation:
-      `Write ${actor}'s arrival first, in her own voice, as she takes in what she is seeing. Do not resolve it in this reply: let it land, ` +
-      `and let the others answer for themselves, each as she would. How it goes from here depends on what ${player} says. ` +
+      `${actor} is in the scene now and speaks as herself. It is not resolved at once: let the others answer for themselves, each as she would. ` +
+      `How it goes from here depends on what ${player} says. ` +
       `Anyone hurt or angry enough may walk out: write her going, and a [LEAVES: Name=feeling why] line at the end of the reply.`,
     rival:
-      `Write ${actor}'s arrival first, in her own voice. She is not here to make peace: she needles, competes for ${player}'s attention or ` +
-      `simply refuses to leave, in her own manner, and the others answer in theirs. Do not resolve it in this reply.`,
+      `${actor} is in the scene now and speaks as herself. She is not here to make peace: she needles, competes for ${player}'s attention or ` +
+      `simply refuses to leave, in her own manner, and the others answer in theirs.`,
     friend:
-      `Write ${actor}'s arrival first, in her own voice: easy, friendly, and curious about ${player}. She stays a while; ` +
+      `${actor} is in the scene now and speaks as herself: easy, friendly, and curious about ${player}. She stays a while; ` +
       `nobody is wronged by it, though whoever he came here with may or may not be glad of the company.`
   }[drama.kind]
-  return [opening, ...drama.reasons.map((reason) => `${reason}.`), playing].join(' ')
+  return [opening, ...drama.reasons.map((reason) => (/[.!?]$/.test(reason) ? reason : `${reason}.`)), playing].join(' ')
+}
+
+/** What is said beside his line as she walks in, where it cannot be missed: who it is, and that the reply opens with her. */
+export function arrivalCue(content: ContentPack, drama: SceneDrama): string {
+  const actor = firstNames(content, [drama.actorId])
+  const how = { confrontation: 'walks in on them', rival: 'turns up, uninvited', friend: 'comes over to join them' }[drama.kind]
+  return `${actor} ${how} as he says this. Open your reply with her arrival, in her own voice, and let her speak in it.`
 }
 
 const HEADLINES: Record<DramaKind, string> = {

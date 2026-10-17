@@ -108,8 +108,9 @@ describe('where a scene can go', () => {
     expect(movedScene(upstairs, shop).roomOf).toBeUndefined()
     expect(roomOwner(content, scene)).toBeUndefined()
     // A view the scene insisted on, and a picture it was set in, are left where they were.
-    const set = movedScene({ ...scene, viewId: 'yard', picture: 'bed.png' }, shop)
+    const set = movedScene({ ...scene, viewId: 'yard', picture: 'bed.png', returnTo: 'fair' }, shop)
     expect(set.viewId).toBeUndefined()
+    expect(set.returnTo).toBeUndefined()
     expect(set.picture).toBeUndefined()
   })
 

@@ -33,6 +33,8 @@ export const StallSchema = z.object({
   name: z.string(),
   description: z.string().default(''),
   icon: z.string().default('gift'),
+  /** Its emblem: a picture in the pack, shown in place of the drawn icon. */
+  iconImage: z.string().optional(),
   locationId: z.string(),
   itemIds: z.array(z.string())
 })

@@ -413,7 +413,9 @@ export interface EventOuting {
  */
 export function eventOutings(content: ContentPack, state: GameState): EventOuting[] {
   const { dayIndex, hour } = toDate(content.calendar, state.time)
-  return eventsOn(content, state).filter((event) => !event.secret).flatMap((event) => {
+  // The societies' fair has a screen of its own, and is not gone to as an outing.
+  const fairId = content.societies?.fair ? content.societies.fairId : undefined
+  return eventsOn(content, state).filter((event) => !event.secret && event.id !== fairId).flatMap((event) => {
     const place = content.locations.find((l) => l.id === event.locationId)
     if (event.startHour === undefined || !place) return []
     const from = timeOn(content, dayIndex, event.startHour)

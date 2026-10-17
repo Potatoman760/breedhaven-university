@@ -15,11 +15,13 @@ import { meet } from './scene'
 export const FAIR_VISITED = 'fair-visited'
 export const fairTableFlag = (societyId: string) => `fair-table:${societyId}`
 export const FAIR_RIVALRY = 'fair-rivalry'
-const helloFlag = (id: string) => `fair-hello:${id}`
+// A hello is a society's pitch, so it is kept per booth: one who stands at two tables says each of theirs. Someone who
+// wanders the fair is a booth of her own.
+const helloFlag = (id: string, booth: string) => `fair-hello:${booth}:${id}`
 
-/** Whether she has said hello to him at the fair already: each does, once. */
-export function saidHello(state: Pick<GameState, 'flags'>, id: string): boolean {
-  return state.flags[helloFlag(id)] === true
+/** Whether she has said hello to him at this booth already (a society's table, or her own if she wanders the fair). */
+export function saidHello(state: Pick<GameState, 'flags'>, id: string, booth = id): boolean {
+  return state.flags[helloFlag(id, booth)] === true
 }
 
 /** The fair's event, while it is on and its tables are out: from its hour on each of its days, for as long as it keeps. */
@@ -29,6 +31,15 @@ export function fairNow(content: ContentPack, state: Pick<GameState, 'time'> & P
   if (!event || event.startHour === undefined) return event
   const { hour } = toDate(content.calendar, state.time)
   return hour >= event.startHour && hour < event.startHour + (event.hours ?? 1) ? event : undefined
+}
+
+/** The fair's event, when it is on today and has yet to open: the time it does. */
+export function fairOpensLater(content: ContentPack, state: GameState): { event: CalendarEvent; at: number } | undefined {
+  const fairId = content.societies?.fairId
+  const event = fairId ? eventsOn(content, state).find((one) => one.id === fairId) : undefined
+  if (!event || event.startHour === undefined) return undefined
+  const { hour } = toDate(content.calendar, state.time)
+  return hour < event.startHour ? { event, at: state.time + (event.startHour - hour) } : undefined
 }
 
 /** The hour the fair packs up today. */
@@ -83,13 +94,27 @@ export function stopAtTable(content: ContentPack, state: GameState, societyId: s
   return gift ? { state: { ...flagged, inventory: { ...flagged.inventory, [gift]: (flagged.inventory[gift] ?? 0) + 1 } }, gift } : { state: flagged }
 }
 
-/** The few lines in which she says hello, as a cutscene at the fair. Nothing when she has none written. */
-export function helloIntro(content: ContentPack, id: string): Intro | undefined {
-  const lines = content.societies?.fair?.hellos[id]
+/** The hello written for a booth and whoever stands at it now: the one for exactly them, or failing that the fullest one they are all in. */
+export function boothHello(content: ContentPack, ids: string[], booth: string): { cast: string[]; lines: string[] } | undefined {
+  const hellos = content.societies?.fair?.hellos[booth] ?? []
+  const here = new Set(ids)
+  const exact = hellos.find((hello) => hello.cast.length === here.size && hello.cast.every((id) => here.has(id)))
+  return exact ?? [...hellos].filter((hello) => hello.cast.every((id) => here.has(id))).sort((a, b) => b.cast.length - a.cast.length)[0]
+}
+
+/** Whether a booth has a hello for him now: one is written for whoever is there, and one of them has yet to say it here. */
+export function helloDue(content: ContentPack, state: GameState, ids: string[], booth: string): boolean {
+  const hello = boothHello(content, ids, booth)
+  return hello !== undefined && hello.cast.some((id) => !saidHello(state, id, booth))
+}
+
+/** Hello from a booth (a society's table, or someone wandering the fair): its lines as a cutscene, with them all on the stage. */
+export function helloIntro(content: ContentPack, state: GameState, ids: string[], booth: string): Intro | undefined {
   const fairId = content.societies?.fairId
   const place = content.calendar.events.find((event) => event.id === fairId)?.locationId
-  if (!lines || !place) return undefined
-  return { speakerId: id, scenes: [{ locationId: place, castIds: [id], backgroundId: fairId, lines }] }
+  const hello = boothHello(content, ids, booth)
+  if (!place || !hello || !helloDue(content, state, ids, booth)) return undefined
+  return { speakerId: hello.cast[0], scenes: [{ locationId: place, castIds: ids, backgroundId: fairId, lines: hello.lines }] }
 }
 
 /**
@@ -98,12 +123,24 @@ export function helloIntro(content: ContentPack, id: string): Intro | undefined 
  */
 export function sayHello(content: ContentPack, state: GameState, id: string, societyId?: string): { state: GameState; gift?: string } {
   const society = content.societies?.societies.find((one) => one.id === societyId)
-  const met = meet(content, { ...state, flags: { ...state.flags, [helloFlag(id)]: true } }, [id])
+  const met = meet(content, { ...state, flags: { ...state.flags, [helloFlag(id, societyId ?? id)]: true } }, [id])
   const remembered =
     state.met.includes(id) || !content.loveInterests.some((li) => li.id === id)
       ? met
       : addMemory(met, id, `You met ${state.player.name} at the Societies Fair${society ? `, when he stopped at the ${society.name.replace(/^the /, '')} table` : ''}, and said hello.`, 'fleeting')
   return society ? stopAtTable(content, remembered, society.id) : { state: remembered }
+}
+
+/** Hello from a whole booth at once: each there who has yet to say it here has, and the table is stopped at once. */
+export function sayHelloAll(content: ContentPack, state: GameState, ids: string[], societyId?: string): { state: GameState; gift?: string } {
+  let gift: string | undefined
+  let after = state
+  for (const id of ids.filter((one) => !saidHello(state, one, societyId ?? one))) {
+    const said = sayHello(content, after, id, societyId)
+    after = said.state
+    gift ??= said.gift
+  }
+  return { state: after, gift }
 }
 
 /** Whether he can stop to talk at a table, or with someone wandering the fair: someone is there, and there is an hour left. */
