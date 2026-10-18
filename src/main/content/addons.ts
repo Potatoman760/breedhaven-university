@@ -571,7 +571,7 @@ export function importAsset(addonDir: string, loveInterestId: string, sourcePath
  */
 export function removeUnusedAssets(
   addonDir: string,
-  who: Pick<LoveInterest, 'id' | 'outfits' | 'animations'> & { room?: { background?: string }; birthPicture?: string },
+  who: Pick<LoveInterest, 'id' | 'outfits' | 'animations'> & { room?: { background?: string }; birthPicture?: string; walkSprite?: string },
   prefix: string = ADDON_PREFIX
 ): string[] {
   if (!isSafeId(who.id)) return []
@@ -580,7 +580,8 @@ export function removeUnusedAssets(
       ...who.outfits.flatMap((outfit) => Object.values(outfit.sprites).map((sprite) => sprite.image)),
       ...who.animations.flatMap(poseMedia),
       who.room?.background,
-      who.birthPicture
+      who.birthPicture,
+      who.walkSprite
     ].filter((path): path is string => typeof path === 'string')
   )
   const removed: string[] = []

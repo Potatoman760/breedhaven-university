@@ -323,6 +323,7 @@
     "background": "generated/backgrounds/elowen/view.webp"
   },
   "birthPicture": "sprites/elowen/birth.png",
+  "walkSprite": "sprites/elowen/walk-cutout.png",
   "childNames": {
     "daughters": [
       "Kerra",

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
-import { Button } from './Button'
+import { GrandButton } from './GrandButton'
 
 interface Question {
   title: string
@@ -41,19 +41,15 @@ export function useConfirm(): { ask: (question: Question) => Promise<boolean>; d
 
   const dialog = open && (
     <div className="overlay confirm" onMouseDown={(event) => event.target === event.currentTarget && close(false)}>
-      <div className="dialog narrow" role="alertdialog" aria-label={open.question.title}>
+      <div className="dialog narrow ornate" role="alertdialog" aria-label={open.question.title}>
         <div className="dialog-head">
           <h1>{open.question.title}</h1>
         </div>
         {open.question.detail && <p>{open.question.detail}</p>}
         <div className="confirm-actions">
           {/* Enter takes the safe answer: going ahead, unless that cannot be undone. */}
-          <Button autoFocus={open.question.grave === true} onClick={() => close(false)}>
-            {open.question.cancel ?? 'Cancel'}
-          </Button>
-          <Button variant={open.question.grave ? 'danger' : 'primary'} autoFocus={!open.question.grave} onClick={() => close(true)}>
-            {open.question.confirm}
-          </Button>
+          <GrandButton label={open.question.cancel ?? 'Cancel'} chevron={false} className="confirm-no" autoFocus={open.question.grave === true} onClick={() => close(false)} />
+          <GrandButton label={open.question.confirm} chevron={false} className={open.question.grave ? 'grave' : undefined} autoFocus={!open.question.grave} onClick={() => close(true)} />
         </div>
       </div>
     </div>

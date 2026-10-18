@@ -52,6 +52,8 @@ describe('the Undercroft of the default pack', () => {
     expect(config).toMatchObject({ entryLocationId: 'bathhouse', opensOnDay: 8, guideId: 'vespera', hours: 3, partySize: 2 })
     expect(config.intro).toMatchObject({ hours: 1 })
     for (const text of [config.intro!.text, config.intro!.missedText]) for (const gap of ['{date}', '{place}']) expect(text).toContain(gap)
+    // She shows him in a scene of her own, at the way down.
+    expect(config.intro!.cutscene).toMatchObject({ speakerId: 'vespera', scenes: [{ locationId: 'bathhouse' }] })
   })
 
   it('has eight depths, each with a relic that changes a number of the game', () => {

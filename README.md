@@ -634,9 +634,12 @@ and the trait library.
   `src/shared/game/expedition.ts`, `ExpeditionView.tsx`, `PartyDialog.tsx`): a turn-based
   adventure with no LLM in its fights. From `opensOnDay` the `guideId` character sets an hour
   to show him the way down (`scheduleDescent` in `descent.ts`, put where his day is free and
-  put down again when he misses it, as the house viewing is). Keeping it is a scene with her
-  at `entryLocationId` whose direction has her say what is below and why it must be him
-  (`attendDescent`); from then on **Go down** is offered there. He picks a depth he
+  put down again when he misses it, as the house viewing is). Keeping it reads `intro.cutscene`,
+  her telling him what is below, its dangers and why it must be him (`attendDescent`), and
+  then `BelowTour.tsx`: she has him open the Go below window and points out its parts, then
+  puts him in a practice fight (`practiceRun`, a run made in memory on its own state, never
+  saved, with no banter) and has him make the first move. From then on **Go down** is
+  offered there. He picks a depth he
   has opened and up to `partySize` women who have a `partyRole` in their file, have been
   met, trust him by `trustNeeded`, are free for `hours` (asked as of any outing, with
   `checkOuting`) and are not at a stage of pregnancy missing from `pregnancyPower`. A run

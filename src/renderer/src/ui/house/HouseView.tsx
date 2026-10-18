@@ -29,12 +29,14 @@ import {
 } from '../../../../shared/game'
 import type { ContentPack, GameState, HouseRoom, HousingConfig } from '../../../../shared/model'
 import { play } from '../../sound'
+import { BackButton } from '../BackButton'
 import { Button } from '../Button'
 import { useConfirm } from '../Confirm'
 import { Dialog } from '../Dialog'
 import { Facts, type Fact } from '../Facts'
 import { GrandButton } from '../GrandButton'
-import { BackIcon, FriendsIcon, HeartIcon, JobIcon } from '../icons'
+import { FriendsIcon, HeartIcon, HelpIcon, JobIcon } from '../icons'
+import { HelpPanel } from '../HelpPanel'
 import { Ornate } from '../Ornate'
 import { Portrait } from '../Portrait'
 import { HouseFacade, wornSprite } from './HouseFacade'
@@ -77,6 +79,8 @@ export function HouseView({ content, state, onChange, onClose }: Props) {
   const [movedIn, setMovedIn] = useState<{ key: string; name: string }>()
   const [refused, setRefused] = useState<string>()
   const [panel, setPanel] = useState<'household' | 'ledger' | null>(null)
+  // The help, opened over the house on how the house works: closing it is back to the house.
+  const [helping, setHelping] = useState(false)
   const { ask, dialog } = useConfirm()
 
   // Escape leaves the house, unless a dialog over it is up: that closes first.
@@ -150,7 +154,17 @@ export function HouseView({ content, state, onChange, onClose }: Props) {
       {backdrop && <div className={exterior ? 'house-backdrop' : 'house-backdrop blurred'} style={{ backgroundImage: `url("content://pack/${backdrop}")` }} />}
       {movedIn && <div className="house-banner">{movedIn.name} has moved in!</div>}
 
-      <Ornate title={config.name} note={atHome ? 'You are at home' : 'Your house'} corners className="house-side">
+      <Ornate
+        title={config.name}
+        note={atHome ? 'You are at home' : 'Your house'}
+        aside={
+          <Button className="ornate-help" aria-label="How the house works" title="How the house works" onClick={() => setHelping(true)}>
+            <HelpIcon size={24} />
+          </Button>
+        }
+        corners
+        className="house-side"
+      >
         <div className="house-progress">
           <span className="caps">
             {builtCount} of {config.rooms.length} rooms
@@ -187,7 +201,7 @@ export function HouseView({ content, state, onChange, onClose }: Props) {
       </Ornate>
 
       {/* The way out, on its own in the corner, where it is looked for. */}
-      <GrandButton label="Close" icon={<BackIcon size={22} />} chevron={false} className="house-close" onClick={onClose} />
+      <BackButton className="house-close" onClick={onClose} />
 
       <div className="house-stage">
         <HouseFacade content={content} state={state} config={config} light={light} picked={picked} built={built} movedInto={movedIn?.key} refused={refused} onPick={pick} />
@@ -212,7 +226,7 @@ export function HouseView({ content, state, onChange, onClose }: Props) {
       )}
 
       {panel === 'household' && (
-        <Dialog title="Household" onClose={() => setPanel(null)}>
+        <Dialog title="Household" onClose={() => setPanel(null)} ornate>
           <Household content={content} state={state} config={config} onAskToLeave={async (id, name) =>
             (await ask({ title: `Ask ${name} to leave?`, detail: 'She will take her children back to the creche, will think the less of you for it, and will not come back.', confirm: 'Ask her to leave', cancel: 'Let her stay', grave: true })) &&
             onChange((s) => askToLeave(content, s, id))
@@ -220,8 +234,8 @@ export function HouseView({ content, state, onChange, onClose }: Props) {
         </Dialog>
       )}
       {panel === 'ledger' && (
-        <Dialog title="Ledger" onClose={() => setPanel(null)} narrow>
-          <div className="house-ledger">
+        <Dialog title="Ledger" onClose={() => setPanel(null)} narrow ornate>
+          <div className="house-ledger sheet">
             {state.housing.ledger.length === 0 && <p className="hint">Nothing yet.</p>}
             {[...state.housing.ledger].reverse().map((line, i) => {
               const date = toDate(calendar, line.time)
@@ -238,6 +252,7 @@ export function HouseView({ content, state, onChange, onClose }: Props) {
           </div>
         </Dialog>
       )}
+      {helping && <HelpPanel content={content} state={state} tab="House and children" onClose={() => setHelping(false)} />}
     </main>
   )
 }

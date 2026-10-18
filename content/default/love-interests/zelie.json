@@ -37,31 +37,31 @@
       "description": "a fitted black knee-length dress with a white collar and white cuffs, a small crisp white apron tied at the waist, sheer dark stockings, a thin ribbon at her throat with the Office's small brass blossom badge pinned to it",
       "sprites": {
         "neutral": {
-          "image": "sprites/zelie/default-neutral-cutout.png",
+          "image": "sprites/zelie/default-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/zelie/default-happy-cutout.png",
+          "image": "sprites/zelie/default-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/zelie/default-sad-cutout.png",
+          "image": "sprites/zelie/default-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/zelie/default-angry-cutout.png",
+          "image": "sprites/zelie/default-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/zelie/default-surprised-cutout.png",
+          "image": "sprites/zelie/default-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/zelie/default-embarrassed-cutout.png",
+          "image": "sprites/zelie/default-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/zelie/default-aroused-cutout.png",
+          "image": "sprites/zelie/default-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -74,31 +74,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/zelie/pregnant-neutral-cutout.png",
+          "image": "sprites/zelie/pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/zelie/pregnant-happy-cutout.png",
+          "image": "sprites/zelie/pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/zelie/pregnant-sad-cutout.png",
+          "image": "sprites/zelie/pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/zelie/pregnant-angry-cutout.png",
+          "image": "sprites/zelie/pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/zelie/pregnant-surprised-cutout.png",
+          "image": "sprites/zelie/pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/zelie/pregnant-embarrassed-cutout.png",
+          "image": "sprites/zelie/pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/zelie/pregnant-aroused-cutout.png",
+          "image": "sprites/zelie/pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -110,31 +110,31 @@
       "description": "nothing at all, completely nude, with a neatly trimmed triangle of pubic hair",
       "sprites": {
         "neutral": {
-          "image": "sprites/zelie/nude-neutral-2-cutout-2.png",
+          "image": "sprites/zelie/nude-neutral-2-cutout-2.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/zelie/nude-happy-cutout-2.png",
+          "image": "sprites/zelie/nude-happy-cutout-2.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/zelie/nude-sad-cutout-2.png",
+          "image": "sprites/zelie/nude-sad-cutout-2.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/zelie/nude-angry-cutout-2.png",
+          "image": "sprites/zelie/nude-angry-cutout-2.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/zelie/nude-surprised-cutout-2.png",
+          "image": "sprites/zelie/nude-surprised-cutout-2.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/zelie/nude-embarrassed-cutout-2.png",
+          "image": "sprites/zelie/nude-embarrassed-cutout-2.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/zelie/nude-aroused-cutout-2.png",
+          "image": "sprites/zelie/nude-aroused-cutout-2.webp",
           "description": ""
         }
       },
@@ -147,31 +147,31 @@
       "inherits": "nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/zelie/nude-pregnant-neutral-cutout.png",
+          "image": "sprites/zelie/nude-pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/zelie/nude-pregnant-happy-cutout.png",
+          "image": "sprites/zelie/nude-pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/zelie/nude-pregnant-sad-cutout.png",
+          "image": "sprites/zelie/nude-pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/zelie/nude-pregnant-angry-cutout.png",
+          "image": "sprites/zelie/nude-pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/zelie/nude-pregnant-surprised-cutout.png",
+          "image": "sprites/zelie/nude-pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/zelie/nude-pregnant-embarrassed-cutout.png",
+          "image": "sprites/zelie/nude-pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/zelie/nude-pregnant-aroused-cutout.png",
+          "image": "sprites/zelie/nude-pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -183,12 +183,13 @@
   "imageSeed": 60,
   "stageHeight": 100,
   "kind": "outsider",
+  "partyRole": "healer",
   "animations": [
     {
       "id": "blowjob",
       "name": "Blowjob",
       "description": "",
-      "image": "sprites/zelie/nsfw-blowjob.png",
+      "image": "sprites/zelie/nsfw-blowjob.webp",
       "clip": "sprites/zelie/nsfw-blowjob.mp4",
       "loop": true
     },
@@ -196,7 +197,7 @@
       "id": "missionary",
       "name": "Missionary",
       "description": "",
-      "image": "sprites/zelie/nsfw-missionary.png",
+      "image": "sprites/zelie/nsfw-missionary.webp",
       "clip": "sprites/zelie/nsfw-missionary-3.mp4",
       "loop": true
     },
@@ -204,7 +205,7 @@
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/zelie/nsfw-doggy.png",
+      "image": "sprites/zelie/nsfw-doggy.webp",
       "clip": "sprites/zelie/nsfw-doggy-2.mp4",
       "loop": true
     },
@@ -212,7 +213,7 @@
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
-      "image": "sprites/zelie/nsfw-cowgirl.png",
+      "image": "sprites/zelie/nsfw-cowgirl.webp",
       "clip": "sprites/zelie/nsfw-cowgirl-2.mp4",
       "loop": true
     },
@@ -220,7 +221,7 @@
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/zelie/nsfw-creampie.png",
+      "image": "sprites/zelie/nsfw-creampie.webp",
       "clip": "sprites/zelie/nsfw-creampie.mp4",
       "loop": true
     },
@@ -228,7 +229,7 @@
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/zelie/nsfw-facial.png",
+      "image": "sprites/zelie/nsfw-facial.webp",
       "clip": "sprites/zelie/nsfw-facial.mp4",
       "loop": true
     },
@@ -236,42 +237,42 @@
       "id": "pregnant-blowjob",
       "name": "Blowjob, pregnant",
       "description": "",
-      "image": "sprites/zelie/nsfw-pregnant-blowjob.png",
+      "image": "sprites/zelie/nsfw-pregnant-blowjob.webp",
       "loop": true
     },
     {
       "id": "pregnant-missionary",
       "name": "Missionary, pregnant",
       "description": "",
-      "image": "sprites/zelie/nsfw-pregnant-missionary.png",
+      "image": "sprites/zelie/nsfw-pregnant-missionary.webp",
       "loop": true
     },
     {
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
-      "image": "sprites/zelie/nsfw-pregnant-doggy.png",
+      "image": "sprites/zelie/nsfw-pregnant-doggy.webp",
       "loop": true
     },
     {
       "id": "pregnant-cowgirl",
       "name": "Cowgirl, pregnant",
       "description": "",
-      "image": "sprites/zelie/nsfw-pregnant-cowgirl.png",
+      "image": "sprites/zelie/nsfw-pregnant-cowgirl.webp",
       "loop": true
     },
     {
       "id": "pregnant-creampie",
       "name": "Creampie, pregnant",
       "description": "",
-      "image": "sprites/zelie/nsfw-pregnant-creampie.png",
+      "image": "sprites/zelie/nsfw-pregnant-creampie.webp",
       "loop": true
     },
     {
       "id": "pregnant-facial",
       "name": "Facial, pregnant",
       "description": "",
-      "image": "sprites/zelie/nsfw-pregnant-facial.png",
+      "image": "sprites/zelie/nsfw-pregnant-facial.webp",
       "loop": true
     }
   ],
@@ -313,7 +314,8 @@
     "locationId": "sire-house",
     "viewId": "nanny"
   },
-  "birthPicture": "sprites/zelie/birth.png",
+  "birthPicture": "sprites/zelie/birth.webp",
+  "walkSprite": "sprites/zelie/walk-cutout.webp",
   "childNames": {
     "daughters": [
       "Colette",
@@ -327,6 +329,7 @@
       "Bastien"
     ]
   },
+  "birthControl": true,
   "ai": {
     "speechPattern": "Fluent, precise Common with a Vesperan accent and Vesperan turns of phrase: she ends a statement with \"non?\", says \"alors\", \"voilà\", \"bien sûr\" and \"mais non\", and reaches for a Vesperan word when the Common one will not do. Her sentences are unhurried and a little formal, and she never raises her voice. Endearments come easily and mean little until they mean a great deal.",
     "tone": "poised, teasing, sensual, exacting",
@@ -397,6 +400,5 @@
       }
     ],
     "extraInstructions": "Zélie lives in his house and is at home there: she is found at the stove, laying a table, pressing linen or with a child on her hip, and goes on with it while she talks. Her flirting is habitual and light, and she is in no hurry: she is the Office's employee and knows what a household's scandal costs, so real closeness with him is something she holds at arm's length at first and then has to hide. Her Vesperan words are seasoning, one or two to a reply, never whole sentences."
-  },
-  "partyRole": "healer"
+  }
 }

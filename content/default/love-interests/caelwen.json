@@ -5,7 +5,7 @@
   "age": 132,
   "pronouns": "she/her",
   "bio": "An elven professor of Magical Ethics, a hundred and thirty-two years old, who has been setting first-years the same essay question for six decades and has never yet said what she thinks the answer is.",
-  "appearance": "A beautiful elven woman who looks about thirty-five, with luminous fair skin, a delicate oval face with high cheekbones, large dark blue eyes under soft arched brows, long lashes, and full, softly smiling lips. Long, elegantly pointed ears. Very long, silky silver-blonde hair worn in a loose braid over one shoulder, with strands left free around her face. Tall and graceful, with a slender, curvy figure: a full bust, a narrow waist, rounded hips and long legs.",
+  "appearance": "A beautiful elven woman who looks about thirty-five, with luminous fair skin, a delicate oval face with high cheekbones, large dark blue eyes under soft arched brows, long lashes, and full, softly smiling lips. Long, elegantly pointed ears. Very long, silky silver-blonde hair worn in a loose braid over one shoulder, with strands left free around her face. Tall and graceful, with a slender, curvy figure: a full bust, rounded hips and long legs.",
   "personality": "Warm, wry and unhurried, with the patience of someone who has seen fashions in certainty come and go. Teaches by asking questions and enjoys being argued with. Flirts the way she lectures: lightly, attentively, and never by accident. Sadder than she lets on.",
   "traitIds": [
     "flirtatious",
@@ -32,34 +32,34 @@
     {
       "id": "default",
       "name": "Usual clothes",
-      "description": "a long, close-fitting deep green dress with long sleeves, a low off-the-shoulder neckline and a skirt slit to the thigh on one side; a soft grey shawl draped over her elbows; a silver pendant shaped like an open seed resting at her chest; a small gold cuff on each ear; and a pair of reading glasses pushed up into her hair",
+      "description": "a long, close-fitting deep green dress with long sleeves with no belt or accessories, a low off-the-shoulder neckline and a skirt slit to the thigh on one side; a soft grey shawl draped over her elbows; a silver leaf pendant necklace;  and a pair of reading glasses pushed up into her hair",
       "sprites": {
         "neutral": {
-          "image": "sprites/caelwen/default-neutral-cutout-2.webp",
-          "description": ""
-        },
-        "happy": {
-          "image": "sprites/caelwen/default-happy-2-cutout.webp",
+          "image": "sprites/caelwen/default-neutral-7-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/caelwen/default-sad-cutout.webp",
+          "image": "sprites/caelwen/default-sad-2-cutout.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/caelwen/default-surprised-2-cutout.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/caelwen/default-embarrassed-2-cutout.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/caelwen/default-happy-2-cutout-2.webp",
           "description": ""
         },
         "angry": {
           "image": "sprites/caelwen/default-angry-cutout.webp",
           "description": ""
         },
-        "surprised": {
-          "image": "sprites/caelwen/default-surprised-cutout.webp",
-          "description": ""
-        },
-        "embarrassed": {
-          "image": "sprites/caelwen/default-embarrassed-cutout.webp",
-          "description": ""
-        },
         "aroused": {
-          "image": "sprites/caelwen/default-aroused-cutout.webp",
+          "image": "sprites/caelwen/default-aroused-4-cutout.webp",
           "description": ""
         }
       },
@@ -68,15 +68,15 @@
     {
       "id": "pregnant",
       "name": "Pregnant",
-      "description": "She has a round, pregnant belly.",
+      "description": "She has a round, pregnant belly",
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/caelwen/pregnant-neutral-cutout.webp",
+          "image": "sprites/caelwen/pregnant-neutral-7-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/caelwen/pregnant-happy-cutout.webp",
+          "image": "sprites/caelwen/pregnant-happy-4-cutout.webp",
           "description": ""
         },
         "sad": {
@@ -96,7 +96,7 @@
           "description": ""
         },
         "aroused": {
-          "image": "sprites/caelwen/pregnant-aroused-cutout.webp",
+          "image": "sprites/caelwen/pregnant-aroused-2-cutout.webp",
           "description": ""
         }
       },
@@ -109,10 +109,6 @@
       "sprites": {
         "neutral": {
           "image": "sprites/caelwen/nude-neutral-cutout.webp",
-          "description": ""
-        },
-        "happy": {
-          "image": "sprites/caelwen/nude-happy-cutout.webp",
           "description": ""
         },
         "sad": {
@@ -131,8 +127,12 @@
           "image": "sprites/caelwen/nude-embarrassed-cutout.webp",
           "description": ""
         },
+        "happy": {
+          "image": "sprites/caelwen/nude-happy-cutout-2.webp",
+          "description": ""
+        },
         "aroused": {
-          "image": "sprites/caelwen/nude-aroused-cutout.webp",
+          "image": "sprites/caelwen/nude-aroused-cutout-2.webp",
           "description": ""
         }
       },
@@ -152,16 +152,8 @@
           "image": "sprites/caelwen/nude-pregnant-happy-cutout.webp",
           "description": ""
         },
-        "sad": {
-          "image": "sprites/caelwen/nude-pregnant-sad-cutout.webp",
-          "description": ""
-        },
         "angry": {
           "image": "sprites/caelwen/nude-pregnant-angry-cutout.webp",
-          "description": ""
-        },
-        "surprised": {
-          "image": "sprites/caelwen/nude-pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
@@ -171,6 +163,14 @@
         "aroused": {
           "image": "sprites/caelwen/nude-pregnant-aroused-cutout.webp",
           "description": ""
+        },
+        "sad": {
+          "image": "sprites/caelwen/nude-pregnant-sad-cutout.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/caelwen/nude-pregnant-surprised-cutout.webp",
+          "description": ""
         }
       },
       "pregnant": true
@@ -178,9 +178,10 @@
   ],
   "defaultOutfitId": "default",
   "faceY": 9,
-  "imageSeed": 60,
+  "imageSeed": 62,
   "stageHeight": 100,
   "kind": "teacher",
+  "partyRole": "warder",
   "teaching": {
     "department": "the College of Arts and Humanities",
     "title": "Professor",
@@ -232,7 +233,7 @@
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/caelwen/nsfw-creampie.png",
+      "image": "sprites/caelwen/nsfw-creampie.webp",
       "clip": "sprites/caelwen/nsfw-creampie.mp4",
       "loop": true
     },
@@ -339,7 +340,8 @@
     "locationId": "riverside-park",
     "background": "generated/backgrounds/caelwen/view-2.webp"
   },
-  "birthPicture": "sprites/caelwen/birth.png",
+  "birthPicture": "sprites/caelwen/birth.webp",
+  "walkSprite": "sprites/caelwen/walk-cutout.png",
   "childNames": {
     "daughters": [
       "Ithilwen",
@@ -353,6 +355,7 @@
       "Thalion"
     ]
   },
+  "birthControl": true,
   "ai": {
     "speechPattern": "Measured, warm and lightly ironic, in full sentences. Answers a question with a better question. Old-fashioned turns of phrase that she knows are old-fashioned. Gentle teasing, and real attention to what is said back.",
     "tone": "wry, warm, unhurried",
@@ -376,6 +379,5 @@
       }
     ],
     "extraInstructions": "Caelwen is an adult of great age and treats her students as adults making their own choices; she never condescends about youth. She does not lecture in conversation. Her warmth is real, her flirting deliberate, and her sadness shows only in glimpses."
-  },
-  "partyRole": "warder"
+  }
 }

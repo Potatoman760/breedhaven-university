@@ -5,11 +5,14 @@ import { CodexBook } from './CodexBook'
 import { Dialog } from './Dialog'
 
 const TABS = ['Basics', 'Conversation', 'Stats and study', 'Relationships', 'Sex and pregnancy', 'House and children', 'Money and jobs', 'The Undercroft', 'The world'] as const
-type Tab = (typeof TABS)[number]
+export type HelpTab = (typeof TABS)[number]
+type Tab = HelpTab
 
 interface Props {
   content: ContentPack
   state: GameState
+  /** The subject it opens on. Left out, the basics. */
+  tab?: HelpTab
   onClose: () => void
 }
 
@@ -56,8 +59,8 @@ const BELOW: Record<string, string> = {
   insight: 'Shows what each enemy is weak to'
 }
 
-export function HelpPanel({ content, state, onClose }: Props) {
-  const [tab, setTab] = useState<Tab>('Basics')
+export function HelpPanel({ content, state, tab: opening = 'Basics', onClose }: Props) {
+  const [tab, setTab] = useState<Tab>(opening)
   const { relationships, pregnancy, housing, jobs, calendar } = content
   const below = content.expedition
   const traitName = (id: string) => content.traits.find((trait) => trait.id === id)?.name ?? id

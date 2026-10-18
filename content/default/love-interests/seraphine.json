@@ -38,31 +38,31 @@
       "description": "a floor-length gown of shimmering pale green with thin shoulder straps made of leafy vines, a sweetheart neckline, and cut-outs at both sides of the waist; embroidered green leaves, gold vines and small gold flowers trail down the bodice and gather at the hips, and the skirt falls in layered, petal-shaped panels. A delicate gold circlet of vines, leaves and small flowers with a green gem at the centre",
       "sprites": {
         "neutral": {
-          "image": "sprites/seraphine/default-neutral-cutout-2.webp",
+          "image": "sprites/seraphine/default-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/seraphine/default-happy-cutout-2.webp",
+          "image": "sprites/seraphine/default-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/seraphine/default-sad-cutout-2.webp",
+          "image": "sprites/seraphine/default-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/seraphine/default-angry-cutout-2.webp",
+          "image": "sprites/seraphine/default-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/seraphine/default-surprised-2-cutout.webp",
+          "image": "sprites/seraphine/default-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/seraphine/default-embarrassed-cutout-2.webp",
+          "image": "sprites/seraphine/default-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/seraphine/default-aroused-cutout-2.webp",
+          "image": "sprites/seraphine/default-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -108,34 +108,34 @@
     {
       "id": "nude",
       "name": "Nude",
-      "description": "nothing at all, completely nude",
+      "description": "nothing at all, completely nude, with a puffy pussy",
       "sprites": {
         "neutral": {
-          "image": "sprites/seraphine/nude-neutral-cutout.webp",
+          "image": "sprites/seraphine/nude-neutral-4-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/seraphine/nude-happy-cutout.webp",
+          "image": "sprites/seraphine/nude-happy-cutout-2.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/seraphine/nude-sad-cutout.webp",
+          "image": "sprites/seraphine/nude-sad-cutout-2.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/seraphine/nude-angry-cutout.webp",
+          "image": "sprites/seraphine/nude-angry-cutout-2.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/seraphine/nude-surprised-cutout.webp",
+          "image": "sprites/seraphine/nude-surprised-cutout-2.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/seraphine/nude-embarrassed-cutout.webp",
+          "image": "sprites/seraphine/nude-embarrassed-cutout-2.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/seraphine/nude-aroused-cutout.webp",
+          "image": "sprites/seraphine/nude-aroused-cutout-2.webp",
           "description": ""
         }
       },
@@ -335,7 +335,8 @@
     "locationId": "dawnbloom-house",
     "background": "generated/backgrounds/seraphine/view.webp"
   },
-  "birthPicture": "sprites/seraphine/birth.png",
+  "birthPicture": "sprites/seraphine/birth.webp",
+  "walkSprite": "sprites/seraphine/walk-cutout.webp",
   "childNames": {
     "daughters": [
       "Celeste",

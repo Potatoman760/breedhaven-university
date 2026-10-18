@@ -36,31 +36,31 @@
       "description": "A cream or ivory fitted blouse with slightly puffed sleeves and cleavage.\nover it: a sleeveless sage-green cardigan/vest\nHer blouse has a small decorative clasp at the throat shaped like a seed.\nA high-waisted pleated midi skirt in dark green color",
       "sprites": {
         "neutral": {
-          "image": "sprites/dinah/default-neutral-cutout.png",
+          "image": "sprites/dinah/default-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/dinah/default-happy-cutout.png",
+          "image": "sprites/dinah/default-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/dinah/default-sad-cutout.png",
+          "image": "sprites/dinah/default-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/dinah/default-angry-cutout.png",
+          "image": "sprites/dinah/default-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/dinah/default-surprised-cutout.png",
+          "image": "sprites/dinah/default-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/dinah/default-embarrassed-cutout.png",
+          "image": "sprites/dinah/default-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/dinah/default-aroused-cutout.png",
+          "image": "sprites/dinah/default-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -73,31 +73,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/dinah/pregnant-neutral-cutout.png",
+          "image": "sprites/dinah/pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/dinah/pregnant-happy-cutout.png",
+          "image": "sprites/dinah/pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/dinah/pregnant-sad-cutout.png",
+          "image": "sprites/dinah/pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/dinah/pregnant-angry-cutout.png",
+          "image": "sprites/dinah/pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/dinah/pregnant-surprised-cutout.png",
+          "image": "sprites/dinah/pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/dinah/pregnant-embarrassed-cutout.png",
+          "image": "sprites/dinah/pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/dinah/pregnant-aroused-cutout.png",
+          "image": "sprites/dinah/pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -109,31 +109,31 @@
       "description": "nothing at all, completely nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/dinah/nude-neutral-cutout.png",
+          "image": "sprites/dinah/nude-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/dinah/nude-happy-cutout.png",
+          "image": "sprites/dinah/nude-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/dinah/nude-sad-cutout.png",
+          "image": "sprites/dinah/nude-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/dinah/nude-angry-cutout.png",
+          "image": "sprites/dinah/nude-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/dinah/nude-surprised-cutout.png",
+          "image": "sprites/dinah/nude-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/dinah/nude-embarrassed-cutout.png",
+          "image": "sprites/dinah/nude-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/dinah/nude-aroused-cutout.png",
+          "image": "sprites/dinah/nude-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -146,31 +146,31 @@
       "inherits": "nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/dinah/nude-pregnant-neutral-cutout.png",
+          "image": "sprites/dinah/nude-pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/dinah/nude-pregnant-happy-cutout.png",
+          "image": "sprites/dinah/nude-pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/dinah/nude-pregnant-sad-cutout.png",
+          "image": "sprites/dinah/nude-pregnant-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/dinah/nude-pregnant-angry-cutout.png",
+          "image": "sprites/dinah/nude-pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/dinah/nude-pregnant-surprised-cutout.png",
+          "image": "sprites/dinah/nude-pregnant-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/dinah/nude-pregnant-embarrassed-cutout.png",
+          "image": "sprites/dinah/nude-pregnant-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/dinah/nude-pregnant-aroused-cutout.png",
+          "image": "sprites/dinah/nude-pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -191,42 +191,42 @@
       "id": "pregnant-blowjob",
       "name": "Blowjob, pregnant",
       "description": "",
-      "image": "sprites/dinah/nsfw-pregnant-blowjob.png",
+      "image": "sprites/dinah/nsfw-pregnant-blowjob.webp",
       "loop": true
     },
     {
       "id": "pregnant-missionary",
       "name": "Missionary, pregnant",
       "description": "",
-      "image": "sprites/dinah/nsfw-pregnant-missionary.png",
+      "image": "sprites/dinah/nsfw-pregnant-missionary.webp",
       "loop": true
     },
     {
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
-      "image": "sprites/dinah/nsfw-pregnant-doggy.png",
+      "image": "sprites/dinah/nsfw-pregnant-doggy.webp",
       "loop": true
     },
     {
       "id": "pregnant-cowgirl",
       "name": "Cowgirl, pregnant",
       "description": "",
-      "image": "sprites/dinah/nsfw-pregnant-cowgirl.png",
+      "image": "sprites/dinah/nsfw-pregnant-cowgirl.webp",
       "loop": true
     },
     {
       "id": "pregnant-creampie",
       "name": "Creampie, pregnant",
       "description": "",
-      "image": "sprites/dinah/nsfw-pregnant-creampie.png",
+      "image": "sprites/dinah/nsfw-pregnant-creampie.webp",
       "loop": true
     },
     {
       "id": "blowjob",
       "name": "Blowjob",
       "description": "",
-      "image": "sprites/dinah/nsfw-blowjob.png",
+      "image": "sprites/dinah/nsfw-blowjob.webp",
       "clip": "sprites/dinah/nsfw-blowjob.mp4",
       "loop": true
     },
@@ -234,7 +234,7 @@
       "id": "missionary",
       "name": "Missionary",
       "description": "",
-      "image": "sprites/dinah/nsfw-missionary.png",
+      "image": "sprites/dinah/nsfw-missionary.webp",
       "clip": "sprites/dinah/nsfw-missionary.mp4",
       "loop": true
     },
@@ -242,7 +242,7 @@
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/dinah/nsfw-doggy.png",
+      "image": "sprites/dinah/nsfw-doggy.webp",
       "clip": "sprites/dinah/nsfw-doggy.mp4",
       "loop": true
     },
@@ -250,7 +250,7 @@
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
-      "image": "sprites/dinah/nsfw-cowgirl.png",
+      "image": "sprites/dinah/nsfw-cowgirl.webp",
       "clip": "sprites/dinah/nsfw-cowgirl.mp4",
       "loop": true
     },
@@ -258,7 +258,7 @@
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/dinah/nsfw-creampie-3.png",
+      "image": "sprites/dinah/nsfw-creampie-3.webp",
       "clip": "sprites/dinah/nsfw-creampie.mp4",
       "loop": true
     },
@@ -266,7 +266,7 @@
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/dinah/nsfw-facial-3.png",
+      "image": "sprites/dinah/nsfw-facial-3.webp",
       "clip": "sprites/dinah/nsfw-facial.mp4",
       "loop": true
     }
@@ -307,7 +307,8 @@
     "locationId": "chapel",
     "background": "generated/backgrounds/dinah/view.webp"
   },
-  "birthPicture": "sprites/dinah/birth-2.png",
+  "birthPicture": "sprites/dinah/birth-2.webp",
+  "walkSprite": "sprites/dinah/walk-cutout.webp",
   "childNames": {
     "daughters": [
       "Elarie",

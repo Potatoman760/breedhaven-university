@@ -61,6 +61,8 @@ import { NavTiles } from './NavTiles'
 import { ChevronIcon } from './icons'
 import type { Panel } from './panels'
 import { useBack } from '../mouseBack'
+import { Portrait } from './Portrait'
+import { Tour, type TourStep } from './Tour'
 
 interface Props {
   content: ContentPack
@@ -91,6 +93,12 @@ interface Props {
   onOpen: (panel: Panel) => void
   /** Goes to the societies' fair, while it is on. */
   onFair: () => void
+  /**
+   * Whoever welcomed him is showing him round the day's choices, straight after the rest of the first look round. It is
+   * orientation day, when they are not his to make: they are shown for it all the same, and hidden again after.
+   */
+  touring: boolean
+  onToured: () => void
 }
 
 /** Between scenes: where and when you are, and the choice of what to do next. */
@@ -157,6 +165,46 @@ export function DayView(props: Props) {
   // At home, whoever of the household is in the room he is looking at is standing in it: the house is lived in, not a set of empty pictures.
   const here = roomHeIsIn(content, state)
   const inTheRoom = here ? inRoom(content, state, here.key).slice(0, MAX_SCENE_CAST) : []
+  // Whoever welcomed him, to show him round the day's choices at the end of the first look round. She opens each menu
+  // herself to show what is in it, and closes it again after.
+  const guideId = content.orientation?.intro?.speakerId
+  const guide = [...content.npcs, ...content.loveInterests].find((one) => one.id === guideId)
+  const dayTour: TourStep[] = [
+    { target: '.choices', before: () => setStudying(null), text: `Everything you can do right now is listed here: your next class or shift, any events on, and the rest. Pick one and you go.` },
+    ...(present.length > 0
+      ? [{ target: '.partners', text: `Whoever's here with you. Click someone to start a line about her in the box below, or right-click her to see what you know about her.` }]
+      : []),
+    ...(mine.length > 0
+      ? [
+          {
+            target: '[data-tour="study"]',
+            before: () => {
+              setShowStats(false)
+              setStudying('')
+            },
+            text: `Study for a class to earn points toward your grade. Pick the course, then where to study. Somewhere quiet is better, and studying with a classmate is better still.`
+          }
+        ]
+      : []),
+    {
+      target: '[data-tour="stats"]',
+      before: () => {
+        setStudying(null)
+        setShowStats(true)
+      },
+      text: `Work on yourself raises your stats, one at a time. Each choice is somewhere you can do it right now, and what it costs you.`
+    },
+    {
+      target: '.focus-pick',
+      before: () => setShowStats(false),
+      text: `This is your focus. When you skip ahead to your next class, shift or plan, the hours in between go into whatever you set here: half of what a real session would earn, but for no energy. Set it and you never waste an hour.`,
+      expression: 'happy'
+    },
+    { target: '.free-text', text: `If what you want isn't listed, write it here. "Spar at the Tiltyard", "invite Faye to dinner". If it can be done, it will be.` },
+    { target: '[data-tour="end-day"]', text: `And when you've had enough, end the day. You sleep until morning.` },
+    { text: `That's everything. Now go on, orientation's about to start.`, expression: 'happy' }
+  ]
+
   return (
     <main className="stage">
       {/* In his own room, the room is what is behind him, and not the building it is in. */}
@@ -231,7 +279,7 @@ export function DayView(props: Props) {
             return (
               <button
                 key={li.id}
-                className={hasMet(state, li.id) ? 'partner' : 'partner unmet'}
+                className={hasMet(state, li.id) ? 'partner face' : 'partner face unmet'}
                 title={`${li.name} · ${hasMet(state, li.id) ? stage.name : 'you have not met'}. Click to start a line about her below; right-click for what you know of her`}
                 onContextMenu={(event) => {
                   event.preventDefault()
@@ -239,7 +287,7 @@ export function DayView(props: Props) {
                 }}
                 onClick={() => setIdea(`Talk with ${li.name.split(' ')[0]}`)}
               >
-                {li.name.split(' ')[0]}
+                <Portrait who={li} size={72} caption />
               </button>
             )
           })}
@@ -247,12 +295,12 @@ export function DayView(props: Props) {
           {npcsHere.map((npc) => (
             <button
               key={npc.id}
-              className="partner npc"
+              className="partner face npc"
               title={`Talk to ${npc.name}${npc.role ? `, ${npc.role}` : ''}`}
               disabled={locked || over}
               onClick={() => props.onTalkNpc(npc.id)}
             >
-              {npc.name.split(' ')[0]}
+              <Portrait who={npc} size={72} caption />
             </button>
           ))}
         </div>
@@ -403,7 +451,7 @@ export function DayView(props: Props) {
 
         {/* The way down, where it is, once he has been told of it. */}
         {!locked && !over && content.expedition && state.expedition.invited && state.locationId === content.expedition.entryLocationId && (
-          <button className="featured" disabled={props.busy} onClick={() => onOpen({ kind: 'below' })}>
+          <button className="featured" data-tour="go-below" disabled={props.busy} onClick={() => onOpen({ kind: 'below' })}>
             <span className="chip outline-light">Below</span>
             <span className="featured-title">Go down into {content.expedition.name}</span>
             <span>
@@ -500,8 +548,8 @@ export function DayView(props: Props) {
 
         {!locked && <ActivityList content={content} state={state} partnerId={partnerId} onPick={onActivity} />}
 
-        {!locked && !over && mine.length > 0 && (
-          <div className="stat-menu">
+        {(!locked || props.touring) && !over && mine.length > 0 && (
+          <div className="stat-menu" data-tour="study">
             <button
               className={studying !== null ? 'featured open' : 'featured'}
               aria-expanded={studying !== null}
@@ -565,8 +613,8 @@ export function DayView(props: Props) {
           </div>
         )}
 
-        {!locked && !over && (
-          <div className="stat-menu">
+        {(!locked || props.touring) && !over && (
+          <div className="stat-menu" data-tour="stats">
             <button className={showStats ? 'featured open' : 'featured'} aria-expanded={showStats} disabled={props.busy} onClick={() => setShowStats(!showStats)}>
               <span className="chip outline-light">Stats</span>
               <span className="featured-title">Work on yourself</span>
@@ -593,7 +641,7 @@ export function DayView(props: Props) {
         )}
 
         {!over && (
-          <button className="featured slim" disabled={props.busy || locked} onClick={props.onEndDay}>
+          <button className="featured slim" data-tour="end-day" disabled={props.busy || locked} onClick={props.onEndDay}>
             <span className="featured-title">End the day</span>
             {/* Orientation has to be sat through first: the day cannot be ended while a part of it is left. */}
             <span>{induction ? 'once orientation is done' : summoned ? 'once you have been' : `until 0${SLEEP_HOURS.until}:00`}</span>
@@ -632,6 +680,19 @@ export function DayView(props: Props) {
       </div>
 
       <NavTiles content={content} state={state} onOpen={onOpen} home />
+
+      {/* The second half of the first look round: the day's choices. */}
+      {props.touring && !over && guide && (
+        <Tour
+          guide={guide}
+          steps={dayTour}
+          onDone={() => {
+            setStudying(null)
+            setShowStats(false)
+            props.onToured()
+          }}
+        />
+      )}
 
     </main>
   )

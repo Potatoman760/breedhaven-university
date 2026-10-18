@@ -13,6 +13,8 @@ interface Props {
   content: ContentPack
   state: GameState
   onChange: (state: GameState) => void
+  /** A practice fight, shown to learn on: nobody is asked to say anything in it. */
+  practice?: boolean
 }
 
 // How long the party is waited on for something to say before the fight begins without it, and how long each thing said stays up.
@@ -32,7 +34,7 @@ const share = (now: number, max: number): string => `${Math.max(0, Math.min(100,
  * bottom, a small plate of everyone's name and what they have left, and beside it what whoever's turn it is can do. What happens is said
  * in a line that comes up over the field, and what a stop or the run came to in a small dialog. No LLM is in it.
  */
-export function ExpeditionView({ content, state, onChange }: Props) {
+export function ExpeditionView({ content, state, onChange, practice = false }: Props) {
   const config = content.expedition!
   const run = state.expedition.run!
   const depth = config.depths[run.depth]
@@ -67,7 +69,7 @@ export function ExpeditionView({ content, state, onChange }: Props) {
     if (!fightKey || asked.current === fightKey) return
     asked.current = fightKey
     // One come back to part-way through, or with nobody to say anything, begins at once.
-    if (fight?.round !== 1 || !banterDue(content, state)) return setOpened(fightKey)
+    if (practice || fight?.round !== 1 || !banterDue(content, state)) return setOpened(fightKey)
     const giveUp = window.setTimeout(() => asked.current === fightKey && setOpened(fightKey), BANTER_WAIT_MS)
     void window.api.banter({ state }).then(({ lines }) => {
       window.clearTimeout(giveUp)
@@ -88,7 +90,7 @@ export function ExpeditionView({ content, state, onChange }: Props) {
   useEffect(() => {
     if (!wonKey || askedWon.current === wonKey) return
     askedWon.current = wonKey
-    if (!banterDue(content, state, 'won')) return
+    if (practice || !banterDue(content, state, 'won')) return
     setWonWait(wonKey)
     void window.api.banter({ state, moment: 'won' }).then(({ lines }) => {
       setWonWait(null)

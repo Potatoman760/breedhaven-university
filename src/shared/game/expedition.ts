@@ -190,6 +190,29 @@ export function startRun(content: ContentPack, state: GameState, partyIds: strin
   return { ...state, expedition: { ...state.expedition, run: arrive(content, state, run) } }
 }
 
+/**
+ * A fight to practise on, made without the checks of a real way down and never meant to be kept: him and these women
+ * at the first fight of the first depth, his turn first. Its state is shown and played, and then thrown away.
+ */
+export function practiceRun(content: ContentPack, state: GameState, partyIds: string[]): GameState {
+  const config = content.expedition!
+  const tough = factor(content, state, 'footing')
+  const his = Math.round((config.playerFooting + Math.max(0, abilityModifier(statOf(state, 'endurance'))) * config.footingPerEndurance) * tough)
+  const fresh = (id: string, max: number): Fighter => ({ id, footing: max, max, cooldowns: {}, surge: 0, guarding: false, taunting: false, anchored: false, covered: false, hexed: 0 })
+  const party: Fighter[] = [
+    fresh(HIM, his),
+    ...partyIds.flatMap((id) => {
+      const role = roleOf(config, content.loveInterests.find((li) => li.id === id))
+      return role ? [fresh(id, Math.round(role.footing * tough))] : []
+    })
+  ]
+  const node = Math.max(0, config.depths[0].nodes.findIndex((one) => one.kind === 'fight'))
+  // He sees it coming, so that the fight opens on his turn.
+  const ready: GameState = { ...state, boons: [...state.boons, { kind: 'ambush', amount: 1, until: state.time + 1, source: 'Practice' }] }
+  const run: ExpeditionRun = { depth: 0, node, startedAt: state.time, party, ward: 0, found: NOTHING, banked: NOTHING, downed: [], rolls: 0, done: false, note: '' }
+  return { ...ready, expedition: { ...ready.expedition, run: arrive(content, ready, run) } }
+}
+
 /** Goes on from a stop that is dealt with to the next. */
 export function goOn(content: ContentPack, state: GameState): GameState {
   const run = state.expedition.run

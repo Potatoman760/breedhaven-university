@@ -33,7 +33,7 @@ const SETTLE_MS = 500
  * A guided tour of a screen: a character pops up beside one part of it after another, rings it, and says what it is
  * for in a speech bubble. A click anywhere goes on; the last step has no target and ends the tour by itself.
  */
-export function Tour({ guide, steps, onDone }: { guide: LoveInterest; steps: TourStep[]; onDone: () => void }) {
+export function Tour({ guide, steps, onDone, onSkip }: { guide: LoveInterest; steps: TourStep[]; onDone: () => void; onSkip?: () => void }) {
   const [index, setIndex] = useState(0)
   const [rect, setRect] = useState<DOMRect | null>(null)
   const [leaving, setLeaving] = useState(false)
@@ -62,9 +62,10 @@ export function Tour({ guide, steps, onDone }: { guide: LoveInterest; steps: Tou
     }
   }, [index])
 
-  const finish = () => {
+  // Skipped, it is over all the same, unless whoever started it wants to know the difference.
+  const finish = (skipped = false) => {
     setLeaving(true)
-    window.setTimeout(onDone, LEAVE_MS)
+    window.setTimeout(skipped ? (onSkip ?? onDone) : onDone, LEAVE_MS)
   }
   const next = () => (last ? finish() : setIndex(index + 1))
   // A step he does himself is over once it is done.
@@ -74,12 +75,12 @@ export function Tour({ guide, steps, onDone }: { guide: LoveInterest; steps: Tou
 
   useEffect(() => {
     if (!last) return
-    const timer = window.setTimeout(finish, FAREWELL_MS)
+    const timer = window.setTimeout(() => finish(), FAREWELL_MS)
     return () => window.clearTimeout(timer)
   }, [last])
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && !isMouseBack(event)) finish()
+      if (event.key === 'Escape' && !isMouseBack(event)) finish(true)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -99,7 +100,7 @@ export function Tour({ guide, steps, onDone }: { guide: LoveInterest; steps: Tou
           <p>{step.text}</p>
           {!last && (
             <div className="tour-actions">
-              <Button variant="quiet" size="small" onClick={(event) => (event.stopPropagation(), finish())}>
+              <Button variant="quiet" size="small" onClick={(event) => (event.stopPropagation(), finish(true))}>
                 Skip
               </Button>
               {!step.waits && (

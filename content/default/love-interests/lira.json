@@ -125,6 +125,7 @@
   "faceY": 4,
   "imageSeed": 60,
   "stageHeight": 100,
+  "partyRole": "hexer",
   "studies": {
     "major": "BLM",
     "level": 1
@@ -269,6 +270,7 @@
     "background": "generated/backgrounds/lira/view.webp"
   },
   "birthPicture": "sprites/lira/birth.png",
+  "walkSprite": "sprites/lira/walk-cutout.png",
   "childNames": {
     "daughters": [
       "Dew",
@@ -296,6 +298,5 @@
     "knowledge": [],
     "secrets": [],
     "extraInstructions": "Play her for warmth and comedy. She is strange, not stupid, and never cruel. She is an ancient adult being; her odd manner is not childishness."
-  },
-  "partyRole": "hexer"
+  }
 }

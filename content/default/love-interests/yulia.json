@@ -43,20 +43,8 @@
           "image": "sprites/yulia/default-neutral-cutout.webp",
           "description": ""
         },
-        "happy": {
-          "image": "sprites/yulia/default-happy-cutout.webp",
-          "description": ""
-        },
-        "sad": {
-          "image": "sprites/yulia/default-sad-cutout.webp",
-          "description": ""
-        },
         "angry": {
           "image": "sprites/yulia/default-angry-cutout.webp",
-          "description": ""
-        },
-        "surprised": {
-          "image": "sprites/yulia/default-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
@@ -65,6 +53,18 @@
         },
         "aroused": {
           "image": "sprites/yulia/default-aroused-cutout.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/yulia/default-happy-cutout.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/yulia/default-sad-cutout.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/yulia/default-surprised-cutout.webp",
           "description": ""
         }
       },
@@ -112,16 +112,20 @@
       "name": "Nude",
       "description": "nothing at all, completely nude",
       "sprites": {
+        "sad": {
+          "image": "sprites/yulia/nude-sad-cutout.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/yulia/nude-aroused-cutout.webp",
+          "description": ""
+        },
         "neutral": {
           "image": "sprites/yulia/nude-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
           "image": "sprites/yulia/nude-happy-cutout.webp",
-          "description": ""
-        },
-        "sad": {
-          "image": "sprites/yulia/nude-sad-cutout.webp",
           "description": ""
         },
         "angry": {
@@ -134,10 +138,6 @@
         },
         "embarrassed": {
           "image": "sprites/yulia/nude-embarrassed-cutout.webp",
-          "description": ""
-        },
-        "aroused": {
-          "image": "sprites/yulia/nude-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -331,6 +331,7 @@
     "background": "generated/backgrounds/yulia/view.png"
   },
   "birthPicture": "sprites/yulia/birth.webp",
+  "walkSprite": "sprites/yulia/walk-cutout.png",
   "childNames": {
     "daughters": [
       "Saga",

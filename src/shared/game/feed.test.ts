@@ -49,9 +49,15 @@ describe('the feed', () => {
     expect(feedOf(later)[0]).toMatchObject({ image: 'addons/generated/photos/ana/a.png', withId: 'bea' })
     expect(recentPostsBy(later, ana.id, 1).map((post) => post.text)).toEqual(['Sun.'])
 
-    const liked = toggleLike(later, later.feed[0].id)
+    const liked = toggleLike(content, later, later.feed[0].id)
     expect(liked.feed.map((post) => post.liked)).toEqual([true, false])
-    expect(toggleLike(liked, later.feed[0].id).feed[0].liked).toBe(false)
+    expect(toggleLike(content, liked, later.feed[0].id).feed[0].liked).toBe(false)
+    // The first like of a post warms her to him by a point; taking it back and liking it again does no more.
+    const before = later.relationships[ana.id].affection
+    expect(liked.relationships[ana.id].affection).toBe(before + content.relationships.postLike)
+    const again = toggleLike(content, toggleLike(content, liked, later.feed[0].id), later.feed[0].id)
+    expect(again.feed[0].liked).toBe(true)
+    expect(again.relationships[ana.id].affection).toBe(before + content.relationships.postLike)
     expect(buildCharacterPrompt({ content, state: liked, loveInterestId: ana.id })).toContain(`Rain again. (${start.player.name} liked this)`)
   })
 

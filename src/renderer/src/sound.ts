@@ -33,7 +33,11 @@ export function setVolume(kind: VolumeKind, value: number): void {
   }
   if (ambience) {
     window.clearInterval(fades.get(ambience.audio))
-    ambience.audio.volume = ambience.sound.volume * volumes.ambience
+    ambience.audio.volume = ambienceLevel(ambience.sound)
+  }
+  if (song) {
+    window.clearInterval(fades.get(song))
+    song.volume = songLevel()
   }
   if (poseLoop) {
     window.clearInterval(fades.get(poseLoop.audio))
@@ -93,7 +97,7 @@ function fade(audio: HTMLAudioElement, to: number, done?: () => void): void {
 export function setAmbience(sound: Sound | undefined): void {
   if (ambience && sound && ambience.sound.file === sound.file) {
     ambience.sound = sound
-    fade(ambience.audio, sound.volume * volumes.ambience)
+    fade(ambience.audio, ambienceLevel(sound))
     return
   }
   if (ambience) {
@@ -106,8 +110,55 @@ export function setAmbience(sound: Sound | undefined): void {
   audio.loop = true
   audio.volume = 0
   audio.play().catch(() => undefined)
-  fade(audio, sound.volume * volumes.ambience)
+  fade(audio, ambienceLevel(sound))
   ambience = { sound, audio }
+}
+
+/** How loud the place's loop is: silent while a song is playing in its place. */
+function ambienceLevel(sound: Sound): number {
+  return song ? 0 : sound.volume * volumes.ambience
+}
+
+// The songs for love-making: one, picked at random, plays once through behind a scene that has come to it.
+const SONGS = Object.values(import.meta.glob<string>('../../assets/songs/*.mp3', { eager: true, import: 'default' }))
+// A song is on the music volume, and under the sounds of the pose, which are on the effects volume.
+const SONG_LEVEL = 0.6
+const SONG_OUT_MS = 3000
+let song: HTMLAudioElement | null = null
+
+const songLevel = () => volumes.music * SONG_LEVEL
+
+/** Puts the place's loop back as it should be, now that a song has started or stopped. */
+function settleAmbience(): void {
+  if (ambience) fade(ambience.audio, ambienceLevel(ambience.sound))
+}
+
+/**
+ * Plays one of the songs, picked at random, once through, in place of the place's loop. One already playing carries
+ * on. When it ends of itself the place's loop comes back.
+ */
+export function playSong(): void {
+  if (song || SONGS.length === 0) return
+  const audio = new Audio(SONGS[Math.floor(Math.random() * SONGS.length)])
+  audio.volume = 0
+  audio.addEventListener('ended', () => {
+    if (song !== audio) return
+    song = null
+    settleAmbience()
+  })
+  song = audio
+  audio.play().catch(() => undefined)
+  fade(audio, songLevel())
+  settleAmbience()
+}
+
+/** Stops the song, if one is playing: it fades out over a few seconds rather than being cut off, and the place's loop comes back. */
+export function stopSong(): void {
+  if (!song) return
+  const audio = song
+  song = null
+  fadeFor(audio, 0, SONG_OUT_MS, () => audio.pause())
+  settleAmbience()
 }
 
 // The loop behind an NSFW pose while it is up: on the effects volume, and quick to come and go with the picture.

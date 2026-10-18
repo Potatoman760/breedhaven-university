@@ -425,6 +425,8 @@ export const LoveInterestSchema = z.object({
   room: RoomSchema.optional(),
   /** A picture of her just after giving birth: sitting up in a hospital bed with the child in her arms. It is the whole stage of the scene of a birth he is there for. */
   birthPicture: z.string().optional(),
+  /** Her walking in profile, facing right, in her usual clothes, cut out: she walks across the loading screen of a scene with her. */
+  walkSprite: z.string().optional(),
   /** The names she would give a child of hers: she suggests the next one not yet used when it is born. */
   childNames: ChildNamesSchema.prefault({}),
   /** She takes something against the Bloom when the game begins, as most women do. She may stop, in a scene, when she chooses to. */

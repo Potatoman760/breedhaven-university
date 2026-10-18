@@ -9,7 +9,6 @@ import { useVolumes } from './sound'
 import { Overlay } from './ui/Dialog'
 import { describeSave, SavesPanel } from './SavesPanel'
 import { SettingsPanel } from './SettingsPanel'
-import { VineCorner } from './ui/icons'
 
 // Where it is remembered that the player turned the menu's music off.
 const MUSIC_OFF = 'breedhaven.menuMusicOff'
@@ -84,12 +83,7 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
       <button type="button" className="quiet title-music" aria-pressed={!muted} onClick={toggleMusic}>
         Music: {muted ? 'off' : 'on'}
       </button>
-      <div className="title-frame framed">
-        <VineCorner corner="tl" />
-        <VineCorner corner="tr" />
-        <VineCorner corner="bl" />
-        <VineCorner corner="br" />
-
+      <div className="title-frame">
         {/* The game's name, as its own picture, at the head of the menu. */}
         <img className="title-logo" src={titleArt} alt="Breedhaven University" />
 

@@ -185,6 +185,7 @@
   "imageSeed": 60,
   "stageHeight": 100,
   "kind": "teacher",
+  "partyRole": "hexer",
   "teaching": {
     "department": "the College of Bloom Studies and Divinity",
     "title": "Professor",
@@ -300,6 +301,7 @@
     "background": "generated/backgrounds/vespera/view.webp"
   },
   "birthPicture": "sprites/vespera/birth.png",
+  "walkSprite": "sprites/vespera/walk-cutout.png",
   "childNames": {
     "daughters": [
       "Nocturne",
@@ -313,6 +315,7 @@
       "Lucius"
     ]
   },
+  "birthControl": true,
   "ai": {
     "speechPattern": "She speaks in a low, unhurried drawl that makes every sentence sound like the punchline to a joke only she is in on. She uses old hexing idioms alongside modern slang and tends to answer a question with a question.",
     "tone": "Sassy, teasing, confident, warm underneath.",
@@ -336,6 +339,5 @@
       }
     ],
     "extraInstructions": "Keep her teasing and playful but never cruel: the sass is an invitation, not a wall. She flirts like she breathes, but she notices everything and remembers what people say when they think she is only joking. Let warmth surface when someone is genuinely struggling."
-  },
-  "partyRole": "hexer"
+  }
 }

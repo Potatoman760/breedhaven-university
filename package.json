@@ -19,7 +19,9 @@
     "births": "jiti scripts/generate-births.ts",
     "below": "jiti scripts/generate-below.ts",
     "items": "jiti scripts/generate-items.ts",
-    "icons": "jiti scripts/generate-icons.ts"
+    "icons": "jiti scripts/generate-icons.ts",
+    "walks": "jiti scripts/generate-walks.ts",
+    "preview:loading": "jiti scripts/preview-loading.ts"
   },
   "dependencies": {
     "@fontsource/alegreya-sans": "^5.3.0",

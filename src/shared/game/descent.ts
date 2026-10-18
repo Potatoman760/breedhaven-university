@@ -1,10 +1,10 @@
-import type { Appointment, ContentPack, GameState, Scene } from '../model'
+import type { Appointment, ContentPack, GameState, Intro } from '../model'
 import { describeWhen, keepAppointment } from './appointments'
 import { slotOn } from './births'
 import { isGameOver, toDate } from './calendar'
 import { addNote, giveContact } from './courier'
 import { belowOpen } from './expedition'
-import { meet, sceneBaseline } from './scene'
+import { meet } from './scene'
 
 /**
  * Being shown the way down. The Undercroft is not his to enter the day it opens: whoever knows of it sets an hour to
@@ -57,40 +57,16 @@ export function scheduleDescent(content: ContentPack, state: GameState): GameSta
  * He is there for it. The scene is the two of them at the head of the stair: she tells him what is below, why it
  * will only answer to him, and what he will need. The way down is his from this hour.
  */
-export function attendDescent(content: ContentPack, state: GameState, appointmentId: string): { state: GameState; scene: Scene } {
+export function attendDescent(content: ContentPack, state: GameState, appointmentId: string): { state: GameState; cutscene: Intro } {
   const config = content.expedition
-  if (!config?.guideId) throw new Error('There is nobody to show him the way down.')
+  if (!config?.guideId || !config.intro) throw new Error('There is nobody to show him the way down.')
   const { state: kept } = keepAppointment(content, state, appointmentId)
-  const player = state.player.name
-  const place = content.locations.find((l) => l.id === config.entryLocationId)?.name ?? config.entryLocationId
-  const shown: GameState = { ...meet(content, kept, [config.guideId]), locationId: config.entryLocationId, inOwnRoom: false, expedition: { ...kept.expedition, invited: true } }
-  return {
-    state: shown,
-    scene: {
-      loveInterestId: config.guideId,
-      companionIds: [],
-      npc: false,
-      nsfw: false,
-      beats: [
-        {
-          activityName: `Being shown the way down`,
-          locationName: place,
-          description: `You meet where she said, at ${place}. She checks that nobody is watching, and leads you round behind the hot pool to a door you have never noticed, and the head of an old stair.`,
-          direction:
-            `You asked ${player} here in secret to show him the way down into ${config.name}, and to ask for his help. Tell him, in your own voice and as he asks:\n` +
-            `- Seven centuries of ward-lines under the University are anchored below, and they are slipping. Where they slip, raw Bloom pools and takes shape: mindless things, nothing like the people called slimes. Left alone, the wards over the whole University go.\n` +
-            `- The Bloom settles around a True Sire. An anchor will only re-seat under his hands, which is why it has to be him and cannot be you.\n` +
-            `- He has no magic, so he needs women who can work and who trust him, two at a time. You may be one of them if he asks and you trust him enough. A woman carrying a child is far stronger down there, and harder to hold.\n` +
-            `- There are ${config.depths.length} anchors, each deeper than the last. One re-seated holds for good, and something of the old University tends to be lying by it.\n` +
-            `- Working on the ward-lines without the Arcane Board's leave is illegal. You have been doing it alone and cannot be seen to. He tells nobody he does not trust.\n` +
-            `Take him down the first flight to look, and no further today. Stay here: do not move the scene anywhere.`
-        }
-      ],
-      messages: [],
-      gifts: [],
-      conceived: [],
-      departed: [],
-      baseline: sceneBaseline(shown, config.guideId, [])
-    }
+  // Shown it, he knows the way down. The hour she keeps him went by in keeping the appointment.
+  const shown: GameState = {
+    ...meet(content, kept, [config.guideId]),
+    locationId: config.entryLocationId,
+    inOwnRoom: false,
+    expedition: { ...kept.expedition, invited: true }
   }
+  return { state: shown, cutscene: config.intro.cutscene }
 }

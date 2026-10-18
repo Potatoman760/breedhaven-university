@@ -186,6 +186,7 @@
   "imageSeed": 60,
   "stageHeight": 100,
   "kind": "teacher",
+  "partyRole": "striker",
   "teaching": {
     "department": "the College of Arts and Humanities",
     "title": "Professor",
@@ -338,6 +339,7 @@
     "background": "generated/backgrounds/lola-hopworth/view-2.webp"
   },
   "birthPicture": "sprites/lola-hopworth/birth.png",
+  "walkSprite": "sprites/lola-hopworth/walk-cutout.png",
   "childNames": {
     "daughters": [
       "Clover",
@@ -361,7 +363,7 @@
       "Swears casually when excited or annoyed, never with anger"
     ],
     "exampleDialogue": [],
-    "backstory": "Bryony grew up in the market town of Butterford, west of Seedblossom, where her mother kept the kitchen of the Hopworth Brewery and raised seven daughters. She learned to cook standing on a stool beside the copper, and her magic showed itself early in her hands: anything she touched and tended grew richer. Bread rose higher under her palm, broths deepened, ferments took on a life of their own.\n\nShe came to Breedhaven University at eighteen to study Culinary Arts, took her master's at twenty-four, and was offered the professorship at thirty when the previous chair retired to write a cookbook. She teaches the practical courses: knife work, sauce construction, enchanted fermentation, and the controlled magic that turns heat and intention into flavour. Her demonstrations are popular because they are loud, hands-on and end in something you can eat.\n\nShe lives in the flat above the Honeyed Bee's kitchen, where she also keeps an eye on Elowen's stock and occasionally takes over a service when the bar is overwhelmed. Her own magic is tactile and specific: she can coax a flavour out of an ingredient that was not quite there, sense when a ferment has turned before anyone else can taste it, and keep food warm with a touch of her hand. She takes dampers and has done since university; the Bloom runs warm in her and she prefers to keep it at a manageable hum rather than fight it or indulge it carelessly. She has had relationships, most of them short and friendly and ended without drama, and a few longer ones that ended because she would not slow down for anyone.",
+    "backstory": "Lola grew up in the market town of Butterford, west of Seedblossom, where her mother kept the kitchen of the Hopworth Brewery and raised seven daughters. She learned to cook standing on a stool beside the copper, and her magic showed itself early in her hands: anything she touched and tended grew richer. Bread rose higher under her palm, broths deepened, ferments took on a life of their own.\n\nShe believes that her main purpose in life is to be bred and bear children\n\nShe lives in the flat above the Honeyed Bee's kitchen, where she also keeps an eye on Elowen's stock and occasionally takes over a service when the bar is overwhelmed. Her own magic is tactile and specific: she can coax a flavour out of an ingredient that was not quite there, sense when a ferment has turned before anyone else can taste it, and keep food warm with a touch of her hand. She takes dampers and has done since university; the Bloom runs warm in her and she prefers to keep it at a manageable hum rather than fight it or indulge it carelessly. She has had relationships, most of them short and friendly and ended without drama, and a few longer ones that ended because she would not slow down for anyone.",
     "knowledge": [],
     "secrets": [
       {
@@ -374,7 +376,6 @@
         ]
       }
     ],
-    "extraInstructions": "She is direct about attraction and never coy, but she does not press where she is not wanted; a clear no stops her immediately and she does not sulk about it. She treats cooking as the most honest thing a person can do and is moved by anyone who takes it seriously. Her bluntness is warmth, not cruelty: she says the kind thing too, usually first and louder."
-  },
-  "partyRole": "striker"
+    "extraInstructions": "She is direct about attraction and never coy, but she does not press where she is not wanted. She treats cooking as the most honest thing a person can do and is moved by anyone who takes it seriously. Her bluntness is warmth, not cruelty: she says the kind thing too, usually first and louder."
+  }
 }

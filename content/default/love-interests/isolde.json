@@ -311,6 +311,7 @@
     "background": "generated/backgrounds/isolde/view-4.webp"
   },
   "birthPicture": "sprites/isolde/birth.png",
+  "walkSprite": "sprites/isolde/walk-cutout.png",
   "childNames": {
     "daughters": [
       "Vivienne",

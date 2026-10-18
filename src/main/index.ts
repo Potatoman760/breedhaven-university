@@ -184,10 +184,13 @@ function createWindow(): void {
 
   // electron-vite sets ELECTRON_RENDERER_URL when running the dev server.
   const devUrl = process.env['ELECTRON_RENDERER_URL']
+  // A screen opened on its own for a look at it (`npm run preview:loading`): named in the address, for the window to show in place of the game.
+  const preview = !app.isPackaged ? process.env['BREEDHAVEN_PREVIEW'] : undefined
+  const hash = preview ? `preview=${encodeURIComponent(preview)}` : undefined
   if (!app.isPackaged && devUrl) {
-    win.loadURL(devUrl)
+    win.loadURL(hash ? `${devUrl}#${hash}` : devUrl)
   } else {
-    win.loadFile(join(__dirname, '../renderer/index.html'))
+    win.loadFile(join(__dirname, '../renderer/index.html'), hash ? { hash } : undefined)
   }
 }
 

@@ -646,7 +646,7 @@ function Updates({ content, state, onChange, onMessage, canMessage }: UpdatesPro
               <button
                 className={post.liked ? 'quiet like liked' : 'quiet like'}
                 aria-pressed={post.liked}
-                onClick={() => onChange((current) => toggleLike(current, post.id))}
+                onClick={() => onChange((current) => toggleLike(content, current, post.id))}
               >
                 <HeartIcon size={20} />
                 {post.liked ? 'Liked' : 'Like'}

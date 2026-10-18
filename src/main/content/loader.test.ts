@@ -106,6 +106,7 @@ describe('the default content pack', () => {
     const missing = content.loveInterests.flatMap((li) =>
       [
         ...li.outfits.flatMap((outfit) => Object.values(outfit.sprites).map((s) => s.image)),
+        ...(li.walkSprite ? [li.walkSprite] : []),
         ...li.animations.flatMap((animation) => [animation.image, animation.clip].filter((file): file is string => file !== undefined))
       ].filter((path) => !existsSync(join(dir, path)))
     )

@@ -35,6 +35,7 @@ import {
   housingOfferDue,
   scheduleDescent,
   attendDescent,
+  practiceRun,
   startRun,
   sendHousingOffer,
   settleHousehold,
@@ -157,6 +158,7 @@ import { CalendarPanel } from './ui/CalendarPanel'
 import { AgeGate } from './ui/AgeGate'
 import { PhonePanel } from './ui/PhonePanel'
 import { HelpPanel } from './ui/HelpPanel'
+import { BelowTour } from './ui/BelowTour'
 import { Bag } from './ui/Bag'
 import { HouseView } from './ui/house/HouseView'
 import { ContentEditor } from './ui/editor/ContentEditor'
@@ -704,12 +706,12 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       setScene(shown.scene)
       return
     }
-    // And being shown the way down: it is his to take from the scene on.
+    // And being shown the way down: what she has to tell him, and then how a way down is gone about.
     if (at.appointments.find((plan) => plan.id === appointmentId)?.kind === 'below') {
       const shown = attendDescent(content, at, appointmentId)
       setNotice('')
       setState(shown.state)
-      setScene(shown.scene)
+      setCutscene({ intro: shown.cutscene, then: () => setBelowTour(true) })
       return
     }
     const { state: after, appointment } = keepAppointment(content, at, appointmentId)
@@ -769,6 +771,11 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
 
   // The cutscene a part of an event opens with, read before its scene begins.
   const [cutscene, setCutscene] = useState<{ intro: Intro; then: () => void } | null>(null)
+  // The guide's walk through going below, once she has shown him the way down, and the practice fight she puts him in.
+  const [belowTour, setBelowTour] = useState(false)
+  // The first look round's second half, round the day's choices: only ever straight after the first half, never kept.
+  const [dayTour, setDayTour] = useState(false)
+  const [practice, setPractice] = useState<GameState | null>(null)
   /** Goes to a part of an event: he is taken there, reads its cutscene if it has one, and its scene begins. */
   function attendPart(eventId: string, partId: string) {
     const result = attendEventPart(content, state, eventId, partId)
@@ -1020,7 +1027,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setEnded(false)
     setLastPrompt('')
     setNotice(pay > 0 ? `You were paid $${pay} for your shift.` : '')
-    setPanel(null)
+    // Walking away from a table at the fair is back out onto it, as the end of a talk there is.
+    setPanel(scene.returnTo === 'fair' && fairNow(content, state) ? { kind: 'fair' } : null)
   }
 
   async function finishScene() {
@@ -1156,6 +1164,9 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
             setCutscene(null)
           }}
         />
+      ) : practice?.expedition.run ? (
+        // The guide's practice fight: played on a state of its own, never saved, and gone once it is over.
+        <ExpeditionView content={content} state={practice} onChange={(next) => setPractice(next.expedition.run ? next : null)} practice />
       ) : state.expedition.run ? (
         <ExpeditionView content={content} state={state} onChange={setState} />
       ) : summary ? (
@@ -1266,10 +1277,23 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
             onFocus={(focus) => applyUpdate((current) => setFocus(current, focus))}
             onOpen={setPanel}
           onFair={goToFair}
+            touring={dayTour}
+            onToured={() => setDayTour(false)}
           />
           {/* The first time he sees his day, on the first day of the game, whoever welcomed him shows him round it. */}
           {state.flags[WELCOMED] && !state.flags[INTERFACE_TOURED] && toDate(content.calendar, state.time).dayIndex === 0 && (
-            <InterfaceTour content={content} state={state} panel={panel} onOpen={setPanel} onDone={() => setState((current) => ({ ...current, flags: { ...current.flags, [INTERFACE_TOURED]: true } }))} />
+            <InterfaceTour
+              content={content}
+              state={state}
+              panel={panel}
+              onOpen={setPanel}
+              // Seen through, it goes straight on round the day's choices; skipped, it is over.
+              onDone={() => {
+                setState((current) => ({ ...current, flags: { ...current.flags, [INTERFACE_TOURED]: true } }))
+                setDayTour(true)
+              }}
+              onSkip={() => setState((current) => ({ ...current, flags: { ...current.flags, [INTERFACE_TOURED]: true } }))}
+            />
           )}
         </>
       )}
@@ -1365,9 +1389,19 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         </Dialog>
       )}
       {panel?.kind === 'help' && <HelpPanel content={content} state={state} onClose={close} />}
+      {belowTour && (
+        <BelowTour
+          content={content}
+          panel={panel}
+          onOpen={setPanel}
+          practice={practice}
+          onPractice={(on) => setPractice(on ? (current) => current ?? practiceRun(content, state, content.expedition?.guideId ? [content.expedition.guideId] : []) : null)}
+          onDone={() => setBelowTour(false)}
+        />
+      )}
       {panel?.kind === 'menu' && (
-        // The way back to the game is the back button at its foot, as on every main screen.
-        <Dialog title="Menu" onClose={close} narrow ornate>
+        // Back to the game is Escape, the mouse's back button, or a press outside it.
+        <Dialog title="Menu" onClose={close} narrow ornate noClose>
           <div className="pause-menu">
             <GrandButton label="Save" icon={<SaveIcon size={22} />} onClick={() => setPanel({ kind: 'save' })} />
             <GrandButton label="Load" icon={<LoadIcon size={22} />} onClick={() => setPanel({ kind: 'load' })} />
@@ -1426,8 +1460,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         </Dialog>
       )}
       {panel?.kind === 'log' && scene && partner && (
-        <Dialog title="Log" onClose={close}>
-          <ol className="log">
+        <Dialog title="Log" onClose={close} wide ornate>
+          <ol className="log sheet">
             {scene.messages.map((m, i) => (
               <li key={i} className={m.role}>
                 {/* In a group each line of the reply already names its speaker. */}
@@ -1440,7 +1474,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           </ol>
           {scene.messages.length === 0 && <p className="hint">Nothing has been said yet.</p>}
           {lastPrompt && (
-            <details>
+            <details className="log-prompt">
               <summary>System prompt sent for the last message</summary>
               <pre>{lastPrompt}</pre>
             </details>

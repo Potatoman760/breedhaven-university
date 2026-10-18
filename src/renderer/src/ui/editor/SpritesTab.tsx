@@ -14,7 +14,7 @@ import { Group, Text } from './fields'
 import { EmptySlot, PictureSlot, SlotGrid } from './slots'
 
 /** What the sprite editor needs of a character: a love interest and an NPC both have it. */
-type SpriteOwner = Pick<LoveInterest, 'id' | 'name' | 'pronouns' | 'appearance' | 'outfits' | 'defaultOutfitId' | 'faceY' | 'stageHeight' | 'animations' | 'imageSeed' | 'birthPicture'>
+type SpriteOwner = Pick<LoveInterest, 'id' | 'name' | 'pronouns' | 'appearance' | 'outfits' | 'defaultOutfitId' | 'faceY' | 'stageHeight' | 'animations' | 'imageSeed' | 'birthPicture' | 'walkSprite'>
 
 interface Props {
   draft: SpriteOwner
@@ -66,6 +66,9 @@ function PercentBox({ value, min, max, onChange }: { value: number; min: number;
 /** Outfits and their sprites, the portrait crop, and the NSFW pictures and clips. */
 export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Props) {
   const [notice, setNotice] = useState('')
+  // The art tool open on her walking profile, and that picture shown large.
+  const [walking, setWalking] = useState(false)
+  const [walkViewing, setWalkViewing] = useState(false)
   // The outfit and expression the art tool is open on, while it is.
   const [drawing, setDrawing] = useState<{ outfitId: string; expression: string } | null>(null)
   const ready = isSafeId(draft.id)
@@ -136,21 +139,21 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
   }
 
   // Her pictures that are still PNGs: everything the optimize button would turn into WebP.
-  const pngs = pngsIn({ outfits: draft.outfits, animations: draft.animations, birthPicture: draft.birthPicture })
+  const pngs = pngsIn({ outfits: draft.outfits, animations: draft.animations, birthPicture: draft.birthPicture, walkSprite: draft.walkSprite })
 
   /**
    * Turns every PNG of hers into a WebP of the same picture, one after another, and puts each in every slot the PNG
    * was in as it is done. Nothing is kept until she is saved; the PNGs go once a save no longer names them.
    */
   async function optimize() {
-    const paths = pngsIn({ outfits: latest.current.outfits, animations: latest.current.animations, birthPicture: latest.current.birthPicture })
+    const paths = pngsIn({ outfits: latest.current.outfits, animations: latest.current.animations, birthPicture: latest.current.birthPicture, walkSprite: latest.current.walkSprite })
     if (paths.length === 0 || batch) return
     setNotice('')
     const put = forOwner(latest.current.id)
     const { failed } = await run(OPTIMIZE_BATCH, 'Optimizing', paths, fileName, async (path) => {
       try {
         const to = await toWebp(path)
-        put({ outfits: renamed(latest.current.outfits, path, to), animations: renamed(latest.current.animations, path, to), birthPicture: renamed(latest.current.birthPicture, path, to) })
+        put({ outfits: renamed(latest.current.outfits, path, to), animations: renamed(latest.current.animations, path, to), birthPicture: renamed(latest.current.birthPicture, path, to), walkSprite: renamed(latest.current.walkSprite, path, to) })
         return { ok: true }
       } catch (error) {
         return { ok: false, message: errorMessage(error) }
@@ -821,6 +824,35 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
           </div>
           <BatchProgress batch={batch} at={NSFW_PREGNANT_BATCH} onStop={stop} />
           <SlotGrid wide>{pregnantPoses.map(poseSlot)}</SlotGrid>
+        </Group>
+      )}
+
+      {!plain && (
+        <Group title="Walking" hint="Her in profile, walking right, in her usual clothes: she walks across the loading screen of a scene with her.">
+          {walking && <ArtTool target={{ kind: 'walk', who: draft, onUse: (walkSprite) => set({ walkSprite }) }} onClose={() => setWalking(false)} />}
+          {walkViewing && draft.walkSprite && <Lightbox image={draft.walkSprite} name="Walking" onClose={() => setWalkViewing(false)} />}
+          <SlotGrid>
+            {draft.walkSprite ? (
+              <PictureSlot
+                image={draft.walkSprite}
+                name="Walking"
+                onView={() => setWalkViewing(true)}
+                actions={
+                  <>
+                    <Button disabled={!isSafeId(draft.id)} onClick={() => setWalking(true)}>
+                      Generate
+                    </Button>
+                    <Button onClick={() => set({ walkSprite: undefined })}>Remove</Button>
+                  </>
+                }
+              />
+            ) : (
+              <EmptySlot name="Walking" disabled={!isSafeId(draft.id)} onAdd={async () => {
+                const picked = await window.api.editor.importAsset({ loveInterestId: draft.id, kind: 'image' })
+                if (picked) set({ walkSprite: picked })
+              }} onGenerate={() => setWalking(true)} />
+            )}
+          </SlotGrid>
         </Group>
       )}
     </>

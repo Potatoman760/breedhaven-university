@@ -84,7 +84,7 @@ export class ComfyStore {
 }
 
 // Where each kind of picture is filed in the add-on folder. Sprites sit with the ones imported by hand.
-const FOLDERS: Record<ArtKind, string> = { sprite: 'sprites', background: 'generated/backgrounds', photo: 'generated/photos', nsfw: 'sprites', birth: 'sprites' }
+const FOLDERS: Record<ArtKind, string> = { sprite: 'sprites', background: 'generated/backgrounds', photo: 'generated/photos', nsfw: 'sprites', birth: 'sprites', walk: 'sprites' }
 
 /** Writes a picture into the add-on folder under a name nothing else has, and returns its content path. A clip is filed the same way, under its own ending. */
 export function fileArt(addonDir: string, kind: ArtKind, subjectId: string, name: string, bytes: Buffer, prefix: string = ADDON_PREFIX, extension = 'png'): string {

@@ -1,6 +1,7 @@
 import { SHOTS, postPrompt, type Shot } from '../comfy'
 import { outfitDescription, type ContentPack, type GameState, type LoveInterest, type Post, type PostPlan } from '../model'
 import { formatDate, formatTime, periodAt, toDate } from './calendar'
+import { applyEffect } from './conditions'
 import { describeEvent, eventsOn } from './events'
 import { locationOf, loveInterestsAt } from './map'
 import { wornOutfit } from './pregnancy'
@@ -68,7 +69,7 @@ export function recentPostsBy(state: GameState, authorId: string, count = 2): Po
 export function addPosts(state: GameState, posts: { authorId: string; time: number; text: string; image?: string; withId?: string }[]): GameState {
   const added: Post[] = posts
     .filter((post) => post.text.trim() !== '')
-    .map(({ authorId, time, text, image, withId }) => ({ id: `post-${time}-${authorId}`, authorId, time, text: text.trim(), image, withId, liked: false }))
+    .map(({ authorId, time, text, image, withId }) => ({ id: `post-${time}-${authorId}`, authorId, time, text: text.trim(), image, withId, liked: false, likeCounted: false }))
     .filter((post, i, all) => !state.feed.some((old) => old.id === post.id) && all.findIndex((other) => other.id === post.id) === i)
   if (added.length === 0) return state
   return { ...state, feed: [...state.feed, ...added].sort((a, b) => a.time - b.time).slice(-MAX_FEED_POSTS) }
@@ -90,8 +91,13 @@ export function postMade(state: GameState, post: { authorId: string; time: numbe
 }
 
 /** Likes a post, or takes the like back. */
-export function toggleLike(state: GameState, postId: string): GameState {
-  return { ...state, feed: state.feed.map((post) => (post.id === postId ? { ...post, liked: !post.liked } : post)) }
+export function toggleLike(content: ContentPack, state: GameState, postId: string): GameState {
+  const post = state.feed.find((one) => one.id === postId)
+  if (!post) return state
+  const counts = !post.liked && !post.likeCounted
+  const toggled = { ...state, feed: state.feed.map((one) => (one.id === postId ? { ...one, liked: !one.liked, likeCounted: one.likeCounted || counts } : one)) }
+  // Her first like on it warms her to him; taking it back and giving it again does no more.
+  return counts ? applyEffect(toggled, { type: 'meter', meter: 'affection', amount: content.relationships.postLike }, { content, loveInterestId: post.authorId }) : toggled
 }
 
 /** A repeatable number in [0, 1) for one draw on one day of one game. */

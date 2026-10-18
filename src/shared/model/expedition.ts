@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { ModifierSchema } from './modifier'
+import { IntroSchema } from './orientation'
 
 /** What a woman does in a party: one of these is written in her file, and with it what she can do in a fight. */
 export const ROLES = ['guard', 'striker', 'hexer', 'warder', 'healer'] as const
@@ -121,8 +122,12 @@ export const ExpeditionConfigSchema = z.object({
   opensOnDay: z.number().int().min(1).default(1),
   /** Who shows him the way down when it opens. Without her, it is simply open. */
   guideId: z.string().optional(),
-  /** Being shown it: how long she keeps him, and what she writes to set the hour and to set it again when he did not come. `{date}` and `{place}` are filled in. */
-  intro: z.object({ hours: z.number().int().min(1).default(1), text: z.string(), missedText: z.string() }).optional(),
+  /**
+   * Being shown it: how long she keeps him, what she writes to set the hour and to set it again when he did not come
+   * (`{date}` and `{place}` are filled in), and the scene of it, read as a cutscene before she shows him how a way down
+   * is gone about.
+   */
+  intro: z.object({ hours: z.number().int().min(1).default(1), text: z.string(), missedText: z.string(), cutscene: IntroSchema }).optional(),
   /** How long a run takes out of his day, however it ends. */
   hours: z.number().int().min(1).default(3),
   /** How many women he may take, and the trust one needs in him to come. */

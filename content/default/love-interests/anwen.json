@@ -314,7 +314,8 @@
     "locationId": "dormitories",
     "background": "generated/backgrounds/anwen/view-3.webp"
   },
-  "birthPicture": "sprites/anwen/birth.png",
+  "birthPicture": "sprites/anwen/birth.webp",
+  "walkSprite": "sprites/anwen/walk-cutout.webp",
   "childNames": {
     "daughters": [
       "Carys",

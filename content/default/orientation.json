@@ -9,9 +9,7 @@
       "hours": 2,
       "description": "The bell and a notification from the University app call every new student to the Great Court. You find a place on the terrace steps as the Chancellor climbs to the lectern, and the people beside you shuffle up to make room.",
       "direction": "It is the first morning of term, at the Chancellor's assembly in the Great Court. You and {player}, your best friend from when you were children, have just been reunited after six years, and you are excited to see him.",
-      "castIds": [
-        "tamsin"
-      ],
+      "castIds": ["tamsin"],
       "cutscene": {
         "speakerId": "tamsin",
         "scenes": [
@@ -35,18 +33,13 @@
       "hours": 3,
       "description": "The Queen's car hangs over the paving at the foot of the steps, its runes still glowing, and the Queen herself is standing in front of you.",
       "direction": "It is the first day of term, early afternoon on the Great Court: {player} and Tamsin have just come to the end of the campus tour together. Queen Seraphine has just arrived on campus in her royal car, and as she walked past {player} she felt the Bloom stir, stopped, and told him she finds him intriguing. Tamsin, his best friend from childhood, had just told him who the Queen is. Seraphine: you have never felt that from anyone; keep your royal composure while you are unsure, ask his name and what he is, and be curious about him; your protection officers wait by the car. Tamsin: you are protective of him and a little jealous of the attention, tease him about it, and do not let a queen intimidate you.",
-      "castIds": [
-        "tamsin",
-        "seraphine"
-      ],
+      "castIds": ["tamsin", "seraphine"],
       "cutscene": {
         "speakerId": "tamsin",
         "scenes": [
           {
             "locationId": "great-court",
-            "castIds": [
-              "tamsin"
-            ],
+            "castIds": ["tamsin"],
             "lines": [
               "*The tour ends where it began, back at the foot of the Great Court's steps. The guide waves everyone off, and you and Tamsin drop onto the bottom step.*",
               "Three hours of 'and this is the Furrow Chapel'. My feet are dead. You owe me a sandwich.",
@@ -67,10 +60,7 @@
           },
           {
             "locationId": "great-court",
-            "castIds": [
-              "tamsin",
-              "seraphine"
-            ],
+            "castIds": ["tamsin", "seraphine"],
             "lines": [
               "*The Queen comes up the steps toward the Lecture Halls without a glance to either side. Until she passes you. Her step falters, and she stops, and turns, and her pale violet eyes go straight to you.*",
               "Seraphine: Forgive me. I felt something, just now, as I passed you. I don't, usually.",
@@ -98,17 +88,16 @@
         "lines": [
           "*A brisk knock at your door. The woman outside wears a scholar's coat and carries a folder under one arm.*",
           "{player}? Edda Lorne. I teach Bloom History, and the Sire Relations Office has asked me to see you in. Welcome to Breedhaven.",
-          "You know what you are, I assume. A True Sire: with a woman who is taking nothing against it, you do not miss. Every time. Your assay was the highest ever recorded.",
-          "Walk with me. Orientation begins at nine."
+          "You know what you are, I assume. A True Sire, fertility rate of 100%. Your assay was the highest ever recorded. A fact not to be taken lightly.",
+          "Know that sex is not frowned upon in Breedhaven, and children are welcome and provided for. If you expect a child, the university will reach out and help you with it.",
+          "Walk with me first, I'll show you the basics."
         ]
       },
       {
         "locationId": "great-court",
         "lines": [
           "*She leads you out into the Great Court, where the terraces are already filling.*",
-          "Sex is not frowned upon in Breedhaven, and children are welcome and provided for. If you expect a child, the university will reach out and help you with it.",
-          "Today is orientation: the Chancellor's assembly here at nine, the campus tour at eleven, and your hall's supper tonight. Nothing else.",
-          "Welcome to Breedhaven University, {player}."
+          "Today is orientation, but before that, let me walk you through the basics of Breedhaven University."
         ]
       }
     ]

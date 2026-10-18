@@ -4,9 +4,8 @@ import { useEffect, useRef, useState, type FormEvent, type CSSProperties, type K
 import { MAX_CHILD_NAME, COMFORT_WORDS, hasSkill, attendees, bondLifts, describeBond, describeWhen, statusOf, dialogueLines, firstNames, sceneCast, sceneClock, toDate, weatherOn, wornOutfit, lookOf, spriteFor, npcAsCharacter, playerRoom, roomBackdrop, roomOwner, sceneExtras } from '../../../shared/game'
 import { Portrait } from './Portrait'
 import { basePoseId, poseMedia, type ContentPack, type GameState, type LoveInterest, type Scene } from '../../../shared/model'
-import logo from '../../../assets/logo.png'
-import { setPoseLoop } from '../sound'
-import { Wisps } from '../fx/Wisps'
+import { playSong, setPoseLoop, stopSong } from '../sound'
+import { LoadingScreen } from './LoadingScreen'
 import { Backdrop } from './Backdrop'
 import { DateBanner } from './DateBanner'
 import { NavTiles } from './NavTiles'
@@ -148,6 +147,18 @@ export function SceneView(props: Props) {
     setPoseLoop(poseSound)
   }, [poseSound?.file])
   useEffect(() => () => setPoseLoop(undefined), [])
+  // Once someone in it is undressed or a sex-act is up, a song plays behind the scene, once through, and fades out if
+  // the scene ends before it does.
+  const intimate =
+    playing ||
+    cast.some((li) => {
+      const worn = wornOutfit(content, state, li, li.id === partner.id ? scene.outfitId : lookOf(scene, li.id).outfitId)
+      return worn?.id === 'nude' || worn?.inherits === 'nude'
+    })
+  useEffect(() => {
+    if (intimate) playSong()
+  }, [intimate])
+  useEffect(() => () => stopSong(), [])
   const beat = scene.beats[scene.beats.length - 1]
 
   // What the text box shows: the latest exchange, or the activity's description as
@@ -555,7 +566,7 @@ export function SceneView(props: Props) {
                 )}
                 {/* A class, a society's meeting or a shift can be brought to its end in a press, once he has said he is sure. Once
                     the scene has moved on somewhere else it is no longer that, and ends as any scene does. */}
-                {(scene.shift || scene.lesson || scene.societyId) && back === 0 && !scene.beats.some((beat) => beat.finished) && (
+                {(scene.shift || scene.lesson || scene.societyId) && back === 0 && !scene.beats.some((beat) => beat.finished) ? (
                   <Button
                     className="end-shift"
                     disabled={busy}
@@ -573,6 +584,21 @@ export function SceneView(props: Props) {
                   >
                     {scene.shift ? 'End shift' : scene.lesson ? 'End class' : 'End meeting'}
                   </Button>
+                ) : (
+                  // Any other conversation can be walked out of: the time is gone, and nothing between them changes. Not a
+                  // birth, whose child is named as it ends, nor orientation, which goes on from it.
+                  scene.newborn === undefined &&
+                  !scene.guideId && (
+                    <Button
+                      className="end-shift"
+                      disabled={busy}
+                      onClick={async () =>
+                        (await ask({ title: 'Are you sure?', detail: 'You will lose all relationship progress.', confirm: 'Leave', grave: true })) && onSkip()
+                      }
+                    >
+                      Leave
+                    </Button>
+                  )
                 )}
               </form>
             )}
@@ -602,15 +628,17 @@ export function SceneView(props: Props) {
           />
         </>
       )}
-      {/* While the scene's opening is being written there is nothing to read yet: the logo stands over it, and goes when the first line is in.
+      {/* While the scene's opening is being written there is nothing to read yet: she walks through a crowd until the first line is in.
           The same while the scene is on its way somewhere else: the old place is covered until the new one is ready. */}
       {busy && (scene.messages.length === 0 || props.movingTo !== null) && (
-        <div className="scene-loading" role="status" aria-label="Loading">
-          <Wisps />
-          <img src={logo} alt="" />
-          <p>{props.movingTo !== null && scene.messages.length > 0 ? props.movingTo : 'Loading'}</p>
-          {tip && <span className="loading-tip">{tip}</span>}
-        </div>
+        <LoadingScreen
+          walker={[scene.loveInterestId, ...scene.companionIds]
+            .map((id) => content.loveInterests.find((li) => li.id === id))
+            .flatMap((li) => (li?.walkSprite ? [{ image: li.walkSprite, stageHeight: li.stageHeight }] : []))
+            .at(0)}
+          label={props.movingTo !== null && scene.messages.length > 0 ? props.movingTo : 'Loading'}
+          tip={tip}
+        />
       )}
     </main>
   )

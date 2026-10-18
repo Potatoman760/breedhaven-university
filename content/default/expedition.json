@@ -8,7 +8,34 @@
   "intro": {
     "hours": 1,
     "text": "Don't ask how I know this, and don't put it in writing. There is something under {place} you need to see, and it will only make sense standing over it. Meet me there, {date}. Come alone. An hour.",
-    "missedText": "You weren't at {place}. I can't keep going down there by myself, and I can't explain it here. Again: {date}, same place. Be there."
+    "missedText": "You weren't at {place}. I can't keep going down there by myself, and I can't explain it here. Again: {date}, same place. Be there.",
+    "cutscene": {
+      "speakerId": "vespera",
+      "scenes": [
+        {
+          "locationId": "bathhouse",
+          "castIds": [
+            "vespera"
+          ],
+          "lines": [
+            "*Vespera is waiting by the hot pool in a long dark coat, her hat pulled low. She checks the doorway behind you twice before she smiles.*",
+            "Vespera: You came. Good. Don't look so worried, sugar. Nobody gets expelled for taking a bath.",
+            "*She leads you round behind the steaming pool to a narrow door you have never noticed. Behind it, an old stair goes down into the dark.*",
+            "Vespera: This University was built on top of something. Drains, root cellars, a gallery where the first masons cut their wards, and at the very bottom, the spring the Bloom rises from.",
+            "Vespera: Seven hundred years of ward-lines are anchored down there. They hold up the wards over every hall you've ever slept in. And they're slipping.",
+            "Vespera: Where a line slips, raw Bloom pools and takes a shape. Slimes with no mind in them. Roots that grab. Old wards that came loose and started walking. Nothing like Lira, before you ask.",
+            "Vespera: They will knock you flat if you let them. Go down unready and you come back up with bruises and nothing in your pockets.",
+            "Vespera: Now the part you'll like. The Bloom settles around a True Sire. An anchor will only take under your hands. Not mine, not the Board's. Yours.",
+            "Vespera: You have no magic, so you can't go alone. You take women who do, two at a time, ones who trust you enough to follow you into the dark.",
+            "Vespera: And a woman carrying your child is a great deal stronger down there. Make of that what you will.",
+            "Vespera: Why bother? Because if the wards go, the University goes with them. And because there is always something lying by an anchor: money, strange old things, relics that change you for good.",
+            "Vespera: The women who go down with you remember it, too. Nothing brings two people closer than a fight in a sewer.",
+            "Vespera: One more thing. Touching the ward-lines without the Arcane Board's leave is illegal. I've been doing it alone, and quietly. Keep it that way.",
+            "Vespera: Now. Let me show you how it works, before you go and get yourself eaten."
+          ]
+        }
+      ]
+    }
   },
   "hours": 3,
   "partySize": 2,

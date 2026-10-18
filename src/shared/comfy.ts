@@ -12,7 +12,7 @@ import { basePoseId, DEFAULT_VIEW, outfitParts, type Location, type LoveInterest
  */
 
 /** What a picture is for. Each kind has its own default workflow, size and framing words. */
-export const ART_KINDS = ['sprite', 'background', 'photo', 'nsfw', 'birth'] as const
+export const ART_KINDS = ['sprite', 'background', 'photo', 'nsfw', 'birth', 'walk'] as const
 export type ArtKind = (typeof ART_KINDS)[number]
 
 export const ART_KIND_LABELS: Record<ArtKind, string> = {
@@ -20,7 +20,8 @@ export const ART_KIND_LABELS: Record<ArtKind, string> = {
   background: 'Background',
   photo: 'Photo',
   nsfw: 'NSFW picture',
-  birth: 'Birth picture'
+  birth: 'Birth picture',
+  walk: 'Walking profile'
 }
 
 /** What a workflow can be the default for: each kind of picture, and the clips made from the NSFW pictures. */
@@ -86,7 +87,8 @@ export const DEFAULT_SIZES: Record<ArtKind, { width: number; height: number }> =
   background: { width: 1920, height: 1080 },
   photo: { width: 1024, height: 1024 },
   nsfw: { width: 1920, height: 1080 },
-  birth: { width: 1920, height: 1080 }
+  birth: { width: 1920, height: 1080 },
+  walk: { width: 960, height: 1344 }
 }
 
 /** Words that close every prompt of a kind, after its subject: how the picture is framed, not what is in it. */
@@ -95,7 +97,8 @@ export const DEFAULT_FRAMING: Record<ArtKind, string> = {
   background: 'wide establishing shot, no people',
   photo: 'phone photo, natural light',
   nsfw: 'wide cinematic shot, bedroom, soft warm light',
-  birth: 'wide cinematic shot, a bright modern hospital maternity room, soft daylight'
+  birth: 'wide cinematic shot, a bright modern hospital maternity room, soft daylight',
+  walk: 'side profile view of one woman walking to the right, upper body shot from the hips up, the picture ending at her hips, her arms relaxed with her hands hanging at her sides, white space above her head and on either side, facing right, seen from the side\n\nplain white background'
 }
 
 /**
@@ -481,6 +484,61 @@ export function birthPrompt(who: Pick<LoveInterest | Npc, 'appearance'> & { pron
     paragraph(`${She} ${subject === 'they' ? 'wear' : 'wears'} a pale hospital gown`),
     paragraph(`${She} ${subject === 'they' ? 'sit' : 'sits'} propped up on pillows in a hospital bed, cradling a newborn baby wrapped in a soft blanket in ${subject === 'they' ? 'their' : subject === 'he' ? 'his' : 'her'} arms, smiling down at it, tired and radiant`),
     framing.trim()
+  ])
+}
+
+// What a description says of a face up close: drawn from the side at a distance it barely shows, and asked for, it turns her to face the viewer.
+const FACE_WORDS = /\b(eyes?|lash(es)?|brows?|nose|lips?|mouth|cheeks?|cheekbones?|chin|jaw(line)?|face|freckles?|dimples?|smile|gaze|(eye)?liners?|lipstick|make-?up)\b/i
+const HAIR_WORDS = /\b(hair|bangs|fringe|braids?|ponytail|bun|curls|locks|ears?)\b/i
+
+/**
+ * A description with what it says of the face up close taken out, phrase by phrase: her age, skin, ears, hair and build
+ * stay. A phrase is what lies between commas, "and" and "with"; a word or two left over from a list of the face's
+ * features goes with them. Rough, and meant to be: it is read by an image model.
+ */
+export function withoutFace(appearance: string): string {
+  return appearance
+    .split(/(?<=\.)\s+/)
+    .map((sentence) => {
+      const parts = sentence.replace(/\.$/, '').split(/(,\s+and\s+|,\s+|\s+and\s+|\s+with\s+)/i)
+      // Each phrase with the joining words before it: [joiner, phrase].
+      const phrases = [{ joiner: '', text: parts[0] }]
+      for (let i = 1; i < parts.length; i += 2) phrases.push({ joiner: parts[i], text: parts[i + 1] ?? '' })
+      // Hair that frames the face is hair, and shows from the side.
+      const face = phrases.map((phrase) => FACE_WORDS.test(phrase.text) && !HAIR_WORDS.test(phrase.text))
+      const kept = phrases.filter((phrase, i) => !face[i] && !(face[i + 1] && phrase.text.trim().split(/\s+/).length <= 2))
+      return kept
+        .map((phrase, i) => (i === 0 ? phrase.text : `${phrase.joiner}${phrase.text}`))
+        .join('')
+        .replace(/^\s*(and|with)\s+/i, '')
+        .trim()
+    })
+    // What is left of a sentence that was all face, a word or two, says nothing.
+    .filter((sentence) => sentence.split(/\s+/).length > 2)
+    .map((sentence) => `${sentence[0].toUpperCase()}${sentence.slice(1)}.`)
+    .join(' ')
+}
+
+/**
+ * The prompt for her walking in profile, in her usual clothes. The pose, the framing's first paragraph, goes first,
+ * her description goes in without its close detail of her face, and that she is seen from the side comes straight
+ * after it: an image model draws a face described at length as a portrait, looking out of the picture.
+ */
+export function walkPrompt(who: Pick<LoveInterest, 'appearance' | 'outfits' | 'defaultOutfitId'> & { pronouns?: string }, framing: string): string {
+  const [pose, ...rest] = framing.trim().split(/\n\s*\n/)
+  const [worn = '', ...added] = outfitParts(who.outfits, who.outfits.find((o) => o.id === who.defaultOutfitId))
+  const { subject } = pronounWords(who.pronouns)
+  const She = `${subject[0].toUpperCase()}${subject.slice(1)}`
+  const they = subject === 'they'
+  return paragraphs([
+    pose,
+    paragraph(withoutFace(who.appearance)),
+    paragraph(`${She} ${they ? 'are' : 'is'} seen from the side in full profile, ${they ? 'their' : subject === 'he' ? 'his' : 'her'} face turned to the right, looking straight ahead where ${subject} ${they ? 'are' : 'is'} going, not at the viewer`),
+    worn && paragraph(`${She} ${they ? 'wear' : 'wears'} ${worn}`),
+    ...added.map(paragraph),
+    // A tail is at the hips, where the picture ends, and is cut off with the legs unless it is asked for.
+    /\btail\b/i.test(who.appearance) && paragraph(`${they ? 'Their' : subject === 'he' ? 'His' : 'Her'} tail is shown whole, curving out behind ${they ? 'them' : subject === 'he' ? 'him' : 'her'} at hip height, inside the frame`),
+    rest.join('\n\n')
   ])
 }
 

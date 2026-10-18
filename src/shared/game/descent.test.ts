@@ -13,7 +13,7 @@ const expedition = (guided: boolean) =>
   ExpeditionConfigSchema.parse({
     entryLocationId: 'shop',
     hours: 2,
-    ...(guided ? { guideId: 'ana', intro: { hours: 1, text: 'Meet me at {place}, {date}.', missedText: 'You were not at {place}. Again: {date}.' } } : {}),
+    ...(guided ? { guideId: 'ana', intro: { hours: 1, text: 'Meet me at {place}, {date}.', missedText: 'You were not at {place}. Again: {date}.', cutscene: { speakerId: 'ana', scenes: [{ locationId: 'shop', lines: ['Ana: Down here.'] }] } } } : {}),
     roles: [{ id: 'guard', name: 'Guard', footing: 30, actions: [{ id: 'bash', name: 'Bash', kind: 'attack', power: 4 }] }],
     enemies: [{ id: 'blob', name: 'Blob', footing: 10, attack: 1 }],
     depths: [{ name: 'the Drains', nodes: [{ kind: 'guardian', enemyIds: ['blob'] }], relic: { id: 'stone', name: 'Stone', description: '', modifier: { kind: 'rent', amount: 0.5 } } }]
@@ -47,11 +47,10 @@ describe('being shown the way down', () => {
   it('kept, is a scene with her at the stair in which he learns what is below, and the way down is his from then', () => {
     const set = scheduleDescent(content, start)
     const plan = descentAppointment(set)!
-    const { state, scene } = attendDescent(content, { ...set, time: plan.time, locationId: 'shop' }, plan.id)
-    expect(scene).toMatchObject({ loveInterestId: 'ana', companionIds: [], npc: false })
-    expect(scene.beats[0].direction).toContain('An anchor will only re-seat under his hands')
-    expect(scene.beats[0].direction).toContain('There are 1 anchors')
-    expect(state).toMatchObject({ locationId: 'shop', expedition: { invited: true } })
+    const { state, cutscene } = attendDescent(content, { ...set, time: plan.time, locationId: 'shop' }, plan.id)
+    // She tells him in a scene of her own, written out, and the hour she keeps him goes by.
+    expect(cutscene).toMatchObject({ speakerId: 'ana', scenes: [{ locationId: 'shop', lines: ['Ana: Down here.'] }] })
+    expect(state).toMatchObject({ time: plan.time + 1, locationId: 'shop', expedition: { invited: true } })
     expect(state.met).toContain('ana')
     expect(descentAppointment(state)).toBeUndefined()
     // Shown, there is nothing more to set.

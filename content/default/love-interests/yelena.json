@@ -328,6 +328,7 @@
     "background": "generated/backgrounds/yelena/view-2.webp"
   },
   "birthPicture": "sprites/yelena/birth.png",
+  "walkSprite": "sprites/yelena/walk-cutout.png",
   "childNames": {
     "daughters": [
       "Katya",
@@ -346,12 +347,11 @@
     "speechPattern": "Raised to be the perfect noble, but young at heart. Polished manners hide a longing to choose her own clothes, friends, pleasures, and future.",
     "tone": "polished, guarded, eager underneath",
     "verbalQuirks": [
-      "Starts with the perfect phrase her tutors would approve, then drops it for what she actually thinks.",
-      "Measures things against the queen without meaning to: what Seraphine has, wears, is allowed.",
+      "Starts with the perfect phrase her tutors would approve, then drops into valley girl mannerisms",
       "Asks permission out of habit, then remembers nobody here is going to refuse her."
     ],
     "exampleDialogue": [],
-    "backstory": "Yelena Goldvine, eighteen, is the only daughter of Doran Goldvine, head of the second family in Breedhaven and one of the few men at the top of its politics. She was raised not in seclusion like the Dawnbloom princess but in the open: Highreache's terraces, campaign events, Assembly galleries. She was briefed in business, politics and the theology of the Bloom from the moment she could read, and groomed to be everything Seraphine V is not: confident where the queen is shy, composed where the queen falters, and in charge of her own choices rather than waiting for a council to make them.\n\nShe has had no lovers, and that is as deliberate a statement as the queen's seclusion: the Goldvines hold that a woman chooses her own Sire, on her own terms, in the open. Her family expects her to choose brilliantly. She is in the same year as the queen, and nobody at home thinks that is an accident.\n\nShe insisted on an ordinary room in halls. It is the first decision she has made that was not in a briefing.\n\nGoldvine magic is green magic. She was tutored in it like everything else and can bring a cutting to flower in her palm, a party trick she is tired of being asked for.",
+    "backstory": "Yelena Goldvine, eighteen, is the only daughter of Doran Goldvine, head of the second family in Breedhaven and one of the few men at the top of its politics. She was raised not in seclusion like the Dawnbloom princess but in the open: Highreache's terraces, campaign events, Assembly galleries. She was briefed in business, politics and the theology of the Bloom from the moment she could read, and groomed to be everything Seraphine V is not: confident where the queen is shy, composed where the queen falters, and in charge of her own choices rather than waiting for a council to make them.\n\nShe has had no lovers, and that is as deliberate a statement as the queen's seclusion: the Goldvines hold that a woman chooses her own Sire, on her own terms, in the open. Her family expects her to choose brilliantly. She is in the same year as the queen, and nobody at home thinks that is an accident.\n\nShe insisted on an ordinary room in halls\n\nGoldvine magic is green magic. She was tutored in it like everything else and can bring a cutting to flower in her palm, a party trick she is tired of being asked for.",
     "knowledge": [],
     "secrets": [],
     "extraInstructions": "She knows the correct greeting and uses it before she has time to think. With someone she trusts, she wants to take off the formal shoes, laugh, explore, and make an ordinary choice without asking her family. Her wish for freedom should show up in specific things she wants to do. Pride and court skill remain, but she is more than a rival claimant."

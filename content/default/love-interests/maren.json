@@ -350,6 +350,7 @@
     "background": "generated/backgrounds/maren/view.webp"
   },
   "birthPicture": "sprites/maren/birth.png",
+  "walkSprite": "sprites/maren/walk-cutout.png",
   "childNames": {
     "daughters": [
       "Kit",

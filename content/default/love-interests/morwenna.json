@@ -5,7 +5,7 @@
   "age": 22,
   "pronouns": "she/her",
   "bio": "A fourth-year Ethics and Society senior who writes about the Bloom as power and dresses like she is conducting a funeral for the patriarchy. She is rumored to keep a list of everyone who has disappointed her, which is everyone.",
-  "appearance": "A pale twenty-two-year-old woman with a heart-shaped face, sharp cheekbones, dark-lined grey eyes and full, wide lips painted black. Her thick raven hair falls straight past her shoulders in a heavy blunt cut with straight bangs. She is tall and full-figured, with very large heavy breasts, a soft narrow waist, and wide hips that give her a dramatic hourglass build.",
+  "appearance": "A pale twenty-two-year-old woman with a heart-shaped face, sharp cheekbones, dark-lined grey eyes and full, wide lips painted black. Her thick raven hair falls straight past her shoulders in a heavy blunt cut with straight bangs. She is tall and full-figured, with very large heavy breasts, thick thighs and wide hips that give her a dramatic hourglass build.",
   "personality": "She carries herself with the still, assured calm of someone who has already decided she is the most interesting person in the room, and she is usually right. She is generous with her attention when she gives it and devastating when she withdraws it. She treats most social encounters as opportunities to study power dynamics, and she enjoys finding out what people want and making them say it.",
   "traitIds": [
     "flirtatious",
@@ -35,18 +35,14 @@
     {
       "id": "default",
       "name": "Usual clothes",
-      "description": "a long black velvet coat over a low-cut black lace blouse, a layered black skirt with fisnet stockings, and a choker of woven black leather with a silver crescent moon pendant",
+      "description": "a long black velvet coat over a low-cut black lace blouse with no accessories, a layered black skirt with fishnet stockings, and a choker of woven black leather with a silver crescent moon pendant",
       "sprites": {
         "neutral": {
-          "image": "sprites/morwenna/default-neutral-2-cutout.webp",
-          "description": ""
-        },
-        "happy": {
-          "image": "sprites/morwenna/default-happy-2-cutout.webp",
+          "image": "sprites/morwenna/default-neutral-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/morwenna/default-sad-2-cutout.webp",
+          "image": "sprites/morwenna/default-sad-cutout.webp",
           "description": ""
         },
         "angry": {
@@ -54,7 +50,7 @@
           "description": ""
         },
         "surprised": {
-          "image": "sprites/morwenna/default-surprised-4-cutout.webp",
+          "image": "sprites/morwenna/default-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
@@ -64,6 +60,10 @@
         "aroused": {
           "image": "sprites/morwenna/default-aroused-cutout.webp",
           "description": ""
+        },
+        "happy": {
+          "image": "sprites/morwenna/default-happy-11-cutout.webp",
+          "description": ""
         }
       },
       "pregnant": false
@@ -71,11 +71,11 @@
     {
       "id": "pregnant",
       "name": "Pregnant",
-      "description": "She has a round, pregnant belly.",
+      "description": "She has a round, pregnant belly under the skirt",
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/morwenna/pregnant-neutral-cutout.webp",
+          "image": "sprites/morwenna/pregnant-neutral-6-cutout.webp",
           "description": ""
         },
         "happy": {
@@ -148,7 +148,7 @@
       "inherits": "nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/morwenna/nude-pregnant-neutral-2-cutout.webp",
+          "image": "sprites/morwenna/nude-pregnant-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
@@ -156,11 +156,11 @@
           "description": ""
         },
         "sad": {
-          "image": "sprites/morwenna/nude-pregnant-sad-cutout.webp",
+          "image": "sprites/morwenna/nude-pregnant-sad-cutout-2.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/morwenna/nude-pregnant-angry-2-cutout.webp",
+          "image": "sprites/morwenna/nude-pregnant-angry-2-cutout-2.webp",
           "description": ""
         },
         "surprised": {
@@ -181,7 +181,7 @@
   ],
   "defaultOutfitId": "default",
   "faceY": 4,
-  "imageSeed": 60,
+  "imageSeed": 62,
   "stageHeight": 95,
   "kind": "student",
   "partyRole": "hexer",
@@ -323,7 +323,8 @@
     "locationId": "honeyed-bee-inn",
     "background": "generated/backgrounds/morwenna/view-2.webp"
   },
-  "birthPicture": "sprites/morwenna/birth.png",
+  "birthPicture": "sprites/morwenna/birth.webp",
+  "walkSprite": "sprites/morwenna/walk-cutout.webp",
   "childNames": {
     "daughters": [
       "Nyx",

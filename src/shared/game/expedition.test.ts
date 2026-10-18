@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { ExpeditionConfigSchema, HIM, PregnancyConfigSchema, validateContentPack, type ContentPack, type Course, type ExpeditionRun, type GameState } from '../model'
-import { act, canGoBelow, comeUp, depthsOpen, goOn, partyChoices, pregnancyPower, relicsHeld, runReport, startRun, turnActions, turnBack, turnOf, wayDownAt } from './expedition'
+import { act, canGoBelow, comeUp, depthsOpen, goOn, partyChoices, practiceRun, pregnancyPower, relicsHeld, runReport, startRun, turnActions, turnBack, turnOf, wayDownAt } from './expedition'
 import { playOut } from './expeditionPolicy'
 import { factor } from './modifiers'
 import { meet } from './scene'
@@ -93,6 +93,20 @@ describe('who can come below', () => {
     expect(pregnancyPower(content, start, 'ana')).toBe(1)
     expect(pregnancyPower(content, carrying(late, 'ana', 0.5), 'ana')).toBe(2)
     expect(canGoBelow(content, carrying(late, 'ana', 0.95), ['ana'], 0).reasons).toContain('Ana: She is too near her time')
+  })
+})
+
+describe('a practice fight', () => {
+  it('is a fight at the first depth, on his turn, wherever he is and whoever trusts him, and leaves the game as it was', () => {
+    // Nowhere near the way down, never told of it, and with nobody trusting him: none of it matters to practise.
+    const anywhere: GameState = { ...start, locationId: 'home', boons: [], relationships: {}, expedition: { ...start.expedition, invited: false } }
+    const practice = practiceRun(content, anywhere, ['ana'])
+    const sample = practice.expedition.run!
+    expect(sample.depth).toBe(0)
+    expect(sample.party.map((fighter) => fighter.id)).toEqual([HIM, 'ana'])
+    expect(sample.fight?.foes.length).toBeGreaterThan(0)
+    expect(turnOf(sample)?.id).toBe(HIM)
+    expect(anywhere.expedition.run).toBeUndefined()
   })
 })
 

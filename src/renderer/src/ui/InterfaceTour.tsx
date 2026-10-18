@@ -8,14 +8,17 @@ interface Props {
   /** What is open over the day, for the step that waits on him to open the phone. */
   panel: Panel | null
   onOpen: (panel: Panel | null) => void
+  /** Seen through to the end: the day's choices are shown next. */
   onDone: () => void
+  /** Skipped: nothing more is shown. */
+  onSkip: () => void
 }
 
 /**
  * The first look round the day's screen, given by whoever welcomed him: the phone, which he opens himself, and each of its
  * apps; the map, the bag and the calendar, each opened for him; and Help, for the rest. Skipped, it is over all the same.
  */
-export function InterfaceTour({ content, state, panel, onOpen, onDone }: Props) {
+export function InterfaceTour({ content, state, panel, onOpen, onDone, onSkip }: Props) {
   const id = content.orientation?.intro?.speakerId
   const guide: LoveInterest | undefined = [...content.npcs, ...content.loveInterests].find((one) => one.id === id)
   if (!guide) return null
@@ -63,7 +66,7 @@ export function InterfaceTour({ content, state, panel, onOpen, onDone }: Props) 
       before: close,
       text: 'If you ever want to know how something works, or more about this world, check Help.'
     },
-    { text: "That's everything. Now go on, orientation's about to start." }
+    { before: close, text: "One more thing: what you can do with your day." }
   ]
 
   return (
@@ -73,6 +76,10 @@ export function InterfaceTour({ content, state, panel, onOpen, onDone }: Props) 
       onDone={() => {
         onOpen(null)
         onDone()
+      }}
+      onSkip={() => {
+        onOpen(null)
+        onSkip()
       }}
     />
   )

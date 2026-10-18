@@ -519,14 +519,16 @@ pre {
   /* A panel under the game's name, no bigger than what is on it. */
   flex: 0 1 auto;
   /* A set width: the picture of the game's name is far wider than it is shown, and would otherwise stretch the box to fit it. */
-  width: min(560px, 100%);
+  width: min(600px, 100%);
   min-height: 0;
   overflow-y: auto;
-  padding: 44px 72px;
-  border: 1px solid var(--rule);
-  border-radius: var(--radius);
-  background: color-mix(in srgb, var(--paper) 92%, transparent);
-  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+  padding: 6px 28px 22px;
+  /* A painted frame of gold and ivy round a parchment middle, cut in nine so that its corners keep their shape at any
+     height: the slices are where the border meets the parchment in the picture, and it is drawn at about two-thirds. */
+  border-style: solid;
+  border-width: 96px 62px 88px;
+  border-image: url('../../assets/title/frame.png') 145 92 130 92 fill / 96px 62px 88px stretch;
+  filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.5));
 }
 
 /* The game's name at the head of the menu: a picture with nothing behind it, on the paper of the box. */
@@ -541,7 +543,7 @@ pre {
 .title-version {
   position: absolute;
   right: 0;
-  bottom: 14px;
+  bottom: 2px;
   left: 0;
   margin: 0;
   color: var(--ink-soft);
@@ -1146,69 +1148,128 @@ pre {
   white-space: pre-wrap;
 }
 
-/* A scene being opened: the logo over everything, a fade running across it in waves, and "Loading" beneath. */
+/* A scene being opened: her walking right through a street of white passers-by walking left, on the game's dark
+   green; what it waits for at the bottom right, and a tip in a panel along the bottom. */
 .scene-loading {
   position: absolute;
   inset: 0;
   z-index: 30;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  /* The dark green the logo was first drawn on. The logo itself is cut out, and would stand on any other. */
-  background: #0a1817;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 40% 60%, #1f3a2c 0%, #0a1817 75%);
   color: var(--on-wood);
   animation: loading-in 0.2s ease-out;
 }
 
-.scene-loading img {
-  width: min(320px, 40vh);
-  height: auto;
-  /* Under the lights that fly across it. */
-  position: relative;
-  z-index: 1;
-}
-
-/* The wisps of light: a canvas over the whole of it, in front of the logo and behind the words, which stay readable. */
-.wisps,
-.wisps canvas {
+.loading-street {
   position: absolute;
   inset: 0;
-  width: 100%;
+}
+
+/* One passer-by: carried right to left across the screen, over and over, at the speed of her lane. */
+.loading-passer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: var(--h);
+  animation: loading-pass var(--seconds) linear var(--delay) infinite;
+}
+
+/* Her stride: a rise and fall, a little off everyone else's. */
+.loading-passer img {
+  display: block;
   height: 100%;
-  pointer-events: none;
+  width: auto;
+  animation: loading-step var(--stride) ease-in-out infinite alternate;
 }
 
-.wisps {
-  z-index: 2;
+@keyframes loading-pass {
+  from {
+    transform: translateX(100vw);
+  }
+  to {
+    transform: translateX(-100%);
+  }
 }
 
-.scene-loading p {
-  position: relative;
-  z-index: 3;
-  font: 600 1.75rem/1 var(--display);
+@keyframes loading-step {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(2.5%);
+  }
+}
+
+/* Her, in front of them all and in colour, walking on the spot while the street goes by. The bottom fifth of her
+   picture is below the screen's edge, so that her legs never show: they do not walk. Drawn a little larger to make up
+   for it, so that she still fills the height. She is scaled by her height on stage, from the same cut at the hips. */
+.loading-walker {
+  --scale: 1;
+  position: absolute;
+  bottom: calc(-22vh * var(--scale));
+  left: 22%;
+  z-index: 10;
+  height: calc(110vh * var(--scale));
+  width: auto;
+  filter: drop-shadow(0 0 18px rgba(0, 0, 0, 0.6));
+  animation: loading-stride 0.55s ease-in-out infinite alternate;
+  transform-origin: 50% 100%;
+}
+
+@keyframes loading-stride {
+  from {
+    transform: translateY(0) rotate(-0.6deg);
+  }
+  to {
+    transform: translateY(-1.6vh) rotate(0.6deg);
+  }
+}
+
+.loading-label {
+  position: absolute;
+  right: 48px;
+  bottom: 112px;
+  z-index: 11;
+  margin: 0;
+  color: #fff;
+  font: italic 700 3rem/1 var(--display);
   letter-spacing: 0.04em;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
 }
 
-/* A tip under the word, small, for something to read while it loads. */
-.loading-tip {
-  position: relative;
-  z-index: 3;
-  max-width: min(720px, 80vw);
-  color: var(--on-wood);
-  font-size: 1.375rem;
-  line-height: 1.4;
-  text-align: center;
-  opacity: 0.8;
-}
-
-.scene-loading p::after {
+.loading-label::after {
   content: '.';
   display: inline-block;
   width: 1.2em;
   text-align: left;
   animation: thinking-dots 1.2s steps(1, end) infinite;
+}
+
+/* A tip in a panel along the bottom, out of her way. */
+.loading-tip {
+  position: absolute;
+  left: 50%;
+  bottom: 24px;
+  z-index: 11;
+  box-sizing: border-box;
+  width: min(820px, calc(100% - 48px));
+  padding: 12px 22px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(212, 175, 90, 0.55);
+  border-radius: 12px;
+  background: rgba(10, 14, 12, 0.82);
+  color: var(--on-wood);
+  font-size: 1.125rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-passer,
+  .loading-passer img,
+  .loading-walker {
+    animation: none;
+  }
 }
 
 @keyframes loading-in {
@@ -1780,10 +1841,11 @@ textarea.memory {
   color: var(--madder);
 }
 
+/* It opens down and to the left: the button sits at the right edge of a card, with the screen's edge just past it. */
 .compare-pop {
   position: absolute;
   top: calc(100% + 6px);
-  left: 0;
+  right: 0;
   z-index: 20;
   display: none;
   width: 460px;
@@ -1871,8 +1933,30 @@ textarea.memory {
 .confirm-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 6px;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+/* In the kit: two grand buttons of a size, the way back quieter, and one that cannot be undone in madder under its gold. */
+.confirm-actions button.btn.grand {
+  flex: 1;
+  min-height: 52px;
+}
+
+.confirm-actions button.btn.grand.confirm-no {
+  border-color: var(--gold-deep);
+  background: linear-gradient(180deg, #3a3f33, #22261d);
+}
+
+.confirm-actions button.btn.grand.grave {
+  background: linear-gradient(180deg, #a3474d 0%, var(--madder) 55%, var(--madder-deep) 100%);
+  color: #fbe9e2;
+}
+
+.dialog.ornate[role='alertdialog'] > p {
+  margin: 4px 0 0;
+  font-size: 1.0625rem;
+  line-height: 1.45;
 }
 
 /* The epilogue: a screen of text at a time over the title screen's picture, each fading in over the last. */
@@ -7380,7 +7464,7 @@ button.item-square:hover {
   overflow-y: auto;
 }
 
-button.btn.grand.house-close {
+button.btn.back-button.house-close {
   position: absolute;
   bottom: 24px;
   left: 24px;
@@ -8126,18 +8210,26 @@ button.btn.grand.centred:has(.grand-icon) .grand-text {
 }
 
 .ornate .depth-carousel button.btn {
-  width: 52px;
-  min-height: 52px;
+  width: 60px;
+  min-height: 60px;
   padding: 0;
   border: 2px solid var(--gold);
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #3a4d2c, var(--wood-deep));
-  color: var(--gold-soft);
+  background: radial-gradient(circle at 35% 30%, #5b7a44, var(--moss-deep) 70%);
+  box-shadow: 0 0 0 3px rgba(212, 175, 90, 0.25), 0 0 14px var(--gold-glow);
+  color: #fff6d8;
 }
 
+.ornate .depth-carousel button.btn svg {
+  stroke-width: 3;
+}
+
+/* With nowhere to go that way: still clearly an arrow, only quieter. */
 .ornate .depth-carousel button.btn:disabled {
-  border-color: var(--gold-deep);
-  opacity: 0.45;
+  border-color: var(--gold);
+  box-shadow: none;
+  color: var(--gold-soft);
+  opacity: 0.7;
 }
 
 /* Below: the panels along the bottom, kept tight, on the dark. */
@@ -9133,3 +9225,185 @@ button.society-member:disabled {
 .phone-tab:disabled .app-icon {
   filter: grayscale(1);
 }
+
+/* The scene's log in the kit: the conversation on one parchment sheet, her lines edged in gold, his set to the right in green. */
+.ornate .log {
+  gap: 10px;
+  max-height: 62vh;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.ornate .log li {
+  border: 1px solid var(--rule-soft);
+  border-left: 3px solid var(--gold-deep);
+  border-radius: 10px;
+  background: var(--paper-raised);
+  box-shadow: 0 1px 3px rgba(60, 45, 20, 0.12);
+  font-size: 1.0625rem;
+  line-height: 1.45;
+}
+
+.ornate .log li.user {
+  border-left-color: var(--moss);
+  background: var(--moss-tint);
+}
+
+.ornate .log li strong {
+  color: var(--gold-deep);
+  font: 700 1.0625rem var(--display);
+}
+
+.ornate .log li.user strong {
+  color: var(--moss-deep);
+}
+
+/* What was sent to the LLM, folded away under the log, for checking a reply. */
+.log-prompt {
+  margin-top: 12px;
+}
+
+.ornate .log-prompt summary {
+  color: var(--gold-soft);
+  cursor: pointer;
+}
+
+.ornate .log-prompt pre {
+  max-height: 40vh;
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid var(--gold-deep);
+  border-radius: 8px;
+  background: rgba(10, 14, 8, 0.6);
+  color: var(--on-wood);
+  white-space: pre-wrap;
+}
+
+/* The house's Household and Ledger in the kit: the people as dark cards on the wood, the accounts on a parchment sheet. */
+.ornate .house-people h2 {
+  font-size: 1.5rem;
+}
+
+.ornate .house-person .hint {
+  color: var(--on-wood);
+}
+
+.ornate .house-ledger {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 6px 16px;
+}
+
+.ornate .house-line:last-child {
+  border-bottom: 0;
+}
+
+
+/* A child's pips on the dark: gold where the green would be lost. */
+.ornate .house-pips i {
+  border-color: var(--gold);
+}
+
+.ornate .house-pips i.on {
+  background: var(--gold);
+}
+
+.ornate .house-pips i.on.low {
+  border-color: #d06a6f;
+  background: #d06a6f;
+}
+
+.ornate .house-pips i.out {
+  border-color: rgba(217, 222, 200, 0.4);
+}
+
+.party-actions {
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* A panel's title and note with something small in a column of its own at the right, such as the way to its help. */
+.ornate-head-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ornate-head-row > .ornate-head {
+  flex: 1;
+  min-width: 0;
+}
+
+/* The way to the help on what a panel shows: a gold-ringed disc with a question mark, beside its title, the size of
+   the disc an icon sits in on a grand button. */
+button.btn.ornate-help {
+  flex: none;
+  width: 46px;
+  min-height: 46px;
+  height: 46px;
+  padding: 0;
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #3a4d2c, var(--wood-deep));
+  color: var(--gold-soft);
+}
+
+button.btn.ornate-help:hover:not(:disabled) {
+  box-shadow: 0 0 0 2px var(--gold-glow);
+  color: #fff;
+}
+
+/* With a column beside it, the rule under the head runs under both. */
+.ornate .ornate-head-row {
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(212, 175, 90, 0.4);
+}
+
+.ornate .ornate-head-row > .ornate-head {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  border-bottom: 0;
+}
+
+/* Fields side by side whose boxes line up along the bottom, though one label runs to two lines and another to one. */
+.row.level-inputs {
+  align-items: flex-end;
+}
+
+/* Who is here, as faces: each a portrait with her name under it, pressed to start a line about her. */
+.partner.face {
+  position: relative;
+  min-height: 0;
+  padding: 4px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  font-weight: 500;
+}
+
+.partner.face:hover:not(:disabled) {
+  border-color: var(--moss);
+  background: var(--moss-tint);
+}
+
+/* Someone he has not met: her face faded, with a large question mark over it. */
+.partner.face.unmet {
+  overflow: visible;
+  border-color: transparent;
+  background: transparent;
+}
+
+.partner.face.unmet .portrait {
+  filter: grayscale(0.6) brightness(0.75);
+  opacity: 0.6;
+}
+
+.partner.face.unmet::before {
+  z-index: 1;
+  /* Over the face, not the name under it. */
+  bottom: 22px;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+

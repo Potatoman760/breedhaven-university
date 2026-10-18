@@ -318,6 +318,7 @@
     "background": "generated/backgrounds/tink/view.webp"
   },
   "birthPicture": "sprites/tink/birth.png",
+  "walkSprite": "sprites/tink/walk-cutout.png",
   "childNames": {
     "daughters": [
       "Pip",

@@ -442,6 +442,7 @@ function checkReferences(pack: ContentPack): string[] {
   if (below) {
     need(locations, below.entryLocationId, 'expedition.entryLocationId', 'location')
     if (below.guideId) need(loveInterests, below.guideId, 'expedition.guideId', 'love interest')
+    if (below.intro) checkCutscene(below.intro.cutscene, 'expedition.intro.cutscene')
     if (loveInterests.has(HIM)) issues.push(`expedition: no character may have the id "${HIM}"`)
     const roles = idSet(below.roles, 'expedition.roles')
     below.roles.forEach((role) => idSet(role.actions, `expedition.roles (${role.id})`))

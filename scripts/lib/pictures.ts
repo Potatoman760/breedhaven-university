@@ -141,9 +141,13 @@ function shrink(image: Raster, most: number): Raster {
   return { width, height, data }
 }
 
-/** Takes the white card out from behind a picture in the pack. Returns the path of the cut-out, or says why it was left as it is. */
-export function cutOut(path: string, most?: number): { path: string; note: string } {
-  const outcome = keyBackground(decodePng(readFileSync(join(PACK, path))), { mode: 'gaps' })
+/**
+ * Takes the white card out from behind a picture in the pack. Returns the path of the cut-out, or says why it was left
+ * as it is. `gaps` also clears white closed in by the picture, such as between an arm and the body; `edge` only what
+ * reaches its edges, for a picture with white in it that is meant to stay, such as a white shirt.
+ */
+export function cutOut(path: string, most?: number, mode: 'gaps' | 'edge' = 'gaps'): { path: string; note: string } {
+  const outcome = keyBackground(decodePng(readFileSync(join(PACK, path))), { mode })
   if (!outcome.ok) return { path, note: `left on its card: ${outcome.message}` }
   const cut = path.replace(/\.png$/i, '-cutout.png')
   writeFileSync(join(PACK, cut), encodePng(most ? shrink(outcome.image, most) : outcome.image))

@@ -37,10 +37,6 @@
       "name": "Sporty outfit",
       "description": "she wears a white crop top jersey with the number 69 in red, baring her midriff. She has on tight blue athletic shorts. Her hair is in a ponytail.",
       "sprites": {
-        "neutral": {
-          "image": "sprites/daphne/default-neutral-cutout.webp",
-          "description": ""
-        },
         "happy": {
           "image": "sprites/daphne/default-happy-cutout.webp",
           "description": ""
@@ -63,6 +59,10 @@
         },
         "aroused": {
           "image": "sprites/daphne/default-aroused-cutout-2.webp",
+          "description": ""
+        },
+        "neutral": {
+          "image": "sprites/daphne/default-neutral-cutout.webp",
           "description": ""
         }
       },
@@ -114,10 +114,6 @@
           "image": "sprites/daphne/nude-happy-cutout.webp",
           "description": ""
         },
-        "neutral": {
-          "image": "sprites/daphne/nude-neutral-cutout.webp",
-          "description": ""
-        },
         "sad": {
           "image": "sprites/daphne/nude-sad-cutout.webp",
           "description": ""
@@ -126,16 +122,20 @@
           "image": "sprites/daphne/nude-angry-cutout.webp",
           "description": ""
         },
-        "surprised": {
-          "image": "sprites/daphne/nude-surprised-cutout.webp",
-          "description": ""
-        },
         "embarrassed": {
           "image": "sprites/daphne/nude-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
           "image": "sprites/daphne/nude-aroused-cutout.webp",
+          "description": ""
+        },
+        "neutral": {
+          "image": "sprites/daphne/nude-neutral-cutout.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/daphne/nude-surprised-cutout.webp",
           "description": ""
         }
       },
@@ -155,6 +155,10 @@
           "image": "sprites/daphne/nude-pregnant-happy-cutout.webp",
           "description": ""
         },
+        "aroused": {
+          "image": "sprites/daphne/nude-pregnant-aroused-cutout.webp",
+          "description": ""
+        },
         "sad": {
           "image": "sprites/daphne/nude-pregnant-sad-cutout.webp",
           "description": ""
@@ -169,10 +173,6 @@
         },
         "embarrassed": {
           "image": "sprites/daphne/nude-pregnant-embarrassed-cutout.webp",
-          "description": ""
-        },
-        "aroused": {
-          "image": "sprites/daphne/nude-pregnant-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -317,7 +317,8 @@
     "locationId": "dormitories",
     "background": "generated/backgrounds/daphne/view.webp"
   },
-  "birthPicture": "sprites/daphne/birth.png",
+  "birthPicture": "sprites/daphne/birth.webp",
+  "walkSprite": "sprites/daphne/walk-cutout.webp",
   "childNames": {
     "daughters": [
       "Thea",

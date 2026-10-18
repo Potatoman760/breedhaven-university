@@ -330,6 +330,7 @@
     "background": "generated/backgrounds/faye/view.webp"
   },
   "birthPicture": "sprites/faye/birth.png",
+  "walkSprite": "sprites/faye/walk-cutout.png",
   "childNames": {
     "daughters": [
       "Rosalind",

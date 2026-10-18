@@ -80,6 +80,8 @@ export const IntimacyRulesSchema = z.object({
 export const RelationshipConfigSchema = z.object({
   meterMax: z.number().positive().default(100),
   gifts: GiftValuesSchema.prefault({}),
+  /** Affection a like on one of her posts is worth, once a post. */
+  postLike: z.number().default(1),
   stages: z.array(RelationshipStageSchema).min(1),
   statuses: z.array(RelationshipStatusSchema).default([]),
   tieLevels: z.array(TieLevelSchema).default([]),

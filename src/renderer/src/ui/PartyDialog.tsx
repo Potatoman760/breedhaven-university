@@ -6,7 +6,8 @@ import { Button } from './Button'
 import { Dialog } from './Dialog'
 import { Facts } from './Facts'
 import { GrandButton } from './GrandButton'
-import { BackIcon, ChevronIcon, StopIcon } from './icons'
+import { ChevronIcon, StopIcon } from './icons'
+import { BackButton } from './BackButton'
 
 interface Props {
   content: ContentPack
@@ -42,10 +43,9 @@ export function PartyDialog({ content, state, onGo, onClose }: Props) {
       />
 
       {/* One depth at a time, with room for its picture, and a way to the one above or below it among those he has opened. It opens on the deepest. */}
-      <h2 className="party-heading">Depth</h2>
       <div className="depth-carousel">
         <Button variant="secondary" className="flip" aria-label="The depth above" disabled={depth <= 0} onClick={() => setDepth(depth - 1)}>
-          <ChevronIcon size={16} />
+          <ChevronIcon size={24} />
         </Button>
         <div className="depth-card">
           <span className="depth-art" style={shown.image ? { backgroundImage: `url("content://pack/${shown.image}")` } : undefined}>
@@ -59,7 +59,7 @@ export function PartyDialog({ content, state, onGo, onClose }: Props) {
           </span>
         </div>
         <Button variant="secondary" aria-label="The depth below" disabled={depth >= open - 1} title={depth >= open - 1 && open < config.depths.length ? 'Set this anchor to open the next' : undefined} onClick={() => setDepth(depth + 1)}>
-          <ChevronIcon size={16} />
+          <ChevronIcon size={24} />
         </Button>
       </div>
 
@@ -84,8 +84,9 @@ export function PartyDialog({ content, state, onGo, onClose }: Props) {
 
       {!check.ok && <p className="notice">{check.reasons.join(' · ')}</p>}
       {check.ok && missed.length > 0 && <p className="notice">You would miss {missed.join('; ')}.</p>}
-      <div className="actions end">
-        <GrandButton label="Not now" icon={<BackIcon size={22} />} chevron={false} onClick={onClose} />
+      {/* The way back at the left, as on every main screen; the way down at the right. */}
+      <div className="actions party-actions">
+        <BackButton label="Not now" onClick={onClose} />
         <GrandButton
           label="Go down"
           icon={<StopIcon kind="guardian" size={24} />}

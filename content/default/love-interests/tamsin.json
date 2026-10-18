@@ -347,6 +347,7 @@
     "background": "generated/backgrounds/tamsin/view-5.webp"
   },
   "birthPicture": "sprites/tamsin/birth.webp",
+  "walkSprite": "sprites/tamsin/walk-cutout.png",
   "childNames": {
     "daughters": [
       "Poppy",

@@ -120,7 +120,8 @@ export function ComfySetup({ settings, list, onSave, connectionOnly }: Props) {
 
           {list && !list.ok && list.message && <p className="notice">{list.message}</p>}
 
-          <div className="row">
+          {/* Level at their boxes, however their labels wrap. */}
+          <div className="row level-inputs">
             <label className="studio-narrow">
               Give up after (seconds)
               <input type="number" min={COMFY_MIN_TIMEOUT_SECONDS} max={COMFY_MAX_TIMEOUT_SECONDS} value={timeout} onChange={(e) => setTimeoutSeconds(e.target.value)} onBlur={commitTimeout} />

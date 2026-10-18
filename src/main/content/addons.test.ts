@@ -176,20 +176,22 @@ describe('tidying up on save', () => {
       mkdirSync(join(dir, path, '..'), { recursive: true })
       writeFileSync(join(dir, path), 'x')
     }
-    for (const file of ['sprites/mira/neutral.png', 'sprites/mira/neutral-old.png', 'sprites/mira/dance.mp4', 'sprites/mira/room.png', 'sprites/mira/birth.png']) put(file)
+    for (const file of ['sprites/mira/neutral.png', 'sprites/mira/neutral-old.png', 'sprites/mira/dance.mp4', 'sprites/mira/room.png', 'sprites/mira/birth.png', 'sprites/mira/walk.png']) put(file)
     for (const file of ['generated/backgrounds/mira/try-1.png', 'generated/backgrounds/mira/kept.png', 'sprites/faye/hers.png']) put(file)
     const saved = {
       id: 'mira',
       outfits: [{ id: 'default', name: 'Usual', description: '', pregnant: false, sprites: { neutral: { image: 'addons/sprites/mira/neutral.png', description: '' } } }],
       animations: [{ id: 'dance', name: 'Dance', description: '', clip: 'addons/sprites/mira/dance.mp4', loop: true }],
       room: { background: 'addons/generated/backgrounds/mira/kept.png' },
-      birthPicture: 'addons/sprites/mira/birth.png'
+      birthPicture: 'addons/sprites/mira/birth.png',
+      walkSprite: 'addons/sprites/mira/walk.png'
     }
     expect(removeUnusedAssets(dir, saved).sort()).toEqual(['neutral-old.png', 'room.png', 'try-1.png'])
     expect(existsSync(join(dir, 'sprites/mira/neutral.png'))).toBe(true)
     expect(existsSync(join(dir, 'sprites/mira/dance.mp4'))).toBe(true)
     // Her picture of a birth is hers to keep.
     expect(existsSync(join(dir, 'sprites/mira/birth.png'))).toBe(true)
+    expect(existsSync(join(dir, 'sprites/mira/walk.png'))).toBe(true)
     expect(existsSync(join(dir, 'generated/backgrounds/mira/kept.png'))).toBe(true)
     expect(existsSync(join(dir, 'sprites/faye/hers.png'))).toBe(true)
     expect(removeUnusedAssets(dir, saved)).toEqual([])
