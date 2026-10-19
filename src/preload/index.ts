@@ -1,9 +1,13 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge, ipcRenderer, webFrame } from 'electron'
 import { IPC } from '../shared/ipc'
 import type { RendererApi } from '../shared/types'
 
 const api: RendererApi = {
   getContent: () => ipcRenderer.invoke(IPC.getContent),
+  spell: {
+    misspelled: (word) => webFrame.isWordMisspelled(word),
+    suggestions: (word) => webFrame.getWordSuggestions(word)
+  },
   chat: (request) => ipcRenderer.invoke(IPC.chat, request),
   cancelChat: () => ipcRenderer.invoke(IPC.cancelChat),
   onSceneMoving: (listener) => {

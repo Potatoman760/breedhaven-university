@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { canEnrol, courseMatches, describeMeetings, toDate, skillFor } from '../../../shared/game'
+import { canBeginTerm, canEnrol, courseMatches, describeMeetings, toDate, skillFor } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { Backdrop } from './Backdrop'
 import { Button } from './Button'
@@ -75,7 +75,7 @@ export function CoursesView({ content, state, onEnrol, toured, onToured }: Props
           expression: 'happy',
           text:
             `Right, ${state.player.name}, this is your week. Every block's a class: point at one to read about it, click it to sign up. ` +
-            `Lectures come round ${config.lecturesPerWeek} times a week and labs eat ${config.labHours} hours. Up to ${config.maxCourses} courses, and none that clash.`
+            `Lectures come round ${config.lecturesPerWeek} times a week and labs eat ${config.labHours} hours. You take ${config.maxCourses} courses, and none that clash.`
         },
         ...(taught
           ? [
@@ -159,13 +159,13 @@ export function CoursesView({ content, state, onEnrol, toured, onToured }: Props
           <Button variant="secondary" data-tour="help" onClick={() => setHelping(true)}>
             Help me pick
           </Button>
-          <button disabled={selected.length === 0} onClick={() => onEnrol(selected)}>
+          <Button variant="primary" disabled={!canBeginTerm(content, selected).ok} title={canBeginTerm(content, selected).reasons.join(' · ') || undefined} onClick={() => onEnrol(selected)}>
             Begin term
-          </button>
+          </Button>
         </div>
 
         {state.courses.length === 0 || !config ? (
-          <p className="hint center">There is no course catalogue in this game. Build one under Edit game content, Courses, and start a new game.</p>
+          <p className="hint center">The game's course catalogue is missing.</p>
         ) : (
           <div className="planner-body">
             <WeekPlanner
@@ -222,8 +222,8 @@ export function CoursesView({ content, state, onEnrol, toured, onToured }: Props
               ) : (
                 <p className="hint">
                   Each course has {config.lecturesPerWeek} lectures a week of {config.lectureHours} hour{config.lectureHours === 1 ? '' : 's'}, and a practical
-                  one a {config.labHours}-hour lab as well. Point at a class to read about it and see who else is taking it; click it to enroll. You can take
-                  up to {config.maxCourses}, and no two that meet at the same time.
+                  one a {config.labHours}-hour lab as well. Point at a class to read about it and see who else is taking it; click it to enroll. You take
+                  {config.maxCourses}, and no two that meet at the same time.
                 </p>
               )}
             </aside>

@@ -23,4 +23,25 @@ describe('the wording of the default pack', () => {
     )
     expect(slips).toEqual([])
   })
+
+  // The game is written in US English: a British word in the pack is copied by the LLM into everything it writes.
+  it('is written in US English', () => {
+    // Joined to an id or a path by a hyphen, slash or underscore, a word is a name and keeps its spelling.
+    const british = new RegExp(
+      String.raw`(?<![\w/_-])(grey|greys|coloured|colour|colours|colourful|centre|centres|favour|favours|favourite|honour|behaviour|neighbour|humour|` +
+        String.raw`armour|harbour|flavour|licence|programme|programmes|labelled|travelling|counsellor|catalogue|whilst|amongst|learnt|maths|` +
+        String.raw`pyjamas|fortnight|timetable|revise|revises|revising|trainers|jumper|high street|kerb|studio flat|a flat above|her flat|enrol|enrolment|practised|practising|` +
+        String.raw`plough|ploughed|queue|queues|flats|reads (?:Government|Law|Economics|Agriculture|Medicine|Engineering|History))(?![\w/_-])`,
+      'i'
+    )
+    // Kept as they are: a coffee, and the programming course's queues.
+    const kept = /flat white|Dictionaries and Queues|A queue serves|in a queue$/g
+    const slips = files.flatMap((file) =>
+      texts(JSON.parse(readFileSync(file, 'utf8')))
+        .map((text) => text.replace(kept, ''))
+        .filter((text) => british.test(text))
+        .map((text) => `${file.slice(dir.length + 1)}: ${text.match(british)![0]} in "${text.slice(0, 80)}"`)
+    )
+    expect(slips).toEqual([])
+  })
 })

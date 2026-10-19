@@ -1,7 +1,8 @@
-import type { ContentPack, GameState, HouseRoom, LoveInterest } from '../model'
+import type { ContentPack, GameState, HouseRoom, LoveInterest, Scene } from '../model'
 import { toDate } from './calendar'
-import { babiesAtHome, builtTier, householdIds, isResident, roomOf } from './housing'
+import { babiesAtHome, builtTier, goToRoom, householdIds, isResident, roomOf } from './housing'
 import { inClass, locationOf } from './map'
+import { sceneBaseline } from './scene'
 import { seedOf } from './seed'
 
 /**
@@ -61,3 +62,41 @@ export function whereAtHome(content: ContentPack, state: GameState, loveInterest
 export function inRoom(content: ContentPack, state: GameState, roomKey: string): LoveInterest[] {
   return content.loveInterests.filter((li) => whereAtHome(content, state, li.id) === roomKey)
 }
+
+/**
+ * The hour after she has said yes to living with him: he is with her in the room she has just moved into, and she is
+ * told what has happened, and that she is glad of it. Nothing else moves the scene: it is any other at home.
+ */
+export function movingInScene(content: ContentPack, state: GameState, loveInterestId: string, roomKey: string): { state: GameState; scene: Scene } | undefined {
+  const config = content.housing
+  const room = config && roomOf(config, roomKey)
+  const li = content.loveInterests.find((one) => one.id === loveInterestId)
+  if (!config || !room || !li || state.housing.residents[loveInterestId] !== roomKey) return undefined
+  const there = goToRoom(content, state, roomKey)
+  const first = li.name.split(' ')[0]
+  const player = state.player.name
+  return {
+    state: there,
+    scene: {
+      loveInterestId,
+      companionIds: [],
+      npc: false,
+      nsfw: false,
+      viewId: room.viewId,
+      beats: [
+        {
+          activityName: `Moving into ${config.name}`,
+          locationName: `${config.name}, ${room.name.toLowerCase()}`,
+          description: `${first} has carried the last of her things into ${room.name.toLowerCase()}. It is hers now.`,
+          direction: `${first} has just said yes to moving in with ${player} at ${config.name}, and has moved into ${room.name.toLowerCase()}. She is excited about it. Stay in the house.`
+        }
+      ],
+      messages: [],
+      gifts: [],
+      conceived: [],
+      departed: [],
+      baseline: sceneBaseline(there, loveInterestId, [])
+    }
+  }
+}
+

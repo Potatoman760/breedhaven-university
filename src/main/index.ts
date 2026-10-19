@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu, protocol, safeStorage, shell, type MenuItemConstructorOptions } from 'electron'
+import { app, BrowserWindow, dialog, ipcMain, Menu, protocol, safeStorage, session, shell, type MenuItemConstructorOptions } from 'electron'
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve, sep } from 'node:path'
 import { z } from 'zod'
@@ -7,6 +7,7 @@ import { completeWithFallback, NOT_CONFIGURED } from './ai/router'
 import { leavers, lookLines, namesHer, parseDirectives, sceneCast, sceneWitnesses, validLook, whoSpoke } from '../shared/game/scene'
 import { canSleepOver } from '../shared/game/sleep'
 import { sexGate } from '../shared/game/intimacy'
+import { sceneRelicUses } from '../shared/game/relics'
 import { CONTENT_SCHEME, resolveContentPath, serveContent } from './content/assets'
 import { deleteLoveInterest,
   removeUnusedAssets,
@@ -520,6 +521,8 @@ function registerIpc(
       sceneBeats: scene.beats,
       lesson: scene.lesson,
       opening: scene.messages.length === 0,
+      uninhibited: scene.uninhibited,
+      relics: sceneRelicUses(content, scene),
       look: scene,
       looks: scene.looks,
       comfort: scene.comfort,
@@ -587,7 +590,7 @@ function registerIpc(
     // What she will not do is not done, whatever the reply says: no sex-act is shown and nothing can come of one.
     const willing = (id: string) => {
       const who = cast.loveInterests.find((c) => c.id === id)
-      return who !== undefined && sexGate(content, state, who).open
+      return who !== undefined && sexGate(content, state, who, scene.uninhibited?.includes(id)).open
     }
     const seededIds = seeded.map(idOf).filter((id): id is string => id !== undefined && willing(id))
     // Who the reply says leaves: at least one has to stay, and whoever was left behind by a move has already gone.
@@ -871,6 +874,9 @@ function registerIpc(
 }
 
 app.whenReady().then(() => {
+  // The scene's text box asks the spell checker word by word, and draws its own marks: it is switched on here, as a
+  // field that leaves the browser's own checking off would never wake it.
+  session.defaultSession.setSpellCheckerEnabled(true)
   const addonDir = join(app.getPath('userData'), 'addons')
   let loaded: { content: ContentPack; info: EditorInfo }
   try {

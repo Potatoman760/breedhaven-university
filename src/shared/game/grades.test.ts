@@ -37,7 +37,6 @@ const course: Course = {
   description: '',
   subject: 'Riddles',
   code: 'RID',
-  level: 1,
   general: false,
   stats: ['wisdom'],
   studentIds: ['ana', 'bea'],
@@ -64,7 +63,7 @@ describe("a course's points", () => {
     const places = studyPlaces(content, start, course)
     expect(places.map((p) => [p.name, p.locationId, p.own ?? false])).toEqual([
       ['the Shop', 'shop', false],
-      ['My own room', 'home', true]
+      ['My room', 'home', true]
     ])
     // A place that is shut, or shuts before the two hours are up, is not offered.
     expect(studyPlaces(content, { ...start, time: start.time + 8 }, course).map((p) => p.locationId)).toEqual(['home'])
@@ -91,7 +90,7 @@ describe("a course's points", () => {
   it('can be studied for in the room of a classmate he has met, which is a scene with her there', () => {
     const met = meet(content, start, ['bea'])
     const places = studyPlaces(content, met, course)
-    expect(places.map((p) => p.name)).toEqual(['the Shop', 'My own room', "Bea's room"])
+    expect(places.map((p) => p.name)).toEqual(['the Shop', 'My room', "Bea's room"])
     const session = studyOuting(content, course, places[2])
     expect(session).toMatchObject({ withIds: ['bea'], roomOf: 'bea', locationId: 'home', dropIn: false })
     // After her class, when she is free.

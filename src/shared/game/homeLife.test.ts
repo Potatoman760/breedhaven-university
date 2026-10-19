@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { loadContentPack } from '../../main/content/loader'
 import type { GameState } from '../model'
 import { timeOn } from './agenda'
-import { inRoom, roomHeIsIn, whereAtHome } from './homeLife'
+import { inRoom, movingInScene, roomHeIsIn, whereAtHome } from './homeLife'
 import { buildRoom, goToRoom, invite, moveIn, withHousing } from './housing'
 import { createInitialState } from './state'
 
@@ -27,6 +27,17 @@ describe('who is where in the house', () => {
   const home = invite(seen(fond), fond, 'tamsin', master)
   // A free day, so that nobody has a class to be at.
   const at = (state: GameState, hour: number): GameState => ({ ...state, time: timeOn(written, 54, hour), locationId: housing.locationId })
+
+  it('goes from her saying yes straight to an hour with her in the room she has moved into', () => {
+    const shown = movingInScene(seen(home), home, 'tamsin', master)!
+    expect(shown.state.housing.room).toBe(master)
+    expect(shown.state.locationId).toBe(housing.locationId)
+    expect(shown.scene).toMatchObject({ loveInterestId: 'tamsin', companionIds: [], npc: false })
+    expect(shown.scene.viewId).toBe(housing.rooms.find((room) => room.key === master)!.viewId)
+    expect(shown.scene.beats[0].direction).toMatch(/just said yes to moving in .*excited/)
+    // Not for someone who does not live there, or not in that room.
+    expect(movingInScene(seen(fond), fond, 'tamsin', master)).toBeUndefined()
+  })
 
   it('has everyone in her own room at night', () => {
     expect(home.housing.residents['tamsin']).toBe(master)

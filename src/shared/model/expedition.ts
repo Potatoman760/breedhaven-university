@@ -75,7 +75,14 @@ export const NodeSchema = z.object({
 })
 export type ExpeditionNode = z.infer<typeof NodeSchema>
 
-/** What re-seating an anchor leaves him with for good: a modifier, like what a course teaches. */
+/** What a relic can do in a scene when he uses it there, once a scene. */
+export const RELIC_USES = ['unravel', 'stillness', 'sapphic', 'minds-eye', 'first-seed'] as const
+export type RelicUse = (typeof RELIC_USES)[number]
+
+/**
+ * What re-seating an anchor leaves him with for good. Either it is always at work, as long as he leaves it on: a
+ * modifier, like what a course teaches, or traits every woman has while it is; or it is used in a scene, once a scene.
+ */
 export const RelicSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -86,7 +93,11 @@ export const RelicSchema = z.object({
   appearance: z.string().default(''),
   /** Its picture, relative to the pack: shown in place of the icon where there is one. */
   image: z.string().optional(),
-  modifier: ModifierSchema
+  modifier: ModifierSchema.optional(),
+  /** Traits every love interest has while it is on: what they are is told to each of them as her own. */
+  traitIds: z.array(z.string()).default([]),
+  /** What it does when he uses it in a scene. */
+  use: z.enum(RELIC_USES).optional()
 })
 export type Relic = z.infer<typeof RelicSchema>
 
@@ -108,6 +119,8 @@ export const ExpeditionConfigSchema = z.object({
   moneyImage: z.string().optional(),
   /** The picture a checkpoint is shown with: a campfire, say. */
   restImage: z.string().optional(),
+  /** The pictures the epilogue tells the way down over: the University saved, with every anchor set, and overrun, with any left. */
+  endingImages: z.object({ saved: z.string().optional(), overrun: z.string().optional() }).default({}),
   /** The emblem of each kind of stop on the way down (fight, find, checkpoint, guardian): pictures in the pack. */
   stopImages: z.record(z.string(), z.string()).default({}),
   /**
@@ -266,6 +279,8 @@ export const ExpeditionStateSchema = z.object({
   cleared: z.number().int().min(0).default(0),
   /** The relics he holds, by id. */
   relics: z.array(z.string()).default([]),
+  /** Those of them always at work that he has turned on: each starts off, and is his to turn on. */
+  relicsOn: z.array(z.string()).default([]),
   /** He has been shown the way down, and may go. */
   invited: z.boolean().default(false),
   run: ExpeditionRunSchema.optional()

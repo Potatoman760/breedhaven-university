@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { StatSchema } from './stats'
 
-/** What a love interest studies: her major. The catalogue has a few courses in it, one of them at her year. */
+/** What a love interest studies: her major, two courses of which she takes. Her year is who she is, not what she may take. */
 export const StudiesSchema = z.object({
   subject: z.string(),
   /** Catalogue prefix, e.g. `POL`. */
@@ -15,13 +15,17 @@ export const StudiesSchema = z.object({
 })
 export type Studies = z.infer<typeof StudiesSchema>
 
-/** What a love interest who teaches at the University teaches. Each subject becomes a course every game. */
+/** A course a teacher gives: its subject, and its number in that subject (`143` for `KIN 143`). */
+export const TaughtSchema = StudiesSchema.omit({ level: true }).extend({ number: z.string() })
+export type Taught = z.infer<typeof TaughtSchema>
+
+/** What a love interest who teaches at the University teaches. Each of the courses is hers every game. */
 export const TeachingSchema = z.object({
   /** The department or college they belong to: "the College of Business". */
   department: z.string(),
   /** How they are styled in the catalogue, before their name: "Professor", "Dr". */
   title: z.string().default('Professor'),
-  subjects: z.array(StudiesSchema).min(1)
+  subjects: z.array(TaughtSchema).min(1)
 })
 export type Teaching = z.infer<typeof TeachingSchema>
 
@@ -39,7 +43,7 @@ export type CourseMeeting = z.infer<typeof CourseMeetingSchema>
 /** A course in the catalogue. Built in the editor before a game starts, and kept in the save. */
 export const CourseSchema = z.object({
   id: z.string(),
-  /** Catalogue number, e.g. `POL 101`. */
+  /** Catalog number, e.g. `POL 132`. */
   number: z.string(),
   title: z.string(),
   professor: z.string(),
@@ -47,8 +51,6 @@ export const CourseSchema = z.object({
   subject: z.string(),
   /** Its major's catalogue prefix, e.g. `POL`. Two courses with the same one never meet at the same time. */
   code: z.string(),
-  /** The year it is taught at: 1-4 for undergraduates, 5 for graduates. */
-  level: z.number().int().min(1).max(5),
   /** A general-education course open to everyone, as opposed to one in a student's own subject. */
   general: z.boolean().default(false),
   /** The stats a class raises: one or two, mostly intelligence, wisdom or charisma. */
@@ -153,7 +155,7 @@ export const CourseworkConfigSchema = z.object({
   maxPerClass: z.number().int().min(1).default(2),
   /** The most a class may come to when those in it read its subject: her own subject's course is hers to sit, whoever else is in it. */
   maxMajorClass: z.number().int().min(1).default(3),
-  /** The most courses anyone, player or love interest, may take. */
+  /** The most courses anyone, player or love interest, may take; the player takes exactly this many, and begins no term with fewer. */
   maxCourses: z.number().int().min(1).default(5),
   /** Stat points an hour of class is worth, shared between the stats the course teaches. */
   statGain: z.number().int().min(0).default(1),

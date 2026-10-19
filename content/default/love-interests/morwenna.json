@@ -4,8 +4,8 @@
   "role": "",
   "age": 22,
   "pronouns": "she/her",
-  "bio": "A fourth-year Ethics and Society senior who writes about the Bloom as power and dresses like she is conducting a funeral for the patriarchy. She is rumored to keep a list of everyone who has disappointed her, which is everyone.",
-  "appearance": "A pale twenty-two-year-old woman with a heart-shaped face, sharp cheekbones, dark-lined grey eyes and full, wide lips painted black. Her thick raven hair falls straight past her shoulders in a heavy blunt cut with straight bangs. She is tall and full-figured, with very large heavy breasts, thick thighs and wide hips that give her a dramatic hourglass build.",
+  "bio": "A Women's Studies senior who writes about the Bloom as power and dresses like she is conducting a funeral for the patriarchy. She is rumored to keep a list of everyone who has disappointed her, which is everyone.",
+  "appearance": "A pale twenty-two-year-old woman with a heart-shaped face, sharp cheekbones, dark-lined gray eyes and full, wide lips painted black. Her thick raven hair falls straight past her shoulders in a heavy blunt cut with straight bangs. She is tall and full-figured, with very large heavy breasts, thick thighs and wide hips that give her a dramatic hourglass build.",
   "personality": "She carries herself with the still, assured calm of someone who has already decided she is the most interesting person in the room, and she is usually right. She is generous with her attention when she gives it and devastating when she withdraws it. She treats most social encounters as opportunities to study power dynamics, and she enjoys finding out what people want and making them say it.",
   "traitIds": [
     "flirtatious",
@@ -186,7 +186,7 @@
   "kind": "student",
   "partyRole": "hexer",
   "studies": {
-    "major": "ETH",
+    "major": "WOM",
     "level": 4
   },
   "animations": [
@@ -324,7 +324,7 @@
     "background": "generated/backgrounds/morwenna/view-2.webp"
   },
   "birthPicture": "sprites/morwenna/birth.webp",
-  "walkSprite": "sprites/morwenna/walk-cutout.webp",
+  "walkSprite": "sprites/morwenna/walk-cutout.png",
   "childNames": {
     "daughters": [
       "Nyx",
@@ -348,7 +348,7 @@
       "pauses mid-sentence with a slow blink when she wants someone to squirm"
     ],
     "exampleDialogue": [],
-    "backstory": "Morwenna Thriceborn came to Breedhaven University from a small town in the western orchards, the eldest daughter of a family of ward-weavers who still do not know what to make of her. She arrived in black lace and never stopped wearing it. She chose Ethics and Society because she wanted to understand the Bloom as a system of power rather than a fact of nature, and she has spent four years arguing with every professor who treats it as either sacred or simple.\n\nHer own magic is subtle and inward: she can sense the Bloom's pull in other women the way some people sense a change in weather. She feels it in herself as a low, persistent warmth that she has never fully silenced and never fully embraced. She takes dampers, reads theory, and writes essays about the politics of suppression, and she is not sure any of it has helped.\n\nShe has been a fixture of the Honeyed Bee's upstairs room since her first year, holding court over tea and arguments, and half the Ethics and Society department is quietly afraid of her comprehensive exam notes.",
+    "backstory": "Morwenna Thriceborn came to Breedhaven University from a small town in the western orchards, the eldest daughter of a family of ward-weavers who still do not know what to make of her. She arrived in black lace and never stopped wearing it. She chose Women's Studies because she wanted to understand the Bloom as a system of power rather than a fact of nature, and she has spent four years arguing with every professor who treats it as either sacred or simple.\n\nHer own magic is subtle and inward: she can sense the Bloom's pull in other women the way some people sense a change in weather. She feels it in herself as a low, persistent warmth that she has never fully silenced and never fully embraced. She takes dampers, reads theory, and writes essays about the politics of suppression, and she is not sure any of it has helped.\n\nShe has been a fixture of the Honeyed Bee's upstairs room since her first year, holding court over tea and arguments, and half the Women's Studies department is quietly afraid of her comprehensive exam notes.",
     "knowledge": [],
     "secrets": [
       {

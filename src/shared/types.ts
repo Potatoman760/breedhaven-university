@@ -185,6 +185,8 @@ export interface TestConnectionResponse {
 /** API exposed to the renderer by the preload script as `window.api`. */
 export interface RendererApi {
   getContent(): Promise<ContentPack>
+  /** The system's spell checker, asked a word at a time: whether it is misspelled, and what it might have been. */
+  spell: { misspelled(word: string): boolean; suggestions(word: string): string[] }
   chat(request: SceneRequest): Promise<ChatResponse>
   /** Stops the scene reply being written. The call to chat then fails with CHAT_CANCELLED. */
   cancelChat(): Promise<void>

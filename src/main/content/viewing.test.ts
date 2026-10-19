@@ -70,8 +70,11 @@ describe('the viewing of the house', () => {
 
   it('kept, is a scene at the house with the officer and the nanny, and the house is his', () => {
     const there: GameState = { ...set, time: plan.time, locationId: plan.locationId }
-    const { state: after, scene } = attendViewing(seen(there), there, plan.id)
+    const { state: after, scene, cutscene } = attendViewing(seen(there), there, plan.id)
     expect(() => SceneSchema.parse(scene)).not.toThrow()
+    // Before the scene, the nanny sets out how a child does in the house: its keep, and the comfort it can rise to.
+    expect(cutscene?.speakerId).toBe(housing.nannyId)
+    expect(cutscene?.scenes.flatMap((one) => one.lines).join(' ')).toMatch(/comfort/i)
     expect(after.housing.status).toBe('resident')
     expect(after.locationId).toBe(housing.locationId)
     expect(after.time).toBe(plan.time + plan.hours)

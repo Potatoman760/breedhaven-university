@@ -4,7 +4,7 @@ import { growTies } from './bonds'
 import { toDate } from './calendar'
 import { consume } from './market'
 import { addMemory, applyFeelings } from './memory'
-import { factor, inForce } from './modifiers'
+import { factor, inForce, trustOf } from './modifiers'
 import { checkOuting } from './outing'
 import { pregnancyStage } from './pregnancy'
 import { hasMet } from './scene'
@@ -74,7 +74,7 @@ export function whyNot(content: ContentPack, state: GameState, li: LoveInterest)
   const config = content.expedition
   if (!config || !roleOf(config, li)) return 'She would not be of use below'
   if (!hasMet(state, li.id)) return 'You have not met'
-  if ((state.relationships[li.id]?.trust ?? 0) < config.trustNeeded) return `She does not trust you enough (${config.trustNeeded})`
+  if (trustOf(content, state, li.id) < config.trustNeeded) return `She does not trust you enough (${config.trustNeeded})`
   if (pregnancyPower(content, state, li.id) === undefined) return 'She is too near her time'
   return undefined
 }

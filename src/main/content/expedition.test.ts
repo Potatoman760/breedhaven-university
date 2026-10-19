@@ -56,10 +56,14 @@ describe('the Undercroft of the default pack', () => {
     expect(config.intro!.cutscene).toMatchObject({ speakerId: 'vespera', scenes: [{ locationId: 'bathhouse' }] })
   })
 
-  it('has eight depths, each with a relic that changes a number of the game', () => {
+  it('has eight depths, each with a relic that does something: a modifier or traits while it is on, or a use in a scene', () => {
     expect(config.depths).toHaveLength(8)
+    const traits = content.traits.map((trait) => trait.id)
     for (const depth of config.depths) {
-      expect(MODIFIER_KINDS as readonly string[], depth.name).toContain(depth.relic.modifier.kind)
+      const { modifier, traitIds, use } = depth.relic
+      expect(modifier !== undefined || traitIds.length > 0 || use !== undefined, depth.name).toBe(true)
+      if (modifier) expect(MODIFIER_KINDS as readonly string[], depth.name).toContain(modifier.kind)
+      for (const id of traitIds) expect(traits, depth.name).toContain(id)
       expect(depth.nodes.map((node) => node.kind).filter((kind) => kind === 'checkpoint'), depth.name).toHaveLength(1)
     }
   })

@@ -58,7 +58,7 @@ describe('the scene prompt', () => {
 
   it('tells the character the day and the weather', () => {
     const weather = weatherOn(content, game(7))!
-    expect(prompt).toContain('It is 06:00 (Day) on Two, 2 A, Year 1.')
+    expect(prompt).toContain('It is 06:00 (Day) on Two, 2 A.')
     expect(prompt).toContain(`The weather today: ${weather.name}.`)
   })
 

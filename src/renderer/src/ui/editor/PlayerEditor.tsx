@@ -195,7 +195,7 @@ export function PlayerEditor({ content, onContent, switcher }: Props) {
               label="Appearance"
               value={look.appearance}
               rows={3}
-              placeholder="a young man of eighteen, tall and lean, short dark hair, grey eyes"
+              placeholder="a young man of eighteen, tall and lean, short dark hair, gray eyes"
               onChange={(appearance) => setLook({ appearance })}
               hint="His body and face, as a picture: no clothes and no name. Sent to ComfyUI as the start of the prompt."
             />

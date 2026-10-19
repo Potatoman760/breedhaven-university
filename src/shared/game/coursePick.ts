@@ -28,15 +28,15 @@ function courseLine(content: ContentPack, course: Course): string {
 export function buildCoursePickPrompt(content: ContentPack, state: GameState, text: string): { system: string; user: string } {
   const most = content.coursework?.maxCourses ?? 0
   const system = [
-    `You choose a term's courses for ${state.player.name}, a student, from a catalogue, to suit what he says he wants.`,
+    `You choose a term's courses for ${state.player.name}, a student, from a catalog, to suit what he says he wants.`,
     'Reply with one JSON object and nothing else:',
     '{"courses": string[], "why": string}',
-    `- "courses": the numbers of the courses to take, exactly as listed, best first. Choose ${most}, or fewer only if he asks for fewer.`,
+    `- "courses": the numbers of the courses to take, exactly as listed, best first. Choose exactly ${most}.`,
     '- No two may meet on the same day at the same hour.',
     '- "why": one or two sentences to him, saying what you chose and why it suits what he asked.',
-    'Use only course numbers from the catalogue.'
+    'Use only course numbers from the catalog.'
   ].join('\n')
-  const user = [`He says: "${text}"`, '', 'Catalogue:', ...state.courses.map((course) => courseLine(content, course))].join('\n')
+  const user = [`He says: "${text}"`, '', 'Catalog:', ...state.courses.map((course) => courseLine(content, course))].join('\n')
   return { system, user }
 }
 
@@ -73,6 +73,6 @@ export function parseCoursePick(reply: string, content: ContentPack, state: Game
     if (canEnrol(content, state, courseIds, course.id).ok) courseIds.push(course.id)
     else dropped.push(course.number)
   }
-  if (courseIds.length === 0) throw new Error('None of the courses it named are in the catalogue.')
+  if (courseIds.length === 0) throw new Error('None of the courses it named are in the catalog.')
   return { courseIds, why: typeof read.why === 'string' ? read.why.trim() : '', dropped }
 }

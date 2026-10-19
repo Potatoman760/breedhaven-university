@@ -36,8 +36,9 @@ export interface SexGate {
  * Whether sex with her can happen in a scene now. What she feels changes only when a scene ends, so a scene that
  * begins shut stays shut however well it goes: unless he sets a charm on her in it, which is the one thing that moves it.
  */
-export function sexGate(content: ContentPack, state: GameState, li: Pick<LoveInterest, 'id' | 'traitIds'>): SexGate {
-  if (isEasy(content, li)) return { open: true }
+export function sexGate(content: ContentPack, state: GameState, li: Pick<LoveInterest, 'id' | 'traitIds'>, uninhibited = false): SexGate {
+  // A scene in which nothing holds anyone back, as a society's adult event, is open to everyone in it.
+  if (uninhibited || isEasy(content, li)) return { open: true }
   // She has nothing to remember him by and he is a stranger to her: this is the day they meet. A woman who begins the
   // game knowing him, an old friend, has met him long since, and is held only to what she feels.
   const rel = state.relationships[li.id]
@@ -62,9 +63,9 @@ export function stopBirthControl(content: ContentPack, state: GameState, loveInt
 }
 
 /** Told to her: whether she will, and what she takes. Nothing about sex for a woman it is open to as it always was. */
-export function describeSexGate(content: ContentPack, state: GameState, li: Pick<LoveInterest, 'id' | 'traitIds'>, group = false): string[] {
+export function describeSexGate(content: ContentPack, state: GameState, li: Pick<LoveInterest, 'id' | 'traitIds'>, group = false, uninhibited = false): string[] {
   const player = state.player.name
-  const gate = sexGate(content, state, li)
+  const gate = sexGate(content, state, li, uninhibited)
   const control = onBirthControl(content, state, li.id)
     ? `You are on birth control, so you are unlikely to conceive. If you want his child, whether ${player} asks you to stop or you decide it yourself, say so in your own words and ` +
       `write ${OFF_CONTROL_TAG}${group ? ` (in a group, ${OFF_CONTROL_TAG.replace(']', ': Name]')})` : ''} on a line of its own at the end of that reply. If he asks and you do not, refuse or say not yet.`

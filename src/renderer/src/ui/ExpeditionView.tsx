@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
-import { banterDue, act, comeUp, describeChange, describeFinds, fighterName, goOn, inForce, nodeAt, pregnancyPower, roleOf, runReport, spriteFor, toDate, turnActions, turnBack, turnOf, wornOutfit, type BanterLine, type TurnAction } from '../../../shared/game'
+import { banterDue, act, comeUp, describeFinds, fighterName, goOn, inForce, nodeAt, pregnancyPower, roleOf, runReport, spriteFor, toDate, turnActions, turnBack, turnOf, wornOutfit, type BanterLine, type TurnAction } from '../../../shared/game'
 import { HIM, type ContentPack, type Fighter, type Finds, type GameState } from '../../../shared/model'
 import { BelowFx, EVENT_GAP_MS } from '../fx/BelowFx'
 import { Backdrop } from './Backdrop'
@@ -391,7 +391,8 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
             <p className="below-relic">
               <ItemArt icon={report.relic.icon} image={report.relic.image} size={72} />
               <span>
-                <strong>{report.relic.name}</strong> ({describeChange(report.relic.modifier)}). {report.relic.description}
+                <strong>{report.relic.name}</strong>. {report.relic.description}{' '}
+                <em>{report.relic.use ? 'Use it from your bag during a scene.' : 'Turn it on from the Relics tab of your bag.'}</em>
               </span>
             </p>
           )}

@@ -7,6 +7,7 @@ import { approachableAt } from './map'
 import { sceneBaseline } from './scene'
 import { statOf, trainStat } from './stats'
 import { factor } from './modifiers'
+import { joinedSocieties } from './societies'
 
 const clock = (hour: number): string => `${String(hour).padStart(2, '0')}:00`
 
@@ -298,26 +299,22 @@ export function jobFacts(content: ContentPack, state: GameState, npcId: string):
 
 /** One hour of one day in a week laid side by side with a job: what he already has on then, and whether the job has a shift then. */
 export interface WeekHour {
-  /** What he already does in that hour: the number of a class he takes, or the job he holds. */
+  /** What he already does in that hour: the society he belongs to that meets then. */
   mine?: string
   /** The job being looked at has a shift then. */
   shift: boolean
 }
 
 /**
- * A job's shifts laid over the player's week as it stands: the classes he takes and the
- * shifts of any other job he holds. Where a shift falls on something of his, the two
- * clash. The hours run from the first thing in the week to the last.
+ * A job's shifts laid over the player's week as it stands: the meetings of the societies he
+ * belongs to. Where a shift falls on one, the two clash. Shifts are laid out clear of classes,
+ * and taking a job gives up the one he holds, so neither is anything in its way. The hours run
+ * from the first thing in the week to the last.
  */
 export function weekAgainst(content: ContentPack, state: GameState, job: Job): { days: string[]; hours: number[]; at: (day: string, hour: number) => WeekHour; clashes: number } {
   const days = content.calendar.weekdays
-  const held = currentJob(content, state)
-  const mine = [
-    ...state.courses
-      .filter((course) => state.enrolment?.includes(course.id))
-      .flatMap((course) => course.meetings.map((m) => ({ weekday: m.weekday, startHour: m.startHour, hours: m.hours, label: course.number }))),
-    ...(held && held.id !== job.id ? held.shifts.map((shift) => ({ ...shift, label: held.title })) : [])
-  ]
+  const meeting = content.societies?.hours ?? 1
+  const mine = joinedSocieties(content, state).map((society) => ({ weekday: society.weekday, startHour: society.startHour, hours: meeting, label: society.name }))
   const spans = [...mine, ...job.shifts]
   const from = Math.min(content.coursework?.dayStart ?? 8, ...spans.map((s) => s.startHour))
   const until = Math.max(content.coursework?.dayEnd ?? 18, ...spans.map((s) => s.startHour + s.hours))

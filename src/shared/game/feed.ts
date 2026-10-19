@@ -1,5 +1,5 @@
 import { SHOTS, postPrompt, type Shot } from '../comfy'
-import { outfitDescription, type ContentPack, type GameState, type LoveInterest, type Post, type PostPlan } from '../model'
+import { classYear, outfitDescription, type ContentPack, type GameState, type LoveInterest, type Post, type PostPlan } from '../model'
 import { formatDate, formatTime, periodAt, toDate } from './calendar'
 import { applyEffect } from './conditions'
 import { describeEvent, eventsOn } from './events'
@@ -29,8 +29,6 @@ export function feedReplyTokens(plans: PostPlan[]): number {
   return FEED_TOKENS.base + FEED_TOKENS.each * plans.length
 }
 
-const YEAR_NAMES = ['First-year', 'Second-year', 'Third-year', 'Fourth-year', 'Graduate']
-
 /** Her name on Bloomr: the one written for her, or one made from her name. */
 export function handleOf(li: LoveInterest): string {
   return `@${li.handle?.replace(/^@/, '') || li.name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '')}`
@@ -38,7 +36,10 @@ export function handleOf(li: LoveInterest): string {
 
 /** What she is at the University, in a line: "Second-year · Economics". Undefined for an outsider. */
 export function describeStudies(li: LoveInterest): string | undefined {
-  if (li.studies) return `${YEAR_NAMES[li.studies.level - 1] ?? 'Student'} · ${li.studies.subject}`
+  if (li.studies) {
+    const year = classYear(li.studies.level)
+    return `${year[0].toUpperCase()}${year.slice(1)} · ${li.studies.subject}`
+  }
   if (li.teaching) return `${li.teaching.title} · ${li.teaching.department}`
   return undefined
 }

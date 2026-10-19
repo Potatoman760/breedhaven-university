@@ -132,7 +132,7 @@
       "id": "overcast",
       "name": "Overcast",
       "icon": "cloudy",
-      "description": "A flat grey sky, mild and still.",
+      "description": "A flat gray sky, mild and still.",
       "effect": "none",
       "chance": {
         "thawmoon": 30,

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { IntroSchema } from './orientation'
 
 /**
  * Sire housing: a house the Sire Relations Office lets to a registered Sire once someone he is with is carrying his
@@ -109,15 +110,18 @@ export const HousingConfigSchema = z.object({
     evicted: z.string()
   }),
   /**
-   * Being shown the house before it is his: where the officer meets him, for how long, and what she writes to set the
-   * hour (`{date}`, `{place}`) and to set another when he did not come. Left out, saying yes is moving in.
+   * Being shown the house before it is his: where the officer meets him, for how long, what she writes to set the
+   * hour (`{date}`, `{place}`) and to set another when he did not come, and the scene of being handed the keys, read as a
+   * cutscene before the nanny's scene: where the children's keep is set out to him as something to strive for. Left
+   * out, saying yes is moving in.
    */
   viewing: z
     .object({
       meetLocationId: z.string(),
       hours: z.number().int().min(1).default(2),
       text: z.string(),
-      missedText: z.string()
+      missedText: z.string(),
+      cutscene: IntroSchema
     })
     .optional(),
   /** The floors, from the ground up, by name. */

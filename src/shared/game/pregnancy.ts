@@ -55,6 +55,18 @@ export function periodDay(content: ContentPack, state: GameState, loveInterestId
   return day < Math.min(config.periodDays, config.cycleDays) ? day + 1 : undefined
 }
 
+/**
+ * Where he has it, every woman who has had his child wants him as much as a woman can: her desire is brought up to
+ * the top, the mothers he has already and any to come. The same state when there is nothing to do.
+ */
+export function devotedMothers(content: ContentPack, state: GameState): GameState {
+  if (!inForce(content, state, 'devoted')) return state
+  const most = content.relationships.meterMax
+  const mothers = Object.keys(state.relationships).filter((id) => childrenOf(state, id).length > 0 && state.relationships[id].desire < most)
+  if (mothers.length === 0) return state
+  return { ...state, relationships: { ...state.relationships, ...Object.fromEntries(mothers.map((id) => [id, { ...state.relationships[id], desire: most }])) } }
+}
+
 /** Whether she could conceive now: not already carrying, not on her period, and recovered from her last birth. */
 export function canConceive(content: ContentPack, state: GameState, loveInterestId: string): boolean {
   const config = content.pregnancy
@@ -179,7 +191,8 @@ export function pregnantForm(li: Pick<LoveInterest, 'outfits'>, outfit: Outfit):
  * to draw and nobody's to choose: `wornOutfit` gives whatever is asked for in its pregnant form once she shows.
  */
 export function wearableOutfits(li: Pick<LoveInterest, 'outfits'>): Outfit[] {
-  const ordinary = li.outfits.filter((o) => !o.pregnant)
+  // One kept for a single night of the content is not hers to choose in any other scene.
+  const ordinary = li.outfits.filter((o) => !o.pregnant && !o.oneOff)
   return ordinary.length > 0 ? ordinary : li.outfits
 }
 
@@ -226,7 +239,7 @@ export function describePregnancy(content: ContentPack, state: GameState, loveIn
   const bleeding = periodDay(content, state, loveInterestId)
   if (bleeding !== undefined) {
     lines.push(
-      `You are on your period: day ${bleeding} of ${content.pregnancy.periodDays}. You know it and feel it, as you do each month, and it colours your mood and what you are up for in your own way. ` +
+      `You are on your period: day ${bleeding} of ${content.pregnancy.periodDays}. You know it and feel it, as you do each month, and it colors your mood and what you are up for in your own way. ` +
         `You cannot conceive while it lasts, and you know that too. Mention it only when it comes up naturally.`
     )
   }

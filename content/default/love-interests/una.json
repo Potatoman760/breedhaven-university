@@ -5,7 +5,7 @@
   "age": 46,
   "pronouns": "she/her",
   "bio": "Una keeps the housing file at the Sire Relations Office, upstairs at the Health Center: who is offered a house, on what terms, and who has kept to them.",
-  "appearance": "A tall, spare woman of 46 with warm brown skin, calm dark eyes behind half-moon glasses on a fine chain, high cheekbones and a composed mouth. Black hair streaked with grey, drawn back in a low knot. A long neck, straight shoulders and a slim, upright figure.",
+  "appearance": "A tall, spare woman of 46 with warm brown skin, calm dark eyes behind half-moon glasses on a fine chain, high cheekbones and a composed mouth. Black hair streaked with gray, drawn back in a low knot. A long neck, straight shoulders and a slim, upright figure.",
   "personality": "Exact, unhurried and kind as a matter of procedure. She does not raise her voice and does not bend a rule, and she will explain the rule twice if asked.",
   "traitIds": [],
   "likes": [],
@@ -17,7 +17,7 @@
     {
       "id": "default",
       "name": "Office clothes",
-      "description": "a charcoal fitted jacket over a cream high-collared blouse, a slate grey skirt, half-moon glasses on a chain, a small brass seven-petal Registry pin on her lapel",
+      "description": "a charcoal fitted jacket over a cream high-collared blouse, a slate gray skirt, half-moon glasses on a chain, a small brass seven-petal Registry pin on her lapel",
       "sprites": {
         "neutral": {
           "image": "sprites/una/default-neutral-cutout.webp",
@@ -60,7 +60,7 @@
     "exampleDialogue": [],
     "backstory": "Una was a caseworker for eleven years before she took the housing file. A Sire on her caseload was once walked off campus by people who meant him no good and was missing for three days. She has put every Sire she can behind a warded door since, and she does not discuss it.",
     "knowledge": [
-      "The terms of the Sire housing scheme: a secure family house, a live-in nanny employed by the Office, a subsidised rent due on the first of each month.",
+      "The terms of the Sire housing scheme: a secure family house, a live-in nanny employed by the Office, a subsidized rent due on the first of each month.",
       "Rent not paid is carried for seven days. After that the Office takes the house back, and there is no second offer.",
       "The nanny is the Office's employee, not the Sire's, and her contract is the Office's business.",
       "She does not discuss other Sires, their houses or their households with anyone."

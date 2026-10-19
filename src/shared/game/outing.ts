@@ -107,10 +107,10 @@ interface OutingRoom {
 export function outingRooms(content: ContentPack, state: GameState): OutingRoom[] {
   const own = content.newGame.room
   return [
-    ...(own ? [{ id: `room-of-${PLAYER_ROOM}`, name: `${state.player.name}'s own room`, locationId: own.locationId ?? content.newGame.locationId, ownerId: PLAYER_ROOM }] : []),
+    ...(own ? [{ id: `room-of-${PLAYER_ROOM}`, name: `${state.player.name}'s room`, locationId: own.locationId ?? content.newGame.locationId, ownerId: PLAYER_ROOM }] : []),
     ...content.loveInterests
       .filter((li) => li.room && hasMet(state, li.id))
-      .map((li) => ({ id: `room-of-${li.id}`, name: `${li.name.split(' ')[0]}'s own room`, locationId: li.room!.locationId, ownerId: li.id }))
+      .map((li) => ({ id: `room-of-${li.id}`, name: `${li.name.split(' ')[0]}'s room`, locationId: li.room!.locationId, ownerId: li.id }))
   ]
 }
 
@@ -381,6 +381,8 @@ export function startOuting(
           messages: [],
           gifts: [], conceived: [], departed: [], npc: false,
           roomOf: outing.roomOf,
+          // Asked along, she is out with him; run into, she is not.
+          ...(outing.withIds.length > 0 && { outing: true }),
           baseline: sceneBaseline(state, leadId, companionIds)
         }
       : null
@@ -394,7 +396,7 @@ export function describeOuting(content: ContentPack, outing: Outing): string {
   const named = outing.withIds.length > 0 && outing.title.toLowerCase().includes(`with ${firstNames(content, outing.withIds).toLowerCase()}`)
   const company = named ? '' : outing.withIds.length > 0 ? ` with ${firstNames(content, outing.withIds)}` : ', alone'
   // In someone's room, the room is where it is.
-  const where = outing.roomOf === PLAYER_ROOM ? 'in your own room' : outing.roomOf && !outing.studyCourseId ? `in ${firstNames(content, [outing.roomOf])}'s room` : `at ${place?.name ?? outing.locationId}`
+  const where = outing.roomOf === PLAYER_ROOM ? 'in your room' : outing.roomOf && !outing.studyCourseId ? `in ${firstNames(content, [outing.roomOf])}'s room` : `at ${place?.name ?? outing.locationId}`
   return `${outing.title}${company} ${where}, ${outing.hours} hour${outing.hours === 1 ? '' : 's'}`
 }
 

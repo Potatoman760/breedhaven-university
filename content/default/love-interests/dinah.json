@@ -4,7 +4,7 @@
   "role": "",
   "age": 25,
   "pronouns": "she/her",
-  "bio": "Graduate student in Bloom Theology, a postulant of the Order of the First Furrow, and the counsellor frightened first-years get sent to.",
+  "bio": "Graduate student in Bloomology, a postulant of the Order of the First Furrow, and the counselor frightened first-years get sent to.",
   "appearance": "A beautiful 25-year-old elven woman. She has a striking, angular face with pale white skin, high cheekbones, a narrow jaw, arched dark brows, and large almond-shaped green eyes emphasized by heavy black liner. Her full lips are softly parted, with a small nose and subtly pointed ears. Her extremely long chestnut-brown hair falls past her waist in thick, flowing waves, swept back from the forehead with abundant volume.",
   "personality": "Torn between duty and personal desire, with a compassionate heart. Already wise in the ways of the world. Calm, observant, and experienced rather than naive or cold.",
   "traitIds": [
@@ -183,7 +183,7 @@
   "stageHeight": 100,
   "partyRole": "healer",
   "studies": {
-    "major": "THE",
+    "major": "BLM",
     "level": 5
   },
   "animations": [

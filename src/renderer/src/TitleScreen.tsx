@@ -16,8 +16,8 @@ const MUSIC_OFF = 'breedhaven.menuMusicOff'
 interface Props {
   content: ContentPack
   onStart: (data: SaveData) => void
-  /** Open the content editor. */
-  onEdit: () => void
+  /** Open the content editor: only when the game is run from its source. */
+  onEdit?: () => void
 }
 
 export function TitleScreen({ content, onStart, onEdit }: Props) {
@@ -101,9 +101,11 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
           <button className="secondary" onClick={() => setPanel('settings')}>
             Settings
           </button>
-          <button className="quiet" onClick={onEdit}>
-            Edit game content
-          </button>
+          {import.meta.env.DEV && onEdit && (
+            <button className="quiet" onClick={onEdit}>
+              Edit game content
+            </button>
+          )}
         </div>
         {notice && <p className="notice">{notice}</p>}
         <p className="title-version">v{__APP_VERSION__}</p>
@@ -170,14 +172,12 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
             </div>
             {noCatalogue && (
               <p className="notice">
-                There is no course catalogue yet. Build one under Edit game content, Courses, and save it: a new game starts from it.
+                The game's course catalogue is missing, so a new game cannot start.
               </p>
             )}
-            {staleCatalogue && (
-              <p className="hint">
-                The course catalogue was built before the characters last changed. The game will start with it as it is; build it again under Edit game
-                content, Courses, to bring it up to date.
-              </p>
+            {/* A warning for whoever is writing the game: a built one ships a catalogue its tests have checked. */}
+            {import.meta.env.DEV && staleCatalogue && (
+              <p className="hint">The course catalogue was built before the characters last changed. Rebuild it with scripts/build-catalogue.ts.</p>
             )}
             {hasAutosave && (
               <p className="hint">

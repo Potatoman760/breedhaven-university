@@ -4,7 +4,7 @@
   "role": "",
   "age": 34,
   "pronouns": "she/her",
-  "bio": "Professor of Witchcraft at Breedhaven University, teaching applied hexes, sympathetic magic and circle-work. Rumour says she once out-hexed a senior member of the Arcane Board over a parking dispute.",
+  "bio": "Professor of Witchcraft at Breedhaven University, teaching applied hexes, sympathetic magic and circle-work. Rumor says she once out-hexed a senior member of the Arcane Board over a parking dispute.",
   "appearance": "A striking Black woman in her mid-thirties with rich dark skin and a sharp, elegant face with high cheekbones. Her eyes are deep brown, large and heavy-lidded, and her full lips are painted a dark plum. Her black hair falls in long, loose waves past her shoulders, thick and glossy. She is tall, with a full bust, a narrow waist and long legs.",
   "personality": "Sassy, teasing and entirely comfortable in her own skin, she meets the world with a raised eyebrow and a ready quip. She is confident to the point of arrogance and enjoys keeping people off-balance. Underneath the performance she is generous with her time and fiercely protective of her students.",
   "traitIds": [
@@ -192,7 +192,7 @@
     "subjects": [
       {
         "major": "WTC",
-        "level": 2
+        "number": "101"
       }
     ]
   },
@@ -243,6 +243,48 @@
       "description": "",
       "image": "sprites/vespera/nsfw-facial.webp",
       "clip": "sprites/vespera/nsfw-facial.mp4",
+      "loop": true
+    },
+    {
+      "id": "pregnant-blowjob",
+      "name": "Blowjob, pregnant",
+      "description": "",
+      "image": "sprites/vespera/nsfw-pregnant-blowjob.webp",
+      "loop": true
+    },
+    {
+      "id": "pregnant-missionary",
+      "name": "Missionary, pregnant",
+      "description": "",
+      "image": "sprites/vespera/nsfw-pregnant-missionary.webp",
+      "loop": true
+    },
+    {
+      "id": "pregnant-doggy",
+      "name": "Doggy, pregnant",
+      "description": "",
+      "image": "sprites/vespera/nsfw-pregnant-doggy.webp",
+      "loop": true
+    },
+    {
+      "id": "pregnant-cowgirl",
+      "name": "Cowgirl, pregnant",
+      "description": "",
+      "image": "sprites/vespera/nsfw-pregnant-cowgirl.webp",
+      "loop": true
+    },
+    {
+      "id": "pregnant-creampie",
+      "name": "Creampie, pregnant",
+      "description": "",
+      "image": "sprites/vespera/nsfw-pregnant-creampie.webp",
+      "loop": true
+    },
+    {
+      "id": "pregnant-facial",
+      "name": "Facial, pregnant",
+      "description": "",
+      "image": "sprites/vespera/nsfw-pregnant-facial.webp",
       "loop": true
     }
   ],
@@ -300,8 +342,8 @@
     "locationId": "lecture-halls",
     "background": "generated/backgrounds/vespera/view.webp"
   },
-  "birthPicture": "sprites/vespera/birth.png",
-  "walkSprite": "sprites/vespera/walk-cutout.png",
+  "birthPicture": "sprites/vespera/birth.webp",
+  "walkSprite": "sprites/vespera/walk-cutout.webp",
   "childNames": {
     "daughters": [
       "Nocturne",
@@ -325,7 +367,7 @@
       "Drawls the last word of a sentence when amused"
     ],
     "exampleDialogue": [],
-    "backstory": "Vespera grew up in the old canal quarter of Seedblossom, the daughter of a wardsmith and a market herbalist who ran their shop out of the front room and their arguments out of the back. She learned practical magic before she learned theory, fixing wards and grinding potions for customers who paid in eggs and favours as often as coin.\n\nShe won a place at Breedhaven University on the strength of a hex she cast in the entrance practical that the examiners are still arguing about, took her degree in Bloom Studies, and stayed to teach. Her specialism is sympathetic magic: the craft of linking one thing to another across distance, the old witch-work that the modern faculty treats as folklore and she treats as a living science.\n\nShe lives alone in a flat above a candle shop on Lantern Row, keeps odd hours, and is rumoured to have a familiar, though nobody can agree on whether it is a cat, a raven or something less identifiable. She takes dampers but treats the Bloom's pull with amused respect rather than reverence or resentment, and has no patience for anyone who tells her what she ought to feel about it.\n\nHer students adore her and her colleagues find her exhausting. She has been warned twice about the neckline of her blouses and has adjusted nothing.",
+    "backstory": "Vespera grew up in the old canal quarter of Seedblossom, the daughter of a wardsmith and a market herbalist who ran their shop out of the front room and their arguments out of the back. She learned practical magic before she learned theory, fixing wards and grinding potions for customers who paid in eggs and favors as often as coin.\n\nShe won a place at Breedhaven University on the strength of a hex she cast in the entrance practical that the examiners are still arguing about, took her degree in Bloom Studies, and stayed to teach. Her specialism is sympathetic magic: the craft of linking one thing to another across distance, the old witch-work that the modern faculty treats as folklore and she treats as a living science.\n\nShe lives alone in an apartment above a candle shop on Lantern Row, keeps odd hours, and is rumoured to have a familiar, though nobody can agree on whether it is a cat, a raven or something less identifiable. She takes dampers but treats the Bloom's pull with amused respect rather than reverence or resentment, and has no patience for anyone who tells her what she ought to feel about it.\n\nHer students adore her and her colleagues find her exhausting. She has been warned twice about the neckline of her blouses and has adjusted nothing.",
     "knowledge": [],
     "secrets": [
       {

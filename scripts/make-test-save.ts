@@ -27,6 +27,7 @@ import {
   revealFacts,
   skillsOf,
   tellSkills,
+  toldOf,
   timeOn,
   withHousing
 } from '../src/shared/game'
@@ -68,7 +69,7 @@ state = {
   coursePoints: Object.fromEntries(enrolment.map((id) => [id, 46])),
   attendance: Object.fromEntries(enrolment.map((id) => [id, { sat: Array.from({ length: 14 }, (_, index) => `${index}:0`) }]))
 }
-state = tellSkills(state, skillsOf(content, state).map((skill) => skill.id))
+state = tellSkills(state, skillsOf(content, state).flatMap(toldOf))
 
 // The women he knows, and how far each has come.
 const women: { id: string; affection: number; trust: number; desire: number; intimate?: number; memories: [string, 'core' | 'normal'][] }[] = [

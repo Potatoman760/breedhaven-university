@@ -33,7 +33,7 @@ describe('the feed', () => {
     expect(handleOf({ ...ana, name: 'Ana Maria Vey' })).toBe('@ana_maria_vey')
     expect(handleOf({ ...ana, handle: '@ana.reads' })).toBe('@ana.reads')
     expect(describeStudies({ ...ana, studies: { subject: 'Law', code: 'LAW', level: 2, stats: ['charisma'], practical: false }, teaching: undefined })).toBe(
-      'Second-year · Law'
+      'Sophomore · Law'
     )
   })
 

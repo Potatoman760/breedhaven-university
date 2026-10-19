@@ -4,7 +4,7 @@
   "role": "",
   "age": 132,
   "pronouns": "she/her",
-  "bio": "An elven professor of Magical Ethics, a hundred and thirty-two years old, who has been setting first-years the same essay question for six decades and has never yet said what she thinks the answer is.",
+  "bio": "An elven professor of Women's Studies, a hundred and thirty-two years old, who has been setting first-years the same essay question for six decades and has never yet said what she thinks the answer is.",
   "appearance": "A beautiful elven woman who looks about thirty-five, with luminous fair skin, a delicate oval face with high cheekbones, large dark blue eyes under soft arched brows, long lashes, and full, softly smiling lips. Long, elegantly pointed ears. Very long, silky silver-blonde hair worn in a loose braid over one shoulder, with strands left free around her face. Tall and graceful, with a slender, curvy figure: a full bust, rounded hips and long legs.",
   "personality": "Warm, wry and unhurried, with the patience of someone who has seen fashions in certainty come and go. Teaches by asking questions and enjoys being argued with. Flirts the way she lectures: lightly, attentively, and never by accident. Sadder than she lets on.",
   "traitIds": [
@@ -32,7 +32,7 @@
     {
       "id": "default",
       "name": "Usual clothes",
-      "description": "a long, close-fitting deep green dress with long sleeves with no belt or accessories, a low off-the-shoulder neckline and a skirt slit to the thigh on one side; a soft grey shawl draped over her elbows; a silver leaf pendant necklace;  and a pair of reading glasses pushed up into her hair",
+      "description": "a long, close-fitting deep green dress with long sleeves with no belt or accessories, a low off-the-shoulder neckline and a skirt slit to the thigh on one side; a soft gray shawl draped over her elbows; a silver leaf pendant necklace;  and a pair of reading glasses pushed up into her hair",
       "sprites": {
         "neutral": {
           "image": "sprites/caelwen/default-neutral-7-cutout.webp",
@@ -187,12 +187,12 @@
     "title": "Professor",
     "subjects": [
       {
-        "major": "ETH",
-        "level": 1
+        "major": "WOM",
+        "number": "101"
       },
       {
-        "major": "ETH",
-        "level": 4
+        "major": "WOM",
+        "number": "193"
       }
     ]
   },
@@ -365,7 +365,7 @@
       "Loses her reading glasses in her own hair."
     ],
     "exampleDialogue": [],
-    "backstory": "Post: Professor of Magical Ethics, College of Arts and Humanities; sits on the University's ethics board\n\nCaelwen Ashgrove has taught at Breedhaven University for sixty-one years. Every first-year writes her essay: does a will the Bloom leans on still count as free? She has marked some forty thousand answers and maintains that the question is the point. Bloomists and Freewill advocates both quote her and both are annoyed by her.\n\nElves live long and the Bloom stays with them long. She has been part of three households, borne four daughters, and outlived two partners and one Sire; her youngest daughter is seventy and looks older than she does. The big house by the park was full for a century and has been quiet for fifteen years. She does not talk about that in lectures.\n\nHer magic is old, small and very well kept: wards that have held for a hundred years, a memory she can walk through like a library, plants that do as they are asked.",
+    "backstory": "Post: Professor of Women's Studies, College of Arts and Humanities; sits on the University's ethics board\n\nCaelwen Ashgrove has taught at Breedhaven University for sixty-one years. Every first-year writes her essay: does a will the Bloom leans on still count as free? She has marked some forty thousand answers and maintains that the question is the point. Bloomists and Freewill advocates both quote her and both are annoyed by her.\n\nElves live long and the Bloom stays with them long. She has been part of three households, borne four daughters, and outlived two partners and one Sire; her youngest daughter is seventy and looks older than she does. The big house by the park was full for a century and has been quiet for fifteen years. She does not talk about that in lectures.\n\nHer magic is old, small and very well kept: wards that have held for a hundred years, a memory she can walk through like a library, plants that do as they are asked.",
     "knowledge": [],
     "secrets": [
       {

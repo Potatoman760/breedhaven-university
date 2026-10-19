@@ -1,4 +1,4 @@
-import type { ContentPack, Course, GameState, Skill, SkillGrant } from '../model'
+import type { ContentPack, Course, GameState, LearntSkill, Skill, SkillGrant } from '../model'
 import { factsOf, revealedIds } from './facts'
 import { coursePoints } from './grades'
 import { applyEffects } from './conditions'
@@ -13,28 +13,43 @@ import type { PerformCheck } from './activities'
 
 type Learner = Pick<GameState, 'courses' | 'enrolment' | 'coursePoints'>
 
-/** The courses he takes that teach a skill. */
-/** Whether a course is one that teaches a skill: of its subject, and at its year where the skill names one. */
-const teaches = (skill: Pick<Skill, 'code' | 'level'>, course: Pick<Course, 'code' | 'level'>) => course.code === skill.code && (skill.level === undefined || skill.level === course.level)
+/** Whether a course is the one that teaches a skill. */
+const teaches = (skill: Pick<Skill, 'courseId'>, course: Pick<Course, 'id'>) => course.id === skill.courseId
 
-function coursesFor(state: Learner, skill: Pick<Skill, 'code' | 'level'>): Course[] {
+/** The courses he takes that teach a skill. */
+function coursesFor(state: Learner, skill: Pick<Skill, 'courseId'>): Course[] {
   return state.courses.filter((course) => teaches(skill, course) && state.enrolment?.includes(course.id))
 }
 
 /** The skill a course teaches, if it teaches one. */
-export function skillFor(content: Pick<ContentPack, 'skills'>, course: Pick<Course, 'code' | 'level'>): Skill | undefined {
+export function skillFor(content: Pick<ContentPack, 'skills'>, course: Pick<Course, 'id'>): Skill | undefined {
   return content.skills.find((skill) => teaches(skill, course))
 }
 
-/** How far he is toward a skill: the most marks he has in a course that teaches it, and what it takes. */
-export function skillProgress(state: Learner, skill: Skill): { marks: number; at: number; has: boolean } {
+/**
+ * How far he is toward a skill: the most marks he has in a course that teaches it, what the next level takes, and the
+ * level he has (0 for none). At the second there is nothing further: `at` is then the second's.
+ */
+export function skillProgress(state: Learner, skill: Skill): { marks: number; at: number; has: boolean; level: 0 | 1 | 2 } {
   const marks = Math.max(0, ...coursesFor(state, skill).map((course) => coursePoints(state as GameState, course.id)))
-  return { marks, at: skill.at, has: coursesFor(state, skill).length > 0 && marks >= skill.at }
+  const taking = coursesFor(state, skill).length > 0
+  const level = !taking || marks < skill.at ? 0 : skill.upgrade && marks >= skill.upgrade.at ? 2 : 1
+  return { marks, at: level === 0 || !skill.upgrade ? skill.at : skill.upgrade.at, has: level > 0, level }
 }
 
-/** The skills he has. */
-export function skillsOf(content: Pick<ContentPack, 'skills'>, state: Learner): Skill[] {
+/** The skills he has, each as he has it. */
+export function skillsOf(content: Pick<ContentPack, 'skills'>, state: Learner): LearntSkill[] {
   return skillsLearnt(content, state)
+}
+
+/** The level he has a sight at: 0 without it. */
+export function skillLevel(content: Pick<ContentPack, 'skills'>, state: Learner, grant: SkillGrant): 0 | 1 | 2 {
+  return skillsOf(content, state).reduce<0 | 1 | 2>((most, skill) => (skill.grants === grant && skill.level > most ? skill.level : most), 0)
+}
+
+/** What he is told of for a skill as he has it: its first level, and its second once he has that. */
+export function toldOf(skill: LearntSkill): string[] {
+  return skill.level === 2 ? [skill.id, `${skill.id}@2`] : [skill.id]
 }
 
 /** How many hours it is until he can do again something he has done: none when it is ready. */
@@ -47,7 +62,7 @@ export function readyIn(content: Pick<ContentPack, 'calendar'>, state: Pick<Game
 /** Whether he can make or set off what a skill lets him: he has it, it is ready, and where it is done on a woman, he is with one. */
 export function canUseAbility(content: ContentPack, state: GameState, skillId: string, loveInterestId?: string): PerformCheck {
   const skill = skillsOf(content, state).find((one) => one.id === skillId)
-  if (!skill?.ability) return { ok: false, reasons: ['You have not learnt that'] }
+  if (!skill?.ability) return { ok: false, reasons: ['You have not learned that'] }
   const wait = readyIn(content, state, skill)
   if (wait > 0) return { ok: false, reasons: [`Ready in ${wait >= content.calendar.hoursPerDay ? `${Math.ceil(wait / content.calendar.hoursPerDay)} days` : `${wait} hours`}`] }
   if (skill.ability.on === 'her' && loveInterestId === undefined) return { ok: false, reasons: ['It is for someone you are with'] }
@@ -62,19 +77,19 @@ export function useAbility(content: ContentPack, state: GameState, skillId: stri
   return { ...done, abilityUsed: { ...done.abilityUsed, [skill.id]: state.time } }
 }
 
-/** Whether he can do a thing: he has some skill that grants it. */
+/** Whether he can do a thing: he has some skill that grants it, or one whose second level does as well. */
 export function hasSkill(content: Pick<ContentPack, 'skills'>, state: Learner, grant: SkillGrant): boolean {
-  return skillsOf(content, state).some((skill) => skill.grants === grant)
+  return skillsOf(content, state).some((skill) => skill.grants === grant || (skill.level === 2 && skill.upgrade?.alsoGrants === grant))
 }
 
 /** The skill that would let him do a thing, for telling him where it is learnt. */
 export function skillGranting(content: Pick<ContentPack, 'skills'>, grant: SkillGrant): Skill | undefined {
-  return content.skills.find((skill) => skill.grants === grant)
+  return content.skills.find((skill) => skill.grants === grant) ?? content.skills.find((skill) => skill.upgrade?.alsoGrants === grant)
 }
 
-/** The skills he has and has not yet been told of. */
-export function newSkills(content: Pick<ContentPack, 'skills'>, state: Learner & Pick<GameState, 'skillsTold'>): Skill[] {
-  return skillsOf(content, state).filter((skill) => !state.skillsTold.includes(skill.id))
+/** The skills he has and has not yet been told of as he has them: new ones, and ones that have reached their second level. */
+export function newSkills(content: Pick<ContentPack, 'skills'>, state: Learner & Pick<GameState, 'skillsTold'>): LearntSkill[] {
+  return skillsOf(content, state).filter((skill) => toldOf(skill).some((key) => !state.skillsTold.includes(key)))
 }
 
 /** Records that he has been told of these. */

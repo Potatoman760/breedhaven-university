@@ -33,7 +33,7 @@ describe('what there is to know about a love interest', () => {
       ['dislike:cards', 'dislikes', 'cards'],
       ['trait:shy', 'traits', 'Shy'],
       ['admires:wisdom', 'admires', 'wisdom'],
-      ['studies', 'life', 'Reads Riddles, year 2'],
+      ['studies', 'life', 'Riddles major, sophomore'],
       ['age', 'life', '25 years old'],
       ['room', 'life', 'Lives in a loft over the shop, at the Shop'],
       ['secret:0', 'secrets', 'Is secretly a dragon.']

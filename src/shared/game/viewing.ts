@@ -1,4 +1,4 @@
-import type { Appointment, ContentPack, GameState, Scene } from '../model'
+import type { Appointment, ContentPack, GameState, Intro, Scene } from '../model'
 import { describeWhen, keepAppointment } from './appointments'
 import { slotOn } from './births'
 import { isGameOver, toDate } from './calendar'
@@ -55,7 +55,7 @@ export function scheduleViewing(content: ContentPack, state: GameState): GameSta
  * He is there for it. He meets the officer where she said, and the scene is the two of them at the house itself: she
  * has walked him through it and hands him over to the nanny, who lives there. The house is his from this hour.
  */
-export function attendViewing(content: ContentPack, state: GameState, appointmentId: string): { state: GameState; scene: Scene } {
+export function attendViewing(content: ContentPack, state: GameState, appointmentId: string): { state: GameState; scene: Scene; cutscene: Intro | undefined } {
   const config = content.housing
   if (!config) throw new Error('There is no house to be shown.')
   const { state: kept } = keepAppointment(content, state, appointmentId)
@@ -65,6 +65,7 @@ export function attendViewing(content: ContentPack, state: GameState, appointmen
   const moved = { ...moveIn(content, kept), locationId: config.locationId, inOwnRoom: false }
   return {
     state: moved,
+    cutscene: config.viewing?.cutscene,
     scene: {
       loveInterestId: config.nannyId,
       companionIds: [],
@@ -78,8 +79,8 @@ export function attendViewing(content: ContentPack, state: GameState, appointmen
           description: `${officer} has walked you through ${config.name} room by room, keys in hand, and brings you back to the hearth room, where the nanny is waiting to meet you.`,
           direction:
             `This is the hour ${player} is given ${config.name}. ${officer}, the housing officer of the Sire Relations Office, has just shown him round it: which rooms are furnished, which stand bare for him to build, ` +
-            `where the wards are, and the terms of the rent. She now introduces you, the nanny who lives in the house, and hands him the keys. You are meeting ${player} for the first time, in what is now his home and yours. ` +
-            `${officer} is here and speaks for herself, exact and brief, and leaves once the introduction is made and his questions are answered. Stay in the house: do not move the scene anywhere.`
+            `where the wards are, and the terms of the rent. She has introduced you, the nanny who lives in the house, and you have told him how the children are looked after here and what makes a child thrive. You are meeting ${player} for the first time, in what is now his home and yours. ` +
+            `${officer} is here and speaks for herself, exact and brief, and leaves once his questions are answered. Stay in the house: do not move the scene anywhere.`
         }
       ],
       messages: [],

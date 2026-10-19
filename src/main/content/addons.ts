@@ -402,16 +402,15 @@ export function saveCatalogue(addonDir: string, raw: unknown): string[] {
 }
 
 /**
- * A character as her file has her: what she reads or teaches by the subject's name in the curriculum, and nothing
+ * A character as her file has her: what she studies or teaches by the subject's name in the curriculum, and nothing
  * of what that subject is. A pack with no curriculum keeps what was written.
  */
 function asWritten(content: ContentPack, li: LoveInterest): unknown {
   if (!content.curriculum) return li
-  const named = (subject: { code: string; level: number }) => ({ major: subject.code, level: subject.level })
   return {
     ...li,
-    ...(li.studies && { studies: named(li.studies) }),
-    ...(li.teaching && { teaching: { ...li.teaching, subjects: li.teaching.subjects.map(named) } })
+    ...(li.studies && { studies: { major: li.studies.code, level: li.studies.level } }),
+    ...(li.teaching && { teaching: { ...li.teaching, subjects: li.teaching.subjects.map((subject) => ({ major: subject.code, number: subject.number })) } })
   }
 }
 

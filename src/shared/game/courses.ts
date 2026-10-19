@@ -63,6 +63,12 @@ export function canEnrol(content: ContentPack, state: GameState, selected: strin
   return { ok: reasons.length === 0, reasons }
 }
 
+/** Whether the term can begin with these courses: he takes a full load, no fewer. */
+export function canBeginTerm(content: ContentPack, selected: string[]): PerformCheck {
+  const load = content.coursework?.maxCourses ?? 0
+  return selected.length === load ? { ok: true, reasons: [] } : { ok: false, reasons: [`Choose ${load} courses`] }
+}
+
 /** The courses the player is taking. */
 export function enrolledCourses(state: GameState): Course[] {
   return state.courses.filter((c) => state.enrolment?.includes(c.id))

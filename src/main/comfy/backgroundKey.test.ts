@@ -433,7 +433,7 @@ describe('refusing rather than wrecking it', () => {
     // Light enough to pass the brightness test, so it is the spread between
     // channels that catches it rather than the brightness.
     const image = grid(['ccc', 'c.c', 'ccc'], { '.': WHITE, c: [255, 245, 228, 255] })
-    expect(refusal(image)).toMatch(/a colour, not white/)
+    expect(refusal(image)).toMatch(/a color, not white/)
   })
 
   /**

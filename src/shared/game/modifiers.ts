@@ -1,4 +1,4 @@
-import { ADDED_KINDS, type Boon, type ContentPack, type GameState, type Modifier, type ModifierKind, type Skill } from '../model'
+import { ADDED_KINDS, type Boon, type ContentPack, type GameState, type Modifier, type ModifierKind, type LearntSkill } from '../model'
 
 /**
  * What changes the game's numbers for him: the courses he has got far enough in and the relics he has brought up
@@ -16,17 +16,27 @@ export interface About {
   loveInterestId?: string
 }
 
-/** The skills he has: those whose course he is taking and has the marks in. Marks do not fall, so what he has learnt he keeps. */
-export function skillsLearnt(content: Pick<ContentPack, 'skills'>, state: Learner): Skill[] {
-  return content.skills.filter((skill) =>
-    state.courses.some(
-      (course) =>
-        course.code === skill.code &&
-        (skill.level === undefined || skill.level === course.level) &&
-        state.enrolment?.includes(course.id) &&
-        (state.coursePoints[course.id] ?? 0) >= skill.at
-    )
-  )
+/**
+ * The skills he has: those whose course he is taking and has the marks in, each as he has it. Far enough on it is at
+ * its second level, and what that changes is in it. Marks do not fall, so what he has learnt he keeps.
+ */
+export function skillsLearnt(content: Pick<ContentPack, 'skills'>, state: Learner): LearntSkill[] {
+  return content.skills.flatMap((skill): LearntSkill[] => {
+    const taking = state.courses.some((course) => course.id === skill.courseId && state.enrolment?.includes(course.id))
+    const marks = state.coursePoints[skill.courseId] ?? 0
+    if (!taking || marks < skill.at) return []
+    const up = skill.upgrade
+    if (!up || marks < up.at) return [{ ...skill, level: 1 }]
+    return [
+      {
+        ...skill,
+        level: 2,
+        description: up.description,
+        passive: up.passive ?? skill.passive,
+        ability: skill.ability && up.cooldownDays ? { ...skill.ability, cooldownDays: up.cooldownDays } : skill.ability
+      }
+    ]
+  })
 }
 
 /** The boons still in force. */
@@ -52,9 +62,16 @@ function applies(content: Pick<ContentPack, 'relationships' | 'loveInterests'>, 
 
 /** Every modifier of a kind in force for what is asked about: from what he has learnt, from the relics he holds, and from boons. */
 export function modifiersOf(content: ContentPack, state: Holder, kind: ModifierKind, about: About = {}): Modifier[] {
-  const learnt = skillsLearnt(content, state).flatMap((skill) => [skill.passive, skill.below].flatMap((one) => (one?.kind === kind ? [one] : [])))
+  const learnt = skillsLearnt(content, state).flatMap((skill) =>
+    [skill.passive, skill.below, skill.level === 2 ? skill.upgrade?.alsoPassive : undefined].flatMap((one) => (one?.kind === kind ? [one] : []))
+  )
   const held = state.expedition?.relics ?? []
-  const relics = (content.expedition?.depths ?? []).flatMap((depth) => (held.includes(depth.relic.id) && depth.relic.modifier.kind === kind ? [depth.relic.modifier] : []))
+  const on = state.expedition?.relicsOn ?? []
+  // A relic is at work only once he has turned it on.
+  const relics = (content.expedition?.depths ?? []).flatMap((depth) => {
+    const { id, modifier } = depth.relic
+    return held.includes(id) && on.includes(id) && modifier?.kind === kind ? [modifier] : []
+  })
   return [...learnt, ...relics, ...liveBoons(state).filter((boon) => boon.kind === kind)].filter((modifier) => applies(content, modifier, about))
 }
 
@@ -75,17 +92,20 @@ export function inForce(content: ContentPack, state: Holder, kind: ModifierKind,
 
 /**
  * What a change in how she feels comes to once everything that bears on it has: a gain in a feeling is multiplied by
- * what he has for that feeling, and in affection again by what a first scene is worth when this is one; a loss of
- * affection or trust by what softens losses. Rounded to a whole point, and never turned from a gain into a loss.
+ * what he has for that feeling, and trust again by what being out with him is worth when she is; a loss of affection
+ * or trust by what softens losses. Rounded to a whole point, and never turned from a gain into a loss.
  */
-export function feltChange(content: ContentPack, state: GameState, loveInterestId: string, meter: 'affection' | 'trust' | 'desire', amount: number): number {
+export function feltChange(content: ContentPack, state: GameState, loveInterestId: string, meter: 'affection' | 'trust' | 'desire', amount: number, out = false): number {
   if (amount === 0) return 0
   const about = { loveInterestId }
-  if (amount > 0) {
-    const first = meter === 'affection' && (state.memories[loveInterestId] ?? []).length === 0 ? factor(content, state, 'firstScene', about) : 1
-    return Math.max(1, Math.round(amount * factor(content, state, meter, about) * first))
-  }
+  if (amount > 0) return Math.max(1, Math.round(amount * factor(content, state, meter, about) * (out && meter === 'trust' ? factor(content, state, 'escort', about) : 1)))
   return meter === 'desire' ? amount : Math.min(0, Math.round(amount * factor(content, state, 'losses', about)))
+}
+
+/** The trust she counts as having with him: what she has, and what he has that adds to it, within the meter. */
+export function trustOf(content: ContentPack, state: GameState, loveInterestId: string): number {
+  const rel = state.relationships[loveInterestId]
+  return rel ? Math.min(content.relationships.meterMax, rel.trust + bonus(content, state, 'trustBonus', { loveInterestId })) : 0
 }
 
 /** Whether an amount is one of the kinds that add: the rest multiply. */

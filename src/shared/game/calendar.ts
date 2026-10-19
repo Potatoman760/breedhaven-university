@@ -92,5 +92,6 @@ export function formatTime(date: GameDate): string {
 }
 
 export function formatDate(date: GameDate): string {
-  return `${date.weekday}, ${date.day} ${date.month.name}, Year ${date.year}`
+  // The year is left out: the game is one stretch of it, and nobody in it needs telling which.
+  return `${date.weekday}, ${date.day} ${date.month.name}`
 }

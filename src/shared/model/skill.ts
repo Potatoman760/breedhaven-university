@@ -6,7 +6,7 @@ import { ModifierSchema } from './modifier'
  * What a sight lets him tell about a woman. The game knows what each of these means; a skill in the content only says
  * which one it is.
  */
-export const SKILL_GRANTS = ['cycle', 'contraception', 'desire', 'comfort', 'tastes', 'schedule'] as const
+export const SKILL_GRANTS = ['cycle', 'contraception', 'comfort', 'tastes', 'odds'] as const
 export type SkillGrant = (typeof SKILL_GRANTS)[number]
 
 /**
@@ -28,6 +28,22 @@ export type Ability = z.infer<typeof AbilitySchema>
  * Something he learns by getting far enough in a course. It is one of three things: a sight (`grants`), something
  * that changes one of the game's numbers for good (`passive`), or something he can make or set off (`ability`).
  */
+/**
+ * What a skill becomes once he is further into its course: its second level. It says what it does now, and changes
+ * what it must: a stronger modifier, an ability ready sooner, or a second sight beside its own.
+ */
+export const SkillUpgradeSchema = z.object({
+  /** The marks it takes. */
+  at: z.number().min(0).default(70),
+  description: z.string(),
+  passive: ModifierSchema.optional(),
+  cooldownDays: z.number().int().min(1).optional(),
+  alsoGrants: z.enum(SKILL_GRANTS).optional(),
+  /** A second modifier, beside the first: something more it does, not the same done better. */
+  alsoPassive: ModifierSchema.optional()
+})
+export type SkillUpgrade = z.infer<typeof SkillUpgradeSchema>
+
 export const SkillSchema = z
   .object({
     id: z.string(),
@@ -36,15 +52,19 @@ export const SkillSchema = z
     description: z.string(),
     /** The subject that teaches it, by its catalogue code. */
     code: z.string(),
-    /** The year of the course that teaches it, where the subject has more than one. Left out, any course of the subject does. */
-    level: z.number().int().min(1).max(5).optional(),
+    /** The course that teaches it, by id. */
+    courseId: z.string(),
     /** The marks he must have in such a course to have it. */
     at: z.number().min(0).default(30),
     grants: z.enum(SKILL_GRANTS).optional(),
     passive: ModifierSchema.optional(),
     ability: AbilitySchema.optional(),
     /** What it is worth to him in the Undercroft, beside what it is above: some courses have a use down there too. */
-    below: ModifierSchema.optional()
+    below: ModifierSchema.optional(),
+    upgrade: SkillUpgradeSchema.optional()
   })
   .refine((skill) => [skill.grants, skill.passive, skill.ability].filter((one) => one !== undefined).length === 1, 'A skill is a sight, a passive or an ability: one of them, and only one.')
 export type Skill = z.infer<typeof SkillSchema>
+
+/** A skill as he has it: at its first level, or at its second with what that changes. */
+export type LearntSkill = Skill & { level: 1 | 2 }

@@ -5,14 +5,14 @@
   "role": "head trainer at Ironroot Fitness",
   "age": 31,
   "pronouns": "she/her",
-  "bio": "Kessa runs the floor at Ironroot: programmes, form checks, and the window onto Aether next door.",
+  "bio": "Kessa runs the floor at Ironroot: programs, form checks, and the window onto Aether next door.",
   "appearance": "A powerfully built, attractive woman of 31 with tanned skin, bright hazel eyes, a square jaw and a wide smile. Sandy-blonde hair in a high ponytail. Broad shoulders, defined abdominal muscles, a full bust and strong thighs.",
   "personality": "Upbeat, demanding and honest. Thinks anyone can be strong and will prove it to them.",
   "outfits": [
     {
       "id": "default",
       "name": "Work clothes",
-      "description": "a fitted black sports crop top with the gym logo, grey leggings, a whistle on a cord and wrist wraps",
+      "description": "a fitted black sports crop top with the gym logo, gray leggings, a whistle on a cord and wrist wraps",
       "sprites": {
         "neutral": {
           "image": "sprites/kessa/default-neutral-cutout.webp",

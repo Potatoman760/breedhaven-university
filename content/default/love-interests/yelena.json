@@ -177,6 +177,33 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "lingerie",
+      "name": "Black silk lingerie",
+      "description": "a black silk balconette bra with a front clasp, matching silk panties and sheer black stockings",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yelena/lingerie-neutral-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true
+    },
+    {
+      "id": "lingerie-pregnant",
+      "name": "Black silk lingerie, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "lingerie",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yelena/lingerie-pregnant-neutral-cutout.png",
+          "description": ""
+        }
+      },
+      "pregnant": true,
+      "oneOff": true
     }
   ],
   "defaultOutfitId": "default",

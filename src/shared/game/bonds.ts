@@ -1,6 +1,7 @@
 import type { Bond, BondProposal, ContentPack, GameState, RelationshipStage, RelationshipStatus, TieLevel } from '../model'
 import type { PerformCheck } from './activities'
 import { stageFor, stageRank } from './relationships'
+import { factor } from './modifiers'
 import { firstNames } from './scene'
 
 // What sharing a scene does for how two love interests feel about each other.
@@ -28,8 +29,9 @@ export function changeTie(content: ContentPack, state: GameState, a: string, b: 
   return { ...state, ties: { ...state.ties, [tieKey(a, b)]: value } }
 }
 
-/** Everyone who shared a scene grows a little closer to each other, pair by pair. */
+/** Everyone who shared a scene grows a little closer to each other, pair by pair: more so where he understands the pull between them. */
 export function growTies(content: ContentPack, state: GameState, cast: string[], amount = SCENE_TIE_GAIN): GameState {
+  if (amount > 0) amount = Math.round(amount * factor(content, state, 'bonds'))
   let after = state
   for (let i = 0; i < cast.length; i++) {
     for (let j = i + 1; j < cast.length; j++) after = changeTie(content, after, cast[i], cast[j], amount)

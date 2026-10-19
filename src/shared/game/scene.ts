@@ -234,8 +234,11 @@ export function applyLook(scene: Scene, look: SceneLook): Scene {
 }
 
 /** Keeps what each love interest last said of how comfortable she is, for the next prompt. */
-export function applyComfort(scene: Scene, comfort: Record<string, Comfort>): Scene {
-  return Object.keys(comfort).length === 0 ? scene : { ...scene, comfort: { ...(scene.comfort ?? {}), ...comfort } }
+export function applyComfort(scene: Scene, comfort: Record<string, Comfort>, floor = 1): Scene {
+  if (Object.keys(comfort).length === 0) return scene
+  // Below what he can keep her at, she is at it.
+  const held = Object.fromEntries(Object.entries(comfort).map(([id, said]) => [id, { ...said, level: Math.max(floor, said.level) }]))
+  return { ...scene, comfort: { ...(scene.comfort ?? {}), ...held } }
 }
 
 /** Applies the looks chosen for the others in a scene, each kept beside the lead's. */

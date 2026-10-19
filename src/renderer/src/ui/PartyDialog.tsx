@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { canGoBelow, depthsOpen, describeChange, outingMisses, partyChoices, pregnancyPower, relicsHeld, spriteFor, wornOutfit } from '../../../shared/game'
+import { canGoBelow, depthsOpen, outingMisses, partyChoices, pregnancyPower, relicsHeld, spriteFor, wornOutfit } from '../../../shared/game'
 import { Portrait } from './Portrait'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { Button } from './Button'
@@ -37,7 +37,7 @@ export function PartyDialog({ content, state, onGo, onClose }: Props) {
         facts={[
           { label: 'Takes', value: `${config.hours} hours` },
           { label: 'Anchors set', value: `${state.expedition.cleared} of ${config.depths.length}` },
-          { label: 'Relics', value: relics.length, title: relics.map((relic) => `${relic.name}: ${describeChange(relic.modifier)}`).join('\n') || undefined },
+          { label: 'Relics', value: relics.length, title: relics.map((relic) => `${relic.name}: ${relic.description}`).join('\n') || undefined },
           { label: 'Party', value: `${party.length} of ${config.partySize}` }
         ]}
       />

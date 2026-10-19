@@ -42,7 +42,7 @@
       "practical": false,
       "courses": [
         {
-          "level": 1,
+          "number": "101",
           "title": "Government and the Breedhaven State",
           "description": "Introduction to the constitutional structure of Breedhaven: the Crown, the elected Assembly, the courts, and the conventions that have shaped government since the founding of House Dawnbloom. Covers the role of the heir's education and the relationship between custom and statute.",
           "topics": [
@@ -133,11 +133,19 @@
             "passive": {
               "kind": "build",
               "amount": 0.85
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You know every grant a Sire can claim: rooms and upgrades cost 30% less.",
+              "passive": {
+                "kind": "build",
+                "amount": 0.7
+              }
             }
           }
         },
         {
-          "level": 5,
+          "number": "153",
           "title": "Seminar in Governance and Reform",
           "description": "Graduate seminar on contemporary challenges in Breedhaven public administration, including the management of the Sire Registry, cross-border policy in the Sown Expanse, and the capacity constraints of governing a state where seven in eight citizens are women.",
           "topics": [
@@ -223,11 +231,19 @@
           "skill": {
             "id": "knowing-the-scheme",
             "name": "Knowing the scheme",
-            "description": "You have read the housing scheme you live under: your rent is a quarter lower.",
+            "description": "You know the housing scheme you live under: rent costs 25% less.",
             "at": 30,
             "passive": {
               "kind": "rent",
               "amount": 0.75
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You know the housing scheme inside out: rent costs 40% less.",
+              "passive": {
+                "kind": "rent",
+                "amount": 0.6
+              }
             }
           }
         }
@@ -245,7 +261,7 @@
       "practical": false,
       "courses": [
         {
-          "level": 1,
+          "number": "101",
           "title": "Foundations of Breedhaven Law",
           "description": "Survey of the Breedhaven legal system: constitutional structure under House Dawnbloom, the Assembly, courts, and the hierarchy of statute and custom. Introduces legal reasoning, case analysis, and the basics of civil and criminal procedure.",
           "topics": [
@@ -331,19 +347,130 @@
           "skill": {
             "id": "claiming-what-is-due",
             "name": "Claiming what is due",
-            "description": "You claim every allowance a father is owed: a child costs a quarter less to keep.",
+            "description": "You claim every allowance a father is owed: a child's keep costs 25% less.",
             "at": 30,
             "passive": {
               "kind": "keep",
               "amount": 0.75
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You claim every allowance there is: a child's keep costs 50% less.",
+              "passive": {
+                "kind": "keep",
+                "amount": 0.5
+              }
+            }
+          }
+        },
+        {
+          "number": "128",
+          "title": "Household and Lineage Law",
+          "description": "The law of the Breedhaven household: how a household is formed and registered, the contracts a Sire makes with the women he fathers children with, and the rules of parentage, support, dissolution and inheritance. Students draft household deeds and Sire agreements and argue disputes before a mock Court of Lineage. Prerequisite: LAW 101.",
+          "topics": [
+            {
+              "title": "The Legal Household",
+              "content": "The Household Act recognizes any group of two or more adults who share a home and register a deed with the county clerk. A deed must name every adult member, the household's seat, and one member as steward, who signs for the household in law and receives its post from the courts. Members need not be related or partnered. A household without a deed is a mere tenancy in common: its members share nothing but the lease, and a child born into it has no household standing until a deed is filed.",
+              "question": {
+                "ask": "Which member of a registered household signs for it in law?",
+                "answer": "The steward",
+                "wrong": [
+                  "The eldest member",
+                  "The leaseholder",
+                  "The county clerk"
+                ]
+              }
+            },
+            {
+              "title": "Sire Contracts and Registration Agreements",
+              "content": "A Sire on the Registry may sign a registration agreement with a woman or a household, filed with the Registry within thirty days. It sets how many children are sought, who bears the costs of pregnancy and whether the Sire joins the household or remains a visiting father. Under the rule in Thorne v Ashgrove, a clause binding a Sire to father children with no one else is void as a restraint on the Bloom. Either side may end the agreement on ninety days' notice, but no notice ends a duty to a child already conceived.",
+              "question": {
+                "ask": "Within how many days must a registration agreement be filed with the Registry?",
+                "answer": "Thirty",
+                "wrong": [
+                  "Seven",
+                  "Ninety",
+                  "Sixty"
+                ]
+              }
+            },
+            {
+              "title": "Parentage and the Registry Presumption",
+              "content": "The mother of a child is the woman who bears her. Fatherhood is fixed by the Registry presumption: a Sire party to a filed agreement with the mother at the time of conception is presumed the father. Where no agreement exists, or the presumption is challenged, the Court of Lineage orders a lineage reading, a clinical charm that traces the Bloom in the child's blood to its source. A reading is taken as conclusive. A challenge must be brought within one year of the birth, after which the record stands.",
+              "question": {
+                "ask": "Within what time of a birth must a challenge to parentage be brought?",
+                "answer": "One year",
+                "wrong": [
+                  "Thirty days",
+                  "Five years",
+                  "Until the child comes of age"
+                ]
+              }
+            },
+            {
+              "title": "Support and the Shared Purse",
+              "content": "Every parent owes support until a child turns eighteen. The Support Schedule sets the amount as a share of income: a parent pays one-tenth of her income for the first child and one-twentieth for each further child, up to a cap of three-tenths. Where the child lives in a registered household, the household purse meets support first and members contribute as the deed provides. A Sire's Crown stipend, paid to every registered father, is not counted as income and cannot be taken for support.",
+              "question": {
+                "ask": "Under the Support Schedule, what share of income does a parent pay for a first child?",
+                "answer": "One-tenth",
+                "wrong": [
+                  "One-twentieth",
+                  "One-quarter",
+                  "Three-tenths"
+                ]
+              }
+            },
+            {
+              "title": "Partnership and Dissolution",
+              "content": "A member leaves a household by filing a notice of withdrawal; the household dissolves when fewer than two adults remain or when every member signs a deed of dissolution. Property is then divided as the deed provides, or, where it is silent, equally among the adults who were members for at least a year. Children stay where the court finds their welfare best served, and the guiding case is Merrow v Merrow, which holds that siblings are not to be separated without strong cause. Parental responsibility survives dissolution.",
+              "question": {
+                "ask": "Which case holds that siblings are not to be separated without strong cause?",
+                "answer": "Merrow v Merrow",
+                "wrong": [
+                  "Thorne v Ashgrove",
+                  "Harrow v Pell",
+                  "Vane v Dawnbloom"
+                ]
+              }
+            },
+            {
+              "title": "Inheritance and Lineage Disputes",
+              "content": "A will must be written, signed and witnessed by two adults who take nothing under it. Where there is no will, the Lineage Succession Act divides the estate: half to the household, half shared equally among the children, whichever household each was born into. A Sire's estate is split among all his children alike, so a father of forty leaves forty equal shares. Disputes go first to compulsory mediation before a lineage assessor, and only a dispute still unresolved after sixty days may be heard by the Court of Lineage.",
+              "question": {
+                "ask": "Under the Lineage Succession Act, what share of an estate without a will passes to the household?",
+                "answer": "Half",
+                "wrong": [
+                  "All of it",
+                  "One-third",
+                  "A quarter"
+                ]
+              }
+            }
+          ],
+          "skill": {
+            "id": "keeping-your-word",
+            "name": "Keeping your word",
+            "description": "You make promises you keep: affection grows 15% faster.",
+            "at": 30,
+            "passive": {
+              "kind": "affection",
+              "amount": 1.15
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "Your word is known to be good: affection grows 30% faster.",
+              "passive": {
+                "kind": "affection",
+                "amount": 1.3
+              }
             }
           }
         }
       ]
     },
     {
-      "code": "ECO",
-      "subject": "Economics",
+      "code": "BUS",
+      "subject": "Business",
       "college": "business",
       "general": false,
       "stats": [
@@ -352,7 +479,110 @@
       "practical": false,
       "courses": [
         {
-          "level": 4,
+          "number": "101",
+          "title": "Service Operations and Guest Experience",
+          "description": "Operational systems for hotels, banquet halls, and tourist sites, including staff scheduling, enchanted inventory tracking, and complaint resolution. Students learn to design guest experiences that accommodate diverse populations, including traveling Sires and their security needs.",
+          "topics": [
+            {
+              "title": "The Guest Journey and Service Design",
+              "content": "A stay has five stages: booking, arrival, the stay itself, departure and follow-up. A service blueprint maps each stage in two rows, what the guest sees and what the staff do out of sight to make it happen. Breedhaven hotels sell suites more than rooms, because the ordinary traveling party is a household of four to six adults. Staff never guess who shares with whom. The booking form asks only how many beds are to be made up and how many keys are wanted, and the answer is taken as given.",
+              "question": {
+                "ask": "How many stages does a guest's stay have?",
+                "answer": "Five",
+                "wrong": [
+                  "Three",
+                  "Four",
+                  "Seven"
+                ]
+              }
+            },
+            {
+              "title": "Rostering and Shift Design",
+              "content": "A roster matches staff to demand hour by hour. The working ratios are one server to eight guests for a plated dinner and one to twelve for a buffet. Magic tires, so charm duties such as warming rooms, mending linen and refreshing lights are rotated in two-hour blocks and never given to one woman for a whole shift. With pregnancies lasting under two months, leave is short but frequent, and a sound roster carries one spare in every ten. Pregnant staff are rostered away from fragile fittings.",
+              "question": {
+                "ask": "Why are charm duties rotated in short blocks on a roster?",
+                "answer": "Magic tires",
+                "wrong": [
+                  "Charms fade within minutes",
+                  "Guests prefer new faces",
+                  "Charm work pays double"
+                ]
+              }
+            },
+            {
+              "title": "Enchanted Inventory Tracking",
+              "content": "Stock is tracked with tally-charms: small tags on linen, bottles and crates that register in the ledger each time they cross a warded doorway. The system sets a par level for every item. Linen par is three sets to a bed: one on it, one in the laundry and one in the store. Tally-charms fade after about ninety days and must be reset, and a tag that has faded reads as stock that has vanished. So the charmed tally is reconciled against a hand count each week, and the difference is investigated.",
+              "question": {
+                "ask": "What tags track hotel stock as it crosses a warded doorway?",
+                "answer": "Tally-charms",
+                "wrong": [
+                  "Ledger-seals",
+                  "Count-wards",
+                  "Par-tokens"
+                ]
+              }
+            },
+            {
+              "title": "Hosting a Traveling Sire",
+              "content": "A Sire's status is his own to disclose, so it never appears in an open booking record; the reservation carries only a private-guest flag that the duty manager can read. He is roomed near a staircase, behind a logged door, with a side entrance agreed in advance with his security. Staff are briefed not to stare, not to ask and never to post his presence on Bloomr, which is cause for dismissal. Good service treats him as a guest first: his name, his breakfast order, his preference for quiet.",
+              "question": {
+                "ask": "What is the only mark a traveling Sire's reservation carries?",
+                "answer": "A private-guest flag",
+                "wrong": [
+                  "His Registry number",
+                  "His assay grade",
+                  "A security escort code"
+                ]
+              }
+            },
+            {
+              "title": "Complaint Resolution and Service Recovery",
+              "content": "Complaints are handled in four steps: hear it out, apologize, mend it, follow up. The guest is never interrupted and never told the fault lies with another department. A worked case: a warming charm fails in a suite at midnight in winter. The desk apologizes, sends a heater and someone to recast within ten minutes, and rings the room an hour later. Front desk staff may refund up to one night without asking a manager. A complaint mended well leaves a guest more loyal than one who had no trouble.",
+              "question": {
+                "ask": "How much may front desk staff refund without asking a manager?",
+                "answer": "Up to one night",
+                "wrong": [
+                  "Up to one week",
+                  "Up to half a night",
+                  "Nothing at all"
+                ]
+              }
+            },
+            {
+              "title": "Banquets, Festivals and Tourist Sites",
+              "content": "A banquet for two hundred is twenty tables of ten and twenty-five servers. Guests arriving by teleport array come in pulses, a dozen at once every few minutes, so the cloakroom is staffed for the pulse and not the average. Foreign parties differ: Kharadi hosts want every term written into the contract, while Vesperans expect to bargain and enjoy it. Because a birth discharges magic that can crack masonry, large venues post the route to the nearest Bloom Chamber and keep a warded quiet room.",
+              "question": {
+                "ask": "How many servers work a banquet for two hundred?",
+                "answer": "Twenty-five",
+                "wrong": [
+                  "Ten",
+                  "Fifteen",
+                  "Forty"
+                ]
+              }
+            }
+          ],
+          "skill": {
+            "id": "service-manner",
+            "name": "Service manner",
+            "description": "You are good with the public: shifts pay 15% more.",
+            "at": 30,
+            "passive": {
+              "kind": "wages",
+              "amount": 1.15
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You are a favorite with the public: shifts pay 30% more.",
+              "passive": {
+                "kind": "wages",
+                "amount": 1.3
+              }
+            }
+          }
+        },
+        {
+          "number": "184",
           "title": "Regulation and the Magitech Economy",
           "description": "Advanced seminar on economic regulation in Breedhaven and the wider Sown Expanse: ward standards, Sire Registry policy, agricultural enchantment subsidies, and competition among magitech firms. Students model policy outcomes using current national data.",
           "topics": [
@@ -438,7 +668,7 @@
           "skill": {
             "id": "knowing-the-margins",
             "name": "Knowing the margins",
-            "description": "You know what things cost to stock: shops charge you a fifth less.",
+            "description": "You know what things cost to stock: shops charge 20% less.",
             "at": 30,
             "passive": {
               "kind": "prices",
@@ -447,113 +677,14 @@
             "below": {
               "kind": "spoils",
               "amount": 1.25
-            }
-          }
-        }
-      ]
-    },
-    {
-      "code": "HSP",
-      "subject": "Hospitality Management",
-      "college": "business",
-      "general": false,
-      "stats": [
-        "intelligence"
-      ],
-      "practical": false,
-      "courses": [
-        {
-          "level": 2,
-          "title": "Service Operations and Guest Experience",
-          "description": "Operational systems for hotels, banquet halls, and tourist sites, including staff scheduling, enchanted inventory tracking, and complaint resolution. Students learn to design guest experiences that accommodate diverse populations, including travelling Sires and their security needs.",
-          "topics": [
-            {
-              "title": "The Guest Journey and Service Design",
-              "content": "A stay has five stages: booking, arrival, the stay itself, departure and follow-up. A service blueprint maps each stage in two rows, what the guest sees and what the staff do out of sight to make it happen. Breedhaven hotels sell suites more than rooms, because the ordinary traveling party is a household of four to six adults. Staff never guess who shares with whom. The booking form asks only how many beds are to be made up and how many keys are wanted, and the answer is taken as given.",
-              "question": {
-                "ask": "How many stages does a guest's stay have?",
-                "answer": "Five",
-                "wrong": [
-                  "Three",
-                  "Four",
-                  "Seven"
-                ]
-              }
             },
-            {
-              "title": "Rostering and Shift Design",
-              "content": "A roster matches staff to demand hour by hour. The working ratios are one server to eight guests for a plated dinner and one to twelve for a buffet. Magic tires, so charm duties such as warming rooms, mending linen and refreshing lights are rotated in two-hour blocks and never given to one woman for a whole shift. With pregnancies lasting under two months, leave is short but frequent, and a sound roster carries one spare in every ten. Pregnant staff are rostered away from fragile fittings.",
-              "question": {
-                "ask": "Why are charm duties rotated in short blocks on a roster?",
-                "answer": "Magic tires",
-                "wrong": [
-                  "Charms fade within minutes",
-                  "Guests prefer new faces",
-                  "Charm work pays double"
-                ]
+            "upgrade": {
+              "at": 70,
+              "description": "You know every trade price in town: shops charge 35% less.",
+              "passive": {
+                "kind": "prices",
+                "amount": 0.65
               }
-            },
-            {
-              "title": "Enchanted Inventory Tracking",
-              "content": "Stock is tracked with tally-charms: small tags on linen, bottles and crates that register in the ledger each time they cross a warded doorway. The system sets a par level for every item. Linen par is three sets to a bed: one on it, one in the laundry and one in the store. Tally-charms fade after about ninety days and must be reset, and a tag that has faded reads as stock that has vanished. So the charmed tally is reconciled against a hand count each week, and the difference is investigated.",
-              "question": {
-                "ask": "What tags track hotel stock as it crosses a warded doorway?",
-                "answer": "Tally-charms",
-                "wrong": [
-                  "Ledger-seals",
-                  "Count-wards",
-                  "Par-tokens"
-                ]
-              }
-            },
-            {
-              "title": "Hosting a Traveling Sire",
-              "content": "A Sire's status is his own to disclose, so it never appears in an open booking record; the reservation carries only a private-guest flag that the duty manager can read. He is roomed near a staircase, behind a logged door, with a side entrance agreed in advance with his security. Staff are briefed not to stare, not to ask and never to post his presence on Bloomr, which is cause for dismissal. Good service treats him as a guest first: his name, his breakfast order, his preference for quiet.",
-              "question": {
-                "ask": "What is the only mark a traveling Sire's reservation carries?",
-                "answer": "A private-guest flag",
-                "wrong": [
-                  "His Registry number",
-                  "His assay grade",
-                  "A security escort code"
-                ]
-              }
-            },
-            {
-              "title": "Complaint Resolution and Service Recovery",
-              "content": "Complaints are handled in four steps: hear it out, apologize, mend it, follow up. The guest is never interrupted and never told the fault lies with another department. A worked case: a warming charm fails in a suite at midnight in winter. The desk apologizes, sends a heater and someone to recast within ten minutes, and rings the room an hour later. Front desk staff may refund up to one night without asking a manager. A complaint mended well leaves a guest more loyal than one who had no trouble.",
-              "question": {
-                "ask": "How much may front desk staff refund without asking a manager?",
-                "answer": "Up to one night",
-                "wrong": [
-                  "Up to one week",
-                  "Up to half a night",
-                  "Nothing at all"
-                ]
-              }
-            },
-            {
-              "title": "Banquets, Festivals and Tourist Sites",
-              "content": "A banquet for two hundred is twenty tables of ten and twenty-five servers. Guests arriving by teleport array come in pulses, a dozen at once every few minutes, so the cloakroom is staffed for the pulse and not the average. Foreign parties differ: Kharadi hosts want every term written into the contract, while Vesperans expect to bargain and enjoy it. Because a birth discharges magic that can crack masonry, large venues post the route to the nearest Bloom Chamber and keep a warded quiet room.",
-              "question": {
-                "ask": "How many servers work a banquet for two hundred?",
-                "answer": "Twenty-five",
-                "wrong": [
-                  "Ten",
-                  "Fifteen",
-                  "Forty"
-                ]
-              }
-            }
-          ],
-          "skill": {
-            "id": "service-manner",
-            "name": "Service manner",
-            "description": "You are good with the public: every shift pays 15% more.",
-            "at": 30,
-            "passive": {
-              "kind": "wages",
-              "amount": 1.15
             }
           }
         }
@@ -571,9 +702,9 @@
       "practical": true,
       "courses": [
         {
-          "level": 2,
+          "number": "101",
           "title": "Brewing and Fermentation Science",
-          "description": "The biochemistry and magical theory of fermentation, covering beer, cider, mead, and Bloom-infused cordials. Weekly lab practises batch brewing, yeast management, and quality control, with attention to Breedhaven's orchard-based brewing traditions.",
+          "description": "The biochemistry and magical theory of fermentation, covering beer, cider, mead, and Bloom-infused cordials. Weekly lab practices batch brewing, yeast management, and quality control, with attention to Breedhaven's orchard-based brewing traditions.",
           "topics": [
             {
               "title": "Fermentation: Yeast, Sugar and Bloom",
@@ -657,7 +788,7 @@
           "skill": {
             "id": "bloom-cordial",
             "name": "Bloom cordial",
-            "description": "Once a week you can brew a cordial to share with a woman. For a day, whatever she takes against the Bloom does not count.",
+            "description": "Once a week you can brew a cordial to share with a woman: for a day, whatever she takes against the Bloom does not work.",
             "at": 30,
             "ability": {
               "label": "Brew",
@@ -670,13 +801,18 @@
               ],
               "cooldownDays": 7,
               "on": "self"
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "Every four days you can brew a cordial to share with a woman: for a day, whatever she takes against the Bloom does not work.",
+              "cooldownDays": 4
             }
           }
         },
         {
-          "level": 3,
+          "number": "111",
           "title": "Enchanted Cuisine and Menu Design",
-          "description": "Advanced cookery integrating culinary technique with deliberate magical effect, including Bloom-resonant dishes for seasonal festivals and restorative meals for pregnant women. Weekly lab develops tasting menus that balance flavour, nutrition, and magical coherence.",
+          "description": "Advanced cookery integrating culinary technique with deliberate magical effect, including Bloom-resonant dishes for seasonal festivals and restorative meals for pregnant women. Weekly lab develops tasting menus that balance flavor, nutrition, and magical coherence.",
           "topics": [
             {
               "title": "Magical Coherence on the Plate",
@@ -760,7 +896,7 @@
           "skill": {
             "id": "charmed-confection",
             "name": "Charmed confection",
-            "description": "Once a week you can make a confection that any woman loves to be given.",
+            "description": "Once a week you can make a confection: any woman loves to be given one.",
             "at": 30,
             "ability": {
               "label": "Make",
@@ -773,6 +909,11 @@
               ],
               "cooldownDays": 7,
               "on": "self"
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "Every four days you can make a confection: any woman loves to be given one.",
+              "cooldownDays": 4
             }
           }
         }
@@ -790,7 +931,7 @@
       "practical": true,
       "courses": [
         {
-          "level": 1,
+          "number": "101",
           "title": "Introduction to Bloomology",
           "description": "Foundational study of the Primordial Bloom as a natural force: its presence in soil, water, and blood, its observed effects on living things, and the basic principles by which women channel it. Weekly lab introduces measurement of Bloom fields and basic exercises in directed enchantment.",
           "topics": [
@@ -876,7 +1017,7 @@
           "skill": {
             "id": "resonance-token",
             "name": "Resonance token",
-            "description": "Once a week you can charge a token. Set off beside a woman you are with, it has her need 10 less desire for a day.",
+            "description": "Once a week you can charge a token: set off beside a woman, it raises her desire by 10.",
             "at": 30,
             "ability": {
               "label": "Charge",
@@ -893,114 +1034,114 @@
             "below": {
               "kind": "anchoring",
               "amount": 1.25
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "Every four days you can charge a token: set off beside a woman, it raises her desire by 10.",
+              "cooldownDays": 4
             }
           }
-        }
-      ]
-    },
-    {
-      "code": "THE",
-      "subject": "Bloom Theology",
-      "college": "bloom-studies-and-divinity",
-      "general": false,
-      "stats": [
-        "wisdom"
-      ],
-      "practical": false,
-      "courses": [
+        },
         {
-          "level": 5,
-          "title": "Seminar in Bloom Theology",
-          "description": "Graduate seminar on contemporary theological debates: the nature of the Bloom's want, post-menopausal magic, and the ethics of magical augmentation through pregnancy. Students engage with current scholarship and produce an original paper.",
+          "number": "147",
+          "title": "The Bloom in the Land",
+          "description": "Study of the Bloom in growing things: how its field gathers in soil, orchards and crops, how growth-charms move it, and how it rises and falls with the seasons. Weekly lab in the teaching garden and orchard covers soil mapping, growth-charming and the keeping of a household kitchen garden. Prerequisite: BLM 101.",
           "topics": [
             {
-              "title": "The Bloom's Want: Immanence Reconsidered",
-              "content": "Orthodox doctrine holds the Bloom to be immanent: present in soil, water and blood, and not a deity standing outside the world. The live dispute is whether an immanent force can properly be said to want anything. The Volitional school reads the generative pull as real intention. The Tropist school, following the Order theologian Hesta Marrowgate, treats it as a leaning, as a root leans to water, and warns that speaking of want smuggles a person into a process.",
+              "title": "Living Soil",
+              "content": "Soil holds the Bloom in proportion to the life in it: roots, fungi, worms and the slow rot of leaves. A field builds over undisturbed years and is lost quickly. Deep plowing halves a bed's reading in a single season, because it breaks the root and fungal mat that holds the field. For this reason Breedhaven growers favor shallow tilling and no-dig beds topped with compost each autumn. A well-kept no-dig bed gains roughly half a thaum a year until it levels off near six.",
               "question": {
-                "ask": "Which school treats the Bloom's pull as a leaning, not a want?",
-                "answer": "The Tropist school",
+                "ask": "What does deep plowing do to a bed's reading in a single season?",
+                "answer": "Halves it",
                 "wrong": [
-                  "The Volitional school",
-                  "The Severance school",
-                  "The Trial school"
+                  "Doubles it",
+                  "Leaves it unchanged",
+                  "Raises it by one thaum"
                 ]
               }
             },
             {
-              "title": "Instinct, Not Command: The Leaning Doctrine",
-              "content": "The Order teaches that the Bloom inclines and never compels: a woman feels the pull and still chooses. Bloomist theologians conclude that a freely given yes to the pull is the highest act of devotion. Freewill theologians answer that consent means something only where refusal is equally honorable. The standing test case is the priestess who chooses never to bear. On the first reading she is a failed devotee. On the second she is the proof that the doctrine is true.",
+              "title": "Growth-Charming",
+              "content": "A growth-charm is a Tier I working in which the caster draws the soil's field into a single plant. The charm creates nothing: it borrows from the ground around the roots. A charmed seedling grows about a third faster than its neighbors, and the bed pays for it. Charm the same bed every day for a season and it reads below one thaum and must lie fallow. The working rule is one charm per bed per week, laid at the stem with an open palm, never on fruit already set.",
               "question": {
-                "ask": "Who is the standing test case of the leaning doctrine?",
-                "answer": "The priestess who chooses never to bear",
+                "ask": "Where does a growth-charm draw its power from?",
+                "answer": "The soil around the roots",
                 "wrong": [
-                  "The Sire who refuses every household",
-                  "The mother who conceives for power",
-                  "The widow who keeps her magic"
+                  "The caster's own blood",
+                  "The sunlight on the leaves",
+                  "The water in the stem"
                 ]
               }
             },
             {
-              "title": "Dampers and the Charge of Impiety",
-              "content": "Suppressants turn the pull down to a background hum, and theology has never agreed what that does to devotion. Rigorist Bloomists call the damper a stopped ear, a refusal to hear what is sacred. Accommodationists within the Order reply that a damper silences nothing, since the magic remains untouched, and that a quieter pull allows a clearer answer. The Order has issued no binding ruling, and most priestesses counsel by the case and not by the rule.",
+              "title": "Orchards and Heartwood",
+              "content": "Fruit trees store the Bloom in their heartwood and give it back to the ground through their roots each spring. This is why old orchard ground reads six thaums or more, and a century-old orchard near ten. A graft cut from an old tree carries some of that store into young stock, which is why Breedhaven nurseries prize scions from the oldest royal orchards. Felling an old orchard drops the ground's reading for decades, and the Assembly licenses every such clearing.",
               "question": {
-                "ask": "What do Rigorist Bloomists call the damper?",
-                "answer": "A stopped ear",
+                "ask": "Where does a fruit tree store the Bloom?",
+                "answer": "In its heartwood",
                 "wrong": [
-                  "A closed door",
-                  "A blind eye",
-                  "A broken vessel"
+                  "In its fruit",
+                  "In its bark",
+                  "In its fallen leaves"
                 ]
               }
             },
             {
-              "title": "Second Bloom and Persisting Magic",
-              "content": "After menopause the pull ceases, yet a woman's magic does not leave her. This is the hardest fact for any theology that ties magic to generativity. Three answers are current. The Residue view holds that power once given is not withdrawn. The Widening view holds that generativity turns from bearing to tending, teaching and guarding. The Severance view, favored by Freewill writers, holds that magic and pull were always two separate gifts that merely travel together.",
+              "title": "The Seasonal Cycle",
+              "content": "The land's field follows the year. It is lowest in midwinter, rises through spring, peaks at blossom and falls away after harvest. A bed that reads two thaums in midwinter commonly reads three at blossom. Growers time sowing by the thaumometer rather than the calendar: seed goes in once the soil reads three thaums at a hand's depth for three mornings running. Growth-charms laid in the weeks after harvest do little, because there is little field left to draw.",
               "question": {
-                "ask": "Which view holds that magic and the pull were always two separate gifts?",
-                "answer": "The Severance view",
+                "ask": "At what point in the year does the land's field peak?",
+                "answer": "At blossom",
                 "wrong": [
-                  "The Residue view",
-                  "The Widening view",
-                  "The Balance view"
+                  "In midwinter",
+                  "At harvest",
+                  "At the first frost"
                 ]
               }
             },
             {
-              "title": "Conceiving for Power: Augmentation Ethics",
-              "content": "Pregnancy multiplies a woman's magic, so a child may be conceived partly for the strength it lends. Iscara assigns its greatest workings to pregnant mages as a matter of state practice. Critics call this instrumental conception and argue that it treats the child as a tool. Defenders note that no mother's motives are ever unmixed and that the surge is the Bloom's own design. The contested ground is whether an employer or a state may ever ask for it.",
+              "title": "Land and People",
+              "content": "The Bloom moves between the land and the people on it. A household that works its own ground keeps a stronger field in its soil than one that leaves it to hired hands, and the strongest gardener of all is a pregnant woman, whose surging field lifts any bed she tends by a thaum or more over a season. Old households planted orchards at the birth of each daughter for this reason. The land does not change the birth ratio: seven girls are born for each boy on rich ground and poor alike.",
               "question": {
-                "ask": "Which state assigns its greatest workings to pregnant mages?",
-                "answer": "Iscara",
+                "ask": "Which gardener lifts a bed's reading the most?",
+                "answer": "A pregnant woman",
                 "wrong": [
-                  "Kharad-Tor",
-                  "Veyra",
-                  "The Vesperan League"
+                  "A hired hand",
+                  "A fertile man",
+                  "An elderly widow"
                 ]
               }
             },
             {
-              "title": "The Theodicy of Scarcity",
-              "content": "If the Bloom leans toward generation, the rarity of fertile men needs explaining: seven daughters to a son, and only one son in ten a Sire. The Trial reading holds that scarcity teaches care and cooperation, and points to the household as its fruit. The Balance reading holds that an abundance of seed would exhaust the Bloom itself. A newer and sharper line asks what the Bloom owes the nine men in ten it passes over, and finds the tradition has almost nothing to say.",
+              "title": "The Kitchen Garden",
+              "content": "A household kitchen garden of about ten square meters can keep a house in greens, roots and herbs from spring to autumn. It is laid out as the three-bed round: one bed of greens, one of roots and one of legumes, moved on by one bed each year. Greens draw the field hardest, roots less, and legumes restore it, so no bed is spent. Herbs go along the edges, where a light charm keeps them through the first frosts. Picking is done in the morning, when the field in the leaves is highest.",
               "question": {
-                "ask": "What share of sons is a Sire?",
-                "answer": "One in ten",
+                "ask": "Which crop in the three-bed round restores the soil's field?",
+                "answer": "Legumes",
                 "wrong": [
-                  "One in seven",
-                  "One in eight",
-                  "One in twenty"
+                  "Greens",
+                  "Roots",
+                  "Herbs"
                 ]
               }
             }
           ],
           "skill": {
-            "id": "speaking-her-creed",
-            "name": "Speaking her creed",
-            "description": "You can talk to a devout or reluctant woman in her own terms: she needs 15 less desire.",
+            "id": "kitchen-garden",
+            "name": "Kitchen garden",
+            "description": "You keep the house in fresh food: its comfort is 2 higher.",
             "at": 30,
             "passive": {
-              "kind": "desireGate",
-              "amount": 15,
-              "only": "reluctant"
+              "kind": "comfort",
+              "amount": 2
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You keep the house in fresh food all year: its comfort is 4 higher.",
+              "passive": {
+                "kind": "comfort",
+                "amount": 4
+              }
             }
           }
         }
@@ -1018,9 +1159,9 @@
       "practical": true,
       "courses": [
         {
-          "level": 2,
+          "number": "101",
           "title": "Practical Witchcraft: Charm, Hex and Counter",
-          "description": "The working witch's craft as it is practised, not theorised: small charms cast by hand, the hexes every student is warned about and how each is undone, and the discipline of working with the Bloom rather than drawing on it. Half of every week is at the bench.",
+          "description": "The working witch's craft as it is practiced, not theorized: small charms cast by hand, the hexes every student is warned about and how each is undone, and the discipline of working with the Bloom rather than drawing on it. Half of every week is at the bench.",
           "topics": [
             {
               "title": "Working With, Not Drawing On",
@@ -1104,7 +1245,7 @@
           "skill": {
             "id": "heartsease",
             "name": "Heartsease draught",
-            "description": "Once a week you can brew a draught at the bench. Drunk, it doubles the affection you win for a day.",
+            "description": "Once a week you can brew a draught: drunk, it makes the affection you win 100% higher for a day.",
             "at": 30,
             "ability": {
               "label": "Brew",
@@ -1121,6 +1262,11 @@
             "below": {
               "kind": "steady",
               "amount": 1
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "Every four days you can brew a draught: drunk, it makes the affection you win 100% higher for a day.",
+              "cooldownDays": 4
             }
           }
         }
@@ -1138,7 +1284,7 @@
       "practical": true,
       "courses": [
         {
-          "level": 1,
+          "number": "101",
           "title": "Introduction to Magical Engineering",
           "description": "Foundations of engineering with the Bloom, covering the principles by which enchantments are structured into materials, circuits, and devices, and the safety standards that govern magical engineering in Breedhaven. Weekly lab in the Foundry introduces basic enchantment construction, measurement, and calibration.",
           "topics": [
@@ -1224,7 +1370,7 @@
           "skill": {
             "id": "stamina-band",
             "name": "Stamina band",
-            "description": "Every four days you can charge a wristband you built. Triggered, it gives you 40 energy.",
+            "description": "Every four days you can charge a wristband you built: triggered, it gives you 40 energy.",
             "at": 30,
             "ability": {
               "label": "Charge",
@@ -1241,113 +1387,120 @@
             "below": {
               "kind": "insight",
               "amount": 1
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "Every two days you can charge a wristband you built: triggered, it gives you 40 energy.",
+              "cooldownDays": 2
             }
           }
-        }
-      ]
-    },
-    {
-      "code": "AGR",
-      "subject": "Agricultural Sciences",
-      "college": "life-sciences-and-agriculture",
-      "general": false,
-      "stats": [
-        "wisdom"
-      ],
-      "practical": true,
-      "courses": [
+        },
         {
-          "level": 1,
-          "title": "Agricultural Systems and the Bloom",
-          "description": "Introduction to modern agriculture in Breedhaven, covering soil science, riverine irrigation, and the role of the Bloom in crop growth and soil health. Weekly lab involves field sampling, soil Bloom measurement, and basic crop assessment at the university's experimental orchards.",
+          "number": "162",
+          "title": "Magical Systems Design",
+          "description": "Design of enchanted systems at the scale of a household and a city, covering enchanted circuits, ward networks, power budgets and mana storage, failure analysis, and the testing standards a system must pass before it enters service. Weekly lab in the Foundry builds, loads, and deliberately breaks small working systems at the warded bench. Prerequisite: MEN 101.",
           "topics": [
             {
-              "title": "The Lowland Farm System",
-              "content": "Breedhaven feeds itself from three kinds of land. River bottoms carry grain and vegetables on deep silt, renewed by controlled spring flooding. The slopes above them carry orchards, the country's signature crop and its main farm export. The uplands are grazed. A typical lowland holding is mixed: forty to eighty hectares, with orchard on the best-drained ground. Nearly all holdings are worked by a household of women, and labor, not land, is the limiting factor.",
+              "title": "Enchanted Circuits: Series and Parallel",
+              "content": "An enchanted circuit links anchors with copper or silver traces so that one charge drives several workings. In series, each working draws in turn and the first to fail cuts every one after it, as in a string of festival lights. In parallel, each working draws from the common trace on its own, so one failure leaves the rest running. Household and city systems are wired in parallel. Series is kept for interlocks, where one open link must stop the whole chain, such as a kiln that will not fire while its door ward is down.",
               "question": {
-                "ask": "What do the slopes above the river bottoms carry?",
-                "answer": "Orchards",
+                "ask": "How are household and city enchanted systems wired?",
+                "answer": "In parallel",
                 "wrong": [
-                  "Wheat fields",
-                  "Vegetable plots",
-                  "Grazing pasture"
+                  "In series",
+                  "In a ring",
+                  "In a star from one anchor"
                 ]
               }
             },
             {
-              "title": "Soil: Texture, Structure and Life",
-              "content": "Soil is described by texture, the proportions of sand, silt and clay, and by structure, how those particles clump into crumbs. Texture is fixed; structure is made or ruined by management. A handful of good loam holds together when squeezed and breaks when prodded. Organic matter feeds the organisms that build structure, and a field at five percent organic matter holds markedly more water than one at two. The spade test, one clean cube lifted and read layer by layer, comes before any instrument.",
+              "title": "Power Budgets",
+              "content": "A power budget lists every working in a system with its draw in thaums per hour and adds them up. The total is set against what the store can supply, and a design is passed only with a margin of at least a quarter above the expected peak load. Peak matters more than average: a house that warms, lights and cooks at six in the evening draws three times its overnight load. The budget also counts losses, since every meter of copper trace bleeds a little charge, which is why stores sit close to the workings they feed.",
               "question": {
-                "ask": "Which property of a soil is fixed and cannot be changed by management?",
-                "answer": "Texture",
+                "ask": "What margin above expected peak load must a power budget show?",
+                "answer": "At least a quarter",
                 "wrong": [
-                  "Structure",
-                  "Organic matter",
-                  "Water content"
+                  "At least a tenth",
+                  "At least half",
+                  "At least double"
                 ]
               }
             },
             {
-              "title": "Water: Rivers, Ditches and Drains",
-              "content": "Lowland farming is water management. The rivers are leveed, and sluice gates admit a measured flood each spring to lay silt on the bottoms. Through the growing season, gravity ditches carry water along the contour to furrows. Too much water kills as surely as too little, so tile drains under orchard ground keep roots out of standing water. An apple tree tolerates about two days waterlogged in summer. The water boards that hold the sluice keys are among the oldest elected bodies in the country.",
+              "title": "Mana Storage: Cells and Banks",
+              "content": "Charge for a system is kept in storage cells, blocks of fired ceramic or quartz rated by capacity in thaums and by discharge rate, the most they can give up in an hour. Capacity says how long a system runs; discharge rate says how much it can run at once. A large cell with a low rate cannot start a heavy working. Cells are joined into a bank to raise both figures. A household bank sits in the cellar and is recharged quarterly; a district bank under a tram depot is topped up by a circle each week.",
               "question": {
-                "ask": "About how long can an apple tree tolerate waterlogged ground in summer?",
-                "answer": "About two days",
+                "ask": "What two figures rate a storage cell?",
+                "answer": "Capacity and discharge rate",
                 "wrong": [
-                  "About two hours",
-                  "About two weeks",
-                  "About a month"
+                  "Half-life and tier",
+                  "Retention and conductance",
+                  "Weight and grain"
                 ]
               }
             },
             {
-              "title": "Measuring the Bloom in a Field",
-              "content": "The Bloom is present in soil as in everything living, and field strength is measured with a thaumometer pushed to root depth. Tilled ground reads two to four thaums and old orchard ground six or more, because long-lived roots and undisturbed soil life hold it. Readings are taken on a grid, twenty to the hectare, at the same hour, since strength rises a little after dawn. A map of the readings shows where a crop will respond to a charm and where the ground has nothing to give.",
+              "title": "Ward Networks",
+              "content": "A ward network joins many ward plates into one field by linking them through nodes, quartz junctions that share charge and pass state between plates. A single plate covers a door; a network covers a building or a street. Networks are built as meshes, with each node linked to at least two others, so that one broken link never opens a gap. A controller polls every node through its coupler each minute and flags any plate that falls silent. The city wall wards, the oldest network in Breedhaven, still run on this principle.",
               "question": {
-                "ask": "Which instrument is pushed to root depth to measure the Bloom in a field?",
-                "answer": "A thaumometer",
+                "ask": "To how many other nodes is each node in a ward mesh linked at least?",
+                "answer": "Two",
                 "wrong": [
-                  "A dowsing rod",
-                  "A soil auger",
-                  "A grounding rod"
+                  "One",
+                  "Three",
+                  "Four"
                 ]
               }
             },
             {
-              "title": "What a Crop Needs, and When",
-              "content": "A crop needs light, water, warmth and about a dozen nutrients, and its yield is set by whichever is shortest. Demand is not level through the season. Wheat takes most of its nitrogen in the six weeks of stem extension; an apple tree draws hardest from petal fall to midsummer, when it is building fruit and next year's buds at once. Feeding outside those windows is wasted or washed into the ditches. Matching supply to the demand curve is the core skill of the grower, with or without magic.",
+              "title": "Failure Analysis",
+              "content": "Failure analysis asks why a device stopped and what else would stop the same way. Engineers sort causes into three classes: drain, where the charge ran out; fracture, where the anchor cracked and the pattern broke; and drift, where the pattern slowly lost its shape and the working began doing something slightly different. Drift is the most dangerous, because the device still runs. Every failure in a public system is written up in a failure report, which names the root cause and the change that prevents it, and is filed with the Foundry.",
               "question": {
-                "ask": "A crop's yield is set by which of its needs?",
-                "answer": "Whichever is in shortest supply",
+                "ask": "Which class of failure is the most dangerous because the device still runs?",
+                "answer": "Drift",
                 "wrong": [
-                  "Whichever is most plentiful",
-                  "Whichever is supplied first",
-                  "Whichever is supplied last"
+                  "Drain",
+                  "Fracture",
+                  "Overload"
                 ]
               }
             },
             {
-              "title": "Reading a Crop in the Field",
-              "content": "Assessment begins with walking the field in a W, stopping at ten points, so that the edges do not mislead. At each stop the grower counts plants in a measured length of row, notes leaf color against a standard card, and looks under leaves for pests. Yellowing on old leaves first points to nitrogen; on young leaves, to iron or sulfur. In orchards the count is fruitlets per cluster after the natural drop. Every figure goes in the field book with its date: one visit shows a state, a series shows a trend.",
+              "title": "Testing and Design for Service",
+              "content": "No system enters service untested. Each device passes a bench test at the warded bench, then a load test at full peak draw for a day, then a drain test, where its store is run to empty to prove it fails safe and goes inert. The design rule for a household or city system is design for service: every anchor, cell and node must be reachable and replaceable without taking the rest offline. A tram line's lamp wards are fitted in sections of ten so that one crew can change a section in an hour while the others stay lit.",
               "question": {
-                "ask": "In what pattern does a grower walk a field to assess a crop?",
-                "answer": "A W",
+                "ask": "Which test runs a device's store to empty to prove it fails safe?",
+                "answer": "The drain test",
                 "wrong": [
-                  "A circle",
-                  "A straight diagonal",
-                  "A loop along the edges"
+                  "The load test",
+                  "The bench test",
+                  "The drift test"
                 ]
               }
             }
           ],
           "skill": {
-            "id": "kitchen-garden",
-            "name": "Kitchen garden",
-            "description": "You keep the house in fresh food: its comfort is 2 higher.",
+            "id": "systems-thinking",
+            "name": "Systems thinking",
+            "description": "You take problems apart properly: training in intelligence is 50% more effective.",
             "at": 30,
             "passive": {
-              "kind": "comfort",
-              "amount": 2
+              "kind": "training",
+              "amount": 1.5,
+              "stats": [
+                "intelligence"
+              ]
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You take any problem apart: training in intelligence is 100% more effective.",
+              "passive": {
+                "kind": "training",
+                "amount": 2,
+                "stats": [
+                  "intelligence"
+                ]
+              }
             }
           }
         }
@@ -1364,7 +1517,7 @@
       "practical": true,
       "courses": [
         {
-          "level": 1,
+          "number": "101",
           "title": "Foundations of Sire Genetics",
           "description": "Introduction to the genetics of the sex ratio and Sire fertility, covering the Bloom's role in sex determination, the clinical assay that establishes Sire status, and the basic biology of inheritance in the Sown Expanse. Weekly lab involves microscopy, assay demonstration, and basic genetic analysis.",
           "topics": [
@@ -1450,123 +1603,19 @@
           "skill": {
             "id": "own-assay",
             "name": "Knowing your own assay",
-            "description": "You understand what you are. The chance of a child with a woman on birth control is half as high again.",
+            "description": "You understand what you are: the chance of a child with a woman on birth control is 50% higher.",
             "at": 30,
             "passive": {
               "kind": "fertility",
               "amount": 1.5
-            }
-          }
-        }
-      ]
-    },
-    {
-      "code": "MID",
-      "subject": "Midwifery and Reproductive Medicine",
-      "college": "life-sciences-and-agriculture",
-      "general": false,
-      "stats": [
-        "wisdom",
-        "intelligence"
-      ],
-      "practical": true,
-      "courses": [
-        {
-          "level": 2,
-          "title": "Clinical Midwifery",
-          "description": "The working practice of the profession Breedhaven depends on most: antenatal care across a seven-week term, attending a birth in a Bloom Chamber, and the care of mother and child in the days after. Taught on the ward at the Reproductive Health Center, with supervised shifts.",
-          "topics": [
-            {
-              "title": "The Seven-Week Term",
-              "content": "A pregnancy runs forty-eight days from conception to birth, and the midwife's calendar is built on it. The first visit is in the first week, to confirm the Bloom has locked in and to take a baseline of the mother's field strength. Visits are then weekly, and twice weekly from the fifth week. Each records weight, pulse, the child's movement and the mother's reading on the thaumometer. A term this short leaves no slack: a problem found on a Solday has to be acted on by Windsday.",
-              "question": {
-                "ask": "How many days does a pregnancy run from conception to birth?",
-                "answer": "Forty-eight",
-                "wrong": [
-                  "Thirty-five",
-                  "Fifty-six",
-                  "Seventy"
-                ]
-              }
             },
-            {
-              "title": "Reading the Surge",
-              "content": "A mother's magic rises through her term and the curve is diagnostic. A small lift is expected in the early weeks, a marked one in the middle, and a steep climb near term. A reading that stalls or falls for two visits running is the earliest sign that something is wrong with the pregnancy, often before any physical symptom. A reading that climbs too fast calls for warded rest, because a mother who cannot hold her own working is a danger to herself. The chart is plotted at every visit, by hand.",
-              "question": {
-                "ask": "What is the earliest sign that something is wrong with a pregnancy?",
-                "answer": "A stalled or falling magic reading",
-                "wrong": [
-                  "A sudden loss of weight",
-                  "A fast and uneven pulse",
-                  "A fever in the evenings"
-                ]
+            "upgrade": {
+              "at": 70,
+              "description": "You know exactly what you are: the chance of a child with a woman on birth control is 100% higher.",
+              "passive": {
+                "kind": "fertility",
+                "amount": 2
               }
-            },
-            {
-              "title": "The Bloom Chamber",
-              "content": "Births take place in a Bloom Chamber: a warded room built to contain the peak of a mother's magic, which arrives with labor. The wards are set to her own baseline and checked that morning. Nothing enchanted is brought in, including phones. A second practitioner stands by as spotter with a grounding rod, whose only job is to bleed off a surge. The mother casts nothing deliberately. Most births need no intervention beyond this, and the chamber is why home birth is rare outside the country districts.",
-              "question": {
-                "ask": "What does the spotter at a birth use to bleed off a surge?",
-                "answer": "A grounding rod",
-                "wrong": [
-                  "A warding stone",
-                  "A damping charm",
-                  "A thaumometer"
-                ]
-              }
-            },
-            {
-              "title": "Labor and Its Stages",
-              "content": "Labor is shorter than the old texts from abroad describe, commonly four to eight hours from the first regular pains. The first stage ends when the mother's field peaks and steadies, which a practiced midwife feels before any instrument shows it. The second stage, delivery, rarely lasts an hour. The third is the afterbirth, and with it the mother's magic falls back sharply over a few minutes, which can leave her faint. She is kept lying down and warm until her reading has settled near baseline.",
-              "question": {
-                "ask": "How long does labor commonly last from the first regular pains?",
-                "answer": "Four to eight hours",
-                "wrong": [
-                  "One to two hours",
-                  "Twelve to twenty hours",
-                  "One to two days"
-                ]
-              }
-            },
-            {
-              "title": "The Lying-In Week",
-              "content": "The seven days after a birth are the lying-in week. The mother's magic is at its lowest and she tires easily. She is visited daily for the first three days and again on the seventh. The checks are bleeding, fever, feeding and mood, in that order of urgency. The Bloom will not lock in again until she has recovered, and a midwife says so plainly to any household in a hurry. A mother well fed, rested and unworried recovers faster, and that is the practical case for a household sharing the work.",
-              "question": {
-                "ask": "Which lying-in check comes first in order of urgency?",
-                "answer": "Bleeding",
-                "wrong": [
-                  "Fever",
-                  "Feeding",
-                  "Mood"
-                ]
-              }
-            },
-            {
-              "title": "Fathers, Households and the Birth",
-              "content": "A father in the room changes outcomes, and the profession's own figures say so: labors with him present are shorter on average and the mother's field steadier. Since a Sire may have several partners near term at once, clinics give each mother a set hour and ask him to keep it. The midwife's duty is to the mother alone. She records who attended, never why someone did not, and she keeps a household's quarrels out of the chamber by asking everyone but the father and one companion to wait outside.",
-              "question": {
-                "ask": "To whom is the midwife's duty owed?",
-                "answer": "The mother alone",
-                "wrong": [
-                  "The father alone",
-                  "The whole household",
-                  "The clinic"
-                ]
-              }
-            }
-          ],
-          "skill": {
-            "id": "lying-in-care",
-            "name": "Lying-in care",
-            "description": "You know how a mother is looked after: she can conceive again in half the time after a birth.",
-            "at": 30,
-            "passive": {
-              "kind": "recovery",
-              "amount": 0.5
-            },
-            "below": {
-              "kind": "surge",
-              "amount": 0.5
             }
           }
         }
@@ -1584,9 +1633,9 @@
       "practical": true,
       "courses": [
         {
-          "level": 1,
+          "number": "101",
           "title": "Foundations of Strength Training",
-          "description": "Introduction to resistance training, conditioning, and movement mechanics for students of all body types and Bloom states. Weekly lab covers proper lifting technique, programme design, and safe training practices for pregnant and non-pregnant students alike.",
+          "description": "Introduction to resistance training, conditioning, and movement mechanics for students of all body types and Bloom states. Weekly lab covers proper lifting technique, program design, and safe training practices for pregnant and non-pregnant students alike.",
           "topics": [
             {
               "title": "Six Movements and the Brace",
@@ -1669,8 +1718,8 @@
           ],
           "skill": {
             "id": "programme-design",
-            "name": "Programme design",
-            "description": "You train properly: work on strength and endurance goes half as far again.",
+            "name": "Program design",
+            "description": "You train properly: training in strength and endurance is 50% more effective.",
             "at": 30,
             "passive": {
               "kind": "training",
@@ -1683,11 +1732,23 @@
             "below": {
               "kind": "might",
               "amount": 1.25
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You train like an athlete: training in strength and endurance is 100% more effective.",
+              "passive": {
+                "kind": "training",
+                "amount": 2,
+                "stats": [
+                  "strength",
+                  "endurance"
+                ]
+              }
             }
           }
         },
         {
-          "level": 4,
+          "number": "143",
           "title": "Athletic Performance and Coaching",
           "description": "The senior course in sport: how a season is planned, how a squad is led, and how magic is and is not allowed on the field. Half of every week is at the Tiltyard, coaching a junior side under supervision.",
           "topics": [
@@ -1732,7 +1793,7 @@
             },
             {
               "title": "Pregnant Athletes and the Surge Rule",
-              "content": "A pregnant player's magic climbs steeply through her term, which upsets any division that allows casting. The surge rule answers it: from the middle weeks she is reclassified upward, playing Open even if she registered for Limited, and she takes the field only with a warded spotter on the touchline. Physical load is cut by a third, contact drills stop, and she is not asked to play through a term's last fortnight. No coach may bench a player for being pregnant; the rule changes where she plays, not whether.",
+              "content": "A pregnant player's magic climbs steeply through her term, which upsets any division that allows casting. The surge rule answers it: from the middle weeks she is reclassified upward, playing Open even if she registered for Limited, and she takes the field only with a warded spotter on the touchline. Physical load is cut by a third, contact drills stop, and she is not asked to play through a term's last two weeks. No coach may bench a player for being pregnant; the rule changes where she plays, not whether.",
               "question": {
                 "ask": "By how much is a pregnant athlete's physical load cut under the surge rule?",
                 "answer": "A third",
@@ -1773,7 +1834,7 @@
           "skill": {
             "id": "conditioned",
             "name": "Conditioned",
-            "description": "Classes and shifts take a quarter less out of you.",
+            "description": "You are in shape: classes and shifts cost 25% less energy.",
             "at": 30,
             "passive": {
               "kind": "effort",
@@ -1782,6 +1843,123 @@
             "below": {
               "kind": "footing",
               "amount": 1.2
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You are in peak shape: classes and shifts cost 40% less energy.",
+              "passive": {
+                "kind": "effort",
+                "amount": 0.6
+              }
+            }
+          }
+        },
+        {
+          "number": "176",
+          "title": "Sport Psychology",
+          "description": "The mind in competition: what makes an athlete train, how she keeps her nerve when a match turns on one point, and how she comes back from injury or burnout. Weekly lab at the Tiltyard puts each technique to work in pressure drills with the varsity volleyball and soccer squads. Prerequisite: KIN 101.",
+          "topics": [
+            {
+              "title": "Why an Athlete Trains",
+              "content": "Motivation comes in two kinds. Intrinsic motivation is the pleasure of the game itself; extrinsic motivation is the medal, the stipend or the coach's praise. Players who train for intrinsic reasons stay in the sport longer and train harder when nobody is watching. Coaches feed it with three things: a sense of choice in how a drill is run, a sense of getting better that can be measured, and a sense of belonging to the side. A prize helps for a season, but a player who trains only for the prize stops when it is won.",
+              "question": {
+                "ask": "Which kind of motivation keeps a player in the sport longer?",
+                "answer": "Intrinsic motivation",
+                "wrong": [
+                  "Extrinsic motivation",
+                  "Prize motivation",
+                  "Rival motivation"
+                ]
+              }
+            },
+            {
+              "title": "Arousal and the Inverted U",
+              "content": "Arousal is how keyed up the body is: heart rate, breath and muscle tension. The inverted-U model holds that performance rises with arousal up to a middle point and then falls off. Too flat and a player is slow to the ball; too high and her hands shake and her vision narrows. The best point is lower for fine skills such as a volleyball serve and higher for raw effort such as a sprint. Box breathing lowers arousal: in for four counts, hold four, out four, hold four, repeated three times.",
+              "question": {
+                "ask": "In box breathing, for how many counts is each step held?",
+                "answer": "Four",
+                "wrong": [
+                  "Two",
+                  "Six",
+                  "Eight"
+                ]
+              }
+            },
+            {
+              "title": "Focus and the Pre-Performance Routine",
+              "content": "Attention has two dimensions: broad or narrow, and outward or inward. A setter reading the whole court uses a broad outward focus; a penalty taker uses a narrow outward one, fixed on a single spot of the net. Distraction is handled with a pre-performance routine, the same short sequence before every serve, kick or lift. A good routine lasts under ten seconds and ends on one cue word, such as \"smooth\" or \"through\". Mages at Aether are taught the same habit before a casting, since a wandering mind spills magic.",
+              "question": {
+                "ask": "A good pre-performance routine ends on what?",
+                "answer": "One cue word",
+                "wrong": [
+                  "A deep bow",
+                  "A count of ten",
+                  "A glance at the coach"
+                ]
+              }
+            },
+            {
+              "title": "Pressure and Choking",
+              "content": "Choking is a sudden drop in performance under pressure, below what the player does in training. The usual cause is overthinking: a skill that runs on its own is taken back under conscious control, and it comes apart, so that a smooth serve turns stiff. The cure is to rehearse under pressure, with a crowd noise drill, a forfeit for a miss, or a scoreboard running. On the day the player thinks about the target and not the movement. Arena Finals squads practice in front of a full Tiltyard stand for the last three weeks of term.",
+              "question": {
+                "ask": "What is the usual cause of choking under pressure?",
+                "answer": "Overthinking",
+                "wrong": [
+                  "Lack of sleep",
+                  "Poor diet",
+                  "Overtraining"
+                ]
+              }
+            },
+            {
+              "title": "Confidence, Self-Talk and the Team",
+              "content": "Confidence comes mostly from past success, so a coach builds it with drills a player can win before raising the bar. Self-talk is the running voice in a player's head. Instructional self-talk names the task (\"eyes up\", \"drive the hip\") and suits skills; motivational self-talk (\"I can hold this\") suits endurance. Spoken in the third person, by her own name, it calms a player faster than in the first person. A team is cohesive in two ways: task cohesion, agreeing on the goal, and social cohesion, liking each other. Task cohesion predicts winning.",
+              "question": {
+                "ask": "Which kind of team cohesion predicts winning?",
+                "answer": "Task cohesion",
+                "wrong": [
+                  "Social cohesion",
+                  "Captain cohesion",
+                  "Crowd cohesion"
+                ]
+              }
+            },
+            {
+              "title": "Injury, Burnout and the Way Back",
+              "content": "An injured player goes through stages much like grief: denial, anger, low mood and then acceptance. Recovery is faster when she sets small weekly rehab goals, stays at training with the squad, and pictures the movement she cannot yet do. A healer mends tissue in minutes, but the fear of reinjury stays, and it is retrained with a graded return over two weeks. Burnout is exhaustion, a loss of meaning and a sense of getting worse. It follows months of training without rest, and the treatment is a full week away from the sport.",
+              "question": {
+                "ask": "What is the treatment for burnout?",
+                "answer": "A full week away from the sport",
+                "wrong": [
+                  "A double training load",
+                  "A pain-easing charm",
+                  "A change of position"
+                ]
+              }
+            }
+          ],
+          "skill": {
+            "id": "steady-mind",
+            "name": "A steady mind",
+            "description": "You keep your head under pressure: training in wisdom is 50% more effective.",
+            "at": 30,
+            "passive": {
+              "kind": "training",
+              "amount": 1.5,
+              "stats": [
+                "wisdom"
+              ]
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "Nothing rattles you: training in wisdom is 100% more effective.",
+              "passive": {
+                "kind": "training",
+                "amount": 2,
+                "stats": [
+                  "wisdom"
+                ]
+              }
             }
           }
         }
@@ -1798,9 +1976,9 @@
       "practical": true,
       "courses": [
         {
-          "level": 4,
+          "number": "101",
           "title": "Protective Operations and Sire Security",
-          "description": "Capstone course in executive and high-value protective operations, emphasising Sire escort detail, threat assessment, and coordination with national Sire Registry enforcement. Weekly lab runs simulated protection scenarios under graduated magical and physical pressure.",
+          "description": "Capstone course in executive and high-value protective operations, emphasizing Sire escort detail, threat assessment, and coordination with national Sire Registry enforcement. Weekly lab runs simulated protection scenarios under graduated magical and physical pressure.",
           "topics": [
             {
               "title": "Threat Assessment for Sire Principals",
@@ -1882,25 +2060,33 @@
             }
           ],
           "skill": {
-            "id": "reading-for-trouble",
-            "name": "Reading a room for trouble",
-            "description": "You see a scene coming and choose your ground: you are walked in on half as often.",
+            "id": "close-protection",
+            "name": "Close protection",
+            "description": "A woman out with you feels safe with you: trust from dates and outings grows 50% faster.",
             "at": 30,
-            "passive": {
-              "kind": "drama",
-              "amount": 0.5
-            },
             "below": {
               "kind": "ambush",
               "amount": 1
+            },
+            "passive": {
+              "kind": "escort",
+              "amount": 1.5
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "A woman out with you feels safer than anywhere: trust from dates and outings grows 100% faster.",
+              "passive": {
+                "kind": "escort",
+                "amount": 2
+              }
             }
           }
         }
       ]
     },
     {
-      "code": "ETH",
-      "subject": "Ethics and Society",
+      "code": "WOM",
+      "subject": "Women's Studies",
       "college": "arts-and-humanities",
       "general": false,
       "stats": [
@@ -1910,9 +2096,9 @@
       "practical": false,
       "courses": [
         {
-          "level": 1,
-          "title": "Ethics of Everyday Magic",
-          "description": "Introduction to moral reasoning about common magical practices: household wards, Bloom suppressants, fertility assays, and enchantments embedded in consumer goods. Students examine consent, privacy, and the line between personal magic and public harm.",
+          "number": "101",
+          "title": "Women, Magic and Consent",
+          "description": "Introduction to women's studies through the magic of everyday life: household wards, Bloom suppressants, fertility assays, and enchantments embedded in consumer goods. Students examine consent, privacy, and who decides where personal magic ends and public harm begins.",
           "topics": [
             {
               "title": "Why Everyday Magic Raises Moral Questions",
@@ -1997,18 +2183,26 @@
           "skill": {
             "id": "good-faith",
             "name": "Good faith",
-            "description": "You argue honestly and it shows: trust grows a quarter faster.",
+            "description": "You argue honestly and it shows: trust grows 25% faster.",
             "at": 30,
             "passive": {
               "kind": "trust",
               "amount": 1.25
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You argue honestly and everyone knows it: trust grows 50% faster.",
+              "passive": {
+                "kind": "trust",
+                "amount": 1.5
+              }
             }
           }
         },
         {
-          "level": 4,
+          "number": "193",
           "title": "Advanced Seminar: Freewill and Bloomism",
-          "description": "Capstone seminar on the central debate of women's studies: whether the Bloom's wants are a woman's own. Students engage primary philosophical and political texts, produce a substantial research paper, and present to the colloquium. Prerequisite: WST 201 and one additional WST course.",
+          "description": "Capstone seminar on the central debate of women's studies: whether the Bloom's wants are a woman's own. Students engage primary philosophical and political texts, produce a substantial research paper, and present to the colloquium. Prerequisite: WOM 101.",
           "topics": [
             {
               "title": "Framing the Oldest Argument",
@@ -2092,119 +2286,19 @@
           "skill": {
             "id": "hearing-her-out",
             "name": "Hearing her out",
-            "description": "You know how to be wrong well: losses of affection and trust are halved.",
+            "description": "You know how to be wrong well: lost affection and trust are 50% smaller.",
             "at": 30,
             "passive": {
               "kind": "losses",
               "amount": 0.5
-            }
-          }
-        }
-      ]
-    },
-    {
-      "code": "LNG",
-      "subject": "Foreign Languages",
-      "college": "arts-and-humanities",
-      "general": false,
-      "stats": [
-        "charisma",
-        "intelligence"
-      ],
-      "practical": false,
-      "courses": [
-        {
-          "level": 2,
-          "title": "Intermediate Language and Translation",
-          "description": "Continued development of reading, writing, and conversational fluency in the student's chosen language track, with introduction to translation theory and the particular challenges of rendering magical and legal terminology across Expanse cultures.",
-          "topics": [
-            {
-              "title": "Five Tongues of the Expanse",
-              "content": "The track languages differ in kind as well as in words. Kharadi, the speech of the orc holds, is terse and built around obligation. Veyran is a shared second language for peoples who each keep a tongue of their own at home. Iscaran is the working language of magic and of the portal network. Vesperan grew from a harbor trade speech and is the language of shipping and insurance. Starke, spoken in Hearthspire, is the least studied. Lowland, Breedhaven's own, has borrowed from all five.",
-              "question": {
-                "ask": "Which language is the working language of magic and of the portal network?",
-                "answer": "Iscaran",
-                "wrong": [
-                  "Kharadi",
-                  "Veyran",
-                  "Vesperan"
-                ]
-              }
             },
-            {
-              "title": "Kharadi: The Grammar of a Given Word",
-              "content": "Kharadi marks on the verb whether a statement is a report or an undertaking. The plain form states a fact. The bound form, made with the suffix -akh, commits the speaker: it is a promise, the form used in contracts and by a War-Mother giving her word. Lowland has no such distinction, so the translator must supply it with shall, undertake or warrant, never with will, which reads as mere prediction. Mistaking a plain form for a bound one in a draft contract is the commonest serious error.",
-              "question": {
-                "ask": "What does the bound form of a Kharadi verb express?",
-                "answer": "A promise",
-                "wrong": [
-                  "A plain fact",
-                  "A question",
-                  "A prediction"
-                ]
+            "upgrade": {
+              "at": 70,
+              "description": "You know how to be wrong gracefully: lost affection and trust are 75% smaller.",
+              "passive": {
+                "kind": "losses",
+                "amount": 0.25
               }
-            },
-            {
-              "title": "Veyran: Register and Indirection",
-              "content": "Assembly Veyran is nobody's mother tongue. It was standardized so that delegates of many peoples could legislate together, and it shows: regular grammar, few idioms, and an elaborate system of softening. A flat refusal is almost never written. A sentence saying it is conceivable that the committee will return to this means no. Rendered word for word into Lowland it gives a false impression of agreement. The practice is to translate the force of the sentence and footnote the form.",
-              "question": {
-                "ask": "What is the practice for translating a softened Assembly Veyran sentence?",
-                "answer": "Translate the force, footnote the form",
-                "wrong": [
-                  "Translate it word for word",
-                  "Leave it in the original",
-                  "Translate the form, footnote the force"
-                ]
-              }
-            },
-            {
-              "title": "Iscaran Magical Terminology",
-              "content": "Lowland took most of its technical vocabulary of magic from Iscaran, and the borrowings have drifted. Iscaran distinguishes a working done once by hand from a working fixed in an object; Lowland says enchantment loosely for both. Iscaran tier terms name the number of casters required, where Breedhaven tiers grade output and hazard, so the two scales do not map one to one. The rule for technical translation is to keep the source term at first use, gloss it, and never substitute a near equivalent.",
-              "question": {
-                "ask": "What do Iscaran tier terms name?",
-                "answer": "The number of casters required",
-                "wrong": [
-                  "The output and hazard",
-                  "The age of the working",
-                  "The cost of the materials"
-                ]
-              }
-            },
-            {
-              "title": "Vesperan and Starke: Contract and Measure",
-              "content": "Vesperan legal prose descends from ship's articles, and its key terms are shares. A party does not own a venture; she holds a lay in it, and a lay carries a matching portion of loss as well as gain. Rendering lay as stake or interest drops the liability. Starke poses the opposite problem, a word with too much in it: hearthmark is both a currency and a measured share of warmth, so a Starke price is literally a quantity of heat. Translators leave it untranslated and gloss it once.",
-              "question": {
-                "ask": "In Vesperan legal prose, what does a party hold in a venture?",
-                "answer": "A lay",
-                "wrong": [
-                  "A stake",
-                  "An interest",
-                  "A hearthmark"
-                ]
-              }
-            },
-            {
-              "title": "Equivalence, Untranslatables and Back-Translation",
-              "content": "Two aims pull against each other: formal equivalence, which keeps the wording, and functional equivalence, which keeps the effect. Legal and magical texts lean formal, because a court or a caster will act on the words. Kinship terms resist both. A Kharadi hold is not a Lowland household, and Second Bloom has no neat equivalent abroad. The working check is back-translation: a second translator returns the draft to the source language, and every mismatch is examined.",
-              "question": {
-                "ask": "Which check has a second translator return the draft to the source language?",
-                "answer": "Back-translation",
-                "wrong": [
-                  "Formal equivalence",
-                  "Functional equivalence",
-                  "Glossing"
-                ]
-              }
-            }
-          ],
-          "skill": {
-            "id": "right-first-words",
-            "name": "The right first words",
-            "description": "You know how to open with anyone: affection from your first scene with a woman is doubled.",
-            "at": 30,
-            "passive": {
-              "kind": "firstScene",
-              "amount": 2
             }
           }
         }
@@ -2214,7 +2308,7 @@
       "code": "EDU",
       "subject": "Education and Child Care",
       "college": "arts-and-humanities",
-      "general": false,
+      "general": true,
       "stats": [
         "wisdom",
         "charisma"
@@ -2222,7 +2316,7 @@
       "practical": false,
       "courses": [
         {
-          "level": 1,
+          "number": "101",
           "title": "Foundations of Child Care",
           "description": "How infants and young children are raised in Breedhaven: the creche and the household nursery, a child's first months, and the work of the nannies and teachers who do most of it. Includes placement hours at the University creche.",
           "topics": [
@@ -2308,11 +2402,19 @@
           "skill": {
             "id": "good-with-children",
             "name": "Good with children",
-            "description": "Children in your house can come to do one level better.",
+            "description": "You know how children are raised: children in your house can reach one level better.",
             "at": 30,
             "passive": {
               "kind": "care",
               "amount": 1
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You know how children thrive: children in your house can reach two levels better.",
+              "passive": {
+                "kind": "care",
+                "amount": 2
+              }
             }
           }
         }
@@ -2330,7 +2432,7 @@
       "practical": false,
       "courses": [
         {
-          "level": 1,
+          "number": "101",
           "title": "Media, Image and the Public Eye",
           "description": "How reputation is made and lost in a country that lives on its phones: Bloomr and the feed, the press, the public life of a Sire, and the difference between being known and being talked about.",
           "topics": [
@@ -2421,6 +2523,123 @@
             "passive": {
               "kind": "desireGate",
               "amount": 5
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You are spoken of warmly everywhere: every woman needs 10 less desire.",
+              "passive": {
+                "kind": "desireGate",
+                "amount": 10
+              }
+            }
+          }
+        },
+        {
+          "number": "119",
+          "title": "Speaking Across Difference",
+          "description": "Interpersonal and intercultural communication in practice: interpreting and translation between Breedhaven and its neighbors, the signals a body sends before a word is said, listening, and framing a message for the people who will hear it. Weekly exercises pair students across languages and kinds, and close with the habits of conversation in a country where anything said may be posted. No prerequisites.",
+          "topics": [
+            {
+              "title": "Interpreting in Practice",
+              "content": "Interpreting is spoken; translation is written. Consecutive interpreting waits for the speaker to pause, then renders the passage whole, and suits a clinic, a court or a dinner. Simultaneous interpreting runs two or three seconds behind the speaker from a booth, and is so tiring that interpreters work in pairs and change over every thirty minutes. The Veyran National Assembly sits in nine working languages, and its interpreters work only into their own mother tongue.",
+              "question": {
+                "ask": "How often do simultaneous interpreters working in a pair change over?",
+                "answer": "Every thirty minutes",
+                "wrong": [
+                  "Every five minutes",
+                  "Every two hours",
+                  "At the end of each speech"
+                ]
+              }
+            },
+            {
+              "title": "Sense Before Words",
+              "content": "A word-for-word translation is almost always a wrong one. The working rule is sense before words: render what the speaker meant, in the register she meant it, and let the grammar fall where the second language puts it. Idioms are replaced by an idiom of equal weight, never carried across literally. Titles and forms of address are the commonest trap; a Veyran honorific dropped from a letter reads as a snub. When no equivalent exists, the translator keeps the word and explains it once.",
+              "question": {
+                "ask": "What is the working rule of translation?",
+                "answer": "Sense before words",
+                "wrong": [
+                  "Words before sense",
+                  "Grammar before register",
+                  "Keep every idiom literally"
+                ]
+              }
+            },
+            {
+              "title": "Signals Before Speech",
+              "content": "Most of a first impression is formed in the opening seven seconds, before much is said. Posture, distance and the eyes do the work. Comfortable conversation in Breedhaven stands at about an arm's length; Kharad-Tor stands closer, and Veyran custom further. Held eye contact reads as honesty here but as challenge to many wolfkin, who glance away to show respect. Beastkin ears and tails show feeling faster than any face: ears laid flat mean unease, whatever the smile says. When signal and words disagree, listeners believe the signal.",
+              "question": {
+                "ask": "When a speaker's signals and words disagree, which do listeners believe?",
+                "answer": "The signal",
+                "wrong": [
+                  "The words",
+                  "Whichever came first",
+                  "Neither of them"
+                ]
+              }
+            },
+            {
+              "title": "Listening Is Work",
+              "content": "People speak at about 130 words a minute and think at three times that, so a listener's mind has room to wander, rehearse a reply or judge. Active listening fills the gap with three moves: attend without interrupting, reflect back the gist in fresh words, and ask one open question that follows from what was said. Advice offered before the speaker asks for it is heard as not listening. The test of a good listener is simple: the speaker leaves feeling understood, not answered.",
+              "question": {
+                "ask": "About how fast do people speak?",
+                "answer": "About 130 words a minute",
+                "wrong": [
+                  "About 40 words a minute",
+                  "About 400 words a minute",
+                  "About 1,000 words a minute"
+                ]
+              }
+            },
+            {
+              "title": "Framing for an Audience",
+              "content": "Before any message, three questions: who will hear it, what do they already know, and what should they do afterward. The same fact is framed differently for each audience. A risk is put as a loss to the cautious and as a chance to the ambitious; a rule is explained to a peer and simply stated to a crowd. Audiences remember the first and the last thing said, so the point goes at both ends. A message framed for everyone at once lands with no one in particular.",
+              "question": {
+                "ask": "Which parts of a message do audiences remember best?",
+                "answer": "The first and the last thing said",
+                "wrong": [
+                  "Only the middle",
+                  "Whatever is repeated most",
+                  "The longest passage"
+                ]
+              }
+            },
+            {
+              "title": "Conversation in a Posted World",
+              "content": "On a campus where every student carries a camera, the working assumption is a third listener: anything said aloud in company may reach the feed by evening. The common courtesy is to ask before posting anyone's face, and to ask again before posting it with a name. A screenshot of a private message breaks a confidence even when every word in it is true. Arguments are settled in person or by voice, never in replies, because a public quarrel on Bloomr has an audience and no ending.",
+              "question": {
+                "ask": "What is the common courtesy before posting someone's face?",
+                "answer": "Asking first",
+                "wrong": [
+                  "Tagging them afterward",
+                  "Blurring the background",
+                  "Posting it only at night"
+                ]
+              }
+            }
+          ],
+          "skill": {
+            "id": "how-you-come-across",
+            "name": "How you come across",
+            "description": "You know how you sound to others: training in charisma is 50% more effective.",
+            "at": 30,
+            "passive": {
+              "kind": "training",
+              "amount": 1.5,
+              "stats": [
+                "charisma"
+              ]
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You can win over a room: training in charisma is 100% more effective.",
+              "passive": {
+                "kind": "training",
+                "amount": 2,
+                "stats": [
+                  "charisma"
+                ]
+              }
             }
           }
         }
@@ -2438,7 +2657,7 @@
       "practical": false,
       "courses": [
         {
-          "level": 1,
+          "number": "101",
           "title": "Household Enchantment and Management",
           "description": "Practical and theoretical introduction to the enchanted household: built-in wards, preservation charms, heating and lighting systems, garden magic, and the domestic economy of a magitech home. No prerequisites.",
           "topics": [
@@ -2524,9 +2743,13 @@
           "skill": {
             "id": "eye-for-taste",
             "name": "An eye for taste",
-            "description": "After time spent with a woman you work out one thing she likes or dislikes that you did not know.",
+            "description": "You notice what a woman likes: after time with her, you learn one of her likes or dislikes you did not know.",
             "at": 30,
-            "grants": "tastes"
+            "grants": "tastes",
+            "upgrade": {
+              "at": 70,
+              "description": "You notice everything a woman likes: after time with her, you learn two of her likes or dislikes you did not know."
+            }
           }
         }
       ]
@@ -2543,7 +2766,7 @@
       "practical": false,
       "courses": [
         {
-          "level": 1,
+          "number": "101",
           "title": "Psychology of the Bloom",
           "description": "Introduction to the psychological dimensions of the Bloom in women: the generative drive, its developmental trajectory, its intensification in pregnancy, and its absence after menopause. Covers damper effects and the psychology of Sire proximity. No prerequisites.",
           "topics": [
@@ -2627,11 +2850,22 @@
             }
           ],
           "skill": {
-            "id": "reading-desire",
-            "name": "Reading desire",
-            "description": "You can tell how much a woman would have to want you before she would go to bed with you: her profile says how far there is to go.",
+            "id": "easing-the-pull",
+            "name": "Easing the pull",
+            "description": "You understand the pull of the Bloom between women: when women share a scene with you, the ties between them grow 25% faster.",
             "at": 30,
-            "grants": "desire"
+            "passive": {
+              "kind": "bonds",
+              "amount": 1.25
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You draw women together: when women share a scene with you, the ties between them grow 50% faster.",
+              "passive": {
+                "kind": "bonds",
+                "amount": 1.5
+              }
+            }
           }
         }
       ]
@@ -2647,7 +2881,7 @@
       "practical": true,
       "courses": [
         {
-          "level": 1,
+          "number": "101",
           "title": "Introduction to Computing",
           "description": "Fundamentals of programming, data structures, and algorithms, with applications to enchantment modeling, ward simulation, and Registry database systems. Weekly laboratory covers hands-on coding and debugging. No prerequisites.",
           "topics": [
@@ -2731,11 +2965,15 @@
             }
           ],
           "skill": {
-            "id": "pattern-of-life",
-            "name": "Pattern of life",
-            "description": "You can work out where a woman usually is through the week: her profile lists it.",
+            "id": "running-the-odds",
+            "name": "Running the odds",
+            "description": "You can work out the odds: at poker, you see your chance of winning each hand.",
             "at": 30,
-            "grants": "schedule"
+            "grants": "odds",
+            "upgrade": {
+              "at": 70,
+              "description": "You can read the table: at poker, you see your chance of winning each hand and the move it calls for."
+            }
           }
         }
       ]
@@ -2751,7 +2989,7 @@
       "practical": false,
       "courses": [
         {
-          "level": 1,
+          "number": "101",
           "title": "Calculus and Statistics",
           "description": "Differential and integral calculus with an introduction to probability and statistics, emphasizing applications in magical engineering, thaumic measurement, and biological assay. No prerequisites.",
           "topics": [
@@ -2837,11 +3075,19 @@
           "skill": {
             "id": "working-it-through",
             "name": "Working it through",
-            "description": "You study efficiently: study and Focus earn a quarter more marks.",
+            "description": "You study efficiently: study and Focus earn 25% more marks.",
             "at": 30,
             "passive": {
               "kind": "marks",
               "amount": 1.25
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You study like a scholar: study and Focus earn 50% more marks.",
+              "passive": {
+                "kind": "marks",
+                "amount": 1.5
+              }
             }
           }
         }
@@ -2859,7 +3105,7 @@
       "practical": true,
       "courses": [
         {
-          "level": 1,
+          "number": "101",
           "title": "Prenatal Thaumaturgy",
           "description": "Survey of the magical changes of pregnancy and their practical applications and risks. Weekly laboratory covers measurement of gestational thaumic output, prenatal warding, and safety protocols for pregnant practitioners. No prerequisites.",
           "topics": [
@@ -2945,12 +3191,17 @@
           "skill": {
             "id": "ward-reading",
             "name": "Ward reading",
-            "description": "You can tell whether a woman is taking anything against the Bloom: her profile says whether she is on birth control.",
+            "description": "You can tell whether a woman takes anything against the Bloom: her profile shows whether she is on birth control.",
             "at": 30,
             "grants": "contraception",
             "below": {
               "kind": "grounding",
               "amount": 1
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You can tell what a woman takes against the Bloom and where she is in her cycle: her profile shows whether she is on birth control and when she is on her period.",
+              "alsoGrants": "cycle"
             }
           }
         }
@@ -2968,7 +3219,7 @@
       "practical": true,
       "courses": [
         {
-          "level": 1,
+          "number": "101",
           "title": "Reproductive Biology of the Sown Expanse",
           "description": "The biology of the seven-to-one sex ratio, Sire fertility, and the mechanisms by which pregnancy amplifies a woman's magic. Weekly laboratory introduces assay techniques, basic histology, and statistical analysis of fertility data. No prerequisites.",
           "topics": [
@@ -3052,11 +3303,26 @@
             }
           ],
           "skill": {
-            "id": "cycle-sense",
-            "name": "Cycle sense",
-            "description": "You can tell when a woman is on her period: her profile says so.",
+            "id": "back-in-bloom",
+            "name": "Back in bloom",
+            "description": "You know how a mother's body mends: she can conceive again right after a birth.",
             "at": 30,
-            "grants": "cycle"
+            "passive": {
+              "kind": "recovery",
+              "amount": 0
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You know how a mother's body mends: she can conceive again right after a birth, and every woman who has had your child wants you as much as a woman can.",
+              "passive": {
+                "kind": "recovery",
+                "amount": 0
+              },
+              "alsoPassive": {
+                "kind": "devoted",
+                "amount": 1
+              }
+            }
           }
         }
       ]
@@ -3073,7 +3339,7 @@
       "practical": true,
       "courses": [
         {
-          "level": 1,
+          "number": "101",
           "title": "Studio Art Foundations",
           "description": "Introduction to drawing, painting, and sculptural practice, with attention to the use of Bloom-infused pigments and materials. Weekly laboratory provides guided studio time and critique. No prerequisites.",
           "topics": [
@@ -3159,7 +3425,7 @@
           "skill": {
             "id": "steady-hand",
             "name": "A steady hand",
-            "description": "Work on dexterity goes half as far again.",
+            "description": "You have a steady hand: training in dexterity is 50% more effective.",
             "at": 30,
             "passive": {
               "kind": "training",
@@ -3167,6 +3433,132 @@
               "stats": [
                 "dexterity"
               ]
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "Your hands are sure: training in dexterity is 100% more effective.",
+              "passive": {
+                "kind": "training",
+                "amount": 2,
+                "stats": [
+                  "dexterity"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "code": "ENG",
+      "subject": "English",
+      "college": "arts-and-humanities",
+      "general": true,
+      "stats": [
+        "intelligence"
+      ],
+      "practical": false,
+      "courses": [
+        {
+          "number": "101",
+          "title": "College Writing and Literature",
+          "description": "A general-education course in reading closely and writing clearly: the argued essay, the use of sources, and a short run of Breedhaven fiction and poetry, from the orchard ballads to the household novel. No prerequisites.",
+          "topics": [
+            {
+              "title": "The Thesis",
+              "content": "An essay argues one thing, and says what it is in its first paragraph. A thesis is a claim someone could disagree with: \"The Lantern Festival is popular\" is a fact, \"The Lantern Festival survives because it lets a household be seen together in public\" is a thesis. Each paragraph after it gives one reason for it, and a paragraph that does not serve the thesis is cut, however good it is.",
+              "question": {
+                "ask": "What must a thesis be, to be one?",
+                "answer": "A claim someone could disagree with",
+                "wrong": [
+                  "A fact everyone accepts",
+                  "A question to the reader",
+                  "A summary of the sources"
+                ]
+              }
+            },
+            {
+              "title": "Using Sources",
+              "content": "A source is quoted when its exact words matter and paraphrased when only its idea does. Either way it is cited, by author and page, so the reader can check it. A quotation never stands alone: it is introduced, then explained in the writer's own words. Passing off another writer's words or ideas as one's own is plagiarism, and the University treats it as cheating, whatever the intent.",
+              "question": {
+                "ask": "When should a source be quoted rather than paraphrased?",
+                "answer": "When its exact words matter",
+                "wrong": [
+                  "Whenever it is long",
+                  "Only when it agrees with the thesis",
+                  "Never in a short essay"
+                ]
+              }
+            },
+            {
+              "title": "The Orchard Ballads",
+              "content": "Breedhaven's oldest poems are the orchard ballads, sung at harvest long before they were written down. They are in four-line stanzas with a refrain, and most tell the same story in a hundred forms: a household that plants, waits and is rewarded or ruined by the season. The refrain is the point: the community sings it together, so the ballad is less one singer's tale than everyone's.",
+              "question": {
+                "ask": "What is the defining feature of the orchard ballads?",
+                "answer": "A refrain the community sings together",
+                "wrong": [
+                  "Unrhymed long lines",
+                  "A single named author",
+                  "A tragic ending every time"
+                ]
+              }
+            },
+            {
+              "title": "The Household Novel",
+              "content": "The household novel is Breedhaven's great prose form, as the household portrait is its great painting. It follows several women of one house over years, none of them the single heroine, and its drama is the balance between them: who is heard, who gives way, how a child changes the house. Its classic, Sabine Orrell's The Long Table, has no villain at all, and readers still argue about whether it has an ending.",
+              "question": {
+                "ask": "What sets the household novel apart from a novel with one heroine?",
+                "answer": "It follows several women of one house, none of them the single heroine",
+                "wrong": [
+                  "It is written in verse",
+                  "It is always told by the Sire",
+                  "It covers a single day"
+                ]
+              }
+            },
+            {
+              "title": "Point of View",
+              "content": "Who tells a story decides what the reader can know. A first-person narrator knows only what she saw and may be wrong about it. A close third-person narrator follows one character's mind without being her. An omniscient narrator moves between minds at will. When analyzing fiction, ask what the narrator cannot see, because a story's meaning often lies in the gap between what she says and what the reader understands.",
+              "question": {
+                "ask": "Which narrator knows only what she saw, and may be wrong about it?",
+                "answer": "A first-person narrator",
+                "wrong": [
+                  "An omniscient narrator",
+                  "A close third-person narrator",
+                  "A chorus"
+                ]
+              }
+            },
+            {
+              "title": "Revision",
+              "content": "A draft is where the writer finds out what she thinks; revision is where she makes the essay say it. Work from the largest change to the smallest: first whether the thesis is the one the essay actually argues, then the order of paragraphs, then sentences, and only last the spelling. Reading the essay aloud catches what the eye skips. A finished essay is usually shorter than its first draft.",
+              "question": {
+                "ask": "In what order should an essay be revised?",
+                "answer": "From the largest change to the smallest",
+                "wrong": [
+                  "Spelling first, then the thesis",
+                  "Paragraph by paragraph, start to end",
+                  "Only the conclusion"
+                ]
+              }
+            }
+          ],
+          "skill": {
+            "id": "speaking-her-creed",
+            "name": "Smooth talker",
+            "description": "You are a smooth talker: every woman trusts you 5 more.",
+            "at": 30,
+            "passive": {
+              "kind": "trustBonus",
+              "amount": 5
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You are a born smooth talker: every woman trusts you 10 more.",
+              "passive": {
+                "kind": "trustBonus",
+                "amount": 10
+              }
             }
           }
         }
@@ -3183,7 +3575,7 @@
       "practical": false,
       "courses": [
         {
-          "level": 1,
+          "number": "101",
           "title": "Peoples and Politics of the Sown Expanse",
           "description": "Comparative survey of the nations and peoples of the Sown Expanse: their governments, economies, magical traditions, and relations with Breedhaven. Covers the regions beyond the Expanse and the status of migrants and outsiders. No prerequisites.",
           "topics": [
@@ -3269,7 +3661,7 @@
           "skill": {
             "id": "knowing-what-travels",
             "name": "Knowing what travels",
-            "description": "You know where a thing is from and why it matters: a gift that lands is worth half as much again.",
+            "description": "You know where a thing is from and why it matters: a gift she likes is worth 50% more.",
             "at": 30,
             "passive": {
               "kind": "gifts",
@@ -3278,6 +3670,14 @@
             "below": {
               "kind": "spoils",
               "amount": 1.25
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You know the story of everything you give: a gift she likes is worth 100% more.",
+              "passive": {
+                "kind": "gifts",
+                "amount": 2
+              }
             }
           }
         }
@@ -3294,7 +3694,7 @@
       "practical": false,
       "courses": [
         {
-          "level": 1,
+          "number": "101",
           "title": "The Bloom in History",
           "description": "A general-education survey of the Primordial Bloom as a historical force, from oral traditions and early natural philosophy to its role in the founding of the Sown Expanse's modern states. No prerequisites.",
           "topics": [
@@ -3380,11 +3780,19 @@
           "skill": {
             "id": "habit-of-reading",
             "name": "Habit of reading",
-            "description": "You read in every spare hour: Focus earns three quarters of a session, not half.",
+            "description": "You read in every spare hour: Focus is worth 50% more.",
             "at": 30,
             "passive": {
               "kind": "focus",
               "amount": 1.5
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You read at every chance: Focus is worth 100% more.",
+              "passive": {
+                "kind": "focus",
+                "amount": 2
+              }
             }
           }
         }
@@ -3401,13 +3809,13 @@
       "practical": true,
       "courses": [
         {
-          "level": 1,
+          "number": "101",
           "title": "Music Theory and Practice",
           "description": "Foundations of melody, harmony, rhythm, and form, with an introduction to resonant and thaumically enhanced instruments. Weekly laboratory includes ensemble performance and ear training. No prerequisites.",
           "topics": [
             {
               "title": "Pitch, Scale and the Octave",
-              "content": "Pitch is how high or low a note sounds. Doubling the speed of vibration gives the same note an octave higher, and the octave is divided into twelve equal semitones. A major scale picks seven of them in the pattern tone, tone, semitone, tone, tone, tone, semitone. An old nursery rhyme calls the seven notes the seven sisters and the eighth, the octave, the brother who comes home. Sung up from C on the white keys of a piano, the scale needs no sharps or flats, which is why teaching starts there.",
+              "content": "Pitch is how high or low a note sounds. Doubling the speed of vibration gives the same note an octave higher, and the octave is divided into twelve equal semitones. A major scale picks seven of them in the pattern tone, tone, semitone, tone, tone, tone, semitone. An old nursery rhyme calls the seven notes the seven sisters and the eighth, the octave, the brother who comes home. Sung up from C on the white keys of a piano, the scale needs no sharps or apartments, which is why teaching starts there.",
               "question": {
                 "ask": "From which note is a major scale sung on the white keys alone?",
                 "answer": "C",
@@ -3487,11 +3895,19 @@
           "skill": {
             "id": "ear-for-a-mood",
             "name": "Ear for a mood",
-            "description": "You know how to set one: desire grows a quarter faster.",
+            "description": "You know how to set a mood: desire grows 25% faster.",
             "at": 30,
             "passive": {
               "kind": "desire",
               "amount": 1.25
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You can set any mood: desire grows 50% faster.",
+              "passive": {
+                "kind": "desire",
+                "amount": 1.5
+              }
             }
           }
         }
@@ -3508,7 +3924,7 @@
       "practical": false,
       "courses": [
         {
-          "level": 1,
+          "number": "101",
           "title": "Rhetoric and Debate",
           "description": "Principles of argumentation, persuasion, and public speaking. Students analyze and construct arguments on topics of public controversy, including Bloom policy, Sire regulation, and royal prerogative. No prerequisites.",
           "topics": [
@@ -3594,9 +4010,13 @@
           "skill": {
             "id": "reading-the-room",
             "name": "Reading the room",
-            "description": "In a scene you can see how comfortable each woman is, and why.",
+            "description": "You can read a room: in a scene, you see how comfortable each woman is, and why.",
             "at": 30,
-            "grants": "comfort"
+            "grants": "comfort",
+            "upgrade": {
+              "at": 70,
+              "description": "You can put a room at ease: in a scene you see how comfortable each woman is, and none falls below uneasy."
+            }
           }
         }
       ]

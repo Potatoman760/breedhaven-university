@@ -53,7 +53,7 @@ export function NewCharacterDialog({ onDraft, onSkip, onClose }: Props) {
             maxLength={2000}
             autoFocus
             disabled={busy}
-            placeholder="A catkin exchange student from Veyra reading Journalism, who runs the student paper and is investigating who leaked the Sire Registry. Sharp, nosy, secretly lonely."
+            placeholder="A catkin exchange student from Veyra majoring in Journalism, who runs the student paper and is investigating who leaked the Sire Registry. Sharp, nosy, secretly lonely."
             onChange={(e) => setIdea(e.target.value)}
           />
           <span className="hint">

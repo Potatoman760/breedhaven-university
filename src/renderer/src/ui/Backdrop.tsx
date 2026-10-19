@@ -39,7 +39,7 @@ export function Backdrop({ location, periodId, light, backgroundId, screen, room
       <>
         <div className="stage-art">
           {background ? background.image : `No background set for ${location?.name ?? 'here'}`}
-          <span>{background ? 'Background file not found' : 'Add one under Edit game content, Locations'}</span>
+          <span>{background ? 'Background file not found' : 'No background'}</span>
         </div>
         {fx}
       </>

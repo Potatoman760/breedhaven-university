@@ -47,7 +47,7 @@
   {
     "id": "loyal",
     "name": "Loyal",
-    "definition": "Stands by the people they care about, even at a cost to themselves. Defends friends when they are criticised and remembers promises.",
+    "definition": "Stands by the people they care about, even at a cost to themselves. Defends friends when they are criticized and remembers promises.",
     "drama": {
       "jealousy": 5,
       "sociable": 0
@@ -65,7 +65,7 @@
   {
     "id": "obsessive",
     "name": "Obsessive",
-    "definition": "Fixes on one person and cannot easily let him out of her thoughts or her sight. Knows his timetable, turns up where he is, reads meaning into small things, and takes any distance hard.",
+    "definition": "Fixes on one person and cannot easily let him out of her thoughts or her sight. Knows his schedule, turns up where he is, reads meaning into small things, and takes any distance hard.",
     "drama": {
       "jealousy": 20,
       "sociable": 0

@@ -1,4 +1,4 @@
-import { MEMORY_LEVEL_LABELS, picturedOutfit, EXPRESSIONS, isPregnantPose, poseDescription, poseMedia, kindOf, outfitDescription, type ChatMessage, type ContentPack, type LoveInterest, type Departure, type GameState, type Lesson, type Npc, type Proposal, type Scene, type SceneBeat, type SceneGift } from '../model'
+import { MEMORY_LEVEL_LABELS, picturedOutfit, EXPRESSIONS, isPregnantPose, poseDescription, poseMedia, kindOf, classYear, outfitDescription, type ChatMessage, type ContentPack, type LoveInterest, type Departure, type GameState, type Lesson, type Npc, type Proposal, type Scene, type SceneBeat, type SceneGift, type RelicUse } from '../model'
 import { describeGift } from './market'
 import { examNotes } from './exams'
 import { attendees, describeWhen, upcomingAppointments } from './appointments'
@@ -26,6 +26,9 @@ import { AGREED_TAG, firstNames, SCENE_END_TAG, SEEDED_TAG, SLEEP_TAG } from './
 import { describePlayerRoom, playerRoom, describePlace, describeRoom, describeWeather, roomOwner, sceneView } from './sceneMoves'
 import { backgroundFor, isIndoors } from './schedule'
 import { weatherOn } from './weather'
+import { describeRelicUses, relicTraitIds } from './relics'
+import { trustOf } from './modifiers'
+import { skillLevel } from './skills'
 
 // Characters know about events this many days ahead.
 const UPCOMING_EVENT_DAYS = 7
@@ -50,6 +53,10 @@ export interface PromptInput {
   lesson?: Lesson
   /** Nothing has been said yet: this reply opens the scene. */
   opening?: boolean
+  /** Those in the scene whom nothing holds back: the sex gate is open to each of them. */
+  uninhibited?: string[]
+  /** What the relics he has used in the scene have set going in it. */
+  relics?: RelicUse[]
   /**
    * Other love interests in the scene. The LLM writes their lines too, each line named
    * for its speaker.
@@ -149,8 +156,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
     isNpc || !content.coursework
       ? undefined
       : kind === 'student' && li.studies
-        ? `You are a student at the University, reading ${li.studies.subject}` +
-          `${li.studies.level >= 5 ? ' as a graduate' : `, in your year ${li.studies.level}`}.` +
+        ? `You are a ${classYear(li.studies.level)} at the University, ${li.studies.level >= 5 ? 'in' : 'majoring in'} ${li.studies.subject}.` +
           clubs
         : kind === 'teacher' && li.teaching
           ? `You teach at the University: ${li.teaching.title} of ${li.teaching.department}, giving ` +
@@ -191,14 +197,16 @@ export function buildCharacterPrompt(input: PromptInput): string {
   const outfits = wearableOutfits(li)
   const wearing = (c: LoveInterest, worn: ReturnType<typeof wornOutfit>): string => (worn ? ordinaryOutfit(c, worn).id : c.defaultOutfitId)
   const cast = [li, ...companions]
-  const fertile = cast.filter((c) => canConceive(content, state, c.id) && sexGate(content, state, c).open)
+  const fertile = cast.filter((c) => canConceive(content, state, c.id) && sexGate(content, state, c, input.uninhibited?.includes(c.id)).open)
   // Only a pose with something to show can be asked for.
   // The poses that can be asked for are the ordinary ones. One drawn pregnant is put up in its place by the game, once she shows.
   const posesOf = (who: LoveInterest) => who.animations.filter((a) => poseMedia(a).length > 0 && !isPregnantPose(a.id))
   // A woman who will not go to bed with him in this scene is told nothing of sex-acts: there is none for her to choose.
-  const actsOf = (c: LoveInterest) => (isNpc || sexGate(content, state, c).open ? posesOf(c) : [])
+  const actsOf = (c: LoveInterest) => (isNpc || sexGate(content, state, c, input.uninhibited?.includes(c.id)).open ? posesOf(c) : [])
   const animations = actsOf(li)
-  const traitsOf = (ids: string[]) => content.traits.filter((t) => ids.includes(t.id))
+  // Her own traits, and any every woman has from a relic he has on.
+  const fromRelics = isNpc ? [] : relicTraitIds(content, state)
+  const traitsOf = (ids: string[]) => content.traits.filter((t) => ids.includes(t.id) || fromRelics.includes(t.id))
   const isBirthday = li.birthday?.month === date.month.id && li.birthday.day === date.day
 
   const ctx = { state, content, loveInterestId: li.id }
@@ -342,19 +350,21 @@ export function buildCharacterPrompt(input: PromptInput): string {
 
     !isNpc && section(`Your relationship with ${player.name}`, [
       `Stage: ${stage.name}. ${stage.description}`.trim(),
-      `Affection ${rel.affection}, trust ${rel.trust}, desire ${rel.desire} ` +
+      `Affection ${rel.affection}, trust ${trustOf(content, state, li.id)}, desire ${rel.desire} ` +
         `(each out of ${content.relationships.meterMax}).`,
       `${describeIntimacy(state, li.id)}.`,
       ...describeAppeal(state, li)
     ]),
 
+    // What a relic he has used in the scene has set going, as a rule of it.
+    !isNpc && !byCourier && (input.relics ?? []).length > 0 && section('What has been done to this scene', describeRelicUses(input.relics ?? [], player.name, group)),
     // Whether each woman here will go to bed with him is the game's to say, and what she takes against the Bloom.
     !isNpc &&
       !byCourier &&
       section(
         `Sex with ${player.name}`,
         cast.flatMap((c) => {
-          const lines = describeSexGate(content, state, c, group)
+          const lines = describeSexGate(content, state, c, group, input.uninhibited?.includes(c.id))
           return group ? [`For ${c.name.split(' ')[0]}, written here as "you":`, ...lines] : lines
         })
       ),
@@ -395,7 +405,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
       memories.length === 0
         ? []
         : [
-            'Most important first. A core memory is one that defines what you are to each other: it stays with you and colours everything. A fleeting one has mostly faded.',
+            'Most important first. A core memory is one that defines what you are to each other: it stays with you and colors everything. A fleeting one has mostly faded.',
             ...memories.map((m) => {
               const then = toDate(content.calendar, m.time)
               return `- ${MEMORY_LEVEL_LABELS[m.level]}, ${describeAge(content, m, state.time)} (${then.day} ${then.month.name}): ${m.summary}`
@@ -578,7 +588,8 @@ export function buildCharacterPrompt(input: PromptInput): string {
         `The number is how much ${group ? 'she wants' : 'you want'} to be here: 5 glad of it, 4 fine, 3 wary, 2 wanting a way out, 1 leaving. ` +
           (group
             ? `Judge it for each woman as herself, from what ${player.name} asks of her, how hard he presses and what he does with another of you in front of her. It can recover.`
-            : `Judge it as yourself, from what ${player.name} asks of you and how hard he presses. It can recover.`),
+            : `Judge it as yourself, from what ${player.name} asks of you and how hard he presses. It can recover.`) +
+          (skillLevel(content, state, 'comfort') === 2 ? ` With ${player.name} it never falls below 2.` : ''),
         ...cast.map((c) => {
           const said = input.comfort?.[c.id]
           const who = group ? c.name.split(' ')[0] : 'You'

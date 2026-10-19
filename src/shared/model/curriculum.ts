@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { AbilitySchema, SKILL_GRANTS } from './skill'
+import { AbilitySchema, SKILL_GRANTS, SkillUpgradeSchema } from './skill'
 import { ModifierSchema } from './modifier'
 import { StatSchema } from './stats'
 import { TopicSchema } from './syllabus'
@@ -16,13 +16,14 @@ const WrittenSkillSchema = z.object({
   grants: z.enum(SKILL_GRANTS).optional(),
   passive: ModifierSchema.optional(),
   ability: AbilitySchema.optional(),
-  below: ModifierSchema.optional()
+  below: ModifierSchema.optional(),
+  upgrade: SkillUpgradeSchema.optional()
 })
 
 /** A course as it is written: what it is called, what its classes are on, and what getting on in it teaches. */
 export const WrittenCourseSchema = z.object({
-  /** The year it is taught at: 1-4 for undergraduates, 5 for graduates. */
-  level: z.number().int().min(1).max(5),
+  /** Its number in the catalog, after its subject's code: `132` for `BUS 132`. A label, not a year: any student may take it. */
+  number: z.string().regex(/^1\d\d$/),
   title: z.string(),
   description: z.string().default(''),
   /** Open to everyone though its subject is one that is read: the first course of a department every student passes through. */
@@ -34,7 +35,7 @@ export const WrittenCourseSchema = z.object({
 })
 export type WrittenCourse = z.infer<typeof WrittenCourseSchema>
 
-/** A subject the University teaches: what a student reads, or a general course open to everyone. */
+/** A subject the University teaches: what a student majors in, or a general course open to everyone. */
 export const MajorSchema = z.object({
   /** Catalogue prefix, e.g. `POL`. */
   code: z.string(),
@@ -53,7 +54,7 @@ export type Major = z.infer<typeof MajorSchema>
 
 /**
  * Everything the University teaches, written down: its colleges, the subjects in them, and each subject's courses
- * with their syllabuses and what they teach. Characters do not make subjects up: a student reads one of these and a
+ * with their syllabuses and what they teach. Characters do not make subjects up: a student majors in one of these and a
  * teacher gives courses from it. Which of the courses are given in a game, when, and to whom, is the catalogue's.
  */
 export const CurriculumSchema = z.object({
@@ -62,26 +63,28 @@ export const CurriculumSchema = z.object({
 })
 export type Curriculum = z.infer<typeof CurriculumSchema>
 
-/** A course's catalogue number: `POL 101`. One course is written for a subject at a year, so the last two digits are always 01. */
-export function courseNumber(code: string, level: number): string {
-  return `${code} ${level}01`
+/** A course's catalogue number: `POL 132`, its subject's code and the number written for it. */
+export function courseNumber(code: string, number: string): string {
+  return `${code} ${number}`
 }
 
-/** A course's id, from its number: `course-pol-101`. */
-export function courseId(code: string, level: number): string {
-  return `course-${courseNumber(code, level).toLowerCase().replace(/\s+/g, '-')}`
+/** A course's id, from its number: `course-pol-132`. */
+export function courseId(code: string, number: string): string {
+  return `course-${courseNumber(code, number).toLowerCase().replace(/\s+/g, '-')}`
 }
 
 type Raw = Record<string, unknown>
 const isObject = (value: unknown): value is Raw => typeof value === 'object' && value !== null && !Array.isArray(value)
 
-/** What a character's file says she reads or teaches, as the rest of the game has it: her subject in full, from the curriculum. */
+/** What a character's file says she studies or teaches, as the rest of the game has it: her subject in full, from the curriculum. */
 function resolveSubject(majors: Major[], written: unknown): unknown {
   if (!isObject(written) || typeof written['major'] !== 'string') return written
   const major = majors.find((one) => one.code === written['major'])
   // A subject there is no such thing as is left as it is written, to be reported when the pack is checked.
-  if (!major) return { subject: written['major'], code: written['major'], level: written['level'], unknownMajor: true }
-  return { subject: major.subject, code: major.code, level: written['level'], stats: major.stats, practical: major.practical }
+  // A student's year goes along with her subject, and a teacher's course its number.
+  const own = { ...(written['level'] !== undefined && { level: written['level'] }), ...(written['number'] !== undefined && { number: written['number'] }) }
+  if (!major) return { subject: written['major'], code: written['major'], ...own, unknownMajor: true }
+  return { subject: major.subject, code: major.code, ...own, stats: major.stats, practical: major.practical }
 }
 
 function resolveCharacter(majors: Major[], character: unknown): unknown {
@@ -106,7 +109,7 @@ export function resolveCurriculum(raw: unknown): unknown {
   const parsed = CurriculumSchema.safeParse(raw['curriculum'])
   if (!parsed.success) return raw
   const { majors } = parsed.data
-  const written = majors.flatMap((major) => major.courses.map((course) => ({ major, course, id: courseId(major.code, course.level) })))
+  const written = majors.flatMap((major) => major.courses.map((course) => ({ major, course, id: courseId(major.code, course.number) })))
   const coursework = raw['coursework']
   const catalogue = raw['catalogue']
   const locationId = isObject(coursework) ? coursework['locationId'] : undefined
@@ -118,7 +121,7 @@ export function resolveCurriculum(raw: unknown): unknown {
       coursework: { ...coursework, generalEd: majors.filter((major) => major.general).map(({ code, subject, stats, practical }) => ({ code, subject, stats, practical })) }
     }),
     syllabus: written.map(({ id, course }) => ({ courseId: id, topics: course.topics })),
-    skills: written.flatMap(({ major, course }) => (course.skill ? [{ ...course.skill, code: major.code, level: course.level }] : [])),
+    skills: written.flatMap(({ major, id, course }) => (course.skill ? [{ ...course.skill, code: major.code, courseId: id }] : [])),
     ...(isObject(catalogue) &&
       Array.isArray(catalogue['courses']) && {
         catalogue: {
@@ -131,12 +134,11 @@ export function resolveCurriculum(raw: unknown): unknown {
             return [
               {
                 id: found.id,
-                number: courseNumber(major.code, course.level),
+                number: courseNumber(major.code, course.number),
                 title: course.title,
                 description: course.description,
                 subject: major.subject,
                 code: major.code,
-                level: course.level,
                 general: major.general || course.general,
                 stats: major.stats,
                 locationId: given['locationId'] ?? locationId,

@@ -20,6 +20,7 @@ import {
   invitable,
   invite,
   monthlyRent,
+  nextHealthStep,
   nextRentDay,
   nextWork,
   payArrears,
@@ -47,6 +48,8 @@ interface Props {
   /** Applied to the newest state. */
   onChange: (update: (state: GameState) => GameState) => void
   onClose: () => void
+  /** Once someone has moved in and it has been celebrated: the scene with her in her new room. */
+  onMovedIn: (loveInterestId: string, roomKey: string) => void
 }
 
 // How long a room is celebrated once it is built, and once someone has moved into it.
@@ -72,11 +75,11 @@ function effectFacts(part: Effects): Fact[] {
  * its accounts at the side, and the room picked laid out on a card. It is opened from the day, never in the middle of a
  * scene, since building and taking people in change where a scene could go.
  */
-export function HouseView({ content, state, onChange, onClose }: Props) {
+export function HouseView({ content, state, onChange, onClose, onMovedIn }: Props) {
   const config = content.housing
   const [picked, setPicked] = useState<string | undefined>(state.housing.room)
   const [built, setBuilt] = useState<string>()
-  const [movedIn, setMovedIn] = useState<{ key: string; name: string }>()
+  const [movedIn, setMovedIn] = useState<{ key: string; id: string; name: string }>()
   const [refused, setRefused] = useState<string>()
   const [panel, setPanel] = useState<'household' | 'ledger' | null>(null)
   // The help, opened over the house on how the house works: closing it is back to the house.
@@ -99,7 +102,11 @@ export function HouseView({ content, state, onChange, onClose }: Props) {
   }, [built])
   useEffect(() => {
     if (!movedIn) return
-    const timer = window.setTimeout(() => setMovedIn(undefined), MOVED_IN_MS)
+    // Celebrated, it is on to the hour with her in her new room.
+    const timer = window.setTimeout(() => {
+      setMovedIn(undefined)
+      onMovedIn(movedIn.id, movedIn.key)
+    }, MOVED_IN_MS)
     return () => window.clearTimeout(timer)
   }, [movedIn])
   useEffect(() => {
@@ -145,7 +152,7 @@ export function HouseView({ content, state, onChange, onClose }: Props) {
   function moveIn(key: string, id: string) {
     play('door')
     onChange((s) => invite(content, s, id, key))
-    setMovedIn({ key, name: content.loveInterests.find((li) => li.id === id)?.name.split(' ')[0] ?? id })
+    setMovedIn({ key, id, name: content.loveInterests.find((li) => li.id === id)?.name.split(' ')[0] ?? id })
   }
 
   return (
@@ -183,6 +190,7 @@ export function HouseView({ content, state, onChange, onClose }: Props) {
             {babiesAtHome(state).length > 0 && <span className="house-children" title="Children at home">+{babiesAtHome(state).length}</span>}
           </div>
         </div>
+        <HouseChildren content={content} state={state} config={config} />
         <HouseFacts content={content} state={state} config={config} onChange={onChange} />
         <div className="house-side-actions">
           <GrandButton label="Household" icon={<FriendsIcon size={24} />} onClick={() => setPanel('household')} />
@@ -254,6 +262,45 @@ export function HouseView({ content, state, onChange, onClose }: Props) {
       )}
       {helping && <HelpPanel content={content} state={state} tab="House and children" onClose={() => setHelping(false)} />}
     </main>
+  )
+}
+
+/** How a child is doing: a pip for each level, filled up to where it stands. One the house cannot yet take it to is dashed. */
+function ChildPips({ config, health, cap }: { config: HousingConfig; health: number; cap: number }) {
+  return (
+    <span className="house-pips" role="img" aria-label={`${healthName(config, health)}: level ${health + 1} of ${config.babies.levels.length}`}>
+      {config.babies.levels.map((_, level) => (
+        <i key={level} className={level <= health ? (health < config.babies.startLevel ? 'on low' : 'on') : level > cap ? 'out' : undefined} />
+      ))}
+    </span>
+  )
+}
+
+/**
+ * The children at home, the goal the house is for: how each is doing, and what the house would need for them to do
+ * better. Nothing until a child lives there.
+ */
+function HouseChildren({ content, state, config }: { content: ContentPack; state: GameState; config: HousingConfig }) {
+  const children = babiesAtHome(state)
+  if (children.length === 0) return null
+  const cap = healthCap(content, state)
+  const step = nextHealthStep(content, state)
+  return (
+    <div className="house-kids">
+      <span className="caps">Children</span>
+      {children.map((child, i) => (
+        <div key={i} className="house-kid" title={config.babies.levels[child.health ?? 0]?.description}>
+          <span className="house-kid-name">{child.name}</span>
+          <span className="house-kid-health">{healthName(config, child.health ?? 0)}</span>
+          <ChildPips config={config} health={child.health ?? 0} cap={cap} />
+        </div>
+      ))}
+      {step && (
+        <span className="house-kid-next" title="Build rooms to raise the house's comfort">
+          Comfort {houseComfort(content, state)} of {step.comfort} for {step.level.toLowerCase()}
+        </span>
+      )}
+    </div>
   )
 }
 
@@ -441,13 +488,7 @@ function Household({ content, state, config, onAskToLeave }: { content: ContentP
               </span>
             )}
           </div>
-          {child.health !== undefined && (
-            <span className="house-pips" role="img" aria-label={`${healthName(config, child.health)}: level ${child.health + 1} of ${config.babies.levels.length}`}>
-              {config.babies.levels.map((_, level) => (
-                <i key={level} className={level <= child.health! ? (child.health! < config.babies.startLevel ? 'on low' : 'on') : level > cap ? 'out' : undefined} />
-              ))}
-            </span>
-          )}
+          {child.health !== undefined && <ChildPips config={config} health={child.health} cap={cap} />}
         </div>
       ))}
     </div>

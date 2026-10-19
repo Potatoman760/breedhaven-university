@@ -58,7 +58,7 @@ export function sceneDestinations(
     return [
       {
         id: `${ROOM_PREFIX}${id}`,
-        name: `${li.name.split(' ')[0]}'s own room: ${li.room.name}, at ${location.name}`,
+        name: `${li.name.split(' ')[0]}'s room: ${li.room.name}, at ${location.name}`,
         locationId: location.id,
         indoors: true,
         roomOf: id
@@ -71,7 +71,7 @@ export function sceneDestinations(
   if (own && ownPlace && scene.roomOf !== PLAYER_ROOM && reachable(ownPlace.id) && open(ownPlace)) {
     rooms.push({
       id: `${ROOM_PREFIX}${PLAYER_ROOM}`,
-      name: `${state.player.name}'s own room: ${own.name}, at ${ownPlace.name}`,
+      name: `${state.player.name}'s room: ${own.name}, at ${ownPlace.name}`,
       locationId: ownPlace.id,
       indoors: true,
       roomOf: PLAYER_ROOM
@@ -124,7 +124,7 @@ export function movedScene<S extends Pick<Scene, 'beats' | 'roomOf' | 'backgroun
       ...scene.beats.map((beat) => ({ ...beat, finished: true })),
       {
         activityName: 'arrived',
-        locationName: destination.roomOf ? destination.name.replace(/^(.*?'s) own room: /, '$1 room, ') : destination.name
+        locationName: destination.roomOf ? destination.name.replace(/^(.*?'s room): /, '$1, ') : destination.name
       }
     ],
     roomOf: destination.roomOf,
@@ -199,13 +199,13 @@ export function roomBackdrop(room: Room | undefined, key: string): { room?: { im
 
 /** Told to the characters in a scene that is in the player's own room. */
 export function describePlayerRoom(room: Room, location: Location | undefined, playerName: string): string {
-  return `${playerName}'s own room: ${room.name}${location ? `, at ${location.name}` : ''}. You are indoors, in private, with the door shut. ${room.description}`.trim()
+  return `${playerName}'s room: ${room.name}${location ? `, at ${location.name}` : ''}. You are indoors, in private, with the door shut. ${room.description}`.trim()
 }
 
 /** Told to the characters in a scene that is in one of their own rooms. */
 export function describeRoom(owner: LoveInterest, location: Location | undefined, speakerId: string): string {
   const room = owner.room
-  const whose = owner.id === speakerId ? 'your own room' : `${owner.name.split(' ')[0]}'s own room`
+  const whose = owner.id === speakerId ? 'your room' : `${owner.name.split(' ')[0]}'s room`
   return `${whose}: ${room?.name ?? 'her room'}${location ? `, at ${location.name}` : ''}. You are indoors, in private, with the door shut. ${room?.description ?? ''}`.trim()
 }
 

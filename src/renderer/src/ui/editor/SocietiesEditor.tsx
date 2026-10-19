@@ -29,7 +29,7 @@ export function SocietiesEditor({ content, onContent, switcher }: Props) {
   const most = config?.maxMembers ?? 2
   const weekdays = content.coursework?.weekdays ?? content.calendar.weekdays
   const after = content.coursework?.dayEnd ?? 18
-  const blank = (): Society => ({ id: '', name: '', description: '', locationId: content.locations[0]?.id ?? '', weekday: weekdays[0], startHour: after, stats: ['charisma'], memberIds: [] })
+  const blank = (): Society => ({ id: '', name: '', description: '', locationId: content.locations[0]?.id ?? '', weekday: weekdays[0], startHour: after, stats: ['charisma'], memberIds: [], syllabus: [], adultEvents: [] })
   const [original, setOriginal] = useState<Society | null>(societies[0] ?? null)
   const [draft, setDraft] = useState<Society>(societies[0] ?? blank())
   const [issues, setIssues] = useState<string[]>([])

@@ -1,8 +1,9 @@
-import type { ContentPack, GameState, Society } from '../model'
+import type { AdultEvent, ContentPack, GameState, Intro, Society } from '../model'
 import type { PerformCheck } from './activities'
 import { dayIndexOf, toDate } from './calendar'
 import { applyEffects } from './conditions'
 import { factor } from './modifiers'
+import { timesIntimate } from './memory'
 
 /** The game time at which the societies open: the hour their fair begins, in the year the game starts. */
 export function societiesOpenAt(content: ContentPack): number | undefined {
@@ -116,3 +117,37 @@ export function attendSociety(content: ContentPack, state: GameState, id: string
     societyMeetings: [...after.societyMeetings, societyMeetingKey(id, date.dayIndex)]
   }
 }
+
+/** How many of a society's meetings he has been to. */
+export function meetingsAttended(state: Pick<GameState, 'societyMeetings'>, societyId: string): number {
+  return state.societyMeetings.filter((key) => key.startsWith(`${societyId}:`)).length
+}
+
+/**
+ * What the next meeting of a society he goes to will be: which of his it is, what it is about, and the adult event it
+ * is, if it is one. Counted by his own meetings, so that he misses nothing by missing a week.
+ */
+export function nextMeeting(content: ContentPack, state: Pick<GameState, 'societyMeetings'>, societyId: string): { number: number; topic?: string; event?: AdultEvent } {
+  const society = societyOf(content, societyId)
+  const number = meetingsAttended(state, societyId) + 1
+  return { number, topic: society?.syllabus[number - 1], event: society?.adultEvents.find((event) => event.meeting === number) }
+}
+
+/**
+ * How a society's night goes for those at it: the setup and the direction it is told with, and who of them nothing
+ * holds back, who are the scene after it. Everyone is free but whoever the night holds to her own wishes, who leaves
+ * once it is set up; one of those he has been to bed with before is free too, and the night is told the way written
+ * for her.
+ */
+export function eventGate(state: GameState, event: AdultEvent, presentIds: string[]): { intro: Intro; direction: string; free: string[] } {
+  let { intro, direction } = event
+  const held: string[] = []
+  for (const reserved of event.reserved) {
+    if (!presentIds.includes(reserved.loveInterestId)) continue
+    if (timesIntimate(state, reserved.loveInterestId) > 0) {
+      if (reserved.ifIntimate) ({ intro, direction } = reserved.ifIntimate)
+    } else held.push(reserved.loveInterestId)
+  }
+  return { intro, direction, free: presentIds.filter((id) => !held.includes(id)) }
+}
+

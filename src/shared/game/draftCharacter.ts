@@ -16,9 +16,9 @@ export function draftSchema(content: ContentPack) {
   const one = <T extends string>(values: T[]) => z.enum(values as [T, ...T[]])
   const location = one(content.locations.map((l) => l.id))
   const subject = z.object({
-    subject: z.string().describe('The subject, as a catalogue would name it: "Marine Biology".'),
-    code: z.string().min(2).max(4).describe('Catalogue prefix: three capital letters, not one already in use.'),
-    level: z.number().int().min(1).max(5).describe('Year of study or of the course: 1 to 4 for undergraduates, 5 for graduate.'),
+    subject: z.string().describe('The subject, as a catalog would name it: "Marine Biology".'),
+    code: z.string().min(2).max(4).describe('Catalog prefix: three capital letters, not one already in use.'),
+    level: z.number().int().min(1).max(5).describe('Year of study: 1 to 4 for undergraduates, 5 for graduate. Background only.'),
     stats: z.array(z.enum(STATS)).min(1).max(2).describe('What a class in it raises in the player.')
   })
   return z.object({
@@ -30,12 +30,12 @@ export function draftSchema(content: ContentPack) {
     appearance: z
       .string()
       .describe(
-        'Her face, hair and body only, in plain words an image model can draw: age, skin, face shape, eyes, lips, hair colour and style, build and figure. ' +
+        'Her face, hair and body only, in plain words an image model can draw: age, skin, face shape, eyes, lips, hair color and style, build and figure. ' +
           'No clothing and no personality. She should be attractive. Two to four sentences.'
       ),
     usualClothes: z
       .string()
-      .describe('What she usually wears, as a noun phrase an image model can draw: garments, colours, accessories. Starts lower case, e.g. "a fitted grey coat over...".'),
+      .describe('What she usually wears, as a noun phrase an image model can draw: garments, colors, accessories. Starts lower case, e.g. "a fitted gray coat over...".'),
     personality: z.string().describe('Two or three sentences on what she is like.'),
     traitIds: z.array(one(content.traits.map((t) => t.id))).max(3).describe('Traits from the game\'s library that fit her.'),
     likes: z.array(z.string()).max(5).describe('Kinds of gift she loves. Use the gift tags given where they fit; others are allowed.'),
@@ -116,7 +116,7 @@ export function buildDraftPrompt(content: ContentPack, idea: string): { system: 
     '',
     `Gift tags in the game: ${tags.join(', ')}.`,
     '',
-    'Characters who already exist; she must not share a name, a catalogue code or a concept with any of them:',
+    'Characters who already exist; she must not share a name, a catalog code or a concept with any of them:',
     ...content.loveInterests.map((li) => `- ${li.name}, ${li.age}: ${li.bio}${li.studies ? ` [${li.studies.code}]` : ''}${li.teaching ? ` [${li.teaching.subjects.map((s) => s.code).join(', ')}]` : ''}`),
     '',
     `The idea for the new character: ${idea.trim()}`
@@ -187,7 +187,8 @@ export function parseDraft(content: ContentPack, reply: string): LoveInterest {
     kind,
     // Each kind keeps only what belongs to it.
     studies: kind === 'student' ? studies : undefined,
-    teaching: kind === 'teacher' ? teaching : undefined,
+    // A teacher gives her subject's first course.
+    teaching: kind === 'teacher' && teaching ? { ...teaching, subjects: teaching.subjects.map(({ level: _year, ...subject }) => ({ ...subject, number: '101' })) } : undefined,
     outfits: STANDARD_OUTFITS.map((outfit) => (outfit.id === 'default' ? { ...outfit, description: usualClothes } : outfit)),
     defaultOutfitId: 'default',
     imageSeed: DEFAULT_IMAGE_SEED,

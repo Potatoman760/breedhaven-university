@@ -15,7 +15,8 @@ import {
 } from "../../shared/saves";
 import { errorMessage } from "./errors";
 import { useConfirm } from "./ui/Confirm";
-import { Overlay } from "./ui/Dialog";
+import { Button } from "./ui/Button";
+import { Dialog } from "./ui/Dialog";
 
 export function describeSave(content: ContentPack, save: SaveSummary): string {
   if (save.unreadable) return "Incompatible save";
@@ -142,9 +143,8 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
     });
 
   return (
-    <Overlay onClose={onClose}>
-      <div className="settings">
-        <h1>{mode === "save" ? "Save game" : "Load game"}</h1>
+    <Dialog title={mode === "save" ? "Save game" : "Load game"} onClose={onClose} ornate className="saves-dialog">
+      <div className="saves">
         {[AUTO_SLOT_ID, ...SLOT_PAGES[page]].map((slotId) => {
           const summary = saves.find((s) => s.slotId === slotId);
           const auto = slotId === AUTO_SLOT_ID;
@@ -186,26 +186,28 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
                   // The game writes this one itself, as he plays: it is not his to save over.
                   <span className="hint slot-auto-note">Saved as you play</span>
                 ) : (
-                  <button onClick={() => save(slotId, summary !== undefined)}>
+                  <Button variant="primary" size="small" onClick={() => save(slotId, summary !== undefined)}>
                     Save here
-                  </button>
+                  </Button>
                 )
               ) : (
-                <button
+                <Button
+                  variant="primary"
+                  size="small"
                   disabled={!summary || summary.unreadable}
                   onClick={() => load(slotId)}
                 >
                   Load
-                </button>
+                </Button>
               )}
               {!(auto && mode === "save") && (
-                <button
-                  className="secondary"
+                <Button
+                  size="small"
                   disabled={!summary}
                   onClick={() => remove(slotId)}
                 >
                   Delete
-                </button>
+                </Button>
               )}
             </div>
           );
@@ -215,47 +217,42 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
           role="tablist"
           aria-label="Pages of save slots"
         >
-          <button
-            className="secondary"
+          <Button
+            size="small"
             disabled={page === 0}
             onClick={() => setPage(page - 1)}
             aria-label="Previous page"
           >
             ‹
-          </button>
+          </Button>
           {SLOT_PAGES.map((slots, i) => (
-            <button
+            <Button
               key={i}
               role="tab"
               aria-selected={i === page}
-              className={
-                i === page ? "slot-page selected" : "slot-page secondary"
-              }
+              variant={i === page ? "primary" : "secondary"}
+              size="small"
+              className="slot-page"
               title={`Slots ${i * slots.length + 1} to ${i * slots.length + slots.length}`}
               onClick={() => setPage(i)}
             >
               {i + 1}
               {/* A dot on a page that has a save on it, so that he need not hunt for them. */}
               {slots.some((slotId) => summaryOf(slotId)) && <i aria-hidden />}
-            </button>
+            </Button>
           ))}
-          <button
-            className="secondary"
+          <Button
+            size="small"
             disabled={page === SLOT_PAGES.length - 1}
             onClick={() => setPage(page + 1)}
             aria-label="Next page"
           >
             ›
-          </button>
+          </Button>
         </div>
         {notice && <p className="notice">{notice}</p>}
-        <div className="actions">
-          <button className="secondary" onClick={onClose}>
-            Close
-          </button>
-        </div>
       </div>
       {dialog}
-    </Overlay>
+    </Dialog>
   );
 }

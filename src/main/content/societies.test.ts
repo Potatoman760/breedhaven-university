@@ -1,7 +1,7 @@
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { atTable, boothHello, fairNow, fairTables, isOpen } from '../../shared/game'
-import { kindOf, type GameState } from '../../shared/model'
+import { EXPRESSIONS, kindOf, type GameState } from '../../shared/model'
 import { createInitialState } from '../../shared/game/state'
 import { loadContentPack } from './loader'
 
@@ -43,4 +43,34 @@ describe('the societies of the default pack', () => {
     expect(open).toBe(2 * (fair.hours ?? 1))
     expect([...new Set(missing)]).toEqual([])
   })
+
+  it('has a topic for every meeting of the term, and two nights of its own at the third and the tenth, with everyone of it in them', () => {
+    for (const society of config.societies) {
+      expect(society.syllabus.length, society.id).toBeGreaterThanOrEqual(16)
+      expect(society.adultEvents.map((event) => event.meeting), society.id).toEqual([3, 10])
+      const people = [...society.memberIds, ...(society.sponsorId ? [society.sponsorId] : [])]
+      for (const event of society.adultEvents) {
+        expect(event.intro.scenes[0].locationId, `${society.id} ${event.name}`).toBe(society.locationId)
+        expect([...(event.intro.scenes[0].castIds ?? [])].sort(), `${society.id} ${event.name}`).toEqual([...people].sort())
+      }
+    }
+  })
+
+  it('dresses and undresses only those on the stage of a night, in outfits and faces they have', () => {
+    const tag = /^\[(OUTFIT|EXPRESSION):\s*([^=\]]+?)=([^\]]+)\]$/
+    for (const society of config.societies) {
+      const intros = society.adultEvents.flatMap((event) => [event.intro, ...event.reserved.flatMap((held) => (held.ifIntimate ? [held.ifIntimate.intro] : []))])
+      for (const intro of intros) {
+        const cast = (intro.scenes[0].castIds ?? []).map((id) => content.loveInterests.find((li) => li.id === id)!)
+        for (const line of intro.scenes.flatMap((scene) => scene.lines).filter((one) => one.startsWith('['))) {
+          const [, kind, name, value] = line.match(tag) ?? []
+          const who = cast.find((li) => li.name.split(' ')[0] === name)
+          expect(who, `${society.id}: ${line}`).toBeDefined()
+          if (kind === 'OUTFIT') expect(who!.outfits.map((outfit) => outfit.id), `${society.id}: ${line}`).toContain(value)
+          else expect(EXPRESSIONS as readonly string[], `${society.id}: ${line}`).toContain(value)
+        }
+      }
+    }
+  })
 })
+

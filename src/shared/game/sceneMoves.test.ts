@@ -63,7 +63,7 @@ describe('where a scene can go', () => {
   it('is the rooms of those in it, then anywhere else that is open', () => {
     expect(ids()).toEqual(['room-of-ana', 'shop'])
     expect(sceneDestinations(content, state, scene)[0]).toMatchObject({
-      name: "Ana's own room: a loft over the shop, at the Shop",
+      name: "Ana's room: a loft over the shop, at the Shop",
       locationId: 'shop',
       roomOf: 'ana',
       indoors: true
@@ -173,13 +173,13 @@ describe('what the character is told of where she is', () => {
     const ana = content.loveInterests[0]
     const shop = content.locations.find((l) => l.id === 'shop')
     expect(describeRoom(ana, shop, 'ana')).toBe(
-      'your own room: a loft over the shop, at the Shop. You are indoors, in private, with the door shut. A bed, a lamp, a great many books.'
+      'your room: a loft over the shop, at the Shop. You are indoors, in private, with the door shut. A bed, a lamp, a great many books.'
     )
-    expect(describeRoom(ana, shop, 'bea')).toMatch(/^Ana's own room: a loft over the shop/)
+    expect(describeRoom(ana, shop, 'bea')).toMatch(/^Ana's room: a loft over the shop/)
 
     // The yard view is out of doors, but a room never is.
     const prompt = buildCharacterPrompt({ ...input, state: { ...state, locationId: 'shop' }, roomOf: 'ana', backgroundId: 'yard' })
-    expect(prompt).toContain('You and Pat are in your own room: a loft over the shop, at the Shop.')
+    expect(prompt).toContain('You and Pat are in your room: a loft over the shop, at the Shop.')
     expect(prompt).toContain('The weather outside today: Rain.')
   })
 
@@ -212,7 +212,7 @@ describe("the player's own room", () => {
     const offered = sceneDestinations(roomed, state, scene)
     expect(offered.map((d) => d.id)).toEqual(['room-of-ana', 'room-of-player', 'shop'])
     const his = offered.find((d) => d.id === 'room-of-player')!
-    expect(his).toMatchObject({ name: "Pat's own room: a small room under the eaves, at Home", locationId: 'home', roomOf: PLAYER_ROOM, indoors: true })
+    expect(his).toMatchObject({ name: "Pat's room: a small room under the eaves, at Home", locationId: 'home', roomOf: PLAYER_ROOM, indoors: true })
 
     const there = movedScene(scene, his)
     expect(there.roomOf).toBe(PLAYER_ROOM)
@@ -222,7 +222,7 @@ describe("the player's own room", () => {
     expect(sceneDestinations(roomed, state, there).map((d) => d.id)).toEqual(['room-of-ana', 'home', 'shop'])
 
     const prompt = buildCharacterPrompt({ content: roomed, state, loveInterestId: 'ana', roomOf: PLAYER_ROOM, sceneBeats: there.beats })
-    expect(prompt).toContain("You and Pat are in Pat's own room: a small room under the eaves, at Home. You are indoors, in private, with the door shut. A narrow bed and a desk.")
+    expect(prompt).toContain("You and Pat are in Pat's room: a small room under the eaves, at Home. You are indoors, in private, with the door shut. A narrow bed and a desk.")
   })
 
   it('is nowhere without one', () => {

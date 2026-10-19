@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { CourseworkConfigSchema, type ContentPack, type Course, type CourseMeeting, type GameState } from '../model'
 import { canPerform } from './activities'
-import { attend, canAttend, canEnrol, classmates, classSoon, courseMatches, coursesClash, coursesInSession, describeMeetings, enrolledCourses } from './courses'
+import { attend, canAttend, canBeginTerm, canEnrol, classmates, classSoon, courseMatches, coursesClash, coursesInSession, describeMeetings, enrolledCourses } from './courses'
 import { buildCharacterPrompt } from './prompt'
 import { approachableAt, inClass, locationOf, loveInterestsAt } from './map'
 import { createInitialState } from './state'
@@ -34,7 +34,6 @@ const course = (id: string, number: string, meetings: CourseMeeting[], studentId
   description: '',
   subject: number,
   code: number.split(' ')[0],
-  level: 1,
   general: false,
   stats: ['wisdom', 'charisma'],
   studentIds,
@@ -72,6 +71,11 @@ describe('enrolment', () => {
     expect(canEnrol(content, state, ['pol', 'phy'], 'his').reasons).toEqual(['You can take at most 2 courses', 'Meets at the same time as POL 101'])
     expect(canEnrol(content, state, ['pol'], 'his').reasons).toEqual(['Meets at the same time as POL 101'])
     expect(canEnrol(content, state, ['pol'], 'phy').ok).toBe(true)
+  })
+
+  it('begins the term only with a full load', () => {
+    expect(canBeginTerm(content, ['pol'])).toEqual({ ok: false, reasons: ['Choose 2 courses'] })
+    expect(canBeginTerm(content, ['pol', 'phy']).ok).toBe(true)
   })
 
   it('lists what the player is taking', () => {

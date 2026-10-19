@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { canUse, canUseAbility, carried, describeChange, liveBoons, readyIn, relicsHeld, skillsOf } from '../../../shared/game'
+import { canUse, canUseAbility, carried, describeChange, liveBoons, readyIn, relicOn, relicsHeld, skillsOf } from '../../../shared/game'
 import type { ContentPack, Effect, GameState } from '../../../shared/model'
 import { Button } from './Button'
 import { EmptySquare, ItemSquare } from './ItemSquare'
@@ -14,6 +14,11 @@ interface Props {
   onAbility: (skillId: string, onId?: string) => void
   /** Gives one of what he carries to someone he is with. Left out, there is nobody to give to. */
   onGive?: (itemId: string, toId: string) => void
+  /** Turns a relic that is always at work off, or on again. */
+  onToggleRelic: (relicId: string) => void
+  /** Uses a relic in the scene he is in, and why one cannot be. Left out, he is in no scene. */
+  onUseRelic?: (relicId: string) => void
+  canUseRelic?: (relicId: string) => { ok: boolean; reasons: string[] }
 }
 
 // What the bag is sorted into: what he carries, what he has brought up from below for good, and what he can make.
@@ -62,7 +67,7 @@ interface Slot {
  * now. Pointing at a square says what it is; picking one shows what can be done with it. The same on the day screen
  * and in a scene, where there is someone to use a thing on.
  */
-export function Bag({ content, state, company = [], busy, onUseItem, onAbility, onGive }: Props) {
+export function Bag({ content, state, company = [], busy, onUseItem, onAbility, onGive, onToggleRelic, onUseRelic, canUseRelic }: Props) {
   const [tab, setTab] = useState<(typeof TABS)[number]>('Regular')
   const [picked, setPicked] = useState<string | null>(null)
   const boons = liveBoons(state)
@@ -111,14 +116,33 @@ export function Bag({ content, state, company = [], busy, onUseItem, onAbility, 
       )
     }
   })
-  const relics: Slot[] = relicsHeld(content, state).map((relic) => ({
-    key: `relic:${relic.id}`,
-    name: relic.name,
-    icon: relic.icon,
-    image: relic.image,
-    tip: `${relic.description}\nAlways: ${describeChange(relic.modifier)}`,
-    line: `Always: ${describeChange(relic.modifier)}`
-  }))
+  // A relic is either always at work, and can be turned off and on, or used in a scene, once a scene.
+  const relics: Slot[] = relicsHeld(content, state).map((relic) => {
+    const on = relicOn(state, relic.id)
+    const usable = canUseRelic?.(relic.id)
+    return {
+      key: `relic:${relic.id}`,
+      name: relic.name,
+      icon: relic.icon,
+      image: relic.image,
+      tag: relic.use || on ? undefined : 'off',
+      tip: relic.description,
+      line: relic.description,
+      actions: relic.use ? (
+        onUseRelic ? (
+          <Button variant="primary" size="small" disabled={busy || !usable?.ok} title={usable?.reasons.join(' · ') || undefined} onClick={() => onUseRelic(relic.id)}>
+            Use
+          </Button>
+        ) : (
+          <span className="hint">Used in a scene</span>
+        )
+      ) : (
+        <Button size="small" variant={on ? 'secondary' : 'primary'} disabled={busy} onClick={() => onToggleRelic(relic.id)}>
+          {on ? 'Turn off' : 'Turn on'}
+        </Button>
+      )
+    }
+  })
   const makes: Slot[] = skillsOf(content, state)
     .filter((skill) => skill.ability)
     .map((skill) => {

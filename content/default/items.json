@@ -39,10 +39,10 @@
   {
     "id": "seed-packets",
     "name": "Seed packets",
-    "description": "Paper twists of herb and bean seed, labelled by hand.",
+    "description": "Paper twists of herb and bean seed, labeled by hand.",
     "price": 4,
     "icon": "plant",
-    "appearance": "Three small brown paper seed packets, hand labelled, fanned out.",
+    "appearance": "Three small brown paper seed packets, hand labeled, fanned out.",
     "tags": [
       "gardening"
     ],
@@ -232,10 +232,10 @@
   {
     "id": "river-stone",
     "name": "River stone",
-    "description": "A smooth grey stone that holds the sun's warmth.",
+    "description": "A smooth gray stone that holds the sun's warmth.",
     "price": 3,
     "icon": "stone",
-    "appearance": "A smooth flat oval grey river stone.",
+    "appearance": "A smooth flat oval gray river stone.",
     "tags": [
       "stones"
     ],
@@ -247,7 +247,7 @@
     "description": "A fine-grained stone for keeping a competition blade honest.",
     "price": 6,
     "icon": "blade",
-    "appearance": "A rectangular grey sharpening whetstone on a small wooden block.",
+    "appearance": "A rectangular gray sharpening whetstone on a small wooden block.",
     "tags": [
       "weapons"
     ],
@@ -295,7 +295,7 @@
     "description": "A classic for a console older than you are. The label is worn and the save file is someone else's.",
     "price": 9,
     "icon": "cards",
-    "appearance": "A grey retro video game cartridge with a worn colorful label.",
+    "appearance": "A gray retro video game cartridge with a worn colorful label.",
     "tags": [
       "games"
     ],
@@ -449,7 +449,7 @@
     "description": "A speaker the size of a plum that is louder than it has any right to be.",
     "price": 15,
     "icon": "gift",
-    "appearance": "A tiny round portable speaker, plum sized, dark grey with a fabric grille and a wrist strap.",
+    "appearance": "A tiny round portable speaker, plum sized, dark gray with a fabric grille and a wrist strap.",
     "tags": [
       "music"
     ],
@@ -494,7 +494,7 @@
   {
     "id": "component-pouch",
     "name": "Pouch of spell components",
-    "description": "Dried herbs, salts and powders in labelled twists, for potion-work and practicals.",
+    "description": "Dried herbs, salts and powders in labeled twists, for potion-work and practicals.",
     "price": 10,
     "icon": "vial",
     "appearance": "A small drawstring cloth pouch, open, with twists of paper and dried herbs spilling out.",
@@ -705,10 +705,10 @@
   {
     "id": "grounding-salt",
     "name": "Grounding salt",
-    "description": "Grey salt from the old pipes. In a fight it settles a pregnant woman's surge at once.",
+    "description": "Gray salt from the old pipes. In a fight it settles a pregnant woman's surge at once.",
     "price": 0,
     "icon": "crystals",
-    "appearance": "A small open leather pouch of coarse grey salt crystals.",
+    "appearance": "A small open leather pouch of coarse gray salt crystals.",
     "tags": [],
     "below": {
       "footing": 4,
@@ -740,7 +740,7 @@
   {
     "id": "resonance-token",
     "name": "Resonance token",
-    "description": "A charged disc that hums against the palm. Set off beside a woman, it warms her to you for a day.",
+    "description": "A charged disc that hums against the palm. Set off beside a woman, it stirs her desire for you.",
     "price": 0,
     "icon": "stone",
     "appearance": "A flat round bronze disc engraved with concentric rings and a rune, glowing faintly pink.",
@@ -748,14 +748,9 @@
     "use": {
       "effects": [
         {
-          "type": "boon",
-          "modifier": {
-            "kind": "desireGate",
-            "amount": 10
-          },
-          "hours": 24,
-          "on": "her",
-          "telling": "Something has you warmer toward him than usual today, and more curious: you feel it as your own mood, and do not question it."
+          "type": "meter",
+          "meter": "desire",
+          "amount": 10
         }
       ],
       "on": "her"
@@ -796,7 +791,7 @@
   {
     "id": "dawnbloom-rose",
     "name": "Dawnbloom rose",
-    "description": "A single gold-edged rose of the royal strain, grown under licence in the palace nurseries.",
+    "description": "A single gold-edged rose of the royal strain, grown under license in the palace nurseries.",
     "price": 7,
     "icon": "flower",
     "appearance": "A single long-stemmed rose with cream petals edged in gold.",

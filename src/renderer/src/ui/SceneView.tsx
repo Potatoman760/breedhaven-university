@@ -1,11 +1,12 @@
 import { Button } from './Button'
 import { useConfirm } from './Confirm'
-import { useEffect, useRef, useState, type FormEvent, type CSSProperties, type KeyboardEvent } from 'react'
-import { MAX_CHILD_NAME, COMFORT_WORDS, hasSkill, attendees, bondLifts, describeBond, describeWhen, statusOf, dialogueLines, firstNames, sceneCast, sceneClock, toDate, weatherOn, wornOutfit, lookOf, spriteFor, npcAsCharacter, playerRoom, roomBackdrop, roomOwner, sceneExtras } from '../../../shared/game'
+import { useEffect, useMemo, useRef, useState, type FormEvent, type CSSProperties, type KeyboardEvent } from 'react'
+import { MAX_CHILD_NAME, COMFORT_WORDS, hasSkill, attendees, bondLifts, describeBond, describeWhen, statusOf, dialogueLines, firstNames, sceneCast, sceneClock, toDate, weatherOn, wornOutfit, lookOf, spriteFor, npcAsCharacter, playerRoom, roomBackdrop, roomOwner, sceneExtras, sceneSuggestions, plain, type Suggestion } from '../../../shared/game'
 import { Portrait } from './Portrait'
 import { basePoseId, poseMedia, type ContentPack, type GameState, type LoveInterest, type Scene } from '../../../shared/model'
 import { playSong, setPoseLoop, stopSong } from '../sound'
 import { LoadingScreen } from './LoadingScreen'
+import { SmartInput } from './SmartInput'
 import { Backdrop } from './Backdrop'
 import { DateBanner } from './DateBanner'
 import { NavTiles } from './NavTiles'
@@ -29,7 +30,8 @@ interface Props {
   onDismissAside?: () => void
   /** The character has closed the scene; all that is left is to move on. */
   ended: boolean
-  onSend: (text: string) => void
+  /** Says a line, with what the game tells her beside it when it was one of the text box's suggestions. */
+  onSend: (text: string, cue?: string) => void
   /** Ends a class or a shift at once, with nothing said, remembered or felt about it: what it earns is earned all the same. */
   onSkip: () => void
   /** Settles the name of the child just born: another than the one its mother thought of, or with nothing given, hers. */
@@ -37,7 +39,7 @@ interface Props {
   /** How many of his turns in this scene can be redone, counting back from the last. */
   turnsKept: number
   /** Says something else in place of what he said that many turns back: everything from that turn on is undone, and the scene goes on from the new line. */
-  onRedo: (turnsBack: number, text: string) => void
+  onRedo: (turnsBack: number, text: string, cue?: string) => void
   /** Move on from a scene that has ended, to its summary. */
   onContinue: () => void
   /** Put the plan the love interest suggested on the calendar. */
@@ -96,6 +98,25 @@ export function SceneView(props: Props) {
     return tips.length > 0 ? tips[Math.floor(Math.random() * tips.length)] : ''
   })
   const [input, setInput] = useState('')
+  // The suggestion the line in the box was begun from, if it was.
+  const [picked, setPicked] = useState<Suggestion | undefined>(undefined)
+  // What the box can offer: the asks open to him now, the names to finish (only those in the scene), and the game's
+  // own words, which no dictionary has.
+  const suggestions = useMemo(() => sceneSuggestions(content, state, scene), [content, state, scene])
+  const nameList = useMemo(
+    () => [...new Set(sceneCast(scene).flatMap((id) => [...content.loveInterests, ...content.npcs].find((one) => one.id === id)?.name.split(' ')[0] ?? []))],
+    [content, scene]
+  )
+  const knownWords = useMemo(
+    () =>
+      new Set(
+        [...content.loveInterests, ...content.npcs].flatMap((one) => [...one.name.split(/\s+/), one.handle ?? ''])
+          .concat(content.locations.flatMap((l) => l.name.split(/\s+/)), state.player.name, 'Bloomr')
+          .map((word) => plain(word.replace(/[^\p{L}'-]/gu, '')))
+          .filter(Boolean)
+      ),
+    [content, state.player.name]
+  )
   const [hidden, setHidden] = useState(false)
   // The sprite or video file that last failed to load, so it isn't retried every render.
   const [missing, setMissing] = useState<string | null>(null)
@@ -147,17 +168,11 @@ export function SceneView(props: Props) {
     setPoseLoop(poseSound)
   }, [poseSound?.file])
   useEffect(() => () => setPoseLoop(undefined), [])
-  // Once someone in it is undressed or a sex-act is up, a song plays behind the scene, once through, and fades out if
-  // the scene ends before it does.
-  const intimate =
-    playing ||
-    cast.some((li) => {
-      const worn = wornOutfit(content, state, li, li.id === partner.id ? scene.outfitId : lookOf(scene, li.id).outfitId)
-      return worn?.id === 'nude' || worn?.inherits === 'nude'
-    })
+  // Once a sex-act is on screen, a song plays behind the scene, once through, and fades out if the scene ends before
+  // it does. Being undressed is not enough: it waits for the act itself.
   useEffect(() => {
-    if (intimate) playSong()
-  }, [intimate])
+    if (playing) playSong()
+  }, [playing])
   useEffect(() => () => stopSong(), [])
   const beat = scene.beats[scene.beats.length - 1]
 
@@ -245,13 +260,16 @@ export function SceneView(props: Props) {
     const text = input.trim()
     if (!text || busy) return
     setInput('')
+    // A line begun from a suggestion takes its note to her with it.
+    const cue = picked?.cue
+    setPicked(undefined)
     // Said from a turn he has gone back to, it takes the place of what he said then, and of all that came of it.
     if (back > 0) {
       // He is no longer looking back: what comes next is the reply to the new line, from its first beat. (The
       // conversation is as long after a turn is redone as it was before, so nothing else would say so.)
       setProgress({ message: lastIndex, back: 0, shown: 0 })
-      props.onRedo(back, text)
-    } else onSend(text)
+      props.onRedo(back, text, cue)
+    } else onSend(text, cue)
   }
 
 
@@ -538,10 +556,14 @@ export function SceneView(props: Props) {
                     {back === 1 ? 'Your last turn' : `${back} turns back`}. Send a line to redo the scene from here, or scroll down to return.
                   </span>
                 )}
-                <input
+                <SmartInput
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  aria-label="Your reply"
+                  onChange={setInput}
+                  suggestions={suggestions}
+                  names={nameList}
+                  known={knownWords}
+                  onPick={setPicked}
+                  ariaLabel="Your reply"
                   placeholder={back > 0 ? 'Say something else here to redo the scene from this point' : `Say something to ${together}, or say goodbye to end the scene`}
                   autoFocus
                 />

@@ -57,6 +57,6 @@ describe('formatting', () => {
   it('formats date and time', () => {
     const d = toDate(calendar, 0)
     expect(formatTime(d)).toBe('06:00')
-    expect(formatDate(d)).toBe('Two, 2 A, Year 1')
+    expect(formatDate(d)).toBe('Two, 2 A')
   })
 })

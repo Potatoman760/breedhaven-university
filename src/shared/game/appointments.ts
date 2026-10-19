@@ -12,7 +12,7 @@ const SEARCH_DAYS = 14
 // How long a planned meeting lasts.
 const MEETING_HOURS = 2
 
-/** "Windsday, 4 Bloomtide, Year 412 at 13:00" */
+/** "Windsday, 4 Bloomtide at 13:00" */
 export function describeWhen(content: ContentPack, time: number): string {
   const date = toDate(content.calendar, time)
   return `${formatDate(date)} at ${formatTime(date)}`

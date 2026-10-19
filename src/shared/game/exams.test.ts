@@ -32,7 +32,6 @@ const course: Course = {
   description: '',
   subject: 'Riddles',
   code: 'RID',
-  level: 1,
   general: false,
   stats: ['wisdom'],
   studentIds: ['ana'],

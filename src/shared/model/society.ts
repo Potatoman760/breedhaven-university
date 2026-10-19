@@ -3,6 +3,27 @@ import { IntroSchema } from './orientation'
 import { StatSchema } from './stats'
 
 /**
+ * A meeting of a society that is more than its usual hour: a written setup, read as a cutscene, and then a scene with
+ * everyone of it who is there in which nothing holds anyone back. `{player}` is filled in.
+ */
+export const AdultEventSchema = z.object({
+  /** Which of his own meetings of the society it is, counted from 1. */
+  meeting: z.number().int().min(1),
+  name: z.string(),
+  intro: IntroSchema,
+  /** Told to the LLM: what is going on tonight, in a sentence or two. */
+  direction: z.string(),
+  /**
+   * Those held to their own wishes tonight, unless he has been to bed with her before: then she is as free as everyone
+   * else, and the night is told the way written for that (`ifIntimate`), where there is one.
+   */
+  reserved: z
+    .array(z.object({ loveInterestId: z.string(), ifIntimate: z.object({ intro: IntroSchema, direction: z.string() }).optional() }))
+    .default([])
+})
+export type AdultEvent = z.infer<typeof AdultEventSchema>
+
+/**
  * A student society: a club that meets once a week for an hour after classes, at a place of its own. A couple of
  * students belong to each, and the player may join it: a meeting is a scene with them, and trains what it is about.
  */
@@ -22,7 +43,11 @@ export const SocietySchema = z.object({
   /** The teacher who sponsors it: at its meetings and its table at the fair, but not one of its members. */
   sponsorId: z.string().optional(),
   /** Its emblem: a picture in the pack, shown in place of the drawn icon. */
-  iconImage: z.string().optional()
+  iconImage: z.string().optional(),
+  /** What each meeting he goes to is about, in order, a line or two each: the first he attends is the first. */
+  syllabus: z.array(z.string()).default([]),
+  /** The meetings that are more than that, by which of his it is. */
+  adultEvents: z.array(AdultEventSchema).default([])
 })
 export type Society = z.infer<typeof SocietySchema>
 

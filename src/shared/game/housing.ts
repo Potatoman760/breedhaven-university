@@ -173,6 +173,16 @@ export function healthCap(content: ContentPack, state: GameState): number {
   return Math.min(config.babies.levels.length - 1, (met.at(-1)?.level ?? config.babies.startLevel) + bonus(content, state, 'care'))
 }
 
+/** The next a baby could do in the house, and the comfort that takes: nothing once the house lets it do its best. */
+export function nextHealthStep(content: ContentPack, state: GameState): { level: string; comfort: number } | undefined {
+  const config = content.housing
+  if (!config) return undefined
+  const cap = healthCap(content, state)
+  const comfort = houseComfort(content, state)
+  const next = [...config.babies.caps].sort((a, b) => a.comfort - b.comfort).find((step) => step.comfort > comfort && step.level > cap)
+  return next ? { level: healthName(config, next.level), comfort: next.comfort } : undefined
+}
+
 /** The view of the house he is looking at, while he is at home: the room he is in. */
 export function homeViewId(content: ContentPack, state: Pick<GameState, 'housing' | 'locationId'>): string | undefined {
   const config = content.housing
@@ -453,7 +463,8 @@ export function invite(content: ContentPack, state: GameState, loveInterestId: s
   let next: GameState = { ...state, housing: { ...state.housing, residents: { ...state.housing.residents, [loveInterestId]: roomKey } } }
   next = applyFeelings(content, next, loveInterestId, feel(config.feelings.movedIn, 'He asked her to live with him.'))
   next = addMemory(next, loveInterestId, `${state.player.name} asked you to come and live with him at ${config.name}, and you moved into ${room.name.toLowerCase()}. It is your home now.`, 'core')
-  next = addNote(giveContact(next, loveInterestId), loveInterestId, { from: 'them', text: `I've brought my things over. ${room.name}, then. I still can't quite believe it. Thank you.`, read: false })
+  // Living with him, she can be written to; what she makes of moving in, she says in the hour with him that follows.
+  next = giveContact(next, loveInterestId)
   return placeBabies(content, ledger(next, `${content.loveInterests.find((li) => li.id === loveInterestId)?.name.split(' ')[0] ?? 'She'} moved into ${room.name.toLowerCase()}`, 0))
 }
 

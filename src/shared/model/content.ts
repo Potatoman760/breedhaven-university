@@ -3,7 +3,7 @@ import { DramaConfigSchema } from './drama'
 import { ExpeditionConfigSchema, HIM } from './expedition'
 import { HousingConfigSchema } from './housing'
 import { SyllabusSchema } from './syllabus'
-import { CurriculumSchema, courseId, resolveCurriculum } from './curriculum'
+import { CurriculumSchema, resolveCurriculum } from './curriculum'
 import { SkillSchema } from './skill'
 import { SocietiesConfigSchema } from './society'
 import { ActivitySchema } from './activity'
@@ -286,6 +286,14 @@ function checkReferences(pack: ContentPack): string[] {
         if (li && kindOf(li) !== 'student') issues.push(`${where}: ${li.name} is not a student`)
       }
       if (new Set(society.memberIds).size !== society.memberIds.length) issues.push(`${where}: a member is listed twice`)
+      if (new Set(society.adultEvents.map((event) => event.meeting)).size !== society.adultEvents.length) issues.push(`${where}: two events are set for the same meeting`)
+      society.adultEvents.forEach((event, i) => {
+        checkCutscene(event.intro, `${where}.adultEvents[${i}].intro`)
+        for (const held of event.reserved) {
+          need(loveInterests, held.loveInterestId, `${where}.adultEvents[${i}].reserved`, 'love interest')
+          if (held.ifIntimate) checkCutscene(held.ifIntimate.intro, `${where}.adultEvents[${i}].reserved (${held.loveInterestId})`)
+        }
+      })
       if (society.sponsorId) {
         need(loveInterests, society.sponsorId, where, 'love interest')
         const sponsor = pack.loveInterests.find((one) => one.id === society.sponsorId)
@@ -338,21 +346,21 @@ function checkReferences(pack: ContentPack): string[] {
       if (inClass === 0) issues.push(`catalogue (${course.number}): no love interest takes or teaches it`)
       if (inClass > most) issues.push(`catalogue (${course.number}): ${inClass} love interests are in it, and a class holds ${most}`)
     }
-    // Nobody makes a subject up: what a character reads or teaches is one the curriculum has written.
+    // Nobody makes a subject up: what a character studies or teaches is one the curriculum has written.
     if (pack.curriculum) {
       const majors = pack.curriculum.majors
       idSet(majors.map((major) => ({ id: major.code })), 'curriculum.majors')
       for (const major of majors) {
         if (!pack.curriculum.colleges.some((college) => college.id === major.college)) issues.push(`curriculum (${major.code}): unknown college "${major.college}"`)
-        if (new Set(major.courses.map((course) => course.level)).size !== major.courses.length) issues.push(`curriculum (${major.code}): two courses are written for one year`)
+        if (new Set(major.courses.map((course) => course.number)).size !== major.courses.length) issues.push(`curriculum (${major.code}): two courses share a number`)
         if (major.general && major.courses.length !== 1) issues.push(`curriculum (${major.code}): a general subject has one course`)
       }
       for (const character of [...pack.loveInterests, ...pack.npcs]) {
         const read = character.studies
-        if (read && !majors.some((major) => major.code === read.code && !major.general)) issues.push(`${character.id}: reads "${read.code}", which is not a subject the curriculum has`)
+        if (read && !majors.some((major) => major.code === read.code && !major.general)) issues.push(`${character.id}: studies "${read.code}", which is not a subject the curriculum has`)
         for (const taught of character.teaching?.subjects ?? []) {
-          if (!majors.some((major) => major.code === taught.code && major.courses.some((course) => course.level === taught.level))) {
-            issues.push(`${character.id}: teaches ${courseId(taught.code, taught.level)}, which the curriculum has not written`)
+          if (!majors.some((major) => major.code === taught.code && major.courses.some((course) => course.number === taught.number))) {
+            issues.push(`${character.id}: teaches ${taught.code} ${taught.number}, which the curriculum has not written`)
           }
         }
       }
@@ -419,6 +427,7 @@ function checkReferences(pack: ContentPack): string[] {
     need(loveInterests, housing.nannyId, 'housing.nannyId', 'love interest')
     if (housing.viewing && !pack.locations.some((l) => l.id === housing.viewing?.meetLocationId)) issues.push(`housing.viewing.meetLocationId: unknown location "${housing.viewing.meetLocationId}"`)
     if (housing.viewing && !pack.npcs.some((npc) => npc.id === housing.officerId)) issues.push('housing.viewing: the officer who shows the house must be an NPC')
+    if (housing.viewing) checkCutscene(housing.viewing.cutscene, 'housing.viewing.cutscene')
     idSet(housing.rooms.map((room) => ({ id: room.key })), 'housing.rooms')
     for (const role of ['master', 'nanny'] as const) {
       if (housing.rooms.filter((room) => room.role === role).length !== 1) issues.push(`housing.rooms: there must be exactly one room of the role "${role}"`)

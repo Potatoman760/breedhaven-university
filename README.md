@@ -68,19 +68,22 @@ left unsigned.
   anywhere else it walks to the first stall's location, the market. Each stall is a tab; each item
   has an icon, a price and tags. A gift can be handed over in any scene: it is loved if one
   of its tags is in the person's `likes`, disliked if one is in their `dislikes`, and the
-  affection it earns is set under `gifts` in `relationships.json`. The character is told
+  affection it earns is `gifts` in `relationships.json`, which the default pack leaves out, so the
+  schema's defaults hold (`GiftValuesSchema`: loved +6, liked +2, disliked −3). The character is told
   what they were given and how they feel about it.
 - **The curriculum** (`curriculum.json`, `src/shared/model/curriculum.ts`) is everything the
   University teaches, written down: its colleges, the subjects in them, and each subject's
-  courses, each with its title, description, the six topics of its syllabus and the one
-  skill it teaches. Nobody makes a subject up. A character's file names what she reads
-  (`"studies": { "major": "POL", "level": 1 }`) or the courses she gives
-  (`"subjects": [{ "major": "ETH", "level": 1 }]`), and the rest is filled in from the
+  courses, each with its number, title, description, the six topics of its syllabus and the
+  one skill it teaches. A course's number (`"number": "132"`, shown as `BUS 132`) is a label
+  in the 100s, not a year: there are no levels, and any student may take any course. Nobody
+  makes a subject up. A character's file names what she studies (`"studies": { "major":
+  "POL", "level": 1 }`, the level being her year, background only) or the courses she gives
+  (`"subjects": [{ "major": "WOM", "number": "101" }]`), and the rest is filled in from the
   curriculum when the pack is read (`resolveCurriculum`), which also draws out of it the
   general subjects, `content.syllabus` and `content.skills`. The editor offers subjects and
   courses from a list, and saves a character with only the names. A subject is `general`
   when it is open to all and nobody reads it; a single course of a subject that is read can
-  be `general` too (the first-year ethics course every student passes through). It is
+  be `general` too (the Women's Studies course every student passes through). It is
   edited by hand, like the codex.
 - **Coursework** (`coursework.json`) holds the rules of the timetable, and **the catalogue**
   (`catalogue.json`) is the term laid out: which of the written courses are given, who
@@ -88,14 +91,16 @@ left unsigned.
   (`buildCatalogue` in `src/shared/game/catalogue.ts`), the same every time for the same
   seed and characters, in the editor (Edit game content, Courses) or with
   `npx jiti scripts/build-catalogue.ts`; build it again after adding a character or
-  changing what one reads or teaches. On disk it holds only what was worked out (`id`,
+  changing what one studies or teaches. On disk it holds only what was worked out (`id`,
   `professor`, `teacherId`, `studentIds`, `meetings`); what a course is called and teaches
   is put back from the curriculum. A `catalogue.json` in the add-on folder is read in place
   of the game's own.
-  - **Which courses are given**: a course a love interest reads or teaches, and every
-    general one. The rest are written and dormant (`dormantCourses`): they are what a new
-    character can be given. A student sits her subject's course for her year, or the
-    nearest written below it (`courseFor`).
+  - **Which courses are given**: every course of a subject a love interest studies, every
+    course one teaches, and every general one. The rest are written and dormant
+    (`dormantCourses`): they are what a new character can be given. A student sits two
+    courses of her subject (`MAJOR_COURSES`), one nobody teaches before one a love interest
+    does and the emptiest first, then two electives from any other subject (`ELECTIVES`),
+    whatever her year. Every major has at least two courses written for it.
   - **Meetings**: every course has `lecturesPerWeek` lectures of `lectureHours`, on
     different days. A subject marked `practical` also has one lab of `labHours`.
   - **Slots** are given out one meeting at a time, each to the hours between `dayStart`
@@ -180,8 +185,11 @@ Run from source they are written into `calendar.json`; in a packaged game they a
 as `events.json` in the add-on folder and laid over the game's own, where one with the id
 of one of the game's own takes its place and only the add-on's can be deleted.
 
-"Edit game content" on the title screen opens the editor. For now it edits love interests
-and the trait library.
+"Edit game content" on the title screen opens the editor, for the developer only: it is there when
+the game is run from its source (`npm run dev`), and a built game leaves it out, code and all
+(`import.meta.env.DEV` in `App.tsx`). Its sides are the characters (love
+interests and NPCs: profile, traits, media, family, academics), the trait library, events,
+courses, the player's start, locations, jobs, societies and ComfyUI.
 
 - **Add-ons** live in an `addons` folder in Electron's user-data folder (the editor has a
   button that opens it): `love-interests/<id>.json`, `traits.json`, and artwork under
@@ -220,6 +228,16 @@ and the trait library.
   for the player, how the relationship moved, and the memory that was kept. Each memory is
   in a text box on that screen: the player can reword it, or clear it so that nothing is
   remembered, and it is kept as it stands when they continue.
+- **The text box** (`ui/SmartInput.tsx`, `src/shared/game/suggest.ts`) helps as an editor does,
+  and offers nothing until he types. The asks open to him now (`sceneSuggestions`) are her
+  Bloomr once she is an acquaintance and he has not got it, and each relationship status whose
+  `minStage` she has reached and that `canBond` allows (two women together, for a throuple, when
+  both are there). As he types, the rest of one he has begun, or of a name (those in the scene
+  first, then everyone he has met), shows in grey after the cursor and Tab takes it. A
+  word the system spell checker does not know (the game's names, places and handles aside) gets
+  a wavy line, and its likeliest fix is offered above the box, also taken with Tab. A line begun
+  from a suggestion carries its `cue` to the LLM beside it: what he is asking, and that it can be
+  granted (she says her handle, or calls `propose_relationship`). Her answer is still hers.
 - **NSFW routing**: scenes go to the Main LLM unless their activity is marked `nsfw`. If
   the Main LLM declines to write (a refusal in its reply, a content filter, or a
   moderation block), the request is retried on the NSFW LLM, which keeps the scene from
@@ -286,10 +304,10 @@ and the trait library.
   on day 1, once the welcome is over, its speaker shows the day's screen (`ui/InterfaceTour.tsx`): the player opens
   the phone, the map, the bag and the calendar himself when she asks, she shows each (turning to every app of the
   phone), and she ends on Help. Each is shown once a game, kept by a flag in the save.
-- **Kinds of love interest** (`kind`): a **student** has `studies`, takes the course in her
-  major at her year, and has the rest of her timetable dealt out by rule when the catalogue is built; a **teacher**
-  has `teaching` (a department, a style such as Magistra, and one or more subjects), each
-  subject becoming a course with her as its professor; an **outsider** has neither and
+- **Kinds of love interest** (`kind`): a **student** has `studies`, takes two courses in her
+  major, and has the rest of her timetable dealt out by rule when the catalogue is built; a **teacher**
+  has `teaching` (a department, a style such as Magistra, and one or more courses), each
+  with her as its professor; an **outsider** has neither and
   nothing to do with classes. Only students are given timetables. A teacher is in the
   hall while her course meets, is busy then for plans and invitations, and leads the
   class scene when the player attends. Orientation introduces students only, not
@@ -309,8 +327,8 @@ and the trait library.
   romance; the NPC keeps a memory of it like anyone else. An NPC who is where a scene with
   love interests takes place is also part of it as an extra (up to two): the prompt lists
   them, the LLM writes a line for one when the player speaks to them or their work calls
-  for it, and their sprite steps in beside the others while that line is on screen. The game has two: Helga, matron
-  of the Cloister Halls, and Bryn, the Tiltyard's armourer.
+  for it, and their sprite steps in beside the others while that line is on screen. The default pack has twenty:
+  matrons, shopkeepers, managers and the housing officer, each a file in `love-interests/` marked `npc`.
 - **Stats**: strength, dexterity, endurance, intelligence, charisma and wisdom
   (`src/shared/model/stats.ts`), on the usual scale of ability scores (10 is ordinary). A new game
   starts every stat at 8 and gives the player 27 points to raise them with as he likes, up
@@ -330,7 +348,7 @@ and the trait library.
   the LLM judges which from the wording, and each location lists what it is a good place
   for (`trains` in `locations.json`).
 - **Appeal**: each love interest `admires` up to three stats. The average of those in the
-  player gives three levels (below 8, 8 and up, 12 and up). The level is told to the
+  player gives three levels (below 14, 14 and up, 18 and up: `appealLevel` in `src/shared/game/stats.ts`). The level is told to the
   character with the player's whole stat sheet, makes affection grow faster (a quarter
   more per level, rounded up), and raises the chance they write to him unprompted.
 - **Relationship statuses**: stages say how close two people are; a status is what they
@@ -415,9 +433,12 @@ and the trait library.
     does not move him in. The officer sets an hour to show him the house (`scheduleViewing`):
     the first stretch from the next day on, in office hours, that is free of everything else
     of his, at `meetLocationId`. It is on his calendar and he has to be there; missed, it is
-    simply set again. Kept (`attendViewing`), it is a scene at the house with the nanny, the
-    officer there as its guide (`guideId` on the scene), and the house is his as it opens:
-    the Home button is there when the scene ends. A pack without `viewing` moves him in on yes.
+    simply set again. Kept (`attendViewing`), the officer hands him the keys and the nanny sets out
+    how a child does in the house (`viewing.cutscene`, read before the scene): its cot, the weekly
+    keep, the five levels of health, and that the house's comfort decides how high they can go. Then
+    it is a scene at the house with the nanny, the officer there as its guide (`guideId` on the
+    scene), and the house is his as it opens: the Home button is there when the scene ends. A pack
+    without `viewing` moves him in on yes.
   - **The house is put into the content**, not handled beside it. `withHousing(content,
     state)` gives the pack as one game sees it, and is applied wherever content is prepared
     for a state (`App.tsx` and `readBy` in `src/main/index.ts`). Until he lives there the
@@ -459,11 +480,12 @@ and the trait library.
     house costs `babies.weeklyCost`, the one doing worst paid for first. Paid for, it comes
     on a level, as far as the house's comfort allows (`babies.caps`); not paid for, it drops
     a level and its mother's affection and trust fall (`babies.neglect`). At the bottom she
-    takes it back to the creche and leaves. No child is ever lost.
+    takes it back to the creche and leaves. No child is ever lost. The house's sidebar lists each
+    child at home with her level, and the comfort the house needs for the next one (`nextHealthStep`).
   - **Reckoning** (`settleHousehold`) walks every day since it was last done, so a jump of
     several days settles each once. Rent day and the children's week are on the calendar.
-  - **The epilogue** has a Home screen, and a mother who lived with him raised the child
-    with him.
+  - **The epilogue** has a Home screen, with how the children raised there fared, and a mother
+    who lived with him raised the child with him.
 - **The calendar** opens on the week, laid out by the hour like a diary: the player's
   classes, plans, orientation, events and expected births are blocks where they fall, side
   by side when they overlap. A Month view names up to three things a day; clicking a day
@@ -573,12 +595,20 @@ and the trait library.
   course teaches one thing at so many marks (`at`, 30). He has it while he is taking the
   course and has the marks; nothing is stored but `skillsTold`, so that it is announced
   once. A skill is one of three shapes (`src/shared/model/skill.ts`):
-  - a **sight** (`grants`, one of `SKILL_GRANTS`): `cycle`, `contraception` and `desire`
-    show the period, birth-control and desire-needed chips on her phone page (a "?" chip
-    says where it is learnt until then), `schedule` lists her week there, `comfort` shows
+  - a **sight** (`grants`, one of `SKILL_GRANTS`): `contraception` and `cycle` show the
+    birth-control and period chips on her phone page (a "?" chip says where it is learnt
+    until then; `cycle` is Ward reading's second level, `alsoGrants`; how much desire she
+    needs is never shown), `odds` shows his chance of winning on his turn at
+    poker (`equity`), `comfort` shows
     each woman's comfort in a scene, and `tastes` finds one like or dislike of hers when a
     scene ends;
   - a **passive** (a modifier, below): always on once learnt;
+  - and, besides its first level, a **second** (`upgrade`, at 70 marks): what it says then, and a stronger
+    `passive`, a shorter `cooldownDays`, a second sight (`alsoGrants`) or a second modifier
+    (`alsoPassive`: Back in bloom's `devoted`, kept by `devotedMothers` between scenes). `skillsLearnt` hands out each skill as he
+    has it (`level` 1 or 2), so everything that reads skills gets the second level's numbers; `skillLevel` asks it of
+    a sight, for what the second does beyond them (two tastes a scene, a suggested move at poker, comfort kept at 2
+    or above). It is told once more as it is reached (`toldOf`, `id@2` in `skillsTold`), and shown in gold with II;
   - an **ability**: something he makes or sets off, then waits `cooldownDays` to do again
     (`canUseAbility`, `useAbility`, `abilityUsed` in the save). He never casts: he brews,
     or readies a thing at the bench and triggers it. Brewing is an ability whose effect
@@ -624,7 +654,7 @@ and the trait library.
   lecture, so that what is asked is something he heard. Handing it in passes the rest of
   the slot and gives the grade (`gradeFor`): with `passAt` (0.6) of the marks to be had by
   then (the midterm against the part of the term gone by, the final against the whole) a
-  C; with `markAt` (0.8) of them a B; every answer right lifts either by a letter; and an F
+  C; with `markAt` (0.8) of them a B; a perfect paper (every answer right) lifts either by a letter; and an F
   under a pass, or when its hour goes by without him (`settleExams`). The classes he sat
   are kept in the save by day and hour under `attendance`. Grades are kept under
   `grades`, by course. Every love interest is told when the examinations are next week or
@@ -656,8 +686,16 @@ and the trait library.
   stage and adds to her surge with each thing she does, which at `surgeLimit` breaks loose
   on everyone. The party is drawn with its ordinary sprites, the face chosen by what last
   happened to each (`FightEvent.faces`); an enemy without an `image` is a card with its
-  name. Winning at the guardian re-seats the anchor: the first time, its `relic` is his, a
-  `Modifier` that `modifiersOf` reads like a learnt skill's, and the next depth opens.
+  name. Winning at the guardian re-seats the anchor: the first time, its `relic` is his, and
+  the next depth opens. A relic is always at work once he turns it on (each starts off; the
+  Bag's Relics tab turns it on and off, `relicsOn`): a `Modifier` that `modifiersOf` reads like a learnt
+  skill's, or `traitIds` every love interest has while it is on (`relicTraitIds`). Or it is
+  used in a scene from the Bag, once a scene (`use`, `src/shared/game/relics.ts`): `unravel`
+  undresses everyone, `stillness` stops time for everyone else (no extras, and private),
+  `sapphic` draws the women to each other, `minds-eye` has them write what they think, and
+  `first-seed` undoes their birth control for the scene. Using one is his turn at once
+  ("*secretly uses the …*"), with what it did told to her beside it as a cue (nobody knows
+  it was him) and, where it lasts, as a rule of the scene.
   Losing keeps only what was banked, empties his energy and costs the trust of whoever
   went down (`comeUp`); each woman who went remembers it, and ties between them grow. A
   course's skill may carry a `below` modifier beside what it teaches (`might`, `footing`,
@@ -705,6 +743,14 @@ and the trait library.
   its place (`locationOf`, after classes and before work), it is on his calendar and is
   the next thing on his day like a class, and going is a scene with whichever of them are
   there, which trains its `stats` (`statGain` an hour, shared between them) for `energy`.
+  Each meeting he goes to has a topic of its own, the next in its `syllabus`, counted by his
+  own meetings (`nextMeeting`), so he misses none by missing a week. His third and tenth are
+  `adultEvents`: a written setup (`intro`, a cutscene) and then a group scene with everyone of
+  it who is there, sponsor included, marked `uninhibited`, so that the sex gate is open to all
+  of them (`sexGate`'s last argument), and `nsfw`. Its `direction` tells the LLM the situation.
+  A night can hold someone to her own wishes (`reserved`) unless he has been to bed with her
+  before, when she is free too and the night is told the way written for that (`ifIntimate`):
+  `eventGate` works out which, and the scene's `uninhibited` lists who is free.
   Her societies, and whether he is in them, are in her profile for the LLM. The editor's
   Societies side writes the file, from source only, as Jobs does.
 - **The Societies Fair** (`fair` in `societies.json`, `src/shared/game/fair.ts`, `ui/FairView.tsx`): while its tables are
@@ -740,12 +786,16 @@ and the trait library.
   that fades in over a placeholder backdrop. Nothing in it is written by the LLM. First his
   studies: failing, getting by or excelling, from the final grade in each course he took
   (the final he sat, or what his marks and attendance would earn if the year ended first), with the grades
-  listed. Then a screen for each arrangement whose status is `committed` in
-  `relationships.json` (every one but lovers without promises). Then a screen for each love
-  interest who carried his child during the year: the children she bore, and for one still
-  to be born, a daughter or a son by `daughterChance`; she was overjoyed if they are
-  together or she is at least as fond of him as a friend, and raised the child by herself
-  otherwise. A click, Space, Enter or the right arrow goes on; the left arrow goes back.
+  listed. Then his legacy, the run's real goal: how many children he fathered and by how many
+  women, a line for each mother. Then a screen for each love interest who carried his child
+  during the year: the children she bore, and for one still to be born, a daughter or a son by
+  `daughterChance`; she was overjoyed if they are together or she is at least as fond of him as a
+  friend, and raised the child by herself otherwise. Then a screen for each arrangement whose
+  status is `committed` in `relationships.json` (every one but lovers without promises). Then the
+  house, if he was let one: who shared it, and how the children raised there were doing. Then the
+  Undercroft, always: every anchor set and he saved the University, and rumors of his heroism
+  spread; any short of that, and the monsters below overflowed onto the campus.
+  A click, Space, Enter or the right arrow goes on; the left arrow goes back.
 - **Sleep and ending the day** (`src/shared/game/sleep.ts`): midnight to 06:00 is for
   sleep and nothing else. Nothing the player sets out on may start in those hours or run
   into them (rest aside), and whenever the clock stands in them with no scene open, he
@@ -952,7 +1002,10 @@ gone to as an outing. Two things make one more than that:
   place looks like dressed. The Commons has one for the Feast of First Frost (`first-frost`).
 - **Dressed people.** A character with an outfit whose `id` is the event's id wears it from morning to night while it
   is on (`wornOutfit`), unless a scene has put her in something else. Dorrit has one for First Frost. A cutscene can
-  also name its speaker's outfit (`outfitId`).
+  also name its speaker's outfit (`outfitId`), and change anyone's as it goes: a line `[OUTFIT: Tamsin=nude]` or
+  `[EXPRESSION: Maren=aroused]` (no name: the speaker's) is not read, and changes her from the next line on
+  (`cutsceneBeats` in `src/shared/game/cutscene.ts`). A society's night hands the scene after it the looks it left
+  everyone in.
 - **A program** (`program`, `src/shared/game/eventParts.ts`): scripted parts of the event, each on one of its days
   (`day`, from 1) at an hour, for some hours, at the event's place or its own. While a part is to come or under way it
   is a card on the day's screen; going takes him there at its hour, plays its `cutscene` if it has one (written lines

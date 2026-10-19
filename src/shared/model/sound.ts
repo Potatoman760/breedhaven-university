@@ -4,7 +4,7 @@ import { z } from 'zod'
  * The moments the game makes a sound at. The interface's own come first, then what happens in the story.
  * Which file each plays is the content's to say, so that any of them can be swapped without touching code.
  */
-export const CUES = ['click', 'open', 'close', 'phoneOn', 'phoneOff', 'bagOpen', 'bagClose', 'cards', 'chips', 'build', 'notice', 'message', 'coins', 'door', 'skill', 'bond', 'pregnancy', 'birth'] as const
+export const CUES = ['click', 'open', 'close', 'phoneOn', 'phoneOff', 'bagOpen', 'bagClose', 'cards', 'chips', 'build', 'notice', 'message', 'coins', 'door', 'skill', 'bond', 'pregnancy', 'birth', 'relic'] as const
 export type Cue = (typeof CUES)[number]
 
 /** One sound file in the pack, how loud it is played, and whose it is. */

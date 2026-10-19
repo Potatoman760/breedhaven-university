@@ -22,7 +22,91 @@
         "yelena"
       ],
       "sponsorId": "caelwen",
-      "iconImage": "sprites/icons/societies-debating-union-cutout.png"
+      "iconImage": "sprites/icons/societies-debating-union-cutout.png",
+      "syllabus": [
+        "Introductions, and a warm-up motion: \"This house believes the Bloom is a blessing.\" Caelwen refuses to say who won.",
+        "How to build an argument: claim, reason, evidence. Seraphine and Yelena each pick it apart in the other.",
+        "The Forfeit Debate, an old Union tradition: every point conceded costs a piece of clothing.",
+        "Rebuttal drills: thirty seconds to answer whatever is thrown at you.",
+        "Motion: \"This house would let the Arcane Board be elected.\" Yelena argues for; Seraphine, uncomfortably, against.",
+        "Points of information: how to interrupt without being rude, and how to be rude without being caught.",
+        "Reading the room: Caelwen on how a vote is won before anyone stands up.",
+        "Motion: \"This house regrets the Sire Registry.\" Everyone looks at {player}.",
+        "Impromptu debating: motions drawn from a hat, five minutes to prepare.",
+        "The Lock-In: a late session, Caelwen's wine, and the porter locks the Commons for the night.",
+        "Motion: \"This house would abolish the monarchy.\" Seraphine insists on taking the opposing side herself.",
+        "Persuasion without logic: anecdote, flattery and a well-timed silence.",
+        "Practice for the Assembly debate, with Caelwen playing a hostile Speaker.",
+        "Motion: \"This house believes love is a choice.\" It runs long.",
+        "The term's grand final, judged by Caelwen and a very bored porter.",
+        "The last meeting: speeches of thanks, and the Union's toast to its absent friends."
+      ],
+      "adultEvents": [
+        {
+          "meeting": 3,
+          "name": "the Forfeit Debate",
+          "intro": {
+            "speakerId": "seraphine",
+            "scenes": [
+              {
+                "locationId": "commons",
+                "castIds": [
+                  "seraphine",
+                  "yelena",
+                  "caelwen"
+                ],
+                "lines": [
+                  "*The back corner of the Student Commons has been cleared, the curtains drawn. A slate on the wall reads, in Caelwen's neat hand: THE FORFEIT DEBATE.*",
+                  "Caelwen: A Union tradition older than the Commons. Every point you concede costs a garment. I keep score and I am not to be bribed.",
+                  "Yelena: She means she's the only one who keeps her clothes on.",
+                  "Seraphine: The motion is that a ruler should never be seen undressed by her subjects. I am proposing it.",
+                  "Yelena: And I am going to enjoy making you lose it, Your Majesty.",
+                  "Caelwen: {player}, you will argue for whichever side is losing. Begin.",
+                  "[OUTFIT: Seraphine=slip]",
+                  "[OUTFIT: Yelena=nude]",
+                  "[EXPRESSION: Yelena=aroused]",
+                  "[EXPRESSION: Seraphine=embarrassed]",
+                  "*Twenty minutes in, Seraphine has conceded three points and is down to her slip. Yelena, in nothing but her stockings, has just lost the last.*",
+                  "Caelwen: Point to the government. Lady Goldvine, the forfeit is yours to choose, and the chair rules it may be paid on the gentleman.",
+                  "Yelena: *crossing to {player}, eyes on Seraphine* Then I take his belt. And I take my time about it."
+                ]
+              }
+            ]
+          },
+          "direction": "The Forfeit Debate: each point conceded costs a piece of clothing. Seraphine and Yelena are competitive about it, and Caelwen keeps score with a glass of wine and no intention of stopping them. The scene opens with Seraphine in her slip and Yelena nearly naked, and Yelena paying her forfeit by unbuckling his belt while Seraphine watches, flushed."
+        },
+        {
+          "meeting": 10,
+          "name": "the Lock-In",
+          "intro": {
+            "speakerId": "caelwen",
+            "scenes": [
+              {
+                "locationId": "commons",
+                "castIds": [
+                  "seraphine",
+                  "yelena",
+                  "caelwen"
+                ],
+                "lines": [
+                  "*The session ran long. By the time anyone looks at the clock, the porter has locked the Commons for the night and gone home.*",
+                  "Yelena: Locked in. With her. Wonderful.",
+                  "Seraphine: My protection officer is outside. She can wait until morning. I gave her the night off.",
+                  "Caelwen: *producing a bottle from her coat* In sixty years I have learned to carry a good red to every late meeting. Glasses are in the cabinet.",
+                  "Caelwen: Since nobody is going anywhere, I propose a new motion. Truth, or a dare. The chair recognizes {player}.",
+                  "*The bottle spins and stops on Seraphine.*",
+                  "Seraphine: Dare. I am a queen, I do not do truth.",
+                  "Yelena: Then put your hand down his trousers, Your Majesty, and do not take it out until he is hard. We will all watch.",
+                  "[EXPRESSION: Seraphine=aroused]",
+                  "[EXPRESSION: Yelena=aroused]",
+                  "*The queen of the realm holds Yelena's gaze, kneels beside {player}, and slides her hand inside his waistband.*"
+                ]
+              }
+            ]
+          },
+          "direction": "They are locked in the Commons overnight with Caelwen's wine, and the evening has turned into truth or dare. The rivalry between Seraphine and Yelena has become something warmer, and nobody wants it to stop. The scene opens on the first dare under way: Seraphine has her hand down his trousers, working him hard, while Yelena watches with her lip between her teeth and Caelwen refills her glass."
+        }
+      ]
     },
     {
       "id": "volleyball-club",
@@ -40,7 +124,92 @@
         "tamsin"
       ],
       "sponsorId": "grushka",
-      "iconImage": "sprites/icons/societies-volleyball-club-cutout.png"
+      "iconImage": "sprites/icons/societies-volleyball-club-cutout.png",
+      "syllabus": [
+        "Try-outs: Daphne watches everyone serve and says nothing, which is worse.",
+        "Footwork and the ready stance. Grushka makes everyone hold it until their legs shake.",
+        "A scrimmage, then showers. The men's locker room is closed for cleaning.",
+        "Passing drills: forearms, not hands. Tamsin uses her hands.",
+        "Setting: soft hands, high balls. Daphne sets for {player} until he gets one over.",
+        "Serving under pressure: Grushka shouts throughout.",
+        "The spike: approach, jump, swing. Tamsin falls over twice and laughs both times.",
+        "A match against the Pyromancy Society's team. They cheat.",
+        "Blocking at the net, and what to do with your elbows.",
+        "Recovery night: Coach Tor-Vael teaches sports massage, and everyone pairs up.",
+        "Conditioning: sprints in the sand until somebody begs.",
+        "Rotations and positions, drawn on Daphne's whiteboard in angry red.",
+        "A night match under the Tiltyard's lanterns.",
+        "Video review: Grushka has drawings of everyone's mistakes.",
+        "The term's tournament against the other colleges.",
+        "The last practice: a game of anything-goes and a bonfire on the sand."
+      ],
+      "adultEvents": [
+        {
+          "meeting": 3,
+          "name": "the shared showers",
+          "intro": {
+            "speakerId": "tamsin",
+            "scenes": [
+              {
+                "locationId": "tiltyard",
+                "castIds": [
+                  "daphne",
+                  "tamsin",
+                  "grushka"
+                ],
+                "lines": [
+                  "*After an hour of scrimmage, everyone is covered in sand to the elbows. There is a sign on the men's locker room door: CLOSED FOR CLEANING.*",
+                  "Grushka: Cleaning. Today. Of course it is.",
+                  "Tamsin: Just use ours, {player}! There's plenty of room. Twelve shower heads and three of us.",
+                  "Daphne: Tamsin. He can wait.",
+                  "Grushka: He cannot. He has sand in places I can see from here. In. Nobody is shy on my team.",
+                  "[OUTFIT: Tamsin=nude]",
+                  "*The women's showers are already steaming. Tamsin is half out of her uniform before the door has closed.*",
+                  "[OUTFIT: Daphne=nude]",
+                  "[OUTFIT: Grushka=nude]",
+                  "[EXPRESSION: Tamsin=aroused]",
+                  "[EXPRESSION: Daphne=aroused]",
+                  "*Under the spray, Tamsin pulls {player} in by the wrist. Daphne gives up pretending not to look. Grushka hangs her towel on the hook and steps under the next shower head, wholly unbothered.*",
+                  "Tamsin: You missed a spot. Here. *She soaps his chest with both hands, and keeps going lower.*",
+                  "Daphne: *coming up behind him, close enough to touch* Captain's orders. Nobody leaves the showers dirty."
+                ]
+              }
+            ]
+          },
+          "direction": "The men's locker room is closed, so he showers with the team in the women's. Tamsin is delighted, Daphne pretends not to look and does, and Grushka says nobody on her team is shy. The scene opens naked in the steaming showers: Tamsin is soaping him and her hands have gone well below his waist, Daphne is pressed against his back, and Grushka watches from under the next shower."
+        },
+        {
+          "meeting": 10,
+          "name": "recovery night",
+          "intro": {
+            "speakerId": "grushka",
+            "scenes": [
+              {
+                "locationId": "tiltyard",
+                "castIds": [
+                  "daphne",
+                  "tamsin",
+                  "grushka"
+                ],
+                "lines": [
+                  "*Instead of drills, there are mats laid out on the sand, warm oil in a pot, and Grushka with her sleeves rolled up.*",
+                  "Grushka: Recovery. A body that is not looked after breaks. Tonight you learn to look after each other.",
+                  "Grushka: Pair up. Shirts off. Oil goes on your hands, not the floor.",
+                  "Tamsin: I call {player}. Ow. My everything hurts.",
+                  "Daphne: You always call him.",
+                  "Grushka: Then he can do both of you, and then me. Work out the knots. All of them.",
+                  "[EXPRESSION: Tamsin=aroused]",
+                  "*Tamsin lies face-down on the mat with her shirt off. Under {player}'s hands the knots in her back melt, and she makes a sound that is not about her back at all.*",
+                  "[OUTFIT: Tamsin=nude]",
+                  "Tamsin: Lower. *A pause.* Lower. *She reaches back, unties her shorts, and pushes them down herself.*",
+                  "Grushka: *watching, arms folded* Good form. Daphne, stop pretending to stretch and get over here."
+                ]
+              }
+            ]
+          },
+          "direction": "Grushka is teaching sports massage: shirts off, warm oil, everyone working on everyone. The massage turns into something else, and Grushka is not about to stop it. The scene opens with Tamsin naked on the massage mat under his oiled hands, guiding them lower, Daphne coming over at Grushka's order, and Grushka next in line."
+        }
+      ]
     },
     {
       "id": "physic-garden-society",
@@ -57,7 +226,88 @@
         "lira",
         "tamsin"
       ],
-      "iconImage": "sprites/icons/societies-physic-garden-society-cutout.png"
+      "iconImage": "sprites/icons/societies-physic-garden-society-cutout.png",
+      "syllabus": [
+        "A tour of the walled garden, and Lira's ponds. Do not drink from the blue one.",
+        "Weeding the herb beds, and learning which weeds bite back.",
+        "Pollinating the night-blooming Venus orchids by hand. Lira forgets to mention the pollen.",
+        "Taking cuttings: mint, sleepcap and bitterwort, to take home.",
+        "Compost, which Tamsin thinks is disgusting and then can't stop talking about.",
+        "Planting the winter beds before the frost.",
+        "Repotting the glasshouse cacti, carefully.",
+        "Harvest of the moonberries, which only ripen after dark.",
+        "Lira teaches what each pond is for, and how old it is. Very old.",
+        "Clearing the warm spring pool at night, waist-deep in the water.",
+        "Pressing flowers for the Health Center's apothecary.",
+        "Grafting apple trees, and naming the new ones.",
+        "Mulching against the first snow.",
+        "Planning next year's beds over tea in the potting shed.",
+        "Winter pruning: the roses, the vines, and Tamsin's fringe, by accident.",
+        "The last evening: a lantern walk through the garden, and Lira's oldest story."
+      ],
+      "adultEvents": [
+        {
+          "meeting": 3,
+          "name": "the Venus orchids",
+          "intro": {
+            "speakerId": "lira",
+            "scenes": [
+              {
+                "locationId": "physic-garden",
+                "castIds": [
+                  "lira",
+                  "tamsin"
+                ],
+                "lines": [
+                  "*In the glasshouse, a row of tall violet orchids is opening in the dusk. Each one is the size of a hand and smells like warm honey.*",
+                  "Lira: These are Venus orchids. They only open at night. We pollinate them with feathers, like this.",
+                  "*A cloud of golden pollen drifts up from the first flower and settles on all of you.*",
+                  "Tamsin: Mm. That smells nice. Why is it so hot in here suddenly?",
+                  "Lira: Oh. I should have said. The pollen makes people very, very friendly for an hour or two. It is perfectly safe. I think.",
+                  "Tamsin: *pulling at her collar* Lira. Lira, you could have said.",
+                  "[OUTFIT: Tamsin=nude]",
+                  "[EXPRESSION: Tamsin=aroused]",
+                  "[EXPRESSION: Lira=aroused]",
+                  "*Tamsin gives up on her collar and pulls her top off entirely. Lira's gel glows a deep, warm pink.*",
+                  "Tamsin: It's so hot. {player}, come here. You're cooler than me. *She presses herself against him and kisses him hard, open-mouthed.*",
+                  "Lira: *flowing around both of you, warm and slick* I am sorry. I am not very sorry."
+                ]
+              }
+            ]
+          },
+          "direction": "Venus orchid pollen is an aphrodisiac, and everyone in the glasshouse has breathed it in. They are flushed, warm and very friendly for the next hour, and they all know why. The scene opens with Tamsin topless and kissing him hard, both of them dizzy with orchid pollen, and Lira wrapped warm and slick around them both."
+        },
+        {
+          "meeting": 10,
+          "name": "the warm spring",
+          "intro": {
+            "speakerId": "tamsin",
+            "scenes": [
+              {
+                "locationId": "physic-garden",
+                "castIds": [
+                  "lira",
+                  "tamsin"
+                ],
+                "lines": [
+                  "*The spring pool at the heart of the garden steams in the cold night air. Lira wants the leaves cleared out of it before winter.*",
+                  "Lira: The water is always warm. It comes up from very deep. Clothes get wet, so most people leave them on the bench.",
+                  "Tamsin: Most people?",
+                  "Lira: All the people. Well. Me. I do not wear any anyway.",
+                  "Tamsin: Right. Okay. *She is already unbuttoning.* Don't look, {player}. Actually, look. I don't care.",
+                  "[OUTFIT: Tamsin=nude]",
+                  "[EXPRESSION: Tamsin=aroused]",
+                  "[EXPRESSION: Lira=aroused]",
+                  "*In the steaming water, the leaves are forgotten. Tamsin wades up behind {player} and wraps her arms around him, her bare breasts against his back.*",
+                  "Tamsin: Lira's right, the water's lovely. *Her hand slides down his stomach under the surface.* Oh. Hello.",
+                  "Lira: *rising from the pool in front of him, glistening* My turn to hold him, Tamsin. Share."
+                ]
+              }
+            ]
+          },
+          "direction": "They are clearing leaves from the warm spring pool at night, undressed and waist-deep. The water is warm, the night is dark, and nobody is in a hurry to finish the job. The scene opens waist-deep in the warm spring, all of them naked: Tamsin is pressed to his back with her hand on him under the water, and Lira has risen in front of him."
+        }
+      ]
     },
     {
       "id": "furrow-choir",
@@ -74,7 +324,88 @@
         "maren",
         "morwenna"
       ],
-      "iconImage": "sprites/icons/societies-furrow-choir-cutout.png"
+      "iconImage": "sprites/icons/societies-furrow-choir-cutout.png",
+      "syllabus": [
+        "Auditions. Morwenna sings one line and the room goes quiet.",
+        "Breathing: from the belly, not the chest. Maren demonstrates with enthusiasm.",
+        "Rehearsing the old Sowing Rite as it was first sung, with a Sire, as the hymn intends.",
+        "Harmony: the altos learn their part, slowly.",
+        "The modern song the choirmaster pretends not to like.",
+        "Singing in the round, which goes wrong in a way everyone enjoys.",
+        "A practice service for the Harvest Fair.",
+        "Diction: the old hymns are in an older tongue, and every word matters.",
+        "A solo for Morwenna, which she refuses, and then sings anyway.",
+        "Snowed into the bell tower after carol practice, sharing one blanket.",
+        "Carols for the Lantern Festival.",
+        "Singing at the Health Center for the new mothers.",
+        "The choirmaster's favorite, which nobody else likes.",
+        "The Feast of First Frost service, in full robes.",
+        "Duets: Maren and Morwenna, against all odds.",
+        "The last rehearsal: everyone picks one song, and they sing them all."
+      ],
+      "adultEvents": [
+        {
+          "meeting": 3,
+          "name": "the Sowing Rite",
+          "intro": {
+            "speakerId": "morwenna",
+            "scenes": [
+              {
+                "locationId": "chapel",
+                "castIds": [
+                  "maren",
+                  "morwenna"
+                ],
+                "lines": [
+                  "*The chapel is empty but for the candles. On the lectern lies a very old hymnal, open at a page with no music on it, only verses.*",
+                  "Maren: This is the Sowing Rite. The first one. They sang it in the fields when a Sire came to the Furrow.",
+                  "Morwenna: Read the stage directions, Maren. Out loud.",
+                  "Maren: *reading, then going pink* Oh. Oh, mon dieu. They did not only sing it.",
+                  "Morwenna: The Order wants it performed as it was written. And look who has turned up.",
+                  "[EXPRESSION: Maren=embarrassed]",
+                  "Maren: *reading on, breathless* \"And the maidens shall kneel before the Sire and sing the first verse with their mouths upon him.\" Upon him!",
+                  "Morwenna: Then we had better do it properly. *She kneels on the chapel stone and reaches for his belt.* Begin the verse, Maren.",
+                  "[EXPRESSION: Maren=aroused]",
+                  "[EXPRESSION: Morwenna=aroused]",
+                  "*Maren kneels beside her, pink to her ears, and the first note of the hymn wavers out of her as Morwenna draws him free.*"
+                ]
+              }
+            ]
+          },
+          "direction": "The original Sowing Rite was not only sung: the old hymnal says it was performed, with a Sire, as a blessing on the fields. Maren is flustered and excited, Morwenna is amused and curious, and the chapel is theirs for the night. The scene opens on the Sowing Rite as written: both women are kneeling before him in the candlelit chapel, Morwenna has drawn him out of his trousers, and the hymn is turning into something else."
+        },
+        {
+          "meeting": 10,
+          "name": "snowed in",
+          "intro": {
+            "speakerId": "maren",
+            "scenes": [
+              {
+                "locationId": "chapel",
+                "castIds": [
+                  "maren",
+                  "morwenna"
+                ],
+                "lines": [
+                  "*Carol practice ran late in the bell tower. When you look out, the snow is past the windowsills and the stair door won't move.*",
+                  "Maren: We are stuck! Oh no. Oh, this is like a story.",
+                  "Morwenna: There is one blanket. It is very old and very small.",
+                  "Maren: Then we share it. For warmth. Properly, skin to skin, it is the only way, everybody knows.",
+                  "Morwenna: Nobody knows that, Maren. *She is already lifting the edge of the blanket.* Come here, {player}. You are the warmest thing in this tower.",
+                  "[OUTFIT: Maren=nude]",
+                  "[OUTFIT: Morwenna=nude]",
+                  "[EXPRESSION: Maren=aroused]",
+                  "[EXPRESSION: Morwenna=aroused]",
+                  "*Under the blanket, three bodies and no clothes. Maren burrows into his side; Morwenna fits herself along his back.*",
+                  "Maren: See? Much warmer. *Her hand drifts down his stomach.* Oh, mon dieu. Much, much warmer.",
+                  "Morwenna: *her lips at his ear* Do not let her do all the work, {player}. It is a very long night."
+                ]
+              }
+            ]
+          },
+          "direction": "They are snowed into the bell tower overnight with one small blanket, and the only way to keep warm is to share it, close and undressed. Morwenna pretends it is practical. Maren does not pretend at all. The scene opens naked under one blanket in the snowed-in bell tower: Maren has her hand on him and Morwenna is pressed along his back, whispering in his ear."
+        }
+      ]
     },
     {
       "id": "bloomist-fellowship",
@@ -90,7 +421,123 @@
         "dinah"
       ],
       "sponsorId": "lola-hopworth",
-      "iconImage": "sprites/icons/societies-bloomist-fellowship-cutout.png"
+      "iconImage": "sprites/icons/societies-bloomist-fellowship-cutout.png",
+      "syllabus": [
+        "A first reading: the Bloom, and why the Fellowship holds it sacred. Lola brings cake.",
+        "Prayers of the morning and evening, and what they ask for.",
+        "Lola's confession: what the Bloom has been asking of her all term.",
+        "The history of the Fellowship, and the schism with the Freewill Society.",
+        "A reading on motherhood, with tea and a lot of feelings.",
+        "Lola's lesson on bread: the Bloom is like yeast, it rises if you feed it.",
+        "Meditation on what the Bloom wants of each person present.",
+        "Visiting the Health Center to sit with the mothers there.",
+        "A discussion of the Sire Registry, kinder than the Freewills'.",
+        "The Rite of the First Seed, an ancient Bloomist rite not performed in a hundred years.",
+        "Hymns with the Furrow Choir, which Dinah loves and Lola sings flat.",
+        "Writing letters of thanks to the University's Sires, past and present.",
+        "A vigil through the long night before First Frost.",
+        "The Fellowship's charity bake sale, with Lola in charge.",
+        "Dinah's own reading, on what it means to be chosen.",
+        "The last meeting: blessings for the winter, and the last of the cake."
+      ],
+      "adultEvents": [
+        {
+          "meeting": 3,
+          "name": "Lola's confession",
+          "intro": {
+            "speakerId": "lola-hopworth",
+            "scenes": [
+              {
+                "locationId": "chapel",
+                "castIds": [
+                  "dinah",
+                  "lola-hopworth"
+                ],
+                "lines": [
+                  "*The side room of the chapel, after the reading. Lola has not touched her cake, which has never happened before.*",
+                  "Lola: I have a confession, and the Fellowship is the place for it. The Bloom has been asking something of me all term, and I have been pretending not to hear.",
+                  "Lola: It wants a child of mine. And it wants it to be yours, {player}. Not any Sire. You. I want you to breed me.",
+                  "Dinah: *very quietly* Professor.",
+                  "Lola: I know, love. I am a teacher and he is a student, and I am saying it anyway. The Bloom does not care about the schedule.",
+                  "Dinah: I want that too. One day. With you. *She twists her hands together.* But I am not ready. Not yet. I am sorry. I should leave you two alone.",
+                  "Lola: Go on, love. No shame in it. The Bloom will wait for you.",
+                  "*Dinah touches Lola's shoulder, gives {player} a long look, and slips out. The door closes softly behind her.*",
+                  "*Lola turns the key in the lock. She unpins her hair, unbuttons her dress, and lets it drop to the chapel floor.*",
+                  "[OUTFIT: Lola=nude]",
+                  "[EXPRESSION: Lola=aroused]",
+                  "Lola: I have waited all term, love. *She takes his hand and presses it to her bare breast.* Now. Before I lose my nerve."
+                ]
+              }
+            ]
+          },
+          "direction": "Lola has confessed that the Bloom wants her to bear his child, and she wants him to breed her, tonight. Dinah, who is not ready yet, has left the two of them alone. The scene opens with Lola naked in the locked side room, his hand on her breast, asking him to breed her now.",
+          "reserved": [
+            {
+              "loveInterestId": "dinah",
+              "ifIntimate": {
+                "intro": {
+                  "speakerId": "lola-hopworth",
+                  "scenes": [
+                    {
+                      "locationId": "chapel",
+                      "castIds": [
+                        "dinah",
+                        "lola-hopworth"
+                      ],
+                      "lines": [
+                        "*The side room of the chapel, after the reading. Lola has not touched her cake, which has never happened before.*",
+                        "Lola: I have a confession, and the Fellowship is the place for it. The Bloom has been asking something of me all term, and I have been pretending not to hear.",
+                        "Lola: It wants a child of mine. And it wants it to be yours, {player}. Not any Sire. You. I want you to breed me.",
+                        "Dinah: *very quietly* Professor.",
+                        "Lola: I know, love. I am a teacher and he is a student, and I am saying it anyway. The Bloom does not care about the schedule.",
+                        "Dinah: *taking Lola's hand, and then his* Then confess it with me, Professor. I have already given myself to him. I want his child too.",
+                        "Lola: *laughing, teary* Both of us, then. The Bloom is generous tonight.",
+                        "*Lola turns the key in the lock and lets her dress fall. Dinah, trembling, unpins her veil and does the same.*",
+                        "[OUTFIT: Lola=nude]",
+                        "[OUTFIT: Dinah=nude]",
+                        "[EXPRESSION: Lola=aroused]",
+                        "[EXPRESSION: Dinah=aroused]",
+                        "Dinah: *taking his hand and placing it on her bare belly* Here. This is where I want it. And Lola wants it too."
+                      ]
+                    }
+                  ]
+                },
+                "direction": "Lola has confessed that the Bloom wants her to bear his child, and she wants him to breed her, tonight. Dinah, who has already been with him, confesses she wants the same and joins her: both of them want to be bred by him. The scene opens with both women naked in the locked side room, Dinah holding his hand to her belly, both asking him to breed them."
+              }
+            }
+          ]
+        },
+        {
+          "meeting": 10,
+          "name": "the Rite of the First Seed",
+          "intro": {
+            "speakerId": "dinah",
+            "scenes": [
+              {
+                "locationId": "chapel",
+                "castIds": [
+                  "dinah",
+                  "lola-hopworth"
+                ],
+                "lines": [
+                  "*The side room has been made into a shrine: white flowers on every surface, a low bed of cushions in the middle, a bowl of warm oil, and the oldest book in the Fellowship open on its stand.*",
+                  "Dinah: The Rite of the First Seed. It has not been performed in a hundred years, because there has been no Sire worth performing it for.",
+                  "Lola: Two of the faithful and a Sire, the book says. Anointed, and joined, and the Bloom witnessing all of it.",
+                  "Dinah: I have read it a hundred times this week. I am ready, {player}. I want this. With both of you.",
+                  "Lola: *dipping her fingers in the oil* Then kneel, love. Both of you. We begin with the anointing.",
+                  "*Lola anoints him with warm oil, slowly, while Dinah undresses for the first time in front of anyone, her hands trembling and her eyes on his.*",
+                  "[OUTFIT: Dinah=nude]",
+                  "[OUTFIT: Lola=nude]",
+                  "[EXPRESSION: Dinah=aroused]",
+                  "[EXPRESSION: Lola=aroused]",
+                  "Dinah: *kneeling, naked, before him* The book says the first faithful offers her mouth. *She does not look away.* I am the first faithful."
+                ]
+              }
+            ]
+          },
+          "direction": "Dinah and Lola are performing the Rite of the First Seed, an ancient Bloomist rite in which two of the faithful are anointed and joined with a Sire together. Both are ready and want it, Dinah as devoutly as Lola; it is a threesome, and sacred to them. The scene opens on the Rite under way: he has been anointed, both women are naked, and Dinah is kneeling before him to offer her mouth, as the old book says."
+        }
+      ]
     },
     {
       "id": "freewill-society",
@@ -107,7 +554,93 @@
         "elowen"
       ],
       "sponsorId": "ottilie",
-      "iconImage": "sprites/icons/societies-freewill-society-cutout.png"
+      "iconImage": "sprites/icons/societies-freewill-society-cutout.png",
+      "syllabus": [
+        "The founding question: is a woman's will her own, or the Bloom's? Elowen pours the cider.",
+        "Ottilie on what the Sire assays actually measure.",
+        "Truth or dare, after too much cider: the free will part is that you can't refuse a dare.",
+        "Reading the Freewill pamphlets of fifty years ago, and laughing at most of them.",
+        "A debate with the Bloomist Fellowship, which ends in shouting.",
+        "Morwenna on poetry, and on choosing whom to love.",
+        "The economics of the Sire Registry, with diagrams.",
+        "Case studies: the women who said no, and what happened next.",
+        "An evening of Elowen's stories, mostly true.",
+        "The resistance trial: Ottilie's test of whether a will can hold out against the Bloom.",
+        "Ottilie's lecture on the genetics of the Bloom, simplified for Elowen.",
+        "Writing a manifesto, then rewriting it.",
+        "A guest from the Arcane Board, who regrets coming.",
+        "The question turned around: does a Sire have free will?",
+        "The term's great debate, open to the whole Honeyed Bee.",
+        "The last meeting: a toast to choosing, and a very large round of drinks."
+      ],
+      "adultEvents": [
+        {
+          "meeting": 3,
+          "name": "truth or dare",
+          "intro": {
+            "speakerId": "elowen",
+            "scenes": [
+              {
+                "locationId": "honeyed-bee-inn",
+                "castIds": [
+                  "morwenna",
+                  "elowen",
+                  "ottilie"
+                ],
+                "lines": [
+                  "*Three jugs of cider in, the meeting has stopped being a meeting. Elowen has a bottle spinning on the table.*",
+                  "Elowen: Truth or dare! House rules: you can't say no to a dare, that's the free will part.",
+                  "Morwenna: That is the exact opposite of free will, Elowen.",
+                  "Ottilie: It is a fascinating contradiction. I'll allow it. *The bottle stops on her.* Dare.",
+                  "Elowen: Kiss {player}. Properly. Then it's your turn to dare someone.",
+                  "[EXPRESSION: Ottilie=aroused]",
+                  "*Ottilie kisses {player} with clinical thoroughness and rather more tongue than science requires. When she sits back, she spins the bottle.*",
+                  "Ottilie: Morwenna. Dare. Remove his shirt with your teeth.",
+                  "[OUTFIT: Elowen=nude]",
+                  "[EXPRESSION: Elowen=aroused]",
+                  "Elowen: *already reaching for her own buttons* And I dare myself. Free will."
+                ]
+              }
+            ]
+          },
+          "direction": "Truth or dare after too much cider, and the dares escalate fast. Morwenna argues philosophy between turns, Elowen dares everyone into everything, and Ottilie treats it all as research. The scene opens with the dares already escalating: Ottilie has just kissed him hard, Morwenna is undressing him with her teeth, and Elowen is stripping on her own dare."
+        },
+        {
+          "meeting": 10,
+          "name": "the resistance trial",
+          "intro": {
+            "speakerId": "ottilie",
+            "scenes": [
+              {
+                "locationId": "honeyed-bee-inn",
+                "castIds": [
+                  "morwenna",
+                  "elowen",
+                  "ottilie"
+                ],
+                "lines": [
+                  "*The upstairs room at the Honeyed Bee has been cleared. There is one wide couch in the middle of it, a clock on the wall, and Ottilie with a clipboard.*",
+                  "Ottilie: The Society's founding question, tested at last. If a woman's will is her own, she can resist the Bloom. Even here. Even with him.",
+                  "Elowen: So the experiment is: we take everything off, we get on the couch with {player}, and we see who cracks first.",
+                  "Morwenna: Nobody touches him with intent. We lie close, skin to skin, and we hold out. That is the whole point.",
+                  "Ottilie: I will be participating, for rigor. The clock starts when the last of us is undressed. *She is already unbuttoning her lab coat.*",
+                  "Elowen: Ten minutes. Easy. *She does not look as though she believes it.*",
+                  "[OUTFIT: Morwenna=nude]",
+                  "[OUTFIT: Elowen=nude]",
+                  "[OUTFIT: Ottilie=nude]",
+                  "[EXPRESSION: Morwenna=aroused]",
+                  "[EXPRESSION: Elowen=aroused]",
+                  "[EXPRESSION: Ottilie=aroused]",
+                  "*Four minutes in, all of them naked, nobody has moved and everyone is breathing hard. Elowen's thigh is across his; Morwenna's breasts press into his arm.*",
+                  "Elowen: *very quietly* This is not fair. He's hard. I can feel it. Ottilie, he's hard.",
+                  "Ottilie: *writing with a shaking hand* Noted. Nobody is to touch it. *She does not put the pen down fast enough to stop her other hand moving.*"
+                ]
+              }
+            ]
+          },
+          "direction": "The resistance trial: all of them are naked and cuddled up to him on one couch, to test whether their will can hold out against the Bloom. Each is trying to resist, and each is finding it harder than she expected; who gives in first, and how far it goes, is up to how he plays it. The scene opens four minutes into the resistance trial: all of them naked and tangled with him on the couch, he is hard against them, and every one of them is a breath away from breaking."
+        }
+      ]
     },
     {
       "id": "card-and-dice-society",
@@ -124,7 +657,87 @@
         "tink",
         "isolde"
       ],
-      "iconImage": "sprites/icons/societies-card-and-dice-society-cutout.png"
+      "iconImage": "sprites/icons/societies-card-and-dice-society-cutout.png",
+      "syllabus": [
+        "Welcome: the rules, the house, and Tink's promise not to cheat, which nobody believes.",
+        "Isolde on odds: every hand, worked out on paper.",
+        "Strip poker, by unanimous vote.",
+        "Old Kingdom chess, which takes all hour and ends in a draw.",
+        "Liar's dice: Tink is unbeatable, and Isolde finds out why.",
+        "A deckbuilding game Tink found in a junk shop.",
+        "Bridge, explained very slowly by Isolde.",
+        "A tournament against the Merchants' Society.",
+        "Card tricks: Tink teaches sleight of hand.",
+        "\"Bloom and Bed\", a very old and very bawdy board game.",
+        "Mahjong, borrowed from a visiting scholar.",
+        "Isolde's probability lecture, illustrated with dice.",
+        "A game night open to the whole of Pixel and Rune.",
+        "Inventing a game of their own.",
+        "The championship hand of the term.",
+        "The last meeting: Tink returns everything she stole this term. Most of it."
+      ],
+      "adultEvents": [
+        {
+          "meeting": 3,
+          "name": "strip poker",
+          "intro": {
+            "speakerId": "tink",
+            "scenes": [
+              {
+                "locationId": "pixel-and-rune",
+                "castIds": [
+                  "tink",
+                  "isolde"
+                ],
+                "lines": [
+                  "*The back room of Pixel and Rune, door locked. Tink fans a deck with a grin you can hear.*",
+                  "Tink: Tonight's game is poker. No money. Officially.",
+                  "Isolde: Then what are we betting, Tink?",
+                  "Tink: Clothes. Lose a hand, lose a layer. I am wearing exactly four things.",
+                  "Isolde: *adjusting her glasses* I have calculated the odds. I am going to win. *She is already unbuttoning her cuff, just in case.*",
+                  "[OUTFIT: Tink=underwear]",
+                  "[OUTFIT: Isolde=nude]",
+                  "[EXPRESSION: Tink=aroused]",
+                  "[EXPRESSION: Isolde=embarrassed]",
+                  "*An hour later Tink is down to her underwear and grinning. Isolde, despite the odds, has lost everything but her glasses. {player} has lost his shirt.*",
+                  "Tink: New rule. Whoever's naked has to pay the next forfeit on whoever won the hand. Isolde's naked. I won.",
+                  "Isolde: *standing, flushed, and coming around the table* The rules are the rules. *She sits in {player}'s lap, facing him.*"
+                ]
+              }
+            ]
+          },
+          "direction": "Strip poker in the locked back room: lose a hand, lose a layer. Tink cheats shamelessly, Isolde calculates the odds out loud, and both of them want to see him lose. The scene opens with Isolde naked but for her glasses, straddling his lap to pay her forfeit, and Tink in her underwear dealing the next hand."
+        },
+        {
+          "meeting": 10,
+          "name": "Bloom and Bed",
+          "intro": {
+            "speakerId": "isolde",
+            "scenes": [
+              {
+                "locationId": "pixel-and-rune",
+                "castIds": [
+                  "tink",
+                  "isolde"
+                ],
+                "lines": [
+                  "*Tink has found a board game at the bottom of a box: a painted board, pink dice, and a stack of cards titled BLOOM AND BED.*",
+                  "Tink: It's two hundred years old. The rules are in the lid.",
+                  "Isolde: *reading the lid, slowly going red* Every card is an instruction. To be performed on the player to your left.",
+                  "Tink: And {player} is to both our lefts. Funny that. Roll.",
+                  "Isolde: There is no probability model for this. I'm going to have to collect data.",
+                  "*Isolde draws the first card and reads it aloud, her voice not quite steady.*",
+                  "Isolde: \"Undress the player to your left, using only your mouth.\" *She swallows.* That is you, {player}.",
+                  "[EXPRESSION: Isolde=aroused]",
+                  "[EXPRESSION: Tink=aroused]",
+                  "Tink: And the next card says I get to help. *It does not. She helps anyway.*"
+                ]
+              }
+            ]
+          },
+          "direction": "An old bawdy board game, Bloom and Bed, where every card is an intimate instruction to carry out on another player. Tink is gleeful, Isolde is flustered and very thorough, and the dice keep rolling. The scene opens on the first card of Bloom and Bed: Isolde is undressing him with her mouth, and Tink is helping whether the card says so or not."
+        }
+      ]
     },
     {
       "id": "merchants-society",
@@ -141,7 +754,85 @@
         "faye",
         "anwen"
       ],
-      "iconImage": "sprites/icons/societies-merchants-society-cutout.png"
+      "iconImage": "sprites/icons/societies-merchants-society-cutout.png",
+      "syllabus": [
+        "A guest speaker from the Broodmarket on what sells, and why.",
+        "Bargaining practice: Anwen sets the price, Faye talks it down.",
+        "A bulk deal on love potions from Lantern Row, and quality control: somebody has to try them.",
+        "Bookkeeping, taught by Anwen, who is very strict about it.",
+        "Pitch night: a minute to sell an idea to the room.",
+        "A visit to Lantern Row's stalls to study how they lay out their goods.",
+        "Who's hiring: gossip from every shop in town.",
+        "Branding: Faye on why people pay more for a story.",
+        "The Merchants' fair stall, planned to the copper.",
+        "An auction coup: Faye has outbid the whole Broodmarket for a rare relic of the old University.",
+        "Contracts: how to read one, and how to write one that favors you.",
+        "A mock auction, with Anwen as auctioneer.",
+        "Investment: where to put money to make more.",
+        "The winter market, and what sells in the cold.",
+        "Each member's business plan, judged by Faye.",
+        "The last meeting: the Society's accounts, balanced to the penny, and drinks on Faye."
+      ],
+      "adultEvents": [
+        {
+          "meeting": 3,
+          "name": "the love potion deal",
+          "intro": {
+            "speakerId": "faye",
+            "scenes": [
+              {
+                "locationId": "spell-and-sip",
+                "castIds": [
+                  "faye",
+                  "anwen"
+                ],
+                "lines": [
+                  "*Spell & Sip has closed for the night. On the one table with its chairs down sits a crate of little pink bottles, each with a heart on its wax seal.*",
+                  "Faye: Lesson one in buying: never pay full price. A potion seller on Lantern Row was clearing stock. Forty bottles, at a quarter of the price.",
+                  "Anwen: Love potions. You bought forty love potions.",
+                  "Faye: Discounted ones. Which is why we have to check they work before we sell them on. Quality control, darling.",
+                  "Anwen: *reading the label* \"One sip for warmth, two for wanting, three for the night.\" It says not to take three.",
+                  "Faye: *pouring three glasses* Then we will be very thorough. {player}, you are our impartial tester.",
+                  "[EXPRESSION: Anwen=aroused]",
+                  "[EXPRESSION: Faye=aroused]",
+                  "*Three sips in, Anwen has abandoned the ledger. She climbs into {player}'s lap, takes his face in her hands, and kisses him like she has been saving it all year.*",
+                  "Faye: *unbuttoning her blouse, watching* Product works. Note it down, Anwen. *Anwen does not note it down.*"
+                ]
+              }
+            ]
+          },
+          "direction": "Faye bought a crate of love potions at a discount, and the three of them are testing whether they work. They do: everyone who has had a sip is warm and wanting, and Faye keeps topping up the glasses for the sake of quality control. The scene opens with the potion working: Anwen is in his lap kissing him hard, and Faye is undressing as she watches, very pleased with her purchase."
+        },
+        {
+          "meeting": 10,
+          "name": "the relic",
+          "intro": {
+            "speakerId": "faye",
+            "scenes": [
+              {
+                "locationId": "spell-and-sip",
+                "castIds": [
+                  "faye",
+                  "anwen"
+                ],
+                "lines": [
+                  "*Faye arrives late, flushed with triumph, carrying a velvet case. She sets it on the table and opens it slowly.*",
+                  "Faye: I outbid every buyer in the Broodmarket tonight. Anwen will not like what I paid.",
+                  "*Inside lies a small carving of gold-veined stone: a flower, old beyond guessing, faintly warm to look at.*",
+                  "Anwen: That is a relic of the old University. The ledger says those are worth a fortune. And the ledger says they do things.",
+                  "Faye: It is called the First Bloom. They say it calls the Bloom up in anyone near it. *Her breath catches.* Oh. They were not exaggerating.",
+                  "Anwen: *pressing a hand to her chest* I can feel it. Everywhere. Close the case. Don't close the case.",
+                  "[EXPRESSION: Faye=aroused]",
+                  "[EXPRESSION: Anwen=aroused]",
+                  "*Nobody closes the case. Faye sweeps the cups off the counter, pulls {player} against her, and kisses him.*",
+                  "Anwen: *pressing herself to his back, her hands already at his belt* I have never wanted anything this much. Not anything."
+                ]
+              }
+            ]
+          },
+          "direction": "Faye has bought a rare relic of the old University, the First Bloom, which calls the Bloom up in everyone near it. All of them are intensely, overwhelmingly aroused while it sits open on the table, and nobody wants it closed. The scene opens with the First Bloom open and burning: Faye is kissing him against the counter and Anwen is behind him with her hands at his belt."
+        }
+      ]
     },
     {
       "id": "needle-and-thread",
@@ -157,7 +848,87 @@
         "maren",
         "yelena"
       ],
-      "iconImage": "sprites/icons/societies-needle-and-thread-cutout.png"
+      "iconImage": "sprites/icons/societies-needle-and-thread-cutout.png",
+      "syllabus": [
+        "Introductions, and the first argument about hemlines.",
+        "Basic stitches: running, back and blind. Maren brings biscuits.",
+        "A fitting session: {player} is measured for a made-to-measure suit.",
+        "Embroidery: everyone stitches their initials, and Yelena's are perfect.",
+        "Altering a thrift-shop dress until it is unrecognizable.",
+        "Pattern drafting, with a lot of chalk and a lot of opinions.",
+        "Lace: Maren's favorite and Yelena's nemesis.",
+        "Mending: socks, sleeves and Tamsin's volleyball shorts.",
+        "Yelena critiques everyone's clothes, honestly and at length.",
+        "A lingerie workshop, and the models are the makers.",
+        "Costumes for the Lantern Festival.",
+        "Knitting by the fire for the winter.",
+        "Designing a dress for the Feast of First Frost.",
+        "Quilting a gift for the Health Center's nursery.",
+        "The term's fashion show in the common room.",
+        "The last meeting: each member gives a gift she made, and Maren cries."
+      ],
+      "adultEvents": [
+        {
+          "meeting": 3,
+          "name": "the fitting",
+          "intro": {
+            "speakerId": "yelena",
+            "scenes": [
+              {
+                "locationId": "dormitories",
+                "castIds": [
+                  "maren",
+                  "yelena"
+                ],
+                "lines": [
+                  "*The common room of the Cloister Halls. A tape measure, a pincushion, and a curtain strung across a corner.*",
+                  "Yelena: You're getting a suit, {player}. A proper one. Which means we need to measure you. All of you.",
+                  "Maren: Everything off behind the curtain, mon coeur! We cannot measure through clothes. It is not done.",
+                  "Yelena: Inseam first. Hold still. *She kneels with the tape.* And stop looking so pleased.",
+                  "Maren: He is allowed to look pleased. I am also very pleased.",
+                  "*The tape climbs the inside of his leg, and stops. Yelena looks up.*",
+                  "Yelena: You're making this very difficult to measure.",
+                  "[EXPRESSION: Maren=aroused]",
+                  "[EXPRESSION: Yelena=aroused]",
+                  "Maren: Then measure that too! For the trousers! *She kneels on his other side, and her hand closes around him to hold him still.*"
+                ]
+              }
+            ]
+          },
+          "direction": "They are measuring him for a made-to-measure suit, which means he is undressed and they are very thorough with the tape. Yelena is businesslike until she isn't; Maren is openly enjoying it. The scene opens with him naked behind the curtain, hard, Yelena kneeling with the tape measure and Maren holding him in her hand \"for the trousers\"."
+        },
+        {
+          "meeting": 10,
+          "name": "the lingerie workshop",
+          "intro": {
+            "speakerId": "maren",
+            "scenes": [
+              {
+                "locationId": "dormitories",
+                "castIds": [
+                  "maren",
+                  "yelena"
+                ],
+                "lines": [
+                  "*Tonight's lesson is lingerie. The work table is covered in silk, lace and ribbon, and two pieces are finished.*",
+                  "Maren: We have each made a set! And a good dressmaker always tests her work.",
+                  "Yelena: On a model. And we don't have one. So we are the models.",
+                  "Maren: And {player} is the judge. *She disappears behind the curtain, humming.*",
+                  "Yelena: Judge honestly. I made mine to be taken off.",
+                  "[OUTFIT: Maren=lingerie]",
+                  "[OUTFIT: Yelena=lingerie]",
+                  "[EXPRESSION: Maren=aroused]",
+                  "[EXPRESSION: Yelena=aroused]",
+                  "*Maren steps out in pink lace that hides nothing. Yelena follows in black silk, and walks straight to {player}.*",
+                  "Yelena: The clasp is at the front. A good design is one a man can open with one hand. Test it.",
+                  "Maren: *climbing onto the couch beside him* Then test mine after! I put the ribbons where you can pull them."
+                ]
+              }
+            ]
+          },
+          "direction": "Maren and Yelena have each sewn a set of lingerie and are modeling it for him, the judge. The fashion show turns into a demonstration of how easily it comes off. The scene opens with both women in the lingerie they made, Yelena guiding his hand to her front clasp and Maren beside him on the couch with her ribbons, asking him to test their work."
+        }
+      ]
     },
     {
       "id": "midnight-circle",
@@ -175,7 +946,94 @@
         "yulia"
       ],
       "sponsorId": "vespera",
-      "iconImage": "sprites/icons/societies-midnight-circle-cutout.png"
+      "iconImage": "sprites/icons/societies-midnight-circle-cutout.png",
+      "syllabus": [
+        "Casting the first circle in chalk, by candlelight. Vespera says nobody gets cursed. Probably.",
+        "Ward-signs and what they keep out.",
+        "A love charm, practiced on each other. It works too well.",
+        "Moon phases, and which spells care about them.",
+        "Brewing a calming tea that Yulia makes glow, by accident.",
+        "Hexes for beginners: small, harmless, very satisfying.",
+        "Scrying in the garden pond, with Lira watching disapprovingly.",
+        "Faye on charms that sell, and Vespera on charms that bite.",
+        "Reading cards: what they say, and what Vespera says they say.",
+        "The full-moon rite, performed skyclad as the old books say.",
+        "Banishing: how to send a thing back where it came from.",
+        "Charms for luck before the examinations.",
+        "Yulia's potion, which turns everyone's hair blue for a day.",
+        "The longest night: a vigil in the circle until dawn.",
+        "Each member casts a spell of her own making.",
+        "The last meeting: the circle is closed, and Vespera tells them what she really teaches."
+      ],
+      "adultEvents": [
+        {
+          "meeting": 3,
+          "name": "the love charm",
+          "intro": {
+            "speakerId": "yulia",
+            "scenes": [
+              {
+                "locationId": "physic-garden",
+                "castIds": [
+                  "faye",
+                  "yulia",
+                  "vespera"
+                ],
+                "lines": [
+                  "*A chalk circle in the dark garden, three candles, a bowl of rose petals. Vespera leans on her staff, watching.*",
+                  "Vespera: A love charm. Beginner's magic. Say the words over the petals, then blow them at someone. Gently.",
+                  "Yulia: Gently. Got it. *She blows the whole bowl.* Oops.",
+                  "*The petals burst into pink sparks over all of you. The air smells of roses and something warmer.*",
+                  "Faye: Oh. Oh, that is strong. Yulia, darling, what did you do?",
+                  "Vespera: *fanning herself with her hat* Well, now. That one is going to take a while to wear off, sugar.",
+                  "[EXPRESSION: Yulia=aroused]",
+                  "[EXPRESSION: Faye=aroused]",
+                  "[EXPRESSION: Vespera=aroused]",
+                  "*Yulia's cup falls in the grass. She crawls across the chalk to {player} and kisses him, hot and clumsy and laughing into his mouth.*",
+                  "Faye: *pulling her dress over her head* I am not waiting for it to wear off.",
+                  "[OUTFIT: Faye=nude]",
+                  "Vespera: *dropping her hat on the grass* Nobody leaves the circle, sugar. Those are the rules."
+                ]
+              }
+            ]
+          },
+          "direction": "Yulia overcast a love charm and it has hit everyone in the circle, Vespera included. Everyone is flushed, giddy and very aroused, and nobody wants to break the circle until it wears off. The scene opens with the charm at full strength: Yulia is kissing him on the chalk, Faye has pulled her dress off, and Vespera has dropped her hat and is coming to join them."
+        },
+        {
+          "meeting": 10,
+          "name": "the full-moon rite",
+          "intro": {
+            "speakerId": "vespera",
+            "scenes": [
+              {
+                "locationId": "physic-garden",
+                "castIds": [
+                  "faye",
+                  "yulia",
+                  "vespera"
+                ],
+                "lines": [
+                  "*The full moon is bright over the Physic Garden. The circle is bigger tonight, and there are no robes laid out.*",
+                  "Vespera: The old rite is done skyclad. Nothing between you and the moon. That includes clothes.",
+                  "Yulia: Skyclad. Naked. In the garden. In winter. *She is already pulling her top off.* Amazing.",
+                  "Faye: And the rite ends with a union, I believe. To bind the circle.",
+                  "Vespera: It does. And look who we have for it. Into the circle, {player}.",
+                  "[OUTFIT: Vespera=nude]",
+                  "[OUTFIT: Faye=nude]",
+                  "[OUTFIT: Yulia=nude]",
+                  "[EXPRESSION: Vespera=aroused]",
+                  "[EXPRESSION: Faye=aroused]",
+                  "[EXPRESSION: Yulia=aroused]",
+                  "*Naked in the moonlight, the three of them close the circle around him. Vespera traces a sign on his chest with oil that glows faintly silver.*",
+                  "Vespera: Now the union. Lie back. *She pushes him down onto the cool grass and kneels astride him.*",
+                  "Yulia: And we hold the circle. *She and Faye kneel on either side of him, their hands on him.*"
+                ]
+              }
+            ]
+          },
+          "direction": "The full-moon rite is performed skyclad and ends in a union to bind the circle, and he is at its center. Vespera leads it, Yulia is giddy, and Faye has been waiting for this all term. The scene opens on the rite's union: all four of them naked in the moonlit circle, Vespera astride him, and Faye and Yulia kneeling on either side with their hands on him."
+        }
+      ]
     }
   ],
   "fair": {
@@ -439,7 +1297,7 @@
             "anwen"
           ],
           "lines": [
-            "*At the Merchants' Society table, Faye Fertillay is pouring coffee for a queue that seems to have formed around her rather than the urn. Anwen stands behind it, quietly taking money for the coffee Faye is giving away.*",
+            "*At the Merchants' Society table, Faye Fertillay is pouring coffee for a line that seems to have formed around her rather than the urn. Anwen stands behind it, quietly taking money for the coffee Faye is giving away.*",
             "Faye: Well, hello. You're the one everyone's whispering about. That makes you an asset, darling.",
             "Anwen: Coffee's a dollar. She gives it away, I don't.",
             "Faye: That's Anwen, our treasurer. Merchants' Society, Hearthdays at six, at Spell & Sip. A speaker from the Broodmarket or Lantern Row, then pitches, then deals.",

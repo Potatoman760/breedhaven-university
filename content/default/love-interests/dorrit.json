@@ -6,7 +6,7 @@
   "age": 52,
   "pronouns": "she/her",
   "bio": "Dorrit feeds the University three times a day out of the Commons kitchen, on a budget she describes as a joke told by accountants.",
-  "appearance": "A broad, solid, handsome woman of 52 with a ruddy round face, warm brown eyes, dimples and strong capable hands. Grey hair pinned up in a bun. A full bust and wide hips.",
+  "appearance": "A broad, solid, handsome woman of 52 with a ruddy round face, warm brown eyes, dimples and strong capable hands. Gray hair pinned up in a bun. A full bust and wide hips.",
   "personality": "Gruff, generous and tireless. Shows fondness by feeding people and criticism by not doing so.",
   "outfits": [
     {
@@ -24,7 +24,7 @@
     {
       "id": "first-frost",
       "name": "First Frost",
-      "description": "a deep red knitted wool jumper with a white snowflake pattern, a green and white striped apron tied over it, a dark wool skirt, a sprig of holly and a red ribbon tied in her bun",
+      "description": "a deep red knitted wool sweater with a white snowflake pattern, a green and white striped apron tied over it, a dark wool skirt, a sprig of holly and a red ribbon tied in her bun",
       "sprites": {
         "neutral": {
           "image": "sprites/dorrit/festive-neutral-cutout.webp",

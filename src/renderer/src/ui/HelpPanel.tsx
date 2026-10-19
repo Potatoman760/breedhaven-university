@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import { MEMORY_LEVEL_LABELS, type ContentPack, type GameState } from '../../../shared/model'
-import { SLEEP_OVER_FROM_HOUR, STOOD_UP, describeAction, describeChange } from '../../../shared/game'
+import { SLEEP_OVER_FROM_HOUR, STOOD_UP, describeAction } from '../../../shared/game'
 import { CodexBook } from './CodexBook'
 import { Dialog } from './Dialog'
 
@@ -163,7 +163,7 @@ export function HelpPanel({ content, state, tab: opening = 'Basics', onClose }: 
               rows={[
                 ['Jobs', 'Better jobs require higher stats, and pay a bonus for every point over the requirement.'],
                 ['Appeal', 'Each woman admires up to three stats. The higher yours are, the faster her affection grows.'],
-                ['Study', 'Studying in your own room earns more; a study at home adds to it.']
+                ['Study', 'Studying in your room earns more; a study at home adds to it.']
               ]}
             />
             <h2>Courses</h2>
@@ -200,7 +200,11 @@ export function HelpPanel({ content, state, tab: opening = 'Basics', onClose }: 
                 </ul>
                 <Table
                   head={['Skill', 'Taught by', 'At', 'What it does']}
-                  rows={content.skills.map((skill) => [skill.name, state.courses.find((course) => course.code === skill.code && (skill.level === undefined || course.level === skill.level))?.title ?? skill.code, `${skill.at} marks`, skill.description])}
+                  rows={content.skills.flatMap((skill) => {
+                    const course = state.courses.find((one) => one.id === skill.courseId)?.title ?? skill.code
+                    const first = [skill.name, course, `${skill.at} marks`, skill.description]
+                    return skill.upgrade ? [first, [`${skill.name} II`, course, `${skill.upgrade.at} marks`, skill.upgrade.description]] : [first]
+                  })}
                 />
               </>
             )}
@@ -284,7 +288,7 @@ export function HelpPanel({ content, state, tab: opening = 'Basics', onClose }: 
               <li>Relics are kept for good and are listed in your Bag. Each changes a number of the game, as a course skill does.</li>
               <li>Money, and things to use in a fight, are yours once made safe.</li>
             </ul>
-            <Table head={['Depth', 'Relic', 'What it does']} rows={below.depths.map((depth, index) => [`${index + 1}. ${depth.name}`, depth.relic.name, describeChange(depth.relic.modifier)])} />
+            <Table head={['Depth', 'Relic', 'What it does']} rows={below.depths.map((depth, index) => [`${index + 1}. ${depth.name}`, depth.relic.name, depth.relic.description])} />
             <Table
               head={['Item', 'In a fight']}
               rows={content.items.filter((item) => item.below).map((item) => [item.name, [item.below!.footing > 0 && `+${item.below!.footing} footing`, item.below!.calms && 'clears a surge'].filter(Boolean).join(', ')])}
@@ -293,7 +297,7 @@ export function HelpPanel({ content, state, tab: opening = 'Basics', onClose }: 
             <h2>Courses that help below</h2>
             <Table
               head={['Course', 'Below']}
-              rows={content.skills.filter((skill) => skill.below).map((skill) => [state.courses.find((course) => course.code === skill.code && course.level === skill.level)?.title ?? skill.code, BELOW[skill.below!.kind] ?? skill.below!.kind])}
+              rows={content.skills.filter((skill) => skill.below).map((skill) => [state.courses.find((course) => course.id === skill.courseId)?.title ?? skill.code, BELOW[skill.below!.kind] ?? skill.below!.kind])}
             />
           </div>
         )}

@@ -2,6 +2,10 @@
   "name": "the Undercroft",
   "moneyImage": "sprites/items/gold-pouch-cutout.png",
   "restImage": "sprites/items/campfire-cutout.png",
+  "endingImages": {
+    "saved": "generated/backgrounds/epilogue/saved.webp",
+    "overrun": "generated/backgrounds/epilogue/overrun.webp"
+  },
   "entryLocationId": "bathhouse",
   "opensOnDay": 8,
   "guideId": "vespera",
@@ -28,7 +32,8 @@
             "Vespera: Now the part you'll like. The Bloom settles around a True Sire. An anchor will only take under your hands. Not mine, not the Board's. Yours.",
             "Vespera: You have no magic, so you can't go alone. You take women who do, two at a time, ones who trust you enough to follow you into the dark.",
             "Vespera: And a woman carrying your child is a great deal stronger down there. Make of that what you will.",
-            "Vespera: Why bother? Because if the wards go, the University goes with them. And because there is always something lying by an anchor: money, strange old things, relics that change you for good.",
+            "Vespera: Why bother? Because if the wards go, the University goes with them. And because there is always something lying by an anchor: money, strange old things, and relics.",
+            "Vespera: The relics are the real prize, sugar. Each one is old magic with a will of its own, and no two do the same thing. Some change how every woman in this place behaves around you. Some do things in a moment that I would not say out loud in a chapel.",
             "Vespera: The women who go down with you remember it, too. Nothing brings two people closer than a fight in a sewer.",
             "Vespera: One more thing. Touching the ward-lines without the Arcane Board's leave is illegal. I've been doing it alone, and quietly. Keep it that way.",
             "Vespera: Now. Let me show you how it works, before you go and get yourself eaten."
@@ -354,16 +359,15 @@
         }
       ],
       "relic": {
-        "id": "spring-stone",
-        "name": "Spring-warmed stone",
-        "description": "A stone from the spring that never cools. The house is warmer for it: comfort +1.",
-        "icon": "ember",
-        "appearance": "A smooth rounded river stone, dark grey, with a warm orange glow showing through fine cracks in it.",
-        "modifier": {
-          "kind": "comfort",
-          "amount": 1
-        },
-        "image": "sprites/undercroft/relic-spring-stone-cutout.png"
+        "id": "silver-tongue",
+        "name": "Silver Tongue",
+        "icon": "necklace",
+        "description": "A charm on a fine chain that loosens every woman's tongue. While it is on, they all talk dirty.",
+        "appearance": "A small silver charm shaped like a curled tongue, hanging from a fine silver chain, polished and gleaming.",
+        "traitIds": [
+          "dirty-talk"
+        ],
+        "image": "sprites/undercroft/relic-silver-tongue-cutout.png"
       },
       "image": "generated/backgrounds/undercroft/the-old-drains.png"
     },
@@ -408,16 +412,15 @@
         }
       ],
       "relic": {
-        "id": "lodestone",
-        "name": "Lodestone",
-        "description": "It pulls toward whatever you are working at. Training goes 15% further.",
-        "icon": "magnet",
-        "appearance": "A rough lump of dark iron-grey lodestone with small iron nails and filings clinging to it.",
-        "modifier": {
-          "kind": "training",
-          "amount": 1.15
-        },
-        "image": "sprites/undercroft/relic-lodestone-cutout.png"
+        "id": "exhibitionists-lantern",
+        "name": "Exhibitionist's Lantern",
+        "icon": "lantern",
+        "description": "A lantern whose rose light makes being seen feel wonderful. While it is on, every woman likes to be watched.",
+        "appearance": "A small ornate brass lantern with panes of rose-tinted glass, a warm pink flame glowing inside.",
+        "traitIds": [
+          "exhibitionist"
+        ],
+        "image": "sprites/undercroft/relic-exhibitionists-lantern-cutout.png"
       },
       "image": "generated/backgrounds/undercroft/the-root-cellars.png"
     },
@@ -465,16 +468,16 @@
         }
       ],
       "relic": {
-        "id": "wardwright-rule",
-        "name": "Wardwright's rule",
-        "description": "A builder's measure from the first masons. Rooms and their fitting out cost 10% less.",
-        "icon": "ruler",
-        "appearance": "An old folding brass measuring rule, half unfolded, engraved with fine tick marks and small runes.",
+        "id": "apple-of-discord",
+        "name": "Apple of Discord",
+        "icon": "stone",
+        "description": "A golden apple with one bite gone. While it is on, jealousy runs hot: twice the drama, twice the interruptions.",
+        "appearance": "A shining golden apple with a single bite taken out of it, the bitten flesh glowing faintly.",
         "modifier": {
-          "kind": "build",
-          "amount": 0.9
+          "kind": "drama",
+          "amount": 2
         },
-        "image": "sprites/undercroft/relic-wardwright-rule-cutout.png"
+        "image": "sprites/undercroft/relic-apple-of-discord-cutout.png"
       },
       "image": "generated/backgrounds/undercroft/the-ward-gallery.png"
     },
@@ -519,16 +522,13 @@
         }
       ],
       "relic": {
-        "id": "registry-seal",
-        "name": "Old Registry seal",
-        "description": "A Sire's seal from before the scheme, which the office still honors. Rent is 10% less.",
-        "icon": "seal",
-        "appearance": "A heavy brass seal stamp with a turned wooden handle, standing beside a disc of red wax stamped with a crest.",
-        "modifier": {
-          "kind": "rent",
-          "amount": 0.9
-        },
-        "image": "sprites/undercroft/relic-registry-seal-cutout.png"
+        "id": "unraveling",
+        "name": "The Unraveling",
+        "icon": "stone",
+        "description": "A spool of shimmering thread. Used in a scene, every stitch of clothing on everyone there vanishes at once.",
+        "appearance": "A small wooden spool of shimmering silver thread, the loose end unwinding itself into the air in glittering coils.",
+        "use": "unravel",
+        "image": "sprites/undercroft/relic-unraveling-cutout.png"
       },
       "image": "generated/backgrounds/undercroft/the-boiler-vaults.png"
     },
@@ -578,16 +578,13 @@
         }
       ],
       "relic": {
-        "id": "listening-shell",
-        "name": "Listening shell",
-        "description": "Held to the ear, it tells you what she left unsaid. Desire grows 15% faster.",
-        "icon": "shell",
-        "appearance": "A spiral conch seashell, cream and pink, with a faint blue glow inside its opening.",
-        "modifier": {
-          "kind": "desire",
-          "amount": 1.15
-        },
-        "image": "sprites/undercroft/relic-listening-shell-cutout.png"
+        "id": "hourglass-of-stillness",
+        "name": "Hourglass of Stillness",
+        "icon": "stone",
+        "description": "An hourglass whose sand hangs still. Used in a scene, time stops for everyone but you and those you are with.",
+        "appearance": "A small brass hourglass whose golden sand hangs motionless in the middle of its fall, frozen in the glass.",
+        "use": "stillness",
+        "image": "sprites/undercroft/relic-hourglass-of-stillness-cutout.png"
       },
       "image": "generated/backgrounds/undercroft/the-chained-stacks.png"
     },
@@ -633,16 +630,13 @@
         }
       ],
       "relic": {
-        "id": "stillwater-vial",
-        "name": "Stillwater vial",
-        "description": "Water that has never moved. A woman is ready for another child in three quarters of the time.",
-        "icon": "vial",
-        "appearance": "A small glass vial of perfectly clear water, stoppered with a cork and sealed with dark blue wax.",
-        "modifier": {
-          "kind": "recovery",
-          "amount": 0.75
-        },
-        "image": "sprites/undercroft/relic-stillwater-vial-cutout.png"
+        "id": "sapphic-charm",
+        "name": "Sapphic Charm",
+        "icon": "necklace",
+        "description": "Two crescent moons locked together. Used in a scene, the women there are drawn to each other and want to kiss.",
+        "appearance": "A pendant of two interlocking crescent moons carved from pale rose quartz, on a thin gold chain.",
+        "use": "sapphic",
+        "image": "sprites/undercroft/relic-sapphic-charm-cutout.png"
       },
       "image": "generated/backgrounds/undercroft/the-still-pools.png"
     },
@@ -693,16 +687,13 @@
         }
       ],
       "relic": {
-        "id": "deep-seed",
-        "name": "Deep seed",
-        "description": "It has waited seven centuries to be planted. A child is 25% more likely while she takes something against one.",
-        "icon": "seed",
-        "appearance": "A large dark brown seed the size of a walnut, split slightly open, with a tiny glowing green shoot inside.",
-        "modifier": {
-          "kind": "fertility",
-          "amount": 1.25
-        },
-        "image": "sprites/undercroft/relic-deep-seed-cutout.png"
+        "id": "minds-eye",
+        "name": "Mind's Eye",
+        "icon": "stone",
+        "description": "A violet crystal eye. Used in a scene, you hear what the women there are really thinking.",
+        "appearance": "A glass eye of deep violet crystal with a golden iris, glowing softly from within.",
+        "use": "minds-eye",
+        "image": "sprites/undercroft/relic-minds-eye-cutout.png"
       },
       "image": "generated/backgrounds/undercroft/the-first-foundations.png"
     },
@@ -749,16 +740,13 @@
         }
       ],
       "relic": {
-        "id": "founders-key",
-        "name": "Founder's key",
-        "description": "The key the University was built to keep. Every woman needs 5 less desire.",
-        "icon": "key",
-        "appearance": "One antique iron skeleton key, shown whole and upright: an ornate round bow at the top worked as a ring of small flowers, a plain straight shaft, a single toothed bit at the bottom. Dark iron with worn gilding.",
-        "modifier": {
-          "kind": "desireGate",
-          "amount": 5
-        },
-        "image": "sprites/undercroft/relic-founders-key-cutout.png"
+        "id": "seed-of-the-first-bloom",
+        "name": "Seed of the First Bloom",
+        "icon": "seed",
+        "description": "The seed the University was built to keep. Used in a scene, whatever the women there take against the Bloom does nothing.",
+        "appearance": "A large golden seed glowing warmly from within, with a single green sprout curling from its tip.",
+        "use": "first-seed",
+        "image": "sprites/undercroft/relic-seed-of-the-first-bloom-cutout.png"
       },
       "image": "generated/backgrounds/undercroft/the-wellspring.png"
     }

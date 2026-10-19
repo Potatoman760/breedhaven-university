@@ -6,6 +6,7 @@ import { factor } from './modifiers'
 import { meet } from './scene'
 import { createInitialState } from './state'
 import { rawFixture } from './testFixture'
+import { toggleRelic } from './relics'
 
 // The fixture's Shop is the way down, open from 05:00 to 15:00 on a 20-hour day that begins at 06:00. Ana holds the
 // line and Bea mends. A run is two hours: a fight, something lying about, a place to rest and the guardian.
@@ -211,9 +212,10 @@ describe('a run', () => {
     expect(relicsHeld(content, state).map((relic) => relic.id)).toEqual(['stone'])
     expect(state.player.money).toBe(start.player.money + 10 + 5 + 20)
     expect(depthsOpen(content, state)).toBe(2)
-    // The relic is as real as something a course teaches.
+    // The relic is as real as something a course teaches, once he turns it on: it comes up off.
     expect(factor(content, start, 'rent')).toBe(1)
-    expect(factor(content, state, 'rent')).toBe(0.5)
+    expect(factor(content, state, 'rent')).toBe(1)
+    expect(factor(content, toggleRelic(state, state.expedition.relics[0]), 'rent')).toBe(0.5)
     expect(state.memories['ana'].at(-1)?.summary).toContain('held while he re-seated the anchor of the Drains')
     expect(state.relationships['ana'].trust).toBe(52)
     // Done again, there is no second relic.
@@ -235,8 +237,8 @@ describe('a run', () => {
 })
 
 describe('what a course is worth below', () => {
-  const course: Course = { id: 'rid', number: 'RID 101', title: 'Riddles', professor: '', description: '', subject: 'Riddles', code: 'RID', level: 1, general: false, stats: ['wisdom'], studentIds: [], locationId: 'shop', meetings: [] }
-  const taught: ContentPack = { ...content, skills: [{ id: 'grip', name: 'Grip', description: '', code: 'RID', at: 30, passive: { kind: 'wages', amount: 1.1 }, below: { kind: 'might', amount: 2 } }] }
+  const course: Course = { id: 'rid', number: 'RID 101', title: 'Riddles', professor: '', description: '', subject: 'Riddles', code: 'RID', general: false, stats: ['wisdom'], studentIds: [], locationId: 'shop', meetings: [] }
+  const taught: ContentPack = { ...content, skills: [{ id: 'grip', name: 'Grip', description: '', code: 'RID', courseId: 'rid', at: 30, passive: { kind: 'wages', amount: 1.1 }, below: { kind: 'might', amount: 2 } }] }
 
   it('is his beside what it teaches above, once he has the marks', () => {
     const enrolled = { ...start, courses: [course], enrolment: ['rid'] }

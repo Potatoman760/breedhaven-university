@@ -144,6 +144,39 @@ describe('the children of the year', () => {
     expect(childrenBy(content, start, 'ana')).toEqual([])
   })
 
+  it('tells what the year left him: how many children, by how many women, before anything else that came of it', () => {
+    // Where children can be had, a year without any is told too.
+    const none = buildEpilogue({ ...content, pregnancy: {} as ContentPack['pregnancy'] }, start).find((screen) => screen.kind === 'legacy')
+    expect(none?.text).toMatch(/^You fathered no children this year/)
+    const family = {
+      ...start,
+      children: [
+        { motherId: 'ana', bornAt: 5, daughter: true, name: 'Ada' },
+        { motherId: 'ana', bornAt: 90, daughter: false, name: 'Bram' }
+      ],
+      pregnancies: { bea: { conceivedAt: 10, dueAt: 9999 } }
+    }
+    const screens = buildEpilogue(content, family)
+    const told = screens.find((screen) => screen.kind === 'legacy')
+    expect(told?.text).toBe('You fathered three children this year, by two women.')
+    expect(told?.details?.[0]).toBe('Ana: two children, a girl and a boy')
+    expect(told?.loveInterestIds).toEqual(['ana', 'bea'])
+    // Straight after his grades, and before each mother's own screen.
+    expect(screens.map((screen) => screen.kind).slice(0, 3)).toEqual(['academics', 'legacy', 'child'])
+  })
+
+  it('always tells of the way down: the University saved with every anchor set, and overrun with any left', () => {
+    const below = { ...content, expedition: { name: 'the Undercroft', depths: [{}, {}], endingImages: { saved: 'saved.webp', overrun: 'overrun.webp' } } as ContentPack['expedition'] }
+    const told = (cleared: number) => buildEpilogue(below, { ...start, expedition: { ...start.expedition, cleared } }).find((screen) => screen.kind === 'below')
+    expect(told(2)?.text).toMatch(/saved it.*rumors of your heroism/)
+    expect(told(1)?.text).toMatch(/one of the two anchors.*overflowed onto the campus, and many students were injured/)
+    expect(told(0)?.text).toMatch(/^You never set an anchor.*overflowed onto the campus/)
+    expect(told(2)?.details).toBeUndefined()
+    // Each told over its own picture.
+    expect(told(2)?.image).toBe('saved.webp')
+    expect(told(1)?.image).toBe('overrun.webp')
+  })
+
   it('ends on the end', () => {
     const screens = buildEpilogue(content, start)
     expect(screens.map((screen) => screen.kind)).toEqual(['academics', 'end'])

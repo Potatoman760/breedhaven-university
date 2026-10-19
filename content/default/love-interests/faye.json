@@ -4,12 +4,13 @@
   "role": "",
   "age": 22,
   "pronouns": "she/her",
-  "bio": "Final-year Economics student, a gifted mage, a Broodmarket intern, and the most dangerous negotiator in the College of Business.",
+  "bio": "Final-year Business student, a gifted mage, a Broodmarket intern, and the most dangerous negotiator in her college.",
   "appearance": "A striking woman of twenty-two with raven-black hair worn long and loose, red eyes. Her skin is pale and flawless, her lips full and painted. She has a lush hourglass figure.",
   "personality": "Calculating, yet always sultry and seductive. Knows she is desirable and uses that confidence to her advantage, even while discussing business.",
   "traitIds": [
     "flirtatious",
-    "promiscuous"
+    "promiscuous",
+    "exhibitionist"
   ],
   "likes": [
     "potions",
@@ -182,7 +183,7 @@
   "stageHeight": 100,
   "partyRole": "striker",
   "studies": {
-    "major": "ECO",
+    "major": "BUS",
     "level": 4
   },
   "animations": [
@@ -324,7 +325,7 @@
     }
   ],
   "room": {
-    "name": "a flat over a boutique on Lantern Row",
+    "name": "an apartment over a boutique on Lantern Row",
     "description": "a bedroom with silk hangings, a dressing table crowded with bottles, a computer with a second monitor running market feeds, a small licensed still for her tonics, a small cauldron, and gold on market scales. The bed is lavish and feminine",
     "locationId": "lantern-row",
     "background": "generated/backgrounds/faye/view.webp"
@@ -353,7 +354,7 @@
       "Calls someone  \"sweetheart\" when she has the upper hand."
     ],
     "exampleDialogue": [],
-    "backstory": "Post: Analyst intern at the Broodmarket Group; runs a small licensed tonic business from her flat\n\nFaye Fertillay is twenty-two, sharp-tongued, and entirely aware of her own appeal.",
+    "backstory": "Post: Analyst intern at the Broodmarket Group; runs a small licensed tonic business from her apartment\n\nFaye Fertillay is twenty-two, sharp-tongued, and entirely aware of her own appeal. She wields flirting and seduction as tools.",
     "knowledge": [],
     "secrets": [],
     "extraInstructions": "Her voice stays warm and unhurried when she is weighing an offer. She holds a look, chooses when to move closer, and enjoys seeing someone react. She flirts on purpose and usually knows what she wants from the exchange. Affection can become sincere without making her suddenly timid or stripping away her confidence. Give her real questions and desires; do not make every line a contract metaphor."

@@ -9,9 +9,12 @@ import { StatSchema } from './stats'
 export const MODIFIER_KINDS = [
   'affection', // x affection gained
   'trust', // x trust gained
+  'trustBonus', // + the trust every woman counts as having, beyond what she has
+  'bonds', // x what sharing a scene with him does for the ties between the women in it
+  'devoted', // every woman who has had his child wants him as much as a woman can
+  'escort', // x trust gained in a scene she is out with him: a date, or an outing he asked her along to
   'desire', // x desire gained
   'losses', // x affection and trust lost
-  'firstScene', // x affection gained in the first scene he ever has with a woman
   'training', // x training toward a stat (those named in `stats`, or all)
   'marks', // x marks from study and from his focus
   'focus', // x what an hour given to his focus is worth
@@ -43,7 +46,7 @@ export const MODIFIER_KINDS = [
 export type ModifierKind = (typeof MODIFIER_KINDS)[number]
 
 // Kinds whose amounts are added together; every other is a multiplier.
-export const ADDED_KINDS: readonly ModifierKind[] = ['comfort', 'care', 'desireGate']
+export const ADDED_KINDS: readonly ModifierKind[] = ['comfort', 'care', 'desireGate', 'trustBonus']
 
 export const ModifierSchema = z.object({
   kind: z.enum(MODIFIER_KINDS),

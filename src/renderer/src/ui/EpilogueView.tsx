@@ -46,7 +46,12 @@ export function EpilogueView({ content, state, onExit }: Props) {
   }, [screens.length])
 
   return (
-    <main className={`stage epilogue of-${screen.kind}${screen.standing ? ` ${screen.standing}` : ''}${shown.length > 0 ? ' with-cast' : ''}`} onClick={() => !last && setAt(index + 1)}>
+    <main
+      className={`stage epilogue of-${screen.kind}${screen.standing ? ` ${screen.standing}` : ''}${shown.length > 0 ? ' with-cast' : ''}${screen.image ? ' with-art' : ''}`}
+      // A screen with a picture of its own is told over it, lightly shaded, instead of over the title screen's.
+      style={screen.image ? { backgroundImage: `linear-gradient(var(--scrim), var(--scrim)), url("content://pack/${screen.image}")` } : undefined}
+      onClick={() => !last && setAt(index + 1)}
+    >
       {/* Whoever it is about stands behind the words, side by side when there is more than one. */}
       {shown.length > 0 && (
         <div key={`cast-${index}`} className="epilogue-cast" aria-hidden="true">

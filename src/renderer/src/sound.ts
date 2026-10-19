@@ -60,7 +60,7 @@ const url = (file: string) => `content://pack/${file}`
 
 // A notice usually says what an event cue has just played for, and is not heard on top of it.
 const NOTICE_GAP_MS = 300
-const EVENT_CUES: Cue[] = ['message', 'coins', 'skill', 'bond', 'pregnancy', 'birth']
+const EVENT_CUES: Cue[] = ['message', 'coins', 'skill', 'bond', 'pregnancy', 'birth', 'relic']
 let lastEventAt = 0
 
 /** Plays a cue once, over whatever else is playing. A cue the content has no sound for is silent. */

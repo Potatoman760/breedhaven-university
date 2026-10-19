@@ -1,4 +1,4 @@
-import { kindOf, type ContentPack, type GameState, type Item, type LoveInterest } from '../model'
+import { classYear, kindOf, type ContentPack, type GameState, type Item, type LoveInterest } from '../model'
 import { evaluateAll } from './conditions'
 import { giftReaction } from './market'
 
@@ -23,7 +23,7 @@ export interface Fact {
   /** Stable within the love interest: `like:tea`, `trait:shy`, `studies`. */
   id: string
   group: FactGroup
-  /** What the player reads once it is known: "tea", "Shy", "Reads Economics, year 4". */
+  /** What the player reads once it is known: "tea", "Shy", "Economics major, senior". */
   label: string
   /** More to say about it, shown with it. */
   detail?: string
@@ -47,8 +47,8 @@ export function factsOf(content: ContentPack, li: LoveInterest): Fact[] {
 
   const kind = kindOf(li)
   if (kind === 'student' && li.studies) {
-    const year = li.studies.level >= 5 ? 'a graduate' : `year ${li.studies.level}`
-    facts.push({ id: 'studies', group: 'life', label: `Reads ${li.studies.subject}, ${year}`, telling: `what ${first} studies (${li.studies.subject})` })
+    const label = li.studies.level >= 5 ? `${li.studies.subject}, graduate student` : `${li.studies.subject} major, ${classYear(li.studies.level)}`
+    facts.push({ id: 'studies', group: 'life', label, telling: `what ${first} studies (${li.studies.subject})` })
   } else if (kind === 'teacher' && li.teaching) {
     const subjects = li.teaching.subjects.map((s) => s.subject).join(' and ')
     facts.push({ id: 'teaching', group: 'life', label: `Teaches ${subjects}, ${li.teaching.department}`, telling: `what ${first} teaches (${subjects})` })

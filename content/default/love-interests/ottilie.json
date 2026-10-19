@@ -5,7 +5,7 @@
   "age": 36,
   "pronouns": "she/her",
   "bio": "Reader in Sire Genetics and head of the fertility lab at the Health Center: the woman who knows more about why a True Sire is what he is than anyone alive.",
-  "appearance": "A beautiful 36-year-old woman with fair skin, a refined face with sharp cheekbones, a straight nose, cool green eyes under fine arched brows, long lashes, and full lips painted a muted rose. Dark blonde hair, sleek and straight, cut to the jaw with a centre parting. Tall and long-legged, with a slim, elegant figure: a full, high bust, a very narrow waist, and curved hips.",
+  "appearance": "A beautiful 36-year-old woman with fair skin, a refined face with sharp cheekbones, a straight nose, cool green eyes under fine arched brows, long lashes, and full lips painted a muted rose. Dark blonde hair, sleek and straight, cut to the jaw with a center parting. Tall and long-legged, with a slim, elegant figure: a full, high bust, a very narrow waist, and curved hips.",
   "personality": "Brilliant, exact and dry, with no small talk and very little patience for sentiment dressed up as science. Curious to the point of rudeness. Kinder than she sounds, and bad at showing it. She is not used to being surprised and rather likes it.",
   "traitIds": [
     "bookish",
@@ -188,11 +188,11 @@
     "subjects": [
       {
         "major": "SGN",
-        "level": 1
+        "number": "101"
       },
       {
         "major": "RBI",
-        "level": 1
+        "number": "101"
       }
     ]
   },
@@ -335,7 +335,7 @@
     }
   ],
   "room": {
-    "name": "her flat above Petal & Pill",
+    "name": "her apartment above Petal & Pill",
     "description": "A bare, bright flat over the pharmacy: journals in stacks on the floor, one good chair, a very expensive coffee machine, a whiteboard where a picture should be, and a bed she treats as a place to read.",
     "locationId": "lantern-row",
     "background": "generated/backgrounds/ottilie/view-5.webp"
@@ -357,7 +357,7 @@
   },
   "birthControl": true,
   "ai": {
-    "speechPattern": "Precise, quick and unsentimental. Short declarative sentences and exact words. Asks direct questions, often clinical ones, and waits for the answer. Dry humour delivered with no change of expression.",
+    "speechPattern": "Precise, quick and unsentimental. Short declarative sentences and exact words. Asks direct questions, often clinical ones, and waits for the answer. Dry humor delivered with no change of expression.",
     "tone": "cool, exact, dry",
     "verbalQuirks": [
       "Corrects loose wording: \"fertile\" is not \"virile\", \"instinct\" is not \"compulsion\".",

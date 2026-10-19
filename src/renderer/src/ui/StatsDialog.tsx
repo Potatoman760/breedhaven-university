@@ -1,4 +1,4 @@
-import { describeModifier, describeStat, STAT_CAP, STAT_TIERS, statOf, skillFor, skillProgress, trainingToward } from '../../../shared/game'
+import { describeModifier, describeStat, STAT_CAP, STAT_TIERS, statOf, skillFor, skillProgress, skillsOf, trainingToward } from '../../../shared/game'
 import { STATS, type ContentPack, type GameState } from '../../../shared/model'
 import { Dialog } from './Dialog'
 
@@ -74,16 +74,24 @@ export function StatsDialog({ content, state, onClose }: { content: ContentPack;
                   return { skill, taking, ...skillProgress(state, skill) }
                 })
                 .sort((a, b) => Number(b.has) - Number(a.has) || Number(!!b.taking) - Number(!!a.taking) || b.marks - a.marks)
-                .map(({ skill, taking, has, marks, at }) => {
-                  const course = taking ?? state.courses.find((one) => one.code === skill.code && (skill.level === undefined || one.level === skill.level))
+                .map(({ skill, taking, has, marks, at, level }) => {
+                  const course = taking ?? state.courses.find((one) => one.id === skill.courseId)
+                  // What it does as he has it; what it would do next is in the tooltip.
+                  const now = skillsOf(content, state).find((one) => one.id === skill.id) ?? skill
+                  const next = level === 1 && skill.upgrade ? `At ${skill.upgrade.at} marks: ${skill.upgrade.description}` : undefined
                   return (
-                    <tr key={skill.id} className={has ? 'has' : taking ? 'studying' : undefined} title={!has && taking ? `You are learning this in ${taking.number}` : undefined}>
+                    <tr
+                      key={skill.id}
+                      className={level === 2 ? 'has second' : has ? 'has' : taking ? 'studying' : undefined}
+                      title={!has && taking ? `You are learning this in ${taking.number}` : next}
+                    >
                       <td>
                         <strong>{skill.name}</strong>
+                        {level === 2 && <span className="skill-level">II</span>}
                       </td>
-                      <td>{skill.description}</td>
+                      <td>{now.description}</td>
                       <td title={course?.title}>{course ? course.number : `${skill.code}, not given this term`}</td>
-                      <td>{has ? 'Learnt' : `${Math.round(marks)} of ${at}`}</td>
+                      <td>{level === 2 ? 'Mastered' : has && skill.upgrade ? `${Math.round(marks)} of ${at} for II` : has ? 'Learnt' : `${Math.round(marks)} of ${at}`}</td>
                     </tr>
                   )
                 })}

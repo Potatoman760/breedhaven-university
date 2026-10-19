@@ -28,7 +28,7 @@ describe('the catalogue of the default pack', () => {
       if (kindOf(li) === 'outsider' || kindOf(li) === 'npc') continue
       const hers = courses.filter((course) => course.teacherId === li.id || course.studentIds.includes(li.id))
       expect(hers.length, li.id).toBeGreaterThanOrEqual(1)
-      if (kindOf(li) === 'student') expect(hers, li.id).toHaveLength(3)
+      if (kindOf(li) === 'student') expect(hers, li.id).toHaveLength(4)
       for (const a of hers) for (const b of hers) if (a !== b) expect(coursesClash(a, b), `${li.id}: ${a.number} and ${b.number}`).toBe(false)
     }
   })

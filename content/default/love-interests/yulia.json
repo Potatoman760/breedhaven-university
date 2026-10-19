@@ -325,13 +325,13 @@
     }
   ],
   "room": {
-    "name": "a flat above Byte & Bloom on Lantern Row",
-    "description": "A studio flat small and cluttered and lit by strings of coloured charms. The bed is unmade and heaped with cushions and coats. A shelf holds half-dead houseplants, a speaker stack, and a tray of vials and powders beside a cracked mirror. The window stands open to the street noise and the lantern-light, and the air smells of perfume and smoke.",
+    "name": "an apartment above Byte & Bloom on Lantern Row",
+    "description": "A studio apartment, small and cluttered and lit by strings of colored charms. The bed is unmade and heaped with cushions and coats. A shelf holds half-dead houseplants, a speaker stack, and a tray of vials and powders beside a cracked mirror. The window stands open to the street noise and the lantern-light, and the air smells of perfume and smoke.",
     "locationId": "lantern-row",
     "background": "generated/backgrounds/yulia/view.png"
   },
   "birthPicture": "sprites/yulia/birth.webp",
-  "walkSprite": "sprites/yulia/walk-cutout.png",
+  "walkSprite": "sprites/yulia/walk-cutout.webp",
   "childNames": {
     "daughters": [
       "Saga",

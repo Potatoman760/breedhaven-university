@@ -105,6 +105,8 @@ describe('carrying', () => {
     expect(wornOutfit(content, at(pregnant, 3), her)?.id).toBe('round')
     // What can be asked for is always her ordinary outfits: the pregnant form is the game's to give.
     expect(wearableOutfits(her).map((o) => o.id)).toEqual(['default'])
+    // Nor is an outfit kept for one night of the content.
+    expect(wearableOutfits({ outfits: [...her.outfits, { id: 'slip', name: 'Slip', description: '', sprites: {}, pregnant: false, oneOff: true }] }).map((o) => o.id)).toEqual(['default'])
     expect(ordinaryOutfit(her, wornOutfit(content, at(pregnant, 3), her)!).id).toBe('default')
     // With the four standard outfits, whatever is chosen for her is given in the form that fits her now.
     const blank = (id: string, isPregnant: boolean) => ({ id, name: id, description: '', sprites: {}, pregnant: isPregnant })

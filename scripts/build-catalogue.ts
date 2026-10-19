@@ -1,7 +1,7 @@
 /**
  * Lays out the term again from the game's curriculum and characters, and writes it to `content/default/catalogue.json`:
  * which courses are given, who gives each, when each meets and who is in it. What the courses are is written in
- * `curriculum.json` and is not touched. Run it after a character is added or changes what she reads or teaches.
+ * `curriculum.json` and is not touched. Run it after a character is added or changes what she studies or teaches.
  * Not part of the app:
  *
  *   npx jiti scripts/build-catalogue.ts          build and write

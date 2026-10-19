@@ -4,7 +4,7 @@
     "name": "the Great Court",
     "icon": "columns",
     "description": "The terraced court at the heart of the University, where every path crosses and everyone passes through sooner or later. The old bell still rings the lecture hours, a beat ahead of everyone's phone. Societies paper the noticeboard with flyers and hold their fair here; students sit on the steps between classes to eat, gossip and watch who walks by with whom. The campus shuttle, an electric bus with a teleport array, stops at the foot of the steps. It is public and busy by day and quiet after dark: a place to be seen, to run into people, and to meet before going somewhere else.",
-    "appearance": "A wide terraced courtyard of pale golden stone at the centre of an old university, with broad flights of steps climbing between three levels of lawn and paving. A tall stone bell tower with a bronze bell stands at the top terrace, a large glowing digital noticeboard mounted on its base above a board layered with colourful paper flyers. Stone arcades with pointed arches run along both sides, lit from inside by floating amber ward-lights. At the foot of the steps a sleek white electric shuttle bus waits at a stop, a ring of blue runes glowing along its underside. Old trees in stone planters, iron lamp posts topped with glowing crystals, bicycles in a rack.",
+    "appearance": "A wide terraced courtyard of pale golden stone at the center of an old university, with broad flights of steps climbing between three levels of lawn and paving. A tall stone bell tower with a bronze bell stands at the top terrace, a large glowing digital noticeboard mounted on its base above a board layered with colorful paper flyers. Stone arcades with pointed arches run along both sides, lit from inside by floating amber ward-lights. At the foot of the steps a sleek white electric shuttle bus waits at a stop, a ring of blue runes glowing along its underside. Old trees in stone planters, iron lamp posts topped with glowing crystals, bicycles in a rack.",
     "backgrounds": [
       {
         "id": "default",
@@ -77,8 +77,8 @@
     "id": "library",
     "name": "the Chained Library",
     "icon": "book",
-    "description": "The Chained Library, the oldest in Breedhaven. The valuable books are still chained to the shelves and the catalogue is on every terminal. The stone reading cells have a desk, a lamp, a socket and patchy wifi, and are fought over in exam season. Talking is done in whispers and the librarians enforce it. People come to study, to hide, to look something up in the restricted stacks, or to sit close to someone under the excuse of revising. A good place to work on intelligence.",
-    "appearance": "The interior of a very old library with a high vaulted stone ceiling and tall dark oak bookcases in long rows. Thick leather-bound books are fastened to the shelves by short iron chains. Between the bookcases, small stone reading alcoves each hold a wooden desk with a green-shaded brass lamp, a power socket and an open book. A slim touchscreen catalogue terminal glows on a stand at the end of each row. Narrow stained-glass windows throw coloured light across a worn flagstone floor, and motes of soft golden light drift near the ceiling.",
+    "description": "The Chained Library, the oldest in Breedhaven. The valuable books are still chained to the shelves and the catalog is on every terminal. The stone reading cells have a desk, a lamp, a socket and patchy wifi, and are fought over in exam season. Talking is done in whispers and the librarians enforce it. People come to study, to hide, to look something up in the restricted stacks, or to sit close to someone under the excuse of studying. A good place to work on intelligence.",
+    "appearance": "The interior of a very old library with a high vaulted stone ceiling and tall dark oak bookcases in long rows. Thick leather-bound books are fastened to the shelves by short iron chains. Between the bookcases, small stone reading alcoves each hold a wooden desk with a green-shaded brass lamp, a power socket and an open book. A slim touchscreen catalog terminal glows on a stand at the end of each row. Narrow stained-glass windows throw colored light across a worn flagstone floor, and motes of soft golden light drift near the ceiling.",
     "backgrounds": [
       {
         "id": "default",
@@ -99,7 +99,7 @@
     "drills": [
       {
         "stat": "intelligence",
-        "title": "Revise in a reading cell",
+        "title": "Study in a reading cell",
         "description": "You claim a stone cell, a lamp and a stack of books, and get down to it."
       },
       {
@@ -159,7 +159,7 @@
     "name": "the Furrow Chapel",
     "icon": "chapel",
     "description": "The Furrow Chapel, the campus chapel of the Order of the First Furrow, which holds the Bloom sacred. It is open to any student who wants quiet, believer or not. Services are short and sung; postulants in green tend the candles. Bloom Counseling keeps its rooms upstairs: free, confidential, and staffed by people who have heard it all before, for anyone the Bloom's pull is troubling. Voices are kept low. People come here to think, to grieve, to pray for a child, or to talk about what they cannot say elsewhere.",
-    "appearance": "The interior of a small campus chapel of pale stone, calm and plain. Rows of simple wooden pews face a low altar draped in green cloth, with a carved stone relief of a ploughed field and a single sprouting seed above it. Tall narrow windows of green and gold stained glass cast soft coloured light across the floor. Clusters of lit candles in brass stands, vases of fresh wildflowers, sheaves of wheat tied with ribbon. A spiral stone staircase in one corner leads up to a wooden door with a small softly glowing sign.",
+    "appearance": "The interior of a small campus chapel of pale stone, calm and plain. Rows of simple wooden pews face a low altar draped in green cloth, with a carved stone relief of a plowed field and a single sprouting seed above it. Tall narrow windows of green and gold stained glass cast soft colored light across the floor. Clusters of lit candles in brass stands, vases of fresh wildflowers, sheaves of wheat tied with ribbon. A spiral stone staircase in one corner leads up to a wooden door with a small softly glowing sign.",
     "backgrounds": [
       {
         "id": "default",
@@ -189,7 +189,7 @@
     "name": "the Tiltyard",
     "icon": "sword",
     "description": "The University's sports ground, still called by its old name. A sanded ring with stands for bouts in all three divisions (unaugmented, augmented and open, by how much magic is allowed), a running track, a weights room under the stands, and the yard where the Campus Security cadets drill at dawn. The Arena Finals are fought here at the end of term. People come to train, to spar, to watch, and to be seen being good at something. Sweat, bruises and blunt honesty are normal. A good place to work on strength and endurance.",
-    "appearance": "An old university sports ground enclosed by stone walls. At its centre a round arena of raked pale sand ringed by a low wooden barrier, with empty tiered wooden spectator stands rising on two sides under canvas awnings in green and gold. A red rubber running track loops around the outside. Tall modern floodlights stand at the corners beside an electronic scoreboard, and faint lines of blue warding runes glow along the arena barrier. Racks of wooden practice swords, weight benches and water coolers stand under the stands. Banners with a crest hang from poles.",
+    "appearance": "An old university sports ground enclosed by stone walls. At its center a round arena of raked pale sand ringed by a low wooden barrier, with empty tiered wooden spectator stands rising on two sides under canvas awnings in green and gold. A red rubber running track loops around the outside. Tall modern floodlights stand at the corners beside an electronic scoreboard, and faint lines of blue warding runes glow along the arena barrier. Racks of wooden practice swords, weight benches and water coolers stand under the stands. Banners with a crest hang from poles.",
     "backgrounds": [
       {
         "id": "default",
@@ -229,7 +229,7 @@
     "id": "physic-garden",
     "name": "the Physic Garden",
     "icon": "leaf",
-    "description": "The walled teaching garden of the College of Life Sciences and Agriculture: raised beds of herbs, vegetables and medicinal plants under growth-charms, sensor stakes in the soil, a glasshouse, and a still pond at the far end. Students of agriculture, brewing and potion-work tend plots here; green magic is practised in the open. It is quiet, sheltered and smells of earth, and the bench by the pond is a known place for a private talk. Lovely at dusk and by moonlight. A good place to work on wisdom.",
+    "description": "The walled teaching garden of the College of Life Sciences and Agriculture: raised beds of herbs, vegetables and medicinal plants under growth-charms, sensor stakes in the soil, a glasshouse, and a still pond at the far end. Students of agriculture, brewing and potion-work tend plots here; green magic is practiced in the open. It is quiet, sheltered and smells of earth, and the bench by the pond is a known place for a private talk. Lovely at dusk and by moonlight. A good place to work on wisdom.",
     "appearance": "A walled teaching garden with old red-brick walls covered in climbing roses and espaliered fruit trees. Neat raised beds of herbs, vegetables and flowering medicinal plants are laid out in a grid between gravel paths, each bed marked with a small label and a slim sensor stake tipped with a glowing green light. Faint shimmering domes of pale green magic hover over some of the beds. Tall bean poles, a wheelbarrow, watering cans, a potting bench. A long Victorian-style glasshouse of white iron and glass stands along one wall, and a still pond with water lilies and a stone bench lies at the far end.",
     "backgrounds": [
       {
@@ -262,7 +262,7 @@
     "name": "the Bathhouse",
     "icon": "droplet",
     "description": "The campus baths: a warm tiled pool under a vaulted roof, fed by the hot spring the University was built over, with modern changing rooms and lockers. Bathing is mixed and unhurried, in swimwear or a towel by custom, and nobody stares. It is busiest in the evening after training. Steam and warm water loosen tongues; conversations here are slower and more honest than elsewhere, and a certain amount of looking is forgiven. The alcoves behind the pool are more private.",
-    "appearance": "The interior of a grand bathhouse with a high vaulted ceiling of pale stone and blue-and-white patterned tiles on every wall. A large rectangular pool of steaming turquoise water fills the centre, lit from beneath, with wide tiled steps leading down into it and stone columns along both sides. Water pours into the pool from carved stone spouts in the shape of flowers. Thick steam drifts in the air. Wooden benches, stacks of folded white towels, potted ferns, and a row of modern lockers with glowing keypads in an alcove. Soft light from round frosted lamps and a skylight.",
+    "appearance": "The interior of a grand bathhouse with a high vaulted ceiling of pale stone and blue-and-white patterned tiles on every wall. A large rectangular pool of steaming turquoise water fills the center, lit from beneath, with wide tiled steps leading down into it and stone columns along both sides. Water pours into the pool from carved stone spouts in the shape of flowers. Thick steam drifts in the air. Wooden benches, stacks of folded white towels, potted ferns, and a row of modern lockers with glowing keypads in an alcove. Soft light from round frosted lamps and a skylight.",
     "backgrounds": [
       {
         "id": "default",
@@ -389,8 +389,8 @@
     "id": "lantern-row",
     "name": "Lantern Row",
     "icon": "lantern",
-    "description": "The street outside the University gate, and the high street of the student district: flats above the shops, a tram stop, and strings of lanterns the council keeps lit by charm. The shops come in pairs that say what kind of country this is. Byte & Bloom sells phones beside Arcana, which sells wands. The Book Nook has the textbooks and the Forbidden Shelf next door has the grimoires. Petal & Thorn the florist shares a wall and most of its customers with the Cradle, which sells maternity wear. Velvet cuts hair and Glamour enchants it. Petal & Pill is the pharmacy. Seven Petals, the convenience store on the corner, never closes. Older students and staff rent the flats upstairs. Busy from morning until the pubs shut.",
-    "appearance": "A lively high street of narrow old townhouses with shops at street level and flats above, just outside a stone university gate. Strings of paper lanterns glowing by magic are hung back and forth across the street. Shopfronts stand in pairs with painted signs and bright window displays: a phone shop beside a wand shop, a bookshop beside a shop of chained grimoires, a florist beside a maternity boutique, a hair salon beside a glamour parlour with shimmering mirrors, and a convenience store on the corner with a glowing seven-petalled flower sign. A sleek tram waits at a stop on tracks set into the cobbles. Bicycles, cafe tables, hanging flower baskets.",
+    "description": "The street outside the University gate, and the main street of the student district: apartments above the shops, a tram stop, and strings of lanterns the council keeps lit by charm. The shops come in pairs that say what kind of country this is. Byte & Bloom sells phones beside Arcana, which sells wands. The Book Nook has the textbooks and the Forbidden Shelf next door has the grimoires. Petal & Thorn the florist shares a wall and most of its customers with the Cradle, which sells maternity wear. Velvet cuts hair and Glamour enchants it. Petal & Pill is the pharmacy. Seven Petals, the convenience store on the corner, never closes. Older students and staff rent the apartments upstairs. Busy from morning until the pubs shut.",
+    "appearance": "A lively main street of narrow old townhouses with shops at street level and apartments above, just outside a stone university gate. Strings of paper lanterns glowing by magic are hung back and forth across the street. Shopfronts stand in pairs with painted signs and bright window displays: a phone shop beside a wand shop, a bookshop beside a shop of chained grimoires, a florist beside a maternity boutique, a hair salon beside a glamour parlour with shimmering mirrors, and a convenience store on the corner with a glowing seven-petalled flower sign. A sleek tram waits at a stop on tracks set into the cobbles. Bicycles, cafe tables, hanging flower baskets.",
     "backgrounds": [
       {
         "id": "default",
@@ -453,8 +453,8 @@
     "id": "market",
     "name": "the Market Square",
     "icon": "crate",
-    "description": "Seedblossom's old open market, a short walk from the South Gate: a sea of awnings selling flowers, food, books, second-hand tech and charms of doubtful licence. It is cheaper than the shops and more fun. Stallholders haggle and gossip, and students come for supplies, odd jobs and gifts. Busiest on Marketday, when half the University is here. A good place to buy someone a present, to be jostled close in a crowd, and to hear what the town is saying.",
-    "appearance": "A large open-air market in an old cobbled town square, crowded with stalls under striped canvas awnings in many colours. Stalls piled with flowers, fruit, bread, stacks of second-hand books, tables of used phones and laptops, and trays of glowing charms, crystals and small bottled potions. Hand-painted signs and price tags, strings of bunting and small floating lights overhead. Tall timber-framed townhouses surround the square, and a stone gateway with a clock stands at one end. Crates, handcarts and a food stall with rising steam.",
+    "description": "Seedblossom's old open market, a short walk from the South Gate: a sea of awnings selling flowers, food, books, second-hand tech and charms of doubtful license. It is cheaper than the shops and more fun. Stallholders haggle and gossip, and students come for supplies, odd jobs and gifts. Busiest on Marketday, when half the University is here. A good place to buy someone a present, to be jostled close in a crowd, and to hear what the town is saying.",
+    "appearance": "A large open-air market in an old cobbled town square, crowded with stalls under striped canvas awnings in many colors. Stalls piled with flowers, fruit, bread, stacks of second-hand books, tables of used phones and laptops, and trays of glowing charms, crystals and small bottled potions. Hand-painted signs and price tags, strings of bunting and small floating lights overhead. Tall timber-framed townhouses surround the square, and a stone gateway with a clock stands at one end. Crates, handcarts and a food stall with rising steam.",
     "backgrounds": [
       {
         "id": "default",
@@ -480,7 +480,7 @@
       {
         "stat": "strength",
         "title": "Carry crates for the stalls",
-        "description": "The morning deliveries are stacked at the kerb and somebody has to shift them."
+        "description": "The morning deliveries are stacked at the curb and somebody has to shift them."
       }
     ],
     "iconImage": "sprites/icons/places-market-cutout.png"
@@ -536,7 +536,7 @@
     "id": "spell-and-sip",
     "name": "Spell & Sip",
     "icon": "coffee",
-    "description": "Spell & Sip, the coffee shop on Lantern Row that everyone revises in, half café and half magical study lounge: mismatched armchairs, warded booths for practising small workings, pastries from Sugarbloom Bakery next door, and never enough sockets. The sign in the window reads: Coffee, Tea, Enchantments, Wi-Fi. No hexing after 9 PM. People stay for hours over one drink. It is the usual place for a first coffee with someone, a study date, or a long talk in an armchair.",
+    "description": "Spell & Sip, the coffee shop on Lantern Row that everyone studies in, half café and half magical study lounge: mismatched armchairs, warded booths for practicing small workings, pastries from Sugarbloom Bakery next door, and never enough sockets. The sign in the window reads: Coffee, Tea, Enchantments, Wi-Fi. No hexing after 9 PM. People stay for hours over one drink. It is the usual place for a first coffee with someone, a study date, or a long talk in an armchair.",
     "appearance": "The interior of a cosy coffee shop that is also a magical study lounge. Mismatched armchairs and small wooden tables crowded with laptops, notebooks and coffee cups, exposed brick walls and shelves of books and potted plants. A wooden counter with an espresso machine, a glass case of pastries and a chalkboard menu. Along one wall, a row of small glass-walled booths, each ringed with softly glowing blue warding runes, a small light spell hovering inside one. hanging filament bulbs, fairy lights in the front window, and a neon sign shaped like a steaming cup with a star.",
     "backgrounds": [
       {
@@ -557,7 +557,7 @@
     "drills": [
       {
         "stat": "intelligence",
-        "title": "Revise over coffee",
+        "title": "Study over coffee",
         "description": "An armchair, a socket, and a coffee you intend to make last."
       },
       {
@@ -572,7 +572,7 @@
     "id": "pixel-and-rune",
     "name": "Pixel and Rune",
     "icon": "gamepad",
-    "description": "Pixel and Rune, an arcade in an old print works off Lantern Row: rows of cabinets, a rhythm game with a queue, air hockey, and a claw machine everyone agrees is hexed. Upstairs is the Mana Bar, a gaming lounge and also a bar: PCs, consoles, VR booths, tournament nights and cocktails that glow. Critical Hit, the game shop next door, does well out of both. It is noisy, competitive and cheap, and good for a date with someone who would rather play than talk. Losing gracefully is optional.",
+    "description": "Pixel and Rune, an arcade in an old print works off Lantern Row: rows of cabinets, a rhythm game with a line, air hockey, and a claw machine everyone agrees is hexed. Upstairs is the Mana Bar, a gaming lounge and also a bar: PCs, consoles, VR booths, tournament nights and cocktails that glow. Critical Hit, the game shop next door, does well out of both. It is noisy, competitive and cheap, and good for a date with someone who would rather play than talk. Losing gracefully is optional.",
     "appearance": "The interior of a video arcade in a converted old industrial building with brick walls and iron columns. Rows of arcade cabinets with glowing screens, a large dance rhythm game with a lit floor pad, air hockey tables, racing seats and a claw machine full of plush toys with a faint purple shimmer around it. Neon signs in pink, blue and green, a carpet with a bright geometric pattern, and glowing runes worked into the neon. An iron staircase leads up to a mezzanine bar with gaming computers, VR booths and shelves of bottles lit from below, glasses of luminous cocktails on the counter.",
     "backgrounds": [
       {
@@ -603,8 +603,8 @@
     "id": "boba-blossom",
     "name": "Boba Blossom",
     "icon": "boba",
-    "description": "Boba Blossom, a bubble tea shop in pink and pale green on Lantern Row. It is next door to Bloomwell Women's Health, so half the queue is waiting on a result and the other half just wants taro milk tea, and nobody asks which. It has window seats, a loyalty card, and a seasonal special that changes colour as it is drunk. Sweet, bright and girlish; friends come in pairs and stay to talk.",
-    "appearance": "The interior of a small bubble tea shop decorated in pastel pink and pale green. A white counter with a row of metal tea containers, jars of coloured tapioca pearls and a sealing machine, under a pink neon sign shaped like a blossom. A wall menu with pictures of drinks, shelves of plush toys and potted succulents, and a window bench with high stools looking onto the street. Round white tables, pastel chairs, a flower wall for photographs, and tall plastic cups of tea that glow softly in shifting colours.",
+    "description": "Boba Blossom, a bubble tea shop in pink and pale green on Lantern Row. It is next door to Bloomwell Women's Health, so half the line is waiting on a result and the other half just wants taro milk tea, and nobody asks which. It has window seats, a loyalty card, and a seasonal special that changes color as it is drunk. Sweet, bright and girlish; friends come in pairs and stay to talk.",
+    "appearance": "The interior of a small bubble tea shop decorated in pastel pink and pale green. A white counter with a row of metal tea containers, jars of colored tapioca pearls and a sealing machine, under a pink neon sign shaped like a blossom. A wall menu with pictures of drinks, shelves of plush toys and potted succulents, and a window bench with high stools looking onto the street. Round white tables, pastel chairs, a flower wall for photographs, and tall plastic cups of tea that glow softly in shifting colors.",
     "backgrounds": [
       {
         "id": "default",
@@ -624,8 +624,8 @@
     "drills": [
       {
         "stat": "charisma",
-        "title": "Chat up the queue",
-        "description": "The queue is long, slow and bored, which is an audience."
+        "title": "Chat up the line",
+        "description": "The line is long, slow and bored, which is an audience."
       }
     ],
     "iconImage": "sprites/icons/places-boba-blossom-cutout.png"
@@ -635,7 +635,7 @@
     "name": "Cauldron",
     "icon": "pot",
     "description": "Cauldron, the restaurant students save up for, where the chefs cook with controlled magic in an open kitchen. The menu has Ember Ramen in a broth that is still on fire, Frostberry Tea served below freezing, and a Thundercake that comes with a warning not to touch the plate. It is expensive by student standards and needs a booking; taking someone here means something. Mama's Table next door does plain food in large portions and takes the overflow.",
-    "appearance": "The interior of an upmarket restaurant with dark wood, copper and deep red walls. An open kitchen runs along the back behind a copper-topped counter, with large black cauldrons over rings of blue and orange magical flame, hanging copper pans and shelves of spice jars. Tables set with white cloths, dark plates and candles; on one, a bowl of ramen with small flames dancing on the broth, and a glass of pale blue tea covered in frost. Glowing runes circle the rims of the cauldrons. Low warm lighting from copper pendant lamps, and wisps of coloured steam drifting toward a vent hood.",
+    "appearance": "The interior of an upmarket restaurant with dark wood, copper and deep red walls. An open kitchen runs along the back behind a copper-topped counter, with large black cauldrons over rings of blue and orange magical flame, hanging copper pans and shelves of spice jars. Tables set with white cloths, dark plates and candles; on one, a bowl of ramen with small flames dancing on the broth, and a glass of pale blue tea covered in frost. Glowing runes circle the rims of the cauldrons. Low warm lighting from copper pendant lamps, and wisps of colored steam drifting toward a vent hood.",
     "backgrounds": [
       {
         "id": "default",
@@ -670,7 +670,7 @@
     "id": "ironroot",
     "name": "Ironroot Fitness",
     "icon": "dumbbell",
-    "description": "Ironroot Fitness, a gym of racks, treadmills and loud music. It shares a wall and a student membership with Aether, the magical training centre next door: spell rooms, an elemental arena, an obstacle course and containment chambers. Men and unaugmented athletes lift on one side and mages drill on the other, and there is a window between the two that both sides pretend not to look through. People spot each other, compare progress and show off a little. A good place to work on strength and endurance.",
+    "description": "Ironroot Fitness, a gym of racks, treadmills and loud music. It shares a wall and a student membership with Aether, the magical training center next door: spell rooms, an elemental arena, an obstacle course and containment chambers. Men and unaugmented athletes lift on one side and mages drill on the other, and there is a window between the two that both sides pretend not to look through. People spot each other, compare progress and show off a little. A good place to work on strength and endurance.",
     "appearance": "The interior of a modern gym with black rubber flooring, exposed ducts and bright overhead lights. Rows of squat racks, barbells, weight plates, benches, dumbbell racks and a line of treadmills facing mirrored walls. A large window in one wall looks through into a second hall: a magical training arena with a floor of scorched stone, targets, and a domed barrier of shimmering blue energy. Motivational banners, wall-mounted screens, water fountains and a front desk with towels.",
     "backgrounds": [
       {
@@ -738,7 +738,7 @@
     "name": "the Undergrowth",
     "icon": "music",
     "description": "The Undergrowth, a basement club under the railway arches where the University goes dancing. Low ceilings are hung with charm-grown vines that pulse with the bass, there is a sprung floor, and a quiet room at the back for anyone the Bloom is getting too loud for. It opens late and is hot, crowded and dark. Talk is shouted in the ear or not at all; dancing close is expected and suppressants wear thin by the end of the night.",
-    "appearance": "The interior of a basement nightclub under brick railway arches. Low vaulted brick ceilings are hung with thick living vines and leaves that glow in pulsing green, violet and blue. A wooden dance floor lit by moving coloured beams and haze, a DJ booth with decks and screens, and tall speaker stacks. A bar along one arch with glowing bottles and luminous drinks. Booths with dark velvet seats, neon signs in the shape of leaves and flowers, and an archway at the back leading to a dimmer, quieter room with soft amber light and cushions.",
+    "appearance": "The interior of a basement nightclub under brick railway arches. Low vaulted brick ceilings are hung with thick living vines and leaves that glow in pulsing green, violet and blue. A wooden dance floor lit by moving colored beams and haze, a DJ booth with decks and screens, and tall speaker stacks. A bar along one arch with glowing bottles and luminous drinks. Booths with dark velvet seats, neon signs in the shape of leaves and flowers, and an archway at the back leading to a dimmer, quieter room with soft amber light and cushions.",
     "backgrounds": [
       {
         "id": "default",
@@ -842,7 +842,7 @@
           "day": "generated/backgrounds/sire-house/nanny-day.webp",
           "night": "generated/backgrounds/sire-house/nanny-night.webp"
         },
-        "appearance": "A neat small bedroom on the ground floor: a narrow bed made up crisply with white linen, a dressing table with an oval mirror hung with small coloured ribbons and a row of perfume bottles, a black dress with a white collar on a hanger behind the door, a softly glowing crystal on the windowsill, a vase of fresh flowers, a small framed print of a harbour."
+        "appearance": "A neat small bedroom on the ground floor: a narrow bed made up crisply with white linen, a dressing table with an oval mirror hung with small colored ribbons and a row of perfume bottles, a black dress with a white collar on a hanger behind the door, a softly glowing crystal on the windowsill, a vase of fresh flowers, a small framed print of a harbor."
       },
       {
         "id": "nursery",

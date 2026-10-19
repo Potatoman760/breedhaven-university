@@ -385,7 +385,7 @@ export function refuseKey(image: Raster, reading: BorderReading): string | null 
   }
 
   if (Math.max(...colour) - Math.min(...colour) > NEUTRAL_ENOUGH) {
-    return `The border of this picture is ${hex(colour)} — a colour, not white. Nothing was changed.`
+    return `The border of this picture is ${hex(colour)} — a color, not white. Nothing was changed.`
   }
 
   if (transparency > ALREADY_CUT) {

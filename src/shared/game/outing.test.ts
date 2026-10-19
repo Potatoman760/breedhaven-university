@@ -414,7 +414,7 @@ describe('something typed that is in a room', () => {
     expect(fallbackOuting(roomed, met, 'talk to Bea in her room').roomOf).toBeUndefined()
 
     const { user } = buildOutingPrompt(roomed, met, 'talk to Ana in her room')
-    expect(user).toContain("- room-of-ana: Ana's own room, at the Shop")
+    expect(user).toContain("- room-of-ana: Ana's room, at the Shop")
     const reply = '{"title": "A private talk", "description": "", "with": [], "place": "room-of-ana", "hours": 1, "trains": "none"}'
     expect(parseOuting(reply, roomed, met, 'talk in her room')).toMatchObject({ locationId: 'shop', roomOf: 'ana', withIds: ['ana'] })
     // The scene it opens is in her room.

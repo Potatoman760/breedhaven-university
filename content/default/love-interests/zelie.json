@@ -4,8 +4,8 @@
   "role": "live-in nanny at Haven House",
   "age": 26,
   "pronouns": "she/her",
-  "bio": "Zélie is the nanny the Sire Relations Office sends with a house. She is Vesperan, from the harbour city of Port-Lumière, trained at one of the League's old governess schools, and came to Breedhaven on an Office contract four years ago. This is her fourth Sire house. She keeps it, and everyone in it, to her own standards.",
-  "appearance": "A 26-year-old human woman with fair skin, icy blue eyes under long lashes, arched brows, a small straight nose, full red lips. Glossy dark brown hair cut in a chin-length bob with a blunt fringe. A slender, elegant figure with a narrow waist, a full chest, shapely hips. She carries herself very upright.",
+  "bio": "Zélie is the nanny the Sire Relations Office sends with a house. She is Vesperan, from the harbor city of Port-Lumière, trained at one of the League's old governess schools, and came to Breedhaven on an Office contract four years ago. This is her fourth Sire house. She keeps it, and everyone in it, to her own standards.",
+  "appearance": "A 26-year-old human woman with fair skin, icy blue eyes under long lashes, arched brows, a small straight nose, full red lips. Glossy jet black hair cut in a chin-length bob with a blunt fringe. A slender, elegant figure with a narrow waist, a full chest, shapely hips. She carries herself very upright.",
   "personality": "Poised, chic and quietly amused by nearly everything. She treats the care of a child, a table and a household as arts, and has exacting opinions on all three. She is warm with children and merciless about manners. With him she is teasing and unhurried, flirts as naturally as she breathes and thinks nothing of it, and is entirely unembarrassed by the body, his or her own. Under the polish she is far from home, sends most of her wages back to it, and has never had a household that was hers and not her employer's.",
   "traitIds": [
     "flirtatious",
@@ -34,22 +34,22 @@
     {
       "id": "default",
       "name": "Nanny's uniform",
-      "description": "a fitted black knee-length dress with a white collar and white cuffs, a small crisp white apron tied at the waist, sheer dark stockings, a thin ribbon at her throat with the Office's small brass blossom badge pinned to it",
+      "description": "a fitted black knee-length dress with a white collar and white cuffs, a small crisp white apron tied at the waist, sheer dark stockings, a thin blue ribbon tied at her throat",
       "sprites": {
         "neutral": {
-          "image": "sprites/zelie/default-neutral-cutout.webp",
+          "image": "sprites/zelie/default-neutral-3-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/zelie/default-happy-cutout.webp",
+          "image": "sprites/zelie/default-happy-2-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/zelie/default-sad-cutout.webp",
+          "image": "sprites/zelie/default-sad-2-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/zelie/default-angry-cutout.webp",
+          "image": "sprites/zelie/default-angry-2-cutout.webp",
           "description": ""
         },
         "surprised": {
@@ -57,11 +57,11 @@
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/zelie/default-embarrassed-cutout.webp",
+          "image": "sprites/zelie/default-embarrassed-2-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/zelie/default-aroused-cutout.webp",
+          "image": "sprites/zelie/default-aroused-2-cutout.webp",
           "description": ""
         }
       },
@@ -74,31 +74,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/zelie/pregnant-neutral-cutout.webp",
+          "image": "sprites/zelie/pregnant-neutral-2-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/zelie/pregnant-happy-cutout.webp",
+          "image": "sprites/zelie/pregnant-happy-2-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/zelie/pregnant-sad-cutout.webp",
+          "image": "sprites/zelie/pregnant-sad-2-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/zelie/pregnant-angry-cutout.webp",
+          "image": "sprites/zelie/pregnant-angry-2-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/zelie/pregnant-surprised-cutout.webp",
+          "image": "sprites/zelie/pregnant-surprised-2-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/zelie/pregnant-embarrassed-cutout.webp",
+          "image": "sprites/zelie/pregnant-embarrassed-2-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/zelie/pregnant-aroused-cutout.webp",
+          "image": "sprites/zelie/pregnant-aroused-2-cutout.webp",
           "description": ""
         }
       },
@@ -110,31 +110,31 @@
       "description": "nothing at all, completely nude, with a neatly trimmed triangle of pubic hair",
       "sprites": {
         "neutral": {
-          "image": "sprites/zelie/nude-neutral-2-cutout-2.webp",
+          "image": "sprites/zelie/nude-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/zelie/nude-happy-cutout-2.webp",
+          "image": "sprites/zelie/nude-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/zelie/nude-sad-cutout-2.webp",
+          "image": "sprites/zelie/nude-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/zelie/nude-angry-cutout-2.webp",
+          "image": "sprites/zelie/nude-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/zelie/nude-surprised-cutout-2.webp",
+          "image": "sprites/zelie/nude-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/zelie/nude-embarrassed-cutout-2.webp",
+          "image": "sprites/zelie/nude-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/zelie/nude-aroused-cutout-2.webp",
+          "image": "sprites/zelie/nude-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -202,14 +202,6 @@
       "loop": true
     },
     {
-      "id": "doggy",
-      "name": "Doggy",
-      "description": "",
-      "image": "sprites/zelie/nsfw-doggy.webp",
-      "clip": "sprites/zelie/nsfw-doggy-2.mp4",
-      "loop": true
-    },
-    {
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
@@ -223,14 +215,6 @@
       "description": "",
       "image": "sprites/zelie/nsfw-creampie.webp",
       "clip": "sprites/zelie/nsfw-creampie.mp4",
-      "loop": true
-    },
-    {
-      "id": "facial",
-      "name": "Facial",
-      "description": "",
-      "image": "sprites/zelie/nsfw-facial.webp",
-      "clip": "sprites/zelie/nsfw-facial.mp4",
       "loop": true
     },
     {
@@ -248,13 +232,6 @@
       "loop": true
     },
     {
-      "id": "pregnant-doggy",
-      "name": "Doggy, pregnant",
-      "description": "",
-      "image": "sprites/zelie/nsfw-pregnant-doggy.webp",
-      "loop": true
-    },
-    {
       "id": "pregnant-cowgirl",
       "name": "Cowgirl, pregnant",
       "description": "",
@@ -269,10 +246,33 @@
       "loop": true
     },
     {
+      "id": "pregnant-doggy",
+      "name": "Doggy, pregnant",
+      "description": "",
+      "image": "sprites/zelie/nsfw-pregnant-doggy.webp",
+      "loop": true
+    },
+    {
       "id": "pregnant-facial",
       "name": "Facial, pregnant",
       "description": "",
       "image": "sprites/zelie/nsfw-pregnant-facial.webp",
+      "loop": true
+    },
+    {
+      "id": "doggy",
+      "name": "Doggy",
+      "description": "",
+      "image": "sprites/zelie/nsfw-doggy.webp",
+      "clip": "sprites/zelie/nsfw-doggy.mp4",
+      "loop": true
+    },
+    {
+      "id": "facial",
+      "name": "Facial",
+      "description": "",
+      "image": "sprites/zelie/nsfw-facial.webp",
+      "clip": "sprites/zelie/nsfw-facial.mp4",
       "loop": true
     }
   ],
@@ -315,7 +315,7 @@
     "viewId": "nanny"
   },
   "birthPicture": "sprites/zelie/birth.webp",
-  "walkSprite": "sprites/zelie/walk-cutout.webp",
+  "walkSprite": "sprites/zelie/walk-2-cutout.webp",
   "childNames": {
     "daughters": [
       "Colette",
@@ -354,7 +354,7 @@
       "How to keep a house and a baby to the standard of the Institut: feeding, sleep, what a cry means, and what a child in the house costs each week.",
       "The house itself: which rooms are built, which are bare, and what each would be good for.",
       "That she is employed by the Sire Relations Office and answers to Una Fairweather there, not to him.",
-      "The Vesperan League: its harbour cities, its merchant houses and their manners, its food and its wine, of which she thinks Breedhaven has a great deal to learn."
+      "The Vesperan League: its harbor cities, its merchant houses and their manners, its food and its wine, of which she thinks Breedhaven has a great deal to learn."
     ],
     "secrets": [
       {

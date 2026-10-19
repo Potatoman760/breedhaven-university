@@ -33,7 +33,7 @@
     {
       "id": "default",
       "name": "Usual clothes",
-      "description": "a tight black cropped training top with a deep neckline that leaves her midriff bare; low-slung, close-fitting grey leggings; a wide red cloth sash knotted at one hip with its ends hanging to the knee; white wrist wraps on both forearms; and a steel whistle on a cord that rests between her breasts",
+      "description": "a tight black cropped training top with a deep neckline that leaves her midriff bare; low-slung, close-fitting gray leggings; a wide red cloth sash knotted at one hip with its ends hanging to the knee; white wrist wraps on both forearms; and a steel whistle on a cord that rests between her breasts",
       "sprites": {
         "neutral": {
           "image": "sprites/grushka/default-neutral-cutout-2.webp",
@@ -189,15 +189,15 @@
     "subjects": [
       {
         "major": "KIN",
-        "level": 1
+        "number": "101"
       },
       {
         "major": "KIN",
-        "level": 4
+        "number": "143"
       },
       {
         "major": "PSF",
-        "level": 4
+        "number": "101"
       }
     ]
   },
@@ -341,7 +341,7 @@
   ],
   "room": {
     "name": "her apartment overlooking the Tiltyard",
-    "description": "A plain two-room apartment in a modern block beside a sports ground, with white walls and a wide floor-to-ceiling window. A wide, low bed under a thick red and grey woven wool blanket, a wall rack of training swords and wooden practice blades, children's crayon drawings pinned beside the door, an iron kettle and a cast-iron pan on an induction hob, a set of dumbbells in the corner, a tablet showing a training schedule on the counter. The window looks down onto a sanded arena ring under floodlights. Warm evening lamplight.",
+    "description": "A plain two-room apartment in a modern block beside a sports ground, with white walls and a wide floor-to-ceiling window. A wide, low bed under a thick red and gray woven wool blanket, a wall rack of training swords and wooden practice blades, children's crayon drawings pinned beside the door, an iron kettle and a cast-iron pan on an induction hob, a set of dumbbells in the corner, a tablet showing a training schedule on the counter. The window looks down onto a sanded arena ring under floodlights. Warm evening lamplight.",
     "locationId": "tiltyard",
     "background": "generated/backgrounds/grushka/view.webp"
   },

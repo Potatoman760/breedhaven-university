@@ -12,7 +12,7 @@
     {
       "id": "default",
       "name": "Work clothes",
-      "description": "a grey lab coat with scorch marks over a dark turtleneck, safety goggles pushed up on her head, a tool belt, heavy gloves tucked in a pocket",
+      "description": "a gray lab coat with scorch marks over a dark turtleneck, safety goggles pushed up on her head, a tool belt, heavy gloves tucked in a pocket",
       "sprites": {
         "neutral": {
           "image": "sprites/halla/default-neutral-cutout.webp",

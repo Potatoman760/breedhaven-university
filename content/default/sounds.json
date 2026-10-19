@@ -89,6 +89,11 @@
       "file": "sounds/events/birth.ogg",
       "volume": 0.7,
       "credit": "Kenney, Music Jingles: jingles_PIZZI12 (CC0), kenney.nl"
+    },
+    "relic": {
+      "file": "sounds/events/relic.ogg",
+      "volume": 0.6,
+      "credit": "qubodup, \"Cliche Magic Spell Sound\" (CC0), https://freesound.org/people/qubodup/sounds/817466/"
     }
   },
   "ambience": {
@@ -267,32 +272,32 @@
     "blowjob": {
       "file": "sounds/scenes/oral.ogg",
       "volume": 0.6,
-      "credit": "SnowFightStudios, \"Slurping 2\" (CC0), freesound.org/people/SnowFightStudios/sounds/666319"
+      "credit": "Uncredited: clipped from source.mp4, 8:05 to 8:15"
     },
     "missionary": {
       "file": "sounds/scenes/thrusting.ogg",
       "volume": 0.6,
-      "credit": "khenshom, \"Skin to skin slams and contact\" (CC0), freesound.org/people/khenshom/sounds/481202"
+      "credit": "Uncredited: clipped from source3.mp4, 27:08 to 27:18"
     },
     "cowgirl": {
       "file": "sounds/scenes/thrusting.ogg",
       "volume": 0.6,
-      "credit": "khenshom, \"Skin to skin slams and contact\" (CC0), freesound.org/people/khenshom/sounds/481202"
+      "credit": "Uncredited: clipped from source3.mp4, 27:08 to 27:18"
     },
     "doggy": {
       "file": "sounds/scenes/thrusting.ogg",
       "volume": 0.6,
-      "credit": "khenshom, \"Skin to skin slams and contact\" (CC0), freesound.org/people/khenshom/sounds/481202"
+      "credit": "Uncredited: clipped from source3.mp4, 27:08 to 27:18"
     },
     "creampie": {
       "file": "sounds/scenes/breathing.ogg",
       "volume": 0.5,
-      "credit": "khenshom, \"Woman breathing heavily 01\" (CC0), freesound.org/people/khenshom/sounds/534473"
+      "credit": "Uncredited: clipped from source2.mp4, 9:30 to 9:40"
     },
     "facial": {
       "file": "sounds/scenes/breathing.ogg",
       "volume": 0.5,
-      "credit": "khenshom, \"Woman breathing heavily 01\" (CC0), freesound.org/people/khenshom/sounds/534473"
+      "credit": "Uncredited: clipped from source2.mp4, 9:30 to 9:40"
     }
   }
 }

@@ -16,7 +16,7 @@ const content: ContentPack = validateContentPack({
   loveInterests: [
     { ...raw.loveInterests[0], ...student },
     { ...raw.loveInterests[0], ...student, id: 'bea', name: 'Bea Stone', schedule: [] },
-    { ...raw.loveInterests[0], id: 'cora', name: 'Cora Vale', schedule: [], teaching: { department: 'the College of Riddles', title: 'Magistra', subjects: [{ subject: 'Riddles', code: 'RID', level: 1, stats: ['wisdom'], practical: false }] } }
+    { ...raw.loveInterests[0], id: 'cora', name: 'Cora Vale', schedule: [], teaching: { department: 'the College of Riddles', title: 'Magistra', subjects: [{ subject: 'Riddles', code: 'RID', number: '101', stats: ['wisdom'], practical: false }] } }
   ],
   items: [{ id: 'pen', name: 'Free pen', price: 0 }],
   societies: {

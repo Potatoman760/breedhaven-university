@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { dialogueLines, spriteFor, toDate, wornOutfit } from '../../../shared/game'
+import { cutsceneBeats, spriteFor, toDate, wornOutfit } from '../../../shared/game'
 import { Portrait } from './Portrait'
 import type { ContentPack, GameState, Intro } from '../../../shared/model'
 import { Backdrop } from './Backdrop'
@@ -16,25 +16,22 @@ interface Props {
 /**
  * A cutscene, as the welcome before orientation and the opening of a story beat are: scenes written out in full, read a
  * line at a time, with nothing to answer and nothing else on the screen. Whoever a place names stands on the stage, and a
- * line that starts with a name is hers. A click, Space, Enter, the right arrow or the wheel goes on; the left arrow or the
+ * line that starts with a name is hers. A line such as [OUTFIT: Tamsin=nude] or [EXPRESSION: Maren=aroused] is not read:
+ * it changes how she looks from the next line on. A click, Space, Enter, the right arrow or the wheel goes on; the left arrow or the
  * wheel back goes back. The last line read, it is over.
  */
 export function IntroView({ content, state, intro, onDone }: Props) {
   const people = [...content.npcs, ...content.loveInterests]
-  // Every line of every scene in order, each with the scene it is in and who is on the stage. A line in asterisks is narration.
-  const beats = intro.scenes.flatMap((scene) => {
-    const cast = (scene.castIds ?? [intro.speakerId]).flatMap((id) => people.find((one) => one.id === id) ?? [])
-    // The speaker's name is known in every place, whether or not she is on the stage there: over a picture with her in it, say.
-    const named = [...cast, ...people.filter((one) => one.id === intro.speakerId && !cast.includes(one))]
-    return scene.lines.flatMap((line) => dialogueLines(line, named)).map((line) => ({ scene, cast, line }))
-  })
+  // Every line of every scene in order, each with the scene it is in, who is on the stage, and how each of them looks. A
+  // line in asterisks is narration.
+  const beats = cutsceneBeats(intro, people)
   const [index, setIndex] = useState(0)
-  const { scene, cast, line } = beats[Math.min(index, beats.length - 1)]
+  const { scene, cast, line, looks } = beats[Math.min(index, beats.length - 1)]
   const location = content.locations.find((l) => l.id === scene.locationId)
   const date = toDate(content.calendar, state.time)
-  // The speaker in the outfit the script asks for, or failing that what she would wear anyway; anyone else as the day has her.
-  const spriteOf = (who: (typeof people)[number]) =>
-    spriteFor(who, (who.id === intro.speakerId ? who.outfits.find((outfit) => outfit.id === intro.outfitId) : undefined) ?? wornOutfit(content, state, who), undefined)
+  // Each in the outfit and with the face the script has put her in by now, or failing that as the day has her. An outfit
+  // asked for is worn as she wears it now: her pregnant form of it, once she shows.
+  const spriteOf = (who: (typeof people)[number]) => spriteFor(who, wornOutfit(content, state, who, looks[who.id]?.outfitId), looks[who.id]?.expression)
   // Whose line it is: the one it names, else the speaker's. Narration is nobody's.
   const speaker = line.action ? undefined : people.find((one) => one.id === (line.speakerId ?? intro.speakerId))
   const sprite = speaker && spriteOf(speaker)

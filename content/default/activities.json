@@ -262,7 +262,7 @@
   },
   {
     "id": "revise-cafe",
-    "name": "Revise at Spell & Sip",
+    "name": "Study at Spell & Sip",
     "description": "A flat white, an armchair and your notes.",
     "durationHours": 2,
     "locationId": "spell-and-sip",

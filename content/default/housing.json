@@ -83,7 +83,7 @@
     }
   },
   "texts": {
-    "offer": "{player}, good morning. Una Fairweather, Sire Relations Office. I understand congratulations are in order, and so the Office's housing scheme is open to you. For the file, the terms: {house}, a secure family house on Quince Row, with a nanny of ours living in. The rent is {rent} on the first of each month, which is the subsidised rate. You would give up your room in the Halls. You may build onto the house and fit it out at your own cost, and the mothers of your children may live there with you. Tell me whether you will take it.",
+    "offer": "{player}, good morning. Una Fairweather, Sire Relations Office. I understand congratulations are in order, and so the Office's housing scheme is open to you. For the file, the terms: {house}, a secure family house on Quince Row, with a nanny of ours living in. The rent is {rent} on the first of each month, which is the subsidized rate. You would give up your room in the Halls. You may build onto the house and fit it out at your own cost, and the mothers of your children may live there with you. Tell me whether you will take it.",
     "welcome": "The keys to {house} are logged to you as of this hour, and the wards know you. Your first rent of {rent} falls due on the first of next month. Rent not paid is carried for seven days and no longer. Zélie Marchand, your nanny, is already in the house. Welcome home, {player}.",
     "nannyHello": "Bonjour, monsieur. Zélie. I come with the house, non? Your room is aired, there is coffee, and I have put the bassinet where no draught will find it. Come home when you like. The door knows you now, and so do I.",
     "arrears": "{player}, for the file: this month's rent on {house} was not met. {amount} is now owing. It must be paid by {date}, or the Office takes the house back and everyone in it goes home. I would rather not write that letter. Pay it from the house's own accounts.",
@@ -94,7 +94,31 @@
     "meetLocationId": "health-centre",
     "hours": 2,
     "text": "Noted for the file, {player}: accepted. Before the keys are logged to you I show every Sire his house in person. Meet me at {place}, {date}, and I will walk you over to {house}, take you through it room by room and introduce you to your nanny. Two hours. Please be there.",
-    "missedText": "{player}, you were not at {place} at the hour we set. The house is not yours until you have been shown it. I have put the viewing down again: {date}, at {place}. Please be there this time."
+    "missedText": "{player}, you were not at {place} at the hour we set. The house is not yours until you have been shown it. I have put the viewing down again: {date}, at {place}. Please be there this time.",
+    "cutscene": {
+      "speakerId": "zelie",
+      "scenes": [
+        {
+          "locationId": "sire-house",
+          "castIds": [
+            "zelie"
+          ],
+          "lines": [
+            "*Una walks you back into the hearth room, keys in hand. A slim woman in a black dress with a white collar is waiting by the fire, and straightens as you come in.*",
+            "Una: This is Zélie Marchand, the nanny. She comes with the house. She will tell you the rest.",
+            "Zélie: Bonjour, monsieur. Welcome home. Before you run off to look at the bedrooms, let me tell you about the little ones. That is what this house is for, non?",
+            "Zélie: Every child of yours who lives here needs a cot. One cot for each, so build the nursery before you fill the house.",
+            "Zélie: Every child here is poorly, fretful, settled, thriving or blooming. I will tell you how each one is doing, and I will not soften it.",
+            "Zélie: Each week the children's keep is paid from your money. A child who is kept does a little better. One who goes short does worse, and the mother will not forgive it easily.",
+            "Zélie: How well a child can do depends on the house. A bare house can keep a baby settled, no more. Make it comfortable enough and they thrive. Make it a real home and they bloom.",
+            "Zélie: Comfort comes from the rooms you build: a nursery, a family room, the garden. And from a nanny who likes you, so be nice to me.",
+            "Zélie: A mother whose children thrive here will love you for it. One whose child goes without for too long will take her baby back to the creche, and herself with it.",
+            "Una: The ledger is yours to keep, the rent is due on the first of the month, and the keys are now registered to you.",
+            "Zélie: Bon. Now ask me anything you like."
+          ]
+        }
+      ]
+    }
   },
   "floors": [
     "First floor",
@@ -297,7 +321,7 @@
           "name": "The household bed",
           "cost": 270,
           "beds": 1,
-          "description": "The bed has been replaced with one built for more than two, as the Office catalogue puts it without blushing."
+          "description": "The bed has been replaced with one built for more than two, as the Office catalog puts it without blushing."
         }
       ]
     },

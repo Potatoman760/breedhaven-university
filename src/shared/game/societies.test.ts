@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { validateContentPack, type ContentPack, type GameState } from '../model'
 import { dayAgenda } from './agenda'
 import { locationOf } from './map'
-import { attendSociety, canAttendSociety, canJoinSociety, joinSociety, leaveSociety, societiesOpen, societyMeetingNow } from './societies'
+import { attendSociety, canAttendSociety, canJoinSociety, eventGate, joinSociety, leaveSociety, meetingsAttended, nextMeeting, societiesOpen, societyMeetingNow } from './societies'
 import { createInitialState } from './state'
 import { rawFixture } from './testFixture'
 import { nextUp } from './upcoming'
@@ -20,7 +20,18 @@ const content: ContentPack = validateContentPack({
     maxJoined: 2,
     energy: 5,
     societies: [
-      { id: 'chess', name: 'the Chess Club', description: 'Chess.', locationId: 'home', weekday: 'Three', startHour: 12, stats: ['intelligence'], memberIds: ['ana'] },
+      {
+        id: 'chess',
+        name: 'the Chess Club',
+        description: 'Chess.',
+        locationId: 'home',
+        weekday: 'Three',
+        startHour: 12,
+        stats: ['intelligence'],
+        memberIds: ['ana'],
+        syllabus: ['Openings.', 'Endgames.'],
+        adultEvents: [{ meeting: 2, name: 'strip chess', intro: { speakerId: 'ana', scenes: [{ locationId: 'home', lines: ['Ana: Check.'] }] }, direction: 'Every piece taken costs a garment.' }]
+      },
       { id: 'choir', name: 'the Choir', description: 'Singing.', locationId: 'shop', weekday: 'Three', startHour: 12, stats: ['charisma'] },
       { id: 'walkers', name: 'the Walkers', description: 'Walking.', locationId: 'shop', weekday: 'Three', startHour: 13, stats: ['endurance', 'wisdom'] }
     ]
@@ -78,3 +89,35 @@ describe('a meeting', () => {
     expect(canAttendSociety(content, at(start, 1, 12, 'home'), 'chess').reasons).toEqual(['You do not belong to the Chess Club'])
   })
 })
+
+describe('what a meeting is about', () => {
+  it('follows the syllabus by his own meetings, so that he misses nothing by missing a week, and is a night of its own where one is set', () => {
+    expect(nextMeeting(content, start, 'chess')).toMatchObject({ number: 1, topic: 'Openings.' })
+    expect(nextMeeting(content, start, 'chess').event).toBeUndefined()
+    const once = { ...start, societyMeetings: ['chess:3', 'choir:3'] }
+    expect(meetingsAttended(once, 'chess')).toBe(1)
+    expect(nextMeeting(content, once, 'chess')).toMatchObject({ number: 2, topic: 'Endgames.', event: { name: 'strip chess' } })
+    // Past the end of it, a meeting is about nothing in particular.
+    expect(nextMeeting(content, { ...start, societyMeetings: ['chess:3', 'chess:10'] }, 'chess')).toEqual({ number: 3, topic: undefined, event: undefined })
+  })
+})
+
+describe('who a night frees', () => {
+  const night = {
+    meeting: 3,
+    name: 'the confession',
+    intro: { speakerId: 'ana', scenes: [{ locationId: 'home', lines: ['Ana: I want this.'] }] },
+    direction: 'Ana wants him; Bea is not ready.',
+    reserved: [{ loveInterestId: 'bea', ifIntimate: { intro: { speakerId: 'ana', scenes: [{ locationId: 'home', lines: ['Bea: Me too.'] }] }, direction: 'Both want him.' } }]
+  }
+
+  it('frees everyone but whoever it holds to her own wishes, until he has been to bed with her, when it is told her way', () => {
+    expect(eventGate(start, night, ['ana', 'bea'])).toMatchObject({ direction: 'Ana wants him; Bea is not ready.', free: ['ana'] })
+    const been = { ...start, timesIntimate: { bea: 1 } }
+    expect(eventGate(been, night, ['ana', 'bea'])).toMatchObject({ direction: 'Both want him.', free: ['ana', 'bea'] })
+    expect(eventGate(been, night, ['ana', 'bea']).intro.scenes[0].lines).toEqual(['Bea: Me too.'])
+    // Without her there, it is the night as written, and everyone there is free.
+    expect(eventGate(start, night, ['ana'])).toMatchObject({ direction: 'Ana wants him; Bea is not ready.', free: ['ana'] })
+  })
+})
+

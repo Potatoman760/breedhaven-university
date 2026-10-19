@@ -124,7 +124,7 @@ export function studyPlaces(content: ContentPack, state: GameState, course: Cour
     const location = content.locations.find((l) => l.id === place.locationId)
     return !location || isOpenFor(content.calendar, location, state.time, grading.studyHours)
   }
-  return [...fixed, { name: 'My own room', locationId: content.newGame.room?.locationId ?? content.newGame.locationId, own: true }, ...classmates].filter(open)
+  return [...fixed, { name: 'My room', locationId: content.newGame.room?.locationId ?? content.newGame.locationId, own: true }, ...classmates].filter(open)
 }
 
 /** The outing a session of study is: a couple of hours on one course at one place. */

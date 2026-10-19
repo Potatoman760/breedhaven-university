@@ -15,7 +15,6 @@ const course = (id: string, number: string, title: string, startHour: number, mo
   description: '',
   subject: title,
   code: number.split(' ')[0],
-  level: 1,
   general: false,
   stats: ['wisdom'],
   studentIds: [],
@@ -31,7 +30,7 @@ const state: GameState = {
 describe('asking for his courses to be chosen', () => {
   it('shows the LLM the catalogue: each course, when it meets and who is in it, and what he said', () => {
     const { system, user } = buildCoursePickPrompt(content, state, 'I want to major in biology')
-    expect(system).toContain('Choose 2')
+    expect(system).toContain('Choose exactly 2.')
     expect(user).toContain('He says: "I want to major in biology"')
     expect(user).toContain('- RID 101: Riddles (Riddles; trains wisdom). Meets Two 08:00. With Ana.')
     expect(user).toContain('- BIO 201: Biology')

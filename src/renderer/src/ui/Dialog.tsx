@@ -16,6 +16,8 @@ interface DialogProps {
   ornate?: boolean
   /** Leaves out the Close button in its heading, for a dialog whose own buttons include the way out. Escape and a press outside still close it. */
   noClose?: boolean
+  /** A class of its own, for a dialog sized to what it holds. */
+  className?: string
   children: ReactNode
 }
 
@@ -47,10 +49,10 @@ export function Overlay({ onClose, sounds = ['open', 'close'], children }: { onC
 }
 
 /** A framed parchment dialog over a dimmed screen. */
-export function Dialog({ title, note, onClose, narrow, wide, noClose, ornate, sounds, children }: DialogProps) {
+export function Dialog({ title, note, onClose, narrow, wide, noClose, ornate, sounds, className, children }: DialogProps) {
   return (
     <Overlay onClose={onClose} sounds={sounds}>
-      <div className={['dialog', narrow ? 'narrow' : wide ? 'wide' : '', ornate && 'ornate'].filter(Boolean).join(' ')}>
+      <div className={['dialog', narrow ? 'narrow' : wide ? 'wide' : '', ornate && 'ornate', className].filter(Boolean).join(' ')}>
         <div className="dialog-head">
           <h1>
             {title}

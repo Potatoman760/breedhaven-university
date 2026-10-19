@@ -87,6 +87,8 @@ export const OutfitSchema = z.object({
   sprites: z.record(z.string(), SpriteSchema).default({}),
   /** Drawn pregnant. Worn in its parent's place once a pregnancy shows, and not before. */
   pregnant: z.boolean().default(false),
+  /** Worn only where the content puts her in it, as a cutscene of a society's night does: never offered to the LLM to choose. */
+  oneOff: z.boolean().optional(),
 });
 export type Outfit = z.infer<typeof OutfitSchema>;
 
@@ -434,6 +436,11 @@ export const LoveInterestSchema = z.object({
   ai: LoveInterestAiSchema.prefault({}),
 });
 export type LoveInterest = z.infer<typeof LoveInterestSchema>;
+
+/** A student's year as an American university says it: "sophomore", or "graduate student" from the fifth on. */
+export function classYear(level: number): string {
+  return ["freshman", "sophomore", "junior", "senior"][level - 1] ?? "graduate student";
+}
 
 /** Whether a character is a student, a teacher, a love interest from outside the University, or an NPC. */
 export function kindOf(

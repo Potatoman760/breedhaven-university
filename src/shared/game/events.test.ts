@@ -110,7 +110,7 @@ describe('buildEventPrompt', () => {
     expect(user).toContain('- the Feast: 1 B')
     expect(user).toContain('- Town: A small town.')
     expect(user).toContain(
-      'Today is Two, 2 A, Year 1.\nInvent 2 new events that start after today and no later than Three, 1 A, Year 2.'
+      'Today is Two, 2 A.\nInvent 2 new events that start after today and no later than Three, 1 A.'
     )
   })
 })

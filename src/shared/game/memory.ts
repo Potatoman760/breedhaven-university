@@ -4,7 +4,7 @@ import { describeBonds } from './bonds'
 import { stageFor } from './relationships'
 import { firstNames, sceneCast, sceneWitnesses } from './scene'
 import { describeAppeal } from './stats'
-import { feltChange } from './modifiers'
+import { feltChange, trustOf } from './modifiers'
 import { hiddenFacts } from './facts'
 import { RELATIONS, relationBetween, type Relation } from './rapport'
 
@@ -125,7 +125,7 @@ export function buildSummaryPrompt(input: SummaryInput): { system: string; user:
         `- ${li.personality}`,
         ...content.traits.filter((t) => li.traitIds.includes(t.id)).map((t) => `- ${t.name}: ${t.definition}`),
         li.admires.length > 0 ? `- She is drawn to ${li.admires.join(' and ')} in a man. ${describeAppeal(state, li).join(' ') || `${player} is ordinary in that so far.`}` : '',
-        `- With ${player} she is at the stage "${stageFor(content.relationships, rel.affection).name}": affection ${rel.affection}, trust ${rel.trust}, desire ${rel.desire}, each of ${max}.`,
+        `- With ${player} she is at the stage "${stageFor(content.relationships, rel.affection).name}": affection ${rel.affection}, trust ${trustOf(content, state, forId)}, desire ${rel.desire}, each of ${max}.`,
         ...describeBonds(content, state, forId, otherIds).map((line) => `- ${line}`),
         // How she stood with each of the others before this scene, so that what changed is told from what did not.
         ...(group
@@ -269,12 +269,13 @@ export function sceneRapport(state: GameState, presentIds: string[], said: { id:
  * relationship moves: by what she made of the time, not by the time. Each stays within
  * its scale. Nothing for anyone the game keeps no feelings for.
  */
-export function applyFeelings(content: ContentPack, state: GameState, loveInterestId: string, feelings: Feelings, asGiven = false): GameState {
+export function applyFeelings(content: ContentPack, state: GameState, loveInterestId: string, feelings: Feelings, asGiven = false, out = false): GameState {
   const rel = state.relationships[loveInterestId]
   if (!rel) return state
   const within = (value: number) => Math.max(0, Math.min(content.relationships.meterMax, value))
   // What he has learnt and what he has taken change what a scene is worth; a reckoning that is meant to cost what it costs is `asGiven`.
-  const change = (meter: 'affection' | 'trust' | 'desire') => (asGiven ? feelings[meter] : feltChange(content, state, loveInterestId, meter, feelings[meter]))
+  // `out`: the scene was one she was out with him.
+  const change = (meter: 'affection' | 'trust' | 'desire') => (asGiven ? feelings[meter] : feltChange(content, state, loveInterestId, meter, feelings[meter], out))
   return {
     ...state,
     relationships: {

@@ -35,10 +35,10 @@
       "Writes a small charm in the foam.",
       "Enforces \"no hexing after nine\" with a wooden spoon."
     ],
-    "backstory": "Wren was a ward-setter for the council before she bought a failing café and made it the place everyone revises in. The booths are her own work.",
+    "backstory": "Wren was a ward-setter for the council before she bought a failing café and made it the place everyone studies in. The booths are her own work.",
     "knowledge": [
       "Who studies here, who is behind, and who is sitting with whom.",
-      "How the warded booths work and what may be practised in them."
+      "How the warded booths work and what may be practiced in them."
     ],
     "extraInstructions": "Wren is an employer and treats the people who work for her as staff: fair, direct about what she expects, and not interested in excuses after the fact."
   }

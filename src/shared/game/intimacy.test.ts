@@ -45,6 +45,9 @@ describe('whether she will', () => {
     expect(describeSexGate(content, friend(10), a)[0]).toContain('You do not want Pat enough yet')
     expect(sexGate(content, friend(30), a)).toEqual({ open: true })
     expect(sexGate(content, known(start, 'ana', 25), a)).toEqual({ open: true })
+    // In a scene where nothing holds anyone back, as a society's night, it is open to her whoever he is to her.
+    expect(sexGate(content, start, a, true)).toEqual({ open: true })
+    expect(describeSexGate(content, start, a, false, true).join(' ')).not.toContain('only just met')
   })
 
   it('asks more of a woman who holds back, and nothing of one who is easy', () => {

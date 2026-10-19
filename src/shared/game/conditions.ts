@@ -3,7 +3,7 @@ import { toDate } from './calendar'
 import { eventsOn } from './events'
 import { stageFor, stageRank } from './relationships'
 import { affectionGain, trainStat } from './stats'
-import { addBoon, feltChange } from './modifiers'
+import { addBoon, feltChange, trustOf } from './modifiers'
 
 export interface RuleContext {
   state: GameState
@@ -32,8 +32,9 @@ export function evaluateCondition(c: Condition, ctx: RuleContext): boolean {
     case 'energy':
       return state.player.energy >= c.min
     case 'meter': {
-      const rel = state.relationships[c.loveInterestId ?? ctx.loveInterestId ?? '']
-      return rel !== undefined && rel[c.meter] >= c.min
+      const id = c.loveInterestId ?? ctx.loveInterestId ?? ''
+      const rel = state.relationships[id]
+      return rel !== undefined && (c.meter === 'trust' ? trustOf(content, state, id) : rel[c.meter]) >= c.min
     }
     case 'stage': {
       const rel = state.relationships[c.loveInterestId ?? ctx.loveInterestId ?? '']

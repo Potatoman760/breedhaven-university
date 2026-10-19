@@ -50,7 +50,7 @@ export function OutingDialog({ content, state, outing: asked, onGo, onClose }: P
       )}
       {outing.studyCourseId && (
         <p className="hint">
-          It is worth {studyPoints(content, outing)} points in the course{outing.ownRoom ? ', one of them for the quiet of your own room' : ''}.
+          It is worth {studyPoints(content, outing)} points in the course{outing.ownRoom ? ', one of them for the quiet of your room' : ''}.
         </p>
       )}
       {outing.withIds.length === 0 && !outing.dropIn && (

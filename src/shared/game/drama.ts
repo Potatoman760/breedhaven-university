@@ -10,6 +10,7 @@ import { firstNames, hasMet, sceneCast } from './scene'
 import { appealLevel } from './stats'
 import { factor } from './modifiers'
 import { seedOf } from './seed'
+import { sceneRelicUses } from './relics'
 
 /**
  * The drama engine. When the player starts a scene it weighs what is simmering around
@@ -30,7 +31,9 @@ export interface DramaContext {
  * Whether the scene is somewhere nobody walks in: a private location (a residence hall),
  * or a room of someone's own. There is no drama there, planned or arriving.
  */
-export function inPrivate(content: ContentPack, state: GameState, scene: Pick<Scene, 'roomOf'>): boolean {
+export function inPrivate(content: ContentPack, state: GameState, scene: Pick<Scene, 'roomOf' | 'relicsUsed'>): boolean {
+  // Time stopped for everyone else is as good as a locked door.
+  if (sceneRelicUses(content, scene).includes('stillness')) return true
   return scene.roomOf !== undefined || content.locations.find((l) => l.id === state.locationId)?.private === true
 }
 

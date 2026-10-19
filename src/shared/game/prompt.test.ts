@@ -21,7 +21,7 @@ describe('buildCharacterPrompt', () => {
 
   it('sets the scene from the game state', () => {
     const text = prompt(start())
-    expect(text).toContain('It is 06:00 (Day) on Two, 2 A, Year 1.')
+    expect(text).toContain('It is 06:00 (Day) on Two, 2 A.')
     expect(text).toContain('You and Pat are at Home.')
     expect(prompt({ ...start(), time: 34 })).toContain('Today is the Feast.')
   })

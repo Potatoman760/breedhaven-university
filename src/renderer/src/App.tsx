@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   acceptBond,
   ambienceAt,
@@ -19,7 +19,9 @@ import {
   useAbility,
   newSkills,
   tellSkills,
-  hasSkill,
+  toldOf,
+  skillLevel,
+  devotedMothers,
   intuitTaste,
   lessonTopic,
   spendOnFocus,
@@ -36,6 +38,14 @@ import {
   scheduleDescent,
   attendDescent,
   practiceRun,
+  nextMeeting,
+  eventGate,
+  toggleRelic,
+  useRelic,
+  relicsHeld,
+  canUseRelic,
+  cutsceneBeats,
+  movingInScene,
   startRun,
   sendHousingOffer,
   settleHousehold,
@@ -145,7 +155,7 @@ import {
   joinSociety,
   societyPeople
 } from '../../shared/game'
-import { MAX_SCENE_CAST, type Activity, type ContentPack, type ExamKind, type GameState, type Intro, type PostPlan, type Scene } from '../../shared/model'
+import { MAX_SCENE_CAST, type Activity, type ContentPack, type ExamKind, type GameState, type Intro, type PostPlan, type Relic, type RelicUse, type Scene } from '../../shared/model'
 import { CHAT_CANCELLED } from '../../shared/ipc'
 import { AUTO_SLOT_ID, type SaveData } from '../../shared/saves'
 import { errorMessage } from './errors'
@@ -161,7 +171,6 @@ import { HelpPanel } from './ui/HelpPanel'
 import { BelowTour } from './ui/BelowTour'
 import { Bag } from './ui/Bag'
 import { HouseView } from './ui/house/HouseView'
-import { ContentEditor } from './ui/editor/ContentEditor'
 import { CoursesView } from './ui/CoursesView'
 import { DayView } from './ui/DayView'
 import { GrandButton } from './ui/GrandButton'
@@ -179,7 +188,12 @@ import { PokerView } from './ui/PokerView'
 import { PartyDialog } from './ui/PartyDialog'
 import type { Panel } from './ui/panels'
 import { SceneView } from './ui/SceneView'
+import { RelicMoment } from './ui/RelicMoment'
 import { SummaryView, type SceneSummary } from './ui/SummaryView'
+
+// The content editor is the developer's own: it is there when the game is run from its source, and a built game leaves
+// it out altogether, its code with it.
+const ContentEditor = import.meta.env.DEV ? lazy(() => import('./ui/editor/ContentEditor').then((module) => ({ default: module.ContentEditor }))) : undefined
 
 // Where it is kept that the player has said he is an adult.
 const OF_AGE_KEY = 'breedhaven.ofAge'
@@ -234,8 +248,13 @@ export function App() {
       }
     })
 
-  if (editing) return <ContentEditor content={content} onContent={setContent} onClose={() => setEditing(false)} />
-  if (!session) return <TitleScreen content={content} onStart={start} onEdit={() => setEditing(true)} />
+  if (editing && ContentEditor)
+    return (
+      <Suspense fallback={null}>
+        <ContentEditor content={content} onContent={setContent} onClose={() => setEditing(false)} />
+      </Suspense>
+    )
+  if (!session) return <TitleScreen content={content} onStart={start} onEdit={ContentEditor ? () => setEditing(true) : undefined} />
   return (
     <Game
       key={session.id}
@@ -330,6 +349,9 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   }, [notice, scene])
   const [lastPrompt, setLastPrompt] = useState('')
   const [panel, setPanel] = useState<Panel | null>(null)
+  // A relic just used in the scene, shown rising over it before the scene goes on.
+  const [relicMoment, setRelicMoment] = useState<(Relic & { use: RelicUse }) | null>(null)
+  const endRelicMoment = useCallback(() => setRelicMoment(null), [])
   // Confirmation of the plan just accepted, shown until the next line is said.
   const [agreed, setAgreed] = useState('')
   // Something the player typed to do, worked out and waiting for a yes.
@@ -471,13 +493,20 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setState((current) => scheduleBirths(content, current).state)
   }, [idle, over, state, content])
 
+  // Where he has learnt it, the mothers of his children want him as much as a woman can: kept so between scenes.
+  useEffect(() => {
+    if (!idle || devotedMothers(content, state) === state) return
+    setState((current) => devotedMothers(content, current))
+  }, [idle, state, content])
+
   // Getting far enough in a course teaches him something: he is told once, when it happens.
   useEffect(() => {
     if (!idle) return
     const earned = newSkills(content, state)
     if (earned.length === 0) return
-    setState((current) => tellSkills(current, earned.map((skill) => skill.id)))
-    setNotice(earned.map((skill) => `New skill: ${skill.name}. ${skill.description}`).join(' '))
+    setState((current) => tellSkills(current, earned.flatMap(toldOf)))
+    // One he already had and has taken further is improved, not new.
+    setNotice(earned.map((skill) => `${skill.level === 2 && state.skillsTold.includes(skill.id) ? 'Skill improved' : 'New skill'}: ${skill.name}${skill.level === 2 ? ' II' : ''}. ${skill.description}`).join(' '))
   }, [idle, state, content])
 
   // Once he has said yes to the house, the officer sets an hour to show him round it, and sets another if he does not come.
@@ -560,7 +589,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
    * Says a line in the scene, or with no line has the character open it. `from` and `at`
    * let a caller pass a scene and state it has just changed.
    */
-  async function send(text?: string, said: Scene | null = scene, when: GameState = state) {
+  async function send(text?: string, said: Scene | null = scene, when: GameState = state, ask?: string) {
     if (!said) return
     // Kept so that the line, and whatever it leads to, can be taken back.
     if (text !== undefined) setTurns((kept) => [...kept, { state: when, scene: said, text }].slice(-MAX_TURNS_KEPT))
@@ -571,8 +600,14 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     if (arrival) setState((current) => ({ ...current, dramaDay: arrival.state.dramaDay }))
     // The view the player has picked goes along, so the character knows exactly where they are.
     // Someone walking in as he speaks is told to the model beside his line, where it is not lost among the rest.
-    const cue = arrival && from.drama ? arrivalCue(content, from.drama) : undefined
-    const asked: Scene = { ...from, backgroundId: from.viewId ?? backgroundId ?? from.backgroundId, messages: text === undefined ? from.messages : [...from.messages, { role: 'user', content: text, ...(cue && { cue }) }] }
+    // And what he is asking, when the line was one of the text box's suggestions.
+    // And what a relic he has just used has done.
+    const cue = [arrival && from.drama ? arrivalCue(content, from.drama) : undefined, ask].filter(Boolean).join(' ') || undefined
+    const asked: Scene = {
+      ...from,
+      backgroundId: from.viewId ?? backgroundId ?? from.backgroundId,
+      messages: text === undefined ? from.messages : [...from.messages, { role: 'user', content: text, ...(cue && { cue }) }]
+    }
     setScene(asked)
     setNotice('')
     setAgreed(arrival?.notice ?? '')
@@ -634,7 +669,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
             conceived: [...new Set([...asked.conceived, ...conceived])]
           },
           response.look
-        ), response.looks), response.comfort))
+        ), response.looks), response.comfort, skillLevel(content, at, 'comfort') === 2 ? 2 : 1))
       )
       setRolls(response.rolls)
       // Whoever gave him her Bloomr can be messaged from now on.
@@ -678,14 +713,14 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
    * where the scene went, who left, what was learned or given), and the scene goes on from
    * the new line. Nothing is undone until this is called: looking back is only looking.
    */
-  function redoFrom(turnsBack: number, text: string) {
+  function redoFrom(turnsBack: number, text: string, cue?: string) {
     const turn = turns[turns.length - turnsBack]
     if (!turn || busy) return
     const then = rewound(turn, state)
     setTurns(turns.slice(0, turns.length - turnsBack))
     setState(then)
     setEnded(false)
-    void send(text, turn.scene, then)
+    void send(text, turn.scene, then, cue)
   }
 
   /** Turns up for a plan made earlier, which opens a scene with everyone it was made with. */
@@ -703,7 +738,9 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       const shown = attendViewing(content, at, appointmentId)
       setNotice('')
       setState(shown.state)
-      setScene(shown.scene)
+      // The nanny tells him first how a child does in the house, and then he can ask her what he likes.
+      if (shown.cutscene) setCutscene({ intro: shown.cutscene, then: () => setScene(shown.scene) })
+      else setScene(shown.scene)
       return
     }
     // And being shown the way down: what she has to tell him, and then how a way down is gone about.
@@ -723,6 +760,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       beats: [{ activityName: appointment.title, locationName: placeName(at) }],
       messages: [],
       planned: true,
+      outing: true,
       gifts: [], conceived: [], departed: [], npc: false,
       baseline: sceneBaseline(at, appointment.loveInterestId, appointment.companionIds)
     }, after)
@@ -775,6 +813,18 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   const [belowTour, setBelowTour] = useState(false)
   // The first look round's second half, round the day's choices: only ever straight after the first half, never kept.
   const [dayTour, setDayTour] = useState(false)
+  // Someone who has just moved in, waiting on the house to be put away for the hour with her in her new room.
+  const [welcome, setWelcome] = useState<{ id: string; key: string } | null>(null)
+  useEffect(() => {
+    if (!welcome) return
+    setWelcome(null)
+    const shown = movingInScene(content, state, welcome.id, welcome.key)
+    if (!shown) return
+    setPanel(null)
+    setNotice('')
+    setState(shown.state)
+    setScene(shown.scene)
+  }, [welcome])
   const [practice, setPractice] = useState<GameState | null>(null)
   /** Goes to a part of an event: he is taken there, reads its cutscene if it has one, and its scene begins. */
   function attendPart(eventId: string, partId: string) {
@@ -881,36 +931,57 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   /** Goes to a meeting of a society of his: with members of it there, the meeting is a scene with them. */
   function attendMeeting(societyId: string, at: GameState = state, arrivedWith: string[] = []) {
     const society = societyOf(content, societyId)
+    // Which of his meetings this is, read before it counts: what it is about, and whether it is one of the nights.
+    const plan = nextMeeting(content, at, societyId)
     const after = attendSociety(content, at, societyId)
     setState(after)
     setNotice('')
     if (!society) return
     // Those of it who are there, and whoever came with him; the rest of the cast is left out, as in a class.
     const there = societyPeople(society).filter((id) => locationOf(content, at, content.loveInterests.find((li) => li.id === id)!) === society.locationId)
-    const [leadId, ...companionIds] = [...new Set([...there, ...arrivedWith])].slice(0, MAX_SCENE_CAST)
-    if (!leadId) {
+    const present = [...new Set([...there, ...arrivedWith])].slice(0, MAX_SCENE_CAST)
+    if (present.length === 0) {
       setNotice(`Nobody you know came to ${society.name} tonight.`)
       return
     }
-    setScene({
+    const { event, topic } = plan
+    // One of its nights: how it goes for those who are there. Whoever it holds back leaves once it is set up, so that the
+    // scene after is only those nothing holds back in it.
+    const gate = event && eventGate(at, event, present)
+    const [leadId, ...companionIds] = gate ? gate.free : present
+    if (!leadId) {
+      if (gate) setCutscene({ intro: gate.intro, then: () => undefined })
+      return
+    }
+    // Everyone goes on from the setup as it left them: stripped, and with the face it gave her.
+    const left = gate ? (cutsceneBeats(gate.intro, content.loveInterests).at(-1)?.looks ?? {}) : {}
+    const meeting: Scene = {
       loveInterestId: leadId,
       companionIds,
-      nsfw: false,
+      nsfw: event !== undefined,
+      uninhibited: gate?.free,
+      outfitId: left[leadId]?.outfitId,
+      expression: left[leadId]?.expression,
+      looks: Object.fromEntries(companionIds.filter((id) => left[id]).map((id) => [id, left[id]])),
       beats: [
         {
-          activityName: `A meeting of ${society.name}`,
+          activityName: event ? `${society.name}: ${event.name}` : `A meeting of ${society.name}`,
           locationName: placeName(at),
           description: society.description,
-          direction:
-            `This is the weekly meeting of ${society.name}, which ${at.player.name} has joined; it runs for an hour, and by the end of this ` +
-            `scene it is over and everyone is free to go.`
+          direction: event && gate
+            ? `This is ${event.name}, a night of ${society.name}, which ${at.player.name} has joined. ${gate.direction} Everyone here is willing tonight; how far it goes is up to ${at.player.name}.`
+            : `This is the weekly meeting of ${society.name}, which ${at.player.name} has joined; it runs for an hour, and by the end of this ` +
+              `scene it is over and everyone is free to go.${topic ? ` Tonight: ${topic}` : ''}`
         }
       ],
       messages: [],
       societyId,
       gifts: [], conceived: [], departed: [], npc: false,
       baseline: sceneBaseline(at, leadId, companionIds)
-    })
+    }
+    // A night of its own is set up in writing first, and then it is his to play.
+    if (gate) setCutscene({ intro: gate.intro, then: () => setScene(meeting) })
+    else setScene(meeting)
   }
 
   /** Goes to the societies' fair: he is taken to it, and it counts as been to. */
@@ -1044,17 +1115,20 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       }
       // How each of them feels about him now is what she made of the scene, and nothing else moves it.
       // A scene in which they had sex is counted for each of them, once.
-      const moved = addIntimacy(Object.entries(result.feelings).reduce((current, [id, feelings]) => applyFeelings(content, current, id, feelings), state), result.intimate)
+      const moved = addIntimacy(Object.entries(result.feelings).reduce((current, [id, feelings]) => applyFeelings(content, current, id, feelings, false, scene.outing === true), state), result.intimate)
       // What he paid for along the way comes out of his pocket now.
       const felt = applySpending(moved, result.spending)
       // With an eye for taste, time with her tells him one more thing she likes or does not, besides what came out in the talk.
-      const noticed =
-        !scene.npc && hasSkill(content, state, 'tastes')
-          ? sceneWitnesses(scene).flatMap((id) => {
-              const factId = intuitTaste(content, state, id, result.revealed.filter((r) => r.loveInterestId === id).map((r) => r.factId))
-              return factId ? [{ loveInterestId: id, factId }] : []
-            })
-          : []
+      // Further on, he picks up two.
+      const eye = scene.npc ? 0 : skillLevel(content, state, 'tastes')
+      const noticed = sceneWitnesses(scene).flatMap((id) => {
+        const found: string[] = []
+        for (let n = 0; n < eye; n++) {
+          const factId = intuitTaste(content, state, id, [...result.revealed.filter((r) => r.loveInterestId === id).map((r) => r.factId), ...found])
+          if (factId) found.push(factId)
+        }
+        return found.map((factId) => ({ loveInterestId: id, factId }))
+      })
       const revealed = [...result.revealed, ...noticed]
       setSummary({
         scene,
@@ -1205,7 +1279,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           aside={aside}
           onDismissAside={() => setAside('')}
           ended={ended}
-          onSend={send}
+          onSend={(text, cue) => send(text, scene, state, cue)}
           onSkip={skipScene}
           onNameChild={(name) => {
             // With no name given he keeps hers. Either way it is settled, and he is not asked again.
@@ -1247,7 +1321,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       ) : panel?.kind === 'fair' ? (
         <FairView content={content} state={state} onHello={sayHelloAtFair} onTalk={talkAtFair} onJoin={(id) => setState((current) => joinSociety(content, current, id))} onLeave={close} />
       ) : panel?.kind === 'house' ? (
-        <HouseView content={content} state={state} onChange={applyUpdate} onClose={close} />
+        <HouseView content={content} state={state} onChange={applyUpdate} onClose={close} onMovedIn={(id, key) => setWelcome({ id, key })} />
       ) : panel?.kind === 'poker' && content.poker ? (
         <PokerView
           content={content}
@@ -1298,6 +1372,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         </>
       )}
 
+      {relicMoment && <RelicMoment relic={relicMoment} onDone={endRelicMoment} />}
+
       {panel?.kind === 'gifts' && scene && partner && (
         <Dialog title="Your bag" onClose={close} sounds={['bagOpen', 'bagClose']} ornate>
           <Bag
@@ -1311,6 +1387,19 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
             onGive={give}
             onUseItem={(itemId, onId) => useInScene(content.items.find((item) => item.id === itemId)?.name ?? itemId, useItem(content, state, itemId, onId), onId)}
             onAbility={(skillId, onId) => useInScene(content.skills.find((skill) => skill.id === skillId)?.name ?? skillId, useAbility(content, state, skillId, onId), onId)}
+            onToggleRelic={(relicId) => setState((current) => toggleRelic(current, relicId))}
+            canUseRelic={(relicId) => canUseRelic(content, state, scene, relicId)}
+            onUseRelic={(relicId) => {
+              // What it does is done now, and it is usually his turn: her reply is what she makes of it.
+              const used = useRelic(content, state, scene, relicId)
+              if (used.scene === scene || busy) return
+              const relic = relicsHeld(content, state).find((one) => one.id === relicId)
+              setState(used.state)
+              setPanel(null)
+              if (relic?.use) setRelicMoment(relic as Relic & { use: RelicUse })
+              if (used.line) void send(used.line, used.scene, used.state, used.cue)
+              else setScene(used.scene)
+            }}
           />
         </Dialog>
       )}
@@ -1318,7 +1407,13 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       {/* Out of a scene, a thing is used on himself: what is for a woman waits until he is with her. */}
       {panel?.kind === 'bag' && !scene && (
         <Dialog title="Your bag" onClose={close} sounds={['bagOpen', 'bagClose']} ornate>
-          <Bag content={content} state={state} onUseItem={(itemId) => setState((current) => useItem(content, current, itemId))} onAbility={(skillId) => setState((current) => useAbility(content, current, skillId))} />
+          <Bag
+            content={content}
+            state={state}
+            onUseItem={(itemId) => setState((current) => useItem(content, current, itemId))}
+            onAbility={(skillId) => setState((current) => useAbility(content, current, skillId))}
+            onToggleRelic={(relicId) => setState((current) => toggleRelic(current, relicId))}
+          />
         </Dialog>
       )}
 

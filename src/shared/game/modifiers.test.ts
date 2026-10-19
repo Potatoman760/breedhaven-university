@@ -7,7 +7,9 @@ import { desireNeeded, sexGate } from './intimacy'
 import { shiftPay } from './jobs'
 import { canUse, carried, consume, giftReaction, giveGift, priceOf, useItem } from './market'
 import { applyFeelings } from './memory'
-import { addBoon, bonus, describeChange, factor, feltChange, inForce, liveBoons, skillsLearnt } from './modifiers'
+import { growTies, tieKey } from './bonds'
+import { devotedMothers } from './pregnancy'
+import { addBoon, bonus, describeChange, factor, feltChange, inForce, liveBoons, skillsLearnt, trustOf } from './modifiers'
 import { canConceive, conceive } from './pregnancy'
 import { canUseAbility, readyIn, skillsOf, useAbility } from './skills'
 import { createInitialState } from './state'
@@ -22,7 +24,6 @@ const course = (code: string): Course => ({
   description: '',
   subject: code,
   code,
-  level: 1,
   general: true,
   stats: ['wisdom'],
   studentIds: [],
@@ -31,7 +32,7 @@ const course = (code: string): Course => ({
 })
 const base = fixture()
 const [ana] = base.loveInterests
-const passive = (code: string, modifier: Modifier): Skill => ({ id: code.toLowerCase(), name: code, description: '', code, at: 30, passive: modifier })
+const passive = (code: string, modifier: Modifier): Skill => ({ id: code.toLowerCase(), name: code, description: '', code, courseId: code.toLowerCase(), at: 30, passive: modifier })
 
 /** The fixture with one skill, and a game in which he has it. */
 function learnt(skill: Skill, more: Partial<ContentPack> = {}): { content: ContentPack; state: GameState; plain: GameState } {
@@ -90,9 +91,33 @@ describe('what he has learnt', () => {
     // What is meant to cost what it costs is not softened.
     expect(applyFeelings(soft.content, known(soft.state, 'ana'), 'ana', { affection: -6, trust: -4, desire: 0, reason: '' }, true).relationships['ana']).toMatchObject({ affection: 14, trust: 16 })
 
-    const first = learnt(passive('LNG', { kind: 'firstScene', amount: 2 }))
-    expect(feltChange(first.content, first.state, 'ana', 'affection', 3)).toBe(6)
-    expect(feltChange(first.content, known(first.state, 'ana'), 'ana', 'affection', 3)).toBe(3)
+  })
+
+  it('has the women who share a scene with him grow closer faster', () => {
+    const { content, state, plain } = learnt(passive('BPS', { kind: 'bonds', amount: 1.5 }))
+    expect(growTies(content, plain, ['ana', 'bea']).ties[tieKey('ana', 'bea')]).toBe(5)
+    expect(growTies(content, state, ['ana', 'bea']).ties[tieKey('ana', 'bea')]).toBe(8)
+  })
+
+  it('has every mother of his child want him as much as a woman can, those he has and those to come', () => {
+    const { content, state, plain } = learnt(passive('RBI', { kind: 'devoted', amount: 1 }))
+    const mother = (s: GameState): GameState => ({ ...known(s, 'ana'), children: [{ motherId: 'ana', bornAt: 0, daughter: true, name: 'Kit' }] })
+    const without = mother(plain)
+    expect(devotedMothers(content, without)).toBe(without)
+    expect(devotedMothers(content, mother(state)).relationships['ana'].desire).toBe(content.relationships.meterMax)
+    // Nobody who has not had his child, and nothing to do twice.
+    expect(devotedMothers(content, known(state, 'ana'))).toEqual(known(state, 'ana'))
+    const done = devotedMothers(content, mother(state))
+    expect(devotedMothers(content, done)).toBe(done)
+  })
+
+  it('has every woman count his trust higher, met or not, for as long as he has it', () => {
+    const { content, state, plain } = learnt(passive('ENG', { kind: 'trustBonus', amount: 5 }))
+    const met = known(state, 'ana')
+    expect(trustOf(content, met, 'ana')).toBe(met.relationships['ana'].trust + 5)
+    expect(trustOf(content, known(plain, 'ana'), 'ana')).toBe(known(plain, 'ana').relationships['ana'].trust)
+    // Someone he meets later counts it from the first.
+    expect(trustOf(content, known(state, 'bea'), 'bea')).toBe(known(state, 'bea').relationships['bea'].trust + 5)
   })
 
   it('lowers what a woman needs to want him, for the women it is about', () => {
@@ -163,11 +188,11 @@ describe('what he carries and uses', () => {
     { id: 'sweets', name: 'Sweets', description: '', price: 0, icon: 'sweet', appearance: '', tags: [], lovedByAll: true },
     { id: 'rock', name: 'Rock', description: '', price: 0, icon: 'stone', appearance: '', tags: [], lovedByAll: false }
   ]
-  const brew: Skill = { id: 'brew', name: 'Brewing', description: '', code: 'WTC', at: 30, ability: { label: 'Brew', effects: [{ type: 'item', itemId: 'draught', count: 1 }], cooldownDays: 7, on: 'self' } }
+  const brew: Skill = { id: 'brew', name: 'Brewing', description: '', code: 'WTC', courseId: 'wtc', at: 30, ability: { label: 'Brew', effects: [{ type: 'item', itemId: 'draught', count: 1 }], cooldownDays: 7, on: 'self' } }
   const { content, state, plain } = learnt(brew, { items, pregnancy: PregnancyConfigSchema.parse({ chance: 1, birthControlChance: 0, periodDays: 0, recoveryDays: 8, birthLocationId: 'shop', stages: [{ id: 'early', name: 'with child', from: 0 }] }) })
 
   it('makes a thing when he has learnt to, and not again until its days are up', () => {
-    expect(canUseAbility(content, plain, 'brew')).toEqual({ ok: false, reasons: ['You have not learnt that'] })
+    expect(canUseAbility(content, plain, 'brew')).toEqual({ ok: false, reasons: ['You have not learned that'] })
     expect(canUseAbility(content, state, 'brew').ok).toBe(true)
     const made = useAbility(content, state, 'brew')
     expect(made.inventory).toEqual({ draught: 1 })

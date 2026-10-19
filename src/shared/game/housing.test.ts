@@ -13,6 +13,7 @@ import {
   describeHousehold,
   goToRoom,
   healthCap,
+  nextHealthStep,
   houseLayout,
   houseTotals,
   housingFacts,
@@ -183,6 +184,10 @@ describe('moving in', () => {
     expect(fitted.player.money).toBe(6)
     expect(houseTotals(pack.housing!, fitted)).toEqual({ beds: 1, cots: 4, comfort: 8, study: 0 })
     expect(healthCap(pack, fitted)).toBe(4)
+    // What the house would take for a child to do better, until it can do its best.
+    expect(nextHealthStep(pack, moved)).toMatchObject({ comfort: 4 })
+    expect(nextHealthStep(pack, built)).toMatchObject({ comfort: 8 })
+    expect(nextHealthStep(pack, fitted)).toBeUndefined()
     expect(canBuild(seen(fitted), fitted, 'nursery')).toEqual({ ok: false, reasons: ['There is nothing more to do to it'] })
     expect(fitted.housing.ledger.map((line) => line.amount)).toEqual([0, -8, -6])
     // What a room has been made into is said of it wherever the room is described.
@@ -279,7 +284,7 @@ describe('what the house costs', () => {
   it('is taken back when rent he owes is not found in the days of grace', () => {
     const short = settle(at(moved, 2))
     expect(short.state.housing).toMatchObject({ status: 'resident', arrears: 10, arrearsSince: 2 })
-    expect(courierThread(short.state, 'una').at(-1)?.text).toBe('You owe $10 by Three, 1 A, Year 2.')
+    expect(courierThread(short.state, 'una').at(-1)?.text).toBe('You owe $10 by Three, 1 A.')
     // Found in time, the file is in order again.
     const found = payArrears(seen(short.state), rich(short.state, 15))
     expect(found.player.money).toBe(5)
@@ -360,7 +365,10 @@ describe('what the house costs', () => {
 
   it('is told at the end of the year', () => {
     const screens = buildEpilogue(seen(home), at(home, 7))
-    expect(screens.find((screen) => screen.kind === 'home')).toMatchObject({ text: 'You kept Quince House, and Ana made her home there with you.', loveInterestIds: ['ana'] })
+    // Who shared it, and how the child raised in it was doing when the year ended.
+    const home7 = screens.find((screen) => screen.kind === 'home')
+    expect(home7).toMatchObject({ text: 'You kept Quince House, and Ana made her home there with you. The child raised there got by, but never thrived.', loveInterestIds: ['ana'] })
+    expect(home7?.details).toHaveLength(1)
     expect(screens.find((screen) => screen.kind === 'child')?.text).toContain('the two of you raised them together at Quince House')
   })
 })

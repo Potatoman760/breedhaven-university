@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   betSize,
   canPlayPoker,
   cardLabel,
   dealHand,
   decide,
+  equity,
+  skillLevel,
   netFor,
   options,
   playMove,
@@ -81,6 +83,22 @@ export function PokerView({ content, state, onSettle, onLeave }: Props) {
   const choice = yours ? options(hand, config) : undefined
   const choose = (what: PokerMove) => hand && move(playMove(hand, config, what), hand)
   const net = hand?.outcome ? netFor(hand, YOU) : 0
+  // With the odds worked out, his chance of taking the pot against whoever is still in, as it stands on his turn.
+  const reckons = skillLevel(content, state, 'odds') > 0
+  const odds = useMemo(() => {
+    if (!reckons || !yours || !hand) return undefined
+    const me = hand.seats.find((seat) => seat.id === YOU)!
+    const against = hand.seats.filter((seat) => seat.id !== YOU && !seat.folded).length
+    return Math.round(equity(me.hole, hand.board, against, Math.random, 600) * 100)
+  }, [reckons, yours, hand?.board.length, hand?.seats.filter((seat) => seat.folded).length, hand?.seats.find((seat) => seat.id === YOU)?.hole.join()])
+  // Further on he knows what to do with them: raise what is likely to win, call what the pot pays for, let go of the rest.
+  const advice = (() => {
+    if (odds === undefined || !choice || !hand || skillLevel(content, state, 'odds') < 2) return undefined
+    const chance = odds / 100
+    if (chance >= 0.6 && choice.canRaise) return `${choice.raiseLabel.toLowerCase()} it`
+    if (choice.toCall === 0) return 'check'
+    return chance >= choice.toCall / (potOf(hand) + choice.toCall) ? 'call' : 'fold'
+  })()
   const between = !hand || hand.outcome !== undefined
 
   // Everyone round the table, him at the bottom and the others clockwise from him, evenly.
@@ -124,6 +142,11 @@ export function PokerView({ content, state, onSettle, onLeave }: Props) {
         )}
         {yours && choice && (
           <>
+            {odds !== undefined && (
+              <span className="poker-odds" title="Your chance of winning this hand">
+                {odds}% to win{advice ? ` · ${advice}` : ''}
+              </span>
+            )}
             {choice.toCall > 0 && (
               <Button variant="quiet" onClick={() => choose('fold')}>
                 Fold

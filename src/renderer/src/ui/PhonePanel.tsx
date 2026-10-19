@@ -20,12 +20,9 @@ import {
   excuseShift,
   hoursPerWeek,
   hasSkill,
+  trustOf,
   skillGranting,
-  courseMembers,
-  describeMeetings,
   periodDay,
-  sexGate,
-  desireNeeded,
   onBirthControl,
   payBonus,
   npcAsCharacter,
@@ -815,11 +812,6 @@ function Jobs({ content, state, onChange, onMessage }: JobsProps) {
                   {stat} {job.requirements[stat]}
                 </span>
               ))}
-              {needs.length > 0 && config && config.bonusPerPoint > 0 && (
-                <span className="chip" title="Each point you have over what the job asks, in any stat it asks for, adds to what every shift pays.">
-                  +{Math.round(config.bonusPerPoint * 100)}% pay a point over, up to {Math.round(config.bonusCap * 100)}%
-                </span>
-              )}
               <CalendarCompare content={content} state={state} job={job} />
             </div>
             {!check.ok && <span className="pin-note">{check.reasons.join(' · ')}</span>}
@@ -950,6 +942,8 @@ function Societies({ content, state, onChange }: { content: ContentPack; state: 
 /** Where things stand with her, and what the player has found out so far. */
 function About({ content, state, li }: { content: ContentPack; state: GameState; li: LoveInterest }) {
   const rel = state.relationships[li.id] ?? { affection: 0, trust: 0, desire: 0 }
+  // Trust as she counts it, with whatever he has that adds to it.
+  const shown = (meter: (typeof METERS)[number]) => (meter === 'trust' ? trustOf(content, state, li.id) : rel[meter])
   const stage = stageFor(content.relationships, rel.affection)
   const memories = state.memories[li.id] ?? []
   const bond = bondOf(state, li.id)
@@ -960,17 +954,7 @@ function About({ content, state, li }: { content: ContentPack; state: GameState;
   const first = li.name.split(' ')[0]
   // A pack with no skills hides nothing: there would be no way to learn to see it.
   const can = (grant: SkillGrant) => skillGranting(content, grant) === undefined || hasSkill(content, state, grant)
-  const unknown = (grant: SkillGrant, label: string) => {
-    const skill = skillGranting(content, grant)
-    const course = state.courses.find((one) => one.code === skill?.code && (skill?.level === undefined || one.level === skill.level))
-    return (
-      <span className="chip unknown" title={skill ? `${skill.name} would tell you. ${course ? `${course.number}, ${course.title}` : skill.code} teaches it at ${skill.at} marks.` : undefined}>
-        {label} ?
-      </span>
-    )
-  }
-  const classes = state.courses.filter((course) => courseMembers(course).includes(li.id))
-  const periodName = (id: string) => content.calendar.periods.find((period) => period.id === id)?.name ?? id
+  const unknown = (label: string) => <span className="chip unknown">{label} ?</span>
   // Everyone she is close to, and everyone he has seen her with: what they are to each other shows once he has.
   const ties = content.loveInterests
     .filter((other) => other.id !== li.id && (tieOf(content, state, li.id, other.id) > 0 || knownRelation(state, li.id, other.id) !== undefined))
@@ -982,21 +966,14 @@ function About({ content, state, li }: { content: ContentPack; state: GameState;
       <div className="chips">
         <span className="chip madder">{stage.name}</span>
         {/* What he can only tell of her once he has learnt how: without the skill, the chip says where it is learnt. */}
-        {!can('desire')
-          ? unknown('desire', 'Desire needed')
-          : !sexGate(content, state, li).open && (
-              <span className="chip" title="She will not go to bed with you yet: not on the day you meet, and not until she wants you this much.">
-                Desire {state.relationships[li.id]?.desire ?? 0} of {desireNeeded(content, state, li)} needed
-              </span>
-            )}
         {content.pregnancy && !can('cycle')
-          ? unknown('cycle', 'Cycle')
+          ? unknown('Cycle')
           : periodDay(content, state, li.id) !== undefined && (
               <span className="chip" title="She cannot conceive while it lasts.">
                 On her period · day {periodDay(content, state, li.id)} of {content.pregnancy?.periodDays}
               </span>
             )}
-        {content.pregnancy && !can('contraception') && unknown('contraception', 'Birth control')}
+        {content.pregnancy && !can('contraception') && unknown('Birth control')}
         {content.pregnancy && can('contraception') && (
           <span className="chip" title={onBirthControl(content, state, li.id) ? 'She takes something against the Bloom, and a child is unlikely. Stopping is hers to decide: it is something to talk to her about.' : 'She has stopped taking anything against the Bloom: a child is very likely.'}>
             {onBirthControl(content, state, li.id) ? 'On birth control' : 'Off birth control'}
@@ -1021,33 +998,12 @@ function About({ content, state, li }: { content: ContentPack; state: GameState;
         <div key={meter} className="meter-row">
           <span>{meter}</span>
           <div className={`meter ${meter}`}>
-            <div style={{ width: `${(rel[meter] / content.relationships.meterMax) * 100}%` }} />
+            <div style={{ width: `${(shown(meter) / content.relationships.meterMax) * 100}%` }} />
           </div>
-          <strong>{rel[meter]}</strong>
+          <strong>{shown(meter)}</strong>
         </div>
       ))}
 
-      {skillGranting(content, 'schedule') && hasSkill(content, state, 'schedule') && (
-        <>
-          <h2>Her week</h2>
-          <ul className="her-week">
-            {li.schedule.map((entry, i) => (
-              <li key={i}>
-                <span className="caps">
-                  {entry.weekdays?.join(', ') ?? 'Every day'}
-                  {entry.periods ? ` · ${entry.periods.map(periodName).join(', ')}` : ''}
-                </span>{' '}
-                {content.locations.find((l) => l.id === entry.locationId)?.name ?? entry.locationId}
-              </li>
-            ))}
-            {classes.map((course) => (
-              <li key={course.id}>
-                <span className="caps">{course.number}</span> {describeMeetings(course)}
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
       <h2>
         What you know of her
         <span className="hint">

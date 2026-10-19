@@ -115,6 +115,10 @@ export const SceneSchema = z.object({
   companionIds: z.array(z.string()).max(MAX_SCENE_CAST - 1),
   /** Routes the scene's AI calls to the NSFW LLM. */
   nsfw: z.boolean(),
+  /** The relics he has used in it, by id: each once a scene, and at work in it from then on. */
+  relicsUsed: z.array(z.string()).optional(),
+  /** Those in it whom nothing holds back: whatever each would otherwise want first before going to bed with him is set aside, as at a society's adult event. */
+  uninhibited: z.array(z.string()).optional(),
   beats: z.array(SceneBeatSchema),
   messages: z.array(ChatMessageSchema),
   /** Gifts handed over during the scene, in order. */
@@ -132,6 +136,8 @@ export const SceneSchema = z.object({
   societyId: z.string().optional(),
   /** The scene is a plan he made with her, kept: a date. */
   planned: z.boolean().optional(),
+  /** She is out with him: a date kept, or an outing he asked her along to. */
+  outing: z.boolean().optional(),
   /** How comfortable each love interest in the scene last said she was, by id. For the LLM only. */
   comfort: z.record(z.string(), ComfortSchema).optional(),
   /** The scene is in this love interest's own room. */

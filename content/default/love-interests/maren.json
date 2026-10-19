@@ -4,7 +4,7 @@
   "role": "",
   "age": 19,
   "pronouns": "she/her",
-  "bio": "A foxkin from Veyra in head-to-toe pink gothic lolita, second-year Foreign Languages student, and the reason half her seminar now owns a parasol.",
+  "bio": "A foxkin from Veyra in head-to-toe pink gothic lolita, second-year Media and Communication student, and the reason half her seminar now owns a parasol.",
   "appearance": "A 19-year-old foxkin woman with warm tan skin on her face, torso and thighs and arms, Amber eyes, dark brows, full lips. Tousled, shoulder-length reddish-brown hair. Two large upright fox ears, russet with white fur inside, and a large bushy russet fox tail with a white tip curled behind her. A petite, feminine figure",
   "personality": "Sweet, girlish and openly delighted by pretty things: lace, ribbons, cake, a well-set tea table. She is cute on purpose and entirely sincere about it, and she is sharper than the frills suggest: she switches languages mid-thought and misses very little. Affectionate, a little vain about her outfits, and quick to pout when she is not taken seriously.",
   "traitIds": [
@@ -33,10 +33,10 @@
     {
       "id": "default",
       "name": "Usual clothes",
-      "description": "cute fully pink gothic lolita style dress, with cleavage",
+      "description": "Pink fantasy maid-inspired lolita dress: fitted corset bodice with pink ribbon lacing, white frilled sweetheart bust, puffed short sleeves with white cuffs, high-waisted flared mini skirt with layered pink and white ruffles, delicate lace trim, and pink bows at the neckline, chest, and sleeves.",
       "sprites": {
         "neutral": {
-          "image": "sprites/maren/default-neutral-2-cutout.webp",
+          "image": "sprites/maren/default-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
@@ -44,23 +44,23 @@
           "description": ""
         },
         "sad": {
-          "image": "sprites/maren/default-sad-2-cutout.webp",
+          "image": "sprites/maren/default-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/maren/default-angry-2-cutout-2.webp",
-          "description": ""
-        },
-        "embarrassed": {
-          "image": "sprites/maren/default-embarrassed-cutout-2.webp",
+          "image": "sprites/maren/default-angry-3-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/maren/default-surprised-2-cutout.webp",
+          "image": "sprites/maren/default-surprised-cutout.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/maren/default-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/maren/default-aroused-3-cutout.webp",
+          "image": "sprites/maren/default-aroused-5-cutout.webp",
           "description": ""
         }
       },
@@ -73,11 +73,11 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/maren/pregnant-neutral-3-cutout.webp",
+          "image": "sprites/maren/pregnant-neutral-6-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/maren/pregnant-happy-cutout.webp",
+          "image": "sprites/maren/pregnant-happy-2-cutout.webp",
           "description": ""
         },
         "sad": {
@@ -97,7 +97,7 @@
           "description": ""
         },
         "aroused": {
-          "image": "sprites/maren/pregnant-aroused-cutout.webp",
+          "image": "sprites/maren/pregnant-aroused-3-cutout.webp",
           "description": ""
         }
       },
@@ -106,10 +106,10 @@
     {
       "id": "nude",
       "name": "Nude",
-      "description": "nothing at all, completely nude",
+      "description": "nothing at all, completely nude, with red pubic hair",
       "sprites": {
         "neutral": {
-          "image": "sprites/maren/nude-neutral-cutout.webp",
+          "image": "sprites/maren/nude-neutral-2-cutout.webp",
           "description": ""
         },
         "happy": {
@@ -158,7 +158,7 @@
           "description": ""
         },
         "angry": {
-          "image": "sprites/maren/nude-pregnant-angry-cutout-2.webp",
+          "image": "sprites/maren/nude-pregnant-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
@@ -175,14 +175,42 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "lingerie",
+      "name": "Pink lace lingerie",
+      "description": "a pink lace bra, matching lace panties and a garter belt with little satin ribbon bows, and pale pink stockings",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/maren/lingerie-neutral-cutout.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true
+    },
+    {
+      "id": "lingerie-pregnant",
+      "name": "Pink lace lingerie, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "lingerie",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/maren/lingerie-pregnant-neutral-cutout.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true,
+      "oneOff": true
     }
   ],
   "defaultOutfitId": "default",
   "faceY": 14,
+  "imageSeed": 60,
   "stageHeight": 100,
   "partyRole": "hexer",
   "studies": {
-    "major": "LNG",
+    "major": "COM",
     "level": 2
   },
   "animations": [
@@ -195,35 +223,11 @@
       "loop": true
     },
     {
-      "id": "missionary",
-      "name": "Missionary",
-      "description": "",
-      "image": "sprites/maren/nsfw-missionary.webp",
-      "clip": "sprites/maren/nsfw-missionary.mp4",
-      "loop": true
-    },
-    {
       "id": "doggy",
       "name": "Doggy",
       "description": "",
       "image": "sprites/maren/nsfw-doggy.webp",
       "clip": "sprites/maren/nsfw-doggy.mp4",
-      "loop": true
-    },
-    {
-      "id": "cowgirl",
-      "name": "Cowgirl",
-      "description": "",
-      "image": "sprites/maren/nsfw-cowgirl.webp",
-      "clip": "sprites/maren/nsfw-cowgirl-2.mp4",
-      "loop": true
-    },
-    {
-      "id": "creampie",
-      "name": "Creampie",
-      "description": "",
-      "image": "sprites/maren/nsfw-creampie.webp",
-      "clip": "sprites/maren/nsfw-creampie.mp4",
       "loop": true
     },
     {
@@ -242,17 +246,24 @@
       "loop": true
     },
     {
-      "id": "pregnant-missionary",
-      "name": "Missionary, pregnant",
-      "description": "",
-      "image": "sprites/maren/nsfw-pregnant-missionary.webp",
-      "loop": true
-    },
-    {
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
       "image": "sprites/maren/nsfw-pregnant-doggy.webp",
+      "loop": true
+    },
+    {
+      "id": "pregnant-facial",
+      "name": "Facial, pregnant",
+      "description": "",
+      "image": "sprites/maren/nsfw-pregnant-facial.webp",
+      "loop": true
+    },
+    {
+      "id": "pregnant-missionary",
+      "name": "Missionary, pregnant",
+      "description": "",
+      "image": "sprites/maren/nsfw-pregnant-missionary.webp",
       "loop": true
     },
     {
@@ -270,10 +281,27 @@
       "loop": true
     },
     {
-      "id": "pregnant-facial",
-      "name": "Facial, pregnant",
+      "id": "missionary",
+      "name": "Missionary",
       "description": "",
-      "image": "sprites/maren/nsfw-pregnant-facial.webp",
+      "image": "sprites/maren/nsfw-missionary.webp",
+      "clip": "sprites/maren/nsfw-missionary.mp4",
+      "loop": true
+    },
+    {
+      "id": "cowgirl",
+      "name": "Cowgirl",
+      "description": "",
+      "image": "sprites/maren/nsfw-cowgirl.webp",
+      "clip": "sprites/maren/nsfw-cowgirl.mp4",
+      "loop": true
+    },
+    {
+      "id": "creampie",
+      "name": "Creampie",
+      "description": "",
+      "image": "sprites/maren/nsfw-creampie.webp",
+      "clip": "sprites/maren/nsfw-creampie.mp4",
       "loop": true
     }
   ],
@@ -349,8 +377,8 @@
     "locationId": "dormitories",
     "background": "generated/backgrounds/maren/view.webp"
   },
-  "birthPicture": "sprites/maren/birth.png",
-  "walkSprite": "sprites/maren/walk-cutout.png",
+  "birthPicture": "sprites/maren/birth.webp",
+  "walkSprite": "sprites/maren/walk-cutout.webp",
   "childNames": {
     "daughters": [
       "Kit",
@@ -374,7 +402,7 @@
       "Pouts and puffs her cheeks when teased, and forgives within the minute."
     ],
     "exampleDialogue": [],
-    "backstory": "Maren is a foxkin from Veyra, the daughter of two interpreters in the federation's diplomatic service. She grew up in a house where dinner was held in three languages and was fluent in four before she was twelve. She came to Breedhaven University to make the family trade her own, and speaks six languages now, two of them badly, which annoys her.\n\nShe found gothic lolita fashion at fifteen in a shop window in the Veyran capital and has not dressed any other way since: pink and black, lace, petticoats, ribbons threaded round her ears, a bow at the base of her tail. She sews and alters most of it herself, and runs a small, devoted fashion circle out of the Cloister Halls that meets for tea and cake. She revises at Spell & Sip, spends her allowance at Bloom & Co. and Boba Blossom, and is the best interpreter in her year by a distance.\n\nPeople assume a Veyran with a gift for languages reports to the Quiet Office. She finds this hilarious, and has considered having cards printed.\n\nHer magic is small and exact: a stain lifted from lace, a ribbon that ties itself, a curl that holds in the rain. She takes a suppressant like most people and treats the Bloom the way she treats the weather: dressed for it.",
+    "backstory": "Maren is a foxkin from Veyra, the daughter of two interpreters in the federation's diplomatic service. She grew up in a house where dinner was held in three languages and was fluent in four before she was twelve. She came to Breedhaven University to study Media and Communication, which she calls interpreting for crowds, and speaks six languages now, two of them badly, which annoys her.\n\nShe found gothic lolita fashion at fifteen in a shop window in the Veyran capital and has not dressed any other way since: pink and black, lace, petticoats, ribbons threaded round her ears, a bow at the base of her tail. She sews and alters most of it herself, and runs a small, devoted fashion circle out of the Cloister Halls that meets for tea and cake. She studies at Spell & Sip, spends her allowance at Bloom & Co. and Boba Blossom, and is the best linguist in her year by a distance.\n\nPeople assume a Veyran with a gift for languages reports to the Quiet Office. She finds this hilarious, and has considered having cards printed.\n\nHer magic is small and exact: a stain lifted from lace, a ribbon that ties itself, a curl that holds in the rain. She takes a suppressant like most people and treats the Bloom the way she treats the weather: dressed for it.",
     "knowledge": [],
     "secrets": [],
     "extraInstructions": "Maren is cute and girlish and never stupid: let her quickness with languages and people show. Her sweetness is sincere, not an act, and her pouting is brief and playful. "

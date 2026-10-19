@@ -20,7 +20,7 @@ const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
  * The term's schedule every new game starts with. What the courses are, what they are called and what they teach
  * is written in the curriculum and only shown here. This lays them out: which are given, when each meets, and who
  * is in it. It is built by rule in an instant from the characters as they stand, and is built again when one is
- * added or changes what she reads.
+ * added or changes what she studies.
  */
 export function CatalogueEditor({ content, onContent, switcher }: Props) {
   const saved = content.catalogue
@@ -72,7 +72,7 @@ export function CatalogueEditor({ content, onContent, switcher }: Props) {
             : saved === undefined
               ? 'No schedule has been saved yet. A new game cannot start without one.'
               : stale
-                ? 'The saved schedule is out of date: a character was added or changed what she reads or teaches, or the curriculum has changed. Build it again.'
+                ? 'The saved schedule is out of date: a character was added or changed what she studies or teaches, or the curriculum has changed. Build it again.'
                 : `The saved schedule has ${saved.courses.length} courses.`}
         </p>
         <label>
@@ -97,7 +97,7 @@ export function CatalogueEditor({ content, onContent, switcher }: Props) {
         ))}
         {dormant.length > 0 && (
           <p className="hint">
-            Written but not given this term, because no love interest reads or teaches them: {dormant.map((course) => `${course.number} ${course.title}`).join('; ')}.
+            Written but not given this term, because no love interest studies or teaches them: {dormant.map((course) => `${course.number} ${course.title}`).join('; ')}.
           </p>
         )}
       </aside>

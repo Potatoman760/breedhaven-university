@@ -9,7 +9,6 @@ import {
 } from "../../../../shared/editor";
 import {
   LIGHTS,
-  courseNumber,
   kindOf,
   LOVE_INTEREST_KINDS,
   LoveInterestSchema,
@@ -68,12 +67,6 @@ function blank(): LoveInterest {
 /** The subjects a student can read: every one the curriculum has that is not a general course. */
 const majorsToRead = (content: ContentPack) => (content.curriculum?.majors ?? []).filter((major) => !major.general);
 
-/** Every course the curriculum has written, for a teacher to be given. */
-const writtenCourses = (content: ContentPack) =>
-  (content.curriculum?.majors ?? []).flatMap((major) =>
-    major.courses.map((course) => ({ code: major.code, level: course.level, number: courseNumber(major.code, course.level), title: course.title })),
-  );
-
 /** A subject of the curriculum at a year, as a character has it. */
 function subjectOf(content: ContentPack, code: string, level: number): Studies | undefined {
   const major = content.curriculum?.majors.find((one) => one.code === code);
@@ -83,7 +76,7 @@ function subjectOf(content: ContentPack, code: string, level: number): Studies |
 /** What a character who has just become a student or a teacher is given until something is chosen for her: the first there is. */
 function firstSubject(content: ContentPack, teaching: boolean): Studies {
   const major = (teaching ? content.curriculum?.majors : majorsToRead(content))?.[0];
-  return (major && subjectOf(content, major.code, major.courses[0].level)) ?? { subject: "", code: "", level: 1, stats: ["intelligence"], practical: false };
+  return (major && subjectOf(content, major.code, 1)) ?? { subject: "", code: "", level: 1, stats: ["intelligence"], practical: false };
 }
 
 const same = (a: unknown, b: unknown) =>
@@ -468,7 +461,7 @@ function LoveInterestEditor({
                           ? (draft.teaching ?? {
                               department: "",
                               title: "Professor",
-                              subjects: [firstSubject(content, true)],
+                              subjects: [{ ...firstSubject(content, true), number: content.curriculum?.majors[0]?.courses[0]?.number ?? "101" }],
                             })
                           : undefined,
                     });
@@ -983,19 +976,20 @@ function LoveInterestEditor({
                       onChange={(title) =>
                         set({ teaching: { ...draft.teaching!, title } })
                       }
-                      hint="Before her name in the catalogue."
+                      hint="Before her name in the catalog."
                     />
                   </div>
-                  {/* What she teaches is courses the curriculum has written: she is not asked to make a subject up. */}
+                  {/* What she teaches is courses the curriculum has written: she is not asked to make one up. */}
                   {draft.teaching.subjects.map((subject, index) => (
                     <div key={index} className="row">
                       <label>
                         Course
                         <select
-                          value={`${subject.code}:${subject.level}`}
+                          value={`${subject.code}:${subject.number}`}
                           onChange={(e) => {
-                            const [code, level] = e.target.value.split(":");
-                            const picked = subjectOf(content, code, Number(level));
+                            const [code, number] = e.target.value.split(":");
+                            const found = subjectOf(content, code, 1);
+                            const picked = found && { ...found, number };
                             if (picked)
                               set({
                                 teaching: {
@@ -1005,11 +999,13 @@ function LoveInterestEditor({
                               });
                           }}
                         >
-                          {writtenCourses(content).map((course) => (
-                            <option key={`${course.code}:${course.level}`} value={`${course.code}:${course.level}`}>
-                              {course.number}: {course.title}
-                            </option>
-                          ))}
+                          {(content.curriculum?.majors ?? []).flatMap((major) =>
+                            major.courses.map((course) => (
+                              <option key={`${major.code}:${course.number}`} value={`${major.code}:${course.number}`}>
+                                {major.code} {course.number}: {course.title}
+                              </option>
+                            )),
+                          )}
                         </select>
                       </label>
                       <Button
@@ -1029,8 +1025,9 @@ function LoveInterestEditor({
                   ))}
                   <Button
                     onClick={() => {
-                      const first = writtenCourses(content)[0];
-                      const picked = first && subjectOf(content, first.code, first.level);
+                      const first = content.curriculum?.majors[0];
+                      const found = first && subjectOf(content, first.code, 1);
+                      const picked = found && { ...found, number: first.courses[0].number };
                       if (picked)
                         set({
                           teaching: {
@@ -1045,7 +1042,7 @@ function LoveInterestEditor({
                 </Group>
               )}
               {kind === "student" && (
-                <Group title="Studies" hint="She reads one of the University's subjects, and sits its course for her year. After changing it, build the schedule again under Courses.">
+                <Group title="Studies" hint="She majors in one of the University's subjects, and sits two courses of it. After changing it, build the schedule again under Courses.">
                   <div className="row">
                     <label>
                       Subject

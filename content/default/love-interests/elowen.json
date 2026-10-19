@@ -318,7 +318,7 @@
   ],
   "room": {
     "name": "her lantern room in the Cloister Halls",
-    "description": "A bright, cluttered modern dormitory room, strung wall to wall with paper lanterns that float and glow without wires, and strings of fairy lights. Gig posters and coloured ribbons cover the smooth white walls. An unmade single bed heaped with patterned cushions, shelves crowded with collected bottles and trinkets, a row of glass fermenting jars bubbling on the windowsill, a small speaker on a stool, clothes over a desk chair, a phone on a glowing charging plate. Warm, colourful light.",
+    "description": "A bright, cluttered modern dormitory room, strung wall to wall with paper lanterns that float and glow without wires, and strings of fairy lights. Gig posters and colored ribbons cover the smooth white walls. An unmade single bed heaped with patterned cushions, shelves crowded with collected bottles and trinkets, a row of glass fermenting jars bubbling on the windowsill, a small speaker on a stool, clothes over a desk chair, a phone on a glowing charging plate. Warm, colorful light.",
     "locationId": "dormitories",
     "background": "generated/backgrounds/elowen/view.webp"
   },

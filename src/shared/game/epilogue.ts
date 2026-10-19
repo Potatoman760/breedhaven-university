@@ -1,6 +1,7 @@
 import { pronounWords, type ContentPack, type GameState, type LoveInterest } from '../model'
 import { statusOf } from './bonds'
 import { gradeFor } from './exams'
+import { babiesAtHome, healthName } from './housing'
 import { seedOf } from './seed'
 
 /** How the year went for him as a student. */
@@ -8,7 +9,7 @@ export type Standing = 'failing' | 'gettingBy' | 'excelling'
 
 /** One screen of the epilogue: what it is about, what it says, and anything listed under it. */
 export interface EpilogueScreen {
-  kind: 'academics' | 'love' | 'child' | 'home' | 'end'
+  kind: 'academics' | 'legacy' | 'love' | 'child' | 'home' | 'below' | 'end'
   /** A word or two over the text: "Academics", "Love". */
   heading: string
   text: string
@@ -18,6 +19,8 @@ export interface EpilogueScreen {
   loveInterestIds?: string[]
   /** For the first screen: how he did. */
   standing?: Standing
+  /** A picture in the pack the screen is told over, in place of the title screen's. */
+  image?: string
 }
 
 // What each letter is worth, as a grade point.
@@ -107,11 +110,66 @@ function describeChildren(children: { daughter: boolean }[]): string {
   return `${count} beautiful children, ${[girls > 0 && of(girls, 'girl'), boys > 0 && of(boys, 'boy')].filter(Boolean).join(' and ')}`
 }
 
+const COUNTS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve']
+const count = (n: number) => COUNTS[n] ?? String(n)
+
+/** What the year left him, the thing a Sire is here for: how many children, by how many women. */
+function legacy(content: ContentPack, state: GameState): EpilogueScreen {
+  const mothers = content.loveInterests.map((li) => ({ li, children: childrenBy(content, state, li.id) })).filter((one) => one.children.length > 0)
+  const total = mothers.reduce((sum, one) => sum + one.children.length, 0)
+  const text =
+    total === 0
+      ? 'You fathered no children this year. The Sire Relations Office noted it in your file, without comment.'
+      : `You fathered ${count(total)} ${total === 1 ? 'child' : 'children'} this year, by ${count(mothers.length)} ${mothers.length === 1 ? 'woman' : 'women'}.` +
+        (mothers.length >= 3 ? ' The Sire Relations Office has never had a year like it.' : '')
+  return {
+    kind: 'legacy',
+    heading: 'Your legacy',
+    text,
+    details: mothers.map(({ li, children }) => `${li.name.split(' ')[0]}: ${describeChildren(children).replace(/^a beautiful baby /, 'a ').replace(/ beautiful children/, ' children')}`),
+    loveInterestIds: mothers.slice(0, 3).map(({ li }) => li.id)
+  }
+}
+
+/** How the children raised in his house were doing when the year ended, as a line under the house. */
+function childrenAtHome(content: ContentPack, state: GameState): { text: string; details: string[] } | undefined {
+  const config = content.housing
+  const home = babiesAtHome(state)
+  if (!config || home.length === 0) return undefined
+  const thriving = home.filter((child) => (child.health ?? 0) >= config.babies.thrivingFrom).length
+  const text =
+    thriving === home.length
+      ? home.length === 1
+        ? ' The child raised there was thriving.'
+        : ` Every child raised there was thriving.`
+      : thriving === 0
+        ? ` The ${home.length === 1 ? 'child' : 'children'} raised there got by, but never thrived.`
+        : ` Of the ${count(home.length)} children raised there, ${count(thriving)} ${thriving === 1 ? 'was' : 'were'} thriving.`
+  return { text, details: home.map((child) => `${child.name}: ${healthName(config, child.health ?? 0)}`) }
+}
+
+/**
+ * The way down, told whatever he made of it: every anchor set, and the University was saved by him and talked of for
+ * it; any short of that, and what was loose below came up onto the campus.
+ */
+function below(content: ContentPack, state: GameState): EpilogueScreen | undefined {
+  const config = content.expedition
+  if (!config) return undefined
+  const set = state.expedition.cleared
+  const all = config.depths.length
+  const text =
+    set >= all
+      ? `You set every anchor beneath the University and saved it from what was rising below. Nobody was meant to know, but rumors of your heroism are already spreading.`
+      : `${set === 0 ? 'You never set an anchor beneath the University.' : `You set ${count(set)} of the ${count(all)} anchors beneath the University.`} The ward-lines you left gave way, the monsters below overflowed onto the campus, and many students were injured.`
+  return { kind: 'below', heading: config.name.replace(/^the /, 'The '), text, image: set >= all ? config.endingImages.saved : config.endingImages.overrun }
+}
+
 /**
  * The epilogue, worked out from how the game stands when its last day is over. Nothing in
- * it is written by the LLM. First how he did as a student; then a screen for each
- * arrangement that is a couple or more; then one for each love interest who carried his
- * child during the year; then the house, if he was let one; and the end.
+ * it is written by the LLM. First how he did as a student; then what the year left him, the
+ * children he fathered and by whom; one screen for each love interest who carried his child;
+ * then a screen for each arrangement that is a couple or more; then the house, if he was let
+ * one, and how the children raised in it fared; then the way down, whatever he made of it; and the end.
  */
 export function buildEpilogue(content: ContentPack, state: GameState): EpilogueScreen[] {
   const screens: EpilogueScreen[] = []
@@ -121,17 +179,9 @@ export function buildEpilogue(content: ContentPack, state: GameState): EpilogueS
   const standing = standingOf(grades)
   screens.push({ kind: 'academics', heading: 'Academics', text: ACADEMICS[standing], standing, details: grades.map((grade) => `${grade.number} ${grade.title}: ${grade.letter}`) })
 
-  // Each arrangement that is a couple or more, in the order they were made.
-  for (const bond of [...state.bonds].sort((a, b) => a.since - b.since)) {
-    const status = statusOf(content, bond)
-    const members = bond.memberIds.map(person).filter((li): li is LoveInterest => li !== undefined)
-    if (!status?.committed || members.length === 0) continue
-    const text =
-      members.length === 1
-        ? `You found love with your ${sweetheart(members[0])} ${names(members)}${status.exclusive ? '' : ', in a relationship open to others'}.`
-        : `You found love with ${names(members)}: the ${members.length + 1 === 3 ? 'three' : members.length + 1} of you together${status.exclusive ? '' : ', and open to others'}.`
-    screens.push({ kind: 'love', heading: status.name, text, loveInterestIds: members.map((li) => li.id) })
-  }
+  // What a Sire is here for, told before anything else that came of the year.
+  // Told wherever a child can be had, and wherever one was, though it is nothing to boast of.
+  if (content.pregnancy || state.children.length > 0 || Object.keys(state.pregnancies).length > 0) screens.push(legacy(content, state))
 
   // Each love interest who carried his child: one screen for her, however many she bore.
   for (const li of content.loveInterests) {
@@ -150,21 +200,40 @@ export function buildEpilogue(content: ContentPack, state: GameState): EpilogueS
     screens.push({ kind: 'child', heading: 'Family', text: `You impregnated ${first} and ${subject} gave birth to ${describeChildren(children)}, ${ending}`, loveInterestIds: [li.id] })
   }
 
-  // The house, if it came to that: kept, with whoever shared it, or lost.
+  // Each arrangement that is a couple or more, in the order they were made.
+  for (const bond of [...state.bonds].sort((a, b) => a.since - b.since)) {
+    const status = statusOf(content, bond)
+    const members = bond.memberIds.map(person).filter((li): li is LoveInterest => li !== undefined)
+    if (!status?.committed || members.length === 0) continue
+    const text =
+      members.length === 1
+        ? `You found love with your ${sweetheart(members[0])} ${names(members)}${status.exclusive ? '' : ', in a relationship open to others'}.`
+        : `You found love with ${names(members)}: the ${members.length + 1 === 3 ? 'three' : members.length + 1} of you together${status.exclusive ? '' : ', and open to others'}.`
+    screens.push({ kind: 'love', heading: status.name, text, loveInterestIds: members.map((li) => li.id) })
+  }
+
+  // The house, if it came to that: kept, with whoever shared it and how the children in it fared, or lost.
   const housing = content.housing
   if (housing && state.housing.status === 'resident') {
     const household = Object.keys(state.housing.residents).map(person).filter((li): li is LoveInterest => li !== undefined)
     const built = housing.rooms.filter((room) => (state.housing.rooms[room.key] ?? 0) > 0).length
     const kept = `You kept ${housing.name}${built === housing.rooms.length ? ', and built it out to the last room' : ''}`
+    const kids = childrenAtHome(content, state)
     screens.push({
       kind: 'home',
       heading: 'Home',
-      text: household.length > 0 ? `${kept}, and ${names(household)} made ${household.length === 1 ? 'her' : 'their'} home there with you.` : `${kept}, though nobody came to share it with you but the nanny.`,
+      text:
+        (household.length > 0 ? `${kept}, and ${names(household)} made ${household.length === 1 ? 'her' : 'their'} home there with you.` : `${kept}, though nobody came to share it with you but the nanny.`) +
+        (kids?.text ?? ''),
+      details: kids?.details,
       loveInterestIds: household.map((li) => li.id)
     })
   } else if (housing && state.housing.status === 'evicted') {
     screens.push({ kind: 'home', heading: 'Home', text: `You were let ${housing.name} and could not keep it: the rent went unpaid, and the year ended back in the Halls.` })
   }
+
+  const way = below(content, state)
+  if (way) screens.push(way)
 
   screens.push({ kind: 'end', heading: 'The end', text: `So ended ${state.player.name}'s first year at Breedhaven University.` })
   return screens

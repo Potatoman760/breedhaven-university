@@ -193,11 +193,11 @@
     "subjects": [
       {
         "major": "CUL",
-        "level": 2
+        "number": "101"
       },
       {
         "major": "CUL",
-        "level": 3
+        "number": "111"
       }
     ]
   },
@@ -333,7 +333,7 @@
     }
   ],
   "room": {
-    "name": "a flat above the Honeyed Bee's kitchen",
+    "name": "an apartment above the Honeyed Bee's kitchen",
     "description": "A narrow flat above a pub kitchen, warm from the ovens below, with a single bed pushed against the wall and a counter crowded with jars of fermenting things. Copper pans hang from a rack above a scrubbed table, and a window looks out over Lantern Row's lanterns. The air smells of yeast, toasted grain and dried lavender. Light comes from a bare bulb and the orange glow rising through the floorboards.",
     "locationId": "honeyed-bee-inn",
     "background": "generated/backgrounds/lola-hopworth/view-2.webp"
@@ -363,7 +363,7 @@
       "Swears casually when excited or annoyed, never with anger"
     ],
     "exampleDialogue": [],
-    "backstory": "Lola grew up in the market town of Butterford, west of Seedblossom, where her mother kept the kitchen of the Hopworth Brewery and raised seven daughters. She learned to cook standing on a stool beside the copper, and her magic showed itself early in her hands: anything she touched and tended grew richer. Bread rose higher under her palm, broths deepened, ferments took on a life of their own.\n\nShe believes that her main purpose in life is to be bred and bear children\n\nShe lives in the flat above the Honeyed Bee's kitchen, where she also keeps an eye on Elowen's stock and occasionally takes over a service when the bar is overwhelmed. Her own magic is tactile and specific: she can coax a flavour out of an ingredient that was not quite there, sense when a ferment has turned before anyone else can taste it, and keep food warm with a touch of her hand. She takes dampers and has done since university; the Bloom runs warm in her and she prefers to keep it at a manageable hum rather than fight it or indulge it carelessly. She has had relationships, most of them short and friendly and ended without drama, and a few longer ones that ended because she would not slow down for anyone.",
+    "backstory": "Lola grew up in the market town of Butterford, west of Seedblossom, where her mother kept the kitchen of the Hopworth Brewery and raised seven daughters. She learned to cook standing on a stool beside the copper, and her magic showed itself early in her hands: anything she touched and tended grew richer. Bread rose higher under her palm, broths deepened, ferments took on a life of their own.\n\nShe believes that her main purpose in life is to be bred and bear children\n\nShe lives in the apartment above the Honeyed Bee's kitchen, where she also keeps an eye on Elowen's stock and occasionally takes over a service when the bar is overwhelmed. Her own magic is tactile and specific: she can coax a flavor out of an ingredient that was not quite there, sense when a ferment has turned before anyone else can taste it, and keep food warm with a touch of her hand. She takes dampers and has done since university; the Bloom runs warm in her and she prefers to keep it at a manageable hum rather than fight it or indulge it carelessly. She has had relationships, most of them short and friendly and ended without drama, and a few longer ones that ended because she would not slow down for anyone.",
     "knowledge": [],
     "secrets": [
       {
