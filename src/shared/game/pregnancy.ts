@@ -92,12 +92,15 @@ export function conceive(content: ContentPack, state: GameState, loveInterestId:
   const guarded = onBirthControl(content, state, loveInterestId) && !inForce(content, state, 'unguarded', about)
   const chance = guarded ? Math.min(config.chance, config.birthControlChance * factor(content, state, 'fertility', about)) : config.chance
   if (roll(state.weatherSeed, dayIndex, index, 1) >= chance) return state
-  const days = config.lengthDays
+  const day = content.calendar.hoursPerDay
+  // A child due while something keeps him away (a trip) is due the day after it instead.
+  let dueAt = state.time + config.lengthDays * day
+  for (let tries = 0; tries < content.calendar.lengthDays && eventsOn(content, state, dueAt).some((event) => event.noBirths); tries++) dueAt += day
   return {
     ...state,
     pregnancies: {
       ...state.pregnancies,
-      [loveInterestId]: { conceivedAt: state.time, dueAt: state.time + days * content.calendar.hoursPerDay }
+      [loveInterestId]: { conceivedAt: state.time, dueAt }
     }
   }
 }

@@ -7,6 +7,7 @@ import { examOn } from './grades'
 import { householdCost, isHouseholdDay, rentOn } from './housing'
 import { firstNames } from './scene'
 import { joinedSocieties, societyMeetingNow } from './societies'
+import { awayOnDay } from './trips'
 
 /** One thing on a day of the calendar. */
 export interface AgendaItem {
@@ -101,7 +102,8 @@ export function dayAgenda(content: ContentPack, state: GameState, dayIndex: numb
     timed.push({ kind: 'society', id: `society-${society.id}`, title: society.name, detail: place, description: society.description, startHour: society.startHour, hours: content.societies!.hours })
   }
   const job = content.jobs?.jobs.find((j) => j.id === state.job?.jobId)
-  if (job && state.job) {
+  // Away on a trip he booked, his shifts are not his to work.
+  if (job && state.job && !awayOnDay(content, state, dayIndex)) {
     const { weekday } = toDate(calendar, morning)
     const place = content.locations.find((l) => l.id === job.locationId)?.name
     for (const shift of job.shifts) {

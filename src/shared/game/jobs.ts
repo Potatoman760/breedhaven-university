@@ -8,6 +8,7 @@ import { sceneBaseline } from './scene'
 import { statOf, trainStat } from './stats'
 import { factor } from './modifiers'
 import { joinedSocieties } from './societies'
+import { awayOnDay } from './trips'
 
 const clock = (hour: number): string => `${String(hour).padStart(2, '0')}:00`
 
@@ -100,10 +101,10 @@ function shiftStart(content: ContentPack, dayIndex: number, shift: Shift): numbe
   return timeOn(content, dayIndex, shift.startHour)
 }
 
-/** A job's shifts on a given day of the game. */
-function shiftsOn(content: ContentPack, job: Job, dayIndex: number): Shift[] {
+/** A job's shifts on a given day of the game: none on a day he is away on a trip he booked. */
+function shiftsOn(content: ContentPack, state: GameState, job: Job, dayIndex: number): Shift[] {
   const morning = timeOn(content, dayIndex, content.calendar.start.hour)
-  if (morning < 0 || isGameOver(content.calendar, morning)) return []
+  if (morning < 0 || isGameOver(content.calendar, morning) || awayOnDay(content, state, dayIndex)) return []
   const { weekday } = toDate(content.calendar, morning)
   return job.shifts.filter((shift) => shift.weekday === weekday)
 }
@@ -113,7 +114,7 @@ export function shiftNow(content: ContentPack, state: GameState): { job: Job; sh
   const job = currentJob(content, state)
   if (!job || !state.job) return undefined
   const { dayIndex, hour } = toDate(content.calendar, state.time)
-  for (const shift of shiftsOn(content, job, dayIndex)) {
+  for (const shift of shiftsOn(content, state, job, dayIndex)) {
     const key = shiftKey(dayIndex, shift)
     if (hour < shift.startHour || hour >= shift.startHour + shift.hours) continue
     if (shiftStart(content, dayIndex, shift) < state.job.hiredAt || state.job.worked.includes(key)) continue
@@ -127,7 +128,7 @@ export function shiftLaterToday(content: ContentPack, state: GameState): { job: 
   const job = currentJob(content, state)
   if (!job || !state.job) return undefined
   const { dayIndex, hour } = toDate(content.calendar, state.time)
-  const shift = shiftsOn(content, job, dayIndex).find((s) => s.startHour > hour && !state.job!.excused.includes(shiftKey(dayIndex, s)))
+  const shift = shiftsOn(content, state, job, dayIndex).find((s) => s.startHour > hour && !state.job!.excused.includes(shiftKey(dayIndex, s)))
   return shift && { job, shift, key: shiftKey(dayIndex, shift) }
 }
 
@@ -252,7 +253,7 @@ export function settleShifts(content: ContentPack, state: GameState): GameState 
   let strikes = employment.strikes
   let next: GameState = state
   for (let dayIndex = from; dayIndex <= to; dayIndex++) {
-    for (const shift of shiftsOn(content, job, dayIndex)) {
+    for (const shift of shiftsOn(content, state, job, dayIndex)) {
       const begins = shiftStart(content, dayIndex, shift)
       const ends = begins + shift.hours
       // Only what has ended since the last count, and was his to work.
@@ -289,7 +290,7 @@ export function jobFacts(content: ContentPack, state: GameState, npcId: string):
   }
   const today = shiftLaterToday(content, state)
   const { dayIndex } = toDate(content.calendar, state.time)
-  const told = shiftsOn(content, job, dayIndex).find((shift) => state.job!.excused.includes(shiftKey(dayIndex, shift)))
+  const told = shiftsOn(content, state, job, dayIndex).find((shift) => state.job!.excused.includes(shiftKey(dayIndex, shift)))
   return [
     `${state.player.name} works for you as ${job.title.toLowerCase()}, paid $${job.hourlyRate} an hour${payBonus(content, state, job) > 0 ? `, and ${Math.round(payBonus(content, state, job) * 100)}% over that because he is better at it than the job asks` : ''}. His shifts are ${job.shifts.map(describeShift).join(', ')}.`,
     `He has ${state.job.strikes} of ${config.strikes} strikes. A shift missed without a word is a full strike, and one he warned you of that day is half. At ${config.strikes} he is out.`,

@@ -4,52 +4,54 @@
   "role": "",
   "age": 21,
   "pronouns": "she/her",
-  "bio": "Runs the kitchen and the bar at the Honeyed Bee on Lantern Row, and studies Culinary Arts and Brewing when she remembers to.",
-  "appearance": "Beautiful 21-year-old woman with a softly angular face, warm tan skin, and large almond-shaped gray eyes framed by dark lashes and defined liner. She has gently arched brows, a slim straight nose, and full slightly parted lips with a soft rosy tone. Her long black hair is thick, glossy, and voluminous, parted slightly off-center and flowing in loose waves past her shoulders. Her figure is highly feminine and idealized, with a slim ribcage, narrow waist, flat toned stomach, full bust, broad hips, and long shapely thighs. Her shoulders are smooth and moderately narrow, giving her an elegant hourglass silhouette. The overall look is youthful, sultry, and polished. She has a single large mole on her left breast.",
-  "personality": "Outgoing, impulsive, warm, and eager to have fun. She makes plans, decorates, and draws whoever is nearest into whatever has caught her interest. She adores her twin sister Anwen but wants a place and identity of her own.",
+  "bio": "Second-year Computer Science student who streams games from her dorm room most nights, and the louder of the twins, online and off.",
+  "appearance": "Beautiful 21-year-old woman with a softly angular face, warm tan skin, and large almond-shaped gray eyes framed by long, thick, prominent dark eyelashes and defined liner. She has gently arched brows, a slim straight nose, and full slightly parted lips with a soft rosy tone. Her long black hair is streaked with bright rainbow colors, thick, glossy, and voluminous, parted slightly off-center and flowing in loose waves past her shoulders. Her figure is highly feminine and idealized, with a slim ribcage, narrow waist, flat toned stomach, full bust, broad hips, and long shapely thighs. Her shoulders are smooth and moderately narrow, giving her an elegant hourglass silhouette. The overall look is youthful, sultry, and polished.",
+  "personality": "Bubbly, extremely online and impulsive. She lives half in her stream chat, games until dawn and talks in memes. Under the cat ears she is sharp at code and soft with people, clingy once she likes someone, and desperate to be known as more than Anwen's twin.",
   "traitIds": [
     "flirtatious",
-    "jealous"
+    "jealous",
+    "exhibitionist"
   ],
   "likes": [
-    "ribbons",
-    "ale",
-    "art",
-    "flowers",
-    "music"
+    "games",
+    "gadgets",
+    "music",
+    "sweets",
+    "art"
   ],
   "dislikes": [
-    "ledgers"
+    "ledgers",
+    "sport"
   ],
   "admires": [
-    "charisma",
+    "intelligence",
     "dexterity"
   ],
   "friends": [
     "anwen"
   ],
   "enemies": [],
-  "handle": "elowen_on_tap",
+  "handle": "elowen.exe",
   "outfits": [
     {
       "id": "default",
       "name": "Usual clothes",
-      "description": "a form fitting yellow sundress, with cleavage",
+      "description": "pink-glowing cat-ear headphones, a black racerback crop top cut like a sports bra, with a scooped neckline showing cleavage, a short plaid skirt",
       "sprites": {
         "neutral": {
-          "image": "sprites/elowen/default-neutral-cutout-2.webp",
+          "image": "sprites/elowen/default-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/elowen/default-happy-2-cutout.webp",
+          "image": "sprites/elowen/default-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/elowen/default-sad-3-cutout.webp",
+          "image": "sprites/elowen/default-sad-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/elowen/default-angry-2-cutout.webp",
+          "image": "sprites/elowen/default-angry-cutout.webp",
           "description": ""
         },
         "surprised": {
@@ -61,7 +63,7 @@
           "description": ""
         },
         "aroused": {
-          "image": "sprites/elowen/default-aroused-5-cutout.webp",
+          "image": "sprites/elowen/default-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -74,27 +76,27 @@
       "inherits": "default",
       "sprites": {
         "happy": {
-          "image": "sprites/elowen/pregnant-happy-2-cutout.webp",
+          "image": "sprites/elowen/pregnant-happy-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/elowen/pregnant-sad-2-cutout.webp",
+          "image": "sprites/elowen/pregnant-sad-cutout.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/elowen/pregnant-surprised-2-cutout.webp",
+          "image": "sprites/elowen/pregnant-surprised-cutout.webp",
           "description": ""
         },
         "neutral": {
-          "image": "sprites/elowen/pregnant-neutral-3-cutout.webp",
+          "image": "sprites/elowen/pregnant-neutral-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/elowen/pregnant-aroused-3-cutout.webp",
+          "image": "sprites/elowen/pregnant-aroused-cutout.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/elowen/pregnant-angry-5-cutout.webp",
+          "image": "sprites/elowen/pregnant-angry-cutout.webp",
           "description": ""
         },
         "embarrassed": {
@@ -110,11 +112,11 @@
       "description": "nothing at all, completely nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/elowen/nude-neutral-2-cutout.webp",
+          "image": "sprites/elowen/nude-neutral-cutout.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/elowen/nude-happy-2-cutout.webp",
+          "image": "sprites/elowen/nude-happy-cutout.webp",
           "description": ""
         },
         "sad": {
@@ -130,11 +132,11 @@
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/elowen/nude-embarrassed-2-cutout.webp",
+          "image": "sprites/elowen/nude-embarrassed-cutout.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/elowen/nude-aroused-9-cutout.webp",
+          "image": "sprites/elowen/nude-aroused-cutout.webp",
           "description": ""
         }
       },
@@ -167,11 +169,36 @@
           "description": ""
         },
         "neutral": {
-          "image": "sprites/elowen/nude-pregnant-neutral-4-cutout.webp",
+          "image": "sprites/elowen/nude-pregnant-neutral-cutout.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/elowen/nude-pregnant-sad-5-cutout.webp",
+          "image": "sprites/elowen/nude-pregnant-sad-cutout.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "bathrobe",
+      "name": "Bathrobe",
+      "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/bathrobe-neutral-cutout.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "Bathrobe, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "bathrobe",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/bathrobe-pregnant-neutral-cutout.webp",
           "description": ""
         }
       },
@@ -184,7 +211,7 @@
   "stageHeight": 100,
   "partyRole": "striker",
   "studies": {
-    "major": "CUL",
+    "major": "CSC",
     "level": 2
   },
   "animations": [
@@ -193,47 +220,39 @@
       "name": "Blowjob",
       "description": "",
       "image": "sprites/elowen/nsfw-blowjob.webp",
-      "clip": "sprites/elowen/nsfw-blowjob.mp4",
+      "clip": "sprites/elowen/nsfw-blowjob-2.mp4",
       "loop": true
     },
     {
       "id": "cowgirl",
       "name": "Cowgirl",
       "description": "",
-      "image": "sprites/elowen/nsfw-cowgirl-8.webp",
-      "clip": "sprites/elowen/nsfw-cowgirl-2.mp4",
-      "loop": true
-    },
-    {
-      "id": "doggy",
-      "name": "Doggy",
-      "description": "",
-      "image": "sprites/elowen/nsfw-doggy-2.webp",
-      "clip": "sprites/elowen/nsfw-doggy.mp4",
+      "image": "sprites/elowen/nsfw-cowgirl.webp",
+      "clip": "sprites/elowen/nsfw-cowgirl.mp4",
       "loop": true
     },
     {
       "id": "creampie",
       "name": "Creampie",
       "description": "",
-      "image": "sprites/elowen/nsfw-creampie-2.webp",
-      "clip": "sprites/elowen/nsfw-creampie-3.mp4",
+      "image": "sprites/elowen/nsfw-creampie.webp",
+      "clip": "sprites/elowen/nsfw-creampie-2.mp4",
       "loop": true
     },
     {
       "id": "facial",
       "name": "Facial",
       "description": "",
-      "image": "sprites/elowen/nsfw-facial-2.webp",
-      "clip": "sprites/elowen/nsfw-facial.mp4",
+      "image": "sprites/elowen/nsfw-facial.webp",
+      "clip": "sprites/elowen/nsfw-facial-2.mp4",
       "loop": true
     },
     {
       "id": "missionary",
       "name": "Missionary",
       "description": "",
-      "image": "sprites/elowen/nsfw-missionary-8.webp",
-      "clip": "sprites/elowen/nsfw-missionary.mp4",
+      "image": "sprites/elowen/nsfw-missionary.webp",
+      "clip": "sprites/elowen/nsfw-missionary-2.mp4",
       "loop": true
     },
     {
@@ -247,14 +266,14 @@
       "id": "pregnant-missionary",
       "name": "Missionary, pregnant",
       "description": "",
-      "image": "sprites/elowen/nsfw-pregnant-missionary-2.webp",
+      "image": "sprites/elowen/nsfw-pregnant-missionary.webp",
       "loop": true
     },
     {
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
-      "image": "sprites/elowen/nsfw-pregnant-doggy-4.webp",
+      "image": "sprites/elowen/nsfw-pregnant-doggy.webp",
       "loop": true
     },
     {
@@ -269,6 +288,14 @@
       "name": "Creampie, pregnant",
       "description": "",
       "image": "sprites/elowen/nsfw-pregnant-creampie.webp",
+      "loop": true
+    },
+    {
+      "id": "doggy",
+      "name": "Doggy",
+      "description": "",
+      "image": "sprites/elowen/nsfw-doggy-2.webp",
+      "clip": "sprites/elowen/nsfw-doggy.mp4",
       "loop": true
     }
   ],
@@ -293,37 +320,42 @@
       "periods": [
         "morning"
       ],
-      "locationId": "commons"
+      "locationId": "dormitories"
     },
     {
       "weekdays": [
         "Marketday"
       ],
       "periods": [
-        "morning",
         "afternoon"
       ],
-      "locationId": "market"
+      "locationId": "boba-blossom"
+    },
+    {
+      "periods": [
+        "afternoon"
+      ],
+      "locationId": "pixel-and-rune"
     },
     {
       "periods": [
         "evening",
         "night"
       ],
-      "locationId": "honeyed-bee-inn"
+      "locationId": "dormitories"
     },
     {
-      "locationId": "lantern-row"
+      "locationId": "pixel-and-rune"
     }
   ],
   "room": {
-    "name": "her lantern room in the Cloister Halls",
-    "description": "A bright, cluttered modern dormitory room, strung wall to wall with paper lanterns that float and glow without wires, and strings of fairy lights. Gig posters and colored ribbons cover the smooth white walls. An unmade single bed heaped with patterned cushions, shelves crowded with collected bottles and trinkets, a row of glass fermenting jars bubbling on the windowsill, a small speaker on a stool, clothes over a desk chair, a phone on a glowing charging plate. Warm, colorful light.",
+    "name": "her streaming room in the Cloister Halls",
+    "description": "A cozy, cluttered modern dormitory room lit pink and purple by strips of LED light along the ceiling and the desk. A gaming desk with two glowing monitors, a mechanical keyboard with rainbow keys, a microphone on a boom arm, a ring light and a pink gaming chair. An unmade single bed heaped with plushies and patterned cushions, game posters on the smooth white walls, empty energy drink cans and a cup of bubble tea by the keyboard, a phone on a glowing charging plate. Soft neon light, the window dark behind blinds.",
     "locationId": "dormitories",
     "background": "generated/backgrounds/elowen/view.webp"
   },
-  "birthPicture": "sprites/elowen/birth.png",
-  "walkSprite": "sprites/elowen/walk-cutout.png",
+  "birthPicture": "sprites/elowen/birth-2.webp",
+  "walkSprite": "sprites/elowen/walk-cutout.webp",
   "childNames": {
     "daughters": [
       "Kerra",
@@ -339,17 +371,17 @@
   },
   "birthControl": true,
   "ai": {
-    "speechPattern": "Quick, bright and talkative. Runs ahead of herself, starts plans mid-sentence, laughs easily. Direct about what she wants.",
-    "tone": "lively, warm, impulsive",
+    "speechPattern": "Fast, bright and online. Talks in internet slang and gamer shorthand, half joking about everything, then suddenly earnest. Direct about what she wants.",
+    "tone": "bubbly, teasing, clingy",
     "verbalQuirks": [
-      "Announces plans as though they were already agreed.",
-      "Gives things and people nicknames.",
+      "Narrates her life as if her stream chat could hear it.",
+      "Uses gamer and internet slang: gg, lowkey, no shot, it's giving.",
       "Says what the Bloom is doing to her out loud, and laughs about it."
     ],
     "exampleDialogue": [],
-    "backstory": "Job: Kitchen and bar lead at the Honeyed Bee on Lantern Row; brews its house ale\n\nAnwen and her twin sister Elowen grew up in their family's guesthouse, Anwen the elder by eleven minutes, and came to Seedblossom together. They took jobs at the Honeyed Bee to pay their way through the University and between them all but run the place: Anwen the  spreadsheets, Elowen the kitchen. They are identical, and have been \"the twins\" to everyone since they were born. They are willing to share everything with each other, including men.\n\nHer magic goes into food and drink: a nudge to the yeast, heat exactly where she wants it. She decorates the bar for every festival, runs the quiz night, and has opinions about everyone's playlists.",
+    "backstory": "Anwen and her twin sister Elowen grew up in their family's guesthouse in the hills, Anwen the elder by eleven minutes, and came to Seedblossom together. They are identical, and have been \"the twins\" to everyone since they were born; at the University they have at last begun to grow apart, one into her screens and the other onto her bike. They are still willing to share everything with each other, including men.\n\nElowen found computers at thirteen through a secondhand console and never looked back. She streams games most nights as elowen.exe to a small, devoted chat she calls her goblins, and pays her way with their tips and the odd commission fixing a shop's charm-till. She is better at code than she lets on, and writes scrappy little programs for anything that annoys her.\n\nHer magic runs into machines: a flicker that brings a dead screen back, lag that clears when she glares at it.",
     "knowledge": [],
     "secrets": [],
-    "extraInstructions": "Elowen and Anwen are identical twin sisters. Elowen is direct and playful but never thoughtless, and she notices when someone treats her as her own person."
+    "extraInstructions": "Elowen and Anwen are identical twin sisters. Elowen is loud and playful but never thoughtless, and she notices when someone treats her as her own person."
   }
 }

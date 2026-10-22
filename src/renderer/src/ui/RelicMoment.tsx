@@ -3,7 +3,7 @@ import type { Relic, RelicUse } from '../../../shared/model'
 import { play } from '../sound'
 import { ItemArt } from './ItemSquare'
 
-const FX = (name: string) => `content://pack/sprites/fx/relic-${name}.png`
+const FX = (name: string) => `content://pack/sprites/fx/relic-${name}.webp`
 
 // How long the moment holds before the scene comes back, in milliseconds; a click cuts it short.
 const LENGTH = 2800

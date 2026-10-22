@@ -1,4 +1,4 @@
-import { MEMORY_LEVEL_LABELS, picturedOutfit, EXPRESSIONS, isPregnantPose, poseDescription, poseMedia, kindOf, classYear, outfitDescription, type ChatMessage, type ContentPack, type LoveInterest, type Departure, type GameState, type Lesson, type Npc, type Proposal, type Scene, type SceneBeat, type SceneGift, type RelicUse } from '../model'
+import { MEMORY_LEVEL_LABELS, picturedOutfit, EXPRESSIONS, isPregnantPose, poseDescription, poseMedia, kindOf, classYear, outfitDescription, type ChatMessage, type ContentPack, type LoveInterest, type Departure, type GameState, type Lesson, type Npc, type Proposal, type Scene, type SceneBeat, type SceneGift, type ScenePresent, type RelicUse } from '../model'
 import { describeGift } from './market'
 import { examNotes } from './exams'
 import { attendees, describeWhen, upcomingAppointments } from './appointments'
@@ -26,6 +26,7 @@ import { AGREED_TAG, firstNames, SCENE_END_TAG, SEEDED_TAG, SLEEP_TAG } from './
 import { describePlayerRoom, playerRoom, describePlace, describeRoom, describeWeather, roomOwner, sceneView } from './sceneMoves'
 import { backgroundFor, isIndoors } from './schedule'
 import { weatherOn } from './weather'
+import { presentEventNow } from './presents'
 import { describeRelicUses, relicTraitIds } from './relics'
 import { trustOf } from './modifiers'
 import { skillLevel } from './skills'
@@ -103,6 +104,8 @@ export interface PromptInput {
   comfort?: Scene['comfort']
   /** Gifts the player has handed over in the current scene. */
   gifts?: SceneGift[]
+  /** Presents those in the scene brought him for the day, to give him as each first greets him. */
+  presents?: ScenePresent[]
   /** A plan a character has suggested in this scene that the player has not yet put in his calendar. */
   pendingProposal?: Proposal
   /** Recent conversation text, used to pick relevant codex entries. */
@@ -496,6 +499,18 @@ export function buildCharacterPrompt(input: PromptInput): string {
           ? 'When a gift has just been handed over, whoever received it reacts in character before ' +
             'anything else. The others may notice, tease or envy, each in their own way.'
           : 'When a gift has just been handed to you, react to it in character before anything else.')
+    ]),
+
+    section(`Presents brought for ${player.name} for ${presentEventNow(content, state)?.name ?? 'the day'}`, [
+      ...(input.presents ?? []).flatMap((present) => {
+        const item = content.items.find((one) => one.id === present.itemId)
+        const who = present.fromId === li.id ? 'You' : firstNames(content, [present.fromId])
+        return item ? [`- ${who} brought him ${item.name}: ${item.description}`] : []
+      }),
+      (input.presents ?? []).length > 0 &&
+        (input.opening
+          ? `It is the custom of the day. Open the scene with it: ${group ? 'each of you tells' : 'you tell'} ${player.name} you have a present for him and ${group ? 'hands' : 'hand'} it over, in character, before anything else. He has nothing to give back and none is expected.`
+          : 'It is the custom of the day. Each gives hers to him, in character, the first time she greets him in this scene; he has nothing to give back and none is expected.')
     ]),
 
     section(

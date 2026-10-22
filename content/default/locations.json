@@ -15,6 +15,15 @@
         }
       },
       {
+        "id": "first-frost",
+        "name": "the Feast of First Frost",
+        "images": {
+          "day": "generated/backgrounds/great-court/first-frost-day.webp",
+          "night": "generated/backgrounds/great-court/first-frost-night.webp"
+        },
+        "description": "The Great Court is dressed for the Feast of First Frost: evergreen garlands and holly along the arcades, wreaths on the bell tower, frost-blue ward-lights strung over the terraces, and a tall evergreen on the middle terrace hung with glass ornaments and little lanterns. Frost on the lawns."
+      },
+      {
         "id": "queen-steps-out",
         "name": "The Queen steps out",
         "images": {
@@ -40,7 +49,7 @@
         "description": "You take a spot on the terrace steps and start talking to whoever sits down near you."
       }
     ],
-    "iconImage": "sprites/icons/places-great-court-cutout.png"
+    "iconImage": "sprites/icons/places-great-court-cutout.webp"
   },
   {
     "id": "lecture-halls",
@@ -71,7 +80,7 @@
         "description": "You slip into the back of a lecture that is not yours and take notes anyway."
       }
     ],
-    "iconImage": "sprites/icons/places-lecture-halls-cutout.png"
+    "iconImage": "sprites/icons/places-lecture-halls-cutout.webp"
   },
   {
     "id": "library",
@@ -108,7 +117,7 @@
         "description": "You take down something chained and difficult and read it slowly."
       }
     ],
-    "iconImage": "sprites/icons/places-library-cutout.png"
+    "iconImage": "sprites/icons/places-library-cutout.webp"
   },
   {
     "id": "commons",
@@ -152,7 +161,7 @@
         "description": "Two trays, three helpings, and a kitchen manager who approves."
       }
     ],
-    "iconImage": "sprites/icons/places-commons-cutout.png"
+    "iconImage": "sprites/icons/places-commons-cutout.webp"
   },
   {
     "id": "chapel",
@@ -182,7 +191,7 @@
         "description": "You take a pew near the back and let the quiet do its work."
       }
     ],
-    "iconImage": "sprites/icons/places-chapel-cutout.png"
+    "iconImage": "sprites/icons/places-chapel-cutout.webp"
   },
   {
     "id": "tiltyard",
@@ -223,7 +232,7 @@
         "description": "You set off round the track at a pace you mean to keep."
       }
     ],
-    "iconImage": "sprites/icons/places-tiltyard-cutout.png"
+    "iconImage": "sprites/icons/places-tiltyard-cutout.webp"
   },
   {
     "id": "physic-garden",
@@ -238,6 +247,14 @@
         "images": {
           "day": "generated/backgrounds/physic-garden/beds-afternoon.webp",
           "night": "generated/backgrounds/physic-garden/beds-night.webp"
+        }
+      },
+      {
+        "id": "lantern-festival",
+        "name": "The Lantern Festival",
+        "images": {
+          "day": "generated/backgrounds/physic-garden/lantern-festival.webp",
+          "night": "generated/backgrounds/physic-garden/lantern-festival.webp"
         }
       }
     ],
@@ -255,7 +272,7 @@
         "description": "A fork, a barrow and a heap that needs to be somewhere else."
       }
     ],
-    "iconImage": "sprites/icons/places-physic-garden-cutout.png"
+    "iconImage": "sprites/icons/places-physic-garden-cutout.webp"
   },
   {
     "id": "bathhouse",
@@ -286,7 +303,7 @@
         "description": "You lower yourself into the warm pool and start counting lengths."
       }
     ],
-    "iconImage": "sprites/icons/places-bathhouse-cutout.png"
+    "iconImage": "sprites/icons/places-bathhouse-cutout.webp"
   },
   {
     "id": "foundry",
@@ -322,7 +339,7 @@
         "description": "A magnifier, a steady hand, and a board of joints the size of pinheads."
       }
     ],
-    "iconImage": "sprites/icons/places-foundry-cutout.png"
+    "iconImage": "sprites/icons/places-foundry-cutout.webp"
   },
   {
     "id": "health-centre",
@@ -361,7 +378,7 @@
         "description": "An open session in a quiet room, on living with the Bloom and with each other."
       }
     ],
-    "iconImage": "sprites/icons/places-health-centre-cutout.png"
+    "iconImage": "sprites/icons/places-health-centre-cutout.webp"
   },
   {
     "id": "dormitories",
@@ -383,7 +400,7 @@
     "indoors": true,
     "private": true,
     "drills": [],
-    "iconImage": "sprites/icons/places-dormitories-cutout.png"
+    "iconImage": "sprites/icons/places-dormitories-cutout.webp"
   },
   {
     "id": "lantern-row",
@@ -399,6 +416,15 @@
           "day": "generated/backgrounds/lantern-row/default-day.webp",
           "night": "generated/backgrounds/lantern-row/default-night.webp"
         }
+      },
+      {
+        "id": "first-frost",
+        "name": "the Feast of First Frost",
+        "images": {
+          "day": "generated/backgrounds/lantern-row/first-frost-day.webp",
+          "night": "generated/backgrounds/lantern-row/first-frost-night.webp"
+        },
+        "description": "Lantern Row is dressed for the Feast of First Frost: evergreen swags and holly hung between the townhouses beside the paper lanterns, frost-blue ward-lights twined through them, a wreath on every shop door, and little stalls along the pavement selling mulled cider and roasted chestnuts."
       }
     ],
     "indoors": false,
@@ -410,13 +436,13 @@
         "description": "You work your way down the row, one counter and one conversation at a time."
       }
     ],
-    "iconImage": "sprites/icons/places-lantern-row-cutout.png"
+    "iconImage": "sprites/icons/places-lantern-row-cutout.webp"
   },
   {
     "id": "honeyed-bee-inn",
     "name": "the Honeyed Bee",
     "icon": "glass",
-    "description": "The Honeyed Bee, the student pub on Lantern Row, in a building older than most of the colleges. It has card games at the back tables, a quiz night, the house ale brewed on the premises, a jukebox that takes requests from a phone, and rooms upstairs. Anwen keeps the front of house and the books and her twin Elowen runs the kitchen and the bar. It is cheap, loud and friendly; everyone ends up here on Marketday night. People drink, flirt, gamble small sums and say more than they meant to.",
+    "description": "The Honeyed Bee, the student pub on Lantern Row, in a building older than most of the colleges. It has card games at the back tables, a quiz night, the house ale brewed on the premises, a jukebox that takes requests from a phone, and rooms upstairs. It is cheap, loud and friendly; everyone ends up here on Marketday night. People drink, flirt, gamble small sums and say more than they meant to.",
     "appearance": "The interior of an old student pub with low dark ceiling beams, uneven plaster walls and a worn wooden floor. A long polished bar with brass beer taps and shelves of bottles lit from behind, a chalkboard listing ales, and a hanging wooden sign carved with a golden bee. Round tables with mismatched chairs, a card game laid out on one, a dartboard, a glowing jukebox with a touchscreen in the corner, and a small stage with a quiz-night banner. Warm amber light from hanging lamps and a fireplace, strings of fairy lights along the beams, a wooden staircase leading up.",
     "backgrounds": [
       {
@@ -447,7 +473,7 @@
         "description": "You are dealt in at the back table, where the stakes are small and the fingers are quick."
       }
     ],
-    "iconImage": "sprites/icons/places-honeyed-bee-inn-cutout.png"
+    "iconImage": "sprites/icons/places-honeyed-bee-inn-cutout.webp"
   },
   {
     "id": "market",
@@ -463,6 +489,15 @@
           "day": "generated/backgrounds/market/default-day.webp",
           "night": "generated/backgrounds/market/default-night.webp"
         }
+      },
+      {
+        "id": "first-frost",
+        "name": "the Feast of First Frost",
+        "images": {
+          "day": "generated/backgrounds/market/first-frost-day.webp",
+          "night": "generated/backgrounds/market/first-frost-night.webp"
+        },
+        "description": "The Market Square is a frost fair for the Feast of First Frost: stalls dressed with evergreen and holly, mulled wine, roasted chestnuts and hot pies steaming in the cold, glowing ice lanterns on the counters, bunting of white and frost-blue, and a bonfire burning in an iron brazier in the middle of the square."
       }
     ],
     "open": {
@@ -483,7 +518,7 @@
         "description": "The morning deliveries are stacked at the curb and somebody has to shift them."
       }
     ],
-    "iconImage": "sprites/icons/places-market-cutout.png"
+    "iconImage": "sprites/icons/places-market-cutout.webp"
   },
   {
     "id": "bloom-and-co",
@@ -508,7 +543,7 @@
     "indoors": true,
     "private": false,
     "drills": [],
-    "iconImage": "sprites/icons/places-bloom-and-co-cutout.png"
+    "iconImage": "sprites/icons/places-bloom-and-co-cutout.webp"
   },
   {
     "id": "dawnbloom-house",
@@ -530,7 +565,7 @@
     "indoors": true,
     "private": false,
     "drills": [],
-    "iconImage": "sprites/icons/places-dawnbloom-house-cutout.png"
+    "iconImage": "sprites/icons/places-dawnbloom-house-cutout.webp"
   },
   {
     "id": "spell-and-sip",
@@ -566,7 +601,7 @@
         "description": "The table next to yours is arguing about the reading, and you have opinions."
       }
     ],
-    "iconImage": "sprites/icons/places-spell-and-sip-cutout.png"
+    "iconImage": "sprites/icons/places-spell-and-sip-cutout.webp"
   },
   {
     "id": "pixel-and-rune",
@@ -597,7 +632,7 @@
         "description": "You feed the machine and step onto the pad as the first track starts."
       }
     ],
-    "iconImage": "sprites/icons/places-pixel-and-rune-cutout.png"
+    "iconImage": "sprites/icons/places-pixel-and-rune-cutout.webp"
   },
   {
     "id": "boba-blossom",
@@ -628,7 +663,7 @@
         "description": "The line is long, slow and bored, which is an audience."
       }
     ],
-    "iconImage": "sprites/icons/places-boba-blossom-cutout.png"
+    "iconImage": "sprites/icons/places-boba-blossom-cutout.webp"
   },
   {
     "id": "cauldron",
@@ -664,7 +699,7 @@
         "description": "You take a table for one and behave as though you do this every week."
       }
     ],
-    "iconImage": "sprites/icons/places-cauldron-cutout.png"
+    "iconImage": "sprites/icons/places-cauldron-cutout.webp"
   },
   {
     "id": "ironroot",
@@ -700,7 +735,7 @@
         "description": "An hour of running that goes nowhere, and then the circuit."
       }
     ],
-    "iconImage": "sprites/icons/places-ironroot-cutout.png"
+    "iconImage": "sprites/icons/places-ironroot-cutout.webp"
   },
   {
     "id": "lumen",
@@ -731,7 +766,7 @@
         "description": "A matinee of something old and slow, in a nearly empty house."
       }
     ],
-    "iconImage": "sprites/icons/places-lumen-cutout.png"
+    "iconImage": "sprites/icons/places-lumen-cutout.webp"
   },
   {
     "id": "undergrowth",
@@ -767,7 +802,7 @@
         "description": "The floor is packed, the bass is in your ribs, and you are not stopping first."
       }
     ],
-    "iconImage": "sprites/icons/places-undergrowth-cutout.png"
+    "iconImage": "sprites/icons/places-undergrowth-cutout.webp"
   },
   {
     "id": "riverside-park",
@@ -783,6 +818,15 @@
           "day": "generated/backgrounds/riverside-park/default-day.webp",
           "night": "generated/backgrounds/riverside-park/default-night.webp"
         }
+      },
+      {
+        "id": "first-frost",
+        "name": "the Feast of First Frost",
+        "images": {
+          "day": "generated/backgrounds/riverside-park/first-frost-day.webp",
+          "night": "generated/backgrounds/riverside-park/first-frost-night.webp"
+        },
+        "description": "Riverside Park is dressed for the Feast of First Frost: the bare orchard trees strung with frost-blue ice lights, glowing ice lanterns along the path, wreaths on the lamp posts, and the shallows by the bank frozen into a little skating pond. Frost on the benches and the grass."
       }
     ],
     "indoors": false,
@@ -799,7 +843,7 @@
         "description": "You take a bench facing the river and let your thoughts run out."
       }
     ],
-    "iconImage": "sprites/icons/places-riverside-park-cutout.png"
+    "iconImage": "sprites/icons/places-riverside-park-cutout.webp"
   },
   {
     "id": "sire-house",
@@ -912,6 +956,103 @@
     "indoors": true,
     "private": true,
     "drills": [],
-    "iconImage": "sprites/icons/places-sire-house-cutout.png"
+    "iconImage": "sprites/icons/places-sire-house-cutout.webp"
+  },
+  {
+    "id": "saltmere",
+    "name": "Saltmere Springs",
+    "icon": "leaf",
+    "description": "A hot-spring spa town a few hours' drive into the wooded hills: old timber-and-stone bathhouse inns, steaming pools, a waterfall, a lake, and the best autumn color in the kingdom.",
+    "appearance": "A hot-spring spa town in wooded hills: old timber-and-stone bathhouse inns, steaming stone pools, red and gold autumn maples, a lake below the town.",
+    "backgrounds": [
+      {
+        "id": "outdoor-bath",
+        "name": "The outdoor bath",
+        "images": {
+          "day": "generated/backgrounds/saltmere/outdoor-bath.webp",
+          "night": "generated/backgrounds/saltmere/outdoor-bath.webp"
+        },
+        "clip": "sprites/saltmere/outdoor-bath.mp4"
+      },
+      {
+        "id": "cascade",
+        "name": "The cascade",
+        "images": {
+          "day": "generated/backgrounds/saltmere/cascade.webp",
+          "night": "generated/backgrounds/saltmere/cascade.webp"
+        },
+        "clip": "sprites/saltmere/cascade.mp4"
+      },
+      {
+        "id": "night-market",
+        "name": "The night market",
+        "images": {
+          "day": "generated/backgrounds/saltmere/night-market.webp",
+          "night": "generated/backgrounds/saltmere/night-market.webp"
+        },
+        "clip": "sprites/saltmere/night-market.mp4"
+      },
+      {
+        "id": "private-bath",
+        "name": "The private bath",
+        "images": {
+          "day": "generated/backgrounds/saltmere/private-bath.webp",
+          "night": "generated/backgrounds/saltmere/private-bath.webp"
+        },
+        "clip": "sprites/saltmere/private-bath.mp4"
+      },
+      {
+        "id": "lake",
+        "name": "The lake",
+        "images": {
+          "day": "generated/backgrounds/saltmere/lake.webp",
+          "night": "generated/backgrounds/saltmere/lake.webp"
+        },
+        "clip": "sprites/saltmere/lake.mp4"
+      },
+      {
+        "id": "balcony",
+        "name": "The balcony",
+        "images": {
+          "day": "generated/backgrounds/saltmere/balcony.webp",
+          "night": "generated/backgrounds/saltmere/balcony.webp"
+        },
+        "clip": "sprites/saltmere/balcony.mp4"
+      }
+    ],
+    "indoors": false,
+    "private": false,
+    "eventOnly": true
+  },
+  {
+    "id": "ballroom",
+    "name": "the Grand Ballroom",
+    "icon": "music",
+    "description": "The Grand Ballroom of the University's old Assembly Rooms, opened once a year for the Masquerade Ball: a vast hall with a polished parquet floor, crystal chandeliers blazing with enchanted light, swags of red and gold silk, a string quartet in the gallery, and tall glass doors onto a moonlit stone terrace above the gardens.",
+    "appearance": "A vast university ballroom at night: a polished parquet dance floor, tall arched windows, golden pilasters, three great crystal chandeliers, swags of deep red and gold silk, a gallery for musicians, and tall glass doors open onto a moonlit terrace.",
+    "backgrounds": [
+      {
+        "id": "default",
+        "name": "Default",
+        "images": {
+          "day": "generated/backgrounds/ballroom/ballroom.webp",
+          "night": "generated/backgrounds/ballroom/ballroom.webp"
+        }
+      },
+      {
+        "id": "terrace",
+        "name": "The terrace",
+        "images": {
+          "day": "generated/backgrounds/ballroom/terrace.webp",
+          "night": "generated/backgrounds/ballroom/terrace.webp"
+        },
+        "indoors": false,
+        "description": "The moonlit stone terrace outside the ballroom: a long carved balustrade over the dark autumn gardens, a stone bench in an alcove of clipped hedges, lanterns, and the music faint through the glass doors. Nobody else is out here."
+      }
+    ],
+    "indoors": true,
+    "eventOnly": true,
+    "private": false,
+    "drills": []
   }
 ]

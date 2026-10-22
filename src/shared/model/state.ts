@@ -119,6 +119,8 @@ export const GameStateSchema = z.object({
   revealed: z.record(z.string(), z.array(z.string())),
   /** Messages exchanged in Bloomr DMs, by love interest id, oldest first. */
   courier: z.record(z.string(), z.array(CourierNoteSchema)),
+  /** Group chats on Bloomr, by id: what each is called, who is in it besides him, and what has been said in it. */
+  groupChats: z.record(z.string(), z.object({ name: z.string(), memberIds: z.array(z.string()), notes: z.array(CourierNoteSchema) })).default({}),
   /** The love interests the player has met, by id: everyone he has been in a scene with. */
   met: z.array(z.string()),
   /** The job the player holds, or null when he has none. */
@@ -139,6 +141,20 @@ export const GameStateSchema = z.object({
   eventGoers: z.record(z.string(), z.array(z.string())).default({}),
   /** The parts of events he has been to, each as the event's id and the part's, joined with a colon. */
   partsAttended: z.array(z.string()).default([]),
+  /** The trips he has booked, by event id: who is going with him. */
+  trips: z.record(z.string(), z.array(z.string())).default({}),
+  /**
+   * A masked ball under way: the part it is (event and part ids, joined with a colon), those who dance with him in the
+   * order they come, each in her mask (none for the stand-in, who comes as she is), how many have, and the hour it began.
+   */
+  masquerade: z
+    .object({
+      part: z.string(),
+      dancers: z.array(z.object({ id: z.string(), maskId: z.string().optional() })),
+      danced: z.number().int().min(0),
+      startedAt: z.number().int()
+    })
+    .optional(),
   /** He is in his own room, in the place it is in, and not merely somewhere in that place: what is shown behind him is the room. */
   inOwnRoom: z.boolean().default(false),
   /** Jobs he has quit or been let go from. None of them will have him back. */

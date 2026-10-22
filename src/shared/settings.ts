@@ -10,7 +10,9 @@ export const LlmProfileSchema = z.object({
   apiKey: z.string().default(''),
   model: z.string().default(''),
   temperature: z.number().min(0).max(2).default(0.8),
-  maxTokens: z.number().int().min(1).default(400),
+  // Only a ceiling: what a reply costs is what it says. Its hidden tags, a tool call and a thinking model's reasoning all
+  // come out of it, and a reply cut short loses them.
+  maxTokens: z.number().int().min(1).default(1024),
   /** Appended to every system prompt sent through this profile. */
   instructions: z.string().default('')
 })

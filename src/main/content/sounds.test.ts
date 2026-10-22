@@ -15,8 +15,12 @@ describe('the sounds of the default pack', () => {
     expect(files.filter((file) => !existsSync(join(dir, file)))).toEqual([])
   })
 
-  it('has a loop for every pose', () => {
+  it('has a sound for every pose', () => {
     expect(NSFW_POSES.filter((pose) => !sounds.poses[pose.id]).map((pose) => pose.id)).toEqual([])
+  })
+
+  it('plays the clip of creampie and facial for its own audio', () => {
+    expect(['creampie', 'facial'].filter((id) => !sounds.poses[id]?.clip)).toEqual([])
   })
 
   it('credits every sound', () => {

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { unreadNotes } from '../../../shared/game'
+import { phoneUnread, tripUnderway } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { HelpIcon, MenuIcon } from './icons'
 import bagArt from '../../../assets/tiles/bag.png'
@@ -7,7 +7,7 @@ import calendarArt from '../../../assets/tiles/calendar.png'
 import houseArt from '../../../assets/tiles/house.png'
 import mapArt from '../../../assets/tiles/map.png'
 import phoneArt from '../../../assets/tiles/phone.png'
-import type { Panel } from './panels'
+import type { Panel, PhoneApp } from './panels'
 
 interface Props {
   content: ContentPack
@@ -15,6 +15,8 @@ interface Props {
   onOpen: (panel: Panel) => void
   /** Whose thread the phone opens on: in a scene, hers. Left out, the list of threads. */
   phoneId?: string
+  /** Which app the phone opens on, where it is not hers or his DMs. */
+  phoneApp?: PhoneApp
   /** What the bag opens: in a scene, what can be given to her. */
   bag?: Panel
   bagDisabled?: boolean
@@ -28,12 +30,14 @@ interface Props {
 /** A tile's picture, drawn and not an icon: the thing itself. */
 const Art = ({ src }: { src: string }) => <img className="tile-art" src={src} alt="" draggable={false} />
 
-export function NavTiles({ content, state, onOpen, phoneId, bag = { kind: 'bag' }, bagDisabled, home, extras }: Props) {
+export function NavTiles({ content, state, onOpen, phoneId, phoneApp, bag = { kind: 'bag' }, bagDisabled, home, extras }: Props) {
+  // Away on a trip he booked, the house is not his to go into until the last of it is done.
+  const away = tripUnderway(content, state) !== undefined
   return (
     <div className="tiles">
       {/* His house, once he has one: its plan, who lives in it, and its accounts. */}
       {home && content.housing && state.housing.status === 'resident' && (
-        <button className="tile glass home" onClick={() => onOpen({ kind: 'house' })}>
+        <button className="tile glass home" disabled={away} title={away ? 'You are away' : undefined} onClick={() => onOpen({ kind: 'house' })}>
           <Art src={houseArt} />
           {content.housing.name}
           {state.housing.arrears > 0 && <span className="badge">!</span>}
@@ -43,10 +47,10 @@ export function NavTiles({ content, state, onOpen, phoneId, bag = { kind: 'bag' 
         <Art src={mapArt} />
         Map
       </button>
-      <button className="tile glass" data-tour="phone" onClick={() => onOpen({ kind: 'courier', id: phoneId })}>
+      <button className="tile glass" data-tour="phone" onClick={() => onOpen({ kind: 'courier', id: phoneId, app: phoneApp })}>
         <Art src={phoneArt} />
         Phone
-        {unreadNotes(state) > 0 && <span className="badge">{unreadNotes(state)}</span>}
+        {phoneUnread(state) > 0 && <span className="badge">{phoneUnread(state)}</span>}
       </button>
       <button className="tile glass" data-tour="calendar" onClick={() => onOpen({ kind: 'calendar' })}>
         <Art src={calendarArt} />

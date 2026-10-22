@@ -18,6 +18,8 @@ export const STAT_LABELS: Record<Stat, string> = {
 /** A note sent between the player and a love interest by the intercampus courier. */
 export const CourierNoteSchema = z.object({
   from: z.enum(['player', 'them']),
+  /** In a group chat, which of them said it. */
+  speakerId: z.string().optional(),
   text: z.string(),
   /** Game time (hours since start) at which it was sent. */
   time: z.number().int().min(0),

@@ -29,7 +29,6 @@ import { ArtTool } from "../art/ArtTool";
 import { ComfyEditor } from "./ComfyEditor";
 import { NewCharacterDialog } from "./NewCharacterDialog";
 import { CatalogueEditor } from "./CatalogueEditor";
-import { EventsEditor } from "./EventsEditor";
 import { JobsEditor } from "./JobsEditor";
 import { SocietiesEditor } from "./SocietiesEditor";
 import { LocationEditor } from "./LocationEditor";
@@ -82,7 +81,7 @@ function firstSubject(content: ContentPack, teaching: boolean): Studies {
 const same = (a: unknown, b: unknown) =>
   JSON.stringify(a) === JSON.stringify(b);
 
-const SIDES = ["Characters", "Player", "Locations", "Events", "Courses", "Societies", "Jobs", "ComfyUI"] as const;
+const SIDES = ["Characters", "Player", "Locations", "Courses", "Societies", "Jobs", "ComfyUI"] as const;
 type Side = (typeof SIDES)[number];
 // The sides that change the game itself and not what a player adds to it: there only when the game's own files are being edited.
 const AUTHORING: readonly Side[] = ["Player", "Locations", "Societies", "Jobs"];
@@ -134,8 +133,6 @@ export function ContentEditor(props: Props) {
   );
   return side === "Courses" ? (
     <CatalogueEditor {...props} switcher={switcher} />
-  ) : side === "Events" ? (
-    <EventsEditor {...props} switcher={switcher} />
   ) : side === "Jobs" ? (
     <JobsEditor {...props} switcher={switcher} />
   ) : side === "Societies" ? (

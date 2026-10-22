@@ -18,13 +18,19 @@ export const SoundSchema = z.object({
 })
 export type Sound = z.infer<typeof SoundSchema>
 
+/** What a pose sounds like: a loop played under it, or, with `clip`, the clip's own audio while a clip is shown and the loop only under a still. */
+export const PoseSoundSchema = SoundSchema.extend({
+  clip: z.boolean().default(false)
+})
+export type PoseSound = z.infer<typeof PoseSoundSchema>
+
 export const SoundsSchema = z.object({
   cues: z.partialRecord(z.enum(CUES), SoundSchema).default({}),
   /** Loops played behind a place, by an id of their own so that places can share one. */
   ambience: z.record(z.string(), SoundSchema).default({}),
   /** Which ambience plays at each location, by location id: by day, and by night if it differs. A place left out is silent. */
   places: z.record(z.string(), z.object({ day: z.string(), night: z.string().optional() })).default({}),
-  /** Loops played while an NSFW pose is up in a scene, by the id of the pose (one drawn pregnant plays its base pose's). */
-  poses: z.record(z.string(), SoundSchema).default({})
+  /** What plays while an NSFW pose is up in a scene, by the id of the pose (one drawn pregnant plays its base pose's). */
+  poses: z.record(z.string(), PoseSoundSchema).default({})
 })
 export type Sounds = z.infer<typeof SoundsSchema>

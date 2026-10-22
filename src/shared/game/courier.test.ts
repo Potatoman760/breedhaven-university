@@ -25,8 +25,10 @@ import {
   inviteStands,
   markRead,
   offersContact,
-  unreadNotes
+  unreadNotes,
+  phoneUnread
 } from './courier'
+import { addPosts } from './feed'
 import { buildCharacterPrompt } from './prompt'
 import { createInitialState } from './state'
 import { fixture } from './testFixture'
@@ -56,6 +58,12 @@ describe('notes', () => {
     expect(unreadNotes(chatted, 'nobody')).toBe(0)
     expect(unreadNotes(markRead(chatted, 'ana'))).toBe(0)
     expect(markRead(start, 'ana')).toBe(start)
+  })
+
+  it('add up with the posts on the feed he has not seen, for the badge on his phone', () => {
+    const posted = addPosts(chatted, [{ authorId: 'ana', time: 0, text: 'Tea, anyone?' }])
+    expect(phoneUnread(posted)).toBe(2)
+    expect(phoneUnread(markRead(posted, 'ana'))).toBe(1)
   })
 
   it('carry invitations the player can accept onto the calendar, decline, or let lapse', () => {

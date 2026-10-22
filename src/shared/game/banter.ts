@@ -1,4 +1,4 @@
-import { HIM, type ContentPack, type GameState } from '../model'
+import { HIM, type ContentPack, type GameState, type LoveInterest } from '../model'
 import { nodeAt, pregnancyPower, roleOf } from './expedition'
 import { pregnancyStage } from './pregnancy'
 import { stageFor } from './relationships'
@@ -93,16 +93,20 @@ export interface BanterLine {
  * party, or is said by him, is left out, as is anything past the few that were asked for.
  */
 export function parseBanter(reply: string, content: ContentPack, state: GameState): BanterLine[] {
-  const party = partyOf(content, state)
+  return readLines(reply, partyOf(content, state).map(({ li }) => li))
+}
+
+/** Lines of "Name: what she says", each given to whoever of `people` it names; the rest left out. */
+export function readLines(reply: string, people: LoveInterest[], most = BANTER_LINES): BanterLine[] {
   const lines: BanterLine[] = []
   for (const raw of reply.replace(/<think(?:ing)?>[\s\S]*?<\/think(?:ing)?>/gi, '').split('\n')) {
     const found = /^\s*[-*"“]*\s*([^:"”]{1,40}?)\s*[*"”]*\s*:\s*(.+)$/.exec(raw)
     if (!found) continue
-    const speaker = party.find(({ li }) => namesHer(found[1], li))
+    const speaker = people.find((li) => namesHer(found[1], li))
     // What is said is said aloud: anything wrapped round it comes off, and stage directions between asterisks go.
     const text = found[2].replace(/\*[^*]*\*/g, '').replace(/\[[^\]]*\]/g, '').trim().replace(/^["“]+|["”]+$/g, '').trim().slice(0, LINE_CHARS)
-    if (speaker && text !== '') lines.push({ speakerId: speaker.li.id, text })
-    if (lines.length >= BANTER_LINES) break
+    if (speaker && text !== '') lines.push({ speakerId: speaker.id, text })
+    if (lines.length >= most) break
   }
   return lines
 }

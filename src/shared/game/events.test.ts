@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { CalendarEvent, GameState } from '../model'
+import { BackgroundSchema, type CalendarEvent, type GameState } from '../model'
 import { canPerform } from './activities'
 import {
   addEvents,
@@ -7,6 +7,8 @@ import {
   describeEvent,
   eventHours,
   eventsOn,
+  mapDressingAt,
+  songAt,
   parseGeneratedEvents,
   removeEvent,
   upcomingEvents
@@ -35,6 +37,29 @@ const event = (extra: Partial<CalendarEvent>): CalendarEvent => ({
   durationDays: 1,
   generated: true,
   ...extra
+})
+
+describe('mapDressingAt', () => {
+  const dressed = { ...content.locations[1], backgrounds: [...content.locations[1].backgrounds, BackgroundSchema.parse({ id: 'feast', name: 'the Feast' })] }
+  const winter = { ...content, calendar: { ...content.calendar, events: content.calendar.events.map((e) => ({ ...e, mapDressing: 'wreath.png' })) } }
+
+  it('is the dressing of an event that is on, on a place dressed for it', () => {
+    expect(mapDressingAt(winter, atDay(2), dressed)).toBe('wreath.png')
+  })
+
+  it('comes with the song of an event that has one, at a place dressed for it, on its day', () => {
+    const singing = { ...content, calendar: { ...content.calendar, events: content.calendar.events.map((e) => ({ ...e, song: 'carol.mp3' })) } }
+    expect(songAt(singing, atDay(2), dressed)).toBe('carol.mp3')
+    expect(songAt(singing, atDay(3), dressed)).toBeUndefined()
+    expect(songAt(singing, atDay(2), content.locations[0])).toBeUndefined()
+    expect(songAt(content, atDay(2), dressed)).toBeUndefined()
+  })
+
+  it('is nothing on another day, on a place not dressed for it, or for an event with none', () => {
+    expect(mapDressingAt(winter, atDay(3), dressed)).toBeUndefined()
+    expect(mapDressingAt(winter, atDay(2), content.locations[0])).toBeUndefined()
+    expect(mapDressingAt(content, atDay(2), dressed)).toBeUndefined()
+  })
 })
 
 describe('eventsOn', () => {

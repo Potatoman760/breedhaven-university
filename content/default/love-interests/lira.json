@@ -269,8 +269,8 @@
     "locationId": "bathhouse",
     "background": "generated/backgrounds/lira/view.webp"
   },
-  "birthPicture": "sprites/lira/birth.png",
-  "walkSprite": "sprites/lira/walk-cutout.png",
+  "birthPicture": "sprites/lira/birth.webp",
+  "walkSprite": "sprites/lira/walk-cutout.webp",
   "childNames": {
     "daughters": [
       "Dew",

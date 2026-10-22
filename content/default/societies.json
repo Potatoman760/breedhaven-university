@@ -22,7 +22,7 @@
         "yelena"
       ],
       "sponsorId": "caelwen",
-      "iconImage": "sprites/icons/societies-debating-union-cutout.png",
+      "iconImage": "sprites/icons/societies-debating-union-cutout.webp",
       "syllabus": [
         "Introductions, and a warm-up motion: \"This house believes the Bloom is a blessing.\" Caelwen refuses to say who won.",
         "How to build an argument: claim, reason, evidence. Seraphine and Yelena each pick it apart in the other.",
@@ -124,7 +124,7 @@
         "tamsin"
       ],
       "sponsorId": "grushka",
-      "iconImage": "sprites/icons/societies-volleyball-club-cutout.png",
+      "iconImage": "sprites/icons/societies-volleyball-club-cutout.webp",
       "syllabus": [
         "Try-outs: Daphne watches everyone serve and says nothing, which is worse.",
         "Footwork and the ready stance. Grushka makes everyone hold it until their legs shake.",
@@ -226,7 +226,7 @@
         "lira",
         "tamsin"
       ],
-      "iconImage": "sprites/icons/societies-physic-garden-society-cutout.png",
+      "iconImage": "sprites/icons/societies-physic-garden-society-cutout.webp",
       "syllabus": [
         "A tour of the walled garden, and Lira's ponds. Do not drink from the blue one.",
         "Weeding the herb beds, and learning which weeds bite back.",
@@ -324,7 +324,7 @@
         "maren",
         "morwenna"
       ],
-      "iconImage": "sprites/icons/societies-furrow-choir-cutout.png",
+      "iconImage": "sprites/icons/societies-furrow-choir-cutout.webp",
       "syllabus": [
         "Auditions. Morwenna sings one line and the room goes quiet.",
         "Breathing: from the belly, not the chest. Maren demonstrates with enthusiasm.",
@@ -332,7 +332,7 @@
         "Harmony: the altos learn their part, slowly.",
         "The modern song the choirmaster pretends not to like.",
         "Singing in the round, which goes wrong in a way everyone enjoys.",
-        "A practice service for the Harvest Fair.",
+        "A practice service for the Masquerade Ball's supper.",
         "Diction: the old hymns are in an older tongue, and every word matters.",
         "A solo for Morwenna, which she refuses, and then sings anyway.",
         "Snowed into the bell tower after carol practice, sharing one blanket.",
@@ -421,7 +421,7 @@
         "dinah"
       ],
       "sponsorId": "lola-hopworth",
-      "iconImage": "sprites/icons/societies-bloomist-fellowship-cutout.png",
+      "iconImage": "sprites/icons/societies-bloomist-fellowship-cutout.webp",
       "syllabus": [
         "A first reading: the Bloom, and why the Fellowship holds it sacred. Lola brings cake.",
         "Prayers of the morning and evening, and what they ask for.",
@@ -554,9 +554,9 @@
         "elowen"
       ],
       "sponsorId": "ottilie",
-      "iconImage": "sprites/icons/societies-freewill-society-cutout.png",
+      "iconImage": "sprites/icons/societies-freewill-society-cutout.webp",
       "syllabus": [
-        "The founding question: is a woman's will her own, or the Bloom's? Elowen pours the cider.",
+        "The founding question: is a woman's will her own, or the Bloom's? Elowen streams it.",
         "Ottilie on what the Sire assays actually measure.",
         "Truth or dare, after too much cider: the free will part is that you can't refuse a dare.",
         "Reading the Freewill pamphlets of fifty years ago, and laughing at most of them.",
@@ -566,7 +566,7 @@
         "Case studies: the women who said no, and what happened next.",
         "An evening of Elowen's stories, mostly true.",
         "The resistance trial: Ottilie's test of whether a will can hold out against the Bloom.",
-        "Ottilie's lecture on the genetics of the Bloom, simplified for Elowen.",
+        "Ottilie's lecture on the genetics of the Bloom, with Elowen captioning it in memes.",
         "Writing a manifesto, then rewriting it.",
         "A guest from the Arcane Board, who regrets coming.",
         "The question turned around: does a Sire have free will?",
@@ -657,7 +657,7 @@
         "tink",
         "isolde"
       ],
-      "iconImage": "sprites/icons/societies-card-and-dice-society-cutout.png",
+      "iconImage": "sprites/icons/societies-card-and-dice-society-cutout.webp",
       "syllabus": [
         "Welcome: the rules, the house, and Tink's promise not to cheat, which nobody believes.",
         "Isolde on odds: every hand, worked out on paper.",
@@ -754,12 +754,12 @@
         "faye",
         "anwen"
       ],
-      "iconImage": "sprites/icons/societies-merchants-society-cutout.png",
+      "iconImage": "sprites/icons/societies-merchants-society-cutout.webp",
       "syllabus": [
         "A guest speaker from the Broodmarket on what sells, and why.",
         "Bargaining practice: Anwen sets the price, Faye talks it down.",
         "A bulk deal on love potions from Lantern Row, and quality control: somebody has to try them.",
-        "Bookkeeping, taught by Anwen, who is very strict about it.",
+        "Haggling for parts, taught by Anwen, who has never paid the asking price.",
         "Pitch night: a minute to sell an idea to the room.",
         "A visit to Lantern Row's stalls to study how they lay out their goods.",
         "Who's hiring: gossip from every shop in town.",
@@ -795,7 +795,7 @@
                   "Faye: *pouring three glasses* Then we will be very thorough. {player}, you are our impartial tester.",
                   "[EXPRESSION: Anwen=aroused]",
                   "[EXPRESSION: Faye=aroused]",
-                  "*Three sips in, Anwen has abandoned the ledger. She climbs into {player}'s lap, takes his face in her hands, and kisses him like she has been saving it all year.*",
+                  "*Three sips in, Anwen has dropped the attitude. She climbs into {player}'s lap, takes his face in her hands, and kisses him like she has been saving it all year.*",
                   "Faye: *unbuttoning her blouse, watching* Product works. Note it down, Anwen. *Anwen does not note it down.*"
                 ]
               }
@@ -848,7 +848,7 @@
         "maren",
         "yelena"
       ],
-      "iconImage": "sprites/icons/societies-needle-and-thread-cutout.png",
+      "iconImage": "sprites/icons/societies-needle-and-thread-cutout.webp",
       "syllabus": [
         "Introductions, and the first argument about hemlines.",
         "Basic stitches: running, back and blind. Maren brings biscuits.",
@@ -946,7 +946,7 @@
         "yulia"
       ],
       "sponsorId": "vespera",
-      "iconImage": "sprites/icons/societies-midnight-circle-cutout.png",
+      "iconImage": "sprites/icons/societies-midnight-circle-cutout.webp",
       "syllabus": [
         "Casting the first circle in chalk, by candlelight. Vespera says nobody gets cursed. Probably.",
         "Ward-signs and what they keep out.",

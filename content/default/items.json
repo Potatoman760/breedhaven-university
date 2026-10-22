@@ -9,7 +9,7 @@
     "tags": [
       "flowers"
     ],
-    "image": "sprites/items/posy-cutout.png"
+    "image": "sprites/items/posy-cutout.webp"
   },
   {
     "id": "potted-fern",
@@ -21,7 +21,7 @@
     "tags": [
       "plants"
     ],
-    "image": "sprites/items/potted-fern-cutout.png"
+    "image": "sprites/items/potted-fern-cutout.webp"
   },
   {
     "id": "moss-ball",
@@ -34,7 +34,7 @@
       "moss",
       "plants"
     ],
-    "image": "sprites/items/moss-ball-cutout.png"
+    "image": "sprites/items/moss-ball-cutout.webp"
   },
   {
     "id": "seed-packets",
@@ -46,7 +46,7 @@
     "tags": [
       "gardening"
     ],
-    "image": "sprites/items/seed-packets-cutout.png"
+    "image": "sprites/items/seed-packets-cutout.webp"
   },
   {
     "id": "lavender-soap",
@@ -58,7 +58,7 @@
     "tags": [
       "soap"
     ],
-    "image": "sprites/items/lavender-soap-cutout.png"
+    "image": "sprites/items/lavender-soap-cutout.webp"
   },
   {
     "id": "honey-cakes",
@@ -70,7 +70,7 @@
     "tags": [
       "sweets"
     ],
-    "image": "sprites/items/honey-cakes-cutout.png"
+    "image": "sprites/items/honey-cakes-cutout.webp"
   },
   {
     "id": "candied-plums",
@@ -82,7 +82,7 @@
     "tags": [
       "sweets"
     ],
-    "image": "sprites/items/candied-plums-cutout.png"
+    "image": "sprites/items/candied-plums-cutout.webp"
   },
   {
     "id": "loose-leaf-tea",
@@ -94,7 +94,7 @@
     "tags": [
       "tea"
     ],
-    "image": "sprites/items/loose-leaf-tea-cutout.png"
+    "image": "sprites/items/loose-leaf-tea-cutout.webp"
   },
   {
     "id": "coffee-beans",
@@ -106,7 +106,7 @@
     "tags": [
       "coffee"
     ],
-    "image": "sprites/items/coffee-beans-cutout.png"
+    "image": "sprites/items/coffee-beans-cutout.webp"
   },
   {
     "id": "spiced-cider",
@@ -118,7 +118,7 @@
     "tags": [
       "ale"
     ],
-    "image": "sprites/items/spiced-cider-cutout.png"
+    "image": "sprites/items/spiced-cider-cutout.webp"
   },
   {
     "id": "salt-pretzels",
@@ -130,7 +130,7 @@
     "tags": [
       "salt"
     ],
-    "image": "sprites/items/salt-pretzels-cutout.png"
+    "image": "sprites/items/salt-pretzels-cutout.webp"
   },
   {
     "id": "blank-ledger",
@@ -142,7 +142,7 @@
     "tags": [
       "ledgers"
     ],
-    "image": "sprites/items/blank-ledger-cutout.png"
+    "image": "sprites/items/blank-ledger-cutout.webp"
   },
   {
     "id": "trade-treatise",
@@ -155,7 +155,7 @@
       "books",
       "trade"
     ],
-    "image": "sprites/items/trade-treatise-cutout.png"
+    "image": "sprites/items/trade-treatise-cutout.webp"
   },
   {
     "id": "book-of-hymns",
@@ -167,7 +167,7 @@
     "tags": [
       "devotional"
     ],
-    "image": "sprites/items/book-of-hymns-cutout.png"
+    "image": "sprites/items/book-of-hymns-cutout.webp"
   },
   {
     "id": "sketchbook",
@@ -179,7 +179,7 @@
     "tags": [
       "art"
     ],
-    "image": "sprites/items/sketchbook-cutout.png"
+    "image": "sprites/items/sketchbook-cutout.webp"
   },
   {
     "id": "old-map",
@@ -191,7 +191,7 @@
     "tags": [
       "maps"
     ],
-    "image": "sprites/items/old-map-cutout.png"
+    "image": "sprites/items/old-map-cutout.webp"
   },
   {
     "id": "playing-cards",
@@ -203,7 +203,7 @@
     "tags": [
       "cards"
     ],
-    "image": "sprites/items/playing-cards-cutout.png"
+    "image": "sprites/items/playing-cards-cutout.webp"
   },
   {
     "id": "silk-ribbon",
@@ -215,7 +215,7 @@
     "tags": [
       "ribbons"
     ],
-    "image": "sprites/items/silk-ribbon-cutout.png"
+    "image": "sprites/items/silk-ribbon-cutout.webp"
   },
   {
     "id": "lace-choker",
@@ -227,7 +227,7 @@
     "tags": [
       "finery"
     ],
-    "image": "sprites/items/lace-choker-cutout.png"
+    "image": "sprites/items/lace-choker-cutout.webp"
   },
   {
     "id": "river-stone",
@@ -239,7 +239,7 @@
     "tags": [
       "stones"
     ],
-    "image": "sprites/items/river-stone-cutout.png"
+    "image": "sprites/items/river-stone-cutout.webp"
   },
   {
     "id": "whetstone",
@@ -251,7 +251,7 @@
     "tags": [
       "weapons"
     ],
-    "image": "sprites/items/whetstone-cutout.png"
+    "image": "sprites/items/whetstone-cutout.webp"
   },
   {
     "id": "sword-belt",
@@ -263,7 +263,7 @@
     "tags": [
       "leatherwork"
     ],
-    "image": "sprites/items/sword-belt-cutout.png"
+    "image": "sprites/items/sword-belt-cutout.webp"
   },
   {
     "id": "lockpicks",
@@ -275,7 +275,7 @@
     "tags": [
       "lockpicks"
     ],
-    "image": "sprites/items/lockpicks-cutout.png"
+    "image": "sprites/items/lockpicks-cutout.webp"
   },
   {
     "id": "glass-vials",
@@ -287,7 +287,7 @@
     "tags": [
       "potions"
     ],
-    "image": "sprites/items/glass-vials-cutout.png"
+    "image": "sprites/items/glass-vials-cutout.webp"
   },
   {
     "id": "game-cartridge",
@@ -299,7 +299,7 @@
     "tags": [
       "games"
     ],
-    "image": "sprites/items/game-cartridge-cutout.png"
+    "image": "sprites/items/game-cartridge-cutout.webp"
   },
   {
     "id": "hobby-kit",
@@ -311,7 +311,7 @@
     "tags": [
       "gadgets"
     ],
-    "image": "sprites/items/hobby-kit-cutout.png"
+    "image": "sprites/items/hobby-kit-cutout.webp"
   },
   {
     "id": "earbuds",
@@ -323,7 +323,7 @@
     "tags": [
       "music"
     ],
-    "image": "sprites/items/earbuds-cutout.png"
+    "image": "sprites/items/earbuds-cutout.webp"
   },
   {
     "id": "charm-case",
@@ -335,7 +335,7 @@
     "tags": [
       "gadgets"
     ],
-    "image": "sprites/items/charm-case-cutout.png"
+    "image": "sprites/items/charm-case-cutout.webp"
   },
   {
     "id": "instant-ramen",
@@ -347,7 +347,7 @@
     "tags": [
       "salt"
     ],
-    "image": "sprites/items/instant-ramen-cutout.png"
+    "image": "sprites/items/instant-ramen-cutout.webp"
   },
   {
     "id": "energy-drink",
@@ -368,7 +368,7 @@
       ],
       "on": "self"
     },
-    "image": "sprites/items/energy-drink-cutout.png"
+    "image": "sprites/items/energy-drink-cutout.webp"
   },
   {
     "id": "scratchcard",
@@ -380,7 +380,7 @@
     "tags": [
       "cards"
     ],
-    "image": "sprites/items/scratchcard-cutout.png"
+    "image": "sprites/items/scratchcard-cutout.webp"
   },
   {
     "id": "phone-charger",
@@ -392,7 +392,7 @@
     "tags": [
       "gadgets"
     ],
-    "image": "sprites/items/phone-charger-cutout.png"
+    "image": "sprites/items/phone-charger-cutout.webp"
   },
   {
     "id": "bath-salts",
@@ -404,7 +404,7 @@
     "tags": [
       "soap"
     ],
-    "image": "sprites/items/bath-salts-cutout.png"
+    "image": "sprites/items/bath-salts-cutout.webp"
   },
   {
     "id": "chamomile-tea",
@@ -416,7 +416,7 @@
     "tags": [
       "tea"
     ],
-    "image": "sprites/items/chamomile-tea-cutout.png"
+    "image": "sprites/items/chamomile-tea-cutout.webp"
   },
   {
     "id": "study-tonic",
@@ -441,7 +441,7 @@
       ],
       "on": "self"
     },
-    "image": "sprites/items/study-tonic-cutout.png"
+    "image": "sprites/items/study-tonic-cutout.webp"
   },
   {
     "id": "pocket-speaker",
@@ -453,7 +453,7 @@
     "tags": [
       "music"
     ],
-    "image": "sprites/items/pocket-speaker-cutout.png"
+    "image": "sprites/items/pocket-speaker-cutout.webp"
   },
   {
     "id": "game-controller",
@@ -465,7 +465,7 @@
     "tags": [
       "games"
     ],
-    "image": "sprites/items/game-controller-cutout.png"
+    "image": "sprites/items/game-controller-cutout.webp"
   },
   {
     "id": "smart-lamp",
@@ -477,7 +477,7 @@
     "tags": [
       "gadgets"
     ],
-    "image": "sprites/items/smart-lamp-cutout.png"
+    "image": "sprites/items/smart-lamp-cutout.webp"
   },
   {
     "id": "quartz-point",
@@ -489,7 +489,7 @@
     "tags": [
       "stones"
     ],
-    "image": "sprites/items/quartz-point-cutout.png"
+    "image": "sprites/items/quartz-point-cutout.webp"
   },
   {
     "id": "component-pouch",
@@ -501,7 +501,7 @@
     "tags": [
       "potions"
     ],
-    "image": "sprites/items/component-pouch-cutout.png"
+    "image": "sprites/items/component-pouch-cutout.webp"
   },
   {
     "id": "charm-bracelet",
@@ -513,7 +513,7 @@
     "tags": [
       "finery"
     ],
-    "image": "sprites/items/charm-bracelet-cutout.png"
+    "image": "sprites/items/charm-bracelet-cutout.webp"
   },
   {
     "id": "tarot-deck",
@@ -525,7 +525,7 @@
     "tags": [
       "cards"
     ],
-    "image": "sprites/items/tarot-deck-cutout.png"
+    "image": "sprites/items/tarot-deck-cutout.webp"
   },
   {
     "id": "grimoire",
@@ -537,7 +537,7 @@
     "tags": [
       "books"
     ],
-    "image": "sprites/items/grimoire-cutout.png"
+    "image": "sprites/items/grimoire-cutout.webp"
   },
   {
     "id": "heretics-history",
@@ -549,7 +549,7 @@
     "tags": [
       "books"
     ],
-    "image": "sprites/items/heretics-history-cutout.png"
+    "image": "sprites/items/heretics-history-cutout.webp"
   },
   {
     "id": "antique-atlas",
@@ -561,7 +561,7 @@
     "tags": [
       "maps"
     ],
-    "image": "sprites/items/antique-atlas-cutout.png"
+    "image": "sprites/items/antique-atlas-cutout.webp"
   },
   {
     "id": "curio",
@@ -573,7 +573,7 @@
     "tags": [
       "lockpicks"
     ],
-    "image": "sprites/items/curio-cutout.png"
+    "image": "sprites/items/curio-cutout.webp"
   },
   {
     "id": "vintage-scarf",
@@ -586,7 +586,7 @@
       "ribbons",
       "finery"
     ],
-    "image": "sprites/items/vintage-scarf-cutout.png"
+    "image": "sprites/items/vintage-scarf-cutout.webp"
   },
   {
     "id": "band-tee",
@@ -598,7 +598,7 @@
     "tags": [
       "music"
     ],
-    "image": "sprites/items/band-tee-cutout.png"
+    "image": "sprites/items/band-tee-cutout.webp"
   },
   {
     "id": "worn-leather-jacket",
@@ -610,7 +610,7 @@
     "tags": [
       "leatherwork"
     ],
-    "image": "sprites/items/worn-leather-jacket-cutout.png"
+    "image": "sprites/items/worn-leather-jacket-cutout.webp"
   },
   {
     "id": "paperback",
@@ -622,7 +622,7 @@
     "tags": [
       "books"
     ],
-    "image": "sprites/items/paperback-cutout.png"
+    "image": "sprites/items/paperback-cutout.webp"
   },
   {
     "id": "heartsease-draught",
@@ -647,7 +647,7 @@
       ],
       "on": "self"
     },
-    "image": "sprites/items/heartsease-draught-cutout.png"
+    "image": "sprites/items/heartsease-draught-cutout.webp"
   },
   {
     "id": "bloom-cordial",
@@ -674,7 +674,7 @@
       ],
       "on": "her"
     },
-    "image": "sprites/items/bloom-cordial-cutout.png"
+    "image": "sprites/items/bloom-cordial-cutout.webp"
   },
   {
     "id": "charmed-confection",
@@ -687,7 +687,7 @@
       "sweets"
     ],
     "lovedByAll": true,
-    "image": "sprites/items/charmed-confection-cutout.png"
+    "image": "sprites/items/charmed-confection-cutout.webp"
   },
   {
     "id": "stillwater",
@@ -700,7 +700,7 @@
     "below": {
       "footing": 12
     },
-    "image": "sprites/items/stillwater-cutout.png"
+    "image": "sprites/items/stillwater-cutout.webp"
   },
   {
     "id": "grounding-salt",
@@ -714,7 +714,7 @@
       "footing": 4,
       "calms": true
     },
-    "image": "sprites/items/grounding-salt-cutout.png"
+    "image": "sprites/items/grounding-salt-cutout.webp"
   },
   {
     "id": "spring-tonic",
@@ -735,7 +735,7 @@
     "below": {
       "footing": 8
     },
-    "image": "sprites/items/spring-tonic-cutout.png"
+    "image": "sprites/items/spring-tonic-cutout.webp"
   },
   {
     "id": "resonance-token",
@@ -755,7 +755,7 @@
       ],
       "on": "her"
     },
-    "image": "sprites/items/resonance-token-cutout.png"
+    "image": "sprites/items/resonance-token-cutout.webp"
   },
   {
     "id": "stamina-band",
@@ -774,7 +774,7 @@
       ],
       "on": "self"
     },
-    "image": "sprites/items/stamina-band-cutout.png"
+    "image": "sprites/items/stamina-band-cutout.webp"
   },
   {
     "id": "first-blossom-bouquet",
@@ -786,7 +786,7 @@
     "tags": [
       "flowers"
     ],
-    "image": "sprites/items/first-blossom-bouquet-cutout.png"
+    "image": "sprites/items/first-blossom-bouquet-cutout.webp"
   },
   {
     "id": "dawnbloom-rose",
@@ -798,7 +798,7 @@
     "tags": [
       "flowers"
     ],
-    "image": "sprites/items/dawnbloom-rose-cutout.png"
+    "image": "sprites/items/dawnbloom-rose-cutout.webp"
   },
   {
     "id": "beeswax-tapers",
@@ -810,7 +810,7 @@
     "tags": [
       "candles"
     ],
-    "image": "sprites/items/beeswax-tapers-cutout.png"
+    "image": "sprites/items/beeswax-tapers-cutout.webp"
   },
   {
     "id": "charmed-trowel",
@@ -822,7 +822,7 @@
     "tags": [
       "gardening"
     ],
-    "image": "sprites/items/charmed-trowel-cutout.png"
+    "image": "sprites/items/charmed-trowel-cutout.webp"
   },
   {
     "id": "moss-terrarium",
@@ -835,7 +835,7 @@
       "moss",
       "plants"
     ],
-    "image": "sprites/items/moss-terrarium-cutout.png"
+    "image": "sprites/items/moss-terrarium-cutout.webp"
   },
   {
     "id": "kharadi-stout",
@@ -847,7 +847,7 @@
     "tags": [
       "ale"
     ],
-    "image": "sprites/items/kharadi-stout-cutout.png"
+    "image": "sprites/items/kharadi-stout-cutout.webp"
   },
   {
     "id": "brown-ale",
@@ -859,7 +859,7 @@
     "tags": [
       "ale"
     ],
-    "image": "sprites/items/brown-ale-cutout.png"
+    "image": "sprites/items/brown-ale-cutout.webp"
   },
   {
     "id": "apple-tart",
@@ -871,7 +871,7 @@
     "tags": [
       "sweets"
     ],
-    "image": "sprites/items/apple-tart-cutout.png"
+    "image": "sprites/items/apple-tart-cutout.webp"
   },
   {
     "id": "starkeland-honey-drops",
@@ -883,7 +883,7 @@
     "tags": [
       "sweets"
     ],
-    "image": "sprites/items/starkeland-honey-drops-cutout.png"
+    "image": "sprites/items/starkeland-honey-drops-cutout.webp"
   },
   {
     "id": "vesperan-romance",
@@ -895,7 +895,7 @@
     "tags": [
       "books"
     ],
-    "image": "sprites/items/vesperan-romance-cutout.png"
+    "image": "sprites/items/vesperan-romance-cutout.webp"
   },
   {
     "id": "paint-set",
@@ -907,7 +907,7 @@
     "tags": [
       "art"
     ],
-    "image": "sprites/items/paint-set-cutout.png"
+    "image": "sprites/items/paint-set-cutout.webp"
   },
   {
     "id": "practice-blade",
@@ -919,7 +919,7 @@
     "tags": [
       "weapons"
     ],
-    "image": "sprites/items/practice-blade-cutout.png"
+    "image": "sprites/items/practice-blade-cutout.webp"
   },
   {
     "id": "banded-agate",
@@ -931,7 +931,7 @@
     "tags": [
       "stones"
     ],
-    "image": "sprites/items/banded-agate-cutout.png"
+    "image": "sprites/items/banded-agate-cutout.webp"
   },
   {
     "id": "prayer-beads",
@@ -943,7 +943,7 @@
     "tags": [
       "devotional"
     ],
-    "image": "sprites/items/prayer-beads-cutout.png"
+    "image": "sprites/items/prayer-beads-cutout.webp"
   },
   {
     "id": "match-ball",
@@ -955,7 +955,7 @@
     "tags": [
       "sport"
     ],
-    "image": "sprites/items/match-ball-cutout.png"
+    "image": "sprites/items/match-ball-cutout.webp"
   },
   {
     "id": "lantern-row-whisper",
@@ -967,7 +967,7 @@
     "tags": [
       "overheard gossip"
     ],
-    "image": "sprites/items/lantern-row-whisper-cutout.png"
+    "image": "sprites/items/lantern-row-whisper-cutout.webp"
   },
   {
     "id": "arena-program",
@@ -979,7 +979,7 @@
     "tags": [
       "sport"
     ],
-    "image": "sprites/items/arena-program-cutout.png"
+    "image": "sprites/items/arena-program-cutout.webp"
   },
   {
     "id": "ward-candles",
@@ -991,7 +991,7 @@
     "tags": [
       "candles"
     ],
-    "image": "sprites/items/ward-candles-cutout.png"
+    "image": "sprites/items/ward-candles-cutout.webp"
   },
   {
     "id": "first-rain",
@@ -1003,7 +1003,7 @@
     "tags": [
       "rain"
     ],
-    "image": "sprites/items/first-rain-cutout.png"
+    "image": "sprites/items/first-rain-cutout.webp"
   },
   {
     "id": "veyran-mask",
@@ -1015,7 +1015,7 @@
     "tags": [
       "art"
     ],
-    "image": "sprites/items/veyran-mask-cutout.png"
+    "image": "sprites/items/veyran-mask-cutout.webp"
   },
   {
     "id": "coffee-to-go",
@@ -1027,7 +1027,7 @@
     "tags": [
       "coffee"
     ],
-    "image": "sprites/items/coffee-to-go-cutout.png"
+    "image": "sprites/items/coffee-to-go-cutout.webp"
   },
   {
     "id": "almond-croissant",
@@ -1039,6 +1039,6 @@
     "tags": [
       "sweets"
     ],
-    "image": "sprites/items/almond-croissant-cutout.png"
+    "image": "sprites/items/almond-croissant-cutout.webp"
   }
 ]

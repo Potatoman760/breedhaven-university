@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, type CSSProperties } from 'react'
-import { canTravel, isOpen, loveInterestsAt, toDate, wayDownAt, whereaboutsUnknown } from '../../../shared/game'
+import { canTravel, isOpen, loveInterestsAt, mapDressingAt, toDate, wayDownAt, whereaboutsUnknown } from '../../../shared/game'
 import type { ContentPack, GameState, Location, MapPin } from '../../../shared/model'
 import { Button } from './Button'
 import { Dialog, Overlay, ToBeImplemented } from './Dialog'
@@ -58,7 +58,7 @@ export function MapPanel({ content, state, onTravel, withHim = [], onClose }: Pr
     ...(locationId === state.locationId ? content.loveInterests.filter((li) => withHim.includes(li.id)) : [])
   ]
   const wayDown = wayDownAt(content, state)
-  const elsewhere = content.locations.filter((location) => !map.pins.some((pin) => pin.locationId === location.id))
+  const elsewhere = content.locations.filter((location) => !location.eventOnly && !map.pins.some((pin) => pin.locationId === location.id))
 
   /** Where a place stands for him now: here, shut, or somewhere to go (and if not, why not). */
   const standing = (location: Location) => {
@@ -80,6 +80,7 @@ export function MapPanel({ content, state, onTravel, withHim = [], onClose }: Pr
     const { here, closed, ok, why } = standing(location)
     const people = peopleAt(location.id)
     const portal = location.id === wayDown
+    const dressing = mapDressingAt(content, state, location)
     const classes = ['map-pin', here && 'here', closed && 'closed', portal && 'portal']
     return (
       <div key={location.id} className={classes.filter(Boolean).join(' ')} style={{ left: `${spot.x}%`, top: `${spot.y}%` }}>
@@ -88,6 +89,8 @@ export function MapPanel({ content, state, onTravel, withHim = [], onClose }: Pr
             {/* The way down: a ring of runes turning around it. */}
             {portal && <span className="map-runes" aria-hidden="true" />}
             <PlaceIcon name={location.icon} image={location.iconImage} size={20} />
+            {/* Dressed for the day: a wreath around it at the Feast of First Frost. */}
+            {dressing && <img className="map-dressing" src={`content://pack/${dressing}`} alt="" aria-hidden="true" />}
           </span>
           <span className="map-plate">{placeName(location)}</span>
           {portal && <span className="map-below">{content.expedition?.name.replace(/^the /, '')}</span>}

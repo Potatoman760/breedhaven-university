@@ -24,9 +24,8 @@ interface Props {
   config: HousingConfig
   light: Light
   picked: string | undefined
-  /** A room just built, and one just moved into, for the moment they are celebrated. */
+  /** A room just built, for the moment it is celebrated. */
   built?: string
-  movedInto?: string
   /** A room that was asked for and cannot be paid for: its price shakes. */
   refused?: string
   onPick: (key: string) => void
@@ -40,7 +39,7 @@ export const wornSprite = (content: ContentPack, state: GameState, li: LoveInter
  * one another under a roof, built from the plan, so that a house of any rooms draws itself. What is not built yet is
  * dark and locked, with its price.
  */
-export function HouseFacade({ content, state, config, light, picked, built, movedInto, refused, onPick }: Props) {
+export function HouseFacade({ content, state, config, light, picked, built, refused, onPick }: Props) {
   const layout = houseLayout(config)
   const house = content.locations.find((l) => l.id === config.locationId)
   const atHome = state.locationId === config.locationId
@@ -118,8 +117,7 @@ export function HouseFacade({ content, state, config, light, picked, built, move
       room.plan.outdoors && 'outdoors',
       affordable && 'affordable',
       picked === room.key && 'selected',
-      built === room.key && 'building',
-      movedInto === room.key && 'moving-in'
+      built === room.key && 'building'
     ]
     return (
       <button
@@ -150,7 +148,7 @@ export function HouseFacade({ content, state, config, light, picked, built, move
         {present.length > 0 && (
           <span className="room-faces">
             {present.map((li) => (
-              <Portrait key={li.id} who={li} image={wornSprite(content, state, li)} size={52} className={movedInto === room.key ? 'room-face arrived' : 'room-face'} />
+              <Portrait key={li.id} who={li} image={wornSprite(content, state, li)} size={52} className="room-face" />
             ))}
           </span>
         )}

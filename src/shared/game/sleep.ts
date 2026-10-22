@@ -2,6 +2,7 @@ import type { ContentPack, GameState } from '../model'
 import { isGameOver, toDate } from './calendar'
 import { describeWhen } from './appointments'
 import { outingMisses } from './outing'
+import { tripUnderway } from './trips'
 
 /**
  * The hours kept for sleep: from midnight until he wakes. Nothing else happens in them.
@@ -28,6 +29,8 @@ export function wakeTime(content: ContentPack, state: GameState): number {
  * both what the small hours do to him and how he ends a day early.
  */
 export function sleep(content: ContentPack, state: GameState): GameState {
+  // Away on a trip, he sleeps where he is.
+  if (tripUnderway(content, state)) return { ...state, time: wakeTime(content, state), player: { ...state.player, energy: state.player.maxEnergy } }
   return { ...state, time: wakeTime(content, state), locationId: homeOf(content), inOwnRoom: content.newGame.room !== undefined, player: { ...state.player, energy: state.player.maxEnergy } }
 }
 

@@ -11,7 +11,7 @@ describe('the courses of the default pack', () => {
 
   it('each teach one thing, whether or not they are given this term', () => {
     const written = content.curriculum!.majors.flatMap((major) => major.courses.map((course) => ({ major, course })))
-    expect(written).toHaveLength(35)
+    expect(written).toHaveLength(37)
     for (const { major, course } of written) {
       const taught = content.skills.filter((skill) => skill.courseId === courseId(major.code, course.number))
       expect(taught, `${major.code} ${course.number}`).toHaveLength(1)

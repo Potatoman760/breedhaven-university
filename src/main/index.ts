@@ -11,7 +11,7 @@ import { sceneRelicUses } from '../shared/game/relics'
 import { CONTENT_SCHEME, resolveContentPath, serveContent } from './content/assets'
 import { deleteLoveInterest,
   removeUnusedAssets,
-  deleteTrait, deleteEvent, deleteJob, saveJob, deleteSociety, saveSociety, importAsset, loadBase, saveEvent, loadWithAddons, saveCatalogue, saveLocation, deleteLocation, saveLoveInterest, saveTrait,
+  deleteTrait, deleteJob, saveJob, deleteSociety, saveSociety, importAsset, loadBase, loadWithAddons, saveCatalogue, saveLocation, deleteLocation, saveLoveInterest, saveTrait,
   resetPlayer,
   savePlayer
 } from './content/addons'
@@ -24,14 +24,15 @@ import { buildFeedPrompt, draftPosts, feedReplyTokens, feedShortfall, parseFeedR
 import { attendableEvents, buildEventPrompt, parseGeneratedEvents } from '../shared/game/events'
 import { buildSpendingPrompt, buildSummaryPrompt, fallbackSummary, parseSpending, parseSummary, PLAIN_FEELINGS, sceneRapport, sceneRevelations, type Spending, type Summary } from '../shared/game/memory'
 import { npcOf, sceneExtras, withNpc } from '../shared/game/npcs'
+import { inMasks } from '../shared/game/masquerade'
 import { sceneHours } from '../shared/game/sceneMoves'
 import { exchanges, windingDown } from '../shared/game/windDown'
 import { asEventOuting, buildOutingPrompt, fallbackOuting, parseOuting } from '../shared/game/outing'
 import { buildCoursePickPrompt, parseCoursePick, type CoursePick } from '../shared/game/coursePick'
 import { banterDue, buildBanterPrompt, parseBanter } from '../shared/game/banter'
+import { buildMomentPrompt, parseMomentLines } from '../shared/game/momentLines'
 import { personalise } from '../shared/game/personalise'
 import { withHousing } from '../shared/game/housing'
-import { createInitialState } from '../shared/game/state'
 import { buildCharacterPrompt, clockNote, sceneTurns } from '../shared/game/prompt'
 import { CHAT_CANCELLED, IPC } from '../shared/ipc'
 import {
@@ -55,7 +56,7 @@ import { ComfyStore, generateArt, generateClip } from './comfy/studio'
 import { listWorkflows } from './comfy/workflows'
 import { bundleDir, checkBundle, readBundle } from './comfy/bundle'
 import { CivitaiKeyStore, downloadModel, findModelsDir, hasModel, readDownloads } from './comfy/downloads'
-import { basePoseId, isMoment, isSeeding, poseMedia, pregnantPoseId, type CalendarEvent, type BondProposal, type ContentPack, type GameState, type LoveInterest, type Proposal } from '../shared/model'
+import { basePoseId, isMoment, isSeeding, poseMedia, pregnantPoseId, type BondProposal, type ContentPack, type GameState, type LoveInterest, type Proposal } from '../shared/model'
 import { pregnancyStage, wornOutfit } from '../shared/game/pregnancy'
 import { buildDraftPrompt, DRAFT_MAX_IDEA_CHARS, DRAFT_MIN_TOKENS, parseDraft } from '../shared/game/draftCharacter'
 import { excuseTool, meetingTool, moveTool, relationshipTool, revealTool, type Leaving } from './ai/tools'
@@ -76,7 +77,7 @@ import {
   type FeedResponse,
   PlanOutingRequestSchema,
   PickCoursesRequestSchema,
-  BanterRequestSchema,
+  BanterRequestSchema, MomentLinesRequestSchema,
   type BanterResponse,
   type PlanOutingResponse,
   GenerateEventsRequestSchema,
@@ -95,8 +96,6 @@ const SUMMARY_TEMPERATURE = 0.3
 // Room enough for the lecture a class opens with, whatever the profile allows an ordinary reply.
 const LESSON_MIN_TOKENS = 900
 const EVENT_MIN_TOKENS = 800
-// How many events the editor asks the LLM for at a time.
-const DRAFTED_EVENTS = 5
 // A whole character takes a while to write.
 const DRAFT_TIMEOUT_MS = 180_000
 
@@ -282,27 +281,12 @@ function registerIpc(
   )
   ipcMain.handle(IPC.editorSaveLocation, (_event, raw: unknown) => change(() => saveLocation(info.addonDir, content, raw, info.base)))
   ipcMain.handle(IPC.editorDeleteLocation, (_event, raw: unknown) => change(() => deleteLocation(info.addonDir, z.string().parse(raw))))
-  ipcMain.handle(IPC.editorSaveEvent, (_event, raw: unknown) => change(() => saveEvent(info.addonDir, content, raw, info.base)))
-  ipcMain.handle(IPC.editorDeleteEvent, (_event, raw: unknown) => change(() => deleteEvent(info.addonDir, z.string().parse(raw), info.base)))
   // Jobs and societies are the game's own: there to be changed only when it is run from source.
   const ownOnly = (apply: () => string[]) => change(() => (info.base ? apply() : ['This can only be changed in the game\'s own files.']))
   ipcMain.handle(IPC.editorSaveJob, (_event, raw: unknown) => ownOnly(() => saveJob(packDir, content, raw)))
   ipcMain.handle(IPC.editorDeleteJob, (_event, raw: unknown) => ownOnly(() => deleteJob(packDir, z.string().parse(raw))))
   ipcMain.handle(IPC.editorSaveSociety, (_event, raw: unknown) => ownOnly(() => saveSociety(packDir, content, raw)))
   ipcMain.handle(IPC.editorDeleteSociety, (_event, raw: unknown) => ownOnly(() => deleteSociety(packDir, z.string().parse(raw))))
-  // Never fails: the LLM thinks of events for the whole of the calendar, as it stands at the start of a game. Nothing is saved here.
-  ipcMain.handle(IPC.editorDraftEvents, async (): Promise<{ events?: CalendarEvent[]; error?: string }> => {
-    const profile = settings.get().main
-    if (!isConfigured(profile)) return { error: NOT_CONFIGURED }
-    try {
-      const state = createInitialState(content)
-      const { system, user } = buildEventPrompt({ content, state, count: DRAFTED_EVENTS, windowDays: content.calendar.lengthDays })
-      const reply = await chatCompletion(profile, { system, messages: [{ role: 'user', content: user }], maxTokens: Math.max(profile.maxTokens, EVENT_MIN_TOKENS) })
-      return { events: parseGeneratedEvents(reply, { content, state }) }
-    } catch (error) {
-      return { error: (error as Error).message }
-    }
-  })
   ipcMain.handle(IPC.editorSavePlayer, (_event, raw: unknown) => change(() => savePlayer(info.addonDir, content, raw)))
   ipcMain.handle(IPC.editorResetPlayer, () => change(() => resetPlayer(info.addonDir)))
   ipcMain.handle(IPC.editorSaveCatalogue, (_event, raw: unknown) => change(() => saveCatalogue(info.addonDir, raw)))
@@ -505,7 +489,8 @@ function registerIpc(
     const content = readBy(state)
     // A scene with an NPC is built the same way, with the NPC standing among the characters.
     const npc = scene.npc ? npcOf(content, scene.loveInterestId) : undefined
-    const cast = npc ? withNpc(content, npc.id) : content
+    // At a masked ball she is herself in her mask's gown, with its sex-acts for her own.
+    const cast = npc ? withNpc(content, npc.id) : inMasks(content, scene, false)
     const systemPrompt = buildCharacterPrompt({
       content: cast,
       state,
@@ -527,6 +512,7 @@ function registerIpc(
       looks: scene.looks,
       comfort: scene.comfort,
       gifts: scene.gifts,
+      presents: scene.presents,
       pendingProposal: scene.proposal && scene.proposal.time > state.time ? scene.proposal : undefined,
       // Everything said in the scene: lore that has come up stays for the rest of it.
       recentText: scene.messages.map((m) => m.content).join('\n')
@@ -542,7 +528,8 @@ function registerIpc(
     let left: Leaving | undefined
     // Set when they leave together for something of his that is theirs too: the scene ends with the going.
     let walkTo: { withIds: string[] } | undefined
-    const move = npc
+    // Nobody leaves a masked ball mid-dance, nor the terrace after it: the night keeps them where it put them.
+    const move = npc || scene.dance || scene.mask
       ? undefined
       : moveTool(content, state, scene, (destination, hours, stayingIds) => {
           movedTo = destination.id
@@ -808,6 +795,19 @@ function registerIpc(
     }
   })
 
+  // Never fails: the moment plays whether or not anyone has anything to say.
+  ipcMain.handle(IPC.momentLines, async (_event, raw: unknown): Promise<BanterResponse> => {
+    const { state, ids, moment, history } = MomentLinesRequestSchema.parse(raw)
+    const content = readBy(state)
+    try {
+      const { system, user } = buildMomentPrompt(content, state, ids, moment, history)
+      const { reply } = await completeWithFallback(settings.get(), false, { system, messages: [{ role: 'user', content: user }] })
+      return { lines: parseMomentLines(reply, content, ids) }
+    } catch {
+      return { lines: [] }
+    }
+  })
+
   // Fails when the LLM cannot be reached or chooses nothing he can take: there is no guessing a term's courses from his words alone.
   ipcMain.handle(IPC.pickCourses, async (_event, raw: unknown): Promise<CoursePick> => {
     const { state, text } = PickCoursesRequestSchema.parse(raw)
@@ -838,7 +838,7 @@ function registerIpc(
     // Every love interest in the scene keeps her own memory of it, written from her side. An NPC keeps none: nothing is asked of the LLM for one.
     const written = await Promise.all(
       (request.scene.npc ? [] : sceneWitnesses(request.scene)).map(async (forId): Promise<[string, Summary]> => {
-        const input = { content: request.scene.npc ? withNpc(content, request.scene.loveInterestId) : content, ...request, forId }
+        const input = { content: request.scene.npc ? withNpc(content, request.scene.loveInterestId) : inMasks(content, request.scene, false), ...request, forId }
         try {
           const { system, user } = buildSummaryPrompt(input)
           // The same for the memories: the Main LLM first, and the NSFW one for a scene it will not go over.

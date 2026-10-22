@@ -184,7 +184,7 @@
       "description": "a plain black cotton bra and matching black panties",
       "sprites": {
         "neutral": {
-          "image": "sprites/tink/underwear-neutral-cutout.png",
+          "image": "sprites/tink/underwear-neutral-cutout.webp",
           "description": ""
         }
       },
@@ -198,12 +198,37 @@
       "inherits": "underwear",
       "sprites": {
         "neutral": {
-          "image": "sprites/tink/underwear-pregnant-neutral-cutout.png",
+          "image": "sprites/tink/underwear-pregnant-neutral-cutout.webp",
           "description": ""
         }
       },
       "pregnant": true,
       "oneOff": true
+    },
+    {
+      "id": "bathrobe",
+      "name": "Bathrobe",
+      "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",
+      "pregnant": false,
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tink/bathrobe-neutral-cutout.webp",
+          "description": ""
+        }
+      }
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "Bathrobe, pregnant",
+      "inherits": "bathrobe",
+      "description": "She has a round, pregnant belly.",
+      "pregnant": true,
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tink/bathrobe-pregnant-neutral-cutout.webp",
+          "description": ""
+        }
+      }
     }
   ],
   "defaultOutfitId": "default",
@@ -344,8 +369,8 @@
     "locationId": "dormitories",
     "background": "generated/backgrounds/tink/view.webp"
   },
-  "birthPicture": "sprites/tink/birth.png",
-  "walkSprite": "sprites/tink/walk-cutout.png",
+  "birthPicture": "sprites/tink/birth.webp",
+  "walkSprite": "sprites/tink/walk-cutout.webp",
   "childNames": {
     "daughters": [
       "Pip",

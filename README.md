@@ -177,18 +177,13 @@ keeps what the user makes apart, as add-ons laid over the base pack, as describe
 What the game makes while it is played (the selfies on the feed) always goes to the
 user's own folder, whichever way it is run.
 
-**Events.** The editor's Events tab lists the calendar's events and holidays in the order
-they fall: a name, a description, the month and day, how many days it lasts, where it is,
-and whether classes stop for it. "Ask the AI for events" has the Main LLM think of five
-more for the setting and adds them, to be read over and changed or deleted like any other.
-Run from source they are written into `calendar.json`; in a packaged game they are kept
-as `events.json` in the add-on folder and laid over the game's own, where one with the id
-of one of the game's own takes its place and only the add-on's can be deleted.
+**Events** are handwritten in `calendar.json`, programs and all: the editor has no side for
+them, and an add-on folder has no events of its own.
 
 "Edit game content" on the title screen opens the editor, for the developer only: it is there when
 the game is run from its source (`npm run dev`), and a built game leaves it out, code and all
 (`import.meta.env.DEV` in `App.tsx`). Its sides are the characters (love
-interests and NPCs: profile, traits, media, family, academics), the trait library, events,
+interests and NPCs: profile, traits, media, family, academics), the trait library,
 courses, the player's start, locations, jobs, societies and ComfyUI.
 
 - **Add-ons** live in an `addons` folder in Electron's user-data folder (the editor has a
@@ -1015,9 +1010,41 @@ gone to as an outing. Two things make one more than that:
   own); else, up to `castSize`, the love interests he has met and is closest to. A part
   marked `required` holds the day until it is attended or over, as orientation does. Each is gone to once
   (`partsAttended` in the save). An event with a part on today is offered by its part, not as an outing as well.
+  A part can be a **date** (`date`: `most`, `gain`, `loss`), as the Lantern Festival's is: going, he picks one to
+  `most` of the women he has met (`ui/DateDialog.tsx`), who are its cast and gain `gain` of affection, trust and
+  desire; every woman with a claim on him he leaves out (in a relationship with him, slept with him, or `jealous`)
+  loses `loss` of each (`passedOver`). Let go by unattended, it costs every one of them the same once its hours are
+  past (`settleMissedDates`, an idle effect, `date-missed:` in `flags`).
+  A part can play an `animation` as it begins: `lanterns` (`ui/LanternRelease.tsx`) has those in it, standing in their
+  happy sprites, say a few lines in comic balloons (asked of the LLM as it opens, `buildLanternPrompt` in
+  `src/shared/game/lanternLines.ts`, the Undercroft's banter reader), then let lanterns go at the pond while the view
+  follows them up the sky (`npm run preview:lantern -- <who>`, with sample lines).
+- **Trips** (`src/shared/game/trips.ts`): a trip away over a break, booked at a part of an event before it (`booking`:
+  the trip's event, `most` along, `price` a head, him included, and the `minStage` she must be at to say yes). That
+  part's lines are read (his own thoughts, as `*narration*`), then the booking screen in the phone's frame
+  (`ui/TripBooking.tsx`); not going is a choice. The trip's own event has parts marked `onTrip`, which are only for one
+  who booked it (`trips` in the save), with those he booked as their cast. While it is on he is away, and it plays as one
+  scene after another with no day screen between: the next part today is gone to at once, and one tomorrow after a
+  night slept where he is, with the morning's turn (`nextTripPart`, an idle effect). He sleeps where
+  he is (`tripUnderway`), his job's shifts on those days are not his to work (`awayOnDay`), and once its last part is
+  done he is taken home (`comeHome`, an idle effect). Each part can play `animations` before its scene
+  (`ui/TripMoment.tsx`): the drive there and home (a few LLM lines in balloons, `buildMomentPrompt` in
+  `src/shared/game/momentLines.ts`) and an opening of its own per outing. The Mistmoon Break at Saltmere Springs is
+  the one there is: booked on 27 Harvestwane, then six outings over four days (`npm run preview:trip`).
+- **Masked balls** (`src/shared/game/masquerade.ts`): a part with `masquerade` is its dances, one after another
+  through its hours. The women he has met who are closest to him (affection, trust and desire together) and in no
+  arrangement with him come to him in turn, as many as there are `masks`, in a shuffled order, each in one of them; too
+  few, and the `standInId` makes up the numbers as she is (Lira, who wears nothing anyway), or comes alone. A mask is a
+  gown, a mask and a shimmering updo drawn once for anyone: in it she has its sprites and sex-acts, everyone's height,
+  and its name in the interface until he names her (`inMasks`, in the renderer and in `src/main`), while the LLM plays
+  her as herself and is told to keep her secret. A dance ends with no summary and moves nobody's feelings, which
+  would give her away (`endDance` in `App.tsx`). After the last dance he picks one of them and names her
+  (`ui/MasqueradeGuess.tsx`): wrongly, and she loses `loss` of affection; rightly, and a scene follows at the
+  `privateViewId` with her in her mask, uninhibited, for its sex-acts. The Masquerade Ball in the Grand Ballroom (an
+  `eventOnly` place, off the map, as Saltmere is) is the one there is, on 20 Emberfall.
 - **Story beats** are events marked `secret`, usually with a `year` so they happen once: they are left off the
   calendar and out of everything the characters are told beforehand, and their program still plays, usually as one
-  `required` part with a fixed `castIds`. A part can set the view its scene is in (`viewId`). A step of orientation can
+  `required` part with a fixed `castIds`. A part can set the view its scene is in (`viewId`), and what everyone in it starts in (`outfitId`, a pregnant woman in its pregnant form). A step of orientation can
   open on a cutscene too, and name everyone in it (`castIds`, every student named is kept): the Assembly opens on Tamsin
   finding him, and the end of the Campus Tour on the Queen's arrival, where Seraphine first meets him with Tamsin there.
   On orientation day nobody can have been met yet, so a first meeting written there is always the first.
@@ -1026,7 +1053,6 @@ gone to as an outing. Two things make one more than that:
   any other the speaker's, and one in asterisks is narration.
 - The load check refuses a part on a day the event does not have, a place or cast that does not exist, and a cutscene
   by nobody or at a view a place does not have.
-- The editor's Events tab does not edit programs yet: they are written in `calendar.json`.
 
 ## Cards
 

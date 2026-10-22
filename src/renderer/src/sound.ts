@@ -134,12 +134,12 @@ function settleAmbience(): void {
 }
 
 /**
- * Plays one of the songs, picked at random, once through, in place of the place's loop. One already playing carries
- * on. When it ends of itself the place's loop comes back.
+ * Plays a song once through, in place of the place's loop: the one named, a file in the pack, or else one of the songs
+ * picked at random. One already playing carries on. When it ends of itself the place's loop comes back.
  */
-export function playSong(): void {
-  if (song || SONGS.length === 0) return
-  const audio = new Audio(SONGS[Math.floor(Math.random() * SONGS.length)])
+export function playSong(file?: string): void {
+  if (song || (!file && SONGS.length === 0)) return
+  const audio = new Audio(file ? url(file) : SONGS[Math.floor(Math.random() * SONGS.length)])
   audio.volume = 0
   audio.addEventListener('ended', () => {
     if (song !== audio) return

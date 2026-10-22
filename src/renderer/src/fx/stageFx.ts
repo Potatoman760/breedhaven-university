@@ -77,12 +77,20 @@ class StageFx {
           ctx.fillStyle = gradient
           ctx.fillRect(0, 0, 12, 12)
         })
-        texture(this, 'fx-puff', 256, 256, (ctx) => {
-          const gradient = ctx.createRadialGradient(128, 128, 0, 128, 128, 128)
-          gradient.addColorStop(0, 'rgba(235,238,232,0.55)')
-          gradient.addColorStop(1, 'rgba(235,238,232,0)')
-          ctx.fillStyle = gradient
-          ctx.fillRect(0, 0, 256, 256)
+        // A wisp of mist: long and low, made of soft overlapping blobs so that no two edges are the same.
+        texture(this, 'fx-wisp', 512, 160, (ctx) => {
+          let seed = 7
+          const next = () => ((seed = (seed * 16807) % 2147483647) / 2147483647)
+          for (let i = 0; i < 14; i++) {
+            const x = 70 + next() * 372
+            const y = 80 + (next() - 0.5) * 50
+            const r = 40 + next() * 50
+            const gradient = ctx.createRadialGradient(x, y, 0, x, y, r)
+            gradient.addColorStop(0, 'rgba(236,240,236,0.32)')
+            gradient.addColorStop(1, 'rgba(236,240,236,0)')
+            ctx.fillStyle = gradient
+            ctx.fillRect(0, 0, 512, 160)
+          }
         })
         texture(this, 'fx-leaf', 14, 8, (ctx) => {
           ctx.fillStyle = '#fff'
@@ -174,21 +182,42 @@ class StageFx {
           })
         )
         break
-      case 'mist':
-        keep(scene.add.rectangle(WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT, 0xdfe4dc, 0.14))
+      case 'mist': {
+        keep(scene.add.rectangle(WIDTH / 2, HEIGHT / 2, WIDTH, HEIGHT, 0xdfe4dc, 0.08))
+        // Each wisp comes up out of nothing and goes back to it: its alpha runs from 0 up to `most` and down again.
+        const swell = (most: number) => ({ start: 0, end: 1, ease: (t: number) => Math.sin(t * Math.PI) * most })
+        // A bank lying low and thick, drifting slowly...
         keep(
-          scene.add.particles(0, 0, 'fx-puff', {
-            x: { min: -300, max: WIDTH },
-            y: { min: HEIGHT * 0.35, max: HEIGHT + 60 },
-            lifespan: 16000,
-            speedX: { min: 12, max: 34 },
-            scale: { min: 1.6, max: 3.4 },
-            alpha: { start: 0, end: 0, ease: (t: number) => Math.sin(t * Math.PI) * 0.5 },
+          scene.add.particles(0, 0, 'fx-wisp', {
+            x: { min: -500, max: WIDTH },
+            y: { min: HEIGHT * 0.62, max: HEIGHT + 40 },
+            lifespan: 18000,
+            speedX: { min: 10, max: 26 },
+            scaleX: { min: 2.2, max: 3.6 },
+            scaleY: { min: 1.2, max: 2 },
+            alpha: swell(0.85),
             quantity: 1,
-            frequency: 700
+            frequency: 900,
+            advance: 18000
+          })
+        )
+        // ...and thinner wisps higher up, faster, crossing in front of the scene.
+        keep(
+          scene.add.particles(0, 0, 'fx-wisp', {
+            x: { min: -500, max: WIDTH },
+            y: { min: HEIGHT * 0.15, max: HEIGHT * 0.7 },
+            lifespan: 14000,
+            speedX: { min: 30, max: 60 },
+            scaleX: { min: 1.4, max: 2.4 },
+            scaleY: { min: 0.6, max: 1.1 },
+            alpha: swell(0.5),
+            quantity: 1,
+            frequency: 1400,
+            advance: 14000
           })
         )
         break
+      }
       case 'wind':
         keep(
           scene.add.particles(0, 0, 'fx-leaf', {
@@ -215,7 +244,7 @@ class StageFx {
             speedX: { min: -8, max: 14 },
             speedY: { min: -16, max: -4 },
             scale: { min: 0.15, max: 0.45 },
-            alpha: { start: 0, end: 0, ease: (t: number) => Math.sin(t * Math.PI) * 0.55 },
+            alpha: { start: 0, end: 1, ease: (t: number) => Math.sin(t * Math.PI) * 0.55 },
             tint: 0xf4dca0,
             quantity: 1,
             frequency: 260

@@ -292,12 +292,14 @@
     "creampie": {
       "file": "sounds/scenes/breathing.ogg",
       "volume": 0.5,
-      "credit": "Uncredited: clipped from source2.mp4, 9:30 to 9:40"
+      "credit": "Uncredited: clipped from source2.mp4, 9:30 to 9:40",
+      "clip": true
     },
     "facial": {
       "file": "sounds/scenes/breathing.ogg",
       "volume": 0.5,
-      "credit": "Uncredited: clipped from source2.mp4, 9:30 to 9:40"
+      "credit": "Uncredited: clipped from source2.mp4, 9:30 to 9:40",
+      "clip": true
     }
   }
 }

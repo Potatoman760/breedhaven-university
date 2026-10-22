@@ -46,19 +46,18 @@ export function ModelField({ profileId, baseUrl, apiKey, value, onChange }: Prop
   }, [profileId, baseUrl, apiKey])
 
   if (load.state === 'loaded' && load.models.length > 0) {
-    // Keep a saved model selectable even if the endpoint no longer lists it.
-    const options = value && !load.models.includes(value) ? [value, ...load.models] : load.models
+    // Typed into, the endpoint's models are searched: whatever has what is typed in its name is offered. A name it
+    // does not list can still be typed, as a saved model it no longer lists is kept.
+    const list = `models-${profileId}`
     return (
       <label>
         Model
-        <select value={value} onChange={(e) => onChange(e.target.value)}>
-          <option value="">Choose a model ({load.models.length} available)</option>
-          {options.map((model) => (
-            <option key={model} value={model}>
-              {model}
-            </option>
+        <input type="search" list={list} value={value} placeholder={`Search ${load.models.length} models`} onChange={(e) => onChange(e.target.value)} />
+        <datalist id={list}>
+          {load.models.map((model) => (
+            <option key={model} value={model} />
           ))}
-        </select>
+        </datalist>
       </label>
     )
   }

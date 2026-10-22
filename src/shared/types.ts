@@ -1,4 +1,5 @@
 import { BANTER_MOMENTS, type BanterLine } from './game/banter'
+import { MOMENTS } from './game/momentLines'
 import type { CoursePick } from './game/coursePick'
 import { z } from 'zod'
 import type { LoveInterest } from './model'
@@ -116,6 +117,14 @@ export type PickCoursesRequest = z.infer<typeof PickCoursesRequestSchema>
 export const BanterRequestSchema = z.object({ state: GameStateSchema, moment: z.enum(BANTER_MOMENTS).default('before') })
 export type BanterRequest = z.input<typeof BanterRequestSchema>
 
+export const MomentLinesRequestSchema = z.object({
+  state: GameStateSchema,
+  ids: z.array(z.string()).min(1).max(3),
+  moment: z.enum(MOMENTS),
+  history: z.array(z.object({ speaker: z.string(), text: z.string() })).default([])
+})
+export type MomentLinesRequest = z.input<typeof MomentLinesRequestSchema>
+
 export interface BanterResponse {
   /** What was said, in order. None when the LLM could not be used, or said nothing that could be read. */
   lines: BanterLine[]
@@ -205,6 +214,7 @@ export interface RendererApi {
   pickCourses(request: PickCoursesRequest): Promise<CoursePick>
   /** Has the party say a few words as a fight below begins. Never rejects: without an LLM they say nothing. */
   banter(request: BanterRequest): Promise<BanterResponse>
+  momentLines(request: MomentLinesRequest): Promise<BanterResponse>
   /**
    * Has a love interest write a message in Bloomr DMs: an answer to the player's latest (rejects
    * if the LLM can't be reached), or an unprompted invitation (never rejects).
@@ -243,12 +253,6 @@ export interface RendererApi {
     saveLocation(location: unknown): Promise<EditorResult>
     /** Puts a changed location back as it shipped. */
     deleteLocation(id: string): Promise<EditorResult>
-    /** Adds an event or holiday to the calendar, or changes one. */
-    saveEvent(event: unknown): Promise<EditorResult>
-    /** Takes an event off the calendar. */
-    deleteEvent(id: string): Promise<EditorResult>
-    /** Has the Main LLM think of events for the calendar. They are not saved: the editor adds the ones it is given. Never rejects. */
-    draftEvents(): Promise<{ events?: CalendarEvent[]; error?: string }>
     /** Adds a job to the game, or changes one. Only when the game's own files are being edited. */
     saveJob(job: unknown): Promise<EditorResult>
     /** Takes a job out of the game. Only when the game's own files are being edited. */

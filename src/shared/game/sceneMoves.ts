@@ -89,7 +89,7 @@ export function sceneDestinations(
   }
   const places = content.locations
     // The place a room is in can be gone back down to from the room.
-    .filter((l) => (l.id !== state.locationId || scene.roomOf !== undefined) && reachable(l.id) && open(l))
+    .filter((l) => (l.id !== state.locationId || scene.roomOf !== undefined) && !l.eventOnly && reachable(l.id) && open(l))
     .map(
       (l): Destination => ({
         id: l.id,

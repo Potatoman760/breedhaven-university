@@ -35,6 +35,8 @@ function effectsLine(content: ContentPack, effects: Effect[]): string {
       if (effect.type === 'energy') return `${effect.amount > 0 ? '+' : ''}${effect.amount} energy`
       if (effect.type === 'item') return `makes ${effect.count > 1 ? `${effect.count} of ` : ''}${content.items.find((item) => item.id === effect.itemId)?.name ?? effect.itemId}`
       if (effect.type === 'money') return `${effect.amount > 0 ? '+' : '-'}$${Math.abs(effect.amount)}`
+      // Her affection, trust or desire, or one of his stats.
+      if (effect.type === 'meter' || effect.type === 'stat') return `${effect.amount > 0 ? '+' : ''}${effect.amount} ${effect.type === 'meter' ? effect.meter : effect.stat}`
       return ''
     })
     .filter(Boolean)
@@ -92,7 +94,8 @@ export function Bag({ content, state, company = [], busy, onUseItem, onAbility, 
 
   const items: Slot[] = carried(content, state).map(({ item, count }) => {
     const below = item.below ? `In a fight below: ${[item.below.footing > 0 && `+${item.below.footing} footing`, item.below.calms && 'clears a surge'].filter(Boolean).join(' · ')}` : ''
-    const use = item.use ? `Use: ${effectsLine(content, item.use.effects)}` : ''
+    const does = item.use ? effectsLine(content, item.use.effects) : ''
+    const use = does ? `Use: ${does}${item.use?.on === 'her' && !does.includes('on her') ? ', on her' : ''}` : ''
     return {
       key: `item:${item.id}`,
       name: item.name,

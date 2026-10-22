@@ -1,5 +1,26 @@
 import { z } from 'zod'
 import { IntroSchema } from './orientation'
+import { AnimationSchema, SpriteSchema } from './loveInterest'
+
+/**
+ * A disguise at a masked ball: a gown, a mask and an enchanted updo that hide whoever wears them. Every woman in it looks
+ * the same, and is known only by the name of her gown. Its sex-acts are drawn in it too, and stand in for her own.
+ */
+export const MaskSchema = z.object({
+  id: z.string(),
+  /** What she is called while it hides her, in the interface and in narration: "Crimson". */
+  name: z.string(),
+  /** What she is wearing, told to the LLM: the gown, the mask, the updo. */
+  description: z.string(),
+  /** How far down its sprites her face is, in percent, for a portrait. */
+  faceY: z.number().min(0).max(100).default(8),
+  /** By expression, as an outfit's are. */
+  sprites: z.record(z.string(), SpriteSchema).default({}),
+  /** Her walking profile in it, for the loading screen, in place of her own. */
+  walk: z.string().optional(),
+  animations: z.array(AnimationSchema).default([])
+})
+export type Mask = z.infer<typeof MaskSchema>
 
 export const MonthSchema = z.object({
   id: z.string(),
@@ -29,6 +50,10 @@ export type Period = z.infer<typeof PeriodSchema>
  * on a cutscene of written lines, and goes on as a scene with its cast, as a step of orientation does. Each is
  * attended once.
  */
+/** What an event part can play as it begins. */
+export const PART_ANIMATIONS = ['lanterns', 'drive-there', 'soak', 'cascade', 'market', 'private-bath', 'fireworks', 'last-morning'] as const
+export type PartAnimation = (typeof PART_ANIMATIONS)[number]
+
 export const EventPartSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -40,6 +65,8 @@ export const EventPartSchema = z.object({
   locationId: z.string().optional(),
   /** The view of the place its scene is set in. Left out, the place as the day has it. */
   viewId: z.string().optional(),
+  /** What everyone in its scene starts in, where she has it: a pregnant woman in its pregnant form. Left out, as they are dressed. */
+  outfitId: z.string().optional(),
   /** Narration that opens the scene. */
   description: z.string().default(''),
   /** Told to the LLM: what is going on, and what the scene is for. */
@@ -53,7 +80,55 @@ export const EventPartSchema = z.object({
   /** Nothing else can be done on its day until it has been attended or is over, as on orientation day. */
   required: z.boolean().default(false),
   /** Lines read before the scene, with nothing to answer: who says them, and where. */
-  cutscene: IntroSchema.optional()
+  cutscene: IntroSchema.optional(),
+  /**
+   * Played as it begins, in turn, with whoever is in it: `lanterns`, her letting a lantern go at the pond; the drive to
+   * a trip; and each of the trip's own openings.
+   */
+  animations: z.array(z.enum(PART_ANIMATIONS)).default([]),
+  /**
+   * The part where a trip is booked: after its lines, a screen to pick who comes (up to `most`, each at `minStage` or
+   * closer with him) and pay `price` a head, him included. The trip is the event `eventId`.
+   */
+  booking: z
+    .object({
+      eventId: z.string(),
+      most: z.number().int().min(1).max(3).default(2),
+      price: z.number().int().min(0).default(150),
+      minStage: z.string().default('dating'),
+      /** The listing he books from: a line about the place, what is on, and how well it is spoken of, out of five. */
+      blurb: z.string().default(''),
+      highlights: z.array(z.string()).default([]),
+      rating: z.number().min(0).max(5).optional()
+    })
+    .optional(),
+  /** Part of a trip: only for one who booked it, with those he booked as its cast. */
+  onTrip: z.boolean().default(false),
+  /**
+   * A masked ball: the women closest to him who are not in an arrangement with him, up to as many as there are masks,
+   * each come to dance with him in turn in a mask that hides her. Too few, and `standInId` makes up the numbers as she
+   * is. At the end he names one of them: rightly, and she takes him to `privateViewId`; wrongly, and she loses `loss`
+   * of affection.
+   */
+  masquerade: z
+    .object({
+      masks: z.array(MaskSchema).min(1),
+      standInId: z.string(),
+      privateViewId: z.string(),
+      loss: z.number().int().min(0).default(10)
+    })
+    .optional(),
+  /**
+   * A date: he picks who goes with him, up to `most`. Those he takes gain `gain` of affection, trust and desire; each
+   * woman with a claim on him that he leaves out loses `loss` of each, and so does every one of them if he never goes.
+   */
+  date: z
+    .object({
+      most: z.number().int().min(1).max(3).default(2),
+      gain: z.number().int().min(0).default(10),
+      loss: z.number().int().min(0).default(10)
+    })
+    .optional()
 })
 export type EventPart = z.infer<typeof EventPartSchema>
 
@@ -74,6 +149,16 @@ export const CalendarEventSchema = z.object({
   hours: z.number().int().min(1).optional(),
   /** No classes meet while it lasts: a holiday, or a break between terms. */
   noClasses: z.boolean().default(false),
+  /** The weather every day of it has, by id, whatever the month would give: snow for a winter festival. */
+  weatherId: z.string().optional(),
+  /** A picture laid around the map's emblem of every place dressed for it, while it runs: a wreath for a winter festival. */
+  mapDressing: z.string().optional(),
+  /** A song in the pack played once through as he comes to each place dressed for it, while it runs: a carol for a winter festival. */
+  song: z.string().optional(),
+  /** Every woman he meets while it runs brings him a present, once: one of the things she likes. */
+  presents: z.boolean().optional(),
+  /** Nobody is due while it runs: a child that would come in it is due the day after, worked out when she conceives. */
+  noBirths: z.boolean().optional(),
   /** True for events invented by the LLM. */
   generated: z.boolean().default(false),
   /**
@@ -82,7 +167,9 @@ export const CalendarEventSchema = z.object({
    */
   secret: z.boolean().default(false),
   /** What happens at it, scripted, in the order it happens. */
-  program: z.array(EventPartSchema).default([])
+  program: z.array(EventPartSchema).default([]),
+  /** For a trip: the hour he is home on the day it ends, the drive back being as long as it takes. */
+  homeAt: z.number().int().min(0).optional()
 })
 export type CalendarEvent = z.infer<typeof CalendarEventSchema>
 

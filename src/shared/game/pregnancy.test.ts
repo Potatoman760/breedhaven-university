@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { PregnancyConfigSchema, type ContentPack, type GameState } from '../model'
+import { CalendarEventSchema, PregnancyConfigSchema, type ContentPack, type GameState } from '../model'
 import { evaluateCondition } from './conditions'
 import {
   canConceive,
@@ -68,6 +68,15 @@ describe('conception', () => {
     expect(pregnant.pregnancies['ana']).toEqual({ conceivedAt: 0, dueAt: 200 })
     expect(conceive(certain, { ...start, time: 7 }, 'bea').pregnancies['bea']).toEqual({ conceivedAt: 7, dueAt: 207 })
     expect(daysUntilDue(content, at(pregnant, 4), 'ana')).toBe(6)
+  })
+
+  it('puts a child due during an event without births off to the day after it', () => {
+    // Due ten days on, on 2 a, the first of the break's two days: she is due on 1 b, after it.
+    const away = CalendarEventSchema.parse({ id: 'trip', name: 'the Trip', month: 'a', day: 2, durationDays: 2, noBirths: true })
+    const tripping: ContentPack = { ...certain, calendar: { ...certain.calendar, events: [...certain.calendar.events, away] } }
+    expect(conceive(tripping, start, 'ana').pregnancies['ana']).toEqual({ conceivedAt: 0, dueAt: 240 })
+    // One that would fall clear of it is due as ever.
+    expect(conceive(tripping, at(start, 2), 'ana').pregnancies['ana']?.dueAt).toBe(240)
   })
 
   it('cannot happen to someone already carrying, a stranger to the game, or a pack without the rules', () => {

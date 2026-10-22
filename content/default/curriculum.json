@@ -1396,6 +1396,109 @@
           }
         },
         {
+          "number": "135",
+          "title": "Motive Enchantment: Engines and Vehicles",
+          "description": "How enchantment moves things: the charm-cores, drives, gearing and brakes of the trams, scooters and motorbikes of Breedhaven, and how to keep one running. Weekly lab in the Foundry's engine bay strips, tunes and rebuilds a working charm-drive.",
+          "topics": [
+            {
+              "title": "The Charm-Core",
+              "content": "A charm-core is a crystal anchor carrying a motive pattern and a store of charge: the heart of every vehicle in Breedhaven that does not burn fuel. The pattern turns stored charge into rotation, as a warming charm turns it into heat. Quartz cores are cheap and steady; corundum cores take more charge and deliver it faster, which is why racing bikes use them. A core is rated in thaums stored and thaums per hour delivered.",
+              "question": {
+                "ask": "What does the motive pattern in a charm-core turn stored charge into?",
+                "answer": "Rotation",
+                "wrong": [
+                  "Heat",
+                  "Light",
+                  "Lift"
+                ]
+              }
+            },
+            {
+              "title": "Combustion and Charm-Drives",
+              "content": "An old combustion engine burns fuel to push pistons; a charm-drive turns a shaft directly from the core. The charm-drive is quiet, has few moving parts and gives full torque from standstill, but it is heavy for the range it gives, and a core must be recharged rather than refilled. Hybrid bikes keep a small combustion engine to recharge the core on long rides. Many riders convert an old engine to a charm-drive and keep the frame.",
+              "question": {
+                "ask": "What does a charm-drive give from standstill?",
+                "answer": "Full torque",
+                "wrong": [
+                  "No torque",
+                  "Half its range",
+                  "Extra charge"
+                ]
+              }
+            },
+            {
+              "title": "Gearing and Transmission",
+              "content": "Gearing trades speed for force. A small gear driving a large one turns it more slowly but with more force: low gear, for pulling away and climbing hills. A large gear driving a small one turns it faster with less: high gear, for the open road. A chain or belt carries the drive to the rear wheel. Because a charm-drive is strong at every speed, many charm bikes need only one or two gears where a combustion bike needs six.",
+              "question": {
+                "ask": "What does a small gear driving a large one give?",
+                "answer": "More force at lower speed",
+                "wrong": [
+                  "More speed with less force",
+                  "More charge",
+                  "Less wear on the chain"
+                ]
+              }
+            },
+            {
+              "title": "Brakes and Recovery",
+              "content": "Friction brakes squeeze pads against a disc and turn motion into heat. A charm-drive can also brake by running its pattern backward, turning the wheel's motion back into charge in the core. This recovery braking returns a share of the charge on every stop, which is why tram lines with many stops are cheap to run. Recovery cannot stop a vehicle quickly on its own, so every vehicle keeps friction brakes for emergencies.",
+              "question": {
+                "ask": "What does recovery braking turn the wheel's motion back into?",
+                "answer": "Charge in the core",
+                "wrong": [
+                  "Heat in the pads",
+                  "Fuel",
+                  "Light"
+                ]
+              }
+            },
+            {
+              "title": "Tuning and Maintenance",
+              "content": "Tuning matches the pattern's draw to the core and the rider: a hotter tune gives more speed and drains the core faster, a cooler one gives range. A core loses retention with every deep discharge, so a well-kept bike is recharged before it runs empty. Chains are cleaned and oiled, pads checked for wear, and pattern traces inspected for cracks, which leak charge as a faint warmth along the frame. Most breakdowns are a cracked trace or a tired core.",
+              "question": {
+                "ask": "What does a hotter tune trade for more speed?",
+                "answer": "Range",
+                "wrong": [
+                  "Torque",
+                  "Weight",
+                  "Braking"
+                ]
+              }
+            },
+            {
+              "title": "Safety and the Road",
+              "content": "Every vehicle with a core above the second tier must be registered, inspected each year and ridden by a licensed driver. A cracked core can discharge all at once, which is why cores sit in warded housings and are never opened with the charge still in them. Riders wear a helmet and armored leathers.Most accidents happen at junctions, to riders the other driver did not see.",
+              "question": {
+                "ask": "Why are charm-cores kept in warded housings?",
+                "answer": "A cracked core can discharge all at once",
+                "wrong": [
+                  "To keep them cool",
+                  "To hide them from thieves",
+                  "To make them charge faster"
+                ]
+              }
+            }
+          ],
+          "skill": {
+            "id": "running-repairs",
+            "name": "Running repairs",
+            "description": "You fix and fit things yourself: rooms and upgrades cost 15% less.",
+            "at": 30,
+            "passive": {
+              "kind": "build",
+              "amount": 0.85
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You can build almost anything: rooms and upgrades cost 30% less.",
+              "passive": {
+                "kind": "build",
+                "amount": 0.7
+              }
+            }
+          }
+        },
+        {
           "number": "162",
           "title": "Magical Systems Design",
           "description": "Design of enchanted systems at the scale of a household and a city, covering enchanted circuits, ward networks, power budgets and mana storage, failure analysis, and the testing standards a system must pass before it enters service. Weekly lab in the Foundry builds, loads, and deliberately breaks small working systems at the warded bench. Prerequisite: MEN 101.",
@@ -2874,7 +2977,7 @@
       "code": "CSC",
       "subject": "Computer Science",
       "college": "engineering",
-      "general": true,
+      "general": false,
       "stats": [
         "intelligence"
       ],
@@ -2973,6 +3076,109 @@
             "upgrade": {
               "at": 70,
               "description": "You can read the table: at poker, you see your chance of winning each hand and the move it calls for."
+            }
+          }
+        },
+        {
+          "number": "142",
+          "title": "Networks, Platforms and Privacy",
+          "description": "How messages travel between devices, from the charm-relays under Seedblossom to the servers behind Bloomr, and what a platform learns about the people who use it. Covers protocols, encryption, feeds and security. Weekly laboratory builds a small chat service and then breaks into it.",
+          "topics": [
+            {
+              "title": "Packets and Addresses",
+              "content": "A network moves data in packets: small numbered pieces, each carrying the address it came from and the address it is going to. A message to a friend across the city is cut into dozens of packets that may each take a different route through the charm-relays, and are put back in order when they arrive. A lost packet is simply asked for again. Every device on a network has an address, as every house on Lantern Row has a number.",
+              "question": {
+                "ask": "What does a network cut a message into?",
+                "answer": "Packets",
+                "wrong": [
+                  "Frames of charge",
+                  "Runes",
+                  "Threads"
+                ]
+              }
+            },
+            {
+              "title": "Protocols: Agreeing How to Talk",
+              "content": "A protocol is a set of rules two machines agree on before they exchange anything: who speaks first, how a message is marked as finished, what to do when something goes missing. A handshake opens the conversation, each side confirming the other is listening. Protocols are layered: one moves packets, one keeps them in order, one carries web pages or chat. A phone and a server in another city can talk because both keep to the same layers.",
+              "question": {
+                "ask": "What opens a conversation between two machines under a protocol?",
+                "answer": "A handshake",
+                "wrong": [
+                  "A ward",
+                  "A checksum",
+                  "A broadcast"
+                ]
+              }
+            },
+            {
+              "title": "Encryption and Keys",
+              "content": "Encryption scrambles a message so only the holder of the right key can read it. In public-key encryption each person has two keys: a public one anyone may use to lock a message to her, and a private one only she holds to unlock it. A message locked with her public key can be read by no one else, not even the platform carrying it. This is end-to-end encryption, and it is why a ward-cracker who copies the packets gets only noise.",
+              "question": {
+                "ask": "In public-key encryption, which key unlocks a message sent to her?",
+                "answer": "Her private key",
+                "wrong": [
+                  "Her public key",
+                  "The platform's key",
+                  "The sender's public key"
+                ]
+              }
+            },
+            {
+              "title": "Metadata: What the Envelope Says",
+              "content": "Even when a message is encrypted, its metadata is not: who sent it, to whom, when, how large it was and from where. Metadata is the envelope, not the letter. It says a great deal: a message to a clinic at midnight, a Sire's phone at the same address three nights a week. Platforms keep metadata because it is cheap and useful, and the Registry can ask for it. Turning off location sharing removes one of its richest fields.",
+              "question": {
+                "ask": "What is metadata?",
+                "answer": "Data about a message, such as who sent it and when",
+                "wrong": [
+                  "The encrypted text itself",
+                  "A message's private key",
+                  "A copy kept on the phone"
+                ]
+              }
+            },
+            {
+              "title": "Feeds and Recommendation",
+              "content": "A feed does not show posts in the order they were made. A recommendation algorithm scores each one by how likely a reader is to stop, like or reply, from what she and readers like her have done before, and shows the highest first. It optimizes for attention, not truth or kindness. A streamer who learns what the algorithm rewards grows; one who does not is shown to nobody. Small changes in what is rewarded change what millions of people see.",
+              "question": {
+                "ask": "What does a recommendation algorithm usually optimize for?",
+                "answer": "Attention",
+                "wrong": [
+                  "Accuracy",
+                  "Fairness",
+                  "The order posts were made"
+                ]
+              }
+            },
+            {
+              "title": "Security: Attacks on People",
+              "content": "Most break-ins attack people, not code. Phishing sends a message that looks like it is from someone trusted and asks for a password or a click. A strong password is long rather than clever, and different for every account; a second factor, such as a code on the phone, stops most stolen passwords from working. Software is patched because every program has bugs, and some bugs let a stranger in. The weakest point of any system is usually the person using it.",
+              "question": {
+                "ask": "What stops most stolen passwords from working?",
+                "answer": "A second factor",
+                "wrong": [
+                  "A longer username",
+                  "A faster connection",
+                  "Turning off the feed"
+                ]
+              }
+            }
+          ],
+          "skill": {
+            "id": "privacy-settings",
+            "name": "Privacy settings",
+            "description": "You keep your messages and your movements to yourself: you are walked in on 50% less often.",
+            "at": 30,
+            "passive": {
+              "kind": "drama",
+              "amount": 0.5
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "Nobody can find you unless you want them to: you are walked in on 75% less often.",
+              "passive": {
+                "kind": "drama",
+                "amount": 0.25
+              }
             }
           }
         }

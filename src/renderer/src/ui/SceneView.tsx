@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState, type FormEvent, type CSSPropertie
 import { MAX_CHILD_NAME, COMFORT_WORDS, hasSkill, attendees, bondLifts, describeBond, describeWhen, statusOf, dialogueLines, firstNames, sceneCast, sceneClock, toDate, weatherOn, wornOutfit, lookOf, spriteFor, npcAsCharacter, playerRoom, roomBackdrop, roomOwner, sceneExtras, sceneSuggestions, plain, type Suggestion } from '../../../shared/game'
 import { Portrait } from './Portrait'
 import { basePoseId, poseMedia, type ContentPack, type GameState, type LoveInterest, type Scene } from '../../../shared/model'
-import { playSong, setPoseLoop, stopSong } from '../sound'
+import { playSong, setPoseLoop, stopSong, useVolumes } from '../sound'
 import { LoadingScreen } from './LoadingScreen'
 import { SmartInput } from './SmartInput'
 import { Backdrop } from './Backdrop'
@@ -12,6 +12,7 @@ import { DateBanner } from './DateBanner'
 import { NavTiles } from './NavTiles'
 import { ChevronIcon, HaltIcon, HideIcon, LogIcon } from './icons'
 import type { Panel } from './panels'
+import { useModelName } from '../modelName'
 
 // What he is taken to say when he ends a shift with the button: enough for the scene to be closed on.
 
@@ -164,9 +165,14 @@ export function SceneView(props: Props) {
   const playing = animation !== undefined && media !== undefined
   // What the pose sounds like, for as long as it is up.
   const poseSound = playing ? (content.sounds.poses[animation.id] ?? content.sounds.poses[basePoseId(animation.id)]) : undefined
+  // A pose that has its clip heard plays it at the player's volume for effects, and its loop only under a still.
+  const ownAudio = poseSound?.clip === true && media === animation?.clip
+  const poseLoop = ownAudio ? undefined : poseSound
+  const effects = useVolumes().effects
+  const heard = ownAudio ? poseSound.volume * effects : 0
   useEffect(() => {
-    setPoseLoop(poseSound)
-  }, [poseSound?.file])
+    setPoseLoop(poseLoop)
+  }, [poseLoop?.file])
   useEffect(() => () => setPoseLoop(undefined), [])
   // Once a sex-act is on screen, a song plays behind the scene, once through, and fades out if the scene ends before
   // it does. Being undressed is not enough: it waits for the act itself.
@@ -195,6 +201,8 @@ export function SceneView(props: Props) {
   const current = progress.message === lastIndex
   // As far back as there are turns of his that can be redone.
   const maxBack = busy || !reply ? 0 : Math.min(props.turnsKept, scene.messages.filter((m) => m.role === 'user').length)
+  // The model his next line goes to, on Send's tooltip.
+  const { model, look: whichModel } = useModelName(scene.nsfw)
   const back = current ? Math.min(progress.back, maxBack) : 0
   // The reply being looked at: the latest, or the one that stood before the turn he has gone back to.
   const viewIndex = lastIndex - 2 * back
@@ -307,7 +315,10 @@ export function SceneView(props: Props) {
             aria-label={animation.name}
             autoPlay
             loop={animation.loop}
-            muted
+            muted={heard === 0}
+            ref={(video) => {
+              if (video) video.volume = heard
+            }}
             playsInline
             onEnded={props.onAnimationEnd}
             onError={() => setLost((before) => [...before, media])}
@@ -582,7 +593,7 @@ export function SceneView(props: Props) {
                     <HaltIcon size={18} />
                   </button>
                 ) : (
-                  <button type="submit" disabled={busy} aria-label="Send" className="icon">
+                  <button type="submit" disabled={busy} aria-label="Send" className="icon" title={model || undefined} onMouseEnter={whichModel}>
                     <ChevronIcon size={18} />
                   </button>
                 )}
@@ -631,7 +642,9 @@ export function SceneView(props: Props) {
             content={content}
             state={state}
             onOpen={onOpen}
-            phoneId={scene.npc ? undefined : partner.id}
+            // Masked, she is nobody yet: the phone opens on everyone he knows, not on her.
+            phoneId={scene.npc || (scene.mask && !scene.mask.revealed) ? undefined : partner.id}
+            phoneApp={scene.mask && !scene.mask.revealed ? 'friends' : undefined}
             bag={{ kind: 'gifts' }}
             bagDisabled={busy || ended || scene.npc}
             extras={

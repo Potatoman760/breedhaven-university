@@ -1,7 +1,6 @@
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { basename, extname, join } from 'node:path'
 import {
-  CalendarEventSchema,
   CatalogueSchema,
   DEFAULT_VIEW,
   LocationSchema,
@@ -14,7 +13,6 @@ import {
   kindOf,
   poseMedia,
   validateContentPack,
-  type CalendarEvent,
   type Job,
   type Society,
   type SocietiesFair,
@@ -33,8 +31,6 @@ const LOCATIONS_FILE = 'locations.json'
 const TRAITS_FILE = 'traits.json'
 const CATALOGUE_FILE = 'catalogue.json'
 const NEW_GAME_FILE = 'new-game.json'
-const EVENTS_FILE = 'events.json'
-const CALENDAR_FILE = 'calendar.json'
 const SPRITES = 'sprites'
 
 interface WithId {
@@ -126,25 +122,10 @@ export function loadWithAddons(packDir: string, addonDir: string): LoadedContent
     }
   }
 
-  // An add-on event joins the calendar, or takes the place of one of the game's own with its id.
-  const baseCalendar = (base as unknown as { calendar: { events?: CalendarEvent[] } }).calendar
-  const baseEvents = baseCalendar.events ?? []
-  const acceptedEvents: CalendarEvent[] = []
-  const calendarWith = (events: CalendarEvent[]) => ({ ...baseCalendar, events: overlay(baseEvents, events) })
-  for (const event of addonEvents(addonDir)) {
-    try {
-      validateContentPack({ ...base, locations: overlay(baseLocations, acceptedLocations), calendar: calendarWith([...acceptedEvents, event]) })
-      acceptedEvents.push(event)
-    } catch (error) {
-      issues.push(`${EVENTS_FILE}: ${event.name || event.id} was left out: ${(error as Error).message}`)
-    }
-  }
-
   // Each character, love interest or NPC, is tried on its own against everything accepted so far.
   const accepted: LoveInterest[] = []
   const pack = (loveInterests: unknown[]) => ({
     ...base,
-    calendar: calendarWith(acceptedEvents),
     locations: overlay(baseLocations, acceptedLocations),
     traits: overlay(baseTraits, traits),
     loveInterests: overlay(baseLoveInterests, loveInterests as LoveInterest[])
@@ -192,11 +173,11 @@ export function loadWithAddons(packDir: string, addonDir: string): LoadedContent
   } catch (error) {
     // The add-on traits broke something in the base pack (a trait a character uses, say). Go without add-ons.
     issues.push(`Add-ons were left out: ${(error as Error).message}`)
-    return { content: validateContentPack(base), info: { addonDir, issues, loveInterests: origins(baseLoveInterests, []), traits: origins(baseTraits, []), locations: origins(baseLocations, []), events: origins(baseEvents, []), playerChanged: false, base: false, assetPrefix: ADDON_PREFIX } }
+    return { content: validateContentPack(base), info: { addonDir, issues, loveInterests: origins(baseLoveInterests, []), traits: origins(baseTraits, []), locations: origins(baseLocations, []), playerChanged: false, base: false, assetPrefix: ADDON_PREFIX } }
   }
   return {
     content,
-    info: { addonDir, issues, loveInterests: origins(baseLoveInterests, accepted), traits: origins(baseTraits, traits), locations: origins(baseLocations, acceptedLocations), events: origins(baseEvents, acceptedEvents), playerChanged, base: false, assetPrefix: ADDON_PREFIX }
+    info: { addonDir, issues, loveInterests: origins(baseLoveInterests, accepted), traits: origins(baseTraits, traits), locations: origins(baseLocations, acceptedLocations), playerChanged, base: false, assetPrefix: ADDON_PREFIX }
   }
 }
 
@@ -219,7 +200,6 @@ export function loadBase(packDir: string): LoadedContent {
       loveInterests: all(raw.loveInterests, 'addon'),
       traits: all((Array.isArray(raw.traits) ? raw.traits : []) as WithId[], 'addon'),
       locations: all(raw.locations, 'base'),
-      events: all(content.calendar.events, 'addon'),
       playerChanged: false,
       base: true,
       assetPrefix: ''
@@ -252,64 +232,7 @@ export function resetPlayer(addonDir: string): string[] {
   return []
 }
 
-/** The add-on folder's events, those of them that can be read as events. */
-function addonEvents(addonDir: string): CalendarEvent[] {
-  const path = join(addonDir, EVENTS_FILE)
-  if (!existsSync(path)) return []
-  try {
-    const raw = readJsonFile(path)
-    return (Array.isArray(raw) ? raw : []).flatMap((entry) => {
-      const parsed = CalendarEventSchema.safeParse(entry)
-      return parsed.success ? [parsed.data] : []
-    })
-  } catch {
-    return []
-  }
-}
 
-/**
- * Adds an event or holiday to the calendar, or changes one, after checking the game would
- * still load with it. As an add-on it goes in the add-on folder's own list, and one with the
- * id of an event of the game's own takes its place; with `base`, the game's own calendar is
- * what is written.
- */
-export function saveEvent(addonDir: string, content: ContentPack, raw: unknown, base = false): string[] {
-  const parsed = CalendarEventSchema.safeParse(raw)
-  if (!parsed.success) return parsed.error.issues.map((issue) => `${issue.path.join('.') || 'event'}: ${issue.message}`)
-  // What the editor makes is written, not thought up in the middle of a game, and comes round every year.
-  const event: CalendarEvent = { ...parsed.data, generated: false, year: undefined }
-  if (!isSafeId(event.id)) return ['The id may only have lower-case letters, digits and hyphens, and must start with a letter or digit.']
-  if (event.name.trim() === '') return ['A name is needed.']
-  try {
-    validateContentPack({ ...content, calendar: { ...content.calendar, events: overlay(content.calendar.events, [event]) } })
-  } catch (error) {
-    return (error as { issues?: string[] }).issues ?? [(error as Error).message]
-  }
-  if (base) {
-    const file = join(addonDir, CALENDAR_FILE)
-    const calendar = readJsonFile(file) as { events?: CalendarEvent[] }
-    writeFileSync(file, `${JSON.stringify({ ...calendar, events: overlay(calendar.events ?? [], [event]) }, null, 2)}\n`)
-    return []
-  }
-  mkdirSync(addonDir, { recursive: true })
-  writeFileSync(join(addonDir, EVENTS_FILE), `${JSON.stringify(overlay(addonEvents(addonDir), [event]), null, 2)}\n`)
-  return []
-}
-
-/** Takes an event off the calendar: one of the add-on's, or with `base` any of the game's own. */
-export function deleteEvent(addonDir: string, id: string, base = false): string[] {
-  if (base) {
-    const file = join(addonDir, CALENDAR_FILE)
-    const calendar = readJsonFile(file) as { events?: CalendarEvent[] }
-    if (!(calendar.events ?? []).some((event) => event.id === id)) return ['There is no such event.']
-    writeFileSync(file, `${JSON.stringify({ ...calendar, events: (calendar.events ?? []).filter((event) => event.id !== id) }, null, 2)}\n`)
-    return []
-  }
-  const mine = addonEvents(addonDir)
-  if (!mine.some((event) => event.id === id)) return ['That event is not an add-on.']
-  writeFileSync(join(addonDir, EVENTS_FILE), `${JSON.stringify(mine.filter((event) => event.id !== id), null, 2)}\n`)
-  return []
-}
 
 const JOBS_FILE = 'jobs.json'
 

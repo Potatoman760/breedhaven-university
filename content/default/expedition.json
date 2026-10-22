@@ -1,7 +1,7 @@
 {
   "name": "the Undercroft",
-  "moneyImage": "sprites/items/gold-pouch-cutout.png",
-  "restImage": "sprites/items/campfire-cutout.png",
+  "moneyImage": "sprites/items/gold-pouch-cutout.webp",
+  "restImage": "sprites/items/campfire-cutout.webp",
   "endingImages": {
     "saved": "generated/backgrounds/epilogue/saved.webp",
     "overrun": "generated/backgrounds/epilogue/overrun.webp"
@@ -200,7 +200,7 @@
       "footing": 14,
       "attack": 3,
       "weakTo": "striker",
-      "image": "sprites/undercroft/wild-slime-cutout.png"
+      "image": "sprites/undercroft/wild-slime-cutout.webp"
     },
     {
       "id": "root-tangle",
@@ -210,7 +210,7 @@
       "attack": 4,
       "hexes": true,
       "weakTo": "hexer",
-      "image": "sprites/undercroft/root-tangle-cutout.png"
+      "image": "sprites/undercroft/root-tangle-cutout.webp"
     },
     {
       "id": "pipe-wight",
@@ -219,7 +219,7 @@
       "footing": 24,
       "attack": 5,
       "weakTo": "warder",
-      "image": "sprites/undercroft/pipe-wight-cutout.png"
+      "image": "sprites/undercroft/pipe-wight-cutout.webp"
     },
     {
       "id": "loose-ward",
@@ -229,7 +229,7 @@
       "attack": 4,
       "sweeps": true,
       "weakTo": "hexer",
-      "image": "sprites/undercroft/loose-ward-cutout.png"
+      "image": "sprites/undercroft/loose-ward-cutout.webp"
     },
     {
       "id": "steam-shade",
@@ -238,7 +238,7 @@
       "footing": 16,
       "attack": 7,
       "weakTo": "guard",
-      "image": "sprites/undercroft/steam-shade-cutout.png"
+      "image": "sprites/undercroft/steam-shade-cutout.webp"
     },
     {
       "id": "drowned-valve",
@@ -247,7 +247,7 @@
       "footing": 42,
       "attack": 5,
       "weakTo": "striker",
-      "image": "sprites/undercroft/drowned-valve-cutout.png"
+      "image": "sprites/undercroft/drowned-valve-cutout.webp"
     },
     {
       "id": "root-mother",
@@ -257,7 +257,7 @@
       "attack": 6,
       "hexes": true,
       "weakTo": "hexer",
-      "image": "sprites/undercroft/root-mother-cutout.png"
+      "image": "sprites/undercroft/root-mother-cutout.webp"
     },
     {
       "id": "broken-lattice",
@@ -267,7 +267,7 @@
       "attack": 6,
       "sweeps": true,
       "weakTo": "warder",
-      "image": "sprites/undercroft/broken-lattice-cutout.png"
+      "image": "sprites/undercroft/broken-lattice-cutout.webp"
     },
     {
       "id": "boiler-saint",
@@ -276,7 +276,7 @@
       "footing": 88,
       "attack": 8,
       "weakTo": "guard",
-      "image": "sprites/undercroft/boiler-saint-cutout.png"
+      "image": "sprites/undercroft/boiler-saint-cutout.webp"
     },
     {
       "id": "chained-stack",
@@ -286,7 +286,7 @@
       "attack": 7,
       "hexes": true,
       "weakTo": "hexer",
-      "image": "sprites/undercroft/chained-stack-cutout.png"
+      "image": "sprites/undercroft/chained-stack-cutout.webp"
     },
     {
       "id": "stillwater",
@@ -296,7 +296,7 @@
       "attack": 8,
       "sweeps": true,
       "weakTo": "striker",
-      "image": "sprites/undercroft/stillwater-cutout.png"
+      "image": "sprites/undercroft/stillwater-cutout.webp"
     },
     {
       "id": "first-ward",
@@ -305,7 +305,7 @@
       "footing": 120,
       "attack": 9,
       "weakTo": "warder",
-      "image": "sprites/undercroft/first-ward-cutout.png"
+      "image": "sprites/undercroft/first-ward-cutout.webp"
     },
     {
       "id": "wellspring",
@@ -315,7 +315,7 @@
       "attack": 9,
       "sweeps": true,
       "hexes": true,
-      "image": "sprites/undercroft/wellspring-cutout.png"
+      "image": "sprites/undercroft/wellspring-cutout.webp"
     }
   ],
   "depths": [
@@ -367,9 +367,9 @@
         "traitIds": [
           "dirty-talk"
         ],
-        "image": "sprites/undercroft/relic-silver-tongue-cutout.png"
+        "image": "sprites/undercroft/relic-silver-tongue-cutout.webp"
       },
-      "image": "generated/backgrounds/undercroft/the-old-drains.png"
+      "image": "generated/backgrounds/undercroft/the-old-drains.webp"
     },
     {
       "name": "the Root Cellars",
@@ -420,9 +420,9 @@
         "traitIds": [
           "exhibitionist"
         ],
-        "image": "sprites/undercroft/relic-exhibitionists-lantern-cutout.png"
+        "image": "sprites/undercroft/relic-exhibitionists-lantern-cutout.webp"
       },
-      "image": "generated/backgrounds/undercroft/the-root-cellars.png"
+      "image": "generated/backgrounds/undercroft/the-root-cellars.webp"
     },
     {
       "name": "the Ward Gallery",
@@ -477,9 +477,9 @@
           "kind": "drama",
           "amount": 2
         },
-        "image": "sprites/undercroft/relic-apple-of-discord-cutout.png"
+        "image": "sprites/undercroft/relic-apple-of-discord-cutout.webp"
       },
-      "image": "generated/backgrounds/undercroft/the-ward-gallery.png"
+      "image": "generated/backgrounds/undercroft/the-ward-gallery.webp"
     },
     {
       "name": "the Boiler Vaults",
@@ -528,9 +528,9 @@
         "description": "A spool of shimmering thread. Used in a scene, every stitch of clothing on everyone there vanishes at once.",
         "appearance": "A small wooden spool of shimmering silver thread, the loose end unwinding itself into the air in glittering coils.",
         "use": "unravel",
-        "image": "sprites/undercroft/relic-unraveling-cutout.png"
+        "image": "sprites/undercroft/relic-unraveling-cutout.webp"
       },
-      "image": "generated/backgrounds/undercroft/the-boiler-vaults.png"
+      "image": "generated/backgrounds/undercroft/the-boiler-vaults.webp"
     },
     {
       "name": "the Chained Stacks",
@@ -584,9 +584,9 @@
         "description": "An hourglass whose sand hangs still. Used in a scene, time stops for everyone but you and those you are with.",
         "appearance": "A small brass hourglass whose golden sand hangs motionless in the middle of its fall, frozen in the glass.",
         "use": "stillness",
-        "image": "sprites/undercroft/relic-hourglass-of-stillness-cutout.png"
+        "image": "sprites/undercroft/relic-hourglass-of-stillness-cutout.webp"
       },
-      "image": "generated/backgrounds/undercroft/the-chained-stacks.png"
+      "image": "generated/backgrounds/undercroft/the-chained-stacks.webp"
     },
     {
       "name": "the Still Pools",
@@ -636,9 +636,9 @@
         "description": "Two crescent moons locked together. Used in a scene, the women there are drawn to each other and want to kiss.",
         "appearance": "A pendant of two interlocking crescent moons carved from pale rose quartz, on a thin gold chain.",
         "use": "sapphic",
-        "image": "sprites/undercroft/relic-sapphic-charm-cutout.png"
+        "image": "sprites/undercroft/relic-sapphic-charm-cutout.webp"
       },
-      "image": "generated/backgrounds/undercroft/the-still-pools.png"
+      "image": "generated/backgrounds/undercroft/the-still-pools.webp"
     },
     {
       "name": "the First Foundations",
@@ -693,9 +693,9 @@
         "description": "A violet crystal eye. Used in a scene, you hear what the women there are really thinking.",
         "appearance": "A glass eye of deep violet crystal with a golden iris, glowing softly from within.",
         "use": "minds-eye",
-        "image": "sprites/undercroft/relic-minds-eye-cutout.png"
+        "image": "sprites/undercroft/relic-minds-eye-cutout.webp"
       },
-      "image": "generated/backgrounds/undercroft/the-first-foundations.png"
+      "image": "generated/backgrounds/undercroft/the-first-foundations.webp"
     },
     {
       "name": "the Wellspring",
@@ -746,9 +746,9 @@
         "description": "The seed the University was built to keep. Used in a scene, whatever the women there take against the Bloom does nothing.",
         "appearance": "A large golden seed glowing warmly from within, with a single green sprout curling from its tip.",
         "use": "first-seed",
-        "image": "sprites/undercroft/relic-seed-of-the-first-bloom-cutout.png"
+        "image": "sprites/undercroft/relic-seed-of-the-first-bloom-cutout.webp"
       },
-      "image": "generated/backgrounds/undercroft/the-wellspring.png"
+      "image": "generated/backgrounds/undercroft/the-wellspring.webp"
     }
   ],
   "effects": {
@@ -763,9 +763,9 @@
     "stone-spikes": "sprites/fx/stone-spikes.webp"
   },
   "stopImages": {
-    "fight": "sprites/icons/stops-fight-cutout.png",
-    "find": "sprites/icons/stops-find-cutout.png",
-    "checkpoint": "sprites/icons/stops-checkpoint-cutout.png",
-    "guardian": "sprites/icons/stops-guardian-cutout.png"
+    "fight": "sprites/icons/stops-fight-cutout.webp",
+    "find": "sprites/icons/stops-find-cutout.webp",
+    "checkpoint": "sprites/icons/stops-checkpoint-cutout.webp",
+    "guardian": "sprites/icons/stops-guardian-cutout.webp"
   }
 }

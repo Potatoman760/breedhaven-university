@@ -667,30 +667,6 @@
     "withLoveInterest": "required"
   },
   {
-    "id": "float-lantern",
-    "name": "Float a lantern together",
-    "description": "Write a wish and set it on the garden pond, side by side.",
-    "durationHours": 1,
-    "locationId": "physic-garden",
-    "tags": [
-      "date",
-      "festival"
-    ],
-    "withLoveInterest": "required",
-    "availability": {
-      "periods": [
-        "evening"
-      ]
-    },
-    "requirements": [
-      {
-        "type": "event",
-        "eventId": "lantern-festival"
-      }
-    ],
-    "effects": []
-  },
-  {
     "id": "night-together",
     "name": "Spend the night together",
     "description": "Invite them back to your suite.",

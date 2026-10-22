@@ -126,7 +126,7 @@
         "deepwinter": 20,
         "icebreak": 22
       },
-      "iconImage": "sprites/icons/weather-clear-cutout.png"
+      "iconImage": "sprites/icons/weather-clear-cutout.webp"
     },
     {
       "id": "overcast",
@@ -148,7 +148,7 @@
         "deepwinter": 30,
         "icebreak": 30
       },
-      "iconImage": "sprites/icons/weather-overcast-cutout.png"
+      "iconImage": "sprites/icons/weather-overcast-cutout.webp"
     },
     {
       "id": "drizzle",
@@ -170,7 +170,7 @@
         "deepwinter": 8,
         "icebreak": 10
       },
-      "iconImage": "sprites/icons/weather-drizzle-cutout.png"
+      "iconImage": "sprites/icons/weather-drizzle-cutout.webp"
     },
     {
       "id": "downpour",
@@ -192,7 +192,7 @@
         "deepwinter": 2,
         "icebreak": 2
       },
-      "iconImage": "sprites/icons/weather-downpour-cutout.png"
+      "iconImage": "sprites/icons/weather-downpour-cutout.webp"
     },
     {
       "id": "windy",
@@ -214,7 +214,7 @@
         "deepwinter": 8,
         "icebreak": 10
       },
-      "iconImage": "sprites/icons/weather-windy-cutout.png"
+      "iconImage": "sprites/icons/weather-windy-cutout.webp"
     },
     {
       "id": "mist",
@@ -235,7 +235,7 @@
         "deepwinter": 6,
         "icebreak": 6
       },
-      "iconImage": "sprites/icons/weather-mist-cutout.png"
+      "iconImage": "sprites/icons/weather-mist-cutout.webp"
     },
     {
       "id": "snow",
@@ -250,7 +250,7 @@
         "deepwinter": 26,
         "icebreak": 20
       },
-      "iconImage": "sprites/icons/weather-snow-cutout.png"
+      "iconImage": "sprites/icons/weather-snow-cutout.webp"
     },
     {
       "id": "heat",
@@ -265,7 +265,7 @@
         "goldenhay": 14,
         "emberfall": 2
       },
-      "iconImage": "sprites/icons/weather-heat-cutout.png"
+      "iconImage": "sprites/icons/weather-heat-cutout.webp"
     }
   ],
   "events": [
@@ -289,15 +289,229 @@
       "description": "Every club and society in the University sets up a table in the Great Court: sports in all three divisions, the debating union, Bloomist and Freewill student groups a careful distance apart, and free pens."
     },
     {
-      "id": "harvest-fair",
-      "name": "the Harvest Fair",
+      "id": "masquerade",
+      "name": "the Masquerade Ball",
+      "description": "The University's masked ball in the Grand Ballroom: gowns, enchanted masks that hide who is under them, and a night of dancing with strangers who may not be strangers at all.",
       "month": "emberfall",
       "day": 20,
-      "durationDays": 3,
-      "locationId": "market",
-      "startHour": 12,
-      "hours": 10,
-      "description": "The harvest is in. Traders, food vans, fairground rides, cider and dancing fill the market square until late."
+      "locationId": "ballroom",
+      "startHour": 19,
+      "hours": 3,
+      "program": [
+        {
+          "id": "ball",
+          "name": "The ball",
+          "day": 1,
+          "startHour": 19,
+          "hours": 3,
+          "description": "The Grand Ballroom glitters under its chandeliers: a string quartet in the gallery, a floor of dancers in gowns and enchanted masks, and the glass doors open on the moonlit terrace.",
+          "direction": "It is the Masquerade Ball in the Grand Ballroom, the University's masked ball: chandeliers, a string quartet, and everyone in gowns and enchanted masks that hide who they are. With nobody knowing who you are, you are bolder than you would ever be unmasked: you say what you would not say, and do what you would not do.",
+          "castSize": 1,
+          "masquerade": {
+            "masks": [
+              {
+                "id": "crimson",
+                "name": "Crimson",
+                "description": "a full-skirted crimson silk ball gown with long sleeves and a high neck, long crimson gloves, an ornate gold filigree mask, eyes behind it that change color from moment to moment, and her hair hidden in a shimmering enchanted updo",
+                "faceY": 8,
+                "sprites": {
+                  "neutral": "sprites/masquerade-crimson/default-neutral-cutout.webp",
+                  "happy": "sprites/masquerade-crimson/default-happy-cutout.webp",
+                  "aroused": "sprites/masquerade-crimson/default-aroused-cutout.webp"
+                },
+                "walk": "sprites/masquerade-crimson/walk-cutout.webp",
+                "animations": [
+                  {
+                    "id": "blowjob",
+                    "name": "Blowjob",
+                    "description": "on her knees on the terrace in her gown, him in her mouth",
+                    "image": "sprites/masquerade-crimson/nsfw-blowjob.webp",
+                    "clip": "sprites/masquerade-crimson/nsfw-blowjob.mp4"
+                  },
+                  {
+                    "id": "doggy",
+                    "name": "Doggy",
+                    "description": "bent over the stone balustrade, her skirt hiked up, him taking her from behind",
+                    "image": "sprites/masquerade-crimson/nsfw-doggy.webp",
+                    "clip": "sprites/masquerade-crimson/nsfw-doggy.mp4"
+                  },
+                  {
+                    "id": "missionary",
+                    "name": "Missionary",
+                    "description": "on her back on the garden bench, her skirt hiked up",
+                    "image": "sprites/masquerade-crimson/nsfw-missionary.webp",
+                    "clip": "sprites/masquerade-crimson/nsfw-missionary.mp4"
+                  },
+                  {
+                    "id": "creampie",
+                    "name": "Creampie",
+                    "description": "the moment he finishes inside her, on the bench",
+                    "image": "sprites/masquerade-crimson/nsfw-creampie.webp",
+                    "clip": "sprites/masquerade-crimson/nsfw-creampie.mp4"
+                  }
+                ]
+              },
+              {
+                "id": "midnight",
+                "name": "Midnight",
+                "description": "a full-skirted midnight-blue velvet ball gown scattered with silver stars, long sleeves and a high neck, long silver gloves, a crystal-set silver mask, eyes behind it that change color from moment to moment, and her hair hidden in a shimmering enchanted updo",
+                "faceY": 8,
+                "sprites": {
+                  "neutral": "sprites/masquerade-midnight/default-neutral-cutout.webp",
+                  "happy": "sprites/masquerade-midnight/default-happy-cutout.webp",
+                  "aroused": "sprites/masquerade-midnight/default-aroused-cutout.webp"
+                },
+                "walk": "sprites/masquerade-midnight/walk-cutout.webp",
+                "animations": [
+                  {
+                    "id": "blowjob",
+                    "name": "Blowjob",
+                    "description": "on her knees on the terrace in her gown, him in her mouth",
+                    "image": "sprites/masquerade-midnight/nsfw-blowjob.webp",
+                    "clip": "sprites/masquerade-midnight/nsfw-blowjob.mp4"
+                  },
+                  {
+                    "id": "doggy",
+                    "name": "Doggy",
+                    "description": "bent over the stone balustrade, her skirt hiked up, him taking her from behind",
+                    "image": "sprites/masquerade-midnight/nsfw-doggy.webp",
+                    "clip": "sprites/masquerade-midnight/nsfw-doggy.mp4"
+                  },
+                  {
+                    "id": "missionary",
+                    "name": "Missionary",
+                    "description": "on her back on the garden bench, her skirt hiked up",
+                    "image": "sprites/masquerade-midnight/nsfw-missionary.webp",
+                    "clip": "sprites/masquerade-midnight/nsfw-missionary.mp4"
+                  },
+                  {
+                    "id": "creampie",
+                    "name": "Creampie",
+                    "description": "the moment he finishes inside her, on the bench",
+                    "image": "sprites/masquerade-midnight/nsfw-creampie.webp",
+                    "clip": "sprites/masquerade-midnight/nsfw-creampie.mp4"
+                  }
+                ]
+              },
+              {
+                "id": "emerald",
+                "name": "Emerald",
+                "description": "a full-skirted emerald satin ball gown embroidered with gold leaves, long sleeves and a high neck, long black gloves, a feathered black lace mask, eyes behind it that change color from moment to moment, and her hair hidden in a shimmering enchanted updo",
+                "faceY": 8,
+                "sprites": {
+                  "neutral": "sprites/masquerade-emerald/default-neutral-cutout.webp",
+                  "happy": "sprites/masquerade-emerald/default-happy-cutout.webp",
+                  "aroused": "sprites/masquerade-emerald/default-aroused-cutout.webp"
+                },
+                "walk": "sprites/masquerade-emerald/walk-cutout.webp",
+                "animations": [
+                  {
+                    "id": "blowjob",
+                    "name": "Blowjob",
+                    "description": "on her knees on the terrace in her gown, him in her mouth",
+                    "image": "sprites/masquerade-emerald/nsfw-blowjob.webp",
+                    "clip": "sprites/masquerade-emerald/nsfw-blowjob.mp4"
+                  },
+                  {
+                    "id": "doggy",
+                    "name": "Doggy",
+                    "description": "bent over the stone balustrade, her skirt hiked up, him taking her from behind",
+                    "image": "sprites/masquerade-emerald/nsfw-doggy.webp",
+                    "clip": "sprites/masquerade-emerald/nsfw-doggy.mp4"
+                  },
+                  {
+                    "id": "missionary",
+                    "name": "Missionary",
+                    "description": "on her back on the garden bench, her skirt hiked up",
+                    "image": "sprites/masquerade-emerald/nsfw-missionary.webp",
+                    "clip": "sprites/masquerade-emerald/nsfw-missionary.mp4"
+                  },
+                  {
+                    "id": "creampie",
+                    "name": "Creampie",
+                    "description": "the moment he finishes inside her, on the bench",
+                    "image": "sprites/masquerade-emerald/nsfw-creampie.webp",
+                    "clip": "sprites/masquerade-emerald/nsfw-creampie.mp4"
+                  }
+                ]
+              }
+            ],
+            "standInId": "lira",
+            "privateViewId": "terrace",
+            "loss": 10
+          },
+          "cutscene": {
+            "speakerId": "agnes",
+            "scenes": [
+              {
+                "locationId": "ballroom",
+                "castIds": [
+                  "agnes"
+                ],
+                "lines": [
+                  "*The Grand Ballroom blazes under its chandeliers. At the foot of the stairs, unmasked, in black, with a list of names on a clipboard, stands Agnes Pell, keeper of the Chained Library, chaperone for the night.*",
+                  "{player}. Your first masquerade. I keep the list, I keep the peace, and in the morning I keep nothing at all.",
+                  "One rule. Nobody is anybody. The masks are enchanted, and well. Under the gown, a tall woman stands no taller than a short one, and a slight one no slighter than a full one.",
+                  "The hair goes up into that shimmer, so no color tells. And the eyes change color each time you look. There is no use memorizing them. People have tried.",
+                  "You may know her by her voice, or by how she dances. That is permitted. It is rather the point of the evening.",
+                  "*She raises one finger, as if for silence in the stacks.*",
+                  "A word of warning. Behind a mask, people do what they would never do with their own faces on. I have chaperoned this ball for nineteen years. It is the most honest night the University has. Go on. You are being watched already."
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "saltmere-booking",
+      "name": "Mistmoon Break",
+      "month": "harvestwane",
+      "day": 27,
+      "locationId": "dormitories",
+      "secret": true,
+      "description": "The break is coming, and he has a trip to plan.",
+      "program": [
+        {
+          "id": "book",
+          "name": "Make Plans!",
+          "day": 1,
+          "startHour": 8,
+          "hours": 2,
+          "required": true,
+          "cutscene": {
+            "speakerId": "tamsin",
+            "scenes": [
+              {
+                "locationId": "dormitories",
+                "castIds": [],
+                "lines": [
+                  "*The Mistmoon Break is coming up. Four days with no classes, and half the campus is already talking about where they're going.*",
+                  "*I've always wanted to go to the hot springs at Saltmere. Steam, maples, a lake, and nowhere I have to be.*",
+                  "*It would be better with company. Who should I bring?*"
+                ]
+              }
+            ]
+          },
+          "booking": {
+            "eventId": "mistmoon-break",
+            "most": 2,
+            "price": 150,
+            "minStage": "dating",
+            "blurb": "A hot-spring spa town in the wooded hills, a few hours' drive from the University: old timber inns, steaming stone pools, a waterfall above the town and a lake below it, and the best autumn color in the kingdom.",
+            "highlights": [
+              "Open-air hot springs under the stars",
+              "A private cedar bath, booked just for you",
+              "The maple trail to the waterfall",
+              "A lantern-lit night market",
+              "Fireworks over the lake on the last night",
+              "Breakfast at sunrise on your own balcony",
+              "Four days away with the one you love"
+            ],
+            "rating": 4.9
+          }
+        }
+      ]
     },
     {
       "id": "lantern-festival",
@@ -307,18 +521,141 @@
       "locationId": "physic-garden",
       "startHour": 18,
       "hours": 4,
-      "description": "On the last night of Harvestwane the University floats paper lanterns on the Physic Garden pond at dusk, each carrying a wish for the dark half of the year."
+      "description": "On the last night of Harvestwane the University floats paper lanterns on the Physic Garden pond at dusk, each carrying a wish for the dark half of the year. It is the night for lovers: nobody goes alone, everyone brings a date, and who you bring is noticed.",
+      "program": [
+        {
+          "id": "float-lantern",
+          "name": "Float a lantern together",
+          "day": 1,
+          "startHour": 18,
+          "hours": 4,
+          "viewId": "lantern-festival",
+          "description": "The Physic Garden is lit by a thousand paper lanterns. They float on the pond, hang in strings between the fruit trees and drift up into the dark, and every path is full of couples walking slowly.",
+          "direction": "It is the Lantern Festival, the University's night for lovers, in the Physic Garden lit by lanterns on the pond, in the trees and rising into the sky. Nobody comes alone: {player} asked you to be his date, and chose you over everyone else he could have asked. This is a date. Walk the lantern paths with him, write a wish and float a lantern together, and let it be romantic. If two of you came with him, you both know he chose you both, and how you feel about sharing the night shows.",
+          "castSize": 2,
+          "date": {
+            "most": 2,
+            "gain": 10,
+            "loss": 10
+          },
+          "animations": [
+            "lanterns"
+          ]
+        }
+      ]
     },
     {
-      "id": "arena-finals",
-      "name": "the Arena Finals",
+      "id": "mistmoon-break",
+      "name": "the Mistmoon Break",
       "month": "mistmoon",
       "day": 6,
-      "durationDays": 2,
-      "locationId": "tiltyard",
-      "startHour": 13,
-      "hours": 5,
-      "description": "The student combat-sports finals at the Tiltyard, in all three divisions: unaugmented, mage and Bloom. The stands are full, the wards on the ring are doubled for the Bloom bouts, and the argument about whether pregnancy is an unfair advantage starts up again on schedule."
+      "durationDays": 4,
+      "locationId": "saltmere",
+      "noClasses": true,
+      "noBirths": true,
+      "description": "Four days off in the middle of Mistmoon. The University empties: students go home, or away together to the hot springs in the hills.",
+      "program": [
+        {
+          "id": "first-soak",
+          "name": "First soak",
+          "day": 1,
+          "startHour": 18,
+          "hours": 3,
+          "viewId": "outdoor-bath",
+          "animations": [
+            "drive-there",
+            "soak"
+          ],
+          "description": "The inn is all dark timber and lamplight. Behind it, past a bamboo fence, the outdoor bath steams under the moon.",
+          "direction": "You are away with {player} at Saltmere Springs, a hot-spring town in the hills, over the Mistmoon Break: he invited you, and you said yes. You have just arrived after the drive, checked in, and come out to the open-air bath behind the inn at night: hot water, steam, stone lanterns, the moon. It is your first evening away. Undress and get in, and enjoy being far from campus with him.",
+          "castSize": 2,
+          "required": true,
+          "onTrip": true,
+          "outfitId": "bathrobe"
+        },
+        {
+          "id": "cascade-walk",
+          "name": "The cascade walk",
+          "day": 2,
+          "startHour": 10,
+          "hours": 4,
+          "viewId": "cascade",
+          "animations": [
+            "cascade"
+          ],
+          "description": "A trail of red and gold maples climbs from the town to the falls, the air full of spray and falling leaves.",
+          "direction": "You are away with {player} at Saltmere Springs, a hot-spring town in the hills, over the Mistmoon Break: he invited you, and you said yes. It is the next morning. You are walking the maple trail with him up to the waterfall above the town, with a picnic for the top. Enjoy the walk, the color and the view.",
+          "castSize": 2,
+          "required": true,
+          "onTrip": true
+        },
+        {
+          "id": "night-market",
+          "name": "The night market",
+          "day": 2,
+          "startHour": 18,
+          "hours": 3,
+          "viewId": "night-market",
+          "animations": [
+            "market"
+          ],
+          "description": "At dusk the main street fills with lantern-lit stalls: grilled skewers, sweet buns, spiced cider and games of chance.",
+          "direction": "You are away with {player} at Saltmere Springs, a hot-spring town in the hills, over the Mistmoon Break: he invited you, and you said yes. It is evening and the town's street has become a night market of food stalls and games. Wander it with him, eat, play, and buy each other something small to remember the trip by.",
+          "castSize": 2,
+          "required": true,
+          "onTrip": true
+        },
+        {
+          "id": "private-bath",
+          "name": "The private bath",
+          "day": 3,
+          "startHour": 11,
+          "hours": 3,
+          "viewId": "private-bath",
+          "animations": [
+            "private-bath"
+          ],
+          "description": "He has booked the inn's private bath for the hour: a cedar tub of hot water in a room of wood and stone, and the door locked behind you.",
+          "direction": "You are away with {player} at Saltmere Springs, a hot-spring town in the hills, over the Mistmoon Break: he invited you, and you said yes. He has booked the private bath for you: a cedar tub in a wood-and-stone room, the door locked, nobody to disturb you. You bathe naked together. It is intimate and nobody can walk in.",
+          "castSize": 2,
+          "required": true,
+          "onTrip": true,
+          "outfitId": "bathrobe"
+        },
+        {
+          "id": "fireworks",
+          "name": "Fireworks over the lake",
+          "day": 3,
+          "startHour": 20,
+          "hours": 3,
+          "viewId": "lake",
+          "animations": [
+            "fireworks"
+          ],
+          "description": "On the last night the town gathers on the lake shore. The first rocket goes up with a thump, and the sky opens in gold.",
+          "direction": "You are away with {player} at Saltmere Springs, a hot-spring town in the hills, over the Mistmoon Break: he invited you, and you said yes. It is the last night of the trip, and fireworks are going up over the lake below the town. Watch them with him from the pier, close together, and let it be the most romantic night of the trip.",
+          "castSize": 2,
+          "required": true,
+          "onTrip": true
+        },
+        {
+          "id": "last-morning",
+          "name": "The last morning",
+          "day": 4,
+          "startHour": 8,
+          "hours": 2,
+          "viewId": "balcony",
+          "animations": [
+            "last-morning"
+          ],
+          "description": "Dawn comes up gold over the misty valley. Tea is laid out on the balcony, and the bags are by the door.",
+          "direction": "You are away with {player} at Saltmere Springs, a hot-spring town in the hills, over the Mistmoon Break: he invited you, and you said yes. It is the last morning. You are having breakfast in robes on the inn's balcony at sunrise, before the drive back. Talk about the trip, what it meant, and what happens when you are back at the University.",
+          "castSize": 2,
+          "required": true,
+          "onTrip": true
+        }
+      ],
+      "homeAt": 18
     },
     {
       "id": "first-frost",
@@ -326,8 +663,23 @@
       "month": "mistmoon",
       "day": 22,
       "locationId": "commons",
-      "description": "The Commons lays on a hot supper to mark the turn of the weather: roast roots, spiced wine, and every hearth lit.",
+      "weatherId": "snow",
+      "mapDressing": "sprites/fx/wreath.webp",
+      "song": "sounds/music/magical-marketplace.mp3",
+      "presents": true,
+      "description": "The University's winter festival: a frost fair in the Market Square, a hot supper in the Commons, and the great tree lit in the Great Court.",
       "program": [
+        {
+          "id": "frost-fair",
+          "name": "The Frost Fair",
+          "day": 1,
+          "startHour": 13,
+          "hours": 4,
+          "locationId": "market",
+          "description": "The Market Square has become a frost fair: stalls hung with evergreen and holly, mulled wine and roasted chestnuts steaming in the cold, ice lanterns on the counters, and a bonfire roaring in the middle of the square.",
+          "direction": "It is the Feast of First Frost, the first cold day of the year, and the Market Square is a frost fair: stalls dressed in evergreen and holly, mulled wine, roasted chestnuts and hot pies, glowing ice lanterns, a bonfire in an iron brazier. You are at the fair with {player}. Wander the stalls, share something hot, warm your hands at the fire, and enjoy the first taste of winter together.",
+          "castSize": 2
+        },
         {
           "id": "feast",
           "name": "The supper",
@@ -352,6 +704,17 @@
               }
             ]
           }
+        },
+        {
+          "id": "tree-lighting",
+          "name": "The lighting of the tree",
+          "day": 1,
+          "startHour": 21,
+          "hours": 2,
+          "locationId": "great-court",
+          "description": "After supper the University spills out into the Great Court. On the middle terrace the great evergreen stands hung with glass, and as the bell strikes nine its lights come on all at once, frost-blue and gold, to a cheer that rings off the arcades.",
+          "direction": "It is late on the Feast of First Frost. After the supper the University has come out into the Great Court, where the great evergreen on the middle terrace has just been lit, frost-blue and gold, and ward-lights glitter along the arcades. Breath mists in the cold and mugs of spiced wine are passed round. You are under the tree with {player}. Stand close against the cold, admire the lights, and talk quietly about the winter ahead.",
+          "castSize": 2
         }
       ]
     },

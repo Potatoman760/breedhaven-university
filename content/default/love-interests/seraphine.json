@@ -184,7 +184,7 @@
       "description": "a short champagne-gold silk slip with thin straps and a lace hem",
       "sprites": {
         "neutral": {
-          "image": "sprites/seraphine/slip-neutral-cutout.png",
+          "image": "sprites/seraphine/slip-neutral-cutout.webp",
           "description": ""
         }
       },
@@ -198,12 +198,37 @@
       "inherits": "slip",
       "sprites": {
         "neutral": {
-          "image": "sprites/seraphine/slip-pregnant-neutral-cutout.png",
+          "image": "sprites/seraphine/slip-pregnant-neutral-cutout.webp",
           "description": ""
         }
       },
       "pregnant": true,
       "oneOff": true
+    },
+    {
+      "id": "bathrobe",
+      "name": "Bathrobe",
+      "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",
+      "pregnant": false,
+      "sprites": {
+        "neutral": {
+          "image": "sprites/seraphine/bathrobe-neutral-cutout.webp",
+          "description": ""
+        }
+      }
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "Bathrobe, pregnant",
+      "inherits": "bathrobe",
+      "description": "She has a round, pregnant belly.",
+      "pregnant": true,
+      "sprites": {
+        "neutral": {
+          "image": "sprites/seraphine/bathrobe-pregnant-neutral-cutout.webp",
+          "description": ""
+        }
+      }
     }
   ],
   "defaultOutfitId": "default",
@@ -363,7 +388,7 @@
     "background": "generated/backgrounds/seraphine/view.webp"
   },
   "birthPicture": "sprites/seraphine/birth.webp",
-  "walkSprite": "sprites/seraphine/walk-cutout.png",
+  "walkSprite": "sprites/seraphine/walk-cutout.webp",
   "childNames": {
     "daughters": [
       "Celeste",

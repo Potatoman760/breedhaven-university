@@ -52,9 +52,8 @@ interface Props {
   onMovedIn: (loveInterestId: string, roomKey: string) => void
 }
 
-// How long a room is celebrated once it is built, and once someone has moved into it.
+// How long a room is celebrated once it is built.
 const BUILT_MS = 1600
-const MOVED_IN_MS = 3200
 const REFUSED_MS = 500
 
 type Effects = { beds: number; cots: number; comfort: number; study: number }
@@ -79,7 +78,6 @@ export function HouseView({ content, state, onChange, onClose, onMovedIn }: Prop
   const config = content.housing
   const [picked, setPicked] = useState<string | undefined>(state.housing.room)
   const [built, setBuilt] = useState<string>()
-  const [movedIn, setMovedIn] = useState<{ key: string; id: string; name: string }>()
   const [refused, setRefused] = useState<string>()
   const [panel, setPanel] = useState<'household' | 'ledger' | null>(null)
   // The help, opened over the house on how the house works: closing it is back to the house.
@@ -100,15 +98,6 @@ export function HouseView({ content, state, onChange, onClose, onMovedIn }: Prop
     const timer = window.setTimeout(() => setBuilt(undefined), BUILT_MS)
     return () => window.clearTimeout(timer)
   }, [built])
-  useEffect(() => {
-    if (!movedIn) return
-    // Celebrated, it is on to the hour with her in her new room.
-    const timer = window.setTimeout(() => {
-      setMovedIn(undefined)
-      onMovedIn(movedIn.id, movedIn.key)
-    }, MOVED_IN_MS)
-    return () => window.clearTimeout(timer)
-  }, [movedIn])
   useEffect(() => {
     if (!refused) return
     const timer = window.setTimeout(() => setRefused(undefined), REFUSED_MS)
@@ -152,14 +141,14 @@ export function HouseView({ content, state, onChange, onClose, onMovedIn }: Prop
   function moveIn(key: string, id: string) {
     play('door')
     onChange((s) => invite(content, s, id, key))
-    setMovedIn({ key, id, name: content.loveInterests.find((li) => li.id === id)?.name.split(' ')[0] ?? id })
+    // Straight on to the hour with her in her new room: the scene is what marks it.
+    onMovedIn(id, key)
   }
 
   return (
     <main className="stage house-screen">
       {dialog}
       {backdrop && <div className={exterior ? 'house-backdrop' : 'house-backdrop blurred'} style={{ backgroundImage: `url("content://pack/${backdrop}")` }} />}
-      {movedIn && <div className="house-banner">{movedIn.name} has moved in!</div>}
 
       <Ornate
         title={config.name}
@@ -212,7 +201,7 @@ export function HouseView({ content, state, onChange, onClose, onMovedIn }: Prop
       <BackButton className="house-close" onClick={onClose} />
 
       <div className="house-stage">
-        <HouseFacade content={content} state={state} config={config} light={light} picked={picked} built={built} movedInto={movedIn?.key} refused={refused} onPick={pick} />
+        <HouseFacade content={content} state={state} config={config} light={light} picked={picked} built={built} refused={refused} onPick={pick} />
       </div>
 
       {room && (

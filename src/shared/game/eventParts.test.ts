@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { ContentError, validateContentPack } from '../model'
-import { attendEventPart, eventPartsToday, partCast, requiredEventPart } from './eventParts'
+import { attendEventPart, eventPartsToday, nextEventPart, partCast, requiredEventPart, settleMissedDates } from './eventParts'
 import { addEventGoers, eventKeeping, eventsOn, upcomingEvents } from './events'
 import { wornOutfit } from './pregnancy'
 import { backgroundFor } from './schedule'
@@ -34,6 +34,50 @@ describe('the parts of an event', () => {
     expect(eventPartsToday(content, { ...start, time: 4 })).toEqual([])
     // The dance is on the second day, twenty hours on.
     expect(eventPartsToday(content, { ...start, time: 20 }).map(({ part }) => part.id)).toEqual(['dance'])
+  })
+
+  it('are offered one at a time: the soonest still to come, then the next once it is gone to or over', () => {
+    // Three parts on one day, written out of order: the fair at 8, the supper at 12, the tree at 16.
+    const day = { ...fair, id: 'frost', name: 'the Frost', durationDays: 1, program: [
+      { id: 'supper', name: 'The supper', startHour: 12, hours: 2 },
+      { id: 'fair', name: 'The fair', startHour: 8, hours: 2 },
+      { id: 'tree', name: 'The tree', startHour: 16, hours: 2 }
+    ] }
+    const feast = validateContentPack({ ...raw, calendar: { ...raw.calendar, events: [...raw.calendar.events, day] } })
+    expect(nextEventPart(feast, start)?.part.id).toBe('fair')
+    expect(nextEventPart(feast, { ...start, partsAttended: ['frost:fair'] })?.part.id).toBe('supper')
+    // At 15:00 the supper is over and the tree is still to come.
+    expect(nextEventPart(feast, { ...start, time: 9 })?.part.id).toBe('tree')
+    expect(nextEventPart(feast, { ...start, time: 13 })).toBeUndefined()
+  })
+
+  it('share out at random the women he knows on a day of several parts, nobody at two of them', () => {
+    const ids = ['bea', 'cy', 'dee', 'eve', 'fay', 'gus']
+    const day = { ...fair, id: 'frost', name: 'the Frost', durationDays: 1, program: [
+      { id: 'fair', name: 'The fair', startHour: 8, hours: 2 },
+      { id: 'supper', name: 'The supper', startHour: 12, hours: 2 },
+      { id: 'tree', name: 'The tree', startHour: 16, hours: 2 }
+    ] }
+    const many = validateContentPack({
+      ...raw,
+      loveInterests: [...raw.loveInterests, ...ids.map((id) => ({ ...raw.loveInterests[0], id, name: `${id} Doe` }))],
+      calendar: { ...raw.calendar, events: [...raw.calendar.events, day] }
+    })
+    const frost = many.calendar.events.find((one) => one.id === 'frost')!
+    const castsOf = (state: typeof start) => frost.program.map((part) => partCast(many, state, frost, part))
+    // Ana is the closest of them by far, and is not always at the first: who comes is not who is closest.
+    const knowing = (seed: number) => ({ ...start, weatherSeed: seed, met: ['ana', ...ids], relationships: { ...start.relationships, ana: { affection: 90, trust: 0, desire: 0 } } })
+    const casts = castsOf(knowing(1))
+    expect(casts.map((cast) => cast.length)).toEqual([2, 2, 2])
+    expect(new Set(casts.flat()).size).toBe(6)
+    // The same all day, and another day or game another draw.
+    expect(castsOf({ ...knowing(1), time: 4 })).toEqual(casts)
+    expect(new Set(Array.from({ length: 20 }, (_, seed) => castsOf(knowing(seed))[0].join())).size).toBeGreaterThan(1)
+    expect(Array.from({ length: 20 }, (_, seed) => castsOf(knowing(seed))[0]).some((cast) => !cast.includes('ana'))).toBe(true)
+    // Three women for six places: the last part starts again from the first of them.
+    const few = castsOf({ ...knowing(1), met: ['ana', 'bea', 'cy'] })
+    expect(few.map((cast) => cast.length)).toEqual([2, 2, 2])
+    expect(new Set(few.slice(0, 2).flat()).size).toBe(3)
   })
 
   it('takes him there at its hour, reads its cutscene, and is gone to once', () => {
@@ -98,5 +142,51 @@ describe('the parts of an event', () => {
     // Nor one that dresses its speaker in something she does not have.
     const undressed = { ...fair, program: [{ ...fair.program[0], cutscene: { ...fair.program[0].cutscene, outfitId: 'ballgown' } }] }
     expect(() => validateContentPack({ ...raw, calendar: { ...raw.calendar, events: [undressed] } })).toThrow(ContentError)
+  })
+})
+
+describe('a date at an event', () => {
+  // Lanterns on 2 a, the game's first day, from 14:00 to 16:00. Bea has slept with him and Cy is jealous; Dee is neither.
+  const lanterns = { id: 'lanterns', name: 'the Lanterns', month: 'a', day: 2, locationId: 'shop', program: [{ id: 'date', name: 'The date', startHour: 14, hours: 2, date: {} }] }
+  const [ana] = raw.loveInterests
+  const others = [
+    { ...ana, id: 'bea', name: 'Bea Stone' },
+    { ...ana, id: 'cy', name: 'Cy Vane', traitIds: ['jealous'] },
+    { ...ana, id: 'dee', name: 'Dee Moss' }
+  ]
+  const dated = validateContentPack({
+    ...raw,
+    traits: [...raw.traits, { id: 'jealous', name: 'Jealous', definition: 'Minds.' }],
+    loveInterests: [...raw.loveInterests, ...others],
+    calendar: { ...raw.calendar, events: [...raw.calendar.events, lanterns] }
+  })
+  const rel = { affection: 40, trust: 40, desire: 40 }
+  const known = { ...createInitialState(dated), met: ['ana', 'bea', 'cy', 'dee'], relationships: { ana: rel, bea: rel, cy: rel, dee: rel }, timesIntimate: { bea: 1 } }
+
+  it('takes up to two, glad of it, and hurts those with a claim on him he leaves out', () => {
+    const { state, scene, hurt } = attendEventPart(dated, known, 'lanterns', 'date', ['ana'])
+    expect(scene).toMatchObject({ loveInterestId: 'ana', companionIds: [] })
+    expect(state.relationships['ana']).toMatchObject({ affection: 50, trust: 50, desire: 50 })
+    expect(hurt.sort()).toEqual(['bea', 'cy'])
+    expect(state.relationships['bea']).toMatchObject({ affection: 30, trust: 30, desire: 30 })
+    expect(state.relationships['dee']).toEqual(rel)
+    expect(attendEventPart(dated, known, 'lanterns', 'date', ['ana', 'bea']).scene).toMatchObject({ loveInterestId: 'ana', companionIds: ['bea'] })
+    // Nobody, too many, or someone he does not know will not do.
+    expect(() => attendEventPart(dated, known, 'lanterns', 'date', [])).toThrow()
+    expect(() => attendEventPart(dated, known, 'lanterns', 'date', ['ana', 'bea', 'cy'])).toThrow()
+    expect(() => attendEventPart(dated, { ...known, met: ['bea'] }, 'lanterns', 'date', ['ana'])).toThrow()
+  })
+
+  it('hurts every one of them, once, if he never goes', () => {
+    // 14:00 is eight hours in; 16:00, when it is over, ten.
+    expect(settleMissedDates(dated, { ...known, time: 9 }).hurt).toEqual([])
+    const missed = settleMissedDates(dated, { ...known, time: 10 })
+    expect(missed.hurt.sort()).toEqual(['bea', 'cy'])
+    expect(missed.state.relationships['cy']).toMatchObject({ affection: 30, trust: 30, desire: 30 })
+    expect(settleMissedDates(dated, missed.state).state).toBe(missed.state)
+    // Still reckoned the morning after, and not at all if he went.
+    expect(settleMissedDates(dated, { ...known, time: 22 }).hurt.sort()).toEqual(['bea', 'cy'])
+    const went = attendEventPart(dated, known, 'lanterns', 'date', ['ana']).state
+    expect(settleMissedDates(dated, went).state).toBe(went)
   })
 })

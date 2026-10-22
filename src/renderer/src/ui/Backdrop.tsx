@@ -45,6 +45,16 @@ export function Backdrop({ location, periodId, light, backgroundId, screen, room
       </>
     )
   }
+  // A view that moves plays its clip, silent, with its picture standing in until the clip is ready, or if it will not play.
+  const clip = !room?.image && view?.clip && failed !== view.clip ? view.clip : undefined
+  if (clip) {
+    return (
+      <>
+        <video key={clip} className="backdrop" src={`content://pack/${clip}`} poster={`content://pack/${background.image}`} autoPlay loop muted playsInline onError={() => setFailed(clip)} />
+        {fx}
+      </>
+    )
+  }
   return (
     <>
       <img

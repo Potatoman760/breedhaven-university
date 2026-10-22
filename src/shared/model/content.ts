@@ -191,12 +191,20 @@ function checkReferences(pack: ContentPack): string[] {
     if (e.locationId !== undefined) {
       need(locations, e.locationId, `calendar.events.${e.id}`, 'location')
     }
+    if (e.weatherId !== undefined && !calendar.weather.some((w) => w.id === e.weatherId)) issues.push(`calendar.events.${e.id}: unknown weather "${e.weatherId}"`)
     idSet(e.program, `calendar.events.${e.id}.program`)
     for (const part of e.program) {
       const where = `calendar.events.${e.id}.program.${part.id}`
       if (part.day > e.durationDays) issues.push(`${where}: day ${part.day} is after the event is over`)
       checkHour(part.startHour, where)
       if (part.locationId !== undefined) need(locations, part.locationId, where, 'location')
+      if (part.masquerade) {
+        const ball = part.masquerade
+        if (!pack.loveInterests.some((li) => li.id === ball.standInId)) issues.push(`${where}: the stand-in "${ball.standInId}" is not a love interest`)
+        const place = pack.locations.find((l) => l.id === (part.locationId ?? e.locationId))
+        if (place && !place.backgrounds.some((view) => view.id === ball.privateViewId)) issues.push(`${where}: ${place.name} has no view "${ball.privateViewId}"`)
+        idSet(ball.masks, `${where}.masquerade.masks`)
+      }
       else if (e.locationId === undefined) issues.push(`${where}: needs a place, since the event has none`)
       const partPlace = pack.locations.find((l) => l.id === (part.locationId ?? e.locationId))
       if (part.viewId !== undefined && partPlace && !partPlace.backgrounds.some((view) => view.id === part.viewId)) issues.push(`${where}.viewId: "${partPlace.id}" has no view "${part.viewId}"`)

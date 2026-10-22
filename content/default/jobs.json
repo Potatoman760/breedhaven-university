@@ -28,7 +28,7 @@
           "hours": 6
         }
       ],
-      "iconImage": "sprites/icons/jobs-market-stallhand-cutout.png"
+      "iconImage": "sprites/icons/jobs-market-stallhand-cutout.webp"
     },
     {
       "id": "commons-kitchen",
@@ -57,7 +57,7 @@
           "hours": 4
         }
       ],
-      "iconImage": "sprites/icons/jobs-commons-kitchen-cutout.png"
+      "iconImage": "sprites/icons/jobs-commons-kitchen-cutout.webp"
     },
     {
       "id": "halls-desk",
@@ -86,7 +86,7 @@
           "hours": 3
         }
       ],
-      "iconImage": "sprites/icons/jobs-halls-desk-cutout.png"
+      "iconImage": "sprites/icons/jobs-halls-desk-cutout.webp"
     },
     {
       "id": "store-tills",
@@ -120,7 +120,7 @@
           "hours": 4
         }
       ],
-      "iconImage": "sprites/icons/jobs-store-tills-cutout.png"
+      "iconImage": "sprites/icons/jobs-store-tills-cutout.webp"
     },
     {
       "id": "lumen-usher",
@@ -149,7 +149,7 @@
           "hours": 4
         }
       ],
-      "iconImage": "sprites/icons/jobs-lumen-usher-cutout.png"
+      "iconImage": "sprites/icons/jobs-lumen-usher-cutout.webp"
     },
     {
       "id": "bathhouse-attendant",
@@ -180,7 +180,7 @@
           "hours": 4
         }
       ],
-      "iconImage": "sprites/icons/jobs-bathhouse-attendant-cutout.png"
+      "iconImage": "sprites/icons/jobs-bathhouse-attendant-cutout.webp"
     },
     {
       "id": "boba-maker",
@@ -211,7 +211,7 @@
           "hours": 4
         }
       ],
-      "iconImage": "sprites/icons/jobs-boba-maker-cutout.png"
+      "iconImage": "sprites/icons/jobs-boba-maker-cutout.webp"
     },
     {
       "id": "garden-hand",
@@ -237,7 +237,7 @@
           "hours": 5
         }
       ],
-      "iconImage": "sprites/icons/jobs-garden-hand-cutout.png"
+      "iconImage": "sprites/icons/jobs-garden-hand-cutout.webp"
     },
     {
       "id": "library-page",
@@ -273,7 +273,7 @@
           "hours": 3
         }
       ],
-      "iconImage": "sprites/icons/jobs-library-page-cutout.png"
+      "iconImage": "sprites/icons/jobs-library-page-cutout.webp"
     },
     {
       "id": "arcade-floor",
@@ -309,7 +309,7 @@
           "hours": 4
         }
       ],
-      "iconImage": "sprites/icons/jobs-arcade-floor-cutout.png"
+      "iconImage": "sprites/icons/jobs-arcade-floor-cutout.webp"
     },
     {
       "id": "barista",
@@ -346,7 +346,7 @@
           "hours": 4
         }
       ],
-      "iconImage": "sprites/icons/jobs-barista-cutout.png"
+      "iconImage": "sprites/icons/jobs-barista-cutout.webp"
     },
     {
       "id": "armoury-assistant",
@@ -372,7 +372,7 @@
           "hours": 6
         }
       ],
-      "iconImage": "sprites/icons/jobs-armoury-assistant-cutout.png"
+      "iconImage": "sprites/icons/jobs-armoury-assistant-cutout.webp"
     },
     {
       "id": "bar-staff",
@@ -409,7 +409,7 @@
           "hours": 4
         }
       ],
-      "iconImage": "sprites/icons/jobs-bar-staff-cutout.png"
+      "iconImage": "sprites/icons/jobs-bar-staff-cutout.webp"
     },
     {
       "id": "clinic-reception",
@@ -446,7 +446,7 @@
           "hours": 4
         }
       ],
-      "iconImage": "sprites/icons/jobs-clinic-reception-cutout.png"
+      "iconImage": "sprites/icons/jobs-clinic-reception-cutout.webp"
     },
     {
       "id": "gym-floor",
@@ -483,7 +483,7 @@
           "hours": 3
         }
       ],
-      "iconImage": "sprites/icons/jobs-gym-floor-cutout.png"
+      "iconImage": "sprites/icons/jobs-gym-floor-cutout.webp"
     },
     {
       "id": "club-door",
@@ -515,7 +515,7 @@
           "hours": 4
         }
       ],
-      "iconImage": "sprites/icons/jobs-club-door-cutout.png"
+      "iconImage": "sprites/icons/jobs-club-door-cutout.webp"
     },
     {
       "id": "waiter",
@@ -552,7 +552,7 @@
           "hours": 4
         }
       ],
-      "iconImage": "sprites/icons/jobs-waiter-cutout.png"
+      "iconImage": "sprites/icons/jobs-waiter-cutout.webp"
     },
     {
       "id": "foundry-technician",
@@ -584,7 +584,7 @@
           "hours": 4
         }
       ],
-      "iconImage": "sprites/icons/jobs-foundry-technician-cutout.png"
+      "iconImage": "sprites/icons/jobs-foundry-technician-cutout.webp"
     },
     {
       "id": "research-assistant",
@@ -611,7 +611,7 @@
           "hours": 4
         }
       ],
-      "iconImage": "sprites/icons/jobs-research-assistant-cutout.png"
+      "iconImage": "sprites/icons/jobs-research-assistant-cutout.webp"
     }
   ]
 }

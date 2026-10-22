@@ -27,6 +27,8 @@ Run `npm run typecheck` and `npm test` after every change and say what they repo
 | `generate-icons.ts` | Paint the emblems shown in place of drawn icons for jobs, places, societies, stalls, weather and Undercroft stops (`npm run icons`, `-- <group or id>`, `--overwrite`, `--dry`). Run it after adding one. |
 | `generate-walks.ts` | Draw each love interest's walking profile (hips up, facing right) for the loading screen (`npm run walks`, `-- <ids>`, `--overwrite`, `--dry`). Run it after adding one. |
 | `preview-loading.ts` | Open the app in dev on the loading screen alone (`npm run preview:loading`, `-- <id or first name>`; random, and a click shows another, when none is named). |
+| `preview-lantern.ts` | Open the app in dev on the Lantern Festival's lantern release alone (`npm run preview:lantern`, `-- <id>` or `-- <id>,<id>` for two; one and then two at random when none is named). |
+| `preview-trip.ts` | Open the app in dev on the Saltmere trip's moments alone (`npm run preview:trip`, all in turn; `-- <moment>` or `-- <moment>:<id>,<id>`). |
 | `generate-clips.ts`, `generate-births.ts` | Batch media generation through the user's ComfyUI (`npm run clips`, `npm run births`). Long-running. |
 
 ## Layout
@@ -76,7 +78,7 @@ scripts/                One-off and maintenance scripts
 
 ## Gotchas
 
-- **Shell.** Bash here is Git Bash on Windows. Heredocs mangle backslashes and backticks; for anything beyond a one-line edit, write a Python or TypeScript script to a temp folder and run it, or use the editor tools.
+- **Shell.** Bash here is Git Bash on Windows, and it mangles backslashes, backticks and `$` in anything passed inline: heredocs, `python -c`, `sed` with escapes. Do not put code in the shell command. Write the script to a file in the scratchpad with the Write tool and run the file (`python <path>`, `npx jiti <path>`), or use the Edit tool for a change to the source. The shell is for running things, listing files and one-line commands with no escapes in them.
 - **Add-on overrides.** The app reads `%APPDATA%\breedhaven-dating-sim\addons\` over the game's own content. A `catalogue.json` left there silently replaces the one in the repo. Saves are in `...\saves\` (`auto.json`, `slot1.json` … `slot40.json`).
 - **Characters in memory are not as in their files.** A file names a subject (`"studies": { "major": "POL", "level": 1 }`); `resolveCurriculum` fills in the subject's name, stats and lab when the pack is read, and the editor writes the short form back.
 - **Circular imports in `src/shared/game`.** `modifiers.ts` reads only the model so that anything may import it. Check before importing between `housing`, `agenda`, `sleep`, `outing` and `births`.

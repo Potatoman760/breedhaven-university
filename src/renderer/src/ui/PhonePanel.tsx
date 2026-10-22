@@ -49,6 +49,9 @@ import {
   locationOf,
   inClass,
   markRead,
+  addGroupNote,
+  markGroupRead,
+  unreadInGroup,
   pregnancyOf,
   answerHousingOffer,
   canTakeHouse,
@@ -72,6 +75,7 @@ import {
   leaveSociety
 } from '../../../shared/game'
 import { Button } from './Button'
+import { useModelName } from '../modelName'
 import type { PhoneApp } from './panels'
 import { Portrait } from './Portrait'
 import { MEMORY_LEVEL_LABELS, METERS, STATS, type ContentPack, type GameState, type Job, type LoveInterest, type SkillGrant } from '../../../shared/model'
@@ -100,6 +104,8 @@ interface Props {
   onClose: () => void
   /** Who to open on, in Friends. Left out, the phone opens on his DMs. */
   initialId?: string
+  /** The chat to open on in his DMs: a love interest's id, or a group chat's as `group:<id>`. */
+  initialChat?: string
   /** The app to open on, and to turn to whenever it changes: as a tour of the phone does. */
   app?: PhoneApp
   /** Goes straight to the plan an invitation is for, accepting it first if it is still to be answered. Left out when he cannot leave: in a scene. */
@@ -142,7 +148,7 @@ function Presence({ content, state, li }: { content: ContentPack; state: GameSta
  * The player's phone: his Bloomr DMs for messages, Friends to keep track of everyone he is
  * getting to know, the Bloomr feed for what they post, and Jobs for work.
  */
-export function PhonePanel({ content, state, onChange, onClose, initialId, app: shown, onGoToInvite, canAct = true }: Props) {
+export function PhonePanel({ content, state, onChange, onClose, initialId, initialChat, app: shown, onGoToInvite, canAct = true }: Props) {
   // Everyone who can be in his DMs: the love interests, and any NPC he has worked for.
   const people = messageable(content)
   const [app, setApp] = useState<App>(shown ?? (initialId === undefined ? 'chats' : 'friends'))
@@ -155,7 +161,7 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, app: 
     if (app === 'updates' && newPosts > 0) onChange(markFeedSeen)
   }, [app, newPosts, onChange])
   // Who the open chat is with, and whose page is open in Friends.
-  const [chatId, setChatId] = useState<string | undefined>(() => people.find((li) => unreadNotes(state, li.id) > 0)?.id)
+  const [chatId, setChatId] = useState<string | undefined>(() => initialChat ?? people.find((li) => unreadNotes(state, li.id) > 0)?.id)
   // Only someone who has given him her Bloomr can be messaged.
   const canMessage = (id: string) => hasContact(state, id)
   const [friendId, setFriendId] = useState<string | undefined>(initialId)
@@ -258,12 +264,35 @@ function Chats({ content, state, onChange, selectedId, onSelect, onGoToInvite, c
   const last = (li: LoveInterest) => courierThread(state, li.id).at(-1)
   const listed = messageable(content).filter((li) => hasContact(state, li.id)).sort((a, b) => (last(b)?.time ?? -1) - (last(a)?.time ?? -1))
   const selected = listed.find((li) => li.id === selectedId)
+  // His group chats, above the rest: each with those in it, newest first.
+  const groups = Object.entries(state.groupChats).sort(([, a], [, b]) => (b.notes.at(-1)?.time ?? -1) - (a.notes.at(-1)?.time ?? -1))
+  const group = groups.find(([id]) => `${GROUP}${id}` === selectedId)
+  const nameOf = (id: string) => content.loveInterests.find((li) => li.id === id)?.name.split(' ')[0] ?? id
 
   return (
     <>
       <div className="chat-list">
         <div className="chat-rows">
-          {listed.length === 0 && <p className="hint">Nobody has given you their Bloomr yet. Ask someone for it when you are with them.</p>}
+          {listed.length === 0 && groups.length === 0 && <p className="hint">Nobody has given you their Bloomr yet. Ask someone for it when you are with them.</p>}
+          {groups.map(([id, chat]) => {
+            const note = chat.notes.at(-1)
+            const unread = unreadInGroup(state, id)
+            const members = chat.memberIds.flatMap((one) => content.loveInterests.find((li) => li.id === one) ?? [])
+            return (
+              <button key={id} className={`${GROUP}${id}` === selectedId ? 'chat-row group selected' : 'chat-row group'} onClick={() => onSelect(`${GROUP}${id}`)}>
+                <span className="avatar group-avatar">
+                  {members.slice(0, 2).map((li) => (
+                    <Portrait key={li.id} who={li} size={38} />
+                  ))}
+                </span>
+                <span className="chat-row-text">
+                  <strong>{chat.name}</strong>
+                  <span className={unread > 0 ? 'preview unread' : 'preview'}>{note ? `${note.from === 'player' ? 'You' : nameOf(note.speakerId ?? '')}: ${note.text}` : 'Say hello'}</span>
+                </span>
+                {unread > 0 ? <span className="badge">{unread}</span> : note && <span className="caps stamp">{stamp(note.time)}</span>}
+              </button>
+            )
+          })}
           {listed.map((li) => {
             const note = last(li)
             const unread = unreadNotes(state, li.id)
@@ -284,7 +313,22 @@ function Chats({ content, state, onChange, selectedId, onSelect, onGoToInvite, c
       </div>
 
       <div className="chat-thread">
-        {selected ? (
+        {group ? (
+          <>
+            <div className="chat-head">
+              <span className="avatar group-avatar">
+                {group[1].memberIds.flatMap((one) => content.loveInterests.find((li) => li.id === one) ?? []).slice(0, 2).map((li) => (
+                  <Portrait key={li.id} who={li} size={34} />
+                ))}
+              </span>
+              <div>
+                <strong>{group[1].name}</strong>
+                <span className="handle">You, {group[1].memberIds.map(nameOf).join(' and ')}</span>
+              </div>
+            </div>
+            <GroupThread key={group[0]} content={content} state={state} chatId={group[0]} onChange={onChange} />
+          </>
+        ) : selected ? (
           <>
             <div className="chat-head">
               <Portrait who={selected} size={48} className="avatar" />
@@ -315,6 +359,7 @@ interface ThreadProps {
 
 /** The messages that have gone between the player and one love interest. */
 function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadProps) {
+  const { model, look } = useModelName()
   const [draft, setDraft] = useState('')
   const [waiting, setWaiting] = useState(false)
   const [notice, setNotice] = useState('')
@@ -492,7 +537,86 @@ function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadPr
           placeholder={`Message ${firstName}...`}
           autoFocus
         />
-        <button type="submit" disabled={!draft.trim() || waiting} aria-label="Send" className="icon">
+        <button type="submit" disabled={!draft.trim() || waiting} aria-label="Send" className="icon" title={model || undefined} onMouseEnter={look}>
+          <ChevronIcon size={18} />
+        </button>
+      </form>
+    </>
+  )
+}
+
+// How a group chat's id is told from a love interest's, where either can be the open chat.
+const GROUP = 'group:'
+
+/** A group chat: what he and they have said in it, each line with who said it, and his answer to the rest. */
+function GroupThread({ content, state, chatId, onChange }: { content: ContentPack; state: GameState; chatId: string; onChange: (update: (state: GameState) => GameState) => void }) {
+  const { model, look } = useModelName()
+  const [draft, setDraft] = useState('')
+  const [waiting, setWaiting] = useState(false)
+  const [notice, setNotice] = useState('')
+  const end = useRef<HTMLDivElement>(null)
+  const chat = state.groupChats[chatId]
+  const notes = chat?.notes ?? []
+  const who = (id: string | undefined) => content.loveInterests.find((li) => li.id === id)
+
+  // Opening it reads it, and keeps its newest message in view.
+  useEffect(() => {
+    if (unreadInGroup(state, chatId) > 0) onChange((current) => markGroupRead(current, chatId))
+    end.current?.scrollIntoView({ block: 'end' })
+  }, [chatId, notes.length, waiting, state, onChange])
+
+  async function send(event: FormEvent) {
+    event.preventDefault()
+    const text = draft.trim()
+    if (!text || waiting || !chat) return
+    setDraft('')
+    const sent = addGroupNote(state, chatId, { from: 'player', text, read: true })
+    onChange((current) => addGroupNote(current, chatId, { from: 'player', text, read: true }))
+    setNotice('')
+    setWaiting(true)
+    try {
+      const history = (sent.groupChats[chatId]?.notes ?? []).map((note) => ({ speaker: note.from === 'player' ? state.player.name : (who(note.speakerId)?.name.split(' ')[0] ?? 'Someone'), text: note.text }))
+      const { lines } = await window.api.momentLines({ state: sent, ids: chat.memberIds, moment: 'group', history })
+      onChange((current) => lines.reduce((next, line) => addGroupNote(next, chatId, { from: 'them', speakerId: line.speakerId, text: line.text, read: false }), current))
+    } catch (error) {
+      setNotice(`No answer came back: ${errorMessage(error)}`)
+    } finally {
+      setWaiting(false)
+    }
+  }
+
+  return (
+    <>
+      <div className="chat-messages">
+        {notes.map((note, i) => {
+          const speaker = note.from === 'them' ? who(note.speakerId) : undefined
+          return (
+            <div key={i} className={note.from === 'player' ? 'message mine' : 'message from-group'}>
+              {speaker && (
+                <span className="group-speaker">
+                  <Portrait who={speaker} size={26} />
+                  {speaker.name.split(' ')[0]}
+                </span>
+              )}
+              <p className="bubble">{note.text}</p>
+            </div>
+          )
+        })}
+        {waiting && (
+          <div className="message">
+            <p className="bubble typing" aria-label="Someone is typing">
+              <i />
+              <i />
+              <i />
+            </p>
+          </div>
+        )}
+        <div ref={end} />
+      </div>
+      {notice && <p className="notice">{notice}</p>}
+      <form className="chat-compose" onSubmit={send}>
+        <input value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={400} aria-label={`A message to ${chat?.name ?? 'the group'}`} placeholder={`Message ${chat?.name ?? 'the group'}...`} autoFocus />
+        <button type="submit" disabled={!draft.trim() || waiting} aria-label="Send" className="icon" title={model || undefined} onMouseEnter={look}>
           <ChevronIcon size={18} />
         </button>
       </form>

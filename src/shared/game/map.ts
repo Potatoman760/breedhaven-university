@@ -80,6 +80,7 @@ export function canTravel(content: ContentPack, state: GameState, locationId: st
 
   if (isGameOver(content.calendar, state.time)) reasons.push('The game is over')
   if (locationId === state.locationId) reasons.push('You are already here')
+  if (location.eventOnly) reasons.push(`Only an event goes to ${location.name}`)
   if (!isOpen(location, toDate(content.calendar, state.time).hour)) reasons.push(`${location.name} is closed`)
   return { ok: reasons.length === 0, reasons }
 }

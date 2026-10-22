@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { CalendarEvent, ContentPack, GameState } from '../model'
+import type { CalendarEvent, ContentPack, GameState, Location } from '../model'
 import { dayIndexOf, formatDate, toDate } from './calendar'
 
 const clock = (hour: number): string => `${String(hour).padStart(2, '0')}:00`
@@ -28,6 +28,23 @@ export function eventsOn(content: ContentPack, state: GameState, time = state.ti
       (start) => start <= dayIndex && dayIndex < start + event.durationDays
     )
   )
+}
+
+/**
+ * What a place wears on the map today: the dressing of an event that is on and that the place has a view for, as it is
+ * dressed for it. Nothing on an ordinary day.
+ */
+export function mapDressingAt(content: ContentPack, state: GameState, location: Location): string | undefined {
+  return eventsOn(content, state).find((event) => event.mapDressing !== undefined && dressedFor(location, event))?.mapDressing
+}
+
+/** Whether a place is dressed for an event: it has a view named for it, as the one it shows while the event is on. */
+const dressedFor = (location: Location, event: CalendarEvent) =>
+  location.backgrounds.some((view) => view.id === event.id || view.name.trim().toLowerCase() === event.name.trim().toLowerCase())
+
+/** The song a place plays as he comes to it today: that of an event that is on and that it is dressed for. */
+export function songAt(content: ContentPack, state: GameState, location: Location | undefined): string | undefined {
+  return location && eventsOn(content, state).find((event) => event.song !== undefined && dressedFor(location, event))?.song
 }
 
 /** Which day of an event it is, counting from 1, or nothing when it is not on. */

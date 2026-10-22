@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { ContentPack, GameState } from '../model'
-import { WeatherTypeSchema } from '../model'
+import { CalendarEventSchema, WeatherTypeSchema } from '../model'
 import { buildCharacterPrompt } from './prompt'
 import { dialogueLines } from './scene'
 import { createInitialState } from './state'
@@ -46,6 +46,13 @@ describe('weatherOn', () => {
     expect(inA.filter((id) => id === 'clear').length).toBeGreaterThan(inA.filter((id) => id === 'rain').length)
     const inB = Array.from({ length: 200 }, (_, seed) => weatherOn(content, game(seed, 2))!.id)
     expect(inB.filter((id) => id === 'snow').length).toBeGreaterThan(180)
+  })
+
+  it('is the weather an event brings on the days it runs, whatever the month would give', () => {
+    // Day 1 is 3 a, where snow can't fall.
+    const snowDay: ContentPack = { ...content, calendar: { ...content.calendar, events: [CalendarEventSchema.parse({ id: 'frost', name: 'Frost', month: 'a', day: 3, weatherId: 'snow' })] } }
+    expect(Array.from({ length: 50 }, (_, seed) => weatherOn(snowDay, game(seed, 1))!.id).every((id) => id === 'snow')).toBe(true)
+    expect(Array.from({ length: 50 }, (_, seed) => weatherOn(snowDay, game(seed, 0))!.id)).not.toContain('snow')
   })
 
   it('is undefined when the content has no weather', () => {

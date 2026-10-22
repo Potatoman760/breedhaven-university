@@ -179,6 +179,31 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "bathrobe",
+      "name": "Bathrobe",
+      "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",
+      "pregnant": false,
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/bathrobe-neutral-cutout.webp",
+          "description": ""
+        }
+      }
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "Bathrobe, pregnant",
+      "inherits": "bathrobe",
+      "description": "She has a round, pregnant belly.",
+      "pregnant": true,
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/bathrobe-pregnant-neutral-cutout.webp",
+          "description": ""
+        }
+      }
     }
   ],
   "defaultOutfitId": "default",
@@ -328,7 +353,7 @@
     "name": "an apartment above Byte & Bloom on Lantern Row",
     "description": "A studio apartment, small and cluttered and lit by strings of colored charms. The bed is unmade and heaped with cushions and coats. A shelf holds half-dead houseplants, a speaker stack, and a tray of vials and powders beside a cracked mirror. The window stands open to the street noise and the lantern-light, and the air smells of perfume and smoke.",
     "locationId": "lantern-row",
-    "background": "generated/backgrounds/yulia/view.png"
+    "background": "generated/backgrounds/yulia/view.webp"
   },
   "birthPicture": "sprites/yulia/birth.webp",
   "walkSprite": "sprites/yulia/walk-cutout.webp",

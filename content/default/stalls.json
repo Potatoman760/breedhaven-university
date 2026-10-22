@@ -17,7 +17,7 @@
       "charmed-trowel",
       "moss-terrarium"
     ],
-    "iconImage": "sprites/icons/stalls-petal-and-posy-cutout.png"
+    "iconImage": "sprites/icons/stalls-petal-and-posy-cutout.webp"
   },
   {
     "id": "the-sweet-tooth",
@@ -37,7 +37,7 @@
       "apple-tart",
       "starkeland-honey-drops"
     ],
-    "iconImage": "sprites/icons/stalls-the-sweet-tooth-cutout.png"
+    "iconImage": "sprites/icons/stalls-the-sweet-tooth-cutout.webp"
   },
   {
     "id": "quill-and-binding",
@@ -55,7 +55,7 @@
       "vesperan-romance",
       "paint-set"
     ],
-    "iconImage": "sprites/icons/stalls-quill-and-binding-cutout.png"
+    "iconImage": "sprites/icons/stalls-quill-and-binding-cutout.webp"
   },
   {
     "id": "tinkers-tray",
@@ -76,7 +76,7 @@
       "prayer-beads",
       "match-ball"
     ],
-    "iconImage": "sprites/icons/stalls-tinkers-tray-cutout.png"
+    "iconImage": "sprites/icons/stalls-tinkers-tray-cutout.webp"
   },
   {
     "id": "second-circuit",
@@ -90,7 +90,7 @@
       "earbuds",
       "charm-case"
     ],
-    "iconImage": "sprites/icons/stalls-second-circuit-cutout.png"
+    "iconImage": "sprites/icons/stalls-second-circuit-cutout.webp"
   },
   {
     "id": "seven-petals",
@@ -106,7 +106,7 @@
       "lantern-row-whisper",
       "arena-program"
     ],
-    "iconImage": "sprites/icons/stalls-seven-petals-cutout.png"
+    "iconImage": "sprites/icons/stalls-seven-petals-cutout.webp"
   },
   {
     "id": "petal-and-pill",
@@ -119,7 +119,7 @@
       "chamomile-tea",
       "study-tonic"
     ],
-    "iconImage": "sprites/icons/stalls-petal-and-pill-cutout.png"
+    "iconImage": "sprites/icons/stalls-petal-and-pill-cutout.webp"
   },
   {
     "id": "byte-and-bloom",
@@ -132,7 +132,7 @@
       "game-controller",
       "smart-lamp"
     ],
-    "iconImage": "sprites/icons/stalls-byte-and-bloom-cutout.png"
+    "iconImage": "sprites/icons/stalls-byte-and-bloom-cutout.webp"
   },
   {
     "id": "arcana",
@@ -148,7 +148,7 @@
       "ward-candles",
       "first-rain"
     ],
-    "iconImage": "sprites/icons/stalls-arcana-cutout.png"
+    "iconImage": "sprites/icons/stalls-arcana-cutout.webp"
   },
   {
     "id": "forbidden-shelf",
@@ -162,7 +162,7 @@
       "antique-atlas",
       "curio"
     ],
-    "iconImage": "sprites/icons/stalls-forbidden-shelf-cutout.png"
+    "iconImage": "sprites/icons/stalls-forbidden-shelf-cutout.webp"
   },
   {
     "id": "second-bloom",
@@ -177,7 +177,7 @@
       "paperback",
       "veyran-mask"
     ],
-    "iconImage": "sprites/icons/stalls-second-bloom-cutout.png"
+    "iconImage": "sprites/icons/stalls-second-bloom-cutout.webp"
   },
   {
     "id": "spell-and-sip-counter",
@@ -189,6 +189,6 @@
       "coffee-to-go",
       "almond-croissant"
     ],
-    "iconImage": "sprites/icons/stalls-spell-and-sip-counter-cutout.png"
+    "iconImage": "sprites/icons/stalls-spell-and-sip-counter-cutout.webp"
   }
 ]

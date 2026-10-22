@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import {
   acceptBond,
   ambienceAt,
+  songAt,
   attendEventPart,
   leaveTable,
   settlePokerHand,
@@ -22,6 +23,15 @@ import {
   toldOf,
   skillLevel,
   devotedMothers,
+  settleMissedDates,
+  bookTrip,
+  comeHome,
+  nextTripPart,
+  tripChatId,
+  addGroupNote,
+  type BanterLine,
+  spriteFor,
+  wornOutfit,
   intuitTaste,
   lessonTopic,
   spendOnFocus,
@@ -131,11 +141,17 @@ import {
   reconcileState,
   sceneBaseline,
   meet,
+  bringPresents,
   sceneCast,
   firstNames,
   sceneOutcome,
   talkToNpc,
   withNpc,
+  inMasks,
+  nextDance,
+  guessable,
+  guessDancer,
+  endMasquerade,
   startOuting,
   type Outing,
   toDate,
@@ -155,11 +171,11 @@ import {
   joinSociety,
   societyPeople
 } from '../../shared/game'
-import { MAX_SCENE_CAST, type Activity, type ContentPack, type ExamKind, type GameState, type Intro, type PostPlan, type Relic, type RelicUse, type Scene } from '../../shared/model'
+import { MAX_SCENE_CAST, type Activity, type ContentPack, type EventPart, type ExamKind, type GameState, type Intro, type PostPlan, type Relic, type RelicUse, type Scene } from '../../shared/model'
 import { CHAT_CANCELLED } from '../../shared/ipc'
 import { AUTO_SLOT_ID, type SaveData } from '../../shared/saves'
 import { errorMessage } from './errors'
-import { play, setAmbience, useSounds } from './sound'
+import { play, playSong, setAmbience, useSounds } from './sound'
 import { EpilogueView } from './ui/EpilogueView'
 import { SavesPanel } from './SavesPanel'
 import { SettingsPanel } from './SettingsPanel'
@@ -189,6 +205,12 @@ import { PartyDialog } from './ui/PartyDialog'
 import type { Panel } from './ui/panels'
 import { SceneView } from './ui/SceneView'
 import { RelicMoment } from './ui/RelicMoment'
+import { DawnTransition } from './ui/DawnTransition'
+import { DateDialog } from './ui/DateDialog'
+import { LanternRelease, type LanternDate } from './ui/LanternRelease'
+import { TripMoment, type TripCompanion, type TripMomentKind } from './ui/TripMoment'
+import { MasqueradeGuess } from './ui/MasqueradeGuess'
+import { TripBooking } from './ui/TripBooking'
 import { SummaryView, type SceneSummary } from './ui/SummaryView'
 
 // The content editor is the developer's own: it is there when the game is run from its source, and a built game leaves
@@ -309,6 +331,9 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   const [walkingWith, setWalkingWith] = useState<string[] | null>(null)
   // The scene ended with them going to sleep where they were: once it is settled, he wakes there in the morning.
   const [sleepingOver, setSleepingOver] = useState(false)
+  // The night going by, played once he has slept: whichever way he came to.
+  const [dawn, setDawn] = useState(false)
+  const endDawn = useCallback(() => setDawn(false), [])
   // Set once a scene is over, until the player dismisses its summary screen.
   const [summary, setSummary] = useState<SceneSummary | null>(null)
   const [busy, setBusy] = useState(false)
@@ -340,6 +365,12 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   // The loop behind where he is, which changes with the place and the dark, and stops when the game is left.
   const ambience = ambienceAt(content, state)
   useEffect(() => setAmbience(ambience), [ambience])
+  // Coming to a place dressed for a festival with a song of its own, the song plays once through: each time he arrives.
+  const arrival = `${state.locationId}:${toDate(content.calendar, state.time).dayIndex}`
+  useEffect(() => {
+    const tune = songAt(content, state, content.locations.find((l) => l.id === state.locationId))
+    if (tune) playSong(tune)
+  }, [arrival])
   useEffect(() => () => setAmbience(undefined), [])
   // Outside a scene, a notice is a toast too, since nothing else on the screen would be read: up for a while, and gone at a click.
   useEffect(() => {
@@ -385,6 +416,17 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     if (scene) setState((current) => meet(content, current, sceneCast(scene)))
   }, [content, scene])
 
+  // On a day of presents, each woman brings him one the first time they meet: it is in his bag, and she hands it over in the scene.
+  useEffect(() => {
+    if (!scene || scene.npc) return
+    const brought = bringPresents(content, state, sceneCast(scene))
+    if (brought.state === state) return
+    setState((current) => bringPresents(content, current, sceneCast(scene)).state)
+    if (brought.presents.length === 0) return
+    setScene((current) => current && { ...current, presents: [...(current.presents ?? []), ...brought.presents] })
+    setNotice(brought.presents.map((present) => `${firstNames(content, [present.fromId])} gave you ${content.items.find((item) => item.id === present.itemId)?.name ?? 'a present'}.`).join(' '))
+  }, [content, scene, state])
+
   // As time goes by, the shifts that have ended are counted: worked, or missed and held against him.
   useEffect(() => {
     setState((current) => settleShifts(content, current))
@@ -402,6 +444,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   useEffect(() => {
     if (scene || summary || !isSleepTime(content, state) || isGameOver(content.calendar, state.time)) return
     setState((current) => (isSleepTime(content, current) ? sleep(content, current) : current))
+    setDawn(true)
   }, [content, scene, summary, state])
 
   /** Asks whether to end the day early: everything still to come today would be let go, and he would wake in the morning. */
@@ -482,7 +525,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       })
   }, [state.feedPlans, state.weatherSeed, over, drawn])
   // In a scene with an NPC, the NPC stands among the characters for every screen that shows the scene.
-  const cast = scene?.npc ? withNpc(content, scene.loveInterestId) : content
+  // At a masked ball the lead is in her mask, and goes by its name until he has named her.
+  const cast = scene?.npc ? withNpc(content, scene.loveInterestId) : scene ? inMasks(content, scene, true) : content
   const partner = cast.loveInterests.find((li) => li.id === partnerId)
   const examCourse = exam ? state.courses.find((course) => course.id === exam.courseId) : undefined
 
@@ -492,6 +536,27 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     if (!idle || over || scheduleBirths(content, state).state === state) return
     setState((current) => scheduleBirths(content, current).state)
   }, [idle, over, state, content])
+
+  // Home from a trip once the last of it is done: the drive back, and he is home.
+  useEffect(() => {
+    if (!idle) return
+    const home = comeHome(content, state)
+    if (home.state === state) return
+    setState(home.state)
+    if (home.companions.length > 0) {
+      const ids = home.companions
+      setTripMoment({ kind: 'drive-home', companions: gladOf(ids, state), lines: () => window.api.momentLines({ state, ids, moment: 'drive-home' }).then((got) => got.lines), then: () => undefined })
+    }
+  }, [idle, state, content])
+
+  // A date he let go by: once its hour is past, every woman with a claim on him minds that he took nobody.
+  useEffect(() => {
+    if (!idle) return
+    const missed = settleMissedDates(content, state)
+    if (missed.state === state) return
+    setState(missed.state)
+    if (missed.hurt.length > 0) setNotice(`You took nobody to ${missed.eventName}. ${firstNames(content, missed.hurt)} ${missed.hurt.length === 1 ? 'is' : 'are'} hurt.`)
+  }, [idle, state, content])
 
   // Where he has learnt it, the mothers of his children want him as much as a woman can: kept so between scenes.
   useEffect(() => {
@@ -703,6 +768,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   const openedFor = useRef<Scene['beats'] | null>(null)
   useEffect(() => {
     if (!scene || busy || scene.messages.length > 0 || openedFor.current === scene.beats) return
+    // A present due today is put on the scene first, for her to open with: the scene comes back here once it is.
+    if (!scene.npc && bringPresents(content, state, sceneCast(scene)).presents.length > 0) return
     openedFor.current = scene.beats
     void send(undefined, scene, state)
   }, [scene, busy])
@@ -739,7 +806,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       setNotice('')
       setState(shown.state)
       // The nanny tells him first how a child does in the house, and then he can ask her what he likes.
-      if (shown.cutscene) setCutscene({ intro: shown.cutscene, then: () => setScene(shown.scene) })
+      if (shown.cutscene) introThenScene(shown.cutscene, shown.scene)
       else setScene(shown.scene)
       return
     }
@@ -803,12 +870,20 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setState(result.state)
     setNotice('')
     const begin = () => setScene(result.scene)
-    if (result.cutscene) setCutscene({ intro: result.cutscene, then: begin })
+    if (result.cutscene) introThenScene(result.cutscene, result.scene)
     else begin()
   }
 
   // The cutscene a part of an event opens with, read before its scene begins.
   const [cutscene, setCutscene] = useState<{ intro: Intro; then: () => void } | null>(null)
+  /**
+   * Written lines, and then the scene they lead into. The scene is set at once, under the lines, so that her opening
+   * is asked for while he reads them and is there, or nearly, when he is done: no loading screen between the two.
+   */
+  function introThenScene(intro: Intro, next: Scene | null) {
+    setScene(next)
+    setCutscene({ intro, then: () => undefined })
+  }
   // The guide's walk through going below, once she has shown him the way down, and the practice fight she puts him in.
   const [belowTour, setBelowTour] = useState(false)
   // The first look round's second half, round the day's choices: only ever straight after the first half, never kept.
@@ -826,14 +901,84 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setScene(shown.scene)
   }, [welcome])
   const [practice, setPractice] = useState<GameState | null>(null)
-  /** Goes to a part of an event: he is taken there, reads its cutscene if it has one, and its scene begins. */
-  function attendPart(eventId: string, partId: string) {
-    const result = attendEventPart(content, state, eventId, partId)
+  // The lanterns let go as the festival date begins, and what comes after them.
+  const [lanterns, setLanterns] = useState<{ dates: LanternDate[]; lines: () => Promise<BanterLine[]>; then: () => void } | null>(null)
+  const endLanterns = useCallback(() => {
+    const after = lanterns?.then
+    setLanterns(null)
+    after?.()
+  }, [lanterns])
+  // A moment of a trip away, playing, and what comes after it.
+  const [tripMoment, setTripMoment] = useState<{ kind: TripMomentKind; companions: TripCompanion[]; title?: string; lines?: () => Promise<BanterLine[]>; then: () => void } | null>(null)
+  const endTripMoment = useCallback(() => {
+    const after = tripMoment?.then
+    setTripMoment(null)
+    after?.()
+  }, [tripMoment])
+  // A trip being booked, once its lines are read.
+  const [booking, setBooking] = useState<NonNullable<EventPart['booking']> | null>(null)
+  // A date at an event, waiting on who he takes.
+  const [dating, setDating] = useState<{ eventId: string; partId: string; title: string; most: number } | null>(null)
+
+  // Away on a trip, it is one scene after another with nothing between: the next of it today is gone to at once, and
+  // one tomorrow comes after a night slept where he is. Whatever is playing or open is let finish first.
+  useEffect(() => {
+    if (!idle || over || dawn || tripMoment || lanterns || booking || dating || cutscene || panel) return
+    const next = nextTripPart(content, state)
+    if (!next) return
+    if (next.today) attendPart(next.event.id, next.part.id)
+    else {
+      setState((current) => sleep(content, current))
+      setDawn(true)
+    }
+  }, [idle, over, dawn, tripMoment, lanterns, booking, dating, cutscene, panel, state, content])
+
+  /**
+   * Goes to a part of an event: he is taken there, reads its cutscene if it has one, and its scene begins. A date asks
+   * first who he takes.
+   */
+  function attendPart(eventId: string, partId: string, dateIds?: string[]) {
+    const event = content.calendar.events.find((one) => one.id === eventId)
+    const part = event?.program.find((one) => one.id === partId)
+    if (event && part?.date && !dateIds) {
+      setDating({ eventId, partId, title: event.name, most: part.date.most })
+      return
+    }
+    setDating(null)
+    const result = attendEventPart(content, state, eventId, partId, dateIds)
     setState(result.state)
-    setNotice('')
-    const begin = () => setScene(result.scene)
-    if (result.cutscene) setCutscene({ intro: result.cutscene, then: begin })
-    else begin()
+    setNotice(result.hurt.length > 0 ? `${firstNames(content, result.hurt)} ${result.hurt.length === 1 ? 'is' : 'are'} hurt you did not ask ${result.hurt.length === 1 ? 'her' : 'them'}.` : '')
+    // A booking part ends on the booking screen, not a scene.
+    const begin = () => (result.booking ? setBooking(result.booking) : setScene(result.scene))
+    // Whatever the part plays as it begins comes first, in turn, with those in it; then its lines, then the scene.
+    const cast = result.scene ? sceneCast(result.scene) : []
+    const dates = gladOf(cast, result.state)
+    // A part that books a trip goes on to its booking screen once its lines are read; any other, under its lines, to its scene.
+    const read = () => (!result.cutscene ? begin() : result.booking ? setCutscene({ intro: result.cutscene, then: begin }) : introThenScene(result.cutscene, result.scene))
+    const lines = () => window.api.momentLines({ state: result.state, ids: cast, moment: 'lanterns' }).then((got) => got.lines)
+    const played = result.animations.reduceRight<() => void>((then, kind) => {
+      if (!result.scene) return then
+      if (kind === 'lanterns') return () => setLanterns({ dates, lines, then })
+      const drive = kind === 'drive-there'
+      return () =>
+        setTripMoment({
+          kind,
+          companions: dates,
+          title: drive ? undefined : part?.name,
+          lines: drive ? () => window.api.momentLines({ state: result.state, ids: cast, moment: 'drive-there' }).then((got) => got.lines) : undefined,
+          then
+        })
+    }, read)
+    played()
+  }
+
+  /** Those named, each in her glad sprite as she is dressed: for the moments played before a scene. */
+  function gladOf(ids: string[], at: GameState) {
+    return ids.flatMap((id) => {
+      const li = content.loveInterests.find((one) => one.id === id)
+      const image = li && spriteFor(li, wornOutfit(content, at, li), 'happy')
+      return li && image ? [{ id, image, walk: li.walkSprite, stageHeight: li.stageHeight }] : []
+    })
   }
 
   /** Has a word with someone who is here and is not a love interest. */
@@ -980,7 +1125,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       baseline: sceneBaseline(at, leadId, companionIds)
     }
     // A night of its own is set up in writing first, and then it is his to play.
-    if (gate) setCutscene({ intro: gate.intro, then: () => setScene(meeting) })
+    if (gate) introThenScene(gate.intro, meeting)
     else setScene(meeting)
   }
 
@@ -1089,8 +1234,22 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
    * Ends a class or a shift at once, with no summary: nobody remembers it and nobody feels differently about him. The
    * class's marks were earned as it began; a shift is paid now, as it would have been.
    */
+  /**
+   * A dance at a masked ball ends with no summary, which would give her away: the next dance comes at once, and after the
+   * last the unmasking, or nothing if nobody was masked. Only the scene that follows a right guess is summed up.
+   */
+  function endDance() {
+    const next = nextDance(content, state)
+    setEnded(false)
+    setLastPrompt('')
+    setScene(next?.scene ?? null)
+    if (next) setState((current) => nextDance(content, current)?.state ?? current)
+    else if (guessable(content, state).length === 0) setState((current) => endMasquerade(current))
+  }
+
   function skipScene() {
     if (!scene || busy) return
+    if (scene.dance) return endDance()
     const pay = shiftPay(content, state, scene)
     setState(payShift(content, state, scene))
     setSleepingOver(false)
@@ -1104,6 +1263,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
 
   async function finishScene() {
     if (!scene || busy) return
+    if (scene.dance) return endDance()
     setBusy(true)
     try {
       const result = await window.api.summarize({ state, scene })
@@ -1164,6 +1324,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       const awake = result.rapport.reduce((next, c) => setRelation(next, c.a, c.b, c.relation), known)
       // They fell asleep where they were: the night goes by, and he wakes there in the morning, rested.
       const settled = sleepingOver ? sleepOver(content, awake) : awake
+      if (sleepingOver) setDawn(true)
       setSleepingOver(false)
       setState(settled)
       // As a scene ends, one of those whose Bloomr he has may write to him. It is written in the background, and turns up on his phone when it is.
@@ -1245,7 +1406,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         <ExpeditionView content={content} state={state} onChange={setState} />
       ) : summary ? (
         <SummaryView
-          content={summary.scene.npc ? withNpc(content, summary.scene.loveInterestId) : content}
+          content={summary.scene.npc ? withNpc(content, summary.scene.loveInterestId) : inMasks(content, summary.scene, true)}
           state={state}
           summary={summary}
           backgroundId={summary.scene.viewId ?? backgroundId}
@@ -1373,6 +1534,44 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       )}
 
       {relicMoment && <RelicMoment relic={relicMoment} onDone={endRelicMoment} />}
+      {lanterns && <LanternRelease dates={lanterns.dates} lines={lanterns.lines} onDone={endLanterns} />}
+      {tripMoment && <TripMoment kind={tripMoment.kind} companions={tripMoment.companions} title={tripMoment.title} lines={tripMoment.lines} onDone={endTripMoment} />}
+      {!scene && !summary && guessable(content, state).length > 0 && (
+        <MasqueradeGuess
+          content={content}
+          state={state}
+          onGuess={(dancerId, guessedId) => {
+            const result = guessDancer(content, state, dancerId, guessedId)
+            setState(result.state)
+            if (result.scene) {
+              setNotice('')
+              setScene(result.scene)
+            } else setNotice(`It was ${firstNames(content, [dancerId])}. She is hurt you did not know her.`)
+          }}
+        />
+      )}
+      {booking && (
+        <TripBooking
+          content={content}
+          state={state}
+          booking={booking}
+          onBook={(ids) => {
+            // Booked, he is taken to the trip's group chat, where he has just told them, and their answers come in.
+            const booked = bookTrip(content, state, booking, ids)
+            const chatId = tripChatId(booking.eventId)
+            setState(booked)
+            setBooking(null)
+            setPanel({ kind: 'courier', app: 'chats', chat: `group:${chatId}` })
+            const history = (booked.groupChats[chatId]?.notes ?? []).map((note) => ({ speaker: booked.player.name, text: note.text }))
+            void window.api.momentLines({ state: booked, ids, moment: 'trip-booked', history }).then(({ lines }) =>
+              applyUpdate((current) => lines.reduce((next, line) => addGroupNote(next, chatId, { from: 'them', speakerId: line.speakerId, text: line.text, read: false }), current))
+            )
+          }}
+          onSkip={() => setBooking(null)}
+        />
+      )}
+      {dating && <DateDialog content={content} state={state} title={dating.title} most={dating.most} onGo={(ids) => attendPart(dating.eventId, dating.partId, ids)} onClose={() => setDating(null)} />}
+      {dawn && <DawnTransition content={content} state={state} onDone={endDawn} />}
 
       {panel?.kind === 'gifts' && scene && partner && (
         <Dialog title="Your bag" onClose={close} sounds={['bagOpen', 'bagClose']} ornate>
@@ -1386,7 +1585,12 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
             })}
             onGive={give}
             onUseItem={(itemId, onId) => useInScene(content.items.find((item) => item.id === itemId)?.name ?? itemId, useItem(content, state, itemId, onId), onId)}
-            onAbility={(skillId, onId) => useInScene(content.skills.find((skill) => skill.id === skillId)?.name ?? skillId, useAbility(content, state, skillId, onId), onId)}
+            onAbility={(skillId, onId) => {
+              const skill = content.skills.find((one) => one.id === skillId)
+              // Making a thing only puts it in his bag: the bag stays open, on what he is making, for him to make or use more.
+              if (skill?.ability?.effects.some((effect) => effect.type === 'item')) return setState((current) => useAbility(content, current, skillId, onId))
+              useInScene(skill?.name ?? skillId, useAbility(content, state, skillId, onId), onId)
+            }}
             onToggleRelic={(relicId) => setState((current) => toggleRelic(current, relicId))}
             canUseRelic={(relicId) => canUseRelic(content, state, scene, relicId)}
             onUseRelic={(relicId) => {
@@ -1426,7 +1630,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       )}
 
       {panel?.kind === 'courier' && (
-        <PhonePanel content={content} state={state} onChange={applyUpdate} onClose={close} initialId={panel.id} app={panel.app} onGoToInvite={scene || summary ? undefined : goToInvite} canAct={!scene && !summary} />
+        <PhonePanel content={content} state={state} onChange={applyUpdate} onClose={close} initialId={panel.id} initialChat={panel.chat} app={panel.app} onGoToInvite={scene || summary ? undefined : goToInvite} canAct={!scene && !summary} />
       )}
       <div className="toasts">
       {!scene && notice && (
@@ -1472,6 +1676,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
             <button
               onClick={() => {
                 setState(sleep(content, state))
+                setDawn(true)
                 close()
               }}
             >

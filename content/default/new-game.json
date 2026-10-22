@@ -18,7 +18,7 @@
   "look": {
     "appearance": "a handsome young man of eighteen, a college student, athletic build with broad shoulders, a defined chest and toned arms, a narrow waist, clean-shaven with a strong jawline, warm brown eyes, thick dark brown hair swept back and to the side",
     "clothes": "a fitted white crew-neck t-shirt that hugs his chest and arms, slim dark jeans",
-    "sprite": "sprites/player/default-neutral-2-cutout.png",
+    "sprite": "sprites/player/default-neutral-2-cutout.webp",
     "faceY": 4
   },
   "locationId": "dormitories",

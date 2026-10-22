@@ -1,7 +1,7 @@
 import type { Appointment, ContentPack, CourierNote, GameState, Proposal } from '../model'
 import { acceptProposal, allFree, attendees, describeWhen, proposeMeeting, upcomingAppointments } from './appointments'
 import { toDate } from './calendar'
-import { handleOf } from './feed'
+import { handleOf, unreadPosts } from './feed'
 import { bondOf, statusOf } from './bonds'
 import { addMemory } from './memory'
 import { appealLevel } from './stats'
@@ -71,10 +71,39 @@ export function addNote(state: GameState, loveInterestId: string, note: Omit<Cou
   }
 }
 
-/** Notes from love interests the player hasn't opened: from one of them, or from all. */
+/** Notes from love interests the player hasn't opened: from one of them, or from all, his group chats among them. */
 export function unreadNotes(state: GameState, loveInterestId?: string): number {
-  const threads = loveInterestId ? [courierThread(state, loveInterestId)] : Object.values(state.courier)
+  const threads = loveInterestId ? [courierThread(state, loveInterestId)] : [...Object.values(state.courier), ...Object.values(state.groupChats).map((chat) => chat.notes)]
   return threads.flat().filter((note) => !note.read).length
+}
+
+/** Everything new on his phone, for the badge on it: messages unread, in DMs and group chats, and posts on the feed unseen. */
+export function phoneUnread(state: GameState): number {
+  return unreadNotes(state) + unreadPosts(state)
+}
+
+/** A group chat started, with those in it besides him, and nothing said yet; one already there is left as it is. */
+export function startGroupChat(state: GameState, chatId: string, name: string, memberIds: string[]): GameState {
+  if (state.groupChats[chatId]) return state
+  return { ...state, groupChats: { ...state.groupChats, [chatId]: { name, memberIds, notes: [] } } }
+}
+
+/** Something said in a group chat: by him, or by one of them, named. */
+export function addGroupNote(state: GameState, chatId: string, note: Omit<CourierNote, 'time'>): GameState {
+  const chat = state.groupChats[chatId]
+  if (!chat) return state
+  return { ...state, groupChats: { ...state.groupChats, [chatId]: { ...chat, notes: [...chat.notes, { ...note, time: state.time }] } } }
+}
+
+/** What in a group chat he has not read. */
+export function unreadInGroup(state: GameState, chatId: string): number {
+  return (state.groupChats[chatId]?.notes ?? []).filter((note) => !note.read).length
+}
+
+export function markGroupRead(state: GameState, chatId: string): GameState {
+  const chat = state.groupChats[chatId]
+  if (!chat || unreadInGroup(state, chatId) === 0) return state
+  return { ...state, groupChats: { ...state.groupChats, [chatId]: { ...chat, notes: chat.notes.map((note) => ({ ...note, read: true })) } } }
 }
 
 export function markRead(state: GameState, loveInterestId: string): GameState {

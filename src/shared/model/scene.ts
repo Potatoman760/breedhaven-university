@@ -57,6 +57,13 @@ export const SceneGiftSchema = z.object({
 })
 export type SceneGift = z.infer<typeof SceneGiftSchema>
 
+/** A present she brought him for the day, and gives him in the scene: already in his bag. */
+export const ScenePresentSchema = z.object({
+  fromId: z.string(),
+  itemId: z.string()
+})
+export type ScenePresent = z.infer<typeof ScenePresentSchema>
+
 /** How things stood just before the scene began, so its end can show what changed. */
 export const SceneBaselineSchema = z.object({
   stats: z.record(z.string(), z.number()),
@@ -123,6 +130,12 @@ export const SceneSchema = z.object({
   messages: z.array(ChatMessageSchema),
   /** Gifts handed over during the scene, in order. */
   gifts: z.array(SceneGiftSchema),
+  /** The lead is masked at a ball: in this mask, and named for it until he has named her (`revealed`). */
+  mask: z.object({ maskId: z.string(), revealed: z.boolean().default(false) }).optional(),
+  /** One of the dances at a masked ball: when it is over, the next comes, or the guess. */
+  dance: z.boolean().optional(),
+  /** Presents brought for him for the day by those in it, given as each first greets him. */
+  presents: z.array(ScenePresentSchema).optional(),
   /** How the love interest currently appears, as last chosen by the LLM. Unset means the defaults. */
   outfitId: z.string().optional(),
   expression: z.string().optional(),

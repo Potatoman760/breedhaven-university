@@ -43,7 +43,7 @@ import {
   stageFor,
   toDate,
   canPlayPoker,
-  eventPartsToday,
+  nextEventPart,
   requiredEventPart,
   weatherOn,
   roomBackdrop,
@@ -158,7 +158,9 @@ export function DayView(props: Props) {
   // The first day of the societies' fair holds the day as orientation does, until he has been.
   const fairCall = over || induction ? false : fairDue(content, state)
   const locked = induction !== undefined || summoned !== undefined || mustAttend !== undefined || fairCall
-  const parts = over || induction ? [] : eventPartsToday(content, state)
+  // Only the next of the day's parts is offered: the others come up as each is gone to or over.
+  const next = over || induction ? undefined : nextEventPart(content, state)
+  const parts = next ? [next] : []
 
 
   const ownRoom = roomBackdrop(state.inOwnRoom ? content.newGame.room : undefined, 'room-of-player')
@@ -410,7 +412,7 @@ export function DayView(props: Props) {
           )
         })}
 
-        {/* The scripted parts of today's events: a card each while it is still to come or under way. */}
+        {/* The next scripted part of today's events, while it is still to come or under way. */}
         {parts.map(({ event, part }) => (
           <button key={`${event.id}:${part.id}`} className="featured" disabled={props.busy} onClick={() => props.onEventPart(event.id, part.id)}>
             <span className="chip outline-light">{part.required ? 'Now' : 'Event'}</span>
@@ -418,7 +420,8 @@ export function DayView(props: Props) {
               {event.name}: {part.name}
             </span>
             <span>
-              {String(part.startHour).padStart(2, '0')}:00 · {content.locations.find((l) => l.id === (part.locationId ?? event.locationId))?.name}
+              {/* From when to when: it can be joined until its last hour is over. */}
+              {String(part.startHour).padStart(2, '0')}:00–{String((part.startHour + part.hours) % content.calendar.hoursPerDay).padStart(2, '0')}:00 · {content.locations.find((l) => l.id === (part.locationId ?? event.locationId))?.name}
             </span>
             <ChevronIcon size={18} />
           </button>

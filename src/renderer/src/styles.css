@@ -7903,19 +7903,6 @@ button.room-window:not(:disabled):active {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
 }
 
-.room-face.arrived {
-  animation: house-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-}
-
-
-
-@keyframes house-pop {
-  from {
-    opacity: 0;
-    transform: scale(0.3) translateY(10px);
-  }
-}
-
 .room-you {
   position: absolute;
   top: 6px;
@@ -7999,51 +7986,6 @@ button.room-window:not(:disabled):active {
   }
 }
 
-/* Someone has moved in: her window glows. */
-.room-window.moving-in {
-  animation: house-moved 1.6s ease-in-out 2 alternate;
-}
-
-@keyframes house-moved {
-  to {
-    box-shadow:
-      0 0 0 3px var(--gold),
-      0 0 30px var(--gold-glow);
-  }
-}
-
-.house-banner {
-  position: absolute;
-  top: 28px;
-  left: 50%;
-  z-index: 10;
-  padding: 10px 30px;
-  border: 1px solid var(--gold);
-  border-radius: 999px;
-  background: linear-gradient(var(--moss-deep), var(--wood));
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  color: var(--gold-soft);
-  font: 600 1.6rem/1.2 var(--display);
-  transform: translateX(-50%);
-  animation: house-banner 3.2s ease both;
-}
-
-@keyframes house-banner {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -30px);
-  }
-  12%,
-  80% {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -16px);
-  }
-}
-
 /* The room picked, on a card that slides in from the side. */
 .house-card {
   position: absolute;
@@ -8100,10 +8042,7 @@ button.room-window:not(:disabled):active {
   .room-window.lit .room-glow,
   .room-window.affordable .room-lock,
   .room-price.refused,
-  .room-face.arrived,
   .room-window.building img,
-  .room-window.moving-in,
-  .house-banner,
   .house-card {
     animation: none;
   }
@@ -8564,6 +8503,18 @@ button.btn.grand.centred:has(.grand-icon) .grand-text {
 }
 
 
+
+/* What a place wears on the map for a festival, around its emblem: the picture's hole is a little above its middle. */
+.map-dressing {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 165%;
+  height: 165%;
+  max-width: none;
+  transform: translate(-50%, -47.7%);
+  pointer-events: none;
+}
 
 /* Go, or why there is no going, at the end of the name. */
 .map-board button.btn.map-go {
@@ -9797,4 +9748,770 @@ button.btn.smart-fix {
   .relic-moment-halo {
     animation: none;
   }
+}
+
+/* The morning's lettering: a brush script, bundled with the game. */
+@font-face {
+  font-family: 'Kaushan Script';
+  src: url('../../assets/fonts/KaushanScript-Regular.ttf') format('truetype');
+  font-display: block;
+}
+
+/* The night going by: the sky turns like a wheel whose hub is the foot of the screen, moon away and sun up, and over
+   it the month, the days turning past with it, and how far through the semester he is. Drawn like a comic's lettering:
+   heavy white type, black outlines, a little askew. */
+.dawn {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  overflow: hidden;
+  cursor: pointer;
+  background: #0b0d22;
+  animation: dawn-veil 5.4s ease both;
+}
+.dawn-dial {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  /* Just wide enough to reach the top corners from its hub at the foot of the screen, whatever the window's shape. */
+  width: calc(2 * hypot(50vw, 100vh) + 8px);
+  height: calc(2 * hypot(50vw, 100vh) + 8px);
+  pointer-events: none;
+  transform: translate(-50%, -50%) rotate(0deg);
+  animation: dawn-turn 5.4s both;
+}
+.dawn-month,
+.dawn-term-label,
+.dawn-term-share {
+  color: #fff;
+  font-family: 'Kaushan Script', var(--display);
+  font-weight: 400;
+  -webkit-text-stroke: 2px #0b0b0b;
+  paint-order: stroke fill;
+  text-shadow: 4px 4px 0 #0b0b0b;
+}
+.dawn-month {
+  position: absolute;
+  top: 5vh;
+  left: 4vw;
+  font-size: clamp(2.4rem, 6vw, 5rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  transform: rotate(-4deg);
+  animation: dawn-month 5.4s ease both;
+}
+/* The days, in a row across the middle: each slides one place along as the sky turns, the one it comes to growing. */
+.dawn-days {
+  position: absolute;
+  top: 44%;
+  left: 50%;
+  pointer-events: none;
+}
+/* Each day is a page torn from a desk calendar: the date in ink across its middle, the weekday under it, and the
+   day's weather at the foot of the page, below the wooden bar at its top. */
+.dawn-date {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  width: 12.5vw;
+  aspect-ratio: 465 / 630;
+  /* Below the wooden bar, which takes the top fifth of the page. In the page's own width (12.5vw), not a percentage:
+     a padding's percentage is of the row the pages stand in, which has no width. */
+  padding-top: calc(12.5vw * 0.3);
+  background: url('content://pack/sprites/fx/calendar-page.webp') center / 100% 100% no-repeat;
+  filter: drop-shadow(5px 6px 0 rgb(0 0 0 / 0.55));
+  transform: translate(calc(-50% + var(--from) * 15vw), -50%) scale(var(--from-size)) rotate(-6deg);
+  animation: dawn-slide 5.4s both;
+}
+.dawn-date strong,
+.dawn-date span {
+  color: #2a1a0c;
+  font-family: 'Kaushan Script', var(--display);
+  font-weight: 400;
+}
+.dawn-date strong {
+  font-size: 5.6vw;
+  line-height: 1;
+}
+.dawn-date span {
+  font-size: 1.35vw;
+  line-height: 1.1;
+}
+.dawn-weather {
+  display: grid;
+  place-items: center;
+  margin-top: calc(12.5vw * 0.04);
+  width: 34%;
+  aspect-ratio: 1;
+}
+.dawn-weather svg,
+.dawn-weather img {
+  width: 100%;
+  height: 100%;
+}
+.dawn-date.free strong,
+.dawn-date.free span {
+  color: #1d6fae;
+}
+.dawn-date.last strong,
+.dawn-date.last span {
+  color: #b8141c;
+}
+/* The kiss, pressed onto the day he wakes to once it has come to the middle. */
+.dawn-kiss {
+  position: absolute;
+  top: 24%;
+  right: -16%;
+  width: 62%;
+  pointer-events: none;
+  opacity: 0;
+  transform: rotate(18deg) scale(2.4);
+  animation: dawn-kiss 5.4s both;
+}
+.dawn-term {
+  position: absolute;
+  right: 4vw;
+  bottom: 6vh;
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: end;
+  gap: 4px 14px;
+  padding: 12px 16px 10px;
+  border: 3px solid #0b0b0b;
+  background: #fff;
+  box-shadow: 6px 6px 0 #0b0b0b;
+  transform: rotate(-3deg);
+  animation: dawn-term 5.4s ease both;
+}
+.dawn-term-label {
+  grid-column: 1 / -1;
+  color: #0b0b0b;
+  font-size: 1.05rem;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+}
+.dawn-term-bar {
+  width: clamp(160px, 22vw, 320px);
+  height: 16px;
+  border: 3px solid #0b0b0b;
+  background: #fff;
+}
+.dawn-term-bar i {
+  display: block;
+  height: 100%;
+  background: #e8262f;
+}
+.dawn-term-share {
+  color: #e8262f;
+  font-size: clamp(1.8rem, 3.6vw, 3rem);
+  line-height: 0.9;
+}
+
+@keyframes dawn-veil {
+  0% { opacity: 0; }
+  7%, 90% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes dawn-turn {
+  0%, 15% { transform: translate(-50%, -50%) rotate(0deg); animation-timing-function: cubic-bezier(0.55, 0, 0.35, 1); }
+  62%, 100% { transform: translate(-50%, -50%) rotate(180deg); }
+}
+@keyframes dawn-slide {
+  0%, 15% { transform: translate(calc(-50% + var(--from) * 15vw), -50%) scale(var(--from-size)) rotate(-6deg); animation-timing-function: cubic-bezier(0.55, 0, 0.35, 1); }
+  62%, 100% { transform: translate(calc(-50% + var(--to) * 15vw), -50%) scale(var(--to-size)) rotate(-6deg); }
+}
+@keyframes dawn-kiss {
+  0%, 64% { opacity: 0; transform: rotate(18deg) scale(2.4); }
+  70% { opacity: 1; transform: rotate(-8deg) scale(0.92); animation-timing-function: ease-out; }
+  74%, 100% { opacity: 1; transform: rotate(-8deg) scale(1); }
+}
+@keyframes dawn-month {
+  0%, 4% { opacity: 0; transform: translateX(-30px) rotate(-4deg); }
+  12%, 100% { opacity: 1; transform: rotate(-4deg); }
+}
+@keyframes dawn-term {
+  0%, 8% { opacity: 0; transform: translateY(20px) rotate(-3deg); }
+  16%, 100% { opacity: 1; transform: rotate(-3deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dawn-dial {
+    animation: none;
+    transform: translate(-50%, -50%) rotate(180deg);
+  }
+  .dawn-date {
+    animation: none;
+    transform: translate(calc(-50% + var(--to) * 15vw), -50%) scale(var(--to-size)) rotate(-6deg);
+  }
+}
+
+/* The lanterns let go at the festival date: she holds hers at the pond while she talks, and once it is let go the tall
+   sky slides down past the screen as the eye follows the lanterns up. */
+.lantern-release {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  overflow: hidden;
+  cursor: pointer;
+  background: #0a0d24;
+  animation: lantern-in 0.6s ease both;
+}
+.lantern-release.released {
+  animation: lantern-in 0.6s ease both, lantern-out 0.6s ease 5.2s forwards;
+}
+.lantern-world {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: max(200vw, 160vh);
+}
+.released .lantern-world {
+  animation: lantern-pan 5.8s both;
+}
+.lantern-sky {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* She stands at the pond's edge, cut off below the knee by the foot of the screen. */
+.lantern-date {
+  position: absolute;
+  bottom: -18vh;
+  left: var(--x);
+  height: calc(96vh * var(--scale, 1));
+  transform: translateX(-50%);
+}
+.lantern-light {
+  /* Held at her hips as it is let go: her sprite stands 96vh tall at her scale, its foot 18vh below the screen, and her
+     hips are halfway down it; the lantern, 22vh tall, is centered there. */
+  position: absolute;
+  top: calc(118vh - 96vh * var(--scale, 1) + 48vh * var(--scale, 1) - 11vh);
+  left: var(--x);
+  height: 22vh;
+  transform: translate(-50%, 0);
+  filter: drop-shadow(0 0 14px rgb(255 190 100 / 0.95)) drop-shadow(0 0 40px rgb(255 150 60 / 0.6));
+  animation: lantern-hold 2.4s ease-in-out infinite alternate;
+}
+.released .lantern-light {
+  animation: lantern-rise 5.8s both;
+}
+/* Her balloon points the other way when she stands right of the middle. */
+.lantern-balloon {
+  z-index: 3;
+}
+.lantern-balloon.toward-left::before {
+  right: -30px;
+  left: auto;
+  border-width: 4px 0 18px 30px;
+  border-color: transparent transparent transparent #14140f;
+}
+.lantern-balloon.toward-left::after {
+  right: -21px;
+  left: auto;
+  border-width: 2px 0 12px 24px;
+  border-color: transparent transparent transparent #fffdf5;
+}
+
+@keyframes lantern-in {
+  from { opacity: 0; }
+}
+@keyframes lantern-out {
+  to { opacity: 0; }
+}
+@keyframes lantern-hold {
+  from { transform: translate(-50%, 0) rotate(-1.5deg); }
+  to { transform: translate(-50%, -1vh) rotate(1.5deg); }
+}
+@keyframes lantern-pan {
+  0%, 6% { transform: translateY(0); animation-timing-function: cubic-bezier(0.45, 0, 0.3, 1); }
+  84%, 100% { transform: translateY(calc(max(200vw, 160vh) - 100vh)); }
+}
+@keyframes lantern-rise {
+  0% { transform: translate(-50%, 0) rotate(0deg); animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1); }
+  52% { transform: translate(calc(-50% + var(--drift)), -34vh) rotate(-3deg) scale(0.8); opacity: 1; }
+  84% { transform: translate(calc(-50% + var(--drift) * 1.5), -44vh) rotate(3deg) scale(0.25); opacity: 0.6; }
+  92%, 100% { transform: translate(calc(-50% + var(--drift) * 1.5), -46vh) scale(0.15); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lantern-world,
+  .lantern-light,
+  .released .lantern-world,
+  .released .lantern-light {
+    animation: none;
+  }
+}
+
+/* A moment of a trip away: the drive along the road, or the opening of one of its outings, each with effects of its
+   own, played over everything before its scene. */
+.trip-moment {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  overflow: hidden;
+  cursor: pointer;
+  background: #08070f;
+  animation: trip-in 0.6s ease both;
+}
+.trip-scene {
+  position: absolute;
+  inset: 0;
+  background: center / cover no-repeat;
+  transform-origin: 50% 50%;
+  animation: trip-drift 6s ease-in-out both;
+}
+video.trip-scene {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.trip-fx,
+.trip-fx * {
+  pointer-events: none;
+}
+.trip-fx {
+  position: absolute;
+  inset: 0;
+}
+/* Her standing at the foot of it, cut off below the knee, as at the lanterns. */
+.trip-companion {
+  position: absolute;
+  bottom: -18vh;
+  left: var(--x);
+  height: calc(96vh * var(--scale, 1));
+  transform: translateX(-50%);
+  animation: trip-rise 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.trip-title {
+  position: absolute;
+  top: 8vh;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #fff;
+  font: 400 clamp(2.6rem, 6vw, 5.2rem) / 1 'Kaushan Script', var(--display);
+  -webkit-text-stroke: 2px #0b0b0b;
+  paint-order: stroke fill;
+  text-shadow: 4px 4px 0 #0b0b0b;
+  transform: rotate(-3deg);
+  animation: trip-title 5.2s ease both;
+}
+
+/* The drives: the car seen from the side, the road going by behind it. Home is the same picture turned round. */
+.trip-drive {
+  position: absolute;
+  inset: 0;
+}
+.trip-drive-home .trip-drive {
+  transform: scaleX(-1);
+}
+.trip-road {
+  position: absolute;
+  inset: 0;
+  background: 0 0 / auto 100% repeat-x;
+  animation: trip-road 9s linear infinite;
+}
+.trip-car {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: trip-car-in 1s cubic-bezier(0.2, 0.8, 0.2, 1) both, trip-bob 0.42s ease-in-out 1s infinite alternate;
+}
+.trip-car-body {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+/* Her balloon over her window in the car: centered on it, the tail pointing down. */
+.drive-balloon-at {
+  position: absolute;
+  z-index: 3;
+  transform: translateX(-50%);
+}
+.drive-balloon {
+  position: relative;
+  width: max-content;
+  max-width: 30vw;
+  transform-origin: 50% 100%;
+}
+.drive-balloon::before,
+.drive-balloon::after {
+  top: auto;
+  left: 50%;
+}
+.drive-balloon::before {
+  bottom: -26px;
+  margin-left: -12px;
+  border-width: 26px 12px 0 12px;
+  border-color: #14140f transparent transparent transparent;
+}
+.drive-balloon::after {
+  bottom: -19px;
+  margin-left: -8px;
+  margin-top: 0;
+  border-width: 20px 8px 0 8px;
+  border-color: #fffdf5 transparent transparent transparent;
+}
+/* Her head shows through the glass: the window clips her, and the car's frame covers its edge. Seated, everyone's head
+   is at the same height, however tall she stands. */
+.trip-window {
+  position: absolute;
+  overflow: hidden;
+}
+.trip-head {
+  position: absolute;
+  left: 50%;
+  top: 335%;
+  height: 330%;
+  transform: translate(-50%, -100%);
+}
+/* The outdoor bath at night: the view tilts down from the moon to the steaming water. */
+.trip-soak .trip-scene {
+  animation: trip-tilt 5.2s cubic-bezier(0.45, 0, 0.3, 1) both;
+}
+/* The private bath: its door slides back on steam. */
+.trip-door {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 50.5%;
+  background: linear-gradient(90deg, rgb(0 0 0 / 0.25), transparent 30%), repeating-linear-gradient(90deg, #5a3a22 0 6px, #6b4529 6px 40px, #4a2f1b 40px 44px);
+  box-shadow: inset 0 0 40px rgb(0 0 0 / 0.5);
+  animation: trip-door-left 1.6s cubic-bezier(0.6, 0, 0.3, 1) 0.6s both;
+}
+.trip-door.left {
+  left: 0;
+}
+.trip-door.right {
+  right: 0;
+  animation-name: trip-door-right;
+}
+
+.trip-steam {
+  position: absolute;
+  bottom: -10vh;
+  left: var(--x);
+  width: calc(30vw * var(--s));
+  height: calc(22vw * var(--s));
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 255 255 / 0.32), transparent 70%);
+  filter: blur(8px);
+  animation: trip-steam 5s ease-out var(--d) both;
+}
+.trip-leaf {
+  position: absolute;
+  top: -5vh;
+  left: var(--x);
+  width: 1.6vw;
+  height: 1.1vw;
+  border-radius: 0 80% 0 80%;
+  background: var(--c);
+  box-shadow: inset -2px -2px 0 rgb(0 0 0 / 0.2);
+  animation: trip-leaf 5s linear var(--d) both;
+}
+.trip-bokeh {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: calc(4vw * var(--s));
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(255 210 140 / 0.7), rgb(255 160 80 / 0.15) 65%, transparent 72%);
+  filter: blur(2px);
+  mix-blend-mode: screen;
+  animation: trip-bokeh 4.6s ease-in-out var(--d) both;
+}
+.trip-burst {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+}
+.trip-burst i {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 10px 2px var(--c);
+  opacity: 0;
+  transform: rotate(var(--a)) translateX(0);
+  animation: trip-spark 1.4s cubic-bezier(0.1, 0.7, 0.3, 1) var(--d) both;
+}
+.trip-rays {
+  position: absolute;
+  inset: -50%;
+  background: repeating-conic-gradient(from 0deg at 70% 20%, rgb(255 236 180 / 0.16) 0 6deg, transparent 6deg 18deg);
+  mix-blend-mode: screen;
+  animation: trip-rays 6s linear both;
+}
+
+@keyframes trip-in {
+  from { opacity: 0; }
+}
+@keyframes trip-drift {
+  from { transform: scale(1.12); }
+  to { transform: scale(1.02); }
+}
+@keyframes trip-road {
+  to { background-position-x: calc(-100vh * var(--ratio)); }
+}
+@keyframes trip-car-in {
+  from { transform: translateX(-140%); }
+}
+@keyframes trip-bob {
+  to { transform: translateX(-50%) translateY(-0.5vh); }
+}
+@keyframes trip-tilt {
+  0%, 10% { transform: scale(1.5) translateY(16%); }
+  100% { transform: scale(1.08) translateY(-3%); }
+}
+@keyframes trip-door-left {
+  to { transform: translateX(-102%); }
+}
+@keyframes trip-door-right {
+  to { transform: translateX(102%); }
+}
+@keyframes trip-rise {
+  from { opacity: 0; transform: translate(-50%, 6vh); }
+}
+@keyframes trip-title {
+  0%, 18% { opacity: 0; transform: translateY(12px) rotate(-3deg); }
+  30%, 82% { opacity: 1; transform: rotate(-3deg); }
+  100% { opacity: 0; }
+}
+@keyframes trip-steam {
+  0% { opacity: 0; transform: translateY(0) scale(0.7); }
+  25% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-60vh) scale(1.4); }
+}
+@keyframes trip-leaf {
+  0% { opacity: 0; transform: translate(0, 0) rotate(0deg); }
+  10% { opacity: 1; }
+  100% { opacity: 0.8; transform: translate(var(--sway), 110vh) rotate(720deg); }
+}
+@keyframes trip-bokeh {
+  0% { opacity: 0; transform: translateY(2vh) scale(0.8); }
+  40%, 70% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-6vh) scale(1.1); }
+}
+@keyframes trip-spark {
+  0% { opacity: 0; transform: rotate(var(--a)) translateX(0); }
+  8% { opacity: 1; }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: rotate(var(--a)) translateX(14vh) translateY(4vh); }
+}
+@keyframes trip-rays {
+  from { opacity: 0; transform: rotate(-4deg); }
+  30% { opacity: 1; }
+  to { opacity: 0.7; transform: rotate(4deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trip-scene,
+  .trip-fx,
+  .trip-door {
+    animation: none;
+  }
+  .trip-door {
+    display: none;
+  }
+}
+
+/* Booking a trip, in the phone's frame, as a travel listing: the place across most of it (a big picture with the
+   others to flip through, its name and rating, a line about it and what is on), and a narrow column for who comes,
+   what it costs and booking it. */
+.phone-glass.trip-booking {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+}
+.trip-listing {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  padding: 22px 26px;
+  overflow-y: auto;
+}
+.trip-photo {
+  position: relative;
+  flex: none;
+  aspect-ratio: 16 / 7;
+  border-radius: 16px;
+  background: #2a1d14 center / cover no-repeat;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.25);
+}
+.trip-photo-name {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  padding: 3px 12px;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.55);
+  color: #fff;
+  font: 600 0.9rem var(--ui);
+}
+.trip-thumbs {
+  display: flex;
+  gap: 8px;
+}
+button.trip-thumb {
+  flex: 1;
+  min-height: 0;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: center / cover no-repeat;
+  opacity: 0.7;
+}
+button.trip-thumb.on,
+button.trip-thumb:hover {
+  border-color: var(--moss);
+  opacity: 1;
+}
+.trip-listing-head {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+.trip-listing-head h1 {
+  margin: 0;
+  font: 400 clamp(2rem, 3.4vw, 3rem) / 1.1 'Kaushan Script', var(--display);
+}
+.trip-rating {
+  color: #d9a21b;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+}
+.trip-rating b {
+  margin-left: 6px;
+  color: var(--ink);
+  font: 700 1rem var(--ui);
+  letter-spacing: 0;
+}
+.trip-meta {
+  color: var(--ink-soft);
+  font: 600 0.95rem var(--ui);
+}
+.trip-blurb {
+  max-width: 70ch;
+  line-height: 1.45;
+}
+.trip-highlights {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 22px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.trip-highlights li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font: 600 0.95rem var(--ui);
+}
+.trip-highlights svg {
+  flex: none;
+  color: var(--madder);
+}
+.trip-who {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+  padding: 22px 20px;
+  border-left: 1px solid var(--rule);
+  background: var(--paper-raised);
+}
+.trip-who h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+.trip-who-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+  overflow-y: auto;
+}
+button.trip-who-row {
+  justify-content: flex-start;
+  gap: 10px;
+  min-height: 0;
+  padding: 6px 10px;
+  border: 2px solid var(--rule);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--ink);
+  font: 600 1rem var(--ui);
+}
+button.trip-who-row.picked {
+  border-color: var(--moss);
+  background: var(--moss-tint);
+}
+.trip-price {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+  font: 700 1.05rem var(--ui);
+}
+.trip-price dd {
+  margin: 0;
+}
+
+/* A group chat: its members' faces overlapping on its row, and in it the name of whoever said each line. */
+.group-avatar {
+  display: inline-flex;
+  flex: none;
+}
+.group-avatar > * + * {
+  margin-left: -14px;
+}
+.group-speaker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+  color: var(--ink-soft);
+  font: 700 0.8rem var(--ui);
+}
+
+/* The unmasking at the end of a masked ball: the masked women he danced with, then everyone he knows to name her. */
+.masquerade-dancers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+.btn.masquerade-dancer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  height: auto;
+  padding: 14px 18px;
+}
+.masquerade-names {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+}
+.btn.masquerade-name {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  height: auto;
+  padding: 6px 12px 6px 6px;
 }

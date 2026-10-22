@@ -7,6 +7,10 @@
  *   npx jiti scripts/make-test-save.ts 12 --force another slot, and over whatever is in it
  *   npx jiti scripts/make-test-save.ts 10 --midterm   the same game an hour before his first midterm, to try sitting one
  *   npx jiti scripts/make-test-save.ts 11 --below     the same game at the way down into the Undercroft, before his first time below, with things for a fight in his bag
+ *   npx jiti scripts/make-test-save.ts 15 --booking   the same game the morning the trip to Saltmere is booked, an hour before
+ *   npx jiti scripts/make-test-save.ts 16 --break    the same game the first morning of the Mistmoon Break, the trip booked with Tamsin and Faye
+ *   npx jiti scripts/make-test-save.ts 17 --masquerade   the same game an hour before the Masquerade Ball, at home
+ *   npx jiti scripts/make-test-save.ts 18 --frost    the same game the morning of the Feast of First Frost, at home
  */
 import { existsSync } from 'node:fs'
 import { homedir } from 'node:os'
@@ -29,6 +33,7 @@ import {
   tellSkills,
   toldOf,
   timeOn,
+  toDate,
   withHousing
 } from '../src/shared/game'
 import { GameStateSchema, type GameState } from '../src/shared/model'
@@ -37,6 +42,10 @@ const args = process.argv.slice(2)
 const force = args.includes('--force')
 const midterm = args.includes('--midterm')
 const goBelow = args.includes('--below')
+const booking = args.includes('--booking')
+const onBreak = args.includes('--break')
+const masquerade = args.includes('--masquerade')
+const frost = args.includes('--frost')
 const slot = `slot${args.find((arg) => /^\d+$/.test(arg)) ?? '8'}`
 
 const appData = process.platform === 'win32' ? (process.env.APPDATA ?? join(homedir(), 'AppData', 'Roaming')) : process.platform === 'darwin' ? join(homedir(), 'Library', 'Application Support') : (process.env.XDG_CONFIG_HOME ?? join(homedir(), '.config'))
@@ -48,8 +57,9 @@ const begun = createInitialState(written)
 const content = withHousing(written, begun)
 const hours = content.calendar.hoursPerDay
 
-// The morning of a free day in the eighth week: Marketday, with nothing on his timetable.
-const DAY = 54
+// The morning of a free day in the eighth week: Marketday, with nothing on his timetable. For the ball, the morning
+// of 20 Emberfall, the day it is, which comes before it.
+const DAY = masquerade ? 36 : 54
 let state: GameState = { ...begun, time: timeOn(content, DAY, 9), orientationStep: content.orientation?.steps.length ?? 0 }
 
 // He has put the work in: good at everything, with money saved.
@@ -99,11 +109,12 @@ for (const woman of women.filter((one) => content.loveInterests.some((li) => li.
 // What they have agreed to be: Tamsin and he are a couple who see others; Faye and Lira are lovers without promises.
 state = formBond(content, { ...state, time: timeOn(content, 24, 20) }, { statusId: 'open', memberIds: ['tamsin'] })
 state = formBond(content, { ...state, time: timeOn(content, 12, 22) }, { statusId: 'casual', memberIds: ['faye'] })
-state = formBond(content, { ...state, time: timeOn(content, 40, 21) }, { statusId: 'casual', memberIds: ['lira'] })
+state = formBond(content, { ...state, time: timeOn(content, Math.min(40, DAY - 1), 21) }, { statusId: 'casual', memberIds: ['lira'] })
 state = { ...state, time: timeOn(content, DAY, 9) }
 
 // Tamsin is carrying his child and is due in five days, so the birth is close enough to try; she has stopped taking anything against it.
-const DUE_IN_DAYS = 5
+// Earlier in the term (for the ball) she cannot be so far along: she conceived on the second day instead.
+const DUE_IN_DAYS = Math.max(5, (content.pregnancy?.lengthDays ?? 48) - DAY + 1)
 const conceivedAt = state.time + DUE_IN_DAYS * hours - (content.pregnancy?.lengthDays ?? 48) * hours
 state = {
   ...state,
@@ -127,6 +138,34 @@ if (midterm) {
   }
 }
 
+// For trying the trip: the clock goes on to a day of the calendar, and the child's date and his job's reckoning with it.
+const onTo = (monthId: string, day: number, hour: number) => {
+  let time = state.time
+  while (!(toDate(content.calendar, time).month.id === monthId && toDate(content.calendar, time).day === day)) time += hours
+  const on = timeOn(content, toDate(content.calendar, time).dayIndex, hour) - state.time
+  state = {
+    ...state,
+    time: state.time + on,
+    pregnancies: { tamsin: { conceivedAt: conceivedAt + on, dueAt: conceivedAt + on + (content.pregnancy?.lengthDays ?? 48) * hours } },
+    job: state.job && { ...state.job, settledTo: state.time + on }
+  }
+}
+// An hour before the booking, at home.
+if (booking) onTo('harvestwane', 27, 7)
+// An hour before the ball: those he has no arrangement with (Seraphine, Caelwen, Dinah) are the ones who will dance with him.
+if (masquerade) onTo('emberfall', 20, 18)
+// The morning of First Frost, with nobody met yet today, so that each brings her present: the fair at one, the supper
+// at six, the tree at nine. What came before it (the lanterns, the trip) is behind him, and nobody minds it.
+if (frost) {
+  onTo('mistmoon', 22, 9)
+  state = { ...state, partsAttended: [...state.partsAttended, 'saltmere-booking:book', 'lantern-festival:float-lantern'] }
+}
+// The first morning of the break, booked, with the lanterns gone to so that nobody minds them.
+if (onBreak) {
+  onTo('mistmoon', 6, 9)
+  state = { ...state, trips: { 'mistmoon-break': ['tamsin', 'faye'] }, partsAttended: [...state.partsAttended, 'saltmere-booking:book', 'lantern-festival:float-lantern'] }
+}
+
 // For trying the Undercroft: he stands at the way down on a free morning, has been told of it, and has yet to go.
 if (goBelow && content.expedition) {
   state = {
@@ -140,7 +179,7 @@ if (goBelow && content.expedition) {
 
 const checked = GameStateSchema.parse(state)
 if (!housingOfferDue(content, checked)) throw new Error('The save does not meet what the offer of a house asks: a woman carrying his child whom he has an arrangement with.')
-const saved = new SaveStore(dir).save(slot, { state: checked, scene: null }, new Date(), midterm ? 'Before a midterm' : goBelow ? 'At the way down' : 'Late game test')
+const saved = new SaveStore(dir).save(slot, { state: checked, scene: null }, new Date(), midterm ? 'Before a midterm' : goBelow ? 'At the way down' : booking ? 'Booking Saltmere' : onBreak ? 'Break morning' : masquerade ? 'Before the masquerade' : frost ? 'First Frost morning' : 'Late game test')
 console.log(`Written to ${join(dir, `${slot}.json`)}: ${saved.unreadable ? 'unreadable' : `${saved.playerName}, day ${Math.floor(checked.time / hours) + 1}`}.`)
 console.log(`Courses: ${enrolment.map((id) => checked.courses.find((course) => course.id === id)?.number).join(', ')}. Skills: ${skillsOf(content, checked).map((skill) => skill.name).join(', ')}.`)
 console.log('The offer of the house arrives as a DM from the housing officer as soon as the save is loaded.')

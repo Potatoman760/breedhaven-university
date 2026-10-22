@@ -31,8 +31,6 @@ export interface EditorInfo {
   traits: Record<string, ContentOrigin>
   /** By location id. A location is only ever the game's own, or the game's own with changes. */
   locations: Record<string, ContentOrigin>
-  /** By event id: the calendar's events and holidays. */
-  events: Record<string, ContentOrigin>
   /** The player a new game starts with has been changed from the game's own. */
   playerChanged: boolean
   /**

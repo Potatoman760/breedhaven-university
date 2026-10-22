@@ -177,6 +177,31 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "bathrobe",
+      "name": "Bathrobe",
+      "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",
+      "pregnant": false,
+      "sprites": {
+        "neutral": {
+          "image": "sprites/morwenna/bathrobe-neutral-cutout.webp",
+          "description": ""
+        }
+      }
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "Bathrobe, pregnant",
+      "inherits": "bathrobe",
+      "description": "She has a round, pregnant belly.",
+      "pregnant": true,
+      "sprites": {
+        "neutral": {
+          "image": "sprites/morwenna/bathrobe-pregnant-neutral-cutout.webp",
+          "description": ""
+        }
+      }
     }
   ],
   "defaultOutfitId": "default",
@@ -324,7 +349,7 @@
     "background": "generated/backgrounds/morwenna/view-2.webp"
   },
   "birthPicture": "sprites/morwenna/birth.webp",
-  "walkSprite": "sprites/morwenna/walk-cutout.png",
+  "walkSprite": "sprites/morwenna/walk-cutout.webp",
   "childNames": {
     "daughters": [
       "Nyx",

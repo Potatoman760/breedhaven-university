@@ -34,6 +34,8 @@ export const BackgroundSchema = z.object({
   name: z.string(),
   /** Its pictures, by day and by night: image paths inside the content pack. */
   images: z.partialRecord(z.enum(['day', 'night']), z.string()).default({}),
+  /** A looping clip of it, played muted behind a scene there in place of its pictures, by day and night alike. */
+  clip: z.string().optional(),
   /** Under a roof: the weather is not drawn over it. Left out, it is as the location says. */
   indoors: z.boolean().optional(),
   /** Told to the LLM in a scene at this view, after what the place itself is: what this spot of it is. */
@@ -73,6 +75,8 @@ export const LocationSchema = z.object({
    * own. Everywhere else is public, and anyone may turn up.
    */
   private: z.boolean().default(false),
+  /** Only an event takes him here, a trip or a ball: it is not on the map, nor anywhere to go of his own accord. */
+  eventOnly: z.boolean().default(false),
   /** What can be done here to raise a stat. The stats these name are the ones the place is good for. */
   drills: z.array(DrillSchema).default([])
 })

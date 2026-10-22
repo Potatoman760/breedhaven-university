@@ -1,5 +1,6 @@
 import type { ContentPack, GameState, WeatherType } from '../model'
 import { toDate } from './calendar'
+import { eventsOn } from './events'
 
 /** A repeatable number in [0, 1) for a given day of a given game. */
 function roll(seed: number, dayIndex: number): number {
@@ -22,6 +23,10 @@ export function weatherWeight(kind: WeatherType, monthId: string): number {
  */
 export function weatherOn(content: ContentPack, state: GameState, time = state.time): WeatherType | undefined {
   const date = toDate(content.calendar, time)
+  // An event that brings its own weather has it on every day it runs.
+  const brought = eventsOn(content, state, time).find((event) => event.weatherId !== undefined)
+  const forced = brought && content.calendar.weather.find((w) => w.id === brought.weatherId)
+  if (forced) return forced
   const month = date.month.id
   const kinds = content.calendar.weather.filter((w) => weatherWeight(w, month) > 0)
   const total = kinds.reduce((sum, w) => sum + weatherWeight(w, month), 0)

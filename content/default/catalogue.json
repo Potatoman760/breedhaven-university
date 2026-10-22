@@ -1,24 +1,24 @@
 {
   "seed": 1,
-  "basis": "[[\"Solday\",\"Moonday\",\"Tidesday\",\"Windsday\",\"Hearthday\"],8,18,\"lecture-halls\",1,3,2,2,4,[\"Professor Orlena Vey\",\"Dr Ysolde Marrin\",\"Professor Corwenna Ashby\",\"Dr Halcyon Reed\",\"Professor Petra Lindqvar\",\"Dr Sunniva Crane\",\"Professor Thessaly Rook\",\"Dr Maelis Varn\",\"Professor Isaura Penhallow\",\"Dr Winnow Sedge\",\"Professor Alba Quillon\",\"Dr Ferelith Moor\",\"Professor Hesper Lark\",\"Dr Odalys Brine\",\"Professor Sabel Thorn\",\"Dr Ianthe Coombe\",\"Professor Dagna Tor-Kesh\",\"Dr Senna Ashpaw\",\"Professor Aldous Thorne\",\"Dr Benedek Hale\"],[[\"POL\",false,false,[\"101\",\"153\"]],[\"LAW\",false,false,[\"101\",\"128\"]],[\"BUS\",false,false,[\"101\",\"184\"]],[\"CUL\",false,true,[\"101\",\"111\"]],[\"BLM\",false,true,[\"101\",\"147\"]],[\"WTC\",false,true,[\"101\"]],[\"MEN\",false,true,[\"101\",\"162\"]],[\"SGN\",false,true,[\"101\"]],[\"KIN\",false,true,[\"101\",\"143\",\"176\"]],[\"PSF\",false,true,[\"101\"]],[\"WOM\",false,false,[\"101\",\"193\"]],[\"EDU\",true,false,[\"101\"]],[\"COM\",false,false,[\"101\",\"119\"]],[\"HHS\",true,false,[\"101\"]],[\"BPS\",true,false,[\"101\"]],[\"CSC\",true,true,[\"101\"]],[\"MTH\",true,false,[\"101\"]],[\"PTH\",true,true,[\"101\"]],[\"RBI\",true,true,[\"101\"]],[\"ART\",true,true,[\"101\"]],[\"ENG\",true,false,[\"101\"]],[\"GEO\",true,false,[\"101\"]],[\"HIS\",true,false,[\"101\"]],[\"MUS\",true,true,[\"101\"]],[\"RHE\",true,false,[\"101\"]]],[[\"anwen\",\"Anwen\",\"student\",\"BUS\",null],[\"caelwen\",\"Caelwen Ashgrove\",\"teacher\",null,[\"Professor\",[[\"WOM\",\"101\"],[\"WOM\",\"193\"]]]],[\"daphne\",\"Daphne\",\"student\",\"KIN\",null],[\"dinah\",\"Dinah Silverith\",\"student\",\"BLM\",null],[\"elowen\",\"Elowen\",\"student\",\"CUL\",null],[\"faye\",\"Faye Fertillay\",\"student\",\"BUS\",null],[\"grushka\",\"Grushka Tor-Vael\",\"teacher\",null,[\"Coach\",[[\"KIN\",\"101\"],[\"KIN\",\"143\"],[\"PSF\",\"101\"]]]],[\"isolde\",\"Isolde Verrane\",\"student\",\"POL\",null],[\"lira\",\"Lira\",\"student\",\"BLM\",null],[\"lola-hopworth\",\"Lola Hopworth\",\"teacher\",null,[\"Professor\",[[\"CUL\",\"101\"],[\"CUL\",\"111\"]]]],[\"maren\",\"Maren\",\"student\",\"COM\",null],[\"morwenna\",\"Morwenna Thriceborn\",\"student\",\"WOM\",null],[\"ottilie\",\"Ottilie Marrow\",\"teacher\",null,[\"Dr\",[[\"SGN\",\"101\"],[\"RBI\",\"101\"]]]],[\"seraphine\",\"Seraphine V\",\"student\",\"POL\",null],[\"tamsin\",\"Tamsin\",\"student\",\"KIN\",null],[\"tink\",\"Tink Lightfoot\",\"student\",\"MEN\",null],[\"vespera\",\"Vespera Midnight\",\"teacher\",null,[\"Professor\",[[\"WTC\",\"101\"]]]],[\"yelena\",\"Yelena Goldvine\",\"student\",\"LAW\",null],[\"yulia\",\"Yulia Starkfelt\",\"student\",\"MEN\",null]]]",
+  "basis": "[[\"Solday\",\"Moonday\",\"Tidesday\",\"Windsday\",\"Hearthday\"],8,18,\"lecture-halls\",1,3,2,2,4,[\"Professor Orlena Vey\",\"Dr Ysolde Marrin\",\"Professor Corwenna Ashby\",\"Dr Halcyon Reed\",\"Professor Petra Lindqvar\",\"Dr Sunniva Crane\",\"Professor Thessaly Rook\",\"Dr Maelis Varn\",\"Professor Isaura Penhallow\",\"Dr Winnow Sedge\",\"Professor Alba Quillon\",\"Dr Ferelith Moor\",\"Professor Hesper Lark\",\"Dr Odalys Brine\",\"Professor Sabel Thorn\",\"Dr Ianthe Coombe\",\"Professor Dagna Tor-Kesh\",\"Dr Senna Ashpaw\",\"Professor Aldous Thorne\",\"Dr Benedek Hale\"],[[\"POL\",false,false,[\"101\",\"153\"]],[\"LAW\",false,false,[\"101\",\"128\"]],[\"BUS\",false,false,[\"101\",\"184\"]],[\"CUL\",false,true,[\"101\",\"111\"]],[\"BLM\",false,true,[\"101\",\"147\"]],[\"WTC\",false,true,[\"101\"]],[\"MEN\",false,true,[\"101\",\"135\",\"162\"]],[\"SGN\",false,true,[\"101\"]],[\"KIN\",false,true,[\"101\",\"143\",\"176\"]],[\"PSF\",false,true,[\"101\"]],[\"WOM\",false,false,[\"101\",\"193\"]],[\"EDU\",true,false,[\"101\"]],[\"COM\",false,false,[\"101\",\"119\"]],[\"HHS\",true,false,[\"101\"]],[\"BPS\",true,false,[\"101\"]],[\"CSC\",false,true,[\"101\",\"142\"]],[\"MTH\",true,false,[\"101\"]],[\"PTH\",true,true,[\"101\"]],[\"RBI\",true,true,[\"101\"]],[\"ART\",true,true,[\"101\"]],[\"ENG\",true,false,[\"101\"]],[\"GEO\",true,false,[\"101\"]],[\"HIS\",true,false,[\"101\"]],[\"MUS\",true,true,[\"101\"]],[\"RHE\",true,false,[\"101\"]]],[[\"anwen\",\"Anwen\",\"student\",\"MEN\",null],[\"caelwen\",\"Caelwen Ashgrove\",\"teacher\",null,[\"Professor\",[[\"WOM\",\"101\"],[\"WOM\",\"193\"]]]],[\"daphne\",\"Daphne\",\"student\",\"KIN\",null],[\"dinah\",\"Dinah Silverith\",\"student\",\"BLM\",null],[\"elowen\",\"Elowen\",\"student\",\"CSC\",null],[\"faye\",\"Faye Fertillay\",\"student\",\"BUS\",null],[\"grushka\",\"Grushka Tor-Vael\",\"teacher\",null,[\"Coach\",[[\"KIN\",\"101\"],[\"KIN\",\"143\"],[\"PSF\",\"101\"]]]],[\"isolde\",\"Isolde Verrane\",\"student\",\"POL\",null],[\"lira\",\"Lira\",\"student\",\"BLM\",null],[\"lola-hopworth\",\"Lola Hopworth\",\"teacher\",null,[\"Professor\",[[\"CUL\",\"101\"],[\"CUL\",\"111\"]]]],[\"maren\",\"Maren\",\"student\",\"COM\",null],[\"morwenna\",\"Morwenna Thriceborn\",\"student\",\"WOM\",null],[\"ottilie\",\"Ottilie Marrow\",\"teacher\",null,[\"Dr\",[[\"SGN\",\"101\"],[\"RBI\",\"101\"]]]],[\"seraphine\",\"Seraphine V\",\"student\",\"POL\",null],[\"tamsin\",\"Tamsin\",\"student\",\"KIN\",null],[\"tink\",\"Tink Lightfoot\",\"student\",\"MEN\",null],[\"vespera\",\"Vespera Midnight\",\"teacher\",null,[\"Professor\",[[\"WTC\",\"101\"]]]],[\"yelena\",\"Yelena Goldvine\",\"student\",\"LAW\",null],[\"yulia\",\"Yulia Starkfelt\",\"student\",\"MEN\",null]]]",
   "courses": [
     {
       "id": "course-pol-101",
       "professor": "Dr Ysolde Marrin",
       "studentIds": [
-        "seraphine",
-        "isolde"
+        "isolde",
+        "seraphine"
       ],
       "meetings": [
         {
           "weekday": "Moonday",
-          "startHour": 11,
+          "startHour": 13,
           "hours": 1,
           "kind": "lecture"
         },
         {
           "weekday": "Hearthday",
-          "startHour": 11,
+          "startHour": 13,
           "hours": 1,
           "kind": "lecture"
         }
@@ -28,19 +28,19 @@
       "id": "course-pol-153",
       "professor": "Dr Ysolde Marrin",
       "studentIds": [
-        "seraphine",
-        "isolde"
+        "isolde",
+        "seraphine"
       ],
       "meetings": [
         {
-          "weekday": "Moonday",
-          "startHour": 13,
+          "weekday": "Solday",
+          "startHour": 12,
           "hours": 1,
           "kind": "lecture"
         },
         {
           "weekday": "Tidesday",
-          "startHour": 13,
+          "startHour": 12,
           "hours": 1,
           "kind": "lecture"
         }
@@ -51,18 +51,18 @@
       "professor": "Professor Aldous Thorne",
       "studentIds": [
         "yelena",
-        "lira"
+        "tamsin"
       ],
       "meetings": [
         {
-          "weekday": "Moonday",
-          "startHour": 8,
+          "weekday": "Tidesday",
+          "startHour": 16,
           "hours": 1,
           "kind": "lecture"
         },
         {
           "weekday": "Windsday",
-          "startHour": 8,
+          "startHour": 16,
           "hours": 1,
           "kind": "lecture"
         }
@@ -72,19 +72,18 @@
       "id": "course-law-128",
       "professor": "Professor Aldous Thorne",
       "studentIds": [
-        "yelena",
-        "morwenna"
+        "yelena"
       ],
       "meetings": [
         {
           "weekday": "Solday",
-          "startHour": 11,
+          "startHour": 9,
           "hours": 1,
           "kind": "lecture"
         },
         {
           "weekday": "Hearthday",
-          "startHour": 11,
+          "startHour": 9,
           "hours": 1,
           "kind": "lecture"
         }
@@ -95,18 +94,18 @@
       "professor": "Professor Alba Quillon",
       "studentIds": [
         "faye",
-        "anwen"
+        "yulia"
       ],
       "meetings": [
         {
-          "weekday": "Windsday",
-          "startHour": 10,
+          "weekday": "Tidesday",
+          "startHour": 17,
           "hours": 1,
           "kind": "lecture"
         },
         {
-          "weekday": "Hearthday",
-          "startHour": 10,
+          "weekday": "Windsday",
+          "startHour": 17,
           "hours": 1,
           "kind": "lecture"
         }
@@ -117,18 +116,18 @@
       "professor": "Professor Alba Quillon",
       "studentIds": [
         "faye",
-        "anwen"
+        "morwenna"
       ],
       "meetings": [
         {
           "weekday": "Solday",
-          "startHour": 11,
+          "startHour": 8,
           "hours": 1,
           "kind": "lecture"
         },
         {
-          "weekday": "Windsday",
-          "startHour": 11,
+          "weekday": "Tidesday",
+          "startHour": 9,
           "hours": 1,
           "kind": "lecture"
         }
@@ -139,24 +138,24 @@
       "professor": "Professor Lola Hopworth",
       "teacherId": "lola-hopworth",
       "studentIds": [
-        "elowen"
+        "lira"
       ],
       "meetings": [
         {
-          "weekday": "Solday",
-          "startHour": 17,
+          "weekday": "Windsday",
+          "startHour": 14,
           "hours": 1,
           "kind": "lecture"
         },
         {
           "weekday": "Hearthday",
-          "startHour": 17,
+          "startHour": 14,
           "hours": 1,
           "kind": "lecture"
         },
         {
-          "weekday": "Tidesday",
-          "startHour": 11,
+          "weekday": "Solday",
+          "startHour": 15,
           "hours": 3,
           "kind": "lab"
         }
@@ -167,24 +166,24 @@
       "professor": "Professor Lola Hopworth",
       "teacherId": "lola-hopworth",
       "studentIds": [
-        "elowen"
+        "faye"
       ],
       "meetings": [
         {
-          "weekday": "Tidesday",
-          "startHour": 14,
+          "weekday": "Windsday",
+          "startHour": 12,
           "hours": 1,
           "kind": "lecture"
         },
         {
           "weekday": "Hearthday",
-          "startHour": 14,
+          "startHour": 12,
           "hours": 1,
           "kind": "lecture"
         },
         {
           "weekday": "Moonday",
-          "startHour": 13,
+          "startHour": 11,
           "hours": 3,
           "kind": "lab"
         }
@@ -199,20 +198,20 @@
       ],
       "meetings": [
         {
-          "weekday": "Tidesday",
-          "startHour": 17,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
-          "weekday": "Windsday",
-          "startHour": 17,
+          "weekday": "Moonday",
+          "startHour": 16,
           "hours": 1,
           "kind": "lecture"
         },
         {
           "weekday": "Hearthday",
-          "startHour": 14,
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 9,
           "hours": 3,
           "kind": "lab"
         }
@@ -228,19 +227,19 @@
       "meetings": [
         {
           "weekday": "Solday",
-          "startHour": 10,
+          "startHour": 13,
           "hours": 1,
           "kind": "lecture"
         },
         {
           "weekday": "Tidesday",
-          "startHour": 10,
+          "startHour": 13,
           "hours": 1,
           "kind": "lecture"
         },
         {
           "weekday": "Moonday",
-          "startHour": 10,
+          "startHour": 8,
           "hours": 3,
           "kind": "lab"
         }
@@ -251,24 +250,24 @@
       "professor": "Professor Vespera Midnight",
       "teacherId": "vespera",
       "studentIds": [
-        "faye"
+        "dinah"
       ],
       "meetings": [
         {
-          "weekday": "Solday",
-          "startHour": 13,
+          "weekday": "Tidesday",
+          "startHour": 8,
           "hours": 1,
           "kind": "lecture"
         },
         {
           "weekday": "Hearthday",
-          "startHour": 14,
+          "startHour": 17,
           "hours": 1,
           "kind": "lecture"
         },
         {
           "weekday": "Windsday",
-          "startHour": 12,
+          "startHour": 8,
           "hours": 3,
           "kind": "lab"
         }
@@ -278,24 +277,52 @@
       "id": "course-men-101",
       "professor": "Dr Odalys Brine",
       "studentIds": [
-        "tink",
-        "yulia"
+        "anwen",
+        "tink"
       ],
       "meetings": [
         {
           "weekday": "Solday",
-          "startHour": 17,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
-          "weekday": "Moonday",
-          "startHour": 17,
+          "startHour": 8,
           "hours": 1,
           "kind": "lecture"
         },
         {
           "weekday": "Windsday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 15,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-men-135",
+      "professor": "Dr Odalys Brine",
+      "studentIds": [
+        "anwen",
+        "yulia"
+      ],
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 14,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 14,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Solday",
           "startHour": 9,
           "hours": 3,
           "kind": "lab"
@@ -311,6 +338,34 @@
       ],
       "meetings": [
         {
+          "weekday": "Solday",
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 12,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-sgn-101",
+      "professor": "Dr Ottilie Marrow",
+      "teacherId": "ottilie",
+      "studentIds": [
+        "yulia"
+      ],
+      "meetings": [
+        {
           "weekday": "Moonday",
           "startHour": 9,
           "hours": 1,
@@ -324,35 +379,7 @@
         },
         {
           "weekday": "Tidesday",
-          "startHour": 15,
-          "hours": 3,
-          "kind": "lab"
-        }
-      ]
-    },
-    {
-      "id": "course-sgn-101",
-      "professor": "Dr Ottilie Marrow",
-      "teacherId": "ottilie",
-      "studentIds": [
-        "elowen"
-      ],
-      "meetings": [
-        {
-          "weekday": "Moonday",
-          "startHour": 12,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
-          "weekday": "Windsday",
-          "startHour": 12,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
-          "weekday": "Tidesday",
-          "startHour": 8,
+          "startHour": 10,
           "hours": 3,
           "kind": "lab"
         }
@@ -367,20 +394,20 @@
       ],
       "meetings": [
         {
-          "weekday": "Solday",
-          "startHour": 12,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
-          "weekday": "Hearthday",
-          "startHour": 12,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
           "weekday": "Moonday",
-          "startHour": 8,
+          "startHour": 11,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Solday",
+          "startHour": 9,
           "hours": 3,
           "kind": "lab"
         }
@@ -395,20 +422,20 @@
       ],
       "meetings": [
         {
+          "weekday": "Moonday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
           "weekday": "Solday",
-          "startHour": 9,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
-          "weekday": "Windsday",
-          "startHour": 14,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
-          "weekday": "Tidesday",
-          "startHour": 10,
+          "startHour": 12,
           "hours": 3,
           "kind": "lab"
         }
@@ -423,20 +450,20 @@
       ],
       "meetings": [
         {
-          "weekday": "Windsday",
-          "startHour": 15,
+          "weekday": "Moonday",
+          "startHour": 14,
           "hours": 1,
           "kind": "lecture"
         },
         {
           "weekday": "Hearthday",
-          "startHour": 15,
+          "startHour": 14,
           "hours": 1,
           "kind": "lecture"
         },
         {
-          "weekday": "Solday",
-          "startHour": 14,
+          "weekday": "Windsday",
+          "startHour": 9,
           "hours": 3,
           "kind": "lab"
         }
@@ -447,24 +474,24 @@
       "professor": "Coach Grushka Tor-Vael",
       "teacherId": "grushka",
       "studentIds": [
-        "morwenna"
+        "isolde"
       ],
       "meetings": [
         {
-          "weekday": "Moonday",
-          "startHour": 13,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
           "weekday": "Tidesday",
-          "startHour": 13,
+          "startHour": 8,
           "hours": 1,
           "kind": "lecture"
         },
         {
           "weekday": "Hearthday",
-          "startHour": 8,
+          "startHour": 11,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 15,
           "hours": 3,
           "kind": "lab"
         }
@@ -479,14 +506,14 @@
       ],
       "meetings": [
         {
-          "weekday": "Solday",
-          "startHour": 8,
+          "weekday": "Moonday",
+          "startHour": 17,
           "hours": 1,
           "kind": "lecture"
         },
         {
           "weekday": "Tidesday",
-          "startHour": 8,
+          "startHour": 17,
           "hours": 1,
           "kind": "lecture"
         }
@@ -501,14 +528,14 @@
       ],
       "meetings": [
         {
-          "weekday": "Solday",
-          "startHour": 9,
+          "weekday": "Windsday",
+          "startHour": 17,
           "hours": 1,
           "kind": "lecture"
         },
         {
-          "weekday": "Windsday",
-          "startHour": 9,
+          "weekday": "Hearthday",
+          "startHour": 17,
           "hours": 1,
           "kind": "lecture"
         }
@@ -518,19 +545,18 @@
       "id": "course-edu-101",
       "professor": "Professor Isaura Penhallow",
       "studentIds": [
-        "isolde",
-        "anwen"
+        "tamsin"
       ],
       "meetings": [
         {
           "weekday": "Solday",
-          "startHour": 15,
+          "startHour": 17,
           "hours": 1,
           "kind": "lecture"
         },
         {
           "weekday": "Moonday",
-          "startHour": 15,
+          "startHour": 17,
           "hours": 1,
           "kind": "lecture"
         }
@@ -544,14 +570,14 @@
       ],
       "meetings": [
         {
-          "weekday": "Moonday",
-          "startHour": 14,
+          "weekday": "Tidesday",
+          "startHour": 15,
           "hours": 1,
           "kind": "lecture"
         },
         {
-          "weekday": "Tidesday",
-          "startHour": 9,
+          "weekday": "Windsday",
+          "startHour": 15,
           "hours": 1,
           "kind": "lecture"
         }
@@ -561,13 +587,12 @@
       "id": "course-com-119",
       "professor": "Professor Petra Lindqvar",
       "studentIds": [
-        "maren",
-        "isolde"
+        "maren"
       ],
       "meetings": [
         {
-          "weekday": "Solday",
-          "startHour": 8,
+          "weekday": "Tidesday",
+          "startHour": 16,
           "hours": 1,
           "kind": "lecture"
         },
@@ -584,18 +609,18 @@
       "professor": "Dr Benedek Hale",
       "studentIds": [
         "yelena",
-        "daphne"
+        "isolde"
       ],
       "meetings": [
         {
           "weekday": "Solday",
-          "startHour": 13,
+          "startHour": 8,
           "hours": 1,
           "kind": "lecture"
         },
         {
-          "weekday": "Hearthday",
-          "startHour": 13,
+          "weekday": "Windsday",
+          "startHour": 8,
           "hours": 1,
           "kind": "lecture"
         }
@@ -605,19 +630,18 @@
       "id": "course-bps-101",
       "professor": "Dr Sunniva Crane",
       "studentIds": [
-        "maren",
-        "yulia"
+        "maren"
       ],
       "meetings": [
         {
-          "weekday": "Windsday",
-          "startHour": 17,
+          "weekday": "Tidesday",
+          "startHour": 9,
           "hours": 1,
           "kind": "lecture"
         },
         {
-          "weekday": "Hearthday",
-          "startHour": 17,
+          "weekday": "Windsday",
+          "startHour": 9,
           "hours": 1,
           "kind": "lecture"
         }
@@ -627,25 +651,52 @@
       "id": "course-csc-101",
       "professor": "Dr Ferelith Moor",
       "studentIds": [
-        "maren",
+        "elowen",
+        "tink"
+      ],
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 10,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 10,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 12,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-csc-142",
+      "professor": "Dr Ferelith Moor",
+      "studentIds": [
         "elowen"
       ],
       "meetings": [
         {
-          "weekday": "Moonday",
-          "startHour": 16,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
-          "weekday": "Windsday",
-          "startHour": 16,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
           "weekday": "Solday",
-          "startHour": 10,
+          "startHour": 15,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 15,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 9,
           "hours": 3,
           "kind": "lab"
         }
@@ -656,116 +707,12 @@
       "professor": "Dr Senna Ashpaw",
       "studentIds": [
         "anwen",
-        "seraphine"
-      ],
-      "meetings": [
-        {
-          "weekday": "Solday",
-          "startHour": 12,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
-          "weekday": "Moonday",
-          "startHour": 16,
-          "hours": 1,
-          "kind": "lecture"
-        }
-      ]
-    },
-    {
-      "id": "course-pth-101",
-      "professor": "Professor Orlena Vey",
-      "studentIds": [
-        "lira"
-      ],
-      "meetings": [
-        {
-          "weekday": "Windsday",
-          "startHour": 12,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
-          "weekday": "Hearthday",
-          "startHour": 12,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
-          "weekday": "Solday",
-          "startHour": 15,
-          "hours": 3,
-          "kind": "lab"
-        }
-      ]
-    },
-    {
-      "id": "course-rbi-101",
-      "professor": "Dr Ottilie Marrow",
-      "teacherId": "ottilie",
-      "studentIds": [
-        "dinah"
+        "maren"
       ],
       "meetings": [
         {
           "weekday": "Moonday",
-          "startHour": 17,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
-          "weekday": "Windsday",
-          "startHour": 9,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
-          "weekday": "Hearthday",
-          "startHour": 11,
-          "hours": 3,
-          "kind": "lab"
-        }
-      ]
-    },
-    {
-      "id": "course-art-101",
-      "professor": "Professor Dagna Tor-Kesh",
-      "studentIds": [
-        "yelena",
-        "faye"
-      ],
-      "meetings": [
-        {
-          "weekday": "Solday",
-          "startHour": 16,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
-          "weekday": "Moonday",
-          "startHour": 16,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
-          "weekday": "Windsday",
-          "startHour": 15,
-          "hours": 3,
-          "kind": "lab"
-        }
-      ]
-    },
-    {
-      "id": "course-eng-101",
-      "professor": "Dr Ysolde Marrin",
-      "studentIds": [
-        "tink"
-      ],
-      "meetings": [
-        {
-          "weekday": "Solday",
-          "startHour": 14,
+          "startHour": 10,
           "hours": 1,
           "kind": "lecture"
         },
@@ -778,13 +725,19 @@
       ]
     },
     {
-      "id": "course-geo-101",
-      "professor": "Professor Aldous Thorne",
+      "id": "course-pth-101",
+      "professor": "Professor Orlena Vey",
       "studentIds": [
-        "yulia",
-        "tamsin"
+        "morwenna",
+        "faye"
       ],
       "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 14,
+          "hours": 1,
+          "kind": "lecture"
+        },
         {
           "weekday": "Moonday",
           "startHour": 14,
@@ -792,67 +745,18 @@
           "kind": "lecture"
         },
         {
-          "weekday": "Tidesday",
-          "startHour": 14,
-          "hours": 1,
-          "kind": "lecture"
-        }
-      ]
-    },
-    {
-      "id": "course-his-101",
-      "professor": "Professor Alba Quillon",
-      "studentIds": [
-        "daphne",
-        "dinah"
-      ],
-      "meetings": [
-        {
           "weekday": "Windsday",
-          "startHour": 8,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
-          "weekday": "Hearthday",
-          "startHour": 8,
-          "hours": 1,
-          "kind": "lecture"
-        }
-      ]
-    },
-    {
-      "id": "course-mus-101",
-      "professor": "Professor Thessaly Rook",
-      "studentIds": [
-        "seraphine"
-      ],
-      "meetings": [
-        {
-          "weekday": "Windsday",
-          "startHour": 8,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
-          "weekday": "Hearthday",
-          "startHour": 8,
-          "hours": 1,
-          "kind": "lecture"
-        },
-        {
-          "weekday": "Tidesday",
-          "startHour": 15,
+          "startHour": 13,
           "hours": 3,
           "kind": "lab"
         }
       ]
     },
     {
-      "id": "course-rhe-101",
-      "professor": "Professor Sabel Thorn",
+      "id": "course-rbi-101",
+      "professor": "Dr Ottilie Marrow",
+      "teacherId": "ottilie",
       "studentIds": [
-        "tamsin",
         "tink"
       ],
       "meetings": [
@@ -863,8 +767,156 @@
           "kind": "lecture"
         },
         {
+          "weekday": "Hearthday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
           "weekday": "Windsday",
-          "startHour": 13,
+          "startHour": 11,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-art-101",
+      "professor": "Professor Dagna Tor-Kesh",
+      "studentIds": [
+        "daphne"
+      ],
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 17,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 15,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 14,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-eng-101",
+      "professor": "Dr Ysolde Marrin",
+      "studentIds": [
+        "seraphine",
+        "elowen"
+      ],
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Windsday",
+          "startHour": 16,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-geo-101",
+      "professor": "Professor Aldous Thorne",
+      "studentIds": [
+        "yelena",
+        "daphne"
+      ],
+      "meetings": [
+        {
+          "weekday": "Solday",
+          "startHour": 15,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 15,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-his-101",
+      "professor": "Professor Alba Quillon",
+      "studentIds": [
+        "elowen"
+      ],
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Tidesday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        }
+      ]
+    },
+    {
+      "id": "course-mus-101",
+      "professor": "Professor Thessaly Rook",
+      "studentIds": [
+        "anwen",
+        "lira"
+      ],
+      "meetings": [
+        {
+          "weekday": "Tidesday",
+          "startHour": 17,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 8,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Moonday",
+          "startHour": 11,
+          "hours": 3,
+          "kind": "lab"
+        }
+      ]
+    },
+    {
+      "id": "course-rhe-101",
+      "professor": "Professor Sabel Thorn",
+      "studentIds": [
+        "seraphine",
+        "dinah"
+      ],
+      "meetings": [
+        {
+          "weekday": "Moonday",
+          "startHour": 15,
+          "hours": 1,
+          "kind": "lecture"
+        },
+        {
+          "weekday": "Hearthday",
+          "startHour": 15,
           "hours": 1,
           "kind": "lecture"
         }

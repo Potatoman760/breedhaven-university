@@ -179,6 +179,31 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "bathrobe",
+      "name": "Bathrobe",
+      "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",
+      "pregnant": false,
+      "sprites": {
+        "neutral": {
+          "image": "sprites/lola-hopworth/bathrobe-neutral-cutout.webp",
+          "description": ""
+        }
+      }
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "Bathrobe, pregnant",
+      "inherits": "bathrobe",
+      "description": "She has a round, pregnant belly.",
+      "pregnant": true,
+      "sprites": {
+        "neutral": {
+          "image": "sprites/lola-hopworth/bathrobe-pregnant-neutral-cutout.webp",
+          "description": ""
+        }
+      }
     }
   ],
   "defaultOutfitId": "default",
@@ -338,8 +363,8 @@
     "locationId": "honeyed-bee-inn",
     "background": "generated/backgrounds/lola-hopworth/view-2.webp"
   },
-  "birthPicture": "sprites/lola-hopworth/birth.png",
-  "walkSprite": "sprites/lola-hopworth/walk-cutout.png",
+  "birthPicture": "sprites/lola-hopworth/birth.webp",
+  "walkSprite": "sprites/lola-hopworth/walk-cutout.webp",
   "childNames": {
     "daughters": [
       "Clover",
@@ -363,7 +388,7 @@
       "Swears casually when excited or annoyed, never with anger"
     ],
     "exampleDialogue": [],
-    "backstory": "Lola grew up in the market town of Butterford, west of Seedblossom, where her mother kept the kitchen of the Hopworth Brewery and raised seven daughters. She learned to cook standing on a stool beside the copper, and her magic showed itself early in her hands: anything she touched and tended grew richer. Bread rose higher under her palm, broths deepened, ferments took on a life of their own.\n\nShe believes that her main purpose in life is to be bred and bear children\n\nShe lives in the apartment above the Honeyed Bee's kitchen, where she also keeps an eye on Elowen's stock and occasionally takes over a service when the bar is overwhelmed. Her own magic is tactile and specific: she can coax a flavor out of an ingredient that was not quite there, sense when a ferment has turned before anyone else can taste it, and keep food warm with a touch of her hand. She takes dampers and has done since university; the Bloom runs warm in her and she prefers to keep it at a manageable hum rather than fight it or indulge it carelessly. She has had relationships, most of them short and friendly and ended without drama, and a few longer ones that ended because she would not slow down for anyone.",
+    "backstory": "Lola grew up in the market town of Butterford, west of Seedblossom, where her mother kept the kitchen of the Hopworth Brewery and raised seven daughters. She learned to cook standing on a stool beside the copper, and her magic showed itself early in her hands: anything she touched and tended grew richer. Bread rose higher under her palm, broths deepened, ferments took on a life of their own.\n\nShe believes that her main purpose in life is to be bred and bear children\n\nShe lives in the apartment above the Honeyed Bee's kitchen, where she keeps an eye on the stock and occasionally takes over a service when the bar is overwhelmed. Her own magic is tactile and specific: she can coax a flavor out of an ingredient that was not quite there, sense when a ferment has turned before anyone else can taste it, and keep food warm with a touch of her hand. She takes dampers and has done since university; the Bloom runs warm in her and she prefers to keep it at a manageable hum rather than fight it or indulge it carelessly. She has had relationships, most of them short and friendly and ended without drama, and a few longer ones that ended because she would not slow down for anyone.",
     "knowledge": [],
     "secrets": [
       {
