@@ -11,6 +11,7 @@ import {
   COMFY_MAX_VIDEO_TIMEOUT_SECONDS,
   COMFY_MIN_TIMEOUT_SECONDS,
   DEFAULT_FRAMING,
+  defaultsFor,
   framingFor,
   normaliseComfyUrl,
   sizeFor,
@@ -65,6 +66,8 @@ export function ComfySetup({ settings, list, onSave, connectionOnly }: Props) {
   const typed = normaliseComfyUrl(url)
   const workflows = list?.workflows ?? []
   const current = workflows.find((w) => w.file === selected) ?? workflows[0] ?? null
+  const videoWorkflows = workflows.filter((w) => w.bindings.firstFrame !== null)
+  const videoWorkflow = videoWorkflows.find((w) => w.file === defaultsFor(settings).video) ?? videoWorkflows[0]
   const patch = (change: Partial<ComfySettings>) => onSave({ ...settings, ...change })
 
   const commitUrl = () => {
@@ -131,9 +134,23 @@ export function ComfySetup({ settings, list, onSave, connectionOnly }: Props) {
               <input type="number" min={COMFY_MIN_TIMEOUT_SECONDS} max={COMFY_MAX_VIDEO_TIMEOUT_SECONDS} value={videoTimeout} onChange={(e) => setVideoTimeout(e.target.value)} onBlur={commitVideoTimeout} />
             </label>
           </div>
+          {/* The game has a clip workflow for each kind of graphics card: this computer's is the one clips are made with. */}
+          {videoWorkflows.length > 1 && (
+            <label>
+              {t('comfy.setup.videoWorkflow')}
+              <select value={videoWorkflow?.file ?? ''} onChange={(e) => patch({ videoWorkflow: e.target.value })}>
+                {videoWorkflows.map((w) => (
+                  <option key={w.file} value={w.file}>
+                    {w.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
         </div>
 
-        <ComfyBundlePanel />
+        {/* Read again for another clip workflow, since what is needed is that workflow's. */}
+        <ComfyBundlePanel key={videoWorkflow?.file} />
 
         {!connectionOnly && (
         <>

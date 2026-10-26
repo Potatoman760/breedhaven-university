@@ -115,6 +115,7 @@
   "setup.answered": "Answered. {device}",
   "setup.timeout": "Give up after (seconds)",
   "setup.videoTimeout": "On a clip, after",
+  "setup.videoWorkflow": "Video workflow",
   "setup.kinds": "Kinds of picture",
   "setup.kindsHint": "Each kind has its own size and its own framing words, which close every prompt of that kind, after its subject. They say how the picture is composed, not what is in it.",
   "setup.videoClips": "Video clips",

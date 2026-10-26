@@ -301,7 +301,7 @@ describe('a pose drawn pregnant', () => {
 
 describe('a video workflow', () => {
   // The one the game ships with: its prompt is on the video node itself, and nothing in it has a sampler's usual shape.
-  const shipped = readFileSync(join(__dirname, '../../../content/default/comfy/minimax h3 eros.json'), 'utf8')
+  const shipped = readFileSync(join(__dirname, '../../../content/default/comfy/minimax h3 eros RTX.json'), 'utf8')
   const graph = parseGraph(shipped).graph!
   const analysis = analyse(graph)
   const { bindings } = effectiveBindings(graph, analysis, undefined)

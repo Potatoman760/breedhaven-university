@@ -3,6 +3,7 @@ import { dirname, extname, join, resolve, sep } from 'node:path'
 import {
   ComfyBundleSettingsSchema,
   ComfySettingsSchema,
+  defaultsFor,
   normaliseComfyUrl,
   prependPrompt,
   type ArtKind,
@@ -182,7 +183,7 @@ export async function generateClip(
   if (url === null) return failed(problem ?? t('comfy.studio.noAddress'))
   const folder = loadWorkflows(bundleDir(packDir), settings.overrides)
   if (!folder.ok) return failed(folder.message || folder.broken[0]?.problem || t('comfy.studio.noWorkflowRead'))
-  const resolved = resolveWorkflow(folder.loaded, request.workflow, 'video', settings.defaults)
+  const resolved = resolveWorkflow(folder.loaded, request.workflow, 'video', defaultsFor(settings))
   if (!resolved.workflow) return failed(resolved.problem ?? t('comfy.studio.noWorkflowChosen'))
   const workflow = resolved.workflow
   if (workflow.bindings.firstFrame === null) {

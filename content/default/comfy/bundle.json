@@ -1,13 +1,14 @@
 {
   "promptPrefixes": {
     "krea2 comic book.json": "AstroWitchV01K2T, comic book style",
-    "minimax h3 eros.json": "comic book style animation",
+    "minimax h3 eros RTX.json": "comic book style animation",
+    "minimax h3 eros AMD.json": "comic book style animation",
     "krea2.json": "AstroWitchV01K2T, comic book style"
   },
   "negativePrefixes": {},
   "overrides": {},
   "defaults": {
-    "video": "minimax h3 eros.json"
+    "video": "minimax h3 eros RTX.json"
   },
   "framing": {},
   "sizes": {},

@@ -151,9 +151,18 @@ export const ComfySettingsSchema = z.object({
   /** Whether a clip is made to loop: asked to end on the picture it starts from, so that it goes round without a jump. One that is not is played once. */
   videoLastFrame: z.boolean().default(false),
   /** How long a clip runs, in seconds. */
-  videoSeconds: z.number().min(1).max(MAX_CLIP_SECONDS).default(DEFAULT_CLIP_SECONDS)
+  videoSeconds: z.number().min(1).max(MAX_CLIP_SECONDS).default(DEFAULT_CLIP_SECONDS),
+  /**
+   * The clip workflow this computer makes clips with, by file name, in place of the game's default: the game has one
+   * for each kind of graphics card. This computer's own, never the game's, so choosing it writes nothing into the content.
+   */
+  videoWorkflow: z.string().optional()
 })
 export type ComfySettings = z.infer<typeof ComfySettingsSchema>
+
+/** The defaults with this computer's clip workflow in place of the game's, where it has chosen one. */
+export const defaultsFor = (settings: Pick<ComfySettings, 'defaults' | 'videoWorkflow'>): ComfySettings['defaults'] =>
+  settings.videoWorkflow === undefined ? settings.defaults : { ...settings.defaults, video: settings.videoWorkflow }
 
 /**
  * What the game itself says of its workflows: the parts of the settings that are about a workflow or a kind of

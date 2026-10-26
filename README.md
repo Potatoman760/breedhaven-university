@@ -1023,7 +1023,12 @@ directly: nothing in a scene ever calls it, and it talks only to the address you
   own "Default for" tick. The prompt is not written from the character, since the picture
   already shows her: it is the one kept for the sex-act (`videoPromptFor` in
   `src/shared/comfy.ts`), edited for every character under ComfyUI setup → Video clips,
-  and a sex-act drawn pregnant shares the prompt of the sex-act it is built on. The clip's size
+  and a sex-act drawn pregnant shares the prompt of the sex-act it is built on. The game ships
+  a clip workflow for each kind of graphics card (`minimax h3 eros RTX.json`, the default, and
+  `minimax h3 eros AMD.json`, which differ only in their upscaler). "Video workflow" under
+  ComfyUI setup, in Settings as in the art tool, picks this computer's; it is kept in
+  `comfy.json` (`videoWorkflow`), never in the game's `bundle.json`, and the models and nodes
+  checked for are only those of the one chosen. The clip's size
   and length are the workflow's own. The clip is saved beside the picture as an `.mp4`,
   and clips have a time limit of their own, since they take far longer than a picture.
   A sex-act of her own has no prompt in the settings: an edited prompt can be kept on the

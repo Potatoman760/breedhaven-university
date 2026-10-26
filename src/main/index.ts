@@ -56,7 +56,7 @@ import {
 import { testComfy } from './comfy/client'
 import { cutoutArt } from './comfy/cutout'
 import { ComfyStore, generateArt, generateClip } from './comfy/studio'
-import { listWorkflows } from './comfy/workflows'
+import { listWorkflows, unusedVideoWorkflows } from './comfy/workflows'
 import { bundleDir, checkBundle, readBundle } from './comfy/bundle'
 import { CivitaiKeyStore, downloadModel, findModelsDir, hasModel, readDownloads } from './comfy/downloads'
 import { basePoseId, isMoment, isSeeding, poseMedia, pregnantPoseId, type BondProposal, type ContentPack, type GameState, type LoveInterest, type Major, type Proposal } from '../shared/model'
@@ -448,8 +448,13 @@ function registerIpc(
   })
   // The game's own workflows, which are what is run: nobody points the game at a folder of them.
   ipcMain.handle(IPC.comfyWorkflows, () => listWorkflows(bundleDir(packDir), comfy.get().overrides))
-  ipcMain.handle(IPC.comfyBundle, (): ComfyBundle => readBundle(packDir))
-  ipcMain.handle(IPC.comfyBundleCheck, (): Promise<ComfyBundleCheck> => checkBundle(comfy.get().baseUrl, readBundle(packDir)))
+  // Only the video workflow clips are made with: the others are for another kind of graphics card.
+  const bundleInUse = (): ComfyBundle => {
+    const unused = unusedVideoWorkflows(bundleDir(packDir), comfy.get())
+    return { workflows: readBundle(packDir).workflows.filter((one) => !unused.includes(one.file)) }
+  }
+  ipcMain.handle(IPC.comfyBundle, (): ComfyBundle => bundleInUse())
+  ipcMain.handle(IPC.comfyBundleCheck, (): Promise<ComfyBundleCheck> => checkBundle(comfy.get().baseUrl, bundleInUse()))
   // The models the game's workflows call for: what there is to fetch, where it goes, and the fetching of it.
   const downloadList = (): ComfyDownloadList => {
     const { models, nodes } = readDownloads(packDir)

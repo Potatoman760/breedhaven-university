@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { MAX_CLIP_SECONDS, videoPromptFor, type ComfySettings, type GenerateArtResult, type GenerateVideoRequest, type WorkflowListResult } from '../../../../shared/comfy'
+import { defaultsFor, MAX_CLIP_SECONDS, videoPromptFor, type ComfySettings, type GenerateArtResult, type GenerateVideoRequest, type WorkflowListResult } from '../../../../shared/comfy'
 import type { LoveInterest, Npc } from '../../../../shared/model'
 import { errorMessage } from '../../errors'
 import { t } from '../../../../shared/i18n'
@@ -40,7 +40,7 @@ export function clipRequest(
   choice: { workflow?: string; prompt?: string; seed?: number; seconds?: number } = {}
 ): { request: GenerateVideoRequest; loop?: boolean; workflow: string } | null {
   const usable = clipWorkflows(list)
-  const chosen = usable.find((w) => w.file === choice.workflow) ?? usable.find((w) => w.file === settings.defaults.video) ?? usable[0]
+  const chosen = usable.find((w) => w.file === choice.workflow) ?? usable.find((w) => w.file === defaultsFor(settings).video) ?? usable[0]
   if (!chosen) return null
   const canEnd = chosen.bindings.lastFrame !== null
   const looping = settings.videoLastFrame && canEnd
@@ -94,7 +94,7 @@ export function GenerateClip({ target, settings, list, onSave }: Props) {
 
   // A workflow makes clips when it has somewhere to put a first frame.
   const usable = clipWorkflows(list)
-  const chosen = usable.find((w) => w.file === workflow) ?? usable.find((w) => w.file === settings.defaults.video) ?? usable[0]
+  const chosen = usable.find((w) => w.file === workflow) ?? usable.find((w) => w.file === defaultsFor(settings).video) ?? usable[0]
   const canEnd = chosen !== undefined && chosen.bindings.lastFrame !== null
   const canLast = chosen === undefined || chosen.bindings.length !== null
   /** The length typed, held to what a clip may be. */
@@ -186,7 +186,7 @@ export function GenerateClip({ target, settings, list, onSave }: Props) {
               {usable.map((w) => (
                 <option key={w.file} value={w.file}>
                   {w.name}
-                  {w.file === settings.defaults.video ? t('comfy.art.defaultSuffix') : ''}
+                  {w.file === defaultsFor(settings).video ? t('comfy.art.defaultSuffix') : ''}
                 </option>
               ))}
             </select>

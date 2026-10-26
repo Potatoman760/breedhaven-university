@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
-import type { ComfySettings, WorkflowAnalysis, WorkflowBindings, WorkflowKind, WorkflowListResult, WorkflowSummary } from '../../shared/comfy'
+import { defaultsFor, type ComfySettings, type WorkflowAnalysis, type WorkflowBindings, type WorkflowKind, type WorkflowListResult, type WorkflowSummary } from '../../shared/comfy'
 import { t } from '../../shared/i18n'
 import { isWorkflow } from './bundle'
 import { analyse, effectiveBindings, noBindings, parseGraph, type ComfyGraph } from './graph'
@@ -70,6 +70,16 @@ export function loadWorkflows(dir: string, overrides: ComfySettings['overrides']
   }
   result.ok = result.loaded.length > 0
   return result
+}
+
+/**
+ * The video workflows that are not the one clips are made with. The game ships one for each kind of graphics card, and
+ * a computer runs only its own: what the others call for is not needed on it.
+ */
+export function unusedVideoWorkflows(dir: string, settings: Pick<ComfySettings, 'overrides' | 'defaults' | 'videoWorkflow'>): string[] {
+  const { loaded } = loadWorkflows(dir, settings.overrides)
+  const used = resolveWorkflow(loaded, '', 'video', defaultsFor(settings)).workflow?.file
+  return loaded.filter((one) => one.bindings.firstFrame !== null && one.file !== used).map((one) => one.file)
 }
 
 /** The same reading, flattened for the renderer: no graphs, no Maps. */
