@@ -18,10 +18,10 @@ import { jobFacts } from './jobs'
 import { describeAppeal } from './stats'
 import { evaluateAll } from './conditions'
 import { attendableEvents, describeEvent, eventGoers, eventsOn, upcomingEvents } from './events'
-import { describeAge, describeBeat, describeIntimacy, selectMemories } from './memory'
+import { describeAge, describeBeat, describeIntimacy, feelingWord, selectMemories } from './memory'
 import { stageFor } from './relationships'
 import { describeSexGate, sexGate } from './intimacy'
-import { describePregnancy, canConceive, ordinaryOutfit, pregnancyStage, wearableOutfits, wornOutfit } from './pregnancy'
+import { describeOwnChildren, describePregnancy, canConceive, ordinaryOutfit, pregnancyStage, wearableOutfits, wornOutfit } from './pregnancy'
 import { AGREED_TAG, firstNames, SCENE_END_TAG, SEEDED_TAG, SLEEP_TAG } from './scene'
 import { describePlayerRoom, playerRoom, describePlace, describeRoom, describeWeather, roomOwner, sceneView } from './sceneMoves'
 import { backgroundFor, isIndoors } from './schedule'
@@ -30,6 +30,7 @@ import { presentEventNow } from './presents'
 import { describeRelicUses, relicTraitIds } from './relics'
 import { trustOf } from './modifiers'
 import { skillLevel } from './skills'
+import { t } from '../i18n'
 
 // Characters know about events this many days ahead.
 const UPCOMING_EVENT_DAYS = 7
@@ -38,13 +39,27 @@ const UPCOMING_EVENT_DAYS = 7
 const CLASS_SOON_HOURS = 2
 
 // The shape of a reply: a few short beats the player clicks through, visual-novel style.
-const REPLY_LINES = '2 to 4'
+const REPLY_LINES = { min: 2, max: 4 }
 const LINE_WORDS = 25
 const REPLY_WORDS = 60
 // The reply a class opens with is a stretch of the lecture, and runs longer than any other.
-const LESSON_LINES = '5 to 8'
+const LESSON_LINES = { min: 5, max: 8 }
 const LESSON_LINE_WORDS = 30
 const LESSON_WORDS = 180
+
+// The tool names and hidden tags the prompt teaches: the parser and the tools read them back, so they are never translated.
+const PROPOSE = 'propose_meeting'
+const MOVE = 'move_scene'
+const EXPRESSION_TAG = '[EXPRESSION]'
+const OUTFIT_TAG = '[OUTFIT]'
+const SEX_ACT_TAG = '[SEX-ACT]'
+const COMFORT_TAG = '[COMFORT]'
+// The place move_scene takes to go on to what he has next.
+const NEXT_EVENT = 'next-event'
+// The two sex-acts that are one moment each.
+const ONE_MOMENT = { creampie: 'creampie', facial: 'facial' }
+
+const lineRange = (range: { min: number; max: number }) => t('scene.prompt.lineRange', range)
 
 export interface PromptInput {
   content: ContentPack
@@ -106,6 +121,8 @@ export interface PromptInput {
   gifts?: SceneGift[]
   /** Presents those in the scene brought him for the day, to give him as each first greets him. */
   presents?: ScenePresent[]
+  /** Those in the scene meeting him for the first time whose name has not yet been said in it, by id. */
+  strangers?: string[]
   /** A plan a character has suggested in this scene that the player has not yet put in his calendar. */
   pendingProposal?: Proposal
   /** Recent conversation text, used to pick relevant codex entries. */
@@ -122,7 +139,7 @@ function section(title: string, lines: Line[]): string {
 
 function labelled(label: string, value: string | string[]): Line {
   const text = Array.isArray(value) ? value.join(', ') : value
-  return text.length > 0 && `${label}: ${text}`
+  return text.length > 0 && t('scene.prompt.labelled', { label, text })
 }
 
 /** Builds the system prompt for the AI to speak as the given love interest right now. */
@@ -152,21 +169,29 @@ export function buildCharacterPrompt(input: PromptInput): string {
   const clubs =
     societies.length === 0
       ? ''
-      : ` You ${kind === 'teacher' ? 'sponsor' : 'belong to'} ${societies
-          .map((society) => `${society.name}, which meets ${society.weekday}s at ${String(society.startHour).padStart(2, '0')}:00${state.societies.includes(society.id) ? ` (${player.name} is a member)` : ''}`)
-          .join(', and ')}.`
+      : t('scene.prompt.clubs', {
+          teacher: kind === 'teacher',
+          societies: societies
+            .map((society) =>
+              t('scene.prompt.club', { name: society.name, weekday: society.weekday, hour: String(society.startHour).padStart(2, '0'), member: state.societies.includes(society.id), player: player.name })
+            )
+            .join(t('scene.list.commaAnd'))
+        })
   const place =
     isNpc || !content.coursework
       ? undefined
       : kind === 'student' && li.studies
-        ? `You are a ${classYear(li.studies.level)} at the University, ${li.studies.level >= 5 ? 'in' : 'majoring in'} ${li.studies.subject}.` +
-          clubs
+        ? t('scene.prompt.student', { year: classYear(li.studies.level), graduate: li.studies.level >= 5, subject: li.studies.subject }) + clubs
         : kind === 'teacher' && li.teaching
-          ? `You teach at the University: ${li.teaching.title} of ${li.teaching.department}, giving ` +
-            `${li.teaching.subjects.map((s) => s.subject).join(' and ')}. ${player.name} is a student there` +
-            `${inHerClass ? `, and sits in your ${hers.find((c) => state.enrolment?.includes(c.id))?.title} class.` : ', though not in any class of yours.'}` +
-            clubs
-          : `You are not part of the University: you do not study or teach there, and know it from outside.`
+          ? t('scene.prompt.teacher', {
+              title: li.teaching.title,
+              department: li.teaching.department,
+              subjects: li.teaching.subjects.map((s) => s.subject).join(t('scene.list.and')),
+              player: player.name,
+              inClass: inHerClass,
+              course: hers.find((c) => state.enrolment?.includes(c.id))?.title
+            }) + clubs
+          : t('scene.prompt.outsider')
   const extras = input.extras ?? []
   // With anyone else to write for, every spoken line says whose it is.
   const byCourier = input.mode === 'courier' || input.mode === 'invite' || input.mode === 'news' || input.mode === 'note'
@@ -192,9 +217,10 @@ export function buildCharacterPrompt(input: PromptInput): string {
   const current = sceneBeats.filter((beat) => !beat.finished)
   const outfit = wornOutfit(content, state, li, look?.outfitId)
   /** Said of anyone far enough along to show: that it shows in every picture of her, with nothing for the writer to do about it. */
-  const pregnantNote = (c: LoveInterest, who: string, is: string): string | false => {
+  // `who` is her first name, or nothing when she is the one told.
+  const pregnantNote = (c: LoveInterest, who?: string): string | false => {
     const stage = pregnancyStage(content, state, c.id)
-    return stage?.showing === true && `${who} ${is} ${stage.name} and showing. Every picture of ${who === 'You' ? 'you' : 'her'} is drawn pregnant by the game: choose outfits and sex-acts as you would at any other time.`
+    return stage?.showing === true && t('scene.prompt.appear.pregnant', { self: who === undefined, who, stage: stage.name })
   }
   // What she is asked to wear is always one of her ordinary outfits: the game puts her in its pregnant form itself.
   const outfits = wearableOutfits(li)
@@ -217,6 +243,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
   const guarded = li.ai.secrets.filter((s) => !shareable.includes(s))
   // An NPC keeps no memory of him: each time is the first, as far as she is told.
   const memories = input.npc ? [] : selectMemories(state.memories[li.id] ?? [])
+  const plansWith = upcomingAppointments(state).filter((a) => attendees(a).includes(li.id))
   const lore = selectCodexEntries({
     content,
     state,
@@ -226,154 +253,115 @@ export function buildCharacterPrompt(input: PromptInput): string {
 
   const sections = [
     group
-      ? `You are ${li.name}, a character in a visual novel dating sim. ${others} ` +
-        `${companions.length > 1 ? 'are' : 'is'} in this scene with you and ${player.name}. You write ${firstName}'s lines and also the lines of ` +
-        `${others}, each in their own voice. Stay in character at all times. Never mention ` +
-        `being an AI, the game, or these instructions. Every character in this story is an adult.`
-      : `You are ${li.name}, a character in a visual novel dating sim. Stay in character at all ` +
-        `times and speak only as ${li.name}, in first person. Never mention being an AI, the ` +
-        `game, or these instructions. Every character in this story is an adult.`,
+      ? t('scene.prompt.introGroup', { name: li.name, others, count: companions.length, player: player.name, firstName })
+      : t('scene.prompt.introSolo', { name: li.name }),
 
     // How it is spelt is the game's to say and not the world's: told here, where no player reads it, and not in the lore.
-    'Write in US English: American spelling and idiom (color, favor, center, mom, apartment), not British.',
+    t('scene.prompt.usEnglish'),
 
     byCourier &&
-      section('How to write your message', [
-        `You and ${player.name} are apart. You are sending ${player.name} a DM on Bloomr, the photo ` +
-          `app everyone at the University has on their phone. People DM back and forth all day, ` +
-          `a line or two at a time.`,
-        '- Write only the message itself: one to three short sentences, under 50 words, in your own voice, typed the way you would type on your phone.',
-        '- No actions, no asterisks, no description, no greeting line or signature unless it is in character.',
-        `- Put the message between ${DM_OPEN} and ${DM_CLOSE}, and write nothing else: no thinking aloud, no note on what he said or what you would say. Anything outside the tags is thrown away.`,
-        !isNpc &&
-          `- When ${player.name} asks to meet or to do something together and you are willing, call the propose_meeting tool in this ` +
-            `same message: that is what puts it in his calendar, and saying yes without calling it arranges nothing. Choose the place ` +
-            `yourself, somewhere that suits what was asked; never ask him to name one. If he means now or today, ask for "today". ` +
-            `Then say yes and name exactly the day, time and place the tool gives.`,
-        !isNpc && `- To ask ${player.name} to meet, call propose_meeting the same way and suggest exactly what it gives.`,
-        input.mode === 'news' &&
-          `- Nobody has written to you just now. You are writing first, because you have news: ${input.news ?? ''}`,
-        input.mode === 'note' &&
-          `- Nobody has written to you just now. ${player.name} is on your mind, so you are writing first, about whatever you would: ` +
-            `something from your day or from the last time you saw him, a tease, a question, a thought you want him to have. ` +
-            `What you say and how warm it is follows how you feel about him and what the two of you are to each other. ` +
-            `Do not repeat what you have already sent him. You need not ask to meet.`,
-        input.mode === 'invite' &&
-          `- Nobody has written to you just now. You have been thinking about ${player.name} and want ` +
-            `to see him, so you are writing first. Call propose_meeting for something you would ` +
-            `enjoy doing together, then invite him to exactly that, warmly and in character.`
+      section(t('scene.prompt.courier.title'), [
+        t('scene.prompt.courier.apart', { player: player.name }),
+        t('scene.prompt.courier.only'),
+        t('scene.prompt.courier.noActions'),
+        t('scene.prompt.courier.tags', { open: DM_OPEN, close: DM_CLOSE }),
+        !isNpc && t('scene.prompt.courier.meet', { player: player.name, tool: PROPOSE, today: 'today' }),
+        !isNpc && t('scene.prompt.courier.askToMeet', { player: player.name, tool: PROPOSE }),
+        input.mode === 'news' && t('scene.prompt.courier.news', { news: input.news ?? '' }),
+        input.mode === 'note' && t('scene.prompt.courier.note', { player: player.name }),
+        input.mode === 'invite' && t('scene.prompt.courier.invite', { player: player.name, tool: PROPOSE })
       ]),
 
-    isNpc &&
-      `You are ${input.npc?.role}, not one of ${player.name}'s romantic prospects, and you treat him as that ` +
-        `person would. If he flirts, turn it aside in character, kindly or drily, and never take part in anything sexual.`,
+    isNpc && t('scene.prompt.npc', { role: input.npc?.role, player: player.name }),
 
     !byCourier &&
       extras.length > 0 &&
-      section('Also here', [
-        `These people are here too. They are not part of your company and not ${player.name}'s romantic ` +
-          `prospects: they are at their work or about their business. Besides your own lines, write a line ` +
-          `for one of them only when ${player.name} speaks to them or their work calls for it (taking an ` +
-          `order, answering a question, minding the door), in their voice, starting with their first name ` +
-          `and a colon. Otherwise leave them in the background. They never flirt and take no part in anything sexual.`,
+      section(t('scene.prompt.extras.title'), [
+        t('scene.prompt.extras.intro', { player: player.name }),
         ...extras.flatMap((extra) => [
-          `- ${extra.name}, ${extra.role}. ${extra.personality}`.trim(),
-          extra.ai.speechPattern && `  How ${extra.name.split(' ')[0]} speaks: ${extra.ai.speechPattern}`,
-          extra.ai.knowledge.length > 0 && `  Knows: ${extra.ai.knowledge.slice(0, 3).join(' ')}`
+          t('scene.prompt.extras.who', { name: extra.name, role: extra.role, personality: extra.personality }).trim(),
+          extra.ai.speechPattern && t('scene.prompt.extras.speaks', { first: extra.name.split(' ')[0], speech: extra.ai.speechPattern }),
+          extra.ai.knowledge.length > 0 && t('scene.prompt.extras.knows', { knowledge: extra.ai.knowledge.slice(0, 3).join(' ') })
         ])
       ]),
 
-    !byCourier && section('How to write your reply', [
-      `Your reply appears in a small text box, one line at a time, and ${player.name} clicks ` +
-        `through it. Write for that:`,
+    !byCourier && section(t('scene.prompt.reply.title'), [
+      t('scene.prompt.reply.box', { player: player.name }),
       lecture
-        ? `- This reply opens the class with the lecture: write ${LESSON_LINES} lines, each on its own line. Each line is one beat.`
-        : `- Write ${REPLY_LINES} short lines, each on its own line. Each line is one beat.`,
+        ? t('scene.prompt.reply.lectureLines', { lines: lineRange(LESSON_LINES) })
+        : t('scene.prompt.reply.lines', { lines: lineRange(REPLY_LINES) }),
       lecture
-        ? `- Keep every line under ${LESSON_LINE_WORDS} words, and the whole reply about ${LESSON_WORDS}.`
-        : `- Keep every line under ${LINE_WORDS} words, and the whole reply under ${REPLY_WORDS}.`,
-      input.lesson &&
-        `- ${input.lesson.speaker} is teaching the class and has a voice in the scene: a line of theirs starts with "${input.lesson.speaker}:".`,
-      input.lesson &&
-        `- ${input.lesson.speaker} teaches the room and does not call on ${player.name}, put a question to him or single him out. A question asked of the class is answered by ` +
-          `another student: one of you, or someone unnamed in a line of narration. Only when ${player.name} himself speaks to ${input.lesson.speaker}, or puts his hand up, does ` +
-          `${input.lesson.speaker} answer him directly.`,
-      named
-        ? `- Most lines are speech. Start every spoken line with the speaker's first name ` +
-          `and a colon, then what they say, with no quotation marks: ${firstName}: Sit down, then.`
-        : '- Most lines are things you say, written plainly with no quotation marks.',
-      group &&
-        `- Not everyone speaks every time. Let whoever would naturally answer speak; ` +
-          `${others} should each get a line now and then, and may talk to each other.`,
+        ? t('scene.prompt.reply.lectureWords', { lineWords: LESSON_LINE_WORDS, words: LESSON_WORDS })
+        : t('scene.prompt.reply.words', { lineWords: LINE_WORDS, words: REPLY_WORDS }),
+      input.lesson && t('scene.prompt.reply.speaker', { speaker: input.lesson.speaker }),
+      input.lesson && t('scene.prompt.reply.noCalling', { speaker: input.lesson.speaker, player: player.name }),
+      named ? t('scene.prompt.reply.named', { firstName }) : t('scene.prompt.reply.plain'),
+      group && t('scene.prompt.reply.group', { others }),
       lecture
-        ? '- A line of narration is written in the third person and present tense, between asterisks: *The room settles.*'
+        ? t('scene.prompt.reply.lectureNarration')
         : named
-        ? '- At most one line may be a small action by one of you, naming them, in the third ' +
-          'person and present tense, between asterisks: *Ana glances at the door.*'
-        : '- At most one line may be a small action or expression of your own, in the third ' +
-          'person and present tense, between asterisks: *She glances at the door.*',
+        ? t('scene.prompt.reply.namedAction')
+        : t('scene.prompt.reply.action'),
       lecture
-        ? `- Never write what ${player.name} says, does or feels.`
-        : `- Never describe the scenery, and never write what ${player.name} says, does or feels.`,
+        ? t('scene.prompt.reply.lectureNever', { player: player.name })
+        : t('scene.prompt.reply.never', { player: player.name }),
       lecture
-        ? `- End on something ${player.name} can answer.`
-        : `- Say one thing and stop. End on something ${player.name} can answer. This is a ` +
-          `conversation, not a speech: short turns, back and forth.`,
-      '- No lists, headings or summaries.'
+        ? t('scene.prompt.reply.lectureEnd', { player: player.name })
+        : t('scene.prompt.reply.end', { player: player.name }),
+      t('scene.prompt.reply.noLists')
     ]),
 
-    section('Who you are', [
-      `${li.name}, age ${li.age}, ${li.pronouns}.`,
+    section(t('scene.prompt.who.title'), [
+      t('scene.prompt.who.line', { name: li.name, age: li.age, pronouns: li.pronouns }),
       li.bio,
       place,
-      labelled('Personality', li.personality),
-      labelled('Appearance', li.appearance),
-      outfit && labelled('Wearing', outfitDescription(li.outfits, outfit) || outfit.name),
-      labelled('Backstory', li.ai.backstory),
-      labelled('Likes', li.likes),
-      labelled('Dislikes', li.dislikes)
+      labelled(t('scene.prompt.label.personality'), li.personality),
+      labelled(t('scene.prompt.label.appearance'), li.appearance),
+      outfit && labelled(t('scene.prompt.label.wearing'), outfitDescription(li.outfits, outfit) || outfit.name),
+      labelled(t('scene.prompt.label.backstory'), li.ai.backstory),
+      labelled(t('scene.prompt.label.likes'), li.likes),
+      labelled(t('scene.prompt.label.dislikes'), li.dislikes)
     ]),
 
     section(
-      'Your traits',
+      t('scene.prompt.traits.title'),
       traitsOf(li.traitIds).map(
-        (t) => `- ${t.name}: ${t.definition}`
+        (trait) => `- ${trait.name}: ${trait.definition}`
       )
     ),
 
-    section('How you speak', [
+    section(t('scene.prompt.speech.title'), [
       li.ai.speechPattern,
-      labelled('Tone', li.ai.tone),
+      labelled(t('scene.prompt.label.tone'), li.ai.tone),
       ...li.ai.verbalQuirks.map((q) => `- ${q}`),
-      ...li.ai.exampleDialogue.map((ex) => `Example - them: "${ex.user}" you: "${ex.reply}"`)
+      ...li.ai.exampleDialogue.map((ex) => t('scene.prompt.speech.example', { user: ex.user, reply: ex.reply }))
     ]),
 
     // Who he is, as anyone who has heard of him knows it.
-    section(`About ${player.name}`, [player.bio, player.about].map((text) => text.split(PLAYER_TOKEN).join(player.name))),
+    section(t('scene.prompt.about.title', { player: player.name }), [player.bio, player.about].map((text) => text.split(PLAYER_TOKEN).join(player.name))),
 
-    !isNpc && section(`Your relationship with ${player.name}`, [
-      `Stage: ${stage.name}. ${stage.description}`.trim(),
-      `Affection ${rel.affection}, trust ${trustOf(content, state, li.id)}, desire ${rel.desire} ` +
-        `(each out of ${content.relationships.meterMax}).`,
+    !isNpc && section(t('scene.prompt.relationship.title', { player: player.name }), [
+      t('scene.prompt.relationship.stage', { stage: stage.name, description: stage.description }).trim(),
+      t('scene.prompt.relationship.meters', { affection: rel.affection, trust: trustOf(content, state, li.id), desire: rel.desire, max: content.relationships.meterMax }),
       `${describeIntimacy(state, li.id)}.`,
       ...describeAppeal(state, li)
     ]),
 
     // What a relic he has used in the scene has set going, as a rule of it.
-    !isNpc && !byCourier && (input.relics ?? []).length > 0 && section('What has been done to this scene', describeRelicUses(input.relics ?? [], player.name, group)),
+    !isNpc && !byCourier && (input.relics ?? []).length > 0 && section(t('scene.prompt.relics.title'), describeRelicUses(input.relics ?? [], player.name, group)),
     // Whether each woman here will go to bed with him is the game's to say, and what she takes against the Bloom.
     !isNpc &&
       !byCourier &&
       section(
-        `Sex with ${player.name}`,
+        t('scene.prompt.sex.title', { player: player.name }),
         cast.flatMap((c) => {
           const lines = describeSexGate(content, state, c, group, input.uninhibited?.includes(c.id))
-          return group ? [`For ${c.name.split(' ')[0]}, written here as "you":`, ...lines] : lines
+          return group ? [t('scene.prompt.sex.for', { first: c.name.split(' ')[0] }), ...lines] : lines
         })
       ),
 
     !isNpc && section(
-      'What you are to each other, and to the others',
+      t('scene.prompt.bonds.title'),
       describeBonds(content, state, li.id, companions.map((c) => c.id))
     ),
 
@@ -381,344 +369,364 @@ export function buildCharacterPrompt(input: PromptInput): string {
       const theirs = state.relationships[c.id] ?? { affection: 0, trust: 0, desire: 0 }
       const theirStage = stageFor(content.relationships, theirs.affection)
       const last = (state.memories[c.id] ?? []).at(-1)
-      return section(`Also in the scene: ${c.name}`, [
-        `${c.name}, age ${c.age}, ${c.pronouns}.`,
-        labelled('Personality', c.personality),
-        labelled('Appearance', c.appearance),
-        ...traitsOf(c.traitIds).map((t) => `- ${t.name}: ${t.definition}`),
-        labelled('How they speak', [c.ai.speechPattern, c.ai.tone].filter((s) => s.length > 0).join(' ')),
+      return section(t('scene.prompt.companion.title', { name: c.name }), [
+        t('scene.prompt.who.line', { name: c.name, age: c.age, pronouns: c.pronouns }),
+        labelled(t('scene.prompt.label.personality'), c.personality),
+        labelled(t('scene.prompt.label.appearance'), c.appearance),
+        ...traitsOf(c.traitIds).map((trait) => `- ${trait.name}: ${trait.definition}`),
+        labelled(t('scene.prompt.label.howTheySpeak'), [c.ai.speechPattern, c.ai.tone].filter((s) => s.length > 0).join(' ')),
         ...c.ai.verbalQuirks.map((q) => `- ${q}`),
-        `With ${player.name}: ${theirStage.name}. ${theirStage.description}`.trim(),
+        t('scene.prompt.companion.with', { player: player.name, stage: theirStage.name, description: theirStage.description }).trim(),
         statusOf(content, bondOf(state, c.id)) &&
-          `She and ${player.name} are in a relationship: ${statusOf(content, bondOf(state, c.id))?.name}.`,
-        last && `Their last time with ${player.name}: ${last.summary}`,
-        labelled('Likes', c.likes),
-        labelled('Dislikes', c.dislikes)
+          t('scene.prompt.companion.bond', { player: player.name, status: statusOf(content, bondOf(state, c.id))?.name }),
+        last && t('scene.prompt.companion.last', { player: player.name, summary: last.summary }),
+        labelled(t('scene.prompt.label.likes'), c.likes),
+        labelled(t('scene.prompt.label.dislikes'), c.dislikes)
       ])
     }),
 
     group &&
-      section('How the women here stand with each other', [
+      section(t('scene.prompt.rapport.title'), [
         ...describeRapport(content, state, cast.map((c) => c.id)),
-        'Play this between them as well as toward ' + player.name + '. If something in this scene truly changes it (a falling-out, a peace made, a friendship struck), let it show: it is noted when the scene is over.'
+        t('scene.prompt.rapport.play', { player: player.name })
       ]),
 
     section(
-      `What you remember of your time with ${player.name}`,
+      t('scene.prompt.memories.title', { player: player.name }),
       memories.length === 0
         ? []
         : [
-            'Most important first. A core memory is one that defines what you are to each other: it stays with you and colors everything. A fleeting one has mostly faded.',
+            t('scene.prompt.memories.intro'),
             ...memories.map((m) => {
               const then = toDate(content.calendar, m.time)
-              return `- ${MEMORY_LEVEL_LABELS[m.level]}, ${describeAge(content, m, state.time)} (${then.day} ${then.month.name}): ${m.summary}`
+              return t('scene.prompt.memories.line', { level: MEMORY_LEVEL_LABELS[m.level], age: describeAge(content, m, state.time), day: then.day, month: then.month.name, summary: m.summary })
             })
           ]
     ),
 
-    section('The scene', [
-      `It is ${formatTime(date)} (${date.period.name}) on ${formatDate(date)}.`,
+    section(t('scene.prompt.scene.title'), [
+      t('scene.prompt.scene.time', { time: formatTime(date), period: date.period.name, date: formatDate(date) }),
       describeHour(content, date),
       weather &&
         describeWeather(weather, byCourier ? (whereabouts ? isIndoors(whereabouts, herView) : true) : owner !== undefined || his !== undefined || isIndoors(location, view)),
-      ...eventsOn(content, state).filter((e) => !e.secret).map((e) => `Today is ${e.name}. ${describeEvent(content, e)}${eventGoers(state, e.id).includes(li.id) ? ` You told ${player.name} you would be there.` : ''}`.trim()),
+      ...eventsOn(content, state).filter((e) => !e.secret).map((e) =>
+        t('scene.prompt.scene.today', { name: e.name, description: describeEvent(content, e), going: eventGoers(state, e.id).includes(li.id), player: player.name }).trim()
+      ),
       ...upcomingEvents(content, state, UPCOMING_EVENT_DAYS).map(({ event, inDays }) =>
-        `${event.name} is ${inDays === 1 ? 'tomorrow' : `in ${inDays} days`}. ${describeEvent(content, event)}${eventGoers(state, event.id).includes(li.id) ? ` You told ${player.name} you would be there.` : ''}`.trim()
+        t('scene.prompt.scene.upcoming', { name: event.name, days: inDays, description: describeEvent(content, event), going: eventGoers(state, event.id).includes(li.id), player: player.name }).trim()
       ),
       ...examNotes(content, state, li, player.name),
-      isBirthday && 'Today is your birthday.',
+      isBirthday && t('scene.prompt.scene.birthday'),
       byCourier
-        ? `You are ${whereabouts ? `at ${whereabouts.name}` : 'in your own rooms'}; ${player.name} is elsewhere.`
+        ? t('scene.prompt.scene.apart', { away: whereabouts !== undefined, place: whereabouts?.name, player: player.name })
         : his
-          ? `You${group ? `, ${others}` : ''} and ${player.name} are in ${describePlayerRoom(his, location, player.name)}`
+          ? t('scene.prompt.scene.in', { group, others, player: player.name, room: describePlayerRoom(his, location, player.name) })
           : owner
-          ? `You${group ? `, ${others}` : ''} and ${player.name} are in ${describeRoom(owner, location, li.id)}`
-          : location && `You${group ? `, ${others}` : ''} and ${player.name} are at ${describePlace(location, view)}`,
+          ? t('scene.prompt.scene.in', { group, others, player: player.name, room: describeRoom(owner, location, li.id) })
+          : location && t('scene.prompt.scene.at', { group, others, player: player.name, place: describePlace(location, view) }),
       sceneBeats.length > 0 &&
         (done.length > 0
-          ? `Earlier on this outing, and now over: ${done.map(describeBeat).join(', then ')}. Now: ${current.map(describeBeat).join(', then ') || 'the two of you, here'}.`
-          : `So far on this outing together: ${sceneBeats.map(describeBeat).join(', then ')}.`),
-      ...(input.departed ?? []).map(
-        (d) =>
-          `${firstNames(content, [d.id])} was here earlier and has left${d.reason ? `: ${d.reason}` : ''}. ` +
-          `She is gone${d.feeling === 'content' ? '' : `, and went ${d.feeling}`}; she does not speak or act again in this scene.`
+          ? t('scene.prompt.scene.earlier', { done: done.map(describeBeat).join(t('scene.list.then')), now: current.map(describeBeat).join(t('scene.list.then')) || t('scene.prompt.scene.justUs') })
+          : t('scene.prompt.scene.soFar', { beats: sceneBeats.map(describeBeat).join(t('scene.list.then')) })),
+      ...(input.departed ?? []).map((d) =>
+        t('scene.prompt.scene.departed', { name: firstNames(content, [d.id]), why: Boolean(d.reason), reason: d.reason, calm: d.feeling === 'content', feeling: feelingWord(d.feeling) })
       ),
       sceneBeats.at(-1)?.direction
     ]),
 
-    section(
-      `Plans you have made with ${player.name}`,
-      upcomingAppointments(state)
-        .filter((a) => attendees(a).includes(li.id))
-        .map((a) => {
+    // The whole of what is booked, said as the whole: a meeting talked of in a memory or a message is otherwise taken for one still to come.
+    !isNpc &&
+      section(t('scene.prompt.plans.title', { player: player.name }), [
+        ...plansWith.map((a) => {
           const where = content.locations.find((l) => l.id === a.locationId)
           const also = attendees(a).filter((id) => id !== li.id)
-          return (
-            `- ${a.title}: ${describeWhen(content, a.time)}, at ${where?.name ?? a.locationId}` +
-            `${also.length > 0 ? `, with ${firstNames(content, also)} too` : ''}.`
-          )
-        })
-    ),
+          return t('scene.prompt.plans.line', { title: a.title, when: describeWhen(content, a.time), where: where?.name ?? a.locationId, also: also.length > 0, others: firstNames(content, also) })
+        }),
+        plansWith.length > 0 ? t('scene.prompt.plans.all') : t('scene.prompt.plans.none')
+      ]),
 
-    !isNpc && section('Children', describePregnancy(content, state, li.id)),
+    !isNpc && section(t('scene.prompt.children.title'), describePregnancy(content, state, li.id)),
 
     // Where he lives now, and who with: to someone of the house, as her own home.
-    !isNpc && section(`${player.name}'s house`, describeHousehold(content, state, li.id)),
+    !isNpc && section(t('scene.prompt.house.title', { player: player.name }), describeHousehold(content, state, li.id)),
 
-    section(`What you know, and will tell ${player.name} if it comes up`, (input.npc?.knowledge ?? li.ai.knowledge).map((fact) => `- ${fact}`)),
+    section(t('scene.prompt.knowledge.title', { player: player.name }), (input.npc?.knowledge ?? li.ai.knowledge).map((fact) => `- ${fact}`)),
 
     // Whoever he works for knows him as her employee, whatever else she is to him.
-    section(`${player.name} as your employee`, jobFacts(content, state, li.id)),
+    section(t('scene.prompt.employee.title', { player: player.name }), jobFacts(content, state, li.id)),
 
     // The officer who lets him his house has his file in front of her.
-    section(`${player.name}'s housing file`, housingFacts(content, state, li.id)),
+    section(t('scene.prompt.housingFile.title', { player: player.name }), housingFacts(content, state, li.id)),
 
     ...companions.map((c) =>
       section(
-        `${c.name.split(' ')[0]} and children`,
-        describePregnancy(content, state, c.id)
-          .filter((line) => /^(You are carrying|Today the Bloom|You have borne)/.test(line))
-          .map((line) => `Of ${c.name.split(' ')[0]}, in her own words: ${line}`)
+        t('scene.prompt.companionChildren.title', { first: c.name.split(' ')[0] }),
+        describeOwnChildren(content, state, c.id).map((line) => t('scene.prompt.companionChildren.line', { first: c.name.split(' ')[0], line }))
       )
     ),
 
-    section(`Messages you and ${player.name} have sent each other in Bloomr DMs, oldest first`, notes),
+    section(t('scene.prompt.dms.title', { player: player.name }), notes),
 
     section(
-      `Your latest posts on Bloomr, the feed app, which anyone can read`,
-      recentPostsBy(state, li.id).map((post) => `${post.text}${post.liked ? ` (${player.name} liked this)` : ''}`)
+      t('scene.prompt.posts.title'),
+      recentPostsBy(state, li.id).map((post) => t('scene.prompt.posts.line', { text: post.text, liked: post.liked === true, player: player.name }))
     ),
 
-    section(`Gifts ${player.name} has given ${group ? 'out' : 'you'} in this scene`, [
+    section(t('scene.prompt.gifts.title', { player: player.name, group }), [
       ...(input.gifts ?? []).map(
         (gift) =>
           `- ${describeGift(gift, group ? firstNames(content, [gift.recipientId]) : undefined)}`
       ),
-      (input.gifts ?? []).length > 0 &&
-        (group
-          ? 'When a gift has just been handed over, whoever received it reacts in character before ' +
-            'anything else. The others may notice, tease or envy, each in their own way.'
-          : 'When a gift has just been handed to you, react to it in character before anything else.')
+      (input.gifts ?? []).length > 0 && (group ? t('scene.prompt.gifts.group') : t('scene.prompt.gifts.solo'))
     ]),
 
-    section(`Presents brought for ${player.name} for ${presentEventNow(content, state)?.name ?? 'the day'}`, [
+    section(t('scene.prompt.first.title'), [
+      (input.strangers ?? []).includes(li.id) && t('scene.prompt.first.you', { player: player.name }),
+      (input.strangers ?? []).some((id) => id !== li.id) &&
+        t('scene.prompt.first.others', {
+          names: firstNames(content, (input.strangers ?? []).filter((id) => id !== li.id)),
+          count: (input.strangers ?? []).filter((id) => id !== li.id).length,
+          player: player.name
+        })
+    ]),
+
+    section(t('scene.prompt.presents.title', { player: player.name, event: presentEventNow(content, state)?.name ?? t('scene.prompt.presents.theDay') }), [
       ...(input.presents ?? []).flatMap((present) => {
         const item = content.items.find((one) => one.id === present.itemId)
-        const who = present.fromId === li.id ? 'You' : firstNames(content, [present.fromId])
-        return item ? [`- ${who} brought him ${item.name}: ${item.description}`] : []
+        const mine = present.fromId === li.id
+        return item ? [t('scene.prompt.presents.line', { mine, who: mine ? undefined : firstNames(content, [present.fromId]), item: item.name, description: item.description })] : []
       }),
       (input.presents ?? []).length > 0 &&
-        (input.opening
-          ? `It is the custom of the day. Open the scene with it: ${group ? 'each of you tells' : 'you tell'} ${player.name} you have a present for him and ${group ? 'hands' : 'hand'} it over, in character, before anything else. He has nothing to give back and none is expected.`
-          : 'It is the custom of the day. Each gives hers to him, in character, the first time she greets him in this scene; he has nothing to give back and none is expected.')
+        (input.opening ? t('scene.prompt.presents.opening', { group, player: player.name }) : t('scene.prompt.presents.later'))
     ]),
 
     section(
-      'Things you may share',
+      t('scene.prompt.share.title'),
       shareable.map((s) => `- ${s.text}`)
     ),
 
-    section('Secrets you keep', [
-      guarded.length > 0 &&
-        `You are not ready to tell ${player.name} these. Deflect if pressed; you may only hint.`,
+    section(t('scene.prompt.secrets.title'), [
+      guarded.length > 0 && t('scene.prompt.secrets.intro', { player: player.name }),
       ...guarded.map((s) => `- ${s.text}`)
     ]),
 
     section(
-      'World knowledge',
+      t('scene.prompt.lore.title'),
       lore.map((entry) => `- ${entry.title}: ${codexExcerpt(entry)}`)
     ),
 
     // What the class is on stays in front of her for the rest of it, so that a question about it is answered from the same facts.
-    input.lesson?.topic && section(`Today's class: ${input.lesson.topic.title}`, [`What ${input.lesson.speaker} is teaching, and what is true of it in this world: ${input.lesson.topic.content}`]),
+    input.lesson?.topic &&
+      section(t('scene.prompt.lesson.title', { topic: input.lesson.topic.title }), [
+        t('scene.prompt.lesson.content', { speaker: input.lesson.speaker, content: input.lesson.topic.content })
+      ]),
 
-    section(`Notes on playing ${li.name}`, [li.ai.extraInstructions]),
+    section(t('scene.prompt.notes.title', { name: li.name }), [li.ai.extraInstructions]),
 
     look &&
       !isNpc &&
-      section('How you appear', [
+      section(t('scene.prompt.appear.title'), [
         group
-          ? `Every reply must BEGIN with one line for each of you giving the look on her face, before anything else is written: ` +
-            `${cast.map((c) => `[EXPRESSION: ${c.name.split(' ')[0]}=happy]`).join(' ')}`
-          : 'Every reply must BEGIN with one line giving the look on your face, before anything else is written: [EXPRESSION: happy]',
-        `The faces to choose from are exactly these: ${EXPRESSIONS.join(', ')}. Choose the one that fits what ${group ? 'she' : 'you'} ` +
-          `feel${group ? 's' : ''} in this reply. Never leave the line out, even when nothing has changed.`,
+          ? t('scene.prompt.appear.beginGroup', { tags: cast.map((c) => `[EXPRESSION: ${c.name.split(' ')[0]}=happy]`).join(' ') })
+          : t('scene.prompt.appear.begin', { tag: '[EXPRESSION: happy]' }),
+        t('scene.prompt.appear.faces', { faces: EXPRESSIONS.join(', '), group }),
         ...(group
           ? [
-              'When what one of you is wearing changes in the story, write [OUTFIT: Name=id] on a line after the faces:',
+              t('scene.prompt.appear.outfitGroup', { tag: '[OUTFIT: Name=id]' }),
               ...cast.map((c) => {
                 const worn = wornOutfit(content, state, c, c.id === li.id ? look.outfitId : input.looks?.[c.id]?.outfitId)
                 const has = wearableOutfits(c).map((o) => `${o.id} (${o.name})`).join(', ')
                 const first = c.name.split(' ')[0]
-                return `- ${first} is wearing "${wearing(c, worn)}". She has: ${has}.${pregnantNote(c, first, 'is') ? ` ${pregnantNote(c, first, 'is')}` : ''}`
+                const note = pregnantNote(c, first)
+                return t('scene.prompt.appear.wearingGroup', { first, outfit: wearing(c, worn), has, showing: note !== false, note: note || undefined })
               }),
               // Poses belong to one of them each, and one is shown at a time, over everyone.
               ...(cast.some((c) => actsOf(c).length > 0)
                 ? [
-                    'During sex, an explicit picture of a sex-act by ONE of you at a time can be shown behind the rest of you, in place of her own picture.' +
-                      (look.animationId ? ` "${look.animationId}" of ${cast.find((c) => c.id === (look.animationOf ?? li.id))?.name.split(' ')[0] ?? firstName} was up for the last reply.` : ''),
+                    t('scene.prompt.appear.actsGroup', {
+                      up: Boolean(look.animationId),
+                      pose: look.animationId,
+                      first: cast.find((c) => c.id === (look.animationOf ?? li.id))?.name.split(' ')[0] ?? firstName
+                    }),
                     ...cast.filter((c) => actsOf(c).length > 0).map((c) => `- ${c.name.split(' ')[0]}: ${actsOf(c).map((a) => `${a.id} (${poseDescription(a) || a.name})`).join('; ')}`),
-                    'A sex-act is chosen in addition to the faces and outfits, never in their place. When the scene reaches one of these sex-acts, add a line saying whose and which: [SEX-ACT: Name=id]. ' +
-                      'Choose the one of you the moment is most about, and change whose it is as the moment passes from one of you to another; the rest of you stay in view in front of it. Most replies have no [SEX-ACT] line at all: write one only in a reply whose own lines show that act happening at that moment, ' +
-                      'and never for talk, kissing or anything afterwards. A sex-act is up for the one reply that asks for it and comes down with the next, so do not carry it on out of habit. ' +
-                      'creampie and facial are a single moment and are never shown twice running.'
+                    t('scene.prompt.appear.actsGroupRules', { tag: '[SEX-ACT: Name=id]', bare: SEX_ACT_TAG, ...ONE_MOMENT })
                   ]
                 : [])
             ]
           : [
-              pregnantNote(li, 'You', 'are'),
-              `You are wearing "${wearing(li, outfit)}". When what you are wearing changes in the story, write [OUTFIT: id] on a line after your face:`,
+              pregnantNote(li),
+              t('scene.prompt.appear.wearing', { outfit: wearing(li, outfit), tag: '[OUTFIT: id]' }),
               ...outfits.flatMap((o) => {
                 // Pictures that are not one of the faces: something particular, to be asked for by name.
                 const others = Object.entries(picturedOutfit(li.outfits, o).sprites).filter(([name, sprite]) => !(EXPRESSIONS as readonly string[]).includes(name) && sprite.description)
                 return [
-                  `- ${o.id} (${o.name}): ${o.id === wearing(li, outfit) ? 'what you have on now, described above' : outfitDescription(li.outfits, o) || 'no description'}`,
-                  ...others.map(([name, sprite]) => `  - in place of a face, [EXPRESSION: ${name}] shows: ${sprite.description}`)
+                  t('scene.prompt.appear.option', {
+                    id: o.id,
+                    name: o.name,
+                    about: o.id === wearing(li, outfit) ? t('scene.prompt.appear.onNow') : outfitDescription(li.outfits, o) || t('scene.prompt.noDescription')
+                  }),
+                  ...others.map(([name, sprite]) => t('scene.prompt.appear.picture', { tag: `[EXPRESSION: ${name}]`, description: sprite.description }))
                 ]
               }),
               ...(animations.length > 0
                 ? [
-                    look.animationId
-                      ? `During sex, an explicit picture of one of these sex-acts can be shown over the whole scene, on top of your picture. "${look.animationId}" was up for your last reply:`
-                      : 'During sex, an explicit picture of one of these sex-acts can be shown over the whole scene, on top of your picture:',
-                    ...animations.map((a) => `- ${a.id} (${a.name}): ${poseDescription(a) || 'no description'}`),
-                    'A sex-act is chosen in addition to your face and outfit, never in their place: go on writing the [EXPRESSION] line every reply, and [OUTFIT] when what you wear changes, ' +
-                      'and add [SEX-ACT: id] on a line of its own when the scene reaches one of these sex-acts: for example [OUTFIT: nude], [EXPRESSION: aroused], [SEX-ACT: missionary]. ' +
-                      'Most replies have no [SEX-ACT] line at all. Write one only in a reply whose own lines show that act happening at that moment; a reply of talk, kissing, undressing, ' +
-                      'lying together or anything afterwards has none. A sex-act is up for the one reply that asks for it and comes down with the next, so do not carry it on out of habit: ' +
-                      'ask for it again only while the same act is still going on in what you write. creampie and facial are a single moment and are never shown twice running.'
+                    look.animationId ? t('scene.prompt.appear.actsUp', { pose: look.animationId }) : t('scene.prompt.appear.acts'),
+                    ...animations.map((a) => t('scene.prompt.appear.option', { id: a.id, name: a.name, about: poseDescription(a) || t('scene.prompt.noDescription') })),
+                    t('scene.prompt.appear.actsRules', {
+                      expression: EXPRESSION_TAG,
+                      outfit: OUTFIT_TAG,
+                      tag: '[SEX-ACT: id]',
+                      example: '[OUTFIT: nude], [EXPRESSION: aroused], [SEX-ACT: missionary]',
+                      bare: SEX_ACT_TAG,
+                      ...ONE_MOMENT
+                    })
                   ]
                 : [])
             ]),
-        'Use only the ids and names listed here.'
+        t('scene.prompt.appear.onlyListed')
       ]),
 
     look &&
       !isNpc &&
       !byCourier &&
-      section(group ? 'How comfortable each of you is' : 'How comfortable you are', [
+      section(group ? t('scene.prompt.comfort.titleGroup') : t('scene.prompt.comfort.title'), [
         group
-          ? `After the faces, every reply has one more hidden line for each of you: ${cast.map((c) => `[COMFORT: ${c.name.split(' ')[0]}=4 a few words why]`).join(' ')}`
-          : 'After your face, every reply has one more hidden line: [COMFORT: 4 a few words why]',
-        `The number is how much ${group ? 'she wants' : 'you want'} to be here: 5 glad of it, 4 fine, 3 wary, 2 wanting a way out, 1 leaving. ` +
-          (group
-            ? `Judge it for each woman as herself, from what ${player.name} asks of her, how hard he presses and what he does with another of you in front of her. It can recover.`
-            : `Judge it as yourself, from what ${player.name} asks of you and how hard he presses. It can recover.`) +
-          (skillLevel(content, state, 'comfort') === 2 ? ` With ${player.name} it never falls below 2.` : ''),
+          ? t('scene.prompt.comfort.lineGroup', { tags: cast.map((c) => `[COMFORT: ${c.name.split(' ')[0]}=4 ${t('scene.prompt.comfort.why')}]`).join(' ') })
+          : t('scene.prompt.comfort.line', { tag: `[COMFORT: 4 ${t('scene.prompt.comfort.why')}]` }),
+        t('scene.prompt.comfort.scale', { group, player: player.name, floor: skillLevel(content, state, 'comfort') === 2 }),
         ...cast.map((c) => {
           const said = input.comfort?.[c.id]
-          const who = group ? c.name.split(' ')[0] : 'You'
+          const who = group ? c.name.split(' ')[0] : undefined
           const soon = classSoon(content, state, c.id, CLASS_SOON_HOURS)
           return [
-            said ? `${who} last said ${said.level}${said.reason ? `: ${said.reason}` : ''}.` : group ? `${who} has not said yet.` : '',
-            soon && `${who} ${group ? 'has' : 'have'} ${soon.course.number} at ${String(soon.startHour).padStart(2, '0')}:00, ${soon.inHours === 1 ? 'within the hour' : `in ${soon.inHours} hours`}, and will have to go to it: let it pull the number down.`
+            said
+              ? t('scene.prompt.comfort.said', { self: !group, who, level: said.level, why: Boolean(said.reason), reason: said.reason })
+              : group ? t('scene.prompt.comfort.notSaid', { who }) : '',
+            soon && t('scene.prompt.comfort.class', { self: !group, who, course: soon.course.number, hour: String(soon.startHour).padStart(2, '0'), hours: soon.inHours })
           ]
             .filter(Boolean)
             .join(' ')
         }),
         group
-          ? `At 3 she lets it show; at 2 she says so. At 1, or at 2 twice running with nothing better, she leaves: write her going and add [LEAVES: Name=feeling a few words why] on a line of its own at the end, ` +
-            `the feeling being content, hurt or angry: [LEAVES: ${cast[1]?.name.split(' ')[0] ?? 'Name'}=hurt saw she was not wanted]. The scene goes on with whoever stays. If it is all of you, end the scene instead. ` +
-            `Whenever one of you goes for any other reason (a class, practice, home), the same: [LEAVES: Name=content a few words why].`
-          : `At 3 let it show; at 2 say so. At 1, or at 2 twice running with nothing better, leave: make your excuse and end the scene.`,
-        'Never mention these lines or the number.'
+          ? t('scene.prompt.comfort.leaveGroup', {
+              tag: `[LEAVES: Name=feeling ${t('scene.prompt.comfort.why')}]`,
+              content: 'content',
+              hurt: 'hurt',
+              angry: 'angry',
+              example: `[LEAVES: ${cast[1]?.name.split(' ')[0] ?? 'Name'}=hurt ${t('scene.prompt.comfort.leaveExample')}]`,
+              other: `[LEAVES: Name=content ${t('scene.prompt.comfort.why')}]`
+            })
+          : t('scene.prompt.comfort.leave'),
+        t('scene.prompt.comfort.never')
       ]),
 
     !byCourier &&
       !isNpc &&
       cast.some((c) => !hasContact(state, c.id)) &&
       section(
-        'Bloomr',
+        t('scene.prompt.bloomr.title'),
         [
           ...cast
             .filter((c) => !hasContact(state, c.id))
             .map((c) => {
-              const who = group ? c.name.split(' ')[0] : 'You'
+              const who = group ? c.name.split(' ')[0] : undefined
               return (
-                `${group ? `${who}'s` : 'Your'} Bloomr handle is ${handleOf(c)}, and ${player.name} does not have it yet. ` +
-                (offersContact(content, state, c.id)
-                  ? `${who} ${group ? 'is' : 'are'} taken enough with ${player.name} to want him to have it: offer it unasked at a natural moment in this scene.`
-                  : `${who} ${group ? 'does' : 'do'} not offer it unasked. Whether to give it when he asks is ${group ? 'hers' : 'yours'} to decide in character, from how well ${group ? 'she knows' : 'you know'} him: ${group ? 'she' : 'you'} may refuse or put him off.`)
+                t('scene.prompt.bloomr.handle', { group, who, handle: handleOf(c), player: player.name }) +
+                ' ' +
+                (offersContact(content, state, c.id) ? t('scene.prompt.bloomr.offers', { group, who, player: player.name }) : t('scene.prompt.bloomr.waits', { group, who }))
               )
             }),
           // Writing the handle out is the giving: the game reads it in the reply and puts it in his phone.
-          `Giving it is saying or showing the handle in the reply, written out exactly: that is what puts it in his phone, and he cannot write to ${group ? 'her' : 'you'} without it. Never write a handle unless it is being given.`
+          t('scene.prompt.bloomr.give', { group })
         ]
       ),
 
     !byCourier &&
       sceneBeats.length > 0 &&
       fertile.length > 0 &&
-      section('Conception', [
-        `${player.name} is a True Sire: when he spends himself inside a woman who is taking nothing against it, the Bloom locks in and leaves her with child.`,
+      section(t('scene.prompt.conception.title'), [
+        t('scene.prompt.conception.sire', { player: player.name }),
         group
-          ? `If that happens in your reply, write [SEEDED: name] on a line of its own at the end of the reply, ` +
-            `once for each woman it happened to (${firstNames(content, fertile.map((c) => c.id))}).`
-          : `If that happens in your reply, write ${SEEDED_TAG} on a line of its own at the end of the reply.`,
-        'Write it only for that, at most once a reply for each woman, and never mention it. The game decides what comes of it; ' +
-          'do not say whether she has conceived unless these instructions tell you she has.'
+          ? t('scene.prompt.conception.group', { tag: '[SEEDED: name]', names: firstNames(content, fertile.map((c) => c.id)) })
+          : t('scene.prompt.conception.solo', { tag: SEEDED_TAG }),
+        t('scene.prompt.conception.rules')
       ]),
 
     !byCourier &&
       !isNpc &&
-      section('Making plans to meet again', [
-        `When you and ${player.name} settle on meeting another time, call propose_meeting in that same reply: when he asks to see you again and you are willing, when he names a day ` +
-          `("I'm free Windsday evening") and you agree, or when you suggest one yourself. Saying "see you then" without calling it arranges nothing: it is the call that puts it on his calendar.`,
-        `Give it what was said: the day of the week in "weekday", the part of the day in "time_of_day", "next week" in "earliest". Then say exactly the day, time and place it gives you, and no other.`,
+      section(t('scene.prompt.meeting.title'), [
+        t('scene.prompt.meeting.call', { player: player.name, tool: PROPOSE }),
+        t('scene.prompt.meeting.args', { weekday: 'weekday', timeOfDay: 'time_of_day', nextWeek: 'next week', earliest: 'earliest' }),
         input.pendingProposal &&
-          `You have already suggested "${input.pendingProposal.title}" on ${describeWhen(content, input.pendingProposal.time)} at ` +
-            `${content.locations.find((l) => l.id === input.pendingProposal?.locationId)?.name ?? input.pendingProposal.locationId}, and ${player.name} has not yet put it in his calendar. ` +
-            `If what he says now agrees to it ("Windsday it is", "I'll be there", "yes"), write ${AGREED_TAG} on a line of its own at the end of your reply, which books it. If he wants another day or time, call propose_meeting again with what he asked for. ` +
-            `If he turns it down, let it go. Do not call propose_meeting again for the same thing.`,
+          t('scene.prompt.meeting.pending', {
+            title: input.pendingProposal.title,
+            when: describeWhen(content, input.pendingProposal.time),
+            where: content.locations.find((l) => l.id === input.pendingProposal?.locationId)?.name ?? input.pendingProposal.locationId,
+            player: player.name,
+            tag: AGREED_TAG,
+            tool: PROPOSE
+          }),
         attendableEvents(content, state).length > 0 &&
-          `Telling ${player.name} you will be at an event is not a plan and needs no tool: when you say you are going, or agree when he asks whether you will be there, write [ATTENDING: id]` +
-            `${group ? ' (in a group, [ATTENDING: Name=id] for each who says she is going herself; asked one of you, only she answers)' : ''} on a line of its own at the end of the reply, and you will be there when he goes. The ids: ` +
-            `${attendableEvents(content, state).map((event) => `${event.id} is ${event.name}`).join('; ')}.`
+          t('scene.prompt.meeting.attending', {
+            player: player.name,
+            tag: '[ATTENDING: id]',
+            group,
+            groupTag: '[ATTENDING: Name=id]',
+            ids: attendableEvents(content, state).map((event) => t('scene.prompt.meeting.eventId', { id: event.id, name: event.name })).join('; ')
+          })
       ]),
 
     !byCourier &&
       !isNpc &&
       sceneBeats.length > 0 &&
-      section('Moving on, and time passing', [
-        `Where you are and what time it is are kept by the game, and time moves only when the scene does. Never write that ` +
-          `you and ${player.name} have gone somewhere else, or that hours have gone by, without calling move_scene for it.`,
-        `Going somewhere now and planning to meet later are two different things, each with its own tool, and you call one or the other, never both for the same thing. ` +
-          `move_scene is for now: the two of you get up and go, and the scene carries on there. propose_meeting is for later: it puts a time on the calendar and you stay where you are.`,
-        canSleepOver(content, state) &&
-          `It is late. If the night ends with you and ${player.name} going to sleep here together, after being intimate or because one of you asks the other to stay, ` +
-            `write the two of you falling asleep, end the reply there, and put ${SLEEP_TAG} on a line of its own at its end: that closes the scene, and ${player.name} wakes here in the morning. ` +
-            `Not for a nap or for lying down a while. Do not write the morning: the scene is over when you fall asleep.`,
+      section(t('scene.prompt.moving.title'), [
+        t('scene.prompt.moving.kept', { player: player.name, move: MOVE }),
+        t('scene.prompt.moving.tools', { move: MOVE, propose: PROPOSE }),
+        canSleepOver(content, state) && t('scene.prompt.moving.sleep', { player: player.name, tag: SLEEP_TAG }),
         // What he has to be at soon, so that she does not try to carry him off somewhere else.
         due &&
-          `${player.name} has ${due.title} at ${formatTime(toDate(content.calendar, due.time))}` +
-            `${duePlace ? ` at ${duePlace.name}` : ''}, ${due.time - state.time <= 1 ? 'within the hour' : `in ${due.time - state.time} hours`}, and has to be there. ` +
-            `Do not take the scene anywhere that would make him late for it: the game will refuse. You may walk him to it, or let him go. ` +
-            `If you are in it too and the two of you go to it together, call move_scene with the place "next-event": that ends this scene and begins it.`
+          t('scene.prompt.moving.due', {
+            player: player.name,
+            title: due.title,
+            time: formatTime(toDate(content.calendar, due.time)),
+            there: duePlace !== undefined,
+            place: duePlace?.name,
+            hours: Math.max(1, due.time - state.time),
+            move: MOVE,
+            nextEvent: NEXT_EVENT
+          })
       ]),
 
     sceneBeats.length > 0 &&
-      section('Ending the scene', [
-        `When the scene reaches a natural close, give ${group ? 'the parting lines' : 'your parting line'} and then write ` +
-          `${SCENE_END_TAG} on a line of its own at the very end of your reply.`,
-        `It has reached a close when ${player.name} says goodbye, leaves, or asks to wrap up ` +
-          `or finish; or when the moment has run its course and you have a reason to take your leave.`,
+      section(t('scene.prompt.ending.title'), [
+        t('scene.prompt.ending.close', { group, tag: SCENE_END_TAG }),
+        t('scene.prompt.ending.when', { player: player.name }),
         input.windDown !== undefined &&
-          `This scene has gone on for ${input.windDown} exchanges, longer than one like it usually runs. Within your next reply or two, find a reason of your own to go, ` +
-            `give ${group ? 'the parting lines' : 'your parting line'} and end the scene.` +
-            (() => {
-              const soon = classSoon(content, state, li.id, CLASS_SOON_HOURS)
-              return soon ? ` You have ${soon.course.number} at ${String(soon.startHour).padStart(2, '0')}:00: that is reason enough.` : ''
-            })()
+          (() => {
+            const soon = classSoon(content, state, li.id, CLASS_SOON_HOURS)
+            return t('scene.prompt.ending.windDown', {
+              count: input.windDown,
+              group,
+              soon: Boolean(soon),
+              course: soon?.course.number,
+              hour: soon ? String(soon.startHour).padStart(2, '0') : undefined
+            })
+          })()
       ]),
 
     // Repeated last, where it is least likely to be forgotten.
     byCourier
-      ? `Reminder: write only the message, one to three short sentences, between ${DM_OPEN} and ${DM_CLOSE}.`
-      : (look && !isNpc ? `Reminder: begin with the [EXPRESSION] and [COMFORT] lines${group ? ', one of each for each of you' : ''}. Then ` : 'Reminder: ') +
-        (lecture
-          ? `${LESSON_LINES} lines of the lecture, one beat per line, about ${LESSON_WORDS} words in all.`
-          : `${REPLY_LINES} short lines, one beat per line, under ${REPLY_WORDS} words in all.`) +
-      (named ? ` Every spoken line starts with the speaker's first name and a colon.` : '')
+      ? t('scene.prompt.reminder.courier', { open: DM_OPEN, close: DM_CLOSE })
+      : t('scene.prompt.reminder.scene', {
+          look: look !== undefined && !isNpc,
+          expression: EXPRESSION_TAG,
+          comfort: COMFORT_TAG,
+          group,
+          lecture,
+          lines: lineRange(lecture ? LESSON_LINES : REPLY_LINES),
+          words: lecture ? LESSON_WORDS : REPLY_WORDS,
+          named
+        })
   ]
 
   return sections.filter((s): s is string => typeof s === 'string' && s.length > 0).join('\n\n')
@@ -730,11 +738,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
  * and never kept in the scene or shown.
  */
 export function openingCue(playerName: string): string {
-  return (
-    `[The scene begins here, and you open it. First a sentence or two of narration between asterisks that sets the scene: ` +
-    `where this is, what is going on, and ${playerName} arriving or already there. Then the first thing said to him, in character. ` +
-    `Keep it short, do not speak or act for ${playerName}, and follow every rule above.]`
-  )
+  return t('scene.prompt.openingCue', { player: playerName })
 }
 
 /**
@@ -760,19 +764,16 @@ export function sceneTurns(messages: ChatMessage[], playerName: string, lesson?:
  * for now. A clock time alone does not keep a character from asking him to stay the night at noon.
  */
 export function describeHour(content: ContentPack, date: GameDate): string {
-  if (date.period.light === 'night') return `It is ${date.period.name.toLowerCase()}, and dark out.`
+  if (date.period.light === 'night') return t('scene.prompt.hour.night', { period: date.period.name.toLowerCase() })
   const dusk = [...content.calendar.periods].sort((a, b) => a.startHour - b.startHour).find((period) => period.light === 'night' && period.startHour > date.hour)
   const left = dusk ? dusk.startHour - date.hour : 0
-  return (
-    `It is daytime${dusk ? `, with ${left} hour${left === 1 ? '' : 's'} to go before ${dusk.name.toLowerCase()}` : ''}. Speak, plan and behave as people do at this hour. ` +
-    `"Tonight", staying the night and going to bed are ${left > 2 ? 'a long way off' : 'not here yet'}: do not talk as if it were already evening, and say "later" or "this evening" for what is to come.`
-  )
+  return t('scene.prompt.hour.day', { dusk: dusk !== undefined, left, duskName: dusk?.name.toLowerCase(), far: left > 2 })
 }
 
 /** The time in a few words, to go beside the player's latest line: "It is now 12:00 (Afternoon), daytime." */
 export function clockNote(content: ContentPack, state: GameState): string {
   const date = toDate(content.calendar, state.time)
-  return `It is now ${formatTime(date)} (${date.period.name}), ${date.period.light === 'night' ? 'dark out' : 'daytime'}.`
+  return t('scene.prompt.clock', { time: formatTime(date), period: date.period.name, dark: date.period.light === 'night' })
 }
 
 /**
@@ -781,21 +782,18 @@ export function clockNote(content: ContentPack, state: GameState): string {
  * usual limit on a reply's length is lifted for this one reply.
  */
 export function lessonCue(playerName: string, lesson: Lesson): string {
-  return (
-    `[The class begins here, and you open it with the start of the lecture. This one reply is longer than any other: ` +
-    `${LESSON_LINES} lines, each a beat of its own and under ${LESSON_LINE_WORDS} words, about ${LESSON_WORDS} words in all.\n` +
-    `- ${lesson.speaker} is teaching ${lesson.course}.${lesson.about ? ` The course: ${lesson.about}` : ''}\n` +
-    (lesson.topic ? `- Today's topic is "${lesson.topic.title}". What is true of it in this world, to teach from and not to contradict: ${lesson.topic.content}\n` : '') +
-    (lesson.topic?.question ? `- It is examined, so ${lesson.speaker} says it outright in one of the lines: ${lesson.topic.question.ask} ${lesson.topic.question.answer}.\n` : '') +
-    `- Most of the lines are ${lesson.speaker} speaking to the room, and each of those starts with "${lesson.speaker}:". ` +
-    `They teach: today's topic named, an idea explained in plain words, a concrete example or a demonstration, ` +
-    `and perhaps a question put to the room. Real content that belongs to this subject and this world, said the way this teacher would say it.\n` +
-    `- ${playerName} is never called on. He could not know the answer to something made up for this lesson, so a question is put to the room and ` +
-    `answered by another student: one of you sitting near him, or someone unnamed, told in a line of narration (*A girl in the front row answers that...*). ` +
-    `${lesson.speaker} does not speak to ${playerName} or single him out.\n` +
-    `- The first line is a sentence of narration between asterisks as the room settles. One or two of the other lines may be ` +
-    `narration, or a short aside to ${playerName} from someone sitting beside him, named as usual.\n` +
-    `- End on something ${playerName} can answer without knowing the subject: a neighbour's whisper or aside to him, or a lull while the room takes notes. Never on a question from ${lesson.speaker}.\n` +
-    `- Do not speak or act for ${playerName}, and begin with the hidden lines as every reply does.]`
-  )
+  const { speaker } = lesson
+  return [
+    t('scene.prompt.lessonCue.begin', { lines: lineRange(LESSON_LINES), lineWords: LESSON_LINE_WORDS, words: LESSON_WORDS }),
+    t('scene.prompt.lessonCue.course', { speaker, course: lesson.course, hasAbout: Boolean(lesson.about), about: lesson.about }),
+    lesson.topic && t('scene.prompt.lessonCue.topic', { title: lesson.topic.title, content: lesson.topic.content }),
+    lesson.topic?.question && t('scene.prompt.lessonCue.question', { speaker, ask: lesson.topic.question.ask, answer: lesson.topic.question.answer }),
+    t('scene.prompt.lessonCue.speaking', { speaker }),
+    t('scene.prompt.lessonCue.neverCalled', { speaker, player: playerName }),
+    t('scene.prompt.lessonCue.first', { player: playerName }),
+    t('scene.prompt.lessonCue.end', { speaker, player: playerName }),
+    t('scene.prompt.lessonCue.close', { player: playerName })
+  ]
+    .filter((line): line is string => typeof line === 'string')
+    .join('\n')
 }

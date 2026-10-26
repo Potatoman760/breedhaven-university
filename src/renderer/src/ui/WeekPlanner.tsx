@@ -1,4 +1,6 @@
 import type { ContentPack, Course } from '../../../shared/model'
+import { courseLabel } from '../../../shared/game'
+import { t } from '../../../shared/i18n'
 
 const clock = (hour: number): string => `${String(hour).padStart(2, '0')}:00`
 
@@ -46,13 +48,14 @@ export function WeekPlanner({ content, courses, focusId, mark, onFocus, onPick }
                   key={course.id}
                   type="button"
                   className={['block', meeting.kind, mark?.(course), course.id === focusId && 'focus'].filter(Boolean).join(' ')}
-                  title={`${course.number} ${course.title}: ${meeting.kind}, ${clock(meeting.startHour)} to ${clock(meeting.startHour + meeting.hours)}`}
+                  title={t('screens.weekPlanner.blockTitle', { label: courseLabel(course), title: course.title, kind: meeting.kind, from: clock(meeting.startHour), to: clock(meeting.startHour + meeting.hours) })}
                   onMouseEnter={() => onFocus?.(course)}
                   onFocus={() => onFocus?.(course)}
                   onClick={() => (onPick ?? onFocus)?.(course)}
                 >
                   {course.number}
-                  {meeting.kind === 'lab' && <span>lab</span>}
+                  {course.section && <span>{t('screens.weekPlanner.section', { section: course.section })}</span>}
+                  {meeting.kind === 'lab' && <span>{t('screens.weekPlanner.lab')}</span>}
                 </button>
               ))}
             </div>

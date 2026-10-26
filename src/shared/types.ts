@@ -2,7 +2,9 @@ import { BANTER_MOMENTS, type BanterLine } from './game/banter'
 import { MOMENTS } from './game/momentLines'
 import type { CoursePick } from './game/coursePick'
 import { z } from 'zod'
-import type { LoveInterest } from './model'
+import type { LoveInterest, Major } from './model'
+import type { MajorIdea } from './game/draftMajor'
+import type { Card } from './game/sillyCard'
 import type { ComfyBundle, ComfyBundleCheck, ComfyDownloadList, ComfySettings, ModelDownloadProgress, ModelDownloadResult, ComfyTestResult, CutoutRequest, CutoutResult, GenerateArtRequest, GenerateArtResult, GenerateVideoRequest, WorkflowListResult } from './comfy'
 import {
   GameStateSchema,
@@ -16,6 +18,7 @@ import {
   type Proposal
 } from './model'
 import type { EditorInfo, EditorResult, ImportAssetRequest, OptimizedPicture } from './editor'
+import type { Language, Messages } from './i18n'
 import type { MemoryLevel } from './model'
 import type { PostDraft } from './game/feed'
 import type { Outing } from './game/outing'
@@ -192,8 +195,18 @@ export interface TestConnectionResponse {
 }
 
 /** API exposed to the renderer by the preload script as `window.api`. */
+/** The language the game is in, its translation of the game's own text, and the languages there are to choose from. */
+export interface LanguageView {
+  language: string
+  messages: Messages
+  languages: Language[]
+}
+
 export interface RendererApi {
   getContent(): Promise<ContentPack>
+  getLanguage(): Promise<LanguageView>
+  /** Changes the language, and with it the content: what comes back is the content as it reads in the new one. */
+  setLanguage(language: string): Promise<LanguageView & { content: ContentPack }>
   /** The system's spell checker, asked a word at a time: whether it is misspelled, and what it might have been. */
   spell: { misspelled(word: string): boolean; suggestions(word: string): string[] }
   chat(request: SceneRequest): Promise<ChatResponse>
@@ -247,6 +260,16 @@ export interface RendererApi {
      * back for the editor to open. Never rejects; a failure comes back as `error`.
      */
     draftLoveInterest(idea: string): Promise<{ loveInterest?: LoveInterest; error?: string }>
+    /** Has the user pick a SillyTavern card (a PNG or its JSON) and reads it; nothing if they cancelled. */
+    readCard(): Promise<{ card?: Card; error?: string } | null>
+    /** A new character from the card last read, unsaved: as the card has her, or with the rest written by the Main LLM. */
+    fromCard(request: { generate: boolean; notes?: string }): Promise<{ loveInterest?: LoveInterest; error?: string }>
+    /** Adds a subject to the University, or changes one made in the editor, with a new college if it names one. */
+    saveMajor(request: { major: unknown; college?: { id: string; name: string } }): Promise<EditorResult>
+    /** Takes away a subject made in the editor, while nobody reads or teaches it. */
+    deleteMajor(code: string): Promise<EditorResult>
+    /** Has the Main LLM write a subject's courses in full. Nothing is saved. Never rejects; a failure comes back as `error`. */
+    draftMajor(idea: MajorIdea): Promise<{ major?: Major; error?: string }>
     saveTrait(trait: unknown): Promise<EditorResult>
     deleteTrait(id: string): Promise<EditorResult>
     /** Saves a location as changed in the editor: what is said of it, and its pictures. */

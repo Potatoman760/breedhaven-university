@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { ComfyBundleSettingsSchema, type ComfyBundle, type ComfyBundleCheck, type ComfyBundleSettings } from '../../shared/comfy'
+import { t } from '../../shared/i18n'
 
 /**
  * The game's own workflows. They are part of the content, in a folder of their own beside a
@@ -87,11 +88,11 @@ export async function checkBundle(baseUrl: string, bundle: ComfyBundle, fetchImp
   let text: string
   try {
     const response = await fetchImpl(`${baseUrl}/object_info`, { signal: AbortSignal.timeout(30_000) })
-    if (!response.ok) return none(`ComfyUI answered ${response.status} ${response.statusText}.`)
+    if (!response.ok) return none(t('comfy.bundle.badStatus', { status: response.status, statusText: response.statusText }))
     text = await response.text()
     known = JSON.parse(text) as Record<string, unknown>
   } catch (cause) {
-    return none(`Could not ask ComfyUI at ${baseUrl}: ${(cause as Error).message}. Is it running?`)
+    return none(t('comfy.bundle.unreachable', { url: baseUrl, reason: (cause as Error).message }))
   }
   // Every file a loader could be given is in what ComfyUI says of its nodes, with either kind of slash.
   const has = (file: string): boolean => text.includes(JSON.stringify(file).slice(1, -1)) || text.includes(JSON.stringify(file.replace(/\\/g, '/')).slice(1, -1))
@@ -99,5 +100,5 @@ export async function checkBundle(baseUrl: string, bundle: ComfyBundle, fetchImp
   const missingNodes = all('nodes').filter((node) => !(node in known))
   const missingModels = all('models').filter((file) => !has(file))
   const ok = missingNodes.length === 0 && missingModels.length === 0
-  return { ok, message: ok ? 'This ComfyUI has every model and node the workflows call for.' : 'This ComfyUI is missing some of what the workflows call for.', missingNodes, missingModels }
+  return { ok, message: ok ? t('comfy.bundle.complete') : t('comfy.bundle.incomplete'), missingNodes, missingModels }
 }

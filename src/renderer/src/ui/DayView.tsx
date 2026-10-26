@@ -54,6 +54,7 @@ import {
   societyMeetingNow
 } from '../../../shared/game'
 import { MAX_SCENE_CAST, STAT_LABELS, STATS, type Activity, type ContentPack, type Focus, type GameState } from '../../../shared/model'
+import { t } from '../../../shared/i18n'
 import { ActivityList } from './ActivityList'
 import { Backdrop } from './Backdrop'
 import { DateBanner } from './DateBanner'
@@ -163,7 +164,7 @@ export function DayView(props: Props) {
   const parts = next ? [next] : []
 
 
-  const ownRoom = roomBackdrop(state.inOwnRoom ? content.newGame.room : undefined, 'room-of-player')
+  const ownRoom = roomBackdrop(state.inOwnRoom ? content.newGame.room : undefined, 'room-of-player', date.period.light)
   // At home, whoever of the household is in the room he is looking at is standing in it: the house is lived in, not a set of empty pictures.
   const here = roomHeIsIn(content, state)
   const inTheRoom = here ? inRoom(content, state, here.key).slice(0, MAX_SCENE_CAST) : []
@@ -172,9 +173,9 @@ export function DayView(props: Props) {
   const guideId = content.orientation?.intro?.speakerId
   const guide = [...content.npcs, ...content.loveInterests].find((one) => one.id === guideId)
   const dayTour: TourStep[] = [
-    { target: '.choices', before: () => setStudying(null), text: `Everything you can do right now is listed here: your next class or shift, any events on, and the rest. Pick one and you go.` },
+    { target: '.choices', before: () => setStudying(null), text: t('screens.dayView.tourChoices') },
     ...(present.length > 0
-      ? [{ target: '.partners', text: `Whoever's here with you. Click someone to start a line about her in the box below, or right-click her to see what you know about her.` }]
+      ? [{ target: '.partners', text: t('screens.dayView.tourPartners') }]
       : []),
     ...(mine.length > 0
       ? [
@@ -184,7 +185,7 @@ export function DayView(props: Props) {
               setShowStats(false)
               setStudying('')
             },
-            text: `Study for a class to earn points toward your grade. Pick the course, then where to study. Somewhere quiet is better, and studying with a classmate is better still.`
+            text: t('screens.dayView.tourStudy')
           }
         ]
       : []),
@@ -194,17 +195,17 @@ export function DayView(props: Props) {
         setStudying(null)
         setShowStats(true)
       },
-      text: `Work on yourself raises your stats, one at a time. Each choice is somewhere you can do it right now, and what it costs you.`
+      text: t('screens.dayView.tourStats')
     },
     {
       target: '.focus-pick',
       before: () => setShowStats(false),
-      text: `This is your focus. When you skip ahead to your next class, shift or plan, the hours in between go into whatever you set here: half of what a real session would earn, but for no energy. Set it and you never waste an hour.`,
+      text: t('screens.dayView.tourFocus'),
       expression: 'happy'
     },
-    { target: '.free-text', text: `If what you want isn't listed, write it here. "Spar at the Tiltyard", "invite Faye to dinner". If it can be done, it will be.` },
-    { target: '[data-tour="end-day"]', text: `And when you've had enough, end the day. You sleep until morning.` },
-    { text: `That's everything. Now go on, orientation's about to start.`, expression: 'happy' }
+    { target: '.free-text', text: t('screens.dayView.tourFreeText') },
+    { target: '[data-tour="end-day"]', text: t('screens.dayView.tourEndDay') },
+    { text: t('screens.dayView.tourDone'), expression: 'happy' }
   ]
 
   return (
@@ -238,26 +239,26 @@ export function DayView(props: Props) {
         </div>
       )}
 
-      <DateBanner date={date} weather={weather} notes={[`Day ${date.dayIndex + 1} of ${calendar.lengthDays}`, ...today.map((e) => e.name), location?.name]} />
+      <DateBanner date={date} weather={weather} notes={[t('screens.dayView.dayOf', { day: date.dayIndex + 1, days: calendar.lengthDays }), ...today.map((e) => e.name), location?.name]} />
 
       <div className="plaque glass">
-        <div className="caps underline">Money</div>
+        <div className="caps underline">{t('screens.dayView.money')}</div>
         <div className="plaque-value">${player.money}</div>
         <div className="caps">
-          Energy {player.energy}/{player.maxEnergy}
+          {t('screens.dayView.energy', { energy: player.energy, max: player.maxEnergy })}
         </div>
         <div className="meter">
           <div style={{ width: `${(player.energy / player.maxEnergy) * 100}%` }} />
         </div>
-        <button type="button" className="stat-grid" aria-label="Your stats in full" onClick={() => setStatSheet(true)}>
+        <button type="button" className="stat-grid" aria-label={t('screens.dayView.statsInFull')} onClick={() => setStatSheet(true)}>
           {STATS.map((stat) => (
             <span
               key={stat}
               className="stat-cell"
               title={
                 (player.stats[stat] ?? 0) >= STAT_CAP
-                  ? `${stat}: as high as it goes`
-                  : `${stat}: ${trainingToward(state, stat).banked} of ${trainingToward(state, stat).needed} training points toward ${(player.stats[stat] ?? 0) + 1}`
+                  ? t('screens.dayView.statMaxed', { stat })
+                  : t('screens.dayView.statTraining', { stat, banked: trainingToward(state, stat).banked, needed: trainingToward(state, stat).needed, next: (player.stats[stat] ?? 0) + 1 })
               }
             >
               <span className="caps">{STAT_LABELS[stat]}</span> {player.stats[stat] ?? 0}
@@ -270,24 +271,24 @@ export function DayView(props: Props) {
       {statSheet && <StatsDialog content={content} state={state} onClose={() => setStatSheet(false)} />}
 
       <div className="choices">
-        {over && <h1 className="prompt glass">The season has ended.</h1>}
+        {over && <h1 className="prompt glass">{t('screens.dayView.seasonEnded')}</h1>}
 
         {/* Who is here to be gone up to. With nobody, there is nothing to show. */}
         {(present.length > 0 || npcsHere.length > 0) && (
         <div className="partners glass">
-          <span className="caps">Here</span>
+          <span className="caps">{t('screens.dayView.here')}</span>
           {present.map((li) => {
             const stage = stageFor(content.relationships, state.relationships[li.id].affection)
             return (
               <button
                 key={li.id}
                 className={hasMet(state, li.id) ? 'partner face' : 'partner face unmet'}
-                title={`${li.name} · ${hasMet(state, li.id) ? stage.name : 'you have not met'}. Click to start a line about her below; right-click for what you know of her`}
+                title={t('screens.dayView.partnerTitle', { name: li.name, met: hasMet(state, li.id), stage: stage.name })}
                 onContextMenu={(event) => {
                   event.preventDefault()
                   onOpen({ kind: 'courier', id: li.id })
                 }}
-                onClick={() => setIdea(`Talk with ${li.name.split(' ')[0]}`)}
+                onClick={() => setIdea(t('screens.dayView.talkWith', { name: li.name.split(' ')[0] }))}
               >
                 <Portrait who={li} size={72} caption />
               </button>
@@ -298,7 +299,7 @@ export function DayView(props: Props) {
             <button
               key={npc.id}
               className="partner face npc"
-              title={`Talk to ${npc.name}${npc.role ? `, ${npc.role}` : ''}`}
+              title={npc.role ? t('screens.dayView.talkToRole', { name: npc.name, role: npc.role }) : t('screens.dayView.talkTo', { name: npc.name })}
               disabled={locked || over}
               onClick={() => props.onTalkNpc(npc.id)}
             >
@@ -310,8 +311,8 @@ export function DayView(props: Props) {
 
         {/* What the hours he skips go on: under who is here, where the day's choices begin. */}
         {!over && (
-          <label className="focus-pick glass" title="When you skip ahead to your next class, shift or plan, the hours in between are spent on this: half of what a session of it would earn, for no energy.">
-            <span className="caps">Focus</span>
+          <label className="focus-pick glass" title={t('screens.dayView.focusTitle')}>
+            <span className="caps">{t('screens.dayView.focus')}</span>
             <select
               value={focusOf(state) ? `${focusOf(state)!.kind}:${focusOf(state)!.id}` : ''}
               onChange={(e) => {
@@ -319,7 +320,7 @@ export function DayView(props: Props) {
                 props.onFocus(kind === 'stat' || kind === 'course' ? { kind, id: id.join(':') } : undefined)
               }}
             >
-              <option value="">Nothing</option>
+              <option value="">{t('screens.dayView.focusNothing')}</option>
               {focusChoices(state).map(({ focus, label }) => (
                 <option key={`${focus.kind}:${focus.id}`} value={`${focus.kind}:${focus.id}`}>
                   {label}
@@ -331,8 +332,8 @@ export function DayView(props: Props) {
 
         {induction && (
           <button className="featured" onClick={props.onOrientation}>
-            <span className="chip outline-light">Orientation</span>
-            <span className="featured-title">Go to {induction.name}</span>
+            <span className="chip outline-light">{t('screens.dayView.orientationChip')}</span>
+            <span className="featured-title">{t('screens.dayView.goTo', { name: induction.name })}</span>
             <span>
               {String(induction.startHour).padStart(2, '0')}:00 · {inductionPlace?.name}
             </span>
@@ -341,12 +342,12 @@ export function DayView(props: Props) {
         )}
         {induction && (
           <p className="glass note">
-            <strong>Orientation Day.</strong> Every student has to attend. The rest of the day is yours once it is done.
+            <strong>{t('screens.dayView.orientationDay')}</strong> {t('screens.dayView.orientationNote')}
           </p>
         )}
         {summoned && (
           <p className="glass note">
-            <strong>{summoned.title}.</strong> You are expected, and it will not wait. The rest of the day is yours once it is done.
+            <strong>{t('screens.dayView.summonedTitle', { title: summoned.title })}</strong> {t('screens.dayView.summonedNote')}
           </p>
         )}
 
@@ -354,18 +355,18 @@ export function DayView(props: Props) {
         {!induction && !over && upcoming && (
           canGoTo(content, state, upcoming).ok ? (
             <button className="featured" disabled={props.busy} onClick={() => props.onGoTo(upcoming)}>
-              <span className="chip outline-light">{upcoming.kind === 'class' ? 'Next class' : upcoming.kind === 'exam' ? 'Exam' : upcoming.kind === 'work' ? 'Next shift' : isBirth(upcoming.id) ? 'Birth' : 'Next plan'}</span>
+              <span className="chip outline-light">{upcoming.kind === 'class' ? t('screens.dayView.nextClass') : upcoming.kind === 'exam' ? t('screens.dayView.exam') : upcoming.kind === 'work' ? t('screens.dayView.nextShift') : isBirth(upcoming.id) ? t('screens.dayView.birth') : t('screens.dayView.nextPlan')}</span>
               <span className="featured-title">{upcoming.title}</span>
               <span>
-                skip to {formatTime(toDate(calendar, upcoming.time))} · {content.locations.find((l) => l.id === upcoming.locationId)?.name}
-                {focusName(state) && upcoming.time > state.time ? ` · ${upcoming.time - state.time}h on ${focusName(state)}` : ''}
+                {t('screens.dayView.skipTo', { time: formatTime(toDate(calendar, upcoming.time)), place: content.locations.find((l) => l.id === upcoming.locationId)?.name ?? '' })}
+                {focusName(state) && upcoming.time > state.time ? t('screens.dayView.skipFocus', { hours: upcoming.time - state.time, focus: focusName(state) }) : ''}
               </span>
               <ChevronIcon size={18} />
             </button>
           ) : (
             <p className="glass note">
               <strong>
-                Next: {upcoming.title} at {formatTime(toDate(calendar, upcoming.time))}.
+                {t('screens.dayView.nextAt', { title: upcoming.title, time: formatTime(toDate(calendar, upcoming.time)) })}
               </strong>{' '}
               {canGoTo(content, state, upcoming).reasons.join(' · ')}
             </p>
@@ -380,13 +381,12 @@ export function DayView(props: Props) {
             .filter(({ event }) => !parts.some((now) => now.event.id === event.id))
             .map(({ event, outing }) => (
             <button key={event.id} className="featured" disabled={props.busy} onClick={() => props.onOuting(outing)}>
-              <span className="chip outline-light">Event</span>
+              <span className="chip outline-light">{t('screens.dayView.eventChip')}</span>
               <span className="featured-title">{event.name}</span>
               <span>
-                {content.locations.find((l) => l.id === outing.locationId)?.name} ·{' '}
                 {outing.window && state.time < outing.window.from
-                  ? `opens ${formatTime(toDate(calendar, outing.window.from))}`
-                  : `until ${formatTime(toDate(calendar, outing.window?.until ?? state.time))}`}
+                  ? t('screens.dayView.placeOpens', { place: content.locations.find((l) => l.id === outing.locationId)?.name ?? '', time: formatTime(toDate(calendar, outing.window.from)) })
+                  : t('screens.dayView.placeUntil', { place: content.locations.find((l) => l.id === outing.locationId)?.name ?? '', time: formatTime(toDate(calendar, outing.window?.until ?? state.time)) })}
               </span>
               <ChevronIcon size={18} />
             </button>
@@ -398,14 +398,14 @@ export function DayView(props: Props) {
           const who = firstNames(content, attendees(plan))
           return check.ok ? (
             <button key={plan.id} className="featured" onClick={() => props.onGoTo(item)}>
-              <span className="chip outline-light">{plan.kind === 'birth' ? 'Birth' : plan.kind === 'viewing' ? 'House' : plan.kind === 'below' ? 'Below' : 'Plan'}</span>
-              <span className="featured-title">{plan.kind === 'birth' ? `${who} is giving birth` : plan.kind === 'viewing' ? plan.title : plan.kind === 'below' ? `${who} is waiting to show you something` : `${plan.title} with ${who}`}</span>
+              <span className="chip outline-light">{plan.kind === 'birth' ? t('screens.dayView.birth') : plan.kind === 'viewing' ? t('screens.dayView.house') : plan.kind === 'below' ? t('screens.dayView.below') : t('screens.dayView.plan')}</span>
+              <span className="featured-title">{plan.kind === 'birth' ? t('screens.dayView.planBirth', { who }) : plan.kind === 'viewing' ? plan.title : plan.kind === 'below' ? t('screens.dayView.planBelow', { who }) : t('screens.dayView.planWith', { title: plan.title, who })}</span>
               <ChevronIcon size={18} />
             </button>
           ) : (
             <p key={plan.id} className="glass note">
               <strong>
-                {plan.kind === 'birth' ? `${who} is giving birth, and wants you there.` : plan.kind === 'viewing' ? `${plan.title}: the housing officer is waiting for you.` : plan.kind === 'below' ? `${who} is waiting to show you something.` : `${who} ${plan.companionIds.length > 0 ? 'are' : 'is'} waiting for you: ${plan.title}.`}
+                {plan.kind === 'birth' ? t('screens.dayView.planBirthNote', { who }) : plan.kind === 'viewing' ? t('screens.dayView.planViewingNote', { title: plan.title }) : plan.kind === 'below' ? t('screens.dayView.planBelowNote', { who }) : t('screens.dayView.planWaitingNote', { who, many: plan.companionIds.length > 0, title: plan.title })}
               </strong>{' '}
               {check.reasons.join(' · ')}
             </p>
@@ -415,9 +415,9 @@ export function DayView(props: Props) {
         {/* The next scripted part of today's events, while it is still to come or under way. */}
         {parts.map(({ event, part }) => (
           <button key={`${event.id}:${part.id}`} className="featured" disabled={props.busy} onClick={() => props.onEventPart(event.id, part.id)}>
-            <span className="chip outline-light">{part.required ? 'Now' : 'Event'}</span>
+            <span className="chip outline-light">{part.required ? t('screens.dayView.now') : t('screens.dayView.eventChip')}</span>
             <span className="featured-title">
-              {event.name}: {part.name}
+              {t('screens.dayView.eventPart', { event: event.name, part: part.name })}
             </span>
             <span>
               {/* From when to when: it can be joined until its last hour is over. */}
@@ -430,11 +430,12 @@ export function DayView(props: Props) {
         {/* The societies' fair: on its first day it is all there is to do until he has been; after that, it is there to go back to. */}
         {fair && (fairCall || (!locked && !over)) && (
           <button className="featured" disabled={props.busy} onClick={props.onFair}>
-            <span className="chip outline-light">{fairCall ? 'Event' : 'Societies'}</span>
-            <span className="featured-title">{fairCall ? `Go to ${fair.name}` : 'Browse the societies'}</span>
+            <span className="chip outline-light">{fairCall ? t('screens.dayView.eventChip') : t('screens.dayView.societies')}</span>
+            <span className="featured-title">{fairCall ? t('screens.dayView.goTo', { name: fair.name }) : t('screens.dayView.browseSocieties')}</span>
             <span>
-              {content.locations.find((l) => l.id === fair.locationId)?.name} ·{' '}
-              {later ? `opens ${String(fair.startHour ?? 0).padStart(2, '0')}:00` : `${state.societies.length} of ${content.societies?.maxJoined} joined`}
+              {later
+                ? t('screens.dayView.placeOpens', { place: content.locations.find((l) => l.id === fair.locationId)?.name ?? '', time: `${String(fair.startHour ?? 0).padStart(2, '0')}:00` })
+                : t('screens.dayView.placeJoined', { place: content.locations.find((l) => l.id === fair.locationId)?.name ?? '', joined: state.societies.length, max: String(content.societies?.maxJoined) })}
             </span>
             <ChevronIcon size={18} />
           </button>
@@ -443,10 +444,10 @@ export function DayView(props: Props) {
         {/* Cards for money, where there is a game. */}
         {!locked && !over && content.poker && state.locationId === content.poker.locationId && (
           <button className="featured" disabled={props.busy || !canPlayPoker(content, state).ok} title={canPlayPoker(content, state).reasons.join(' · ') || content.poker.description} onClick={() => onOpen({ kind: 'poker' })}>
-            <span className="chip outline-light">Cards</span>
+            <span className="chip outline-light">{t('screens.dayView.cards')}</span>
             <span className="featured-title">{content.poker.name}</span>
             <span>
-              ${content.poker.smallBlind}/${content.poker.bigBlind} · ${content.poker.handCap} a hand at most
+              {t('screens.dayView.pokerStakes', { small: content.poker.smallBlind, big: content.poker.bigBlind, cap: content.poker.handCap })}
             </span>
             <ChevronIcon size={18} />
           </button>
@@ -455,10 +456,10 @@ export function DayView(props: Props) {
         {/* The way down, where it is, once he has been told of it. */}
         {!locked && !over && content.expedition && state.expedition.invited && state.locationId === content.expedition.entryLocationId && (
           <button className="featured" data-tour="go-below" disabled={props.busy} onClick={() => onOpen({ kind: 'below' })}>
-            <span className="chip outline-light">Below</span>
-            <span className="featured-title">Go down into {content.expedition.name}</span>
+            <span className="chip outline-light">{t('screens.dayView.below')}</span>
+            <span className="featured-title">{t('screens.dayView.goDown', { name: content.expedition.name })}</span>
             <span>
-              {state.expedition.cleared} of {content.expedition.depths.length} anchors set
+              {t('screens.dayView.anchors', { cleared: state.expedition.cleared, total: content.expedition.depths.length })}
             </span>
             <ChevronIcon size={18} />
           </button>
@@ -467,14 +468,14 @@ export function DayView(props: Props) {
         {!locked && shift && (
           canGoTo(content, state, underWay('work', shift.job.id, shift.job.locationId)).ok ? (
             <button className="featured" onClick={() => props.onGoTo(underWay('work', shift.job.id, shift.job.locationId))}>
-              <span className="chip outline-light">Work</span>
-              <span className="featured-title">Start your shift: {shift.job.title}</span>
-              <span>until {String(shift.shift.startHour + shift.shift.hours).padStart(2, '0')}:00</span>
+              <span className="chip outline-light">{t('screens.dayView.work')}</span>
+              <span className="featured-title">{t('screens.dayView.startShift', { title: shift.job.title })}</span>
+              <span>{t('screens.dayView.until', { time: `${String(shift.shift.startHour + shift.shift.hours).padStart(2, '0')}:00` })}</span>
               <ChevronIcon size={18} />
             </button>
           ) : (
             <p className="glass note">
-              <strong>Your shift as {shift.job.title.toLowerCase()} is on now.</strong> {canGoTo(content, state, underWay('work', shift.job.id, shift.job.locationId)).reasons.join(' · ')}
+              <strong>{t('screens.dayView.shiftNow', { title: shift.job.title.toLowerCase() })}</strong> {canGoTo(content, state, underWay('work', shift.job.id, shift.job.locationId)).reasons.join(' · ')}
             </p>
           )
         )}
@@ -487,19 +488,19 @@ export function DayView(props: Props) {
             const until = `${String(exam.meeting.startHour + exam.meeting.hours).padStart(2, '0')}:00`
             return canGoTo(content, state, sitting).ok ? (
               <button key={course.id} className="featured" disabled={props.busy} onClick={() => props.onGoTo(sitting)}>
-                <span className="chip outline-light">{exam.kind === 'midterm' ? 'Midterm' : 'Final'}</span>
+                <span className="chip outline-light">{exam.kind === 'midterm' ? t('screens.dayView.midterm') : t('screens.dayView.final')}</span>
                 <span className="featured-title">
-                  Sit the {exam.kind}: {course.number}
+                  {t('screens.dayView.sitExam', { kind: exam.kind, number: course.number })}
                 </span>
                 <span>
-                  until {until} · {content.locations.find((l) => l.id === course.locationId)?.name}
+                  {t('screens.dayView.untilAt', { time: until, place: content.locations.find((l) => l.id === course.locationId)?.name ?? '' })}
                 </span>
                 <ChevronIcon size={18} />
               </button>
             ) : (
               <p key={course.id} className="glass note">
                 <strong>
-                  The {exam.kind} in {course.number} is over at {until}.
+                  {t('screens.dayView.examOver', { kind: exam.kind, number: course.number, time: until })}
                 </strong>{' '}
                 {canGoTo(content, state, sitting).reasons.join(' · ')}
               </p>
@@ -509,22 +510,20 @@ export function DayView(props: Props) {
           const check = canGoTo(content, state, item)
           return check.ok ? (
             <button key={course.id} className="featured" onClick={() => props.onGoTo(item)}>
-              <span className="chip outline-light">Class</span>
+              <span className="chip outline-light">{t('screens.dayView.class')}</span>
               <span className="featured-title">
-                Attend {course.number}: {course.title}
+                {t('screens.dayView.attend', { number: course.number, title: course.title })}
               </span>
               <span>
-                until{' '}
-                {String(
-                  (meetingNow(content, state, course)?.startHour ?? 0) + (meetingNow(content, state, course)?.hours ?? 0)
-                ).padStart(2, '0')}
-                :00
+                {t('screens.dayView.until', {
+                  time: `${String((meetingNow(content, state, course)?.startHour ?? 0) + (meetingNow(content, state, course)?.hours ?? 0)).padStart(2, '0')}:00`
+                })}
               </span>
               <ChevronIcon size={18} />
             </button>
           ) : (
             <p key={course.id} className="glass note">
-              <strong>{course.number} is meeting now.</strong> {check.reasons.join(' · ')}
+              <strong>{t('screens.dayView.meetingNow', { name: course.number })}</strong> {check.reasons.join(' · ')}
             </p>
           )
         })}
@@ -535,16 +534,19 @@ export function DayView(props: Props) {
             const check = canGoTo(content, state, item)
             return check.ok ? (
               <button key={society.id} className="featured" disabled={props.busy} onClick={() => props.onGoTo(item)}>
-                <span className="chip outline-light">Society</span>
-                <span className="featured-title">Go to {society.name}</span>
+                <span className="chip outline-light">{t('screens.dayView.society')}</span>
+                <span className="featured-title">{t('screens.dayView.goTo', { name: society.name })}</span>
                 <span>
-                  until {String(society.startHour + (content.societies?.hours ?? 1)).padStart(2, '0')}:00 · {content.locations.find((l) => l.id === society.locationId)?.name}
+                  {t('screens.dayView.untilAt', {
+                    time: `${String(society.startHour + (content.societies?.hours ?? 1)).padStart(2, '0')}:00`,
+                    place: content.locations.find((l) => l.id === society.locationId)?.name ?? ''
+                  })}
                 </span>
                 <ChevronIcon size={18} />
               </button>
             ) : (
               <p key={society.id} className="glass note">
-                <strong>{society.name} is meeting now.</strong> {check.reasons.join(' · ')}
+                <strong>{t('screens.dayView.meetingNow', { name: society.name })}</strong> {check.reasons.join(' · ')}
               </p>
             )
           })}
@@ -559,9 +561,9 @@ export function DayView(props: Props) {
               disabled={props.busy}
               onClick={() => setStudying(studying === null ? '' : null)}
             >
-              <span className="chip outline-light">Study</span>
-              <span className="featured-title">{studied ? `Study for ${studied.number}` : 'Study for a class'}</span>
-              <span>{studying === null ? `${mine.length} course${mine.length === 1 ? '' : 's'}` : 'Close'}</span>
+              <span className="chip outline-light">{t('screens.dayView.study')}</span>
+              <span className="featured-title">{studied ? t('screens.dayView.studyFor', { number: studied.number }) : t('screens.dayView.studyForAClass')}</span>
+              <span>{studying === null ? t('screens.dayView.courses', { n: mine.length }) : t('screens.dayView.close')}</span>
               <ChevronIcon size={18} />
             </button>
             {/* First the course, then where. */}
@@ -572,26 +574,26 @@ export function DayView(props: Props) {
                 return (
                   <button key={course.id} className="stat-option glass" disabled={props.busy} onClick={() => setStudying(course.id)}>
                     <span className="caps">
-                      {course.number} · {Math.round(coursePoints(state, course.id))} of {content.coursework?.grading.points}
+                      {t('screens.dayView.coursePoints', { number: course.number, points: Math.round(coursePoints(state, course.id)), total: content.coursework?.grading.points ?? '' })}
                     </span>
                     <strong>{course.title}</strong>
                     {skillFor(content, course) && (
                       <span className="hint">
-                        {skillProgress(state, skillFor(content, course)!).has ? `Taught you: ${skillFor(content, course)!.name}` : `Teaches ${skillFor(content, course)!.name} at ${skillFor(content, course)!.at} marks`}
+                        {skillProgress(state, skillFor(content, course)!).has ? t('screens.dayView.taughtYou', { skill: skillFor(content, course)!.name }) : t('screens.dayView.teaches', { skill: skillFor(content, course)!.name, at: skillFor(content, course)!.at })}
                       </span>
                     )}
                     <span className="hint">
-                      {grades?.final ? `Final ${grades.final.letter}` : grades?.midterm ? `Midterm ${grades.midterm.letter}` : 'Not yet graded'}
+                      {grades?.final ? t('screens.dayView.gradeFinal', { letter: grades.final.letter }) : grades?.midterm ? t('screens.dayView.gradeMidterm', { letter: grades.midterm.letter }) : t('screens.dayView.notGraded')}
                     </span>
                   </button>
                 )
               })}
             {studied && (
               <button className="stat-option glass" disabled={props.busy} onClick={() => setStudying('')}>
-                <span className="caps">Back</span>
-                <strong>Another course</strong>
+                <span className="caps">{t('screens.dayView.back')}</span>
+                <strong>{t('screens.dayView.anotherCourse')}</strong>
                 <span className="hint">
-                  {Math.round(coursePoints(state, studied.id))} of {content.coursework?.grading.points} so far
+                  {t('screens.dayView.soFar', { points: Math.round(coursePoints(state, studied.id)), total: content.coursework?.grading.points ?? '' })}
                 </span>
               </button>
             )}
@@ -604,11 +606,10 @@ export function DayView(props: Props) {
                     setStudying(null)
                     props.onOuting(session)
                   }}>
-                    <span className="caps">+{studyPoints(content, session)} points</span>
+                    <span className="caps">{t('screens.dayView.plusPoints', { points: studyPoints(content, session) })}</span>
                     <strong>{place.name}</strong>
                     <span className="hint">
-                      {session.hours} hours
-                      {place.own ? ' · nothing to interrupt you' : place.roomOf ? ` · with ${place.roomOf.name.split(' ')[0]}` : ''}
+                      {t('screens.dayView.studyHours', { hours: session.hours, where: place.own ? 'own' : place.roomOf ? 'with' : 'none', name: place.roomOf?.name.split(' ')[0] })}
                     </span>
                   </button>
                 )
@@ -619,9 +620,9 @@ export function DayView(props: Props) {
         {(!locked || props.touring) && !over && (
           <div className="stat-menu" data-tour="stats">
             <button className={showStats ? 'featured open' : 'featured'} aria-expanded={showStats} disabled={props.busy} onClick={() => setShowStats(!showStats)}>
-              <span className="chip outline-light">Stats</span>
-              <span className="featured-title">Work on yourself</span>
-              <span>{showStats ? 'Close' : 'Six ways to get better'}</span>
+              <span className="chip outline-light">{t('screens.dayView.stats')}</span>
+              <span className="featured-title">{t('screens.dayView.workOnYourself')}</span>
+              <span>{showStats ? t('screens.dayView.close') : t('screens.dayView.sixWays')}</span>
               <ChevronIcon size={18} />
             </button>
             {showStats &&
@@ -635,8 +636,13 @@ export function DayView(props: Props) {
                   </span>
                   <strong>{suggestion.drill.title}</strong>
                   <span className="hint">
-                    {suggestion.location.name} · {DRILL_HOURS} hours · {trainingToward(state, suggestion.stat).banked} of {trainingToward(state, suggestion.stat).needed} toward{' '}
-                    {(player.stats[suggestion.stat] ?? 0) + 1}
+                    {t('screens.dayView.drillHint', {
+                      place: suggestion.location.name,
+                      hours: DRILL_HOURS,
+                      banked: trainingToward(state, suggestion.stat).banked,
+                      needed: trainingToward(state, suggestion.stat).needed,
+                      next: (player.stats[suggestion.stat] ?? 0) + 1
+                    })}
                   </span>
                 </button>
               ))}
@@ -645,9 +651,9 @@ export function DayView(props: Props) {
 
         {!over && (
           <button className="featured slim" data-tour="end-day" disabled={props.busy || locked} onClick={props.onEndDay}>
-            <span className="featured-title">End the day</span>
+            <span className="featured-title">{t('screens.dayView.endDay')}</span>
             {/* Orientation has to be sat through first: the day cannot be ended while a part of it is left. */}
-            <span>{induction ? 'once orientation is done' : summoned ? 'once you have been' : `until 0${SLEEP_HOURS.until}:00`}</span>
+            <span>{induction ? t('screens.dayView.onceOrientation') : summoned ? t('screens.dayView.onceBeen') : t('screens.dayView.until', { time: `0${SLEEP_HOURS.until}:00` })}</span>
             <ChevronIcon size={18} />
           </button>
         )}
@@ -665,18 +671,18 @@ export function DayView(props: Props) {
             onChange={(e) => setIdea(e.target.value)}
             disabled={props.busy || over || locked}
             maxLength={500}
-            aria-label="Describe something else to do"
+            aria-label={t('screens.dayView.describeLabel')}
             placeholder={
               induction
-                ? 'Orientation comes first today'
+                ? t('screens.dayView.orientationFirst')
                 : summoned
-                  ? `${summoned.title} comes first`
+                  ? t('screens.dayView.comesFirst', { title: summoned.title })
                 : props.busy
-                  ? 'Working it out...'
-                : 'Describe it: "spar at the tiltyard", "invite Faye and Tink to dinner", "sleep"...'
+                  ? t('screens.dayView.workingItOut')
+                : t('screens.dayView.describePlaceholder')
             }
           />
-          <button type="submit" disabled={props.busy || over || !idea.trim() || locked} aria-label="Do this" className="danger icon">
+          <button type="submit" disabled={props.busy || over || !idea.trim() || locked} aria-label={t('screens.dayView.doThis')} className="danger icon">
             <ChevronIcon size={18} />
           </button>
         </form>

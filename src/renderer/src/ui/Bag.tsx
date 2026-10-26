@@ -1,8 +1,9 @@
 import { useState, type ReactNode } from 'react'
 import { canUse, canUseAbility, carried, describeChange, liveBoons, readyIn, relicOn, relicsHeld, skillsOf } from '../../../shared/game'
-import type { ContentPack, Effect, GameState } from '../../../shared/model'
+import { STATS, type ContentPack, type Effect, type GameState, type Stat } from '../../../shared/model'
 import { Button } from './Button'
 import { EmptySquare, ItemSquare } from './ItemSquare'
+import { t, type MessageKey } from '../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -23,6 +24,7 @@ interface Props {
 
 // What the bag is sorted into: what he carries, what he has brought up from below for good, and what he can make.
 const TABS = ['Regular', 'Relics', 'Crafting'] as const
+const TAB_LABELS: Record<(typeof TABS)[number], MessageKey> = { Regular: 'panels.bag.tab.regular', Relics: 'panels.bag.tab.relics', Crafting: 'panels.bag.tab.crafting' }
 
 // The fewest squares the grid of what he carries shows, empty ones among them, so that it reads as a bag and not as a list.
 const SLOTS = 12
@@ -31,19 +33,20 @@ const SLOTS = 12
 function effectsLine(content: ContentPack, effects: Effect[]): string {
   return effects
     .map((effect) => {
-      if (effect.type === 'boon') return `${describeChange(effect.modifier)} for ${effect.hours >= 24 ? `${Math.round(effect.hours / 24)} day${effect.hours >= 48 ? 's' : ''}` : `${effect.hours} hours`}${effect.on === 'her' ? ', on her' : ''}`
-      if (effect.type === 'energy') return `${effect.amount > 0 ? '+' : ''}${effect.amount} energy`
-      if (effect.type === 'item') return `makes ${effect.count > 1 ? `${effect.count} of ` : ''}${content.items.find((item) => item.id === effect.itemId)?.name ?? effect.itemId}`
+      if (effect.type === 'boon')
+        return `${t('panels.bag.effect.boon', { change: describeChange(effect.modifier), duration: effect.hours >= 24 ? t('panels.bag.effect.days', { n: Math.round(effect.hours / 24), many: effect.hours >= 48 }) : t('panels.bag.effect.hours', { n: effect.hours }) })}${effect.on === 'her' ? t('panels.bag.onHer') : ''}`
+      if (effect.type === 'energy') return t('panels.bag.effect.energy', { amount: `${effect.amount > 0 ? '+' : ''}${effect.amount}` })
+      if (effect.type === 'item') return t(effect.count > 1 ? 'panels.bag.effect.makesSome' : 'panels.bag.effect.makes', { count: effect.count, name: content.items.find((item) => item.id === effect.itemId)?.name ?? effect.itemId })
       if (effect.type === 'money') return `${effect.amount > 0 ? '+' : '-'}$${Math.abs(effect.amount)}`
       // Her affection, trust or desire, or one of his stats.
-      if (effect.type === 'meter' || effect.type === 'stat') return `${effect.amount > 0 ? '+' : ''}${effect.amount} ${effect.type === 'meter' ? effect.meter : effect.stat}`
+      if (effect.type === 'meter' || effect.type === 'stat') return t('panels.bag.effect.meter', { amount: `${effect.amount > 0 ? '+' : ''}${effect.amount}`, what: effect.type === 'meter' ? t(`panels.common.meter.${effect.meter}` as const) : (STATS as readonly string[]).includes(effect.stat) ? t(`panels.common.stat.${effect.stat as Stat}` as const) : effect.stat })
       return ''
     })
     .filter(Boolean)
     .join(' · ')
 }
 
-const span = (hours: number, hoursPerDay: number) => (hours >= hoursPerDay ? `${Math.ceil(hours / hoursPerDay)} day${Math.ceil(hours / hoursPerDay) === 1 ? '' : 's'}` : `${hours} hour${hours === 1 ? '' : 's'}`)
+const span = (hours: number, hoursPerDay: number) => (hours >= hoursPerDay ? t('panels.bag.spanDays', { n: Math.ceil(hours / hoursPerDay) }) : t('panels.bag.spanHours', { n: hours }))
 
 /** One square of the bag: what is in it, drawn, with how many and, pointed at, everything there is to say of it. */
 interface Slot {
@@ -83,19 +86,19 @@ export function Bag({ content, state, company = [], busy, onUseItem, onAbility, 
         {label}
       </Button>
     ) : company.length === 0 ? (
-      <span className="hint">For someone you are with</span>
+      <span className="hint">{t('panels.bag.forHer')}</span>
     ) : (
       company.map((who) => (
         <Button key={who.id} variant="primary" size="small" disabled={busy || !ok(who.id).ok} title={ok(who.id).reasons.join(' · ')} onClick={() => act(who.id)}>
-          {label} on {who.name}
+          {t('panels.bag.actionOn', { action: label, name: who.name })}
         </Button>
       ))
     )
 
   const items: Slot[] = carried(content, state).map(({ item, count }) => {
-    const below = item.below ? `In a fight below: ${[item.below.footing > 0 && `+${item.below.footing} footing`, item.below.calms && 'clears a surge'].filter(Boolean).join(' · ')}` : ''
+    const below = item.below ? t('panels.bag.below', { effects: [item.below.footing > 0 && t('panels.bag.belowFooting', { n: item.below.footing }), item.below.calms && t('panels.bag.belowCalms')].filter(Boolean).join(' · ') }) : ''
     const does = item.use ? effectsLine(content, item.use.effects) : ''
-    const use = does ? `Use: ${does}${item.use?.on === 'her' && !does.includes('on her') ? ', on her' : ''}` : ''
+    const use = does ? `${t('panels.bag.useLine', { effects: does })}${item.use?.on === 'her' && !does.includes(t('panels.bag.onHer')) ? t('panels.bag.onHer') : ''}` : ''
     return {
       key: `item:${item.id}`,
       name: item.name,
@@ -103,16 +106,16 @@ export function Bag({ content, state, company = [], busy, onUseItem, onAbility, 
       image: item.image,
       count,
       tip: [item.description, use, below].filter(Boolean).join('\n'),
-      line: [use, below].filter(Boolean).join(' · ') || (item.lovedByAll ? 'A gift any woman loves' : 'A gift'),
+      line: [use, below].filter(Boolean).join(' · ') || (item.lovedByAll ? t('panels.bag.giftAll') : t('panels.bag.gift')),
       actions: (
         <>
-          {item.use && targets(item.use.on, (onId) => onUseItem(item.id, onId), (onId) => canUse(content, state, item.id, onId), 'Use')}
+          {item.use && targets(item.use.on, (onId) => onUseItem(item.id, onId), (onId) => canUse(content, state, item.id, onId), t('panels.bag.use'))}
           {onGive &&
             !item.use &&
             !item.below &&
             company.map((who) => (
               <Button key={who.id} variant="primary" size="small" disabled={busy} onClick={() => onGive(item.id, who.id)}>
-                {company.length > 1 ? `Give ${who.name}` : 'Give'}
+                {company.length > 1 ? t('panels.bag.giveTo', { name: who.name }) : t('panels.bag.give')}
               </Button>
             ))}
         </>
@@ -128,20 +131,20 @@ export function Bag({ content, state, company = [], busy, onUseItem, onAbility, 
       name: relic.name,
       icon: relic.icon,
       image: relic.image,
-      tag: relic.use || on ? undefined : 'off',
+      tag: relic.use || on ? undefined : t('panels.bag.off'),
       tip: relic.description,
       line: relic.description,
       actions: relic.use ? (
         onUseRelic ? (
           <Button variant="primary" size="small" disabled={busy || !usable?.ok} title={usable?.reasons.join(' · ') || undefined} onClick={() => onUseRelic(relic.id)}>
-            Use
+            {t('panels.bag.use')}
           </Button>
         ) : (
-          <span className="hint">Used in a scene</span>
+          <span className="hint">{t('panels.bag.usedInScene')}</span>
         )
       ) : (
         <Button size="small" variant={on ? 'secondary' : 'primary'} disabled={busy} onClick={() => onToggleRelic(relic.id)}>
-          {on ? 'Turn off' : 'Turn on'}
+          {on ? t('panels.bag.turnOff') : t('panels.bag.turnOn')}
         </Button>
       )
     }
@@ -152,17 +155,17 @@ export function Bag({ content, state, company = [], busy, onUseItem, onAbility, 
       const wait = readyIn(content, state, skill)
       // What is made, where it is a thing: the square shows that, and says what the thing does, not that it is made.
       const made = skill.ability!.effects.flatMap((effect) => (effect.type === 'item' ? (content.items.find((item) => item.id === effect.itemId) ?? []) : []))[0]
-      const does = made ? (made.use ? effectsLine(content, made.use.effects) : made.lovedByAll ? 'a gift any woman loves' : made.description) : effectsLine(content, skill.ability!.effects)
-      const line = `${does} · ${wait > 0 ? `ready in ${span(wait, hoursPerDay)}` : `every ${span(skill.ability!.cooldownDays * hoursPerDay, hoursPerDay)}`}`
+      const does = made ? (made.use ? effectsLine(content, made.use.effects) : made.lovedByAll ? t('panels.bag.giftAllLower') : made.description) : effectsLine(content, skill.ability!.effects)
+      const line = `${does} · ${wait > 0 ? t('panels.bag.readyIn', { span: span(wait, hoursPerDay) }) : t('panels.bag.every', { span: span(skill.ability!.cooldownDays * hoursPerDay, hoursPerDay) })}`
       return {
         key: `skill:${skill.id}`,
         name: made?.name ?? skill.name,
         icon: made?.icon ?? 'vial',
         image: made?.image,
-        tag: wait > 0 ? span(wait, hoursPerDay) : 'ready',
+        tag: wait > 0 ? span(wait, hoursPerDay) : t('panels.bag.ready'),
         tip: line,
         line,
-        actions: targets(skill.ability!.on, (onId) => onAbility(skill.id, onId), (onId) => canUseAbility(content, state, skill.id, onId), made ? 'Craft' : skill.ability!.label)
+        actions: targets(skill.ability!.on, (onId) => onAbility(skill.id, onId), (onId) => canUseAbility(content, state, skill.id, onId), made ? t('panels.bag.craft') : skill.ability!.label)
       }
     })
 
@@ -172,7 +175,7 @@ export function Bag({ content, state, company = [], busy, onUseItem, onAbility, 
     <div className="bag-grid">
       {slots.map((slot) => (
         <div key={slot.key} className="bag-cell">
-          <ItemSquare icon={slot.icon} image={slot.image} count={slot.count} tag={slot.tag} picked={slot.key === picked} faint={slot.tag !== undefined && slot.tag !== 'ready'} title={slot.tip} onClick={() => setPicked(slot.key === picked ? null : slot.key)} />
+          <ItemSquare icon={slot.icon} image={slot.image} count={slot.count} tag={slot.tag} picked={slot.key === picked} faint={slot.tag !== undefined && slot.tag !== t('panels.bag.ready')} title={slot.tip} onClick={() => setPicked(slot.key === picked ? null : slot.key)} />
           <span className="bag-name">{slot.name}</span>
         </div>
       ))}
@@ -199,7 +202,7 @@ export function Bag({ content, state, company = [], busy, onUseItem, onAbility, 
               setPicked(null)
             }}
           >
-            {name}
+            {t(TAB_LABELS[name])}
           </button>
         ))}
       </div>
@@ -220,11 +223,11 @@ export function Bag({ content, state, company = [], busy, onUseItem, onAbility, 
         </div>
       )}
 
-      {boons.length > 0 && <h2>In effect</h2>}
+      {boons.length > 0 && <h2>{t('panels.bag.inEffect')}</h2>}
       {boons.map((boon, i) => (
         <p key={i} className="bag-boon">
           <strong>{boon.source}</strong>
-          {boon.targetId ? ` on ${nameOf(boon.targetId)}` : ''}: {describeChange(boon)} · {span(boon.until - state.time, hoursPerDay)} left
+          {t(boon.targetId ? 'panels.bag.boonOnLine' : 'panels.bag.boonLine', { name: boon.targetId && nameOf(boon.targetId), change: describeChange(boon), span: span(boon.until - state.time, hoursPerDay) })}
         </p>
       ))}
     </div>

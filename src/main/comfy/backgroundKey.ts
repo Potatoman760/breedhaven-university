@@ -1,3 +1,5 @@
+import { t } from '../../shared/i18n'
+
 /**
  * Taking a white card out from behind a picture.
  *
@@ -375,31 +377,31 @@ export function refuseKey(image: Raster, reading: BorderReading): string | null 
   const { width, height } = image
   const { colour, edges, transparency } = reading
 
-  if (width < 1 || height < 1) return 'That picture has no pixels in it.'
+  if (width < 1 || height < 1) return t('comfy.key.noPixels')
   if (width * height > MAX_PIXELS) {
-    return `That picture is ${width}×${height}, which is larger than this can work on.`
+    return t('comfy.key.tooLarge', { width, height })
   }
 
   if (Math.min(...colour) < LIGHT_ENOUGH) {
-    return `The border of this picture is ${hex(colour)}, which is not a white background. Nothing was changed.`
+    return t('comfy.key.notWhite', { colour: hex(colour) })
   }
 
   if (Math.max(...colour) - Math.min(...colour) > NEUTRAL_ENOUGH) {
-    return `The border of this picture is ${hex(colour)} — a color, not white. Nothing was changed.`
+    return t('comfy.key.coloured', { colour: hex(colour) })
   }
 
   if (transparency > ALREADY_CUT) {
-    return `${Math.round(transparency * 100)}% of this picture is already transparent — it looks like it has been cut out already. Nothing was changed.`
+    return t('comfy.key.alreadyCut', { percent: Math.round(transparency * 100) })
   }
 
   const clean = edges.filter((one) => one >= EDGE_CLEAR).length
   if (clean < EDGES_NEEDED) {
     const best = EDGE_NAMES[edges.indexOf(Math.max(...edges))]!
-    return `The subject runs off every side of this picture — the clearest edge is the ${best}, and even that is only ${Math.round(Math.max(...edges) * 100)}% background. Nothing was changed.`
+    return t('comfy.key.noClearEdge', { edge: best, percent: Math.round(Math.max(...edges) * 100) })
   }
 
   if (reading.coverage < RING_CLEAR) {
-    return `Only ${Math.round(reading.coverage * 100)}% of the border is background, so there is no card to take out. Nothing was changed.`
+    return t('comfy.key.noCard', { percent: Math.round(reading.coverage * 100) })
   }
 
   return null
@@ -427,11 +429,11 @@ export function keyBackground(image: Raster, options: KeyOptions = {}): KeyOutco
     return {
       ok: false,
       reading: null,
-      message: `That picture is ${width}×${height}, which is larger than this can work on.`
+      message: t('comfy.key.tooLarge', { width, height })
     }
   }
   if (width < 1 || height < 1 || data.length !== width * height * 4) {
-    return { ok: false, reading: null, message: 'That picture has no pixels in it.' }
+    return { ok: false, reading: null, message: t('comfy.key.noPixels') }
   }
 
   const reading = readBorder(image, tolerance)

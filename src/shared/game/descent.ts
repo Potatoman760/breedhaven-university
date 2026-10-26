@@ -5,6 +5,7 @@ import { isGameOver, toDate } from './calendar'
 import { addNote, giveContact } from './courier'
 import { belowOpen } from './expedition'
 import { meet } from './scene'
+import { t } from '../i18n'
 
 /**
  * Being shown the way down. The Undercroft is not his to enter the day it opens: whoever knows of it sets an hour to
@@ -48,7 +49,7 @@ export function scheduleDescent(content: ContentPack, state: GameState): GameSta
   }
   if (!best || isGameOver(content.calendar, best.time)) return cleared
   const place = content.locations.find((l) => l.id === config.entryLocationId)?.name ?? config.entryLocationId
-  const plan: Appointment = { id: DESCENT_ID, kind: 'below', loveInterestId: config.guideId, companionIds: [], title: `Something under ${place}`, time: best.time, hours, locationId: config.entryLocationId }
+  const plan: Appointment = { id: DESCENT_ID, kind: 'below', loveInterestId: config.guideId, companionIds: [], title: t('game.descent.title', { place }), time: best.time, hours, locationId: config.entryLocationId }
   const text = (missed ? config.intro.missedText : config.intro.text).replaceAll('{date}', describeWhen(content, best.time)).replaceAll('{place}', place)
   return addNote(giveContact({ ...cleared, appointments: [...cleared.appointments, plan].sort((a, b) => a.time - b.time) }, config.guideId), config.guideId, { from: 'them', text, read: false })
 }

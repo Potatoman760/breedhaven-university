@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { t } from '../../../shared/i18n'
 
 // The emoji people reach for most in a message, a row to a mood: faces, affection, gestures, and the odds and ends of a day.
 const COMMON_EMOJI = [
@@ -47,11 +48,11 @@ export function EmojiPicker({ onPick, disabled }: Props) {
 
   return (
     <div className="emoji-picker" ref={root}>
-      <button type="button" className="secondary icon" aria-label="Emoji" aria-expanded={open} disabled={disabled} onClick={() => setOpen(!open)}>
+      <button type="button" className="secondary icon" aria-label={t('screens.emojiPicker.label')} aria-expanded={open} disabled={disabled} onClick={() => setOpen(!open)}>
         <span aria-hidden="true">🙂</span>
       </button>
       {open && (
-        <div className="emoji-sheet" role="listbox" aria-label="Emoji">
+        <div className="emoji-sheet" role="listbox" aria-label={t('screens.emojiPicker.label')}>
           {COMMON_EMOJI.map((emoji) => (
             <button key={emoji} type="button" role="option" aria-selected="false" aria-label={emoji} onClick={() => onPick(emoji)}>
               {emoji}

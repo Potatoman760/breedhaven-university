@@ -7,6 +7,7 @@ import { useConfirm } from '../Confirm'
 import { JobIcon } from '../icons'
 import { Portrait } from '../Portrait'
 import { EditorFoot, Group, Text } from './fields'
+import { t } from '../../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -39,7 +40,7 @@ export function SocietiesEditor({ content, onContent, switcher }: Props) {
 
   const isNew = original === null
   const dirty = !same(draft, original ?? blank())
-  const mayLeave = () => !dirty || window.confirm('Discard the changes you have not saved?')
+  const mayLeave = () => !dirty || window.confirm(t('editor.common.discard'))
   const set = (patch: Partial<Society>) => {
     setIssues([])
     setDraft((current) => ({ ...current, ...patch }))
@@ -90,7 +91,7 @@ export function SocietiesEditor({ content, onContent, switcher }: Props) {
       {dialog}
       <aside className="editor-list">
         <Button variant="primary" onClick={() => open(null)}>
-          New society
+          {t('editor.societies.new')}
         </Button>
         <div className="editor-people">
           {listed.map((society) => (
@@ -99,37 +100,37 @@ export function SocietiesEditor({ content, onContent, switcher }: Props) {
               <span>
                 <strong>{society.name}</strong>
                 <span className="hint">
-                  {society.weekday} {clock(society.startHour)} · {society.memberIds.length} of {most}
+                  {t('editor.societies.listed', { weekday: society.weekday, time: clock(society.startHour), count: society.memberIds.length, most })}
                 </span>
               </span>
             </button>
           ))}
-          {listed.length === 0 && <p className="hint">No societies yet.</p>}
+          {listed.length === 0 && <p className="hint">{t('editor.societies.none')}</p>}
         </div>
-        {unplaced.length > 0 && <p className="pin-note">In no society: {unplaced.map((li) => li.name.split(' ')[0]).join(', ')}</p>}
+        {unplaced.length > 0 && <p className="pin-note">{t('editor.societies.unplaced', { names: unplaced.map((li) => li.name.split(' ')[0]).join(', ') })}</p>}
       </aside>
 
       <section className="editor-main">
         <div className="editor-head">
           <div>
-            <h1>{draft.name || (isNew ? 'New society' : draft.id)}</h1>
-            <span className="hint">{isNew ? 'Not saved yet.' : `${placeName(draft.locationId)} · ${draft.weekday}s at ${clock(draft.startHour)}`}</span>
+            <h1>{draft.name || (isNew ? t('editor.societies.new') : draft.id)}</h1>
+            <span className="hint">{isNew ? t('editor.common.notSaved') : t('editor.societies.when', { place: placeName(draft.locationId), weekday: draft.weekday, time: clock(draft.startHour) })}</span>
           </div>
         </div>
 
         <div className="editor-body">
-          <Group title="What it is">
+          <Group title={t('editor.jobs.whatItIs')}>
             <div className="row">
-              <Text label="Name" llm value={draft.name} onChange={(name) => set(isNew ? { name, id: slugify(name.replace(/^the /i, '')) } : { name })} />
-              <Text label="Id" value={draft.id} disabled={!isNew} onChange={(id) => set({ id: slugify(id) })} hint={isNew ? 'It cannot be changed later.' : undefined} />
+              <Text label={t('editor.common.name')} llm value={draft.name} onChange={(name) => set(isNew ? { name, id: slugify(name.replace(/^the /i, '')) } : { name })} />
+              <Text label={t('editor.common.id')} value={draft.id} disabled={!isNew} onChange={(id) => set({ id: slugify(id) })} hint={isNew ? t('editor.common.idFixed') : undefined} />
             </div>
-            <Text label="Description" llm value={draft.description} rows={3} onChange={(description) => set({ description })} />
+            <Text label={t('editor.common.description')} llm value={draft.description} rows={3} onChange={(description) => set({ description })} />
           </Group>
 
-          <Group title="When and where">
+          <Group title={t('editor.societies.whenWhere')}>
             <div className="row">
               <label>
-                Where
+                {t('editor.jobs.where')}
                 <select value={draft.locationId} onChange={(e) => set({ locationId: e.target.value })}>
                   {content.locations.map((location) => (
                     <option key={location.id} value={location.id}>
@@ -139,7 +140,7 @@ export function SocietiesEditor({ content, onContent, switcher }: Props) {
                 </select>
               </label>
               <label>
-                Day
+                {t('editor.jobs.day')}
                 <select value={draft.weekday} onChange={(e) => set({ weekday: e.target.value })}>
                   {weekdays.map((day) => (
                     <option key={day} value={day}>
@@ -149,7 +150,7 @@ export function SocietiesEditor({ content, onContent, switcher }: Props) {
                 </select>
               </label>
               <label>
-                Starts at (hour)
+                {t('editor.jobs.startHour')}
                 <input
                   type="number"
                   min={0}
@@ -161,7 +162,7 @@ export function SocietiesEditor({ content, onContent, switcher }: Props) {
             </div>
           </Group>
 
-          <Group title="What a meeting trains">
+          <Group title={t('editor.societies.trains')}>
             <div className="row checks">
               {STATS.map((stat) => (
                 <label key={stat} className="inline">
@@ -172,11 +173,11 @@ export function SocietiesEditor({ content, onContent, switcher }: Props) {
             </div>
           </Group>
 
-          <Group title="Sponsor">
+          <Group title={t('editor.societies.sponsor')}>
             <label>
-              The teacher who sponsors it
+              {t('editor.societies.sponsorLabel')}
               <select value={draft.sponsorId ?? ''} onChange={(e) => set({ sponsorId: e.target.value || undefined })}>
-                <option value="">Nobody</option>
+                <option value="">{t('editor.common.nobody')}</option>
                 {teachers.map((li) => (
                   <option key={li.id} value={li.id}>
                     {li.name}
@@ -186,7 +187,7 @@ export function SocietiesEditor({ content, onContent, switcher }: Props) {
             </label>
           </Group>
 
-          <Group title={`Members (${draft.memberIds.length} of ${most})`}>
+          <Group title={t('editor.societies.members', { count: draft.memberIds.length, most })}>
             <div className="portraits society-members">
               {students.map((li) => {
                 const member = draft.memberIds.includes(li.id)
@@ -214,14 +215,14 @@ export function SocietiesEditor({ content, onContent, switcher }: Props) {
           dirty={dirty}
           canSave={isSafeId(draft.id) && draft.name.trim() !== '' && draft.stats.length > 0}
           onUndo={() => (setDraft(original ?? blank()), setIssues([]))}
-          onSave={() => apply(window.api.editor.saveSociety(draft), 'Saved.', draft.id)}
+          onSave={() => apply(window.api.editor.saveSociety(draft), t('editor.common.saved'), draft.id)}
           remove={
             !isNew
               ? {
-                  label: 'Delete',
+                  label: t('editor.common.delete'),
                   onClick: async () =>
-                    (await ask({ title: `Delete ${draft.name}?`, detail: 'Anyone who belongs to it in a running game is simply no longer a member.', confirm: 'Delete', grave: true })) &&
-                    apply(window.api.editor.deleteSociety(draft.id), 'Deleted.', '')
+                    (await ask({ title: t('editor.common.deleteNamed', { name: draft.name }), detail: t('editor.societies.deleteDetail'), confirm: t('editor.common.delete'), grave: true })) &&
+                    apply(window.api.editor.deleteSociety(draft.id), t('editor.common.deleted'), '')
                 }
               : undefined
           }

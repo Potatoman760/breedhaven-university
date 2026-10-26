@@ -304,7 +304,7 @@
   "schedule": [
     {
       "weekdays": [
-        "Marketday"
+        "Saturday"
       ],
       "periods": [
         "morning"
@@ -313,7 +313,7 @@
     },
     {
       "weekdays": [
-        "Windsday"
+        "Thursday"
       ],
       "periods": [
         "afternoon"
@@ -322,7 +322,7 @@
     },
     {
       "weekdays": [
-        "Restday"
+        "Sunday"
       ],
       "periods": [
         "afternoon"

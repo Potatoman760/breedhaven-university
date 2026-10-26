@@ -1,12 +1,26 @@
 import { useState, type ReactNode } from 'react'
-import { MEMORY_LEVEL_LABELS, type ContentPack, type GameState } from '../../../shared/model'
+import { MEMORY_LEVEL_LABELS, courseOf, type ContentPack, type GameState } from '../../../shared/model'
 import { SLEEP_OVER_FROM_HOUR, STOOD_UP, describeAction } from '../../../shared/game'
+import { t, type MessageKey } from '../../../shared/i18n'
 import { CodexBook } from './CodexBook'
 import { Dialog } from './Dialog'
 
 const TABS = ['Basics', 'Conversation', 'Stats and study', 'Relationships', 'Sex and pregnancy', 'House and children', 'Money and jobs', 'The Undercroft', 'The world'] as const
 export type HelpTab = (typeof TABS)[number]
 type Tab = HelpTab
+
+// What each tab is called on screen: the tabs themselves are known by these English names wherever Help is opened on one.
+const TAB_LABELS: Record<Tab, MessageKey> = {
+  Basics: 'shell.help.tabBasics',
+  Conversation: 'shell.help.tabConversation',
+  'Stats and study': 'shell.help.tabStats',
+  Relationships: 'shell.help.tabRelationships',
+  'Sex and pregnancy': 'shell.help.tabSex',
+  'House and children': 'shell.help.tabHouse',
+  'Money and jobs': 'shell.help.tabMoney',
+  'The Undercroft': 'shell.help.tabUndercroft',
+  'The world': 'shell.help.tabWorld'
+}
 
 interface Props {
   content: ContentPack
@@ -40,23 +54,23 @@ function Table({ head, rows }: { head: string[]; rows: ReactNode[][] }) {
   )
 }
 
-const percent = (fraction: number) => `${Math.round(fraction * 100)}%`
+const percent = (fraction: number) => t('shell.help.percent', { n: Math.round(fraction * 100) })
 
 /**
  * How the game works, for the player: its rules in brief, a tab to a subject. The numbers are read from the content,
  * so that what it says is what the game does.
  */
 // What a course is worth below, in a few words, by the kind of its modifier.
-const BELOW: Record<string, string> = {
-  might: 'Your strike does more',
-  footing: 'Everyone can take more',
-  anchoring: 'Empower gives her more',
-  surge: 'A surge builds half as fast',
-  spoils: 'More money found',
-  grounding: 'Ground clears all of a surge',
-  ambush: 'You always act first',
-  steady: 'A hex on your party lasts half as long',
-  insight: 'Shows what each enemy is weak to'
+const BELOW: Record<string, MessageKey> = {
+  might: 'shell.help.belowMight',
+  footing: 'shell.help.belowFooting',
+  anchoring: 'shell.help.belowAnchoring',
+  surge: 'shell.help.belowSurge',
+  spoils: 'shell.help.belowSpoils',
+  grounding: 'shell.help.belowGrounding',
+  ambush: 'shell.help.belowAmbush',
+  steady: 'shell.help.belowSteady',
+  insight: 'shell.help.belowInsight'
 }
 
 export function HelpPanel({ content, state, tab: opening = 'Basics', onClose }: Props) {
@@ -64,17 +78,17 @@ export function HelpPanel({ content, state, tab: opening = 'Basics', onClose }: 
   const { relationships, pregnancy, housing, jobs, calendar } = content
   const below = content.expedition
   const traitName = (id: string) => content.traits.find((trait) => trait.id === id)?.name ?? id
-  const names = (ids: string[]) => ids.map(traitName).join(', ') || 'none'
+  const names = (ids: string[]) => ids.map(traitName).join(', ') || t('shell.help.none')
   const rules = relationships.intimacy
   const max = relationships.meterMax
 
   return (
-    <Dialog title="Help" onClose={onClose} wide ornate>
+    <Dialog title={t('shell.help.title')} onClose={onClose} wide ornate>
       <div className="help">
         <div className="tabs" role="tablist">
           {TABS.map((name) => (
             <button key={name} type="button" role="tab" aria-selected={tab === name} className={tab === name ? 'tab selected' : 'tab'} onClick={() => setTab(name)}>
-              {name}
+              {t(TAB_LABELS[name])}
             </button>
           ))}
         </div>
@@ -83,127 +97,127 @@ export function HelpPanel({ content, state, tab: opening = 'Basics', onClose }: 
 
         {tab === 'Basics' && (
           <div className="help-page sheet">
-            <h2>The term</h2>
+            <h2>{t('shell.help.termHeading')}</h2>
             <ul>
-              <li>The game runs for one term of {calendar.lengthDays} days. When the last day ends, the epilogue tells what became of you.</li>
-              <li>Everything you do takes whole hours. Classes, shifts and plans happen at set hours whether you turn up or not.</li>
-              <li>Pick a Focus on the day screen, under who is here: when you skip ahead to your next class, shift or plan, the hours in between are spent on it, at half the rate of a session and for no energy.</li>
-              <li>Midnight to 06:00 is for sleep. End the day skips to 06:00 the next morning with full energy.</li>
+              <li>{t('shell.help.termLength', { days: calendar.lengthDays })}</li>
+              <li>{t('shell.help.termHours')}</li>
+              <li>{t('shell.help.termFocus')}</li>
+              <li>{t('shell.help.termSleep')}</li>
             </ul>
-            <h2>The day screen</h2>
+            <h2>{t('shell.help.dayHeading')}</h2>
             <Table
-              head={['Button', 'What it does']}
+              head={[t('shell.help.dayButton'), t('shell.help.dayDoes')]}
               rows={[
-                ['Map', `The town, with who is at each place beside it. Press Go on a place to walk there.${below ? ` Once you know of it, the way down into ${below.name} glows.` : ''}`],
-                ['Phone', 'Friends, messages, the photo feed, the jobs board and the market.'],
-                ['Calendar', 'Your week by the hour, or the month. Press anything on it to read about it; a class shows who is in it.'],
-                ['Bag', 'What you carry, what you can make, and the relics you hold.'],
-                ...(housing ? [[housing.name, 'Your house, once you have one.']] : []),
-                ['Help', 'How the game works.'],
-                ['Menu', 'Save, load, settings.']
+                [t('shell.help.dayMap'), t('shell.help.dayMapDoes', { below: below !== undefined, name: below?.name ?? '' })],
+                [t('shell.help.dayPhone'), t('shell.help.dayPhoneDoes')],
+                [t('shell.help.dayCalendar'), t('shell.help.dayCalendarDoes')],
+                [t('shell.help.dayBag'), t('shell.help.dayBagDoes')],
+                ...(housing ? [[housing.name, t('shell.help.dayHouseDoes')]] : []),
+                [t('shell.help.dayHelp'), t('shell.help.dayHelpDoes')],
+                [t('shell.help.dayMenu'), t('shell.help.dayMenuDoes')]
               ]}
             />
-            <h2>Scenes</h2>
+            <h2>{t('shell.help.scenesHeading')}</h2>
             <ul>
-              <li>Doing something with someone opens a scene. You type; she answers in her own voice.</li>
-              <li>She decides when a scene ends, and can leave early if she is uncomfortable.</li>
-              <li>Scroll up over the text box to go back to an earlier turn and say something else.</li>
-              <li>While she is answering, the stop button beside the text box halts it.</li>
-              <li>When a scene ends, a summary shows how her feelings changed and what she will remember.</li>
+              <li>{t('shell.help.scenesOpen')}</li>
+              <li>{t('shell.help.scenesEnd')}</li>
+              <li>{t('shell.help.scenesScroll')}</li>
+              <li>{t('shell.help.scenesStop')}</li>
+              <li>{t('shell.help.scenesSummary')}</li>
             </ul>
           </div>
         )}
 
         {tab === 'Conversation' && (
           <div className="help-page sheet">
-            <h2>What talking gets you</h2>
+            <h2>{t('shell.help.talkHeading')}</h2>
             <ul>
-              <li>Nearly everything between you and a woman is settled in what is said. There are no buttons for it: ask, offer, suggest, and she answers as herself.</li>
+              <li>{t('shell.help.talkIntro')}</li>
             </ul>
             <Table
-              head={['You want', 'How', 'Good to know']}
+              head={[t('shell.help.talkWant'), t('shell.help.talkHow'), t('shell.help.talkKnow')]}
               rows={[
-                ['Her Bloomr contact', 'Ask her for it.', 'You cannot message her without it. She may refuse or put you off if she barely knows you, and offers it unasked once she is taken with you.'],
-                ['To know her', 'Ask about her, and listen.', 'Her likes, dislikes, nature and what she is drawn to fill in on her phone profile as they come out.'],
-                ['Her secrets', 'Earn them.', 'Each has its own condition, such as a stage or enough trust. Until then she deflects, however you ask.'],
-                ['To see her again', 'Agree a day and a time.', `It goes on your calendar. Stand her up and she loses ${-STOOD_UP.affection} affection and ${-STOOD_UP.trust} trust, and remembers it.`],
-                ['To go somewhere together', 'Suggest it.', 'If she agrees, the scene moves there and carries on, and the clock moves with it.'],
-                ['Her company at an event', 'Ask whether she is going.', 'If she says she will be there, she is there when you go.'],
-                ['A relationship', 'Raise it, or wait for her to.', 'She proposes an arrangement; you accept or decline. Each needs a stage first.'],
-                ['Her off birth control', 'Talk about wanting a child.', 'It is her decision. She may also decide it on her own.'],
-                ['The night together', `Be with her from ${SLEEP_OVER_FROM_HOUR}:00 on.`, 'If the scene ends with the two of you falling asleep, you wake there in the morning, rested.']
+                [t('shell.help.contactWant'), t('shell.help.contactHow'), t('shell.help.contactKnow')],
+                [t('shell.help.knowWant'), t('shell.help.knowHow'), t('shell.help.knowKnow')],
+                [t('shell.help.secretsWant'), t('shell.help.secretsHow'), t('shell.help.secretsKnow')],
+                [t('shell.help.againWant'), t('shell.help.againHow'), t('shell.help.againKnow', { affection: -STOOD_UP.affection, trust: -STOOD_UP.trust })],
+                [t('shell.help.goWant'), t('shell.help.goHow'), t('shell.help.goKnow')],
+                [t('shell.help.eventWant'), t('shell.help.eventHow'), t('shell.help.eventKnow')],
+                [t('shell.help.bondWant'), t('shell.help.bondHow'), t('shell.help.bondKnow')],
+                [t('shell.help.controlWant'), t('shell.help.controlHow'), t('shell.help.controlKnow')],
+                [t('shell.help.nightWant'), t('shell.help.nightHow', { hour: SLEEP_OVER_FROM_HOUR }), t('shell.help.nightKnow')]
               ]}
             />
-            <h2>Reading her</h2>
+            <h2>{t('shell.help.readingHeading')}</h2>
             <ul>
-              <li>She decides when a scene is over, and says goodbye in her own way.</li>
-              <li>Press her on something she does not want and she grows uneasy, changes the subject, and in the end leaves. Easing off brings her back.</li>
-              <li>A class she has to get to pulls her away too.</li>
-              <li>Give a gift from the Bag button in a scene. She reacts on the spot, and a gift she loves or hates tells you something about her.</li>
+              <li>{t('shell.help.readingEnd')}</li>
+              <li>{t('shell.help.readingPress')}</li>
+              <li>{t('shell.help.readingClass')}</li>
+              <li>{t('shell.help.readingGift')}</li>
             </ul>
-            <h2>Between scenes</h2>
+            <h2>{t('shell.help.betweenHeading')}</h2>
             <ul>
-              <li>Message anyone whose Bloomr you have from the phone. She answers when she is free, and may write to you first.</li>
-              <li>Invitations arrive as messages: accept one and it is on your calendar.</li>
-              <li>What she posts on her feed is hers to mention, and yours to like.</li>
+              <li>{t('shell.help.betweenMessage')}</li>
+              <li>{t('shell.help.betweenInvites')}</li>
+              <li>{t('shell.help.betweenFeed')}</li>
             </ul>
           </div>
         )}
 
         {tab === 'Stats and study' && (
           <div className="help-page sheet">
-            <h2>Stats</h2>
+            <h2>{t('shell.help.statsHeading')}</h2>
             <ul>
-              <li>Six stats: strength, dexterity, endurance, intelligence, charisma, wisdom. 10 is ordinary; the cap is 30.</li>
-              <li>They rise through work on them: classes, the Stats option on the day screen, and shifts at a job that builds one.</li>
-              <li>A day&apos;s work on one stat counts less after the first few points, so stats are built over weeks. They never fall.</li>
+              <li>{t('shell.help.statsSix')}</li>
+              <li>{t('shell.help.statsRise')}</li>
+              <li>{t('shell.help.statsSlow')}</li>
             </ul>
             <Table
-              head={['What stats do', 'How']}
+              head={[t('shell.help.statsDo'), t('shell.help.statsHow')]}
               rows={[
-                ['Jobs', 'Better jobs require higher stats, and pay a bonus for every point over the requirement.'],
-                ['Appeal', 'Each woman admires up to three stats. The higher yours are, the faster her affection grows.'],
-                ['Study', 'Studying in your room earns more; a study at home adds to it.']
+                [t('shell.help.statsJobs'), t('shell.help.statsJobsHow')],
+                [t('shell.help.statsAppeal'), t('shell.help.statsAppealHow')],
+                [t('shell.help.statsStudy'), t('shell.help.statsStudyHow')]
               ]}
             />
-            <h2>Courses</h2>
+            <h2>{t('shell.help.coursesHeading')}</h2>
             <ul>
-              <li>Every class has one or two women you can know in it, counting the teacher: sitting it is a scene with them.</li>
-              <li>Each course has 100 points to earn over the term: attending class earns most, studying earns the rest.</li>
-              <li>Midterms and finals replace a class in their week, and ask about the classes you sat.</li>
-              <li>80% of the marks is a B and 60% a C. Every answer right lifts either by a letter. Under 60%, or not turning up, is an F.</li>
+              <li>{t('shell.help.coursesClass')}</li>
+              <li>{t('shell.help.coursesPoints')}</li>
+              <li>{t('shell.help.coursesExams')}</li>
+              <li>{t('shell.help.coursesGrades')}</li>
             </ul>
             {content.societies && (
               <>
-                <h2>Societies</h2>
+                <h2>{t('shell.help.societiesHeading')}</h2>
                 <ul>
                   <li>
-                    Student clubs, each meeting for {content.societies.hours === 1 ? 'an hour' : `${content.societies.hours} hours`} once a week after classes. They open at{' '}
-                    {content.calendar.events.find((event) => event.id === content.societies!.fairId)?.name ?? 'their fair'}; join or leave them on the phone after that.
+                    {t('shell.help.societiesMeet', {
+                      hours: content.societies.hours,
+                      fair: content.calendar.events.find((event) => event.id === content.societies!.fairId)?.name ?? t('shell.help.societiesTheirFair')
+                    })}
                   </li>
-                  <li>You can belong to {content.societies.maxJoined} at a time, and not two that meet at the same hour. A meeting can clash with a shift.</li>
-                  {content.societies.fair && (
-                    <li>At the fair, every student is at one of her society's tables. Saying hello costs nothing and counts as meeting her; stopping to talk takes an hour. Each table gives something away the first time you stop.</li>
-                  )}
-                  <li>A meeting is a scene with the students in it, and trains what the society is about, like a short class with no marks.</li>
+                  <li>{t('shell.help.societiesMost', { most: content.societies.maxJoined })}</li>
+                  {content.societies.fair && <li>{t('shell.help.societiesFair')}</li>}
+                  <li>{t('shell.help.societiesScene')}</li>
                 </ul>
               </>
             )}
             {content.skills.length > 0 && (
               <>
-                <h2>Skills</h2>
+                <h2>{t('shell.help.skillsHeading')}</h2>
                 <ul>
-                  <li>Every course teaches one thing once you have enough marks in it, for as long as you stay enrolled.</li>
-                  <li>Some let you see something about a woman. Some change a number for good: wages, rent, how fast trust grows.</li>
-                  <li>Some let you make or set off something, then wait days to do it again. Find those in your Bag, on the day screen or behind the Bag button in a scene.</li>
-                  <li>What you brew is an item: drink it yourself, or use it on the woman you are with. The Bag shows what is in effect and for how long.</li>
+                  <li>{t('shell.help.skillsTaught')}</li>
+                  <li>{t('shell.help.skillsKinds')}</li>
+                  <li>{t('shell.help.skillsAbilities')}</li>
+                  <li>{t('shell.help.skillsBrews')}</li>
                 </ul>
                 <Table
-                  head={['Skill', 'Taught by', 'At', 'What it does']}
+                  head={[t('shell.help.skillsSkill'), t('shell.help.skillsBy'), t('shell.help.skillsAt'), t('shell.help.skillsDoes')]}
                   rows={content.skills.flatMap((skill) => {
-                    const course = state.courses.find((one) => one.id === skill.courseId)?.title ?? skill.code
-                    const first = [skill.name, course, `${skill.at} marks`, skill.description]
-                    return skill.upgrade ? [first, [`${skill.name} II`, course, `${skill.upgrade.at} marks`, skill.upgrade.description]] : [first]
+                    const course = state.courses.find((one) => courseOf(one) === skill.courseId)?.title ?? skill.code
+                    const first = [skill.name, course, t('shell.help.marks', { n: skill.at }), skill.description]
+                    return skill.upgrade ? [first, [t('shell.common.skillTwo', { name: skill.name }), course, t('shell.help.marks', { n: skill.upgrade.at }), skill.upgrade.description]] : [first]
                   })}
                 />
               </>
@@ -213,172 +227,193 @@ export function HelpPanel({ content, state, tab: opening = 'Basics', onClose }: 
 
         {tab === 'The Undercroft' && !below && (
           <div className="help-page sheet">
-            <p className="hint">There is nothing under the University in this game.</p>
+            <p className="hint">{t('shell.help.belowNone')}</p>
           </div>
         )}
         {tab === 'The Undercroft' && below && (
           <div className="help-page sheet">
-            <h2>Getting in</h2>
+            <h2>{t('shell.help.belowInHeading')}</h2>
             <ul>
-              <li>From day {below.opensOnDay} someone asks to meet you at {content.locations.find((l) => l.id === below.entryLocationId)?.name}. It cannot be put off: once it is next on your day, it is all there is to do.</li>
-              <li>After that meeting, <strong>Go down</strong> is offered there. A run takes {below.hours} hours of your day, however it ends.</li>
-              <li>Pick a depth you have opened and up to {below.partySize} women. She must have met you, trust you ({below.trustNeeded}), be free for those hours, and not be about to give birth.</li>
+              <li>{t('shell.help.belowFromDay', { day: below.opensOnDay, place: content.locations.find((l) => l.id === below.entryLocationId)?.name ?? '' })}</li>
+              <li>
+                {t('shell.help.belowGoDownBefore')}
+                <strong>{t('shell.help.belowGoDown')}</strong>
+                {t('shell.help.belowGoDownAfter', { hours: below.hours })}
+              </li>
+              <li>{t('shell.help.belowParty', { most: below.partySize, trust: below.trustNeeded })}</li>
             </ul>
 
-            <h2>A run</h2>
+            <h2>{t('shell.help.runHeading')}</h2>
             <Table
-              head={['Stop', 'What happens']}
+              head={[t('shell.help.runStop'), t('shell.help.runHappens')]}
               rows={[
-                ['Fight', 'Beat what is there to pick up what it was guarding.'],
-                ['Find', 'Something lying about: picked up as you pass.'],
-                ['Checkpoint', `What you have found so far is made safe, and everyone gets back ${Math.round(below.checkpointRest * 100)}% of their footing.`],
-                ['Guardian', 'The last fight. Win it and you set the anchor.']
+                [t('shell.help.runFight'), t('shell.help.runFightDoes')],
+                [t('shell.help.runFind'), t('shell.help.runFindDoes')],
+                [t('shell.help.runCheckpoint'), t('shell.help.runCheckpointDoes', { n: Math.round(below.checkpointRest * 100) })],
+                [t('shell.help.runGuardian'), t('shell.help.runGuardianDoes')]
               ]}
             />
             <ul>
-              <li>Setting an anchor for the first time gives you its relic and opens the next depth. There are {below.depths.length}.</li>
-              <li>Turning back keeps only what was made safe at a checkpoint.</li>
-              <li>Losing keeps the same, leaves you with no energy for the day, and costs the trust of whoever went down.</li>
-              <li>Whoever came remembers it, and a win raises her trust.</li>
+              <li>{t('shell.help.runAnchor', { n: below.depths.length })}</li>
+              <li>{t('shell.help.runTurnBack')}</li>
+              <li>{t('shell.help.runLose')}</li>
+              <li>{t('shell.help.runRemember')}</li>
             </ul>
 
-            <h2>A fight</h2>
+            <h2>{t('shell.help.fightHeading')}</h2>
             <ul>
-              <li>You act first, then each woman, then the enemies. Without the right course, they get a free blow about half the time as a fight begins.</li>
-              <li>Footing is health. At none she is down until the fight is over.</li>
-              <li>A ward shows as a blue band on everyone's footing: it takes the next hits meant for any of you.</li>
-              <li>The blue bar under your footing is energy, the same energy as above ground.</li>
-              <li>Her affection makes her strike true more often, for half as much again.</li>
+              <li>{t('shell.help.fightOrder')}</li>
+              <li>{t('shell.help.fightFooting')}</li>
+              <li>{t('shell.help.fightWard')}</li>
+              <li>{t('shell.help.fightEnergy')}</li>
+              <li>{t('shell.help.fightAffection')}</li>
             </ul>
             <Table
-              head={['On your turn', 'What it does']}
+              head={[t('shell.help.turnHeading'), t('shell.help.turnDoes')]}
               rows={[
-                ['Attack', 'Hits one enemy. Stronger with strength.'],
-                ['Protect', 'The next hit meant for her lands on you, and less of it for your endurance.'],
-                ['Empower', `Her next action is about ${Math.round((below.anchorPower - 1) * 100)}% stronger, more with wisdom. ${below.anchorEnergy} energy.`],
-                ['Ground', `Takes ${below.grounds} off a pregnant woman's surge. ${below.groundEnergy} energy.`],
-                ['An item', 'Something from your bag that works below.']
+                [t('shell.help.turnAttack'), t('shell.help.turnAttackDoes')],
+                [t('shell.help.turnProtect'), t('shell.help.turnProtectDoes')],
+                [t('shell.help.turnEmpower'), t('shell.help.turnEmpowerDoes', { n: Math.round((below.anchorPower - 1) * 100), energy: below.anchorEnergy })],
+                [t('shell.help.turnGround'), t('shell.help.turnGroundDoes', { n: below.grounds, energy: below.groundEnergy })],
+                [t('shell.help.turnItem'), t('shell.help.turnItemDoes')]
               ]}
             />
             <Table
-              head={['Role', 'Footing', 'Action', 'What it does']}
+              head={[t('shell.help.roleRole'), t('shell.help.roleFooting'), t('shell.help.roleAction'), t('shell.help.roleDoes')]}
               rows={below.roles.flatMap((role) => role.actions.map((action, index) => [index === 0 ? role.name : '', index === 0 ? role.footing : '', action.name, describeAction(action)]))}
             />
 
-            <h2>Pregnancy</h2>
+            <h2>{t('shell.help.pregnancyHeading')}</h2>
             <ul>
-              <li>A woman who is carrying does more: {Object.entries(below.pregnancyPower).map(([stage, power]) => `x${power} ${content.pregnancy?.stages.find((one) => one.id === stage)?.name.toLowerCase() ?? stage}`).join(', ')}.</li>
-              <li>Each thing she does adds to her surge, the orange bar under her footing. At {below.surgeLimit} it breaks loose: {below.misfire} from everyone, through any ward.</li>
-              <li>Ground her, or use something that clears a surge, before it fills. Defending and taunting add nothing to it.</li>
+              <li>
+                {t('shell.help.pregnancyPower', {
+                  list: Object.entries(below.pregnancyPower)
+                    .map(([stage, power]) => t('shell.help.pregnancyPowerEach', { power, stage: content.pregnancy?.stages.find((one) => one.id === stage)?.name.toLowerCase() ?? stage }))
+                    .join(', ')
+                })}
+              </li>
+              <li>{t('shell.help.pregnancySurge', { limit: below.surgeLimit, misfire: below.misfire })}</li>
+              <li>{t('shell.help.pregnancyGround')}</li>
             </ul>
 
-            <h2>What you meet</h2>
+            <h2>{t('shell.help.meetHeading')}</h2>
             <Table
-              head={['Marked', 'Meaning']}
+              head={[t('shell.help.meetMarked'), t('shell.help.meetMeaning')]}
               rows={[
-                ['Sweeps', 'It hits all of you at once, for less each.'],
-                ['Hexes', 'Its hit leaves her doing less for a couple of rounds.'],
-                ['Faltering', 'Weakened by a hexer: it hits less hard for now.'],
-                ['Weak to', 'One role does half as much again to it. Shown only with the right course.']
+                [t('shell.help.meetSweeps'), t('shell.help.meetSweepsMeans')],
+                [t('shell.help.meetHexes'), t('shell.help.meetHexesMeans')],
+                [t('shell.help.meetFaltering'), t('shell.help.meetFalteringMeans')],
+                [t('shell.help.meetWeak'), t('shell.help.meetWeakMeans')]
               ]}
             />
 
-            <h2>What you bring up</h2>
+            <h2>{t('shell.help.upHeading')}</h2>
             <ul>
-              <li>Relics are kept for good and are listed in your Bag. Each changes a number of the game, as a course skill does.</li>
-              <li>Money, and things to use in a fight, are yours once made safe.</li>
+              <li>{t('shell.help.upRelics')}</li>
+              <li>{t('shell.help.upMoney')}</li>
             </ul>
-            <Table head={['Depth', 'Relic', 'What it does']} rows={below.depths.map((depth, index) => [`${index + 1}. ${depth.name}`, depth.relic.name, depth.relic.description])} />
             <Table
-              head={['Item', 'In a fight']}
-              rows={content.items.filter((item) => item.below).map((item) => [item.name, [item.below!.footing > 0 && `+${item.below!.footing} footing`, item.below!.calms && 'clears a surge'].filter(Boolean).join(', ')])}
+              head={[t('shell.help.upDepth'), t('shell.help.upRelic'), t('shell.help.upDoes')]}
+              rows={below.depths.map((depth, index) => [t('shell.help.upDepthRow', { n: index + 1, name: depth.name }), depth.relic.name, depth.relic.description])}
+            />
+            <Table
+              head={[t('shell.help.upItem'), t('shell.help.upInFight')]}
+              rows={content.items
+                .filter((item) => item.below)
+                .map((item) => [item.name, [item.below!.footing > 0 && t('shell.help.upFooting', { n: item.below!.footing }), item.below!.calms && t('shell.help.upCalms')].filter(Boolean).join(', ')])}
             />
 
-            <h2>Courses that help below</h2>
+            <h2>{t('shell.help.coursesBelowHeading')}</h2>
             <Table
-              head={['Course', 'Below']}
-              rows={content.skills.filter((skill) => skill.below).map((skill) => [state.courses.find((course) => course.id === skill.courseId)?.title ?? skill.code, BELOW[skill.below!.kind] ?? skill.below!.kind])}
+              head={[t('shell.help.coursesBelowCourse'), t('shell.help.coursesBelowBelow')]}
+              rows={content.skills
+                .filter((skill) => skill.below)
+                .map((skill) => {
+                  const kind = BELOW[skill.below!.kind]
+                  return [state.courses.find((course) => courseOf(course) === skill.courseId)?.title ?? skill.code, kind ? t(kind) : skill.below!.kind]
+                })}
             />
           </div>
         )}
 
         {tab === 'Relationships' && (
           <div className="help-page sheet">
-            <h2>Her three feelings</h2>
+            <h2>{t('shell.help.feelingsHeading')}</h2>
             <Table
-              head={['Feeling', 'What it is for']}
+              head={[t('shell.help.feelingsFeeling'), t('shell.help.feelingsFor')]}
               rows={[
-                ['Affection', 'Sets the stage of the relationship.'],
-                ['Trust', 'What she will tell you and agree to.'],
-                ['Desire', 'Whether she will go to bed with you.']
+                [t('shell.help.feelingsAffection'), t('shell.help.feelingsAffectionFor')],
+                [t('shell.help.feelingsTrust'), t('shell.help.feelingsTrustFor')],
+                [t('shell.help.feelingsDesire'), t('shell.help.feelingsDesireFor')]
               ]}
             />
             <ul>
-              <li>Each runs from 0 to {max}. They change only when a scene ends, by up to 10 either way, as she judges the scene. Gifts also raise affection.</li>
+              <li>{t('shell.help.feelingsRange', { max })}</li>
             </ul>
-            <h2>Stages</h2>
-            <Table head={['Stage', 'Affection']} rows={relationships.stages.map((stage) => [stage.name, `${stage.minAffection}+`])} />
-            <h2>What you agree to be</h2>
+            <h2>{t('shell.help.stagesHeading')}</h2>
             <Table
-              head={['Arrangement', 'Needs', 'What it is']}
-              rows={relationships.statuses.map((status) => [status.name, relationships.stages.find((stage) => stage.id === status.minStage)?.name ?? 'Any stage', status.description])}
+              head={[t('shell.help.stagesStage'), t('shell.help.stagesAffection')]}
+              rows={relationships.stages.map((stage) => [stage.name, t('shell.help.stagesFrom', { n: stage.minAffection })])}
+            />
+            <h2>{t('shell.help.bondsHeading')}</h2>
+            <Table
+              head={[t('shell.help.bondsArrangement'), t('shell.help.bondsNeeds'), t('shell.help.bondsIs')]}
+              rows={relationships.statuses.map((status) => [
+                status.name,
+                relationships.stages.find((stage) => stage.id === status.minStage)?.name ?? t('shell.help.bondsAnyStage'),
+                status.description
+              ])}
             />
             <ul>
-              <li>She asks, or you raise it in a scene; you accept or decline.</li>
-              <li>A woman with a claim on you may turn up in the middle of a scene with someone else. Jealous women do it more.</li>
+              <li>{t('shell.help.bondsAsk')}</li>
+              <li>{t('shell.help.bondsJealous')}</li>
             </ul>
-            <h2>Memories</h2>
+            <h2>{t('shell.help.memoriesHeading')}</h2>
             <ul>
-              <li>She keeps one short memory of each scene, rated {Object.values(MEMORY_LEVEL_LABELS).join(', ')}. You can edit both on the summary screen.</li>
-              <li>In a scene she recalls at most eight: the most important first, then the most recent.</li>
+              <li>{t('shell.help.memoriesOne', { levels: Object.values(MEMORY_LEVEL_LABELS).join(', ') })}</li>
+              <li>{t('shell.help.memoriesRecall')}</li>
             </ul>
           </div>
         )}
 
         {tab === 'Sex and pregnancy' && (
           <div className="help-page sheet">
-            <h2>When she will</h2>
+            <h2>{t('shell.help.willHeading')}</h2>
             <Table
-              head={['Her nature', 'What it takes']}
+              head={[t('shell.help.willNature'), t('shell.help.willTakes')]}
               rows={[
-                [`Easy (${names(rules.easyTraitIds)})`, 'Nothing: she may on the day you meet.'],
-                ['Most women', `Not the day you meet, and desire of ${rules.minDesire} or more.`],
-                [`Reluctant (${names(rules.reluctantTraitIds)})`, `Not the day you meet, and desire of ${rules.reluctantMinDesire} or more.`]
+                [t('shell.help.willEasy', { traits: names(rules.easyTraitIds) }), t('shell.help.willEasyTakes')],
+                [t('shell.help.willMost'), t('shell.help.willDesire', { n: rules.minDesire })],
+                [t('shell.help.willReluctant', { traits: names(rules.reluctantTraitIds) }), t('shell.help.willDesire', { n: rules.reluctantMinDesire })]
               ]}
             />
             <ul>
-              <li>It is settled when the scene starts. A scene that begins too early stays that way however well it goes.</li>
-              <li>With the right skill, her profile on the phone shows how much desire is still needed.</li>
+              <li>{t('shell.help.willSettled')}</li>
+              <li>{t('shell.help.willSkill')}</li>
             </ul>
             {pregnancy && (
               <>
-                <h2>Conceiving</h2>
+                <h2>{t('shell.help.conceiveHeading')}</h2>
                 <Table
-                  head={['She is', 'Chance each day you finish inside her']}
+                  head={[t('shell.help.conceiveShe'), t('shell.help.conceiveChance')]}
                   rows={[
-                    ['Off birth control', percent(pregnancy.chance)],
-                    ['On birth control', percent(pregnancy.birthControlChance)],
-                    [`On her period (${pregnancy.periodDays} days in every ${pregnancy.cycleDays})`, 'None'],
-                    ['Already pregnant, or just delivered', 'None']
+                    [t('shell.help.conceiveOff'), percent(pregnancy.chance)],
+                    [t('shell.help.conceiveOn'), percent(pregnancy.birthControlChance)],
+                    [t('shell.help.conceivePeriod', { days: pregnancy.periodDays, cycle: pregnancy.cycleDays }), t('shell.help.conceiveNone')],
+                    [t('shell.help.conceivePregnant'), t('shell.help.conceiveNone')]
                   ]}
                 />
                 <ul>
-                  <li>Most women start on birth control. She stops when she chooses to: ask her in a scene, or she may decide it herself.</li>
-                  <li>With the right skills, her profile shows whether she is on it, and when she is on her period. See Stats and study.</li>
-                  <li>
-                    A pregnancy lasts {pregnancy.lengthDays} days. She cannot conceive again for {pregnancy.recoveryDays} days after a birth.
-                  </li>
-                  <li>
-                    About {Math.round(pregnancy.daughterChance * 8)} children in 8 are daughters.
-                  </li>
+                  <li>{t('shell.help.conceiveStart')}</li>
+                  <li>{t('shell.help.conceiveSkills')}</li>
+                  <li>{t('shell.help.conceiveLength', { days: pregnancy.lengthDays, recovery: pregnancy.recoveryDays })}</li>
+                  <li>{t('shell.help.conceiveDaughters', { n: Math.round(pregnancy.daughterChance * 8) })}</li>
                 </ul>
-                <h2>The birth</h2>
+                <h2>{t('shell.help.birthHeading')}</h2>
                 <ul>
-                  <li>
-                    {pregnancy.birthNoticeDays} days before she is due, the hour is set, it goes on your calendar and she messages you. It cannot be moved.
-                  </li>
-                  <li>Be there: the birth is a scene, she suggests a name, and you may choose another.</li>
-                  <li>Miss it: the child is born anyway, she names it, and she takes a heavy and lasting loss of affection, trust and desire.</li>
+                  <li>{t('shell.help.birthNotice', { days: pregnancy.birthNoticeDays })}</li>
+                  <li>{t('shell.help.birthThere')}</li>
+                  <li>{t('shell.help.birthMiss')}</li>
                 </ul>
               </>
             )}
@@ -389,54 +424,67 @@ export function HelpPanel({ content, state, tab: opening = 'Basics', onClose }: 
           <div className="help-page sheet">
             {housing ? (
               <>
-                <h2>Getting the house</h2>
+                <h2>{t('shell.help.houseHeading')}</h2>
                 <ul>
-                  <li>Once a woman you have an arrangement with is carrying your child, the Sire Relations Office messages you an offer.</li>
-                  <li>Accept, and the housing officer sets an hour to show you round. It goes on your calendar; if you miss it she sets another.</li>
-                  <li>The house is yours once you have been shown it. It replaces your room in the Halls, and a live-in nanny comes with it.</li>
+                  <li>{t('shell.help.houseOffer')}</li>
+                  <li>{t('shell.help.houseViewing')}</li>
+                  <li>{t('shell.help.houseYours')}</li>
                 </ul>
-                <h2>What it costs</h2>
+                <h2>{t('shell.help.costHeading')}</h2>
                 <Table
-                  head={['Cost', 'Amount', 'When']}
+                  head={[t('shell.help.costCost'), t('shell.help.costAmount'), t('shell.help.costWhen')]}
                   rows={[
-                    ['Rent', `$${housing.rent}, less $${housing.rentRelief.perChild} a child, to no less than $${Math.min(housing.rent, housing.rentRelief.floor)}`, 'The 1st of each month'],
-                    ['Each child in the house', `$${housing.babies.weeklyCost}`, 'The first day of each week'],
-                    ['Rooms and upgrades', `$${Math.min(...housing.rooms.filter((room) => room.cost > 0).map((room) => room.cost))} to $${Math.max(...housing.rooms.flatMap((room) => [room.cost, ...room.tiers.map((tier) => tier.cost)]))} each`, 'When you build']
+                    [
+                      t('shell.help.costRent'),
+                      t('shell.help.costRentAmount', { rent: housing.rent, perChild: housing.rentRelief.perChild, floor: Math.min(housing.rent, housing.rentRelief.floor) }),
+                      t('shell.help.costRentWhen')
+                    ],
+                    [t('shell.help.costChild'), t('shell.help.costChildAmount', { n: housing.babies.weeklyCost }), t('shell.help.costChildWhen')],
+                    [
+                      t('shell.help.costRooms'),
+                      t('shell.help.costRoomsAmount', {
+                        min: Math.min(...housing.rooms.filter((room) => room.cost > 0).map((room) => room.cost)),
+                        max: Math.max(...housing.rooms.flatMap((room) => [room.cost, ...room.tiers.map((tier) => tier.cost)]))
+                      }),
+                      t('shell.help.costRoomsWhen')
+                    ]
                   ]}
                 />
                 <ul>
-                  <li>
-                    Rent unpaid for {housing.graceDays} days loses the house for good: everyone goes home and the children go to the creche.
-                  </li>
+                  <li>{t('shell.help.costGrace', { days: housing.graceDays })}</li>
                 </ul>
-                <h2>Rooms</h2>
+                <h2>{t('shell.help.roomsHeading')}</h2>
                 <Table
-                  head={['A room adds', 'What it is for']}
+                  head={[t('shell.help.roomsAdds'), t('shell.help.roomsFor')]}
                   rows={[
-                    ['Beds', 'Each bed lets one woman move in.'],
-                    ['Cots', 'Each cot lets one child live at home.'],
-                    ['Comfort', 'Sets how well children can do.'],
-                    ['Study', 'Adds to what studying at home earns.']
+                    [t('shell.help.roomsBeds'), t('shell.help.roomsBedsFor')],
+                    [t('shell.help.roomsCots'), t('shell.help.roomsCotsFor')],
+                    [t('shell.help.roomsComfort'), t('shell.help.roomsComfortFor')],
+                    [t('shell.help.roomsStudy'), t('shell.help.roomsStudyFor')]
                   ]}
                 />
-                <h2>Who can move in</h2>
+                <h2>{t('shell.help.moveHeading')}</h2>
                 <ul>
-                  <li>
-                    A woman who is carrying your child or has borne one, has an arrangement with you, and has affection of {housing.invite.minAffection} or more. Pick a bedroom in the house and offer it to her.
-                  </li>
-                  <li>Asked to leave, she does not forgive it and does not come back.</li>
+                  <li>{t('shell.help.moveWho', { n: housing.invite.minAffection })}</li>
+                  <li>{t('shell.help.moveLeave')}</li>
                 </ul>
-                <h2>Children</h2>
-                <Table head={['Health', 'Level']} rows={housing.babies.levels.map((level, i) => [level.name, i === 0 ? 'Lowest: she leaves with the child' : i === housing.babies.startLevel ? 'Where a child starts' : ''])} />
+                <h2>{t('shell.help.childrenHeading')}</h2>
+                <Table
+                  head={[t('shell.help.childrenHealth'), t('shell.help.childrenLevel')]}
+                  rows={housing.babies.levels.map((level, i) => [
+                    level.name,
+                    i === 0 ? t('shell.help.childrenLowest') : i === housing.babies.startLevel ? t('shell.help.childrenStart') : ''
+                  ])}
+                />
                 <ul>
-                  <li>A child lives at home when its mother does and a cot is free. Otherwise it is at the creche, which costs nothing.</li>
-                  <li>A week paid for: the child goes up a level, as far as the house&apos;s comfort allows.</li>
-                  <li>A week not paid for: it drops a level and its mother thinks less of you.</li>
-                  <li>No child is ever lost.</li>
+                  <li>{t('shell.help.childrenHome')}</li>
+                  <li>{t('shell.help.childrenPaid')}</li>
+                  <li>{t('shell.help.childrenUnpaid')}</li>
+                  <li>{t('shell.help.childrenLost')}</li>
                 </ul>
               </>
             ) : (
-              <p>This game has no housing.</p>
+              <p>{t('shell.help.noHousing')}</p>
             )}
           </div>
         )}
@@ -445,36 +493,42 @@ export function HelpPanel({ content, state, tab: opening = 'Basics', onClose }: 
           <div className="help-page sheet">
             {jobs ? (
               <>
-                <h2>Jobs</h2>
+                <h2>{t('shell.help.jobsHeading')}</h2>
                 <ul>
-                  <li>The Jobs board is on the phone. You hold one job at a time, and are taken on at once if you meet its requirements.</li>
-                  <li>A shift is a scene at the workplace. It costs {jobs.energyPerHour} energy an hour and pays when it ends.</li>
-                  <li>A job you quit or lose will not take you back.</li>
+                  <li>{t('shell.help.jobsBoard')}</li>
+                  <li>{t('shell.help.jobsShift', { energy: jobs.energyPerHour })}</li>
+                  <li>{t('shell.help.jobsQuit')}</li>
                 </ul>
                 <Table
-                  head={['Rule', 'How it works']}
+                  head={[t('shell.help.jobsRule'), t('shell.help.jobsHow')]}
                   rows={[
-                    ['Stat bonus', `+${percent(jobs.bonusPerPoint)} pay for each point over a job's requirements, up to +${percent(jobs.bonusCap)}. Jobs with no requirements pay no bonus.`],
-                    ['Missed shift', `${jobs.missedStrike} strike, or ${jobs.excusedStrike} if you messaged your boss that day beforehand.`],
-                    ['Losing the job', `${jobs.strikes} strikes.`]
+                    [t('shell.help.jobsBonus'), t('shell.help.jobsBonusHow', { bonus: percent(jobs.bonusPerPoint), cap: percent(jobs.bonusCap) })],
+                    [t('shell.help.jobsMissed'), t('shell.help.jobsMissedHow', { strike: jobs.missedStrike, excused: jobs.excusedStrike })],
+                    [t('shell.help.jobsLose'), t('shell.help.jobsLoseHow', { strikes: jobs.strikes })]
                   ]}
                 />
               </>
             ) : (
-              <p>This game has no jobs.</p>
+              <p>{t('shell.help.noJobs')}</p>
             )}
-            <h2>Spending</h2>
+            <h2>{t('shell.help.spendingHeading')}</h2>
             <ul>
-              <li>Gifts from the market and shops change affection: up for something she likes, more for something she loves, down for something she dislikes.</li>
-              <li>What you spend during a scene is settled when it ends.</li>
-              {housing && <li>The house is the main thing to save for: rent, the children&apos;s keep, and every room.</li>}
+              <li>{t('shell.help.spendingGifts')}</li>
+              <li>{t('shell.help.spendingScene')}</li>
+              {housing && <li>{t('shell.help.spendingHouse')}</li>}
             </ul>
             {content.poker && (
               <>
-                <h2>Cards</h2>
+                <h2>{t('shell.help.cardsHeading')}</h2>
                 <ul>
                   <li>
-                    {content.poker.name} at {content.locations.find((l) => l.id === content.poker!.locationId)?.name}: Texas hold&apos;em with whoever is there, ${content.poker.smallBlind}/${content.poker.bigBlind}, and no more than ${content.poker.handCap} in a hand.
+                    {t('shell.help.cardsTable', {
+                      name: content.poker.name,
+                      place: content.locations.find((l) => l.id === content.poker!.locationId)?.name ?? '',
+                      small: content.poker.smallBlind,
+                      big: content.poker.bigBlind,
+                      cap: content.poker.handCap
+                    })}
                   </li>
                 </ul>
               </>

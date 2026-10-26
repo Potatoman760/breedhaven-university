@@ -1,3 +1,5 @@
+import { t } from '../i18n'
+
 // Enough for anything a scene could want, and small enough that a bad request can't run away.
 const MAX_DICE = 20
 const MAX_SIDES = 1000
@@ -23,12 +25,12 @@ function between(min: number, max: number, random: () => number): number {
  */
 export function rollDice(notation: string, random: () => number = Math.random): Roll {
   const match = /^\s*(\d*)\s*d\s*(\d+|%)\s*(?:([+-])\s*(\d+))?\s*$/i.exec(notation)
-  if (!match) throw new Error(`"${notation}" is not dice. Write it like d6, 2d6, d20+5 or d100.`)
+  if (!match) throw new Error(t('game.dice.notDice', { notation }))
   const count = match[1] === '' ? 1 : Number(match[1])
   const sides = match[2] === '%' ? 100 : Number(match[2])
   const modifier = match[3] ? Number(match[4]) * (match[3] === '-' ? -1 : 1) : 0
-  if (count < 1 || count > MAX_DICE) throw new Error(`Roll between 1 and ${MAX_DICE} dice at a time.`)
-  if (sides < 2 || sides > MAX_SIDES) throw new Error(`A die has between 2 and ${MAX_SIDES} sides.`)
+  if (count < 1 || count > MAX_DICE) throw new Error(t('game.dice.tooMany', { max: MAX_DICE }))
+  if (sides < 2 || sides > MAX_SIDES) throw new Error(t('game.dice.sides', { max: MAX_SIDES }))
 
   const rolls = Array.from({ length: count }, () => between(1, sides, random))
   const sign = modifier === 0 ? '' : modifier > 0 ? `+${modifier}` : `${modifier}`
@@ -42,10 +44,10 @@ export function rollDice(notation: string, random: () => number = Math.random): 
 
 /** Picks a whole number in a range, both ends included. The ends may be given either way round. */
 export function rollRange(a: number, b: number, random: () => number = Math.random): Roll {
-  if (!Number.isFinite(a) || !Number.isFinite(b)) throw new Error('A range needs two numbers, like 30 and 100.')
+  if (!Number.isFinite(a) || !Number.isFinite(b)) throw new Error(t('game.dice.range'))
   const min = Math.ceil(Math.min(a, b))
   const max = Math.floor(Math.max(a, b))
-  if (min > max) throw new Error('There is no whole number in that range.')
+  if (min > max) throw new Error(t('game.dice.emptyRange'))
   const total = between(min, max, random)
   return { label: `${min}-${max}`, rolls: [total], modifier: 0, total }
 }

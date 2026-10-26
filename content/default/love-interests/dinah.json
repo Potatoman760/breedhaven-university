@@ -299,7 +299,7 @@
   "schedule": [
     {
       "weekdays": [
-        "Windsday"
+        "Thursday"
       ],
       "periods": [
         "afternoon"
@@ -330,7 +330,9 @@
     "name": "a small flat beside the Furrow Chapel",
     "description": "A small, quiet one-room flat with pale plastered walls and a tall narrow window. A single bed made with white linen without a crease, a shelf of worn theology books, a simple desk with a tablet on a stand and a softly glowing golden crystal lamp, one lit candle in a holder, bunches of dried flowers on the windowsill, a small embroidered wall hanging of a furrowed field. Soft, still, golden light.",
     "locationId": "chapel",
-    "background": "generated/backgrounds/dinah/view.webp"
+    "images": {
+      "day": "generated/backgrounds/dinah/view.webp"
+    }
   },
   "birthPicture": "sprites/dinah/birth-2.webp",
   "walkSprite": "sprites/dinah/walk-cutout.webp",

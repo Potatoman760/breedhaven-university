@@ -130,6 +130,8 @@ export const SceneSchema = z.object({
   messages: z.array(ChatMessageSchema),
   /** Gifts handed over during the scene, in order. */
   gifts: z.array(SceneGiftSchema),
+  /** Those in it he had never met when it began or she walked into it, by id: shown as "???" until her name is said in it. */
+  strangers: z.array(z.string()).optional(),
   /** The lead is masked at a ball: in this mask, and named for it until he has named her (`revealed`). */
   mask: z.object({ maskId: z.string(), revealed: z.boolean().default(false) }).optional(),
   /** One of the dances at a masked ball: when it is over, the next comes, or the guess. */

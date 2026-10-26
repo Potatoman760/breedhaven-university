@@ -7,6 +7,7 @@ import { Button } from '../Button'
 import { Lightbox } from '../Lightbox'
 import { Group, List } from './fields'
 import { EmptySlot, PictureSlot, SlotGrid } from './slots'
+import { t } from '../../../../shared/i18n'
 
 interface Props {
   draft: LoveInterest
@@ -34,49 +35,49 @@ export function FamilyTab({ draft, set }: Props) {
   return (
     <>
       {birthing && <ArtTool target={{ kind: 'birth', who: draft, onUse: (birthPicture) => set({ birthPicture }) }} onClose={() => setBirthing(false)} />}
-      {birthViewing && draft.birthPicture && <Lightbox image={draft.birthPicture} name="Birth" onClose={() => setBirthViewing(false)} />}
-      {!ready && <p className="notice">Give the character an id before adding pictures: they are filed under it.</p>}
+      {birthViewing && draft.birthPicture && <Lightbox image={draft.birthPicture} name={t('editor.family.birth')} onClose={() => setBirthViewing(false)} />}
+      {!ready && <p className="notice">{t('editor.common.idFirst')}</p>}
       {notice && <p className="notice">{notice}</p>}
 
       {/* The picture of her with a newborn: the whole stage of the scene of a birth he is there for. */}
       <Group
-        title="Birth"
-        hint="One picture of her just after giving birth: sitting up in a hospital bed in a gown, with the child in her arms. When he is there for the birth of a child of hers, the scene is set in it. Without one, the Health Center's maternity room is shown."
+        title={t('editor.family.birth')}
+        hint={t('editor.family.birthHint')}
       >
         <SlotGrid wide>
           {draft.birthPicture ? (
             <PictureSlot
               image={draft.birthPicture}
-              name="Birth"
+              name={t('editor.family.birth')}
               onView={() => setBirthViewing(true)}
               actions={
                 <>
                   <Button disabled={!ready} onClick={pick}>
-                    Replace
+                    {t('editor.common.replace')}
                   </Button>
-                  <Button disabled={!ready} title="Draw it again with ComfyUI" onClick={() => setBirthing(true)}>
-                    Generate
+                  <Button disabled={!ready} title={t('editor.common.drawAgain')} onClick={() => setBirthing(true)}>
+                    {t('editor.common.generate')}
                   </Button>
-                  <Button onClick={() => set({ birthPicture: undefined })}>Remove</Button>
+                  <Button onClick={() => set({ birthPicture: undefined })}>{t('editor.common.remove')}</Button>
                 </>
               }
             />
           ) : (
-            <EmptySlot name="Birth" disabled={!ready} onAdd={pick} onGenerate={() => setBirthing(true)} />
+            <EmptySlot name={t('editor.family.birth')} disabled={!ready} onAdd={pick} onGenerate={() => setBirthing(true)} />
           )}
         </SlotGrid>
       </Group>
 
-      <Group title="Birth control" hint="Most women take something against the Bloom, and seldom conceive while they do. She can be talked into stopping in a scene, if she comes to want his child.">
+      <Group title={t('editor.family.birthControl')} hint={t('editor.family.birthControlHint')}>
         <label className="inline">
           <input type="checkbox" checked={draft.birthControl} onChange={(e) => set({ birthControl: e.target.checked })} />
-          On birth control when the game begins
+          {t('editor.family.onBirthControl')}
         </label>
       </Group>
 
-      <Group title="Names" hint="What she would call a child of hers. When one is born she suggests one of these that no child has yet.">
-        <List label="Names for a daughter" value={draft.childNames.daughters} onChange={(daughters) => set({ childNames: { ...draft.childNames, daughters } })} />
-        <List label="Names for a son" value={draft.childNames.sons} onChange={(sons) => set({ childNames: { ...draft.childNames, sons } })} />
+      <Group title={t('editor.family.names')} hint={t('editor.family.namesHint')}>
+        <List label={t('editor.family.daughters')} value={draft.childNames.daughters} onChange={(daughters) => set({ childNames: { ...draft.childNames, daughters } })} />
+        <List label={t('editor.family.sons')} value={draft.childNames.sons} onChange={(sons) => set({ childNames: { ...draft.childNames, sons } })} />
       </Group>
     </>
   )

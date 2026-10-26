@@ -25,10 +25,19 @@ describe('what a class is on', () => {
     expect(lessonTopic(content, start, { id: 'course-other' })).toBeUndefined()
   })
 
+  it('is its course’s syllabus in any section of it, taken up from what he has sat in his own', () => {
+    const section = { id: 'course-rid-101-2', courseId: 'course-rid-101' }
+    const inSection = { attendance: { 'course-rid-101-2': { sat: ['0:6'] } } }
+    expect(lessonTopic(content, inSection, section)).toEqual(topics[1])
+    expect(topicsCovered(content, inSection, section)).toEqual([0])
+    // What he sat in another section of it is not his.
+    expect(lessonTopic(content, sat(2), section)).toEqual(topics[0])
+  })
+
   it('has taught him a topic for each class he sat, and no more than there are', () => {
-    expect(topicsCovered(content, start, 'course-rid-101')).toEqual([])
-    expect(topicsCovered(content, sat(2), 'course-rid-101')).toEqual([0, 1])
-    expect(topicsCovered(content, sat(7), 'course-rid-101')).toEqual([0, 1, 2])
+    expect(topicsCovered(content, start, { id: 'course-rid-101' })).toEqual([])
+    expect(topicsCovered(content, sat(2), { id: 'course-rid-101' })).toEqual([0, 1])
+    expect(topicsCovered(content, sat(7), { id: 'course-rid-101' })).toEqual([0, 1, 2])
   })
 
   it('has whoever teaches say what the examination asks', () => {

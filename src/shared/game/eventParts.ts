@@ -5,6 +5,7 @@ import { eventDay, eventGoers, eventsOn } from './events'
 import { applyFeelings, timesIntimate } from './memory'
 import { sceneBaseline } from './scene'
 import { beginMasquerade } from './masquerade'
+import { t } from '../i18n'
 
 // The trait of a woman who minds being passed over, whatever there is between them.
 const JEALOUS = 'jealous'
@@ -93,11 +94,11 @@ export function attendEventPart(
   dateIds: string[] = []
 ): { state: GameState; cutscene?: Intro; scene: Scene | null; hurt: string[]; animations: EventPart['animations']; booking?: EventPart['booking'] } {
   const now = eventPartsToday(content, state).find(({ event, part }) => event.id === eventId && part.id === partId)
-  if (!now) throw new Error('That part of the event is not on now')
+  if (!now) throw new Error(t('llm.eventParts.notOn'))
   const { event, part } = now
   if (part.date) {
     const ok = dateIds.length >= 1 && dateIds.length <= part.date.most && dateIds.every((id) => dateChoices(content, state).some((li) => li.id === id))
-    if (!ok) throw new Error(`Take one to ${part.date.most} of the women you know`)
+    if (!ok) throw new Error(t('llm.eventParts.takeSome', { most: part.date.most }))
   }
   const begins = state.time + Math.max(0, part.startHour - toDate(content.calendar, state.time).hour)
   const locationId = part.locationId ?? event.locationId ?? state.locationId
@@ -152,11 +153,11 @@ export function passedOver(content: ContentPack, state: GameState, takenIds: str
 
 function dateFeelings(content: ContentPack, state: GameState, takenIds: string[], hurtIds: string[], date: NonNullable<EventPart['date']>): GameState {
   const taken = takenIds.reduce(
-    (next, id) => applyFeelings(content, next, id, { affection: date.gain, trust: date.gain, desire: date.gain, reason: 'He took her on a date.' }, true),
+    (next, id) => applyFeelings(content, next, id, { affection: date.gain, trust: date.gain, desire: date.gain, reason: t('llm.eventParts.tookHer') }, true),
     state
   )
   return hurtIds.reduce(
-    (next, id) => applyFeelings(content, next, id, { affection: -date.loss, trust: -date.loss, desire: -date.loss, reason: 'He took someone else on a date.' }, true),
+    (next, id) => applyFeelings(content, next, id, { affection: -date.loss, trust: -date.loss, desire: -date.loss, reason: t('llm.eventParts.tookOther') }, true),
     taken
   )
 }

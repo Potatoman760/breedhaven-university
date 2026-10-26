@@ -1,5 +1,5 @@
 import { proposeMeeting } from '../../shared/game/appointments'
-import { bondOf, canBond, describeBond, END_BOND, statusOf } from '../../shared/game/bonds'
+import { bondName, bondOf, canBond, END_BOND, statusOf } from '../../shared/game/bonds'
 import { MAX_SCENE_CAST, type BondProposal, type ContentPack, type DepartureFeeling, type GameState, type Proposal, type Scene } from '../../shared/model'
 import { moveClash, sharedUpcoming, type Upcoming } from '../../shared/game/upcoming'
 import { shiftLaterToday } from '../../shared/game/jobs'
@@ -16,6 +16,7 @@ import {
   type Destination
 } from '../../shared/game/sceneMoves'
 import { weatherOn } from '../../shared/game/weather'
+import { t } from '../../shared/i18n'
 import type { LlmTool } from './openai'
 
 /**
@@ -39,39 +40,28 @@ export function meetingTool(
   const together = presentIds.length > 0
   return {
     name: 'propose_meeting',
-    description:
-      `Find a time to meet ${player} later. Call this whenever you or ${player} want to meet ` +
-      `up another time: to study, for a meal or a drink, on a date, or for anything else. ` +
-      `It checks everyone's timetables and returns the day and time you are all free. ` +
-      `Never invent a day or time yourself; call this, then suggest exactly what it returns. ` +
-      (together
-        ? `It is for another time only: it books something on the calendar and nobody goes anywhere. ` +
-          `For going somewhere together right now, call move_scene and not this. They are never both called for the same thing: ` +
-          `"let's go and get a coffee" is move_scene alone, "coffee on Hearthday?" is this alone.`
-        : `You are writing to each other, not together, so this is the only way anything is arranged: call it for any meeting, ` +
-          `whether for later today ("come over now", "see you in an hour": ask for "today") or for another day. ` +
-          `Agreeing to meet without calling it puts nothing on ${player}'s calendar.`),
+    description: t('llm.tools.meeting', { player, together, move: 'move_scene', today: '"today"' }),
     parameters: {
       type: 'object',
       properties: {
         activity: {
           type: 'string',
-          description: 'What you would do together, in a few words: "study for the Statecraft exam", "dinner", "a walk".'
+          description: t('llm.tools.meetingActivity')
         },
         place: {
           type: 'string',
           enum: content.locations.map((l) => l.id),
-          description: 'Where to meet.'
+          description: t('llm.tools.meetingPlace')
         },
         earliest: {
           type: 'string',
           enum: ['today', 'tomorrow', 'later this week', 'the weekend', 'next week'],
-          description: 'How soon. Leave out for the first time that works, which may be today. For "next week", say so here: nothing before the next week begins is offered.'
+          description: t('llm.tools.meetingEarliest', { nextWeek: '"next week"' })
         },
         weekday: {
           type: 'string',
           enum: content.calendar.weekdays,
-          description: 'A day of the week, when one was named. With "next week" it is that day next week; alone, the next such day, which may be today.'
+          description: t('llm.tools.meetingWeekday', { nextWeek: '"next week"' })
         },
         ...(others.length > 0
           ? {
@@ -79,14 +69,14 @@ export function meetingTool(
                 type: 'array',
                 maxItems: MAX_SCENE_CAST - 1,
                 items: { type: 'string', enum: others },
-                description: `Who else here comes too, when a group was asked for. Leave out to meet ${player} alone.`
+                description: t('llm.tools.meetingWith', { player })
               }
             }
           : {}),
         time_of_day: {
           type: 'string',
           enum: content.calendar.periods.map((p) => p.name.toLowerCase()),
-          description: 'Leave out unless a particular time of day was asked for.'
+          description: t('llm.tools.meetingTimeOfDay')
         }
       },
       required: ['activity', 'place']
@@ -97,7 +87,7 @@ export function meetingTool(
       const gone = movedTo?.()
       if (gone !== undefined && gone === text(args['place'])) {
         const where = content.locations.find((l) => l.id === gone)?.name ?? gone
-        return `You have just gone to ${where} with move_scene, and that is all it takes: you are there now. Nothing was put in the calendar. Call this only for another time.`
+        return t('llm.tools.meetingMoved', { place: where, move: 'move_scene' })
       }
       const { proposal, message } = proposeMeeting(content, state, loveInterestId, {
         activity: text(args['activity']) ?? '',
@@ -132,14 +122,12 @@ export function relationshipTool(
   const current = statusOf(content, bondOf(state, loveInterestId))
   return {
     name: 'propose_relationship',
-    description:
-      `Ask ${player} to change what you are to each other. Call this only when the two of you ` +
-      `(or the three of you) have talked your way to it and you are ready to ask outright, ` +
-      `or when you have decided to end things. How long you have known him does not stand in the way: if you mean it, ask. ` +
-      `It checks only that nothing already promised forbids it, and tells you what to say. ${player} then accepts or declines. Never declare a relationship ` +
-      `changed without calling this. Right now you are: ${current?.name ?? 'nothing agreed'}. The kinds: ` +
-      statuses.map((s) => `${s.id}: ${s.name}. ${s.description}`).join(' ') +
-      ` ${END_BOND}: end what you have.`,
+    description: t('llm.tools.relationship', {
+      player,
+      current: current?.name ?? t('llm.tools.nothingAgreed'),
+      kinds: statuses.map((s) => `${s.id}: ${s.name}. ${s.description}`).join(' '),
+      end: END_BOND
+    }),
     parameters: {
       type: 'object',
       properties: {
@@ -150,7 +138,7 @@ export function relationshipTool(
                 type: 'array',
                 maxItems: MAX_SCENE_CAST - 1,
                 items: { type: 'string', enum: others },
-                description: 'For an arrangement of three, the other person in it. Leave out otherwise.'
+                description: t('llm.tools.relationshipWith')
               }
             }
           : {})
@@ -161,20 +149,21 @@ export function relationshipTool(
       const also = Array.isArray(args['with']) ? args['with'].filter((id): id is string => typeof id === 'string' && others.includes(id)) : []
       const statusId = typeof args['status'] === 'string' ? args['status'].trim().toLowerCase() : ''
       if (statusId === END_BOND) {
-        if (!bondOf(state, loveInterestId)) return `You and ${player} have nothing agreed between you to end.`
+        if (!bondOf(state, loveInterestId)) return t('llm.tools.nothingToEnd', { player })
         onProposal({ statusId: END_BOND, memberIds: [loveInterestId] })
-        return `Tell ${player} plainly, in character, that you want to end what you have. ${player} will answer.`
+        return t('llm.tools.endIt', { player })
       }
       const proposal = { statusId, memberIds: [loveInterestId, ...also] }
       const check = canBond(content, state, proposal)
       if (!check.ok) {
-        return `Not yet: ${check.reasons.join('; ')}. Do not ask for it now. Say, in character, why it is too soon or what stands in the way.`
+        return t('llm.tools.notYet', { reasons: check.reasons.join('; ') })
       }
       onProposal(proposal)
-      return (
-        `It is possible: ${describeBond(content, proposal).replace(/ with .*/, '')}. ` +
-        `${statusOf(content, proposal)?.description ?? ''} Ask ${player} for exactly this, plainly and in character. ${player} will accept or decline.`
-      )
+      return t('llm.tools.possible', {
+        bond: bondName(content, proposal),
+        description: statusOf(content, proposal)?.description ?? '',
+        player
+      })
     }
   }
 }
@@ -210,41 +199,39 @@ export function moveTool(
   return {
     name: 'move_scene',
     description:
-      `Take the scene somewhere else, right now: you and ${player} leave here together and go there. ` +
-      `It is for going at once only. For meeting another time, later today or another day, call propose_meeting and not this. ` +
-      `They are never both called for the same thing: going there now is this alone, and needs no plan made for it. ` +
-      `Call it when what you are doing here is finished or you both decide to leave: the class is over and ` +
-      `you walk back to your room, the meal is done, you want somewhere quieter. It ends ` +
-      `${doing ? `"${doing}"` : 'what you were doing'} here. It moves you and ${player} only: you cannot send ` +
-      `${player} off alone or bring anyone who is not already with you. ` +
-      (group
-        ? `Everyone in the scene comes along unless you name in "staying" whoever does not: she stays here, or goes her own way ` +
-          `(to class, to practice, home). When ${player} leaves with only one or some of you ("I leave with Ana"), name every one of the others. ` +
-          `Whoever is named is out of the scene from then on and you stop writing for her. `
-        : '') +
-      `Call it before you write the reply, ` +
-      `then write the two of you leaving and arriving. Never say you have gone somewhere without calling it. ` +
-      `This is also the only way time passes: the clock stands still while you stay here` +
-      `${soFar === undefined ? '' : ` (${soFar} hour${soFar === 1 ? '' : 's'} counted so far)`}, and moves on when you leave.` +
+      t('llm.tools.move', {
+        player,
+        meeting: 'propose_meeting',
+        doing: doing ? t('llm.tools.moveDoing', { doing }) : t('llm.tools.moveWhatYouWereDoing'),
+        group,
+        staying: '"staying"',
+        counted: soFar === undefined ? '' : t('llm.tools.moveCounted', { hours: soFar })
+      }) +
       destinations
         .filter((d) => d.id.startsWith('room-of-'))
-        .map((d) => ` ${d.id} is ${d.name}.`)
+        .map((d) => t('llm.tools.moveRoom', { id: d.id, name: d.name }))
         .join('') +
       (shared
-        ? ` ${NEXT_EVENT} is ${shared.next.title} at ${formatTime(toDate(content.calendar, shared.next.time))} at ${sharedPlace}, which ${player} has next and ${firstNames(content, shared.sharedBy)} ${shared.sharedBy.length > 1 ? 'are' : 'is'} in too: ` +
-          `choose it when you set off for it together ("shall we walk to class?"). That ends this scene as you leave, lets the time until it starts go by, and the next scene is ${shared.next.kind === 'class' ? 'the class' : 'the plan'} itself. Give no hours with it.`
+        ? t('llm.tools.moveShared', {
+            next: NEXT_EVENT,
+            title: shared.next.title,
+            time: formatTime(toDate(content.calendar, shared.next.time)),
+            place: sharedPlace,
+            player,
+            names: firstNames(content, shared.sharedBy),
+            many: shared.sharedBy.length > 1,
+            kind: shared.next.kind
+          })
         : ''),
     parameters: {
       type: 'object',
       properties: {
-        place: { type: 'string', enum: [...destinations.map((d) => d.id), ...(shared ? [NEXT_EVENT] : [])], description: 'Where to go.' },
+        place: { type: 'string', enum: [...destinations.map((d) => d.id), ...(shared ? [NEXT_EVENT] : [])], description: t('llm.tools.movePlace') },
         hours: {
           type: 'integer',
           minimum: 1,
           maximum: MAX_SCENE_HOURS,
-          description:
-            'Whole hours you stayed on here beyond the time already counted, before leaving: a meal that ran long, an afternoon of study, the night. ' +
-            'Leave out when you leave on time.'
+          description: t('llm.tools.moveHours')
         },
         ...(group
           ? {
@@ -252,7 +239,7 @@ export function moveTool(
                 type: 'array',
                 maxItems: cast.length - 1,
                 items: { type: 'string', enum: cast },
-                description: `Who does not come along, whether she stays here or goes off elsewhere: out of the scene. Leave out when everyone goes. Whoever ${player} is leaving with is never named here.`
+                description: t('llm.tools.moveStaying', { player })
               }
             }
           : {})
@@ -263,14 +250,11 @@ export function moveTool(
       const asked = typeof args['place'] === 'string' ? args['place'] : ''
       if (shared && asked.trim().toLowerCase() === NEXT_EVENT) {
         onEvent?.(shared.next, shared.sharedBy)
-        return (
-          `You and ${player} set off for ${shared.next.title} at ${sharedPlace}. Write the two of you leaving here and the walk there, in character, and stop as you arrive: ` +
-          `this scene ends there, and ${shared.next.kind === 'class' ? 'the class' : 'what you came for'} is the next one. Write nothing of it yet.`
-        )
+        return t('llm.tools.moveToEvent', { player, title: shared.next.title, place: sharedPlace, kind: shared.next.kind })
       }
       const destination = findDestination(destinations, asked)
       if (!destination) {
-        return `You cannot go to "${asked}". Stay where you are, and choose only from: ${[...destinations.map((d) => d.id), ...(shared ? [NEXT_EVENT] : [])].join(', ')}.`
+        return t('llm.tools.moveNowhere', { asked, places: [...destinations.map((d) => d.id), ...(shared ? [NEXT_EVENT] : [])].join(', ') })
       }
       const asHours = Math.floor(Number(args['hours'] ?? 0))
       const before = Number.isFinite(asHours) && asHours >= 1 ? passSceneTime(content, state, asHours) : state
@@ -282,12 +266,17 @@ export function moveTool(
         const where = content.locations.find((l) => l.id === clash.locationId)
         const wait = clash.time - state.time
         const there = destinations.find((d) => d.locationId === clash.locationId && d.roomOf === undefined)
-        return (
-          `You cannot go to ${destination.name} now: ${player} has ${clash.title} at ${formatTime(toDate(content.calendar, clash.time))}` +
-          `${where ? ` at ${where.name}` : ''}, ${wait <= 1 ? 'within the hour' : `in ${wait} hours`}, and has to be there. Nothing has moved and no time has passed. ` +
-          `Stay where you are and write your reply knowing it: say that he has to go soon, and do not write the two of you leaving for anywhere else. ` +
-          (there ? `You may walk him to it instead, by calling this again with "${there.id}".` : 'Wind things up here, or part and make a plan for later.')
-        )
+        return t('llm.tools.moveClash', {
+          place: destination.name,
+          player,
+          title: clash.title,
+          time: formatTime(toDate(content.calendar, clash.time)),
+          at: where !== undefined,
+          where: where?.name,
+          soon: wait <= 1,
+          wait,
+          then: there ? t('llm.tools.moveWalkHim', { id: there.id }) : t('llm.tools.moveWindUp')
+        })
       }
       const named = Array.isArray(args['staying']) ? args['staying'].filter((id): id is string => typeof id === 'string').map((id) => id.trim().toLowerCase()) : []
       // Someone has to come along: a list that names everyone is not acted on.
@@ -295,15 +284,17 @@ export function moveTool(
       onMove(destination, stayed, behind)
       const there = moveState(before, destination)
       const weather = weatherOn(content, there)
-      return (
-        `${stayed > 0 ? `${stayed} more hour${stayed === 1 ? '' : 's'} pass${stayed === 1 ? 'es' : ''} here first. ` : ''}You and ${player} go to ${destination.name}. ` +
-        `It is ${formatTime(toDate(content.calendar, there.time))} when you get there. ` +
-        `It is ${destination.indoors ? 'indoors' : 'out of doors'}` +
-        `${weather ? `, and the weather is: ${weather.name}` : ''}. ` +
-        `${doing ? `"${doing}" is over. ` : ''}` +
-        (behind.length > 0 ? `${firstNames(content, behind)} ${behind.length === 1 ? 'does' : 'do'} not come along and ${behind.length === 1 ? 'is' : 'are'} out of the scene: give ${behind.length === 1 ? 'her' : 'them'} a last line as you go, and no more after it. ` : '') +
-        `Write leaving and arriving, in character.`
-      )
+      return t('llm.tools.moved', {
+        stayed: stayed > 0 ? t('llm.tools.moveStayed', { hours: stayed }) : '',
+        player,
+        place: destination.name,
+        time: formatTime(toDate(content.calendar, there.time)),
+        indoors: Boolean(destination.indoors),
+        hasWeather: weather !== undefined,
+        weather: weather?.name,
+        over: doing ? t('llm.tools.moveOver', { doing }) : '',
+        behind: behind.length > 0 ? t('llm.tools.moveBehind', { names: firstNames(content, behind), one: behind.length === 1 }) : ''
+      })
     }
   }
 }
@@ -343,13 +334,11 @@ export function revealTool(
   const secrets = options.filter((o) => o.fact.group === 'secrets')
   return {
     name: 'reveal_fact',
-    description:
-      `Record that ${player} has just learned something about you. Below are things ${player} does not yet ` +
-      `know. When your reply plainly tells or shows him one of them (he asks whether you like tea and you say ` +
-      `you prefer coffee; you mention what you study; your temper shows), call this with it, as well as writing ` +
-      `the reply. Only for what really comes out in this reply: do not volunteer things just to record them, ` +
-      `and never read the list out. Each is named for what it is` +
-      (secrets.length > 0 ? `, but for these: ${secrets.map((o) => `${o.key} = ${o.fact.telling}`).join('; ')}.` : '.'),
+    description: t('llm.tools.reveal', {
+      player,
+      hasSecrets: secrets.length > 0,
+      secrets: secrets.map((o) => `${o.key} = ${o.fact.telling}`).join('; ')
+    }),
     parameters: {
       type: 'object',
       properties: {
@@ -357,7 +346,7 @@ export function revealTool(
           type: 'array',
           minItems: 1,
           items: { type: 'string', enum: options.map((o) => o.key) },
-          description: 'What came out in this reply.'
+          description: t('llm.tools.revealFacts')
         }
       },
       required: ['facts']
@@ -365,9 +354,9 @@ export function revealTool(
     run(args) {
       const asked = Array.isArray(args['facts']) ? args['facts'].filter((key): key is string => typeof key === 'string') : []
       const found = options.filter((o) => asked.some((key) => key.trim().toLowerCase() === o.key.toLowerCase()))
-      if (found.length === 0) return 'None of those is on the list. Nothing was recorded; carry on with your reply.'
+      if (found.length === 0) return t('llm.tools.revealNone')
       for (const o of found) onReveal({ loveInterestId: o.loveInterestId, factId: o.fact.id })
-      return `Recorded: ${found.map((o) => o.fact.telling).join('; ')}. Make sure your reply does say so, in character.`
+      return t('llm.tools.revealed', { facts: found.map((o) => o.fact.telling).join('; ') })
     }
   }
 }
@@ -384,18 +373,14 @@ export function excuseTool(content: ContentPack, state: GameState, npcId: string
   const at = `${String(due.shift.startHour).padStart(2, '0')}:00`
   return {
     name: 'excuse_shift',
-    description:
-      `Record that ${player} has told you he cannot come to his shift today at ${at}. Call it when his message says he will not ` +
-      `make it, whatever the reason (ill, an exam, something came up) and whatever you think of the excuse: being told beforehand is what ` +
-      `counts. It then costs him half a strike in place of a whole one. Not for anything else: not for being late, not for another day, ` +
-      `and not if he has only asked a question about his shifts.`,
+    description: t('llm.tools.excuse', { player, at }),
     parameters: {
       type: 'object',
-      properties: { reason: { type: 'string', description: 'What he gave as his reason, in a few words.' } }
+      properties: { reason: { type: 'string', description: t('llm.tools.excuseReason') } }
     },
     run() {
       onExcuse(due.key)
-      return `Recorded: ${player} will miss today's ${at} shift and has told you so. It counts as half a strike. Answer him in character.`
+      return t('llm.tools.excused', { player, at })
     }
   }
 }

@@ -57,7 +57,7 @@ const begun = createInitialState(written)
 const content = withHousing(written, begun)
 const hours = content.calendar.hoursPerDay
 
-// The morning of a free day in the eighth week: Marketday, with nothing on his timetable. For the ball, the morning
+// The morning of a free day in the eighth week: Saturday, with nothing on his timetable. For the ball, the morning
 // of 20 Emberfall, the day it is, which comes before it.
 const DAY = masquerade ? 36 : 54
 let state: GameState = { ...begun, time: timeOn(content, DAY, 9), orientationStep: content.orientation?.steps.length ?? 0 }

@@ -4,6 +4,7 @@ import type { ContentPack, GameState, Stall } from '../../../shared/model'
 import { Button } from './Button'
 import { ItemIcon } from './icons'
 import { ItemSquare } from './ItemSquare'
+import { t } from '../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -30,7 +31,7 @@ export function Stalls({ content, state, stalls, byPhone = false, closed, onBuy 
     <>
       <div className="chat-list">
         <div className="chat-rows">
-          {stalls.length === 0 && <p className="hint">No stalls are trading.</p>}
+          {stalls.length === 0 && <p className="hint">{t('panels.market.noStalls')}</p>}
           {stalls.map((s) => (
             <button key={s.id} className={s.id === stall?.id ? 'chat-row selected' : 'chat-row'} onClick={() => setStallId(s.id)}>
               <span className="ware-icon">
@@ -50,13 +51,13 @@ export function Stalls({ content, state, stalls, byPhone = false, closed, onBuy 
             {/* The stall is named in its row on the left: here, only what he has on him. */}
             <div className="chat-head">
               <div>
-                <span className="caps">Carrying</span>
+                <span className="caps">{t('panels.market.carrying')}</span>
                 <strong>
-                  {carrying} gift{carrying === 1 ? '' : 's'}
+                  {t('panels.market.gifts', { n: carrying })}
                 </strong>
               </div>
               <div className="purse">
-                <span className="caps">Money</span>
+                <span className="caps">{t('panels.market.money')}</span>
                 <strong>${state.player.money}</strong>
               </div>
             </div>
@@ -83,7 +84,7 @@ export function Stalls({ content, state, stalls, byPhone = false, closed, onBuy 
             </div>
           </>
         ) : (
-          <p className="hint phone-empty">This content pack has no market stalls.</p>
+          <p className="hint phone-empty">{t('panels.market.noMarket')}</p>
         )}
       </div>
     </>

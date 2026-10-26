@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { canBeginTerm, canEnrol, courseMatches, describeMeetings, toDate, skillFor } from '../../../shared/game'
+import { canBeginTerm, canEnrol, courseLabel, courseMatches, describeMeetings, toDate, skillFor } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { Backdrop } from './Backdrop'
 import { Button } from './Button'
@@ -7,6 +7,7 @@ import { Dialog } from './Dialog'
 import { Portrait } from './Portrait'
 import { Tour, type TourStep } from './Tour'
 import { WeekPlanner } from './WeekPlanner'
+import { t } from '../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -73,16 +74,14 @@ export function CoursesView({ content, state, onEnrol, toured, onToured }: Props
         {
           target: '.planner',
           expression: 'happy',
-          text:
-            `Right, ${state.player.name}, this is your week. Every block's a class: point at one to read about it, click it to sign up. ` +
-            `Lectures come round ${config.lecturesPerWeek} times a week and labs eat ${config.labHours} hours. You take ${config.maxCourses} courses, and none that clash.`
+          text: t('screens.courses.tourWeek', { player: state.player.name, lectures: config.lecturesPerWeek, labHours: config.labHours, max: config.maxCourses })
         },
         ...(taught
           ? [
               {
                 target: '.course-skill',
                 before: () => setFocusId(taught.id),
-                text: `See that? Get your marks high enough in a class and it teaches you something you can actually use. Worth more than the grade, if you ask me.`
+                text: t('screens.courses.tourSkill')
               }
             ]
           : []),
@@ -90,13 +89,13 @@ export function CoursesView({ content, state, onEnrol, toured, onToured }: Props
           target: '.planner-search',
           expression: 'embarrassed',
           before: () => setFocusId(null),
-          text: `After someone in particular? Put her name in here and it shows you every class she's in. Don't look at me like that. I know why you're asking.`
+          text: t('screens.courses.tourSearch')
         },
         {
           target: '[data-tour="help"]',
-          text: `Too lazy to do it yourself? Hit this, tell it what you're after, and it'll pick the lot for you. Can't say I'm surprised.`
+          text: t('screens.courses.tourHelp')
         },
-        { expression: 'happy', text: `Good luck, ${state.player.name}!` }
+        { expression: 'happy', text: t('screens.courses.tourDone', { player: state.player.name }) }
       ]
     : []
 
@@ -105,10 +104,10 @@ export function CoursesView({ content, state, onEnrol, toured, onToured }: Props
   return (
     <main className="stage">
       {helping && (
-        <Dialog title="Help me pick" onClose={() => setHelping(false)} narrow noClose>
+        <Dialog title={t('screens.courses.helpMePick')} onClose={() => setHelping(false)} narrow noClose>
           <label>
-            What do you want from this term?
-            <textarea value={wish} rows={3} maxLength={500} autoFocus disabled={asking} placeholder="I want to major in biology" onChange={(e) => setWish(e.target.value)} />
+            {t('screens.courses.wishLabel')}
+            <textarea value={wish} rows={3} maxLength={500} autoFocus disabled={asking} placeholder={t('screens.courses.wishPlaceholder')} onChange={(e) => setWish(e.target.value)} />
           </label>
           {advice && 'error' in advice && <p className="notice">{advice.error}</p>}
           {advice && 'why' in advice && (
@@ -119,20 +118,20 @@ export function CoursesView({ content, state, onEnrol, toured, onToured }: Props
                   const course = state.courses.find((c) => c.id === id)
                   return course ? (
                     <li key={id}>
-                      <strong>{course.number}</strong> {course.title}
+                      <strong>{courseLabel(course)}</strong> {course.title}
                     </li>
                   ) : null
                 })}
               </ul>
-              {advice.dropped.length > 0 && <p className="hint">Left out, because they clash or are one too many: {advice.dropped.join(', ')}.</p>}
+              {advice.dropped.length > 0 && <p className="hint">{t('screens.courses.leftOut', { courses: advice.dropped.join(', ') })}</p>}
             </>
           )}
           <div className="actions end">
             <Button variant="quiet" onClick={() => setHelping(false)}>
-              {advice && 'why' in advice ? 'Done' : 'Cancel'}
+              {advice && 'why' in advice ? t('screens.courses.done') : t('screens.courses.cancel')}
             </Button>
             <Button variant="primary" disabled={asking || wish.trim() === ''} onClick={ask}>
-              {asking ? 'Choosing...' : advice && 'why' in advice ? 'Choose again' : 'Choose for me'}
+              {asking ? t('screens.courses.choosing') : advice && 'why' in advice ? t('screens.courses.chooseAgain') : t('screens.courses.chooseForMe')}
             </Button>
           </div>
         </Dialog>
@@ -142,30 +141,30 @@ export function CoursesView({ content, state, onEnrol, toured, onToured }: Props
       <div className="planner-panel glass framed">
         <div className="market-head">
           <div>
-            <span className="caps">Start of term</span>
-            <h1>Plan your week</h1>
+            <span className="caps">{t('screens.courses.startOfTerm')}</span>
+            <h1>{t('screens.courses.planYourWeek')}</h1>
           </div>
           <label className="planner-search">
-            <input type="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search a name or a code: Tamsin, ADM" aria-label="Search courses" />
+            <input type="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('screens.courses.searchPlaceholder')} aria-label={t('screens.courses.searchLabel')} />
             {searching && (
               <span className="hint">
-                {found.length === 0 ? 'No course matches' : `${found.length} course${found.length === 1 ? '' : 's'}`}
+                {found.length === 0 ? t('screens.courses.noMatch') : t('screens.dayView.courses', { n: found.length })}
               </span>
             )}
           </label>
           <span className="hint">
-            {selected.length} of {config?.maxCourses} courses chosen
+            {t('screens.courses.chosen', { n: selected.length, max: config?.maxCourses ?? '' })}
           </span>
           <Button variant="secondary" data-tour="help" onClick={() => setHelping(true)}>
-            Help me pick
+            {t('screens.courses.helpMePick')}
           </Button>
           <Button variant="primary" disabled={!canBeginTerm(content, selected).ok} title={canBeginTerm(content, selected).reasons.join(' · ') || undefined} onClick={() => onEnrol(selected)}>
-            Begin term
+            {t('screens.courses.beginTerm')}
           </Button>
         </div>
 
         {state.courses.length === 0 || !config ? (
-          <p className="hint center">The game's course catalogue is missing.</p>
+          <p className="hint center">{t('screens.courses.catalogueMissing')}</p>
         ) : (
           <div className="planner-body">
             <WeekPlanner
@@ -188,9 +187,9 @@ export function CoursesView({ content, state, onEnrol, toured, onToured }: Props
               {focus ? (
                 <>
                   <div className="chips">
-                    <span className="chip dark">{focus.number}</span>
-                    {focus.general && <span className="chip">General education</span>}
-                    {focus.meetings.some((m) => m.kind === 'lab') && <span className="chip">Has a lab</span>}
+                    <span className="chip dark">{courseLabel(focus)}</span>
+                    {focus.general && <span className="chip">{t('screens.courses.generalEducation')}</span>}
+                    {focus.meetings.some((m) => m.kind === 'lab') && <span className="chip">{t('screens.courses.hasLab')}</span>}
                   </div>
                   <h2>{focus.title}</h2>
                   <span className="hint">{focus.professor}</span>
@@ -198,12 +197,12 @@ export function CoursesView({ content, state, onEnrol, toured, onToured }: Props
                   <p>{focus.description}</p>
                   {skillFor(content, focus) && (
                     <p className="course-skill">
-                      <span className="caps">Teaches at {skillFor(content, focus)!.at} marks</span>
+                      <span className="caps">{t('screens.courses.teachesAt', { at: skillFor(content, focus)!.at })}</span>
                       <strong>{skillFor(content, focus)!.name}</strong> {skillFor(content, focus)!.description}
                     </p>
                   )}
-                  <span className="caps">In this class</span>
-                  {classmates.length === 0 && !teacher && <span className="hint">No one you know.</span>}
+                  <span className="caps">{t('screens.calendar.inThisClass')}</span>
+                  {classmates.length === 0 && !teacher && <span className="hint">{t('screens.calendar.noOneYouKnow')}</span>}
                   <div className="portraits">
                     {teacher && <Portrait who={teacher} caption />}
                     {classmates.map((li) => (
@@ -215,15 +214,13 @@ export function CoursesView({ content, state, onEnrol, toured, onToured }: Props
                     disabled={!selected.includes(focus.id) && !focusCheck?.ok}
                     onClick={() => toggle(focus.id)}
                   >
-                    {selected.includes(focus.id) ? 'Drop' : 'Enroll'}
+                    {selected.includes(focus.id) ? t('screens.courses.drop') : t('screens.courses.enroll')}
                   </button>
                   {!selected.includes(focus.id) && !focusCheck?.ok && <span className="pin-note">{focusCheck?.reasons.join(' · ')}</span>}
                 </>
               ) : (
                 <p className="hint">
-                  Each course has {config.lecturesPerWeek} lectures a week of {config.lectureHours} hour{config.lectureHours === 1 ? '' : 's'}, and a practical
-                  one a {config.labHours}-hour lab as well. Point at a class to read about it and see who else is taking it; click it to enroll. You take
-                  {config.maxCourses}, and no two that meet at the same time.
+                  {t('screens.courses.planHint', { lectures: config.lecturesPerWeek, hours: config.lectureHours, labHours: config.labHours, max: config.maxCourses })}
                 </p>
               )}
             </aside>

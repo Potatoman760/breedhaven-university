@@ -24,6 +24,7 @@ import { Portrait } from './Portrait'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { play } from '../sound'
 import { Button } from './Button'
+import { t, type MessageKey } from '../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -38,6 +39,9 @@ interface Props {
 const THINK_MS = 750
 // How far out from the middle of the picture the seats stand, as a share of its width and height: on the rim of the table.
 const SEAT_RADIUS = { x: 39, y: 36 }
+
+const STREETS: Record<PokerHand['street'], MessageKey> = { preflop: 'panels.poker.street.preflop', flop: 'panels.poker.street.flop', turn: 'panels.poker.street.turn', river: 'panels.poker.street.river' }
+const RAISES: Record<'Bet' | 'Raise', { label: MessageKey; advice: MessageKey }> = { Bet: { label: 'panels.poker.bet', advice: 'panels.poker.advice.bet' }, Raise: { label: 'panels.poker.raise', advice: 'panels.poker.advice.raise' } }
 
 /** Cards at the back tables: fixed-limit hold 'em against whoever is here, a hand at a time, for small stakes. */
 export function PokerView({ content, state, onSettle, onLeave }: Props) {
@@ -95,9 +99,9 @@ export function PokerView({ content, state, onSettle, onLeave }: Props) {
   const advice = (() => {
     if (odds === undefined || !choice || !hand || skillLevel(content, state, 'odds') < 2) return undefined
     const chance = odds / 100
-    if (chance >= 0.6 && choice.canRaise) return `${choice.raiseLabel.toLowerCase()} it`
-    if (choice.toCall === 0) return 'check'
-    return chance >= choice.toCall / (potOf(hand) + choice.toCall) ? 'call' : 'fold'
+    if (chance >= 0.6 && choice.canRaise) return t(RAISES[choice.raiseLabel].advice)
+    if (choice.toCall === 0) return t('panels.poker.advice.check')
+    return chance >= choice.toCall / (potOf(hand) + choice.toCall) ? t('panels.poker.advice.call') : t('panels.poker.advice.fold')
   })()
   const between = !hand || hand.outcome !== undefined
 
@@ -122,52 +126,54 @@ export function PokerView({ content, state, onSettle, onLeave }: Props) {
           <div className="poker-board">
             {[0, 1, 2, 3, 4].map((i) => (hand?.board[i] !== undefined ? <PlayingCard key={i} card={hand.board[i]} /> : <span key={i} className="playing-card slot" />))}
           </div>
-          <span className="poker-pot">Pot ${hand ? potOf(hand) : 0}</span>
-          {hand && !hand.outcome && <span className="poker-street">{hand.street === 'preflop' ? 'Before the flop' : `The ${hand.street}`} · bets of ${betSize(config, hand.street)}</span>}
+          <span className="poker-pot">{t('panels.poker.pot', { pot: hand ? potOf(hand) : 0 })}</span>
+          {hand && !hand.outcome && <span className="poker-street">{t('panels.poker.streetBets', { street: t(STREETS[hand.street]), bet: betSize(config, hand.street) })}</span>}
         </div>
       </div>
 
       <div className="poker-actions glass framed">
         {/* What he has left, beside what he can do with it. The stakes are in its tooltip. */}
-        <span className="poker-purse" title={`Blinds $${config.smallBlind}/$${config.bigBlind} · bets $${config.smallBet}/$${config.bigBet} · $${config.handCap} a hand at most`}>
+        <span className="poker-purse" title={t('panels.poker.stakes', { smallBlind: config.smallBlind, bigBlind: config.bigBlind, smallBet: config.smallBet, bigBet: config.bigBet, cap: config.handCap })}>
           ${state.player.money}
         </span>
         {hand?.outcome && (
           <p className="poker-result">
-            {hand.outcome.winners.map((id) => hand.seats.find((seat) => seat.id === id)?.name).join(' and ')}{' '}
-            {hand.outcome.winners.length > 1 ? 'split' : 'take'} the pot
-            {hand.outcome.shown[hand.outcome.winners[0]] ? ` with ${hand.outcome.shown[hand.outcome.winners[0]].toLowerCase()}` : ''}.{' '}
-            <strong className={net > 0 ? 'won' : net < 0 ? 'lost' : undefined}>{net > 0 ? `You win $${net}.` : net < 0 ? `You lose $${-net}.` : 'You break even.'}</strong>
+            {t(hand.outcome.shown[hand.outcome.winners[0]] ? 'panels.poker.resultWith' : 'panels.poker.result', {
+              names: hand.outcome.winners.map((id) => hand.seats.find((seat) => seat.id === id)?.name).join(t('panels.poker.and')),
+              split: hand.outcome.winners.length > 1,
+              hand: hand.outcome.shown[hand.outcome.winners[0]]?.toLowerCase()
+            })}{' '}
+            <strong className={net > 0 ? 'won' : net < 0 ? 'lost' : undefined}>{net > 0 ? t('panels.poker.youWin', { amount: net }) : net < 0 ? t('panels.poker.youLose', { amount: -net }) : t('panels.poker.even')}</strong>
           </p>
         )}
         {yours && choice && (
           <>
             {odds !== undefined && (
-              <span className="poker-odds" title="Your chance of winning this hand">
-                {odds}% to win{advice ? ` · ${advice}` : ''}
+              <span className="poker-odds" title={t('panels.poker.oddsTitle')}>
+                {advice ? t('panels.poker.oddsAdvice', { odds, advice }) : t('panels.poker.odds', { odds })}
               </span>
             )}
             {choice.toCall > 0 && (
               <Button variant="quiet" onClick={() => choose('fold')}>
-                Fold
+                {t('panels.poker.fold')}
               </Button>
             )}
-            <Button onClick={() => choose(choice.toCall > 0 ? 'call' : 'check')}>{choice.toCall > 0 ? `Call $${choice.toCall}` : 'Check'}</Button>
+            <Button onClick={() => choose(choice.toCall > 0 ? 'call' : 'check')}>{choice.toCall > 0 ? t('panels.poker.call', { amount: choice.toCall }) : t('panels.poker.check')}</Button>
             {choice.canRaise && (
               <Button variant="primary" onClick={() => choose('raise')}>
-                {choice.raiseLabel} ${choice.raiseCost}
+                {t('panels.poker.raiseButton', { label: t(RAISES[choice.raiseLabel].label), amount: choice.raiseCost })}
               </Button>
             )}
           </>
         )}
-        {hand && !hand.outcome && !yours && <span className="hint">{hand.seats[hand.toAct].name} is thinking…</span>}
+        {hand && !hand.outcome && !yours && <span className="hint">{t('panels.poker.thinking', { name: hand.seats[hand.toAct].name })}</span>}
         {between && (
           <>
             <Button variant="quiet" onClick={() => onLeave(played)}>
-              Leave the table
+              {t('panels.poker.leave')}
             </Button>
             <Button variant="primary" disabled={!check.ok} title={check.reasons.join(' · ') || undefined} onClick={deal}>
-              {hand ? 'Deal again' : 'Deal me in'}
+              {hand ? t('panels.poker.dealAgain') : t('panels.poker.dealIn')}
             </Button>
           </>
         )}
@@ -193,8 +199,10 @@ function Seat({ content, state, seat, hand }: { content: ContentPack; state: Gam
       <Portrait who={{ name: seat.name, faceY }} image={sprite} size={you ? 144 : 124} className="poker-face" />
       <div className="poker-seat-info">
         <div className="poker-seat-name">
-          {you ? 'You' : seat.name}
-          {dealer && <span className="dealer-chip" title="Dealer">D</span>}
+          {you ? t('panels.poker.you') : seat.name}
+          {dealer && <span className="dealer-chip" title={t('panels.poker.dealer')}>
+              {t('panels.poker.dealerChip')}
+            </span>}
         </div>
         <div className="poker-hole">
           {seat.hole.map((card, i) => (shown && !seat.folded ? <PlayingCard key={i} card={card} /> : <span key={i} className={seat.folded ? 'playing-card down mucked' : 'playing-card down'} />))}

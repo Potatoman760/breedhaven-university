@@ -333,7 +333,7 @@
   "schedule": [
     {
       "weekdays": [
-        "Marketday"
+        "Saturday"
       ],
       "periods": [
         "morning",
@@ -343,7 +343,7 @@
     },
     {
       "weekdays": [
-        "Marketday"
+        "Saturday"
       ],
       "periods": [
         "evening"
@@ -352,7 +352,7 @@
     },
     {
       "weekdays": [
-        "Restday"
+        "Sunday"
       ],
       "periods": [
         "morning",
@@ -362,11 +362,11 @@
     },
     {
       "weekdays": [
-        "Solday",
-        "Moonday",
-        "Tidesday",
-        "Windsday",
-        "Hearthday"
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
       ],
       "periods": [
         "morning"
@@ -375,11 +375,11 @@
     },
     {
       "weekdays": [
-        "Solday",
-        "Moonday",
-        "Tidesday",
-        "Windsday",
-        "Hearthday"
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
       ],
       "periods": [
         "afternoon"
@@ -400,7 +400,9 @@
     "name": "her pink room in the Cloister Halls",
     "description": "A small modern dormitory room turned into a pink gothic lolita bedroom. Smooth white walls hung with black lace and pink ribbon garlands, a flat ceiling with a strip of soft rose-tinted ward-light. A single bed piled with frilled pink and black cushions and plush toys, a white vanity with a heart-shaped mirror ringed in small glowing crystals, a dress rail crowded with ruffled dresses and petticoats, a row of platform shoes, a lace parasol in a stand. A built-in desk holds a tiered cake stand, a floral teapot and cups, a tablet showing vocabulary flashcards, and a stack of foreign-language dictionaries. Soft pink light through a tall window with lace curtains.",
     "locationId": "dormitories",
-    "background": "generated/backgrounds/maren/view.webp"
+    "images": {
+      "day": "generated/backgrounds/maren/view.webp"
+    }
   },
   "birthPicture": "sprites/maren/birth.webp",
   "walkSprite": "sprites/maren/walk-cutout.webp",

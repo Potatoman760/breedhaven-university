@@ -4,6 +4,8 @@ import type { ContentPack, Course, ExamKind, GameState } from '../../../shared/m
 import { Button } from './Button'
 import { Dialog } from './Dialog'
 import { Facts } from './Facts'
+import { useCueAt } from '../sound'
+import { t } from '../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -33,7 +35,7 @@ export function ExamDialog({ content, state, course, kind, onHandIn, onClose }: 
   ]
 
   return (
-    <Dialog title={`${kind === 'midterm' ? 'Midterm' : 'Final'}: ${course.number}`} note={course.title} onClose={onClose} noClose>
+    <Dialog title={t('screens.exam.title', { kind, number: course.number })} note={course.title} onClose={onClose} noClose>
       {paper.map((question, index) => (
         <fieldset key={question.topic} className="exam-question" disabled={grade !== undefined}>
           <legend>
@@ -59,8 +61,8 @@ export function ExamDialog({ content, state, course, kind, onHandIn, onClose }: 
           <div className="exam-marks">
             <Facts
               facts={[
-                { label: 'Marks', value: `${points} of ${outOf}` },
-                { label: 'Answers', value: `${grade.correct} of ${grade.topics.length}`, title: 'Every answer right lifts a pass by a letter' }
+                { label: t('screens.exam.marks'), value: t('screens.exam.outOf', { n: points, total: outOf }) },
+                { label: t('screens.exam.answers'), value: t('screens.exam.outOf', { n: grade.correct, total: grade.topics.length }), title: t('screens.exam.answersTitle') }
               ]}
             />
             <div className="exam-measure">
@@ -74,30 +76,38 @@ export function ExamDialog({ content, state, course, kind, onHandIn, onClose }: 
               ))}
             </div>
           </div>
-          <div className="exam-stamp" role="img" aria-label={`Grade ${grade.letter}`}>
-            {grade.letter}
-          </div>
+          <GradeStamp letter={grade.letter} />
         </div>
       ) : (
-        <Facts facts={[{ label: 'Marks', value: `${points} of ${outOf}`, note: lines.map((line) => `${Math.ceil(outOf * line.at)} for a ${line.letter}`).join(', '), warn: points < outOf * grading.passAt }]} />
+        <Facts facts={[{ label: t('screens.exam.marks'), value: t('screens.exam.outOf', { n: points, total: outOf }), note: lines.map((line) => t('screens.exam.forA', { n: Math.ceil(outOf * line.at), letter: line.letter })).join(', '), warn: points < outOf * grading.passAt }]} />
       )}
 
       <div className="actions end">
         {grade ? (
           <Button variant="primary" onClick={onClose}>
-            Done
+            {t('screens.courses.done')}
           </Button>
         ) : (
           <>
             <Button variant="quiet" onClick={onClose}>
-              Not yet
+              {t('screens.exam.notYet')}
             </Button>
             <Button variant="primary" disabled={answers.includes(-1)} onClick={() => onHandIn(answers)}>
-              Hand it in
+              {t('screens.exam.handIn')}
             </Button>
           </>
         )}
       </div>
     </Dialog>
+  )
+}
+
+/** The grade, stamped on the paper with a thump as it lands: 0.6s in, and most of the way through its 0.45s (`exam-stamp` in styles.css). */
+function GradeStamp({ letter }: { letter: string }) {
+  useCueAt('stamp', 850)
+  return (
+    <div className="exam-stamp" role="img" aria-label={t('screens.exam.grade', { letter })}>
+      {letter}
+    </div>
   )
 }

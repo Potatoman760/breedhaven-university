@@ -1,7 +1,7 @@
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { dormantCourses, skillFor, topicsOf } from '../../shared/game'
-import { SKILL_GRANTS, courseId } from '../../shared/model'
+import { SKILL_GRANTS, courseId, courseOf } from '../../shared/model'
 import { loadContentPack } from './loader'
 
 /** What the game's own courses teach, as they ship: something to be learnt for everything there is to learn, and a term's worth of classes written for every course. */
@@ -11,7 +11,7 @@ describe('the courses of the default pack', () => {
 
   it('each teach one thing, whether or not they are given this term', () => {
     const written = content.curriculum!.majors.flatMap((major) => major.courses.map((course) => ({ major, course })))
-    expect(written).toHaveLength(37)
+    expect(written).toHaveLength(40)
     for (const { major, course } of written) {
       const taught = content.skills.filter((skill) => skill.courseId === courseId(major.code, course.number))
       expect(taught, `${major.code} ${course.number}`).toHaveLength(1)
@@ -21,7 +21,7 @@ describe('the courses of the default pack', () => {
     }
     expect(new Set(content.skills.map((skill) => skill.id)).size).toBe(content.skills.length)
     // The course a skill is shown for is the one that teaches it.
-    for (const course of courses) expect(skillFor(content, course)?.courseId, course.number).toBe(course.id)
+    for (const course of courses) expect(skillFor(content, course)?.courseId, course.number).toBe(courseOf(course))
   })
 
   it('go further at 70 marks, each the same kind of thing done better', () => {
@@ -73,7 +73,7 @@ describe('the courses of the default pack', () => {
 
   it('have six classes written for each, and none of it speaks to the player', () => {
     for (const course of courses) {
-      const topics = topicsOf(content, course.id)
+      const topics = topicsOf(content, courseOf(course))
       expect(topics, course.number).toHaveLength(6)
       for (const topic of topics) {
         expect(topic.title.trim().length, `${course.number}: ${topic.title}`).toBeGreaterThan(0)
@@ -85,7 +85,8 @@ describe('the courses of the default pack', () => {
     // Some courses are written and not given this term, for want of anyone to read or teach them: they have their classes all the same.
     const dormant = dormantCourses(content, courses).map((course) => course.number)
     expect(dormant).toEqual([])
-    expect(content.syllabus).toHaveLength(courses.length + dormant.length)
+    // One syllabus to a written course, however many sections of it are given.
+    expect(content.syllabus).toHaveLength(new Set(courses.map(courseOf)).size + dormant.length)
     for (const entry of content.syllabus) expect(entry.topics, entry.courseId).toHaveLength(6)
   })
 })

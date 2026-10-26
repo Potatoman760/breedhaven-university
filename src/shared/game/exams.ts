@@ -1,10 +1,11 @@
-import { EXAM_KINDS, type ContentPack, type Course, type ExamKind, type GameState, type Grade, type LoveInterest } from '../model'
+import { EXAM_KINDS, courseOf, type ContentPack, type Course, type ExamKind, type GameState, type Grade, type LoveInterest } from '../model'
 import type { PerformCheck } from './activities'
 import { toDate } from './calendar'
 import { courseMembers } from './courses'
 import { coursePoints, examNow, examSlot, examWeek, gradingOf } from './grades'
 import { draws, seedOf } from './seed'
 import { topicsCovered, topicsOf } from './syllabus'
+import { t } from '../i18n'
 
 /**
  * Sitting an examination and what it is marked on. With the mark the course asks for by then he has a B, and short
@@ -38,9 +39,9 @@ export interface ExamQuestion {
  */
 export function examPaper(content: ContentPack, state: GameState, course: Course, kind: ExamKind): ExamQuestion[] {
   const count = gradingOf(content)?.examQuestions ?? 0
-  const topics = topicsOf(content, course.id)
+  const topics = topicsOf(content, courseOf(course))
   const random = draws(state.weatherSeed ^ seedOf(`${course.id}:${kind}`))
-  const taught = shuffled(topicsCovered(content, state, course.id).filter((index) => topics[index].question), random)
+  const taught = shuffled(topicsCovered(content, state, course).filter((index) => topics[index].question), random)
   const asked = kind === 'final' ? (state.grades[course.id]?.midterm?.topics ?? []) : []
   const chosen = [...taught.filter((index) => !asked.includes(index)), ...taught.filter((index) => asked.includes(index))].slice(0, count).sort((a, b) => a - b)
   return chosen.map((index) => {
@@ -103,10 +104,10 @@ export function settleExams(content: ContentPack, state: GameState): { state: Ga
 /** Whether he can go and sit an examination: it is one of his, it is on now, and he has not sat it. */
 export function canSitExam(content: ContentPack, state: GameState, courseId: string): PerformCheck {
   const course = state.courses.find((c) => c.id === courseId)
-  if (!course || !state.enrolment?.includes(courseId)) return { ok: false, reasons: ['You are not taking this course'] }
+  if (!course || !state.enrolment?.includes(courseId)) return { ok: false, reasons: [t('llm.exams.notTaking')] }
   const slot = examNow(content, state, course)
-  if (!slot) return { ok: false, reasons: ['It is not being sat now'] }
-  if (state.grades[courseId]?.[slot.kind]) return { ok: false, reasons: ['You have already sat it'] }
+  if (!slot) return { ok: false, reasons: [t('llm.exams.notNow')] }
+  if (state.grades[courseId]?.[slot.kind]) return { ok: false, reasons: [t('llm.exams.alreadySat')] }
   return { ok: true, reasons: [] }
 }
 
@@ -134,19 +135,19 @@ export function sitExam(content: ContentPack, state: GameState, courseId: string
   }
 }
 
-const kindName = (kind: ExamKind): string => (kind === 'midterm' ? 'Midterm' : 'Final')
+const kindName = (kind: ExamKind): string => (kind === 'midterm' ? t('llm.exams.midterm') : t('llm.exams.final'))
 
 /** "Midterm in ECO 101: B (42 of 50 marks · 2 of 3 right)" */
 export function describeGrade({ course, kind, grade }: Graded): string {
   const why = grade.sat
     ? [
-        `${grade.points} of ${grade.outOf} marks`,
-        grade.topics.length > 0 && `${grade.correct} of ${grade.topics.length} right`
+        t('llm.exams.marks', { points: grade.points, outOf: grade.outOf }),
+        grade.topics.length > 0 && t('llm.exams.right', { correct: grade.correct, total: grade.topics.length })
       ]
         .filter(Boolean)
         .join(' · ')
-    : 'not sat'
-  return `${kindName(kind)} in ${course.number}: ${grade.letter} (${why})`
+    : t('llm.exams.notSat')
+  return t('llm.exams.grade', { kind: kindName(kind), course: course.number, letter: grade.letter, why })
 }
 
 /**
@@ -159,21 +160,21 @@ export function examNotes(content: ContentPack, state: GameState, li: Pick<LoveI
   const on = examWeek(content, dayIndex)
   const coming = on ? undefined : examWeek(content, dayIndex + 7)
   const notes: string[] = []
-  if (on) notes.push(`It is the week of the ${on}s at the University: no lectures or labs, and each course sits its ${on} in place of its last class of the week.`)
-  if (coming) notes.push(`The ${coming}s at the University are next week.`)
+  if (on) notes.push(t('llm.exams.weekOf', { kind: on }))
+  if (coming) notes.push(t('llm.exams.nextWeek', { kind: coming }))
 
   for (const course of state.courses.filter((one) => courseMembers(one).includes(li.id))) {
     const his = state.enrolment?.includes(course.id) ?? false
     const teaches = course.teacherId === li.id
     const slot = on && examSlot(content, course, on)
     if (slot && slot.ends > state.time) {
-      const when = slot.dayIndex === dayIndex ? 'today' : `on ${slot.meeting.weekday}`
-      notes.push(`You ${teaches ? 'give' : 'sit'} the ${on} in ${course.number} ${course.title} ${when} at ${String(slot.meeting.startHour).padStart(2, '0')}:00${his ? `, and ${playerName} sits it` : ''}.`)
+      const when = slot.dayIndex === dayIndex ? t('llm.exams.today') : t('llm.exams.onDay', { weekday: slot.meeting.weekday })
+      notes.push(t('llm.exams.sitting', { teaches, kind: on, number: course.number, title: course.title, when, hour: String(slot.meeting.startHour).padStart(2, '0'), his, player: playerName }))
     }
     const kind = [...EXAM_KINDS].reverse().find((one) => state.grades[course.id]?.[one])
     if (his && kind) {
       const grade = state.grades[course.id]![kind]!
-      notes.push(`${playerName} ${grade.sat ? `got ${grade.letter === 'A' ? 'an' : 'a'} ${grade.letter} in` : 'did not turn up for'} the ${kind} in ${course.number}, which you ${teaches ? 'teach' : 'take with him'}.`)
+      notes.push(t('llm.exams.result', { player: playerName, sat: grade.sat, an: grade.letter === 'A', letter: grade.letter, kind, number: course.number, teaches }))
     }
   }
   return notes

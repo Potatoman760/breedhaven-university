@@ -41,6 +41,7 @@ import { HelpPanel } from '../HelpPanel'
 import { Ornate } from '../Ornate'
 import { Portrait } from '../Portrait'
 import { HouseFacade, wornSprite } from './HouseFacade'
+import { t } from '../../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -61,10 +62,10 @@ type Effects = { beds: number; cots: number; comfort: number; study: number }
 /** What a room, or a fitting-out of one, adds to the house, as figures. Nothing for what it does not add. */
 function effectFacts(part: Effects): Fact[] {
   const facts: (Fact | false)[] = [
-    part.beds > 0 && { label: 'Beds', value: `+${part.beds}` },
-    part.cots > 0 && { label: 'Cots', value: `+${part.cots}` },
-    part.comfort > 0 && { label: 'Comfort', value: `+${part.comfort}` },
-    part.study > 0 && { label: 'Study', value: `+${part.study}` }
+    part.beds > 0 && { label: t('panels.house.beds'), value: `+${part.beds}` },
+    part.cots > 0 && { label: t('panels.house.cots'), value: `+${part.cots}` },
+    part.comfort > 0 && { label: t('panels.house.comfort'), value: `+${part.comfort}` },
+    part.study > 0 && { label: t('panels.house.study'), value: `+${part.study}` }
   ]
   return facts.filter((fact): fact is Fact => fact !== false)
 }
@@ -106,8 +107,8 @@ export function HouseView({ content, state, onChange, onClose, onMovedIn }: Prop
 
   if (!config || state.housing.status !== 'resident') {
     return (
-      <Dialog title="Home" onClose={onClose} narrow>
-        <p className="hint">You have no house of your own.</p>
+      <Dialog title={t('panels.house.home')} onClose={onClose} narrow>
+        <p className="hint">{t('panels.house.noHouse')}</p>
       </Dialog>
     )
   }
@@ -152,9 +153,9 @@ export function HouseView({ content, state, onChange, onClose, onMovedIn }: Prop
 
       <Ornate
         title={config.name}
-        note={atHome ? 'You are at home' : 'Your house'}
+        note={atHome ? t('panels.house.atHome') : t('panels.house.yourHouse')}
         aside={
-          <Button className="ornate-help" aria-label="How the house works" title="How the house works" onClick={() => setHelping(true)}>
+          <Button className="ornate-help" aria-label={t('panels.house.help')} title={t('panels.house.help')} onClick={() => setHelping(true)}>
             <HelpIcon size={24} />
           </Button>
         }
@@ -163,30 +164,30 @@ export function HouseView({ content, state, onChange, onClose, onMovedIn }: Prop
       >
         <div className="house-progress">
           <span className="caps">
-            {builtCount} of {config.rooms.length} rooms
+            {t('panels.house.roomsBuilt', { n: builtCount, total: config.rooms.length })}
           </span>
           <span className="gold-bar">
             <span style={{ width: `${(builtCount / config.rooms.length) * 100}%` }} />
           </span>
         </div>
         <div className="house-household">
-          <span className="caps">Household</span>
+          <span className="caps">{t('panels.house.household')}</span>
           <div className="house-faces">
             {nanny && <Portrait who={nanny} image={wornSprite(content, state, nanny)} size={72} className="room-face" />}
             {residents.map((li) => (
               <Portrait key={li.id} who={li} image={wornSprite(content, state, li)} size={72} className="room-face" />
             ))}
-            {babiesAtHome(state).length > 0 && <span className="house-children" title="Children at home">+{babiesAtHome(state).length}</span>}
+            {babiesAtHome(state).length > 0 && <span className="house-children" title={t('panels.house.childrenAtHome')}>+{babiesAtHome(state).length}</span>}
           </div>
         </div>
         <HouseChildren content={content} state={state} config={config} />
         <HouseFacts content={content} state={state} config={config} onChange={onChange} />
         <div className="house-side-actions">
-          <GrandButton label="Household" icon={<FriendsIcon size={24} />} onClick={() => setPanel('household')} />
-          <GrandButton label="Ledger" icon={<JobIcon name="scroll" size={24} />} onClick={() => setPanel('ledger')} />
+          <GrandButton label={t('panels.house.household')} icon={<FriendsIcon size={24} />} onClick={() => setPanel('household')} />
+          <GrandButton label={t('panels.house.ledger')} icon={<JobIcon name="scroll" size={24} />} onClick={() => setPanel('ledger')} />
           {!atHome && (
             <GrandButton
-              label="Go home"
+              label={t('panels.house.goHome')}
               icon={<JobIcon name="house" size={24} />}
               onClick={() => {
                 onChange((s) => goHome(content, s))
@@ -223,23 +224,23 @@ export function HouseView({ content, state, onChange, onClose, onMovedIn }: Prop
       )}
 
       {panel === 'household' && (
-        <Dialog title="Household" onClose={() => setPanel(null)} ornate>
+        <Dialog title={t('panels.house.household')} onClose={() => setPanel(null)} ornate>
           <Household content={content} state={state} config={config} onAskToLeave={async (id, name) =>
-            (await ask({ title: `Ask ${name} to leave?`, detail: 'She will take her children back to the creche, will think the less of you for it, and will not come back.', confirm: 'Ask her to leave', cancel: 'Let her stay', grave: true })) &&
+            (await ask({ title: t('panels.house.askLeaveTitle', { name }), detail: t('panels.house.askLeaveDetail'), confirm: t('panels.house.askLeaveConfirm'), cancel: t('panels.house.askLeaveCancel'), grave: true })) &&
             onChange((s) => askToLeave(content, s, id))
           } />
         </Dialog>
       )}
       {panel === 'ledger' && (
-        <Dialog title="Ledger" onClose={() => setPanel(null)} narrow ornate>
+        <Dialog title={t('panels.house.ledger')} onClose={() => setPanel(null)} narrow ornate>
           <div className="house-ledger sheet">
-            {state.housing.ledger.length === 0 && <p className="hint">Nothing yet.</p>}
+            {state.housing.ledger.length === 0 && <p className="hint">{t('panels.house.nothingYet')}</p>}
             {[...state.housing.ledger].reverse().map((line, i) => {
               const date = toDate(calendar, line.time)
               return (
                 <div key={i} className="house-line">
                   <span className="hint">
-                    {date.day} {date.month.name}
+                    {t('panels.house.ledgerDate', { day: date.day, month: date.month.name })}
                   </span>
                   <span>{line.text}</span>
                   <strong>{line.amount === 0 ? '' : `−$${-line.amount}`}</strong>
@@ -257,7 +258,7 @@ export function HouseView({ content, state, onChange, onClose, onMovedIn }: Prop
 /** How a child is doing: a pip for each level, filled up to where it stands. One the house cannot yet take it to is dashed. */
 function ChildPips({ config, health, cap }: { config: HousingConfig; health: number; cap: number }) {
   return (
-    <span className="house-pips" role="img" aria-label={`${healthName(config, health)}: level ${health + 1} of ${config.babies.levels.length}`}>
+    <span className="house-pips" role="img" aria-label={t('panels.house.pips', { health: healthName(config, health), n: health + 1, total: config.babies.levels.length })}>
       {config.babies.levels.map((_, level) => (
         <i key={level} className={level <= health ? (health < config.babies.startLevel ? 'on low' : 'on') : level > cap ? 'out' : undefined} />
       ))}
@@ -276,7 +277,7 @@ function HouseChildren({ content, state, config }: { content: ContentPack; state
   const step = nextHealthStep(content, state)
   return (
     <div className="house-kids">
-      <span className="caps">Children</span>
+      <span className="caps">{t('panels.house.children')}</span>
       {children.map((child, i) => (
         <div key={i} className="house-kid" title={config.babies.levels[child.health ?? 0]?.description}>
           <span className="house-kid-name">{child.name}</span>
@@ -285,8 +286,8 @@ function HouseChildren({ content, state, config }: { content: ContentPack; state
         </div>
       ))}
       {step && (
-        <span className="house-kid-next" title="Build rooms to raise the house's comfort">
-          Comfort {houseComfort(content, state)} of {step.comfort} for {step.level.toLowerCase()}
+        <span className="house-kid-next" title={t('panels.house.nextStepTitle')}>
+          {t('panels.house.nextStep', { comfort: houseComfort(content, state), need: step.comfort, level: step.level.toLowerCase() })}
         </span>
       )}
     </div>
@@ -298,7 +299,7 @@ function HouseFacts({ content, state, config, onChange }: { content: ContentPack
   const { calendar } = content
   const dayLabel = (dayIndex: number) => {
     const date = toDate(calendar, dayIndex * calendar.hoursPerDay)
-    return `${date.weekday} ${date.day} ${date.month.name}`
+    return t('panels.house.dayLabel', { weekday: date.weekday, day: date.day, month: date.month.name })
   }
   const totals = houseTotals(config, state)
   const rentDay = nextRentDay(content, state)
@@ -309,27 +310,27 @@ function HouseFacts({ content, state, config, onChange }: { content: ContentPack
       facts={[
         deadline !== undefined
           ? {
-              label: 'Rent owing',
+              label: t('panels.house.rentOwing'),
               value: `$${state.housing.arrears}`,
-              note: `by ${dayLabel(deadline)}`,
+              note: t('panels.house.by', { day: dayLabel(deadline) }),
               warn: true,
               action: (
-                <Button variant="primary" size="small" disabled={state.player.money < state.housing.arrears} title={state.player.money < state.housing.arrears ? `You have $${state.player.money}` : undefined} onClick={() => onChange((s) => payArrears(content, s))}>
-                  Pay
+                <Button variant="primary" size="small" disabled={state.player.money < state.housing.arrears} title={state.player.money < state.housing.arrears ? t('panels.house.youHaveMoney', { money: state.player.money }) : undefined} onClick={() => onChange((s) => payArrears(content, s))}>
+                  {t('panels.house.pay')}
                 </Button>
               )
             }
           : {
-              label: 'Rent',
-              value: rentDay === undefined ? 'None left' : `$${monthlyRent(content, state)}`,
-              note: rentDay === undefined ? 'this year' : `due ${dayLabel(rentDay)}`,
-              title: config.rentRelief.perChild > 0 ? `$${config.rent} a month, less $${config.rentRelief.perChild} for each child of yours, to no less than $${Math.min(config.rent, config.rentRelief.floor)}.` : undefined
+              label: t('panels.house.rent'),
+              value: rentDay === undefined ? t('panels.house.noneLeft') : `$${monthlyRent(content, state)}`,
+              note: rentDay === undefined ? t('panels.house.thisYear') : t('panels.house.due', { day: dayLabel(rentDay) }),
+              title: config.rentRelief.perChild > 0 ? t('panels.house.rentTitle', { rent: config.rent, perChild: config.rentRelief.perChild, floor: Math.min(config.rent, config.rentRelief.floor) }) : undefined
             },
-        { label: "Children's week", value: `$${householdCost(content, state)}` },
-        { label: 'Beds', value: `${Object.keys(state.housing.residents).length} of ${totals.beds}` },
-        { label: 'Cots', value: `${babiesAtHome(state).length} of ${totals.cots}` },
-        { label: 'Comfort', value: houseComfort(content, state), title: `How well the house looks after those in it: children can reach ${healthName(config, cap).toLowerCase()}.` },
-        { label: 'You have', value: `$${state.player.money}` }
+        { label: t('panels.house.childrensWeek'), value: `$${householdCost(content, state)}` },
+        { label: t('panels.house.beds'), value: t('panels.house.countOf', { n: Object.keys(state.housing.residents).length, total: totals.beds }) },
+        { label: t('panels.house.cots'), value: t('panels.house.countOf', { n: babiesAtHome(state).length, total: totals.cots }) },
+        { label: t('panels.house.comfort'), value: houseComfort(content, state), title: t('panels.house.comfortTitle', { level: healthName(config, cap).toLowerCase() }) },
+        { label: t('panels.house.youHave'), value: `$${state.player.money}` }
       ]}
     />
   )
@@ -372,7 +373,7 @@ function RoomCard({ content, state, config, room, image, atHome, onBuild, onInvi
         {image ? <img src={`content://pack/${image}`} alt={room.name} className={tier < 1 ? 'locked' : undefined} /> : <div className="room-blank" />}
       </div>
       <h2>{room.name}</h2>
-      {tier < 1 && <span className="caps">Not built yet</span>}
+      {tier < 1 && <span className="caps">{t('panels.house.notBuilt')}</span>}
       <p>{[room.description, ...made.map((t) => t.description)].filter(Boolean).join(' ')}</p>
       {adds.length > 0 && <Facts facts={adds} />}
       {made.length > 0 && (
@@ -395,7 +396,7 @@ function RoomCard({ content, state, config, room, image, atHome, onBuild, onInvi
       {work && (
         <div className="house-work">
           <GrandButton
-            label={work.upgrade ? work.name : 'Build this room'}
+            label={work.upgrade ? work.name : t('panels.house.build')}
             note={check.ok ? `$${work.cost}` : `$${work.cost} · ${check.reasons.join(' · ')}`}
             icon={<JobIcon name="crate" size={24} />}
             tip={work.description || undefined}
@@ -408,7 +409,7 @@ function RoomCard({ content, state, config, room, image, atHome, onBuild, onInvi
       {candidates.length > 0 && (
         <div className="house-work">
           {candidates.map((li) => (
-            <GrandButton key={li.id} label={`Offer to ${li.name.split(' ')[0]}`} icon={<HeartIcon size={24} />} onClick={() => onInvite(li.id)} />
+            <GrandButton key={li.id} label={t('panels.house.offerTo', { name: li.name.split(' ')[0] })} icon={<HeartIcon size={24} />} onClick={() => onInvite(li.id)} />
           ))}
         </div>
       )}
@@ -418,7 +419,7 @@ function RoomCard({ content, state, config, room, image, atHome, onBuild, onInvi
         </span>
       ))}
 
-      {tier > 0 && (!atHome || state.housing.room !== room.key) && <GrandButton label="Go to this room" icon={<JobIcon name="door" size={24} />} onClick={onGo} />}
+      {tier > 0 && (!atHome || state.housing.room !== room.key) && <GrandButton label={t('panels.house.goToRoom')} icon={<JobIcon name="door" size={24} />} onClick={onGo} />}
     </Ornate>
   )
 }
@@ -430,13 +431,13 @@ function Household({ content, state, config, onAskToLeave }: { content: ContentP
   const cap = healthCap(content, state)
   return (
     <div className="house-people">
-      <h2>Who lives here</h2>
+      <h2>{t('panels.house.whoLivesHere')}</h2>
       {nanny && (
         <div className="card house-person">
           <Portrait who={nanny} image={wornSprite(content, state, nanny)} size={62} className="room-face" />
           <div>
             <strong>{nanny.name}</strong>
-            <span className="hint">The nanny. She comes with the house.</span>
+            <span className="hint">{t('panels.house.nanny')}</span>
           </div>
         </div>
       )}
@@ -450,30 +451,29 @@ function Household({ content, state, config, onAskToLeave }: { content: ContentP
               <strong>{li.name}</strong>
               <span className="hint">
                 {config.rooms.find((r) => r.key === key)?.name}
-                {pregnancyOf(state, id) ? ' · pregnant' : ''}
+                {pregnancyOf(state, id) ? t('panels.house.pregnant') : ''}
               </span>
             </div>
             <Button size="small" onClick={() => onAskToLeave(id, firstOf(id))}>
-              Ask to leave
+              {t('panels.house.askToLeave')}
             </Button>
           </div>
         )
       })}
 
-      <h2>The children</h2>
-      {state.children.length === 0 && <p className="hint">None yet.</p>}
+      <h2>{t('panels.house.theChildren')}</h2>
+      {state.children.length === 0 && <p className="hint">{t('panels.house.noneYet')}</p>}
       {state.children.map((child, i) => (
         <div key={i} className="card house-person">
           <div>
-            <strong>{`${child.name}, ${firstOf(child.motherId)}'s ${child.daughter ? 'daughter' : 'son'}`}</strong>
+            <strong>{t('panels.house.childOf', { name: child.name, mother: firstOf(child.motherId), daughter: child.daughter })}</strong>
             {child.health === undefined ? (
               <span className="hint">
-                At the University's creche
-                {state.housing.residents[child.motherId] !== undefined || child.motherId === config.nannyId ? ': there is no free cot' : ''}
+                {state.housing.residents[child.motherId] !== undefined || child.motherId === config.nannyId ? t('panels.house.crecheFull') : t('panels.house.creche')}
               </span>
             ) : (
               <span className="hint">
-                {healthName(config, child.health)} · ${config.babies.weeklyCost} a week
+                {t('panels.house.childKeep', { health: healthName(config, child.health), cost: config.babies.weeklyCost })}
               </span>
             )}
           </div>

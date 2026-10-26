@@ -73,6 +73,14 @@ describe('enrolment', () => {
     expect(canEnrol(content, state, ['pol'], 'phy').ok).toBe(true)
   })
 
+  it('takes one section of a course, not two', () => {
+    const second: Course = { ...course('pol-2', 'POL 101', [lecture('One', 12), lecture('Two', 12)]), courseId: 'pol', section: 2 }
+    const state = { ...start(null), courses: [pol, his, phy, second] }
+    expect(canEnrol(content, state, [], 'pol-2').ok).toBe(true)
+    expect(canEnrol(content, state, ['pol'], 'pol-2').reasons).toEqual(['Already taking POL 101'])
+    expect(canEnrol(content, state, ['pol-2'], 'pol').reasons).toEqual(['Already taking POL 101 (section 2)'])
+  })
+
   it('begins the term only with a full load', () => {
     expect(canBeginTerm(content, ['pol'])).toEqual({ ok: false, reasons: ['Choose 2 courses'] })
     expect(canBeginTerm(content, ['pol', 'phy']).ok).toBe(true)

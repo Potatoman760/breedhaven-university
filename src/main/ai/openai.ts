@@ -1,5 +1,6 @@
 import type { ChatMessage } from '../../shared/model'
 import type { LlmProfile } from '../../shared/settings'
+import { t } from '../../shared/i18n'
 
 const REQUEST_TIMEOUT_MS = 120_000
 
@@ -48,11 +49,11 @@ export async function listModels(
     })
   } catch (error) {
     const cause = (error as { cause?: Error }).cause
-    throw new Error(`Could not reach ${url}: ${cause?.message ?? (error as Error).message}`)
+    throw new Error(t('llm.openai.unreachable', { url, cause: cause?.message ?? (error as Error).message }))
   }
   if (!response.ok) {
     const body = (await response.text()).slice(0, 200)
-    throw new Error(`Could not list models (${response.status} ${response.statusText}): ${body}`)
+    throw new Error(t('llm.openai.listFailed', { status: response.status, statusText: response.statusText, body }))
   }
 
   // OpenAI answers { data: [{ id }] }; some servers answer { models: [...] } or a bare list.
@@ -60,7 +61,7 @@ export async function listModels(
   const list = Array.isArray(body)
     ? body
     : ((body as { data?: unknown; models?: unknown }).data ?? (body as { models?: unknown }).models)
-  if (!Array.isArray(list)) throw new Error('The endpoint did not return a list of models')
+  if (!Array.isArray(list)) throw new Error(t('llm.openai.noModelList'))
   const ids = list
     .map((m) => (typeof m === 'string' ? m : (m as { id?: unknown; name?: unknown }).id ?? (m as { name?: unknown }).name))
     .filter((id): id is string => typeof id === 'string' && id.length > 0)
@@ -89,7 +90,7 @@ export function isRefusalResponse(status: number, body: string): boolean {
 /** The endpoint declined to produce the reply: a content filter, moderation block or refusal. */
 export class RefusalError extends Error {
   constructor(detail: string) {
-    super(`The LLM declined to reply: ${detail}`)
+    super(t('llm.openai.declined', { detail }))
     this.name = 'RefusalError'
   }
 }
@@ -101,7 +102,8 @@ export async function chatCompletion(
   fetchImpl: typeof fetch = fetch
 ): Promise<string> {
   const url = `${profile.baseUrl.trim().replace(/\/+$/, '')}/chat/completions`
-  const system = [input.system, profile.instructions].filter((s) => s.length > 0).join('\n\n')
+  // In a language other than English, the last thing said is which one to write in. English needs no saying.
+  const system = [input.system, t('core.llm.writeIn'), profile.instructions].filter((s) => s.length > 0).join('\n\n')
   // Grows as tools are called: the model's requests and their results are appended.
   const messages: unknown[] = [{ role: 'system', content: system }, ...input.messages]
   let tools = input.tools && input.tools.length > 0 ? input.tools : undefined
@@ -122,9 +124,9 @@ export async function chatCompletion(
           temperature: input.temperature ?? profile.temperature,
           max_tokens: input.maxTokens ?? profile.maxTokens,
           ...(tools && {
-            tools: tools.map((t) => ({
+            tools: tools.map((tool) => ({
               type: 'function',
-              function: { name: t.name, description: t.description, parameters: t.parameters }
+              function: { name: tool.name, description: tool.description, parameters: tool.parameters }
             }))
           })
         }),
@@ -132,9 +134,9 @@ export async function chatCompletion(
       })
     } catch (error) {
       if (input.signal?.aborted) throw input.signal.reason
-      if ((error as Error).name === 'TimeoutError') throw new Error('The LLM took too long to answer')
+      if ((error as Error).name === 'TimeoutError') throw new Error(t('llm.openai.tooLong'))
       const cause = (error as { cause?: Error }).cause
-      throw new Error(`Could not reach ${url}: ${cause?.message ?? (error as Error).message}`)
+      throw new Error(t('llm.openai.unreachable', { url, cause: cause?.message ?? (error as Error).message }))
     }
 
     if (!response.ok) {
@@ -148,7 +150,7 @@ export async function chatCompletion(
         tools = undefined
         return request()
       }
-      throw new Error(`LLM request failed (${response.status} ${response.statusText}): ${body}`)
+      throw new Error(t('llm.openai.failed', { status: response.status, statusText: response.statusText, body }))
     }
 
     const data = (await response.json()) as { choices?: { finish_reason?: unknown; native_finish_reason?: unknown; message?: AssistantMessage }[] }
@@ -156,14 +158,14 @@ export async function chatCompletion(
     // Why it stopped, as the endpoint says it and, behind a router, as the provider itself said it.
     const finishes = [choice?.finish_reason, choice?.native_finish_reason].filter((reason): reason is string => typeof reason === 'string').map((reason) => reason.toLowerCase())
     const stopped = finishes.find((reason) => REFUSAL_FINISHES.includes(reason))
-    if (stopped) throw new RefusalError(`the reply was stopped (${stopped})`)
+    if (stopped) throw new RefusalError(t('llm.openai.stopped', { reason: stopped }))
     if (typeof choice?.message?.refusal === 'string' && choice.message.refusal.length > 0) {
       throw new RefusalError(choice.message.refusal)
     }
     // Nothing at all, and not for want of room: that is how some providers answer what they will not write, Google's above all.
     const said = typeof choice?.message?.content === 'string' && choice.message.content.trim().length > 0
     if (!said && (choice?.message?.tool_calls ?? []).length === 0 && !finishes.includes('length')) {
-      throw new RefusalError('an empty reply came back, which is how some providers block one')
+      throw new RefusalError(t('llm.openai.emptyBlocked'))
     }
     return choice?.message ?? {}
   }
@@ -175,7 +177,7 @@ export async function chatCompletion(
     const calls = message.tool_calls ?? []
     if (!tools || calls.length === 0) {
       if (typeof message.content !== 'string' || message.content.trim().length === 0) {
-        throw new Error('The LLM returned an empty reply: it ran out of room before it answered. Raise the max reply tokens in Settings.')
+        throw new Error(t('llm.openai.emptyReply'))
       }
       return message.content.trim()
     }
@@ -188,7 +190,7 @@ export async function chatCompletion(
       const result = await runTool(tools, call)
       messages.push({ role: 'tool', tool_call_id: call.id, content: n === calls.length - 1 ? `${result}
 
-${wrote ? WROTE_BESIDE_TOOL : AFTER_TOOL}` : result })
+${wrote ? wroteBesideTool() : afterTool()}` : result })
     }
     // After the last allowed round the model has to answer in words.
     if (round + 1 >= MAX_TOOL_ROUNDS) tools = undefined
@@ -196,10 +198,8 @@ ${wrote ? WROTE_BESIDE_TOOL : AFTER_TOOL}` : result })
 }
 
 // Said to the model after its tools have run, so that what comes next is the reply itself and nothing about how it was made.
-export const AFTER_TOOL = '(Now write your reply, in character. Say nothing about tools, these notes, or what has or has not been written.)'
-export const WROTE_BESIDE_TOOL =
-  '(What you wrote before calling the tool was not shown to anyone and is gone. Write your whole reply now, from the start, in character, ' +
-  'including anything from it that still holds. Say nothing about tools, these notes, or what has or has not been written.)'
+export const afterTool = (): string => t('llm.openai.afterTool')
+export const wroteBesideTool = (): string => t('llm.openai.wroteBesideTool')
 
 interface ToolCall {
   id: string
@@ -214,12 +214,12 @@ interface AssistantMessage {
 
 /** Runs the tool a call names. Problems are reported back to the model, not thrown. */
 async function runTool(tools: LlmTool[], call: ToolCall): Promise<string> {
-  const tool = tools.find((t) => t.name === call.function.name)
-  if (!tool) return `There is no tool called "${call.function.name}".`
+  const tool = tools.find((one) => one.name === call.function.name)
+  if (!tool) return t('llm.openai.noTool', { name: call.function.name })
   try {
     const args: unknown = JSON.parse(call.function.arguments || '{}')
     return await tool.run(typeof args === 'object' && args !== null ? (args as Record<string, unknown>) : {})
   } catch (error) {
-    return `The tool could not be used: ${(error as Error).message}`
+    return t('llm.openai.toolFailed', { error: (error as Error).message })
   }
 }

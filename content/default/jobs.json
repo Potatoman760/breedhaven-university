@@ -18,12 +18,12 @@
       "requirements": {},
       "shifts": [
         {
-          "weekday": "Marketday",
+          "weekday": "Saturday",
           "startHour": 8,
           "hours": 6
         },
         {
-          "weekday": "Restday",
+          "weekday": "Sunday",
           "startHour": 8,
           "hours": 6
         }
@@ -42,17 +42,17 @@
       "requirements": {},
       "shifts": [
         {
-          "weekday": "Moonday",
+          "weekday": "Tuesday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Hearthday",
+          "weekday": "Friday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Restday",
+          "weekday": "Sunday",
           "startHour": 8,
           "hours": 4
         }
@@ -71,17 +71,17 @@
       "requirements": {},
       "shifts": [
         {
-          "weekday": "Solday",
+          "weekday": "Monday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Windsday",
+          "weekday": "Thursday",
           "startHour": 18,
           "hours": 3
         },
         {
-          "weekday": "Restday",
+          "weekday": "Sunday",
           "startHour": 18,
           "hours": 3
         }
@@ -100,22 +100,22 @@
       "requirements": {},
       "shifts": [
         {
-          "weekday": "Tidesday",
+          "weekday": "Wednesday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Hearthday",
+          "weekday": "Friday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Marketday",
+          "weekday": "Saturday",
           "startHour": 13,
           "hours": 4
         },
         {
-          "weekday": "Restday",
+          "weekday": "Sunday",
           "startHour": 13,
           "hours": 4
         }
@@ -134,17 +134,17 @@
       "requirements": {},
       "shifts": [
         {
-          "weekday": "Solday",
+          "weekday": "Monday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Moonday",
+          "weekday": "Tuesday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Windsday",
+          "weekday": "Thursday",
           "startHour": 18,
           "hours": 4
         }
@@ -165,17 +165,17 @@
       },
       "shifts": [
         {
-          "weekday": "Solday",
+          "weekday": "Monday",
           "startHour": 18,
           "hours": 3
         },
         {
-          "weekday": "Moonday",
+          "weekday": "Tuesday",
           "startHour": 18,
           "hours": 3
         },
         {
-          "weekday": "Marketday",
+          "weekday": "Saturday",
           "startHour": 8,
           "hours": 4
         }
@@ -196,17 +196,17 @@
       },
       "shifts": [
         {
-          "weekday": "Moonday",
+          "weekday": "Tuesday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Windsday",
+          "weekday": "Thursday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Hearthday",
+          "weekday": "Friday",
           "startHour": 18,
           "hours": 4
         }
@@ -227,12 +227,12 @@
       },
       "shifts": [
         {
-          "weekday": "Marketday",
+          "weekday": "Saturday",
           "startHour": 8,
           "hours": 5
         },
         {
-          "weekday": "Restday",
+          "weekday": "Sunday",
           "startHour": 8,
           "hours": 5
         }
@@ -253,22 +253,22 @@
       },
       "shifts": [
         {
-          "weekday": "Windsday",
+          "weekday": "Thursday",
           "startHour": 18,
           "hours": 3
         },
         {
-          "weekday": "Hearthday",
+          "weekday": "Friday",
           "startHour": 18,
           "hours": 3
         },
         {
-          "weekday": "Marketday",
+          "weekday": "Saturday",
           "startHour": 9,
           "hours": 3
         },
         {
-          "weekday": "Restday",
+          "weekday": "Sunday",
           "startHour": 9,
           "hours": 3
         }
@@ -289,22 +289,22 @@
       },
       "shifts": [
         {
-          "weekday": "Tidesday",
+          "weekday": "Wednesday",
           "startHour": 18,
           "hours": 3
         },
         {
-          "weekday": "Hearthday",
+          "weekday": "Friday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Marketday",
+          "weekday": "Saturday",
           "startHour": 18,
           "hours": 3
         },
         {
-          "weekday": "Restday",
+          "weekday": "Sunday",
           "startHour": 18,
           "hours": 4
         }
@@ -326,22 +326,22 @@
       },
       "shifts": [
         {
-          "weekday": "Moonday",
+          "weekday": "Tuesday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Tidesday",
+          "weekday": "Wednesday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Windsday",
+          "weekday": "Thursday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Restday",
+          "weekday": "Sunday",
           "startHour": 8,
           "hours": 4
         }
@@ -362,12 +362,12 @@
       },
       "shifts": [
         {
-          "weekday": "Marketday",
+          "weekday": "Saturday",
           "startHour": 8,
           "hours": 6
         },
         {
-          "weekday": "Restday",
+          "weekday": "Sunday",
           "startHour": 13,
           "hours": 6
         }
@@ -389,22 +389,22 @@
       },
       "shifts": [
         {
-          "weekday": "Moonday",
+          "weekday": "Tuesday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Hearthday",
+          "weekday": "Friday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Marketday",
+          "weekday": "Saturday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Restday",
+          "weekday": "Sunday",
           "startHour": 18,
           "hours": 4
         }
@@ -426,22 +426,22 @@
       },
       "shifts": [
         {
-          "weekday": "Solday",
+          "weekday": "Monday",
           "startHour": 18,
           "hours": 2
         },
         {
-          "weekday": "Tidesday",
+          "weekday": "Wednesday",
           "startHour": 18,
           "hours": 2
         },
         {
-          "weekday": "Marketday",
+          "weekday": "Saturday",
           "startHour": 9,
           "hours": 4
         },
         {
-          "weekday": "Restday",
+          "weekday": "Sunday",
           "startHour": 9,
           "hours": 4
         }
@@ -463,22 +463,22 @@
       },
       "shifts": [
         {
-          "weekday": "Moonday",
+          "weekday": "Tuesday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Tidesday",
+          "weekday": "Wednesday",
           "startHour": 18,
           "hours": 3
         },
         {
-          "weekday": "Hearthday",
+          "weekday": "Friday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Marketday",
+          "weekday": "Saturday",
           "startHour": 8,
           "hours": 3
         }
@@ -500,17 +500,17 @@
       },
       "shifts": [
         {
-          "weekday": "Windsday",
+          "weekday": "Thursday",
           "startHour": 20,
           "hours": 4
         },
         {
-          "weekday": "Hearthday",
+          "weekday": "Friday",
           "startHour": 20,
           "hours": 4
         },
         {
-          "weekday": "Restday",
+          "weekday": "Sunday",
           "startHour": 20,
           "hours": 4
         }
@@ -532,22 +532,22 @@
       },
       "shifts": [
         {
-          "weekday": "Windsday",
+          "weekday": "Thursday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Hearthday",
+          "weekday": "Friday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Marketday",
+          "weekday": "Saturday",
           "startHour": 12,
           "hours": 4
         },
         {
-          "weekday": "Restday",
+          "weekday": "Sunday",
           "startHour": 18,
           "hours": 4
         }
@@ -569,17 +569,17 @@
       },
       "shifts": [
         {
-          "weekday": "Moonday",
+          "weekday": "Tuesday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Tidesday",
+          "weekday": "Wednesday",
           "startHour": 18,
           "hours": 4
         },
         {
-          "weekday": "Hearthday",
+          "weekday": "Friday",
           "startHour": 18,
           "hours": 4
         }
@@ -601,12 +601,12 @@
       },
       "shifts": [
         {
-          "weekday": "Marketday",
+          "weekday": "Saturday",
           "startHour": 9,
           "hours": 4
         },
         {
-          "weekday": "Restday",
+          "weekday": "Sunday",
           "startHour": 9,
           "hours": 4
         }

@@ -1,6 +1,7 @@
 import { STATS, type ContentPack, type GameState, type LoveInterest, type Stat } from '../model'
 import { toDate } from './calendar'
 import { factor } from './modifiers'
+import { t } from '../i18n'
 
 // Stats are ability scores: 8 to 15 at the start, 10 or 11 for anyone, and up to 30 with a term's work.
 // These are where one stops being ordinary, and then stops being merely good.
@@ -11,11 +12,11 @@ const LEGENDARY = 26
 
 /** What a score is called, lowest first, and the score each name begins at. */
 export const STAT_TIERS = [
-  { name: 'ordinary', from: 0 },
-  { name: 'good', from: GOOD },
-  { name: 'impressive', from: IMPRESSIVE },
-  { name: 'exceptional', from: EXCEPTIONAL },
-  { name: 'legendary', from: LEGENDARY }
+  { get name() { return t('scene.stats.ordinary') }, from: 0 },
+  { get name() { return t('scene.stats.good') }, from: GOOD },
+  { get name() { return t('scene.stats.impressive') }, from: IMPRESSIVE },
+  { get name() { return t('scene.stats.exceptional') }, from: EXCEPTIONAL },
+  { get name() { return t('scene.stats.legendary') }, from: LEGENDARY }
 ] as const
 
 /** As high as a stat goes. */
@@ -32,7 +33,15 @@ export function statOf(state: GameState, stat: string): number {
 
 /** A stat's value in a word, for prompts: ordinary, good, impressive, exceptional or legendary. */
 export function describeStat(value: number): string {
-  return value >= LEGENDARY ? 'legendary' : value >= EXCEPTIONAL ? 'exceptional' : value >= IMPRESSIVE ? 'impressive' : value >= GOOD ? 'good' : 'ordinary'
+  return value >= LEGENDARY
+    ? t('scene.stats.legendary')
+    : value >= EXCEPTIONAL
+      ? t('scene.stats.exceptional')
+      : value >= IMPRESSIVE
+        ? t('scene.stats.impressive')
+        : value >= GOOD
+          ? t('scene.stats.good')
+          : t('scene.stats.ordinary')
 }
 
 /** How the player measures up in the things a love interest admires: the average of those stats. */
@@ -61,14 +70,9 @@ export function affectionGain(content: ContentPack, state: GameState, loveIntere
  */
 export function describeAppeal(state: GameState, li: Pick<LoveInterest, 'admires'>): string[] {
   const { name } = state.player
-  const drawn = li.admires.filter((stat) => statOf(state, stat) >= GOOD).map((stat) => `${describeStat(statOf(state, stat))} ${stat}`)
+  const drawn = li.admires.filter((stat) => statOf(state, stat) >= GOOD).map((stat) => t('scene.stats.quality', { tier: describeStat(statOf(state, stat)), stat }))
   if (drawn.length === 0) return []
-  const felt = [
-    '',
-    ' You are a little warmer for it, more curious, and slower to end a conversation.',
-    ' It makes him hard for you to ignore: you flirt more readily, make time for him, and find reasons to see him again.'
-  ][appealLevel(state, li)]
-  return [`You are drawn to ${name}'s ${drawn.join(' and ')}.${felt}`]
+  return [t('scene.stats.drawn', { player: name, qualities: drawn.join(t('scene.list.and')), level: appealLevel(state, li) })]
 }
 
 /**

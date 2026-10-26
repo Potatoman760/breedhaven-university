@@ -1,18 +1,19 @@
 import { classYear, kindOf, type ContentPack, type GameState, type Item, type LoveInterest } from '../model'
 import { evaluateAll } from './conditions'
 import { giftReaction } from './market'
+import { t } from '../i18n'
 
 /** The kinds of thing there are to find out about a love interest, in the order they are shown. */
 export const FACT_GROUPS = ['likes', 'dislikes', 'traits', 'admires', 'life', 'secrets'] as const
 export type FactGroup = (typeof FACT_GROUPS)[number]
 
 export const FACT_GROUP_NAMES: Record<FactGroup, string> = {
-  likes: 'Likes',
-  dislikes: 'Dislikes',
-  traits: 'Nature',
-  admires: 'Drawn to',
-  life: 'Her life',
-  secrets: 'Confided'
+  get likes() { return t('game.facts.group.likes') },
+  get dislikes() { return t('game.facts.group.dislikes') },
+  get traits() { return t('game.facts.group.traits') },
+  get admires() { return t('game.facts.group.admires') },
+  get life() { return t('game.facts.group.life') },
+  get secrets() { return t('game.facts.group.secrets') }
 }
 
 /**
@@ -37,34 +38,34 @@ const slug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').re
 export function factsOf(content: ContentPack, li: LoveInterest): Fact[] {
   const first = li.name.split(' ')[0]
   const facts: Fact[] = [
-    ...li.likes.map((like): Fact => ({ id: `like:${slug(like)}`, group: 'likes', label: like, telling: `${first} likes ${like}` })),
-    ...li.dislikes.map((dislike): Fact => ({ id: `dislike:${slug(dislike)}`, group: 'dislikes', label: dislike, telling: `${first} dislikes ${dislike}` })),
+    ...li.likes.map((like): Fact => ({ id: `like:${slug(like)}`, group: 'likes', label: like, telling: t('game.facts.likes', { first, what: like }) })),
+    ...li.dislikes.map((dislike): Fact => ({ id: `dislike:${slug(dislike)}`, group: 'dislikes', label: dislike, telling: t('game.facts.dislikes', { first, what: dislike }) })),
     ...content.traits
       .filter((trait) => li.traitIds.includes(trait.id))
-      .map((trait): Fact => ({ id: `trait:${trait.id}`, group: 'traits', label: trait.name, detail: trait.definition, telling: `${first} is ${trait.name.toLowerCase()}: ${trait.definition}` })),
-    ...li.admires.map((stat): Fact => ({ id: `admires:${stat}`, group: 'admires', label: stat, telling: `${first} is drawn to ${stat} in a man` }))
+      .map((trait): Fact => ({ id: `trait:${trait.id}`, group: 'traits', label: trait.name, detail: trait.definition, telling: t('game.facts.trait', { first, trait: trait.name.toLowerCase(), definition: trait.definition }) })),
+    ...li.admires.map((stat): Fact => ({ id: `admires:${stat}`, group: 'admires', label: stat, telling: t('game.facts.admires', { first, stat }) }))
   ]
 
   const kind = kindOf(li)
   if (kind === 'student' && li.studies) {
-    const label = li.studies.level >= 5 ? `${li.studies.subject}, graduate student` : `${li.studies.subject} major, ${classYear(li.studies.level)}`
-    facts.push({ id: 'studies', group: 'life', label, telling: `what ${first} studies (${li.studies.subject})` })
+    const label = li.studies.level >= 5 ? t('game.facts.graduate', { subject: li.studies.subject }) : t('game.facts.major', { subject: li.studies.subject, year: classYear(li.studies.level) })
+    facts.push({ id: 'studies', group: 'life', label, telling: t('game.facts.studiesTelling', { first, subject: li.studies.subject }) })
   } else if (kind === 'teacher' && li.teaching) {
-    const subjects = li.teaching.subjects.map((s) => s.subject).join(' and ')
-    facts.push({ id: 'teaching', group: 'life', label: `Teaches ${subjects}, ${li.teaching.department}`, telling: `what ${first} teaches (${subjects})` })
+    const subjects = li.teaching.subjects.map((s) => s.subject).join(t('game.courses.and'))
+    facts.push({ id: 'teaching', group: 'life', label: t('game.facts.teaches', { subjects, department: li.teaching.department }), telling: t('game.facts.teachesTelling', { first, subjects }) })
   }
-  facts.push({ id: 'age', group: 'life', label: `${li.age} years old`, telling: `${first}'s age (${li.age})` })
+  facts.push({ id: 'age', group: 'life', label: t('game.facts.age', { age: li.age }), telling: t('game.facts.ageTelling', { first, age: li.age }) })
   if (li.birthday) {
     const month = content.calendar.months.find((m) => m.id === li.birthday?.month)?.name ?? li.birthday.month
-    facts.push({ id: 'birthday', group: 'life', label: `Born on ${li.birthday.day} ${month}`, telling: `${first}'s birthday (${li.birthday.day} ${month})` })
+    facts.push({ id: 'birthday', group: 'life', label: t('game.facts.birthday', { day: li.birthday.day, month }), telling: t('game.facts.birthdayTelling', { first, day: li.birthday.day, month }) })
   }
   if (li.room) {
     const where = content.locations.find((l) => l.id === li.room?.locationId)?.name ?? li.room.locationId
-    facts.push({ id: 'room', group: 'life', label: `Lives in ${li.room.name}, at ${where}`, detail: li.room.description, telling: `where ${first} lives (${li.room.name}, at ${where})` })
+    facts.push({ id: 'room', group: 'life', label: t('game.facts.room', { room: li.room.name, where }), detail: li.room.description, telling: t('game.facts.roomTelling', { first, room: li.room.name, where }) })
   }
   li.ai.secrets.forEach((secret, index) => {
     if (secret.text.trim() === '') return
-    facts.push({ id: `secret:${index}`, group: 'secrets', label: secret.text, telling: `the secret: ${secret.text}` })
+    facts.push({ id: `secret:${index}`, group: 'secrets', label: secret.text, telling: t('game.facts.secretTelling', { secret: secret.text }) })
   })
   return facts
 }
@@ -117,13 +118,5 @@ export function describeLearned(content: ContentPack, loveInterestId: string, fa
   const fact = li && factsOf(content, li).find((f) => f.id === factId)
   if (!li || !fact) return undefined
   const first = li.name.split(' ')[0]
-  const about: Record<FactGroup, string> = {
-    likes: `${first} likes ${fact.label}`,
-    dislikes: `${first} dislikes ${fact.label}`,
-    traits: `${first} is ${fact.label.toLowerCase()}`,
-    admires: `${first} is drawn to ${fact.label}`,
-    life: `${first}: ${fact.label}`,
-    secrets: `${first} confided in you`
-  }
-  return about[fact.group]
+  return t(`game.facts.learned.${fact.group}`, { first, label: fact.group === 'traits' ? fact.label.toLowerCase() : fact.label })
 }

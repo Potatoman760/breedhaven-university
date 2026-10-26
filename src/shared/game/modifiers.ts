@@ -1,4 +1,5 @@
-import { ADDED_KINDS, type Boon, type ContentPack, type GameState, type Modifier, type ModifierKind, type LearntSkill } from '../model'
+import { ADDED_KINDS, courseOf, type Boon, type ContentPack, type GameState, type Modifier, type ModifierKind, type LearntSkill } from '../model'
+import { t } from '../i18n'
 
 /**
  * What changes the game's numbers for him: the courses he has got far enough in and the relics he has brought up
@@ -22,9 +23,10 @@ export interface About {
  */
 export function skillsLearnt(content: Pick<ContentPack, 'skills'>, state: Learner): LearntSkill[] {
   return content.skills.flatMap((skill): LearntSkill[] => {
-    const taking = state.courses.some((course) => course.id === skill.courseId && state.enrolment?.includes(course.id))
-    const marks = state.coursePoints[skill.courseId] ?? 0
-    if (!taking || marks < skill.at) return []
+    // Whichever section of its course he is in: his marks are that section's.
+    const mine = state.courses.filter((course) => courseOf(course) === skill.courseId && state.enrolment?.includes(course.id))
+    const marks = Math.max(0, ...mine.map((course) => state.coursePoints[course.id] ?? 0))
+    if (mine.length === 0 || marks < skill.at) return []
     const up = skill.upgrade
     if (!up || marks < up.at) return [{ ...skill, level: 1 }]
     return [
@@ -113,8 +115,12 @@ export const isAdded = (kind: ModifierKind): boolean => ADDED_KINDS.includes(kin
 
 /** In a few words, what a modifier does: "x2 affection", "+2 comfort". For the bag and the stat sheet. */
 export function describeChange(modifier: Modifier): string {
-  const what = modifier.stats ? `${modifier.stats.join(' and ')} training` : modifier.kind === 'desireGate' ? 'desire she needs' : modifier.kind
-  if (modifier.kind === 'unguarded') return 'birth control does not count'
+  const what = modifier.stats
+    ? t('scene.modifiers.training', { stats: modifier.stats.join(t('scene.list.and')) })
+    : modifier.kind === 'desireGate'
+      ? t('scene.modifiers.desireNeeded')
+      : modifier.kind
+  if (modifier.kind === 'unguarded') return t('scene.modifiers.unguarded')
   if (modifier.kind === 'desireGate') return `-${modifier.amount} ${what}`
   if (isAdded(modifier.kind)) return `+${modifier.amount} ${what}`
   return `x${modifier.amount} ${what}`

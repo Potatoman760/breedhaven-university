@@ -62,13 +62,13 @@
     }
   ],
   "weekdays": [
-    "Solday",
-    "Moonday",
-    "Tidesday",
-    "Windsday",
-    "Hearthday",
-    "Marketday",
-    "Restday"
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday"
   ],
   "hoursPerDay": 24,
   "periods": [
@@ -103,7 +103,7 @@
     "day": 15,
     "hour": 8
   },
-  "startWeekday": 0,
+  "startWeekday": 1,
   "lengthDays": 133,
   "weather": [
     {

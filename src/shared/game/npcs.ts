@@ -5,6 +5,7 @@ import { workplaceNow } from './map'
 import { sceneBaseline } from './scene'
 import { scheduledLocationId } from './schedule'
 import { sceneRelicUses } from './relics'
+import { t } from '../i18n'
 
 // How many NPCs can have a part in someone else's scene.
 const MAX_EXTRAS = 2
@@ -61,10 +62,10 @@ export function sceneExtras(content: ContentPack, state: GameState, scene: Pick<
 
 export function canTalkToNpc(content: ContentPack, state: GameState, npcId: string): PerformCheck {
   const npc = npcOf(content, npcId)
-  if (!npc) return { ok: false, reasons: ['Nobody by that name'] }
+  if (!npc) return { ok: false, reasons: [t('scene.npcs.nobody')] }
   const reasons: string[] = []
-  if (isGameOver(content.calendar, state.time)) reasons.push('The game is over')
-  if (npcLocation(content, state, npc) !== state.locationId) reasons.push(`${npc.name} is not here`)
+  if (isGameOver(content.calendar, state.time)) reasons.push(t('scene.npcs.over'))
+  if (npcLocation(content, state, npc) !== state.locationId) reasons.push(t('scene.npcs.notHere', { name: npc.name }))
   return { ok: reasons.length === 0, reasons }
 }
 
@@ -81,7 +82,7 @@ export function talkToNpc(content: ContentPack, state: GameState, npcId: string)
       companionIds: [],
       npc: true,
       nsfw: false,
-      beats: [{ activityName: `A word with ${npc.name}`, locationName: place?.name, description: npc.bio || undefined }],
+      beats: [{ activityName: t('scene.npcs.word', { name: npc.name }), locationName: place?.name, description: npc.bio || undefined }],
       messages: [],
       gifts: [],
       conceived: [], departed: [],

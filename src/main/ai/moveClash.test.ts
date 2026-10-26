@@ -178,6 +178,6 @@ describe('agreeing in words to a plan already suggested', () => {
     const waiting = buildCharacterPrompt({ content, state, loveInterestId: 'ana', sceneBeats: scene.beats, pendingProposal: pending })
     expect(waiting).toContain('You have already suggested "Tea" on')
     expect(waiting).toContain('write [AGREED] on a line of its own at the end of your reply, which books it')
-    expect(parseDirectives('Windsday it is.\n[AGREED]')).toMatchObject({ text: 'Windsday it is.', agreed: true })
+    expect(parseDirectives('Thursday it is.\n[AGREED]')).toMatchObject({ text: 'Thursday it is.', agreed: true })
   })
 })

@@ -1,6 +1,7 @@
 import { canPerform, isEventActivity } from '../../../shared/game'
 import type { Activity, ContentPack, GameState } from '../../../shared/model'
 import { ChevronIcon } from './icons'
+import { t } from '../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -28,10 +29,10 @@ export function ActivityList({ content, state, partnerId, disabled, onPick }: Pr
         const firstName = activity.withLoveInterest !== 'none' ? partner?.name.split(' ')[0] : undefined
         return (
           <button key={activity.id} className="featured" disabled={disabled} onClick={() => onPick(activity)}>
-            <span className="chip outline-light">Event</span>
-            <span className="featured-title">{firstName ? `${activity.name} with ${firstName}` : activity.name}</span>
+            <span className="chip outline-light">{t('screens.dayView.eventChip')}</span>
+            <span className="featured-title">{firstName ? t('screens.activityList.with', { activity: activity.name, name: firstName }) : activity.name}</span>
             <span>
-              {activity.durationHours} {activity.durationHours === 1 ? 'hour' : 'hours'}
+              {t('screens.activityList.hours', { n: activity.durationHours })}
             </span>
             <ChevronIcon size={18} />
           </button>

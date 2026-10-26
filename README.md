@@ -16,7 +16,7 @@ npm run dev
 | `npm run dev`       | Launch the app with hot reload                |
 | `npm run build`     | Build main, preload and renderer into `out/`  |
 | `npm start`         | Run the built app                             |
-| `npm run build:win` | Package Windows as a `.zip` into `dist/` (unzip and run) |
+| `npm run build:win` | Package Windows unpacked into `dist/win-unpacked/` (run the `.exe` there) |
 | `npm run build:win:installer` | Package a Windows installer instead |
 | `npm run build:mac` | Package a macOS `.dmg` (run on a Mac)         |
 | `npm run build:linux` | Package a Linux AppImage and `.tar.gz`      |
@@ -75,26 +75,39 @@ left unsigned.
   University teaches, written down: its colleges, the subjects in them, and each subject's
   courses, each with its number, title, description, the six topics of its syllabus and the
   one skill it teaches. A course's number (`"number": "132"`, shown as `BUS 132`) is a label
-  in the 100s, not a year: there are no levels, and any student may take any course. Nobody
-  makes a subject up. A character's file names what she studies (`"studies": { "major":
+  in the 100s, not a year: there are no levels, and any student may take any course. Nothing
+  makes a subject up while a game is played. A character's file names what she studies (`"studies": { "major":
   "POL", "level": 1 }`, the level being her year, background only) or the courses she gives
   (`"subjects": [{ "major": "WOM", "number": "101" }]`), and the rest is filled in from the
   curriculum when the pack is read (`resolveCurriculum`), which also draws out of it the
   general subjects, `content.syllabus` and `content.skills`. The editor offers subjects and
   courses from a list, and saves a character with only the names. A subject is `general`
   when it is open to all and nobody reads it; a single course of a subject that is read can
-  be `general` too (the Women's Studies course every student passes through). It is
-  edited by hand, like the codex.
+  be `general` too (the Women's Studies course every student passes through). The game's
+  own is edited by hand, like the codex.
+- **Subjects of one's own** are made on the editor's **Majors** side: a subject, its code
+  (two to four capitals), its college (or a new one), the stats it trains, whether it has a
+  lab, and at least two courses (`MAJOR_COURSES`), each with six topics, a question for
+  each, and the skill it teaches. "Draft with AI" asks the main LLM for the lot from a
+  subject, a college and a few notes (`src/shared/game/draftMajor.ts`); the draft is checked
+  and put in the form to be read and changed, and only saving keeps it. A subject made
+  this way is kept in the add-on folder's `curriculum.json` (in `content/default/curriculum.json`
+  when the game's own files are being edited), is laid over the game's curriculum before any
+  character is read, and is offered wherever a subject is. It cannot be deleted while
+  anyone reads or teaches it. The game's own subjects are shown and not changed there.
 - **Coursework** (`coursework.json`) holds the rules of the timetable, and **the catalogue**
   (`catalogue.json`) is the term laid out: which of the written courses are given, who
   gives each, when each meets and who is in it. It is built by rule, with no LLM
   (`buildCatalogue` in `src/shared/game/catalogue.ts`), the same every time for the same
-  seed and characters, in the editor (Edit game content, Courses) or with
-  `npx jiti scripts/build-catalogue.ts`; build it again after adding a character or
-  changing what one studies or teaches. On disk it holds only what was worked out (`id`,
+  seed and characters. It is built again by itself whenever a save in the editor changes
+  who studies or teaches what, and when the game starts on add-ons it is out of date for,
+  with the seed it had (`rebuildCatalogue` in `src/main/content/addons.ts`); a game already
+  under way keeps the classes it started with, and a new character has hers from the next
+  new game. It can also be built in the editor (Edit game content, Courses) or with
+  `npx jiti scripts/build-catalogue.ts`. On disk it holds only what was worked out (`id`,
   `professor`, `teacherId`, `studentIds`, `meetings`); what a course is called and teaches
   is put back from the curriculum. A `catalogue.json` in the add-on folder is read in place
-  of the game's own.
+  of the game's own, and is removed again once the add-ons no longer change the term.
   - **Which courses are given**: every course of a subject a love interest studies, every
     course one teaches, and every general one. The rest are written and dormant
     (`dormantCourses`): they are what a new character can be given. A student sits two
@@ -115,8 +128,15 @@ left unsigned.
     an empty general course, then one where she would have company. A class holds at most
     `maxPerClass` (2) love interests, its teacher counted; those who read its subject sit
     it regardless, up to `maxMajorClass` (3). A course nobody ends up in is not given.
-  The editor shows when the saved catalogue is out of date (a character's subject or year
-  has changed since). At the start of term the player picks up to `maxCourses` on a week
+  - **Sections**: a student who finds no room in a course she needs, or no elective that
+    fits, has a second section of it opened (`course-pol-101-2`, shown as "POL 101
+    (section 2)"), taught by the subject's professor and meeting at hours clear of hers.
+    So classes grow with the roster, and there is no limit to how many characters can be
+    added to any subject. A section is the same course: its `courseId` names the written
+    one, whose syllabus and skill it shares, and nobody, the player included, takes two
+    sections of one course.
+  The title screen warns when the saved catalogue is out of date (a character's subject or year
+  has changed since) and it was not built again. At the start of term the player picks up to `maxCourses` on a week
   planner, a column per day and a row per hour; two courses whose hours overlap cannot
   both be taken. While a course meets, everyone taking it is at the Lecture Halls, and
   in class (`inClass` in `src/shared/game/map.ts`): not in the day view's "Here" row, not
@@ -180,14 +200,14 @@ user's own folder, whichever way it is run.
 **Events** are handwritten in `calendar.json`, programs and all: the editor has no side for
 them, and an add-on folder has no events of its own.
 
-"Edit game content" on the title screen opens the editor, for the developer only: it is there when
-the game is run from its source (`npm run dev`), and a built game leaves it out, code and all
-(`import.meta.env.DEV` in `App.tsx`). Its sides are the characters (love
-interests and NPCs: profile, traits, media, family, academics), the trait library,
+"Edit game content" on the title screen opens the editor, in a built game as from source, so
+that a player can add characters and subjects of their own. Its sides are the characters (love
+interests and NPCs: profile, traits, media, family, academics), majors, the trait library,
 courses, the player's start, locations, jobs, societies and ComfyUI.
 
 - **Add-ons** live in an `addons` folder in Electron's user-data folder (the editor has a
-  button that opens it): `love-interests/<id>.json`, `traits.json`, and artwork under
+  button that opens it): `love-interests/<id>.json`, `traits.json`, `curriculum.json`
+  (subjects of one's own), `catalogue.json` (built for them), and artwork under
   `sprites/<id>/`. They are laid over the game's own content when it loads
   (`src/main/content/addons.ts`). An add-on with a new id is a new character; one with a
   built-in character's id takes her place, and deleting it puts the original back. The
@@ -204,6 +224,38 @@ courses, the player's start, locations, jobs, societies and ComfyUI.
   with `addons/` are served from there.
 - **Traits**: toggle a character's traits, and add, change or remove traits in the shared
   library. A trait someone still has can't be deleted.
+
+## Languages
+
+The game is played in one language at a time, chosen in **Settings** (offered once there is
+more than one). It covers the interface, the content, what the LLM is told, and what it is
+asked to write. The choice is kept in `settings.json` with the LLM profiles.
+
+- **The game's own text** (every label, message, prompt and tool description the code
+  writes) is looked up with `t(key, params)` from `src/shared/i18n`. The English is in
+  `src/shared/i18n/en/<namespace>.json` (`core`, `scene`, `llm`, `game`, `comfy`, `editor`,
+  `shell`, `screens`, `panels`). A key is its namespace and its name, `scene.intimacy.onControl`,
+  and is typed: one that does not exist fails the typecheck. Messages take `{name}`,
+  `{n, plural, one {# day} other {# days}}` and `{x, select, a {…} other {…}}`
+  (`src/shared/i18n/format.ts`); any other brace is literal, so JSON in a prompt needs no
+  escaping. Never call `t()` at module load: the language is set after modules are read.
+- **Another language** is a folder beside `content/default/`: `content/<id>/language.json`
+  (`{ "name": "Deutsch" }`), `strings/<namespace>.json` with any of the English keys
+  translated, and any content file laid out as in `content/default/` (`codex.json`,
+  `love-interests/anwen.json`) holding only the text it translates. Content is laid over the
+  English entry by entry, by `id` (or a subject's `code`, a course's `number`), and by place
+  where entries have none; lists of plain values are replaced whole. Ids, numbers and
+  fields that name other entries (`locationId`, `traitIds`) are never changed by it
+  (`src/main/content/language.ts`). Anything a language leaves out is in English. Messages
+  that name an unknown key, or take other values than the English, are reported in the
+  console when the language is loaded.
+- **What stays English**: hidden tags and anything the game parses back out of a reply,
+  tool and JSON property names, image-generation prompts for ComfyUI, and developer errors.
+  In another language the LLM is told which one to write in by `core.llm.writeIn`, added
+  to every system prompt (empty in English).
+- **Saves** keep text as it was written: memories written in one language stay in it.
+- **The content editor** saves nothing while the game is in another language: what it
+  shows is the translation, and saving would write it over the English.
 
 ## AI
 
@@ -908,7 +960,22 @@ LLM only if it has a description.
 the left: **Characters**, **Locations** and **Courses**. Characters lists love interests
 and NPCs together. A character's **Kind** is one of student, teacher, another love
 interest, or NPC; an NPC is shown fewer fields (a role and what she knows, and no traits,
-likes, friends, room or secrets). Everyone is saved to the add-on folder as
+likes, friends, room or secrets). A new character starts from a few words the Main LLM
+writes her whole profile from (`src/shared/game/draftCharacter.ts`), from nothing, or from a
+SillyTavern card, the PNG or its JSON (`src/shared/game/sillyCard.ts`). A card is imported as it
+is (her name, its example chats, its lorebook as what she knows, its description and
+scenario as her backstory, its personality, and any age of 18 or over it states; never its
+picture) or with the rest written by the LLM, which is given the card to bring
+her into the setting; what the card has as it is is put over what the LLM wrote. `{{char}}`
+becomes her name and `{{user}}` becomes `{player}`. The Profile tab has her birthday, whether she knows him
+already when a game starts (`startsAt`, with her three meters), what she knows, and when
+each secret is told (`revealWhen`, the same conditions an activity's requirements use). On
+the Media tab an outfit can be her usual one, worn only where an event puts her in it
+(`oneOff`), or named for an event's outfit ("Worn for", from `eventOutfits` in
+`src/shared/game/events.ts`), and "Add a bathrobe for the trip" adds the bathrobe and its
+pregnant form the springs trip starts her in. Her room has a picture by day and one by
+night (`room.images`; either shows when the other is missing), or uses a view of the
+place it is in (`room.viewId`). Everyone is saved to the add-on folder as
 `love-interests/<id>.json`; one with a built-in character's id takes that character's
 place, and deleting the add-on puts the original back.
 
@@ -922,8 +989,9 @@ directly: nothing in a scene ever calls it, and it talks only to the address you
 - **The tool** (`src/renderer/src/ui/art/ArtTool.tsx`) is a dialog any editor screen can
   open with a target: a sprite of a character, a background, or a photo. The Media tab
   opens it for sprites, of love interests and NPCs alike, and a love interest's room opens
-  it for a background: her room's picture can be uploaded, generated from the room's
-  description, or set to one of the views of the place the room is in. Photos have no
+  it for a background: her room's pictures, by day and by night, can be uploaded or
+  generated from the room's description, or the room set to one of the views of the place
+  it is in. Photos have no
   screen that opens the tool yet.
 - **ComfyUI setup** (a tab in the tool, and the editor's own ComfyUI side; the game's Settings keep only the server and the game's workflows and models, which a player needs): the server address (with a Test button that names
   the machine that answered) and how long to wait.
@@ -958,6 +1026,13 @@ directly: nothing in a scene ever calls it, and it talks only to the address you
   and a sex-act drawn pregnant shares the prompt of the sex-act it is built on. The clip's size
   and length are the workflow's own. The clip is saved beside the picture as an `.mp4`,
   and clips have a time limit of their own, since they take far longer than a picture.
+  A sex-act of her own has no prompt in the settings: an edited prompt can be kept on the
+  pose ("Keep this prompt", `clipPrompt`), for that pose of hers only. "Make missing clips"
+  on the NSFW side makes one, one after another, for every sex-act with a picture and no
+  clip, as the tool would with nothing changed (`clipRequest` in `ui/art/ClipForm.tsx`).
+- **Cutting out**: a sprite's flat background is made transparent from the border inward
+  and, unless "edges only" is ticked, in the gaps the art closes around as well (inside a
+  loop of hair, between an arm and the body); edges only keeps a gap that is meant.
 - **Using a picture**: "Use as the sprite" puts it on the outfit under that expression in
   the editor's draft; saving the character keeps it, like any other edit.
 - **Locations** (Edit game content, Locations): each of the game's places can be changed

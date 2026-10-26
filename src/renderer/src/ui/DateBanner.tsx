@@ -1,6 +1,7 @@
 import type { GameDate } from '../../../shared/game'
 import type { WeatherType } from '../../../shared/model'
 import { WeatherIcon } from './icons'
+import { t } from '../../../shared/i18n'
 
 interface Props {
   date: GameDate
@@ -20,7 +21,7 @@ export function DateBanner({ date, minute = 0, weather, notes }: Props) {
       </div>
       <div>
         <div className="date-line">
-          {date.weekday}, {date.day} {date.month.name}
+          {t('screens.dateBanner.date', { weekday: date.weekday, day: date.day, month: date.month.name })}
         </div>
         <div className="caps">{notes.filter(Boolean).join(' · ')}</div>
       </div>

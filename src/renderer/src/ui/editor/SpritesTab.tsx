@@ -5,6 +5,7 @@ import { EXPRESSIONS, isPregnantPose, NSFW_POSES, NSFW_PREGNANT_POSES, STANDARD_
 import { errorMessage } from '../../errors'
 import { ArtTool } from '../art/ArtTool'
 import { BatchProgress, useBatch, type BatchOutcome } from '../art/batch'
+import { clipRequest } from '../art/ClipForm'
 import { fileName, pngsIn, renamed, toWebp } from '../art/optimize'
 import { Button } from '../Button'
 import { VideoIcon } from '../icons'
@@ -12,9 +13,10 @@ import { Lightbox } from '../Lightbox'
 import { Portrait } from '../Portrait'
 import { Group, Text } from './fields'
 import { EmptySlot, PictureSlot, SlotGrid } from './slots'
+import { t } from '../../../../shared/i18n'
 
 /** What the sprite editor needs of a character: a love interest and an NPC both have it. */
-type SpriteOwner = Pick<LoveInterest, 'id' | 'name' | 'pronouns' | 'appearance' | 'outfits' | 'defaultOutfitId' | 'faceY' | 'stageHeight' | 'animations' | 'imageSeed' | 'birthPicture' | 'walkSprite'>
+type SpriteOwner = Pick<LoveInterest, 'id' | 'name' | 'pronouns' | 'appearance' | 'outfits' | 'defaultOutfitId' | 'faceY' | 'stageHeight' | 'animations' | 'imageSeed' | 'birthPicture' | 'walkSprite' | 'room'>
 
 interface Props {
   draft: SpriteOwner
@@ -23,12 +25,15 @@ interface Props {
   plain?: boolean
   /** What the path of a picture the editor can change starts with: `addons/` for an add-on, nothing when the game's own files are being edited. */
   assetPrefix?: string
+  /** The outfits the game's events put a woman in, each with where: an outfit of hers by that id is the one she wears there. */
+  eventOutfits?: { id: string; worn: string[] }[]
 }
 
 // What the run that draws her missing NSFW poses is filed under, beside the runs of her outfits.
 const NSFW_BATCH = '(nsfw)'
 // And the run that draws the same poses pregnant.
 const NSFW_PREGNANT_BATCH = '(nsfw-pregnant)'
+const CLIPS_BATCH = '(clips)'
 // What the run that makes her pictures smaller is filed under.
 const OPTIMIZE_BATCH = '(optimize)'
 
@@ -52,7 +57,7 @@ function PercentBox({ value, min, max, onChange }: { value: number; min: number;
     <span className="percent-box">
       <input
         inputMode="numeric"
-        aria-label="Height on stage, as a percentage"
+        aria-label={t('editor.sprites.heightPercent')}
         value={text ?? String(value)}
         onChange={(e) => setText(e.target.value.replace(/[^0-9]/g, '').slice(0, 3))}
         onBlur={commit}
@@ -64,11 +69,13 @@ function PercentBox({ value, min, max, onChange }: { value: number; min: number;
 }
 
 /** Outfits and their sprites, the portrait crop, and the NSFW pictures and clips. */
-export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Props) {
+export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, eventOutfits = [] }: Props) {
   const [notice, setNotice] = useState('')
   // The art tool open on her walking profile, and that picture shown large.
   const [walking, setWalking] = useState(false)
   const [walkViewing, setWalkViewing] = useState(false)
+  // Cutting out leaves the gaps the art closes around.
+  const [edgesOnly, setEdgesOnly] = useState(false)
   // The outfit and expression the art tool is open on, while it is.
   const [drawing, setDrawing] = useState<{ outfitId: string; expression: string } | null>(null)
   const ready = isSafeId(draft.id)
@@ -95,7 +102,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
   const forOwner = (owner: string) => (patch: Partial<SpriteOwner>) => {
     if (latest.current.id === owner) set(patch)
   }
-  const gone = (owner: string): BatchOutcome | undefined => (latest.current.id === owner ? undefined : { ok: false, message: 'another character was opened', fatal: true })
+  const gone = (owner: string): BatchOutcome | undefined => (latest.current.id === owner ? undefined : { ok: false, message: t('editor.sprites.anotherOpened'), fatal: true })
 
   /**
    * Draws every face an outfit lacks, one after another, and puts each on the outfit as it
@@ -111,7 +118,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
     const size = sizeFor(settings, 'sprite')
     const owner = latest.current.id
     const put = forOwner(owner)
-    const { failed } = await run(outfitId, 'Drawing', missing, (face) => face, async (face) => {
+    const { failed } = await run(outfitId, t('editor.common.drawing'), missing, (face) => face, async (face) => {
       const stopped = gone(owner)
       if (stopped) return stopped
       const who = latest.current
@@ -135,31 +142,31 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
       })
       return { ok: true }
     })
-    if (failed.length > 0) setNotice(`Stopped at ${failed[0]}`)
+    if (failed.length > 0) setNotice(t('editor.common.stoppedAt', { name: failed[0] }))
   }
 
-  // Her pictures that are still PNGs: everything the optimize button would turn into WebP.
-  const pngs = pngsIn({ outfits: draft.outfits, animations: draft.animations, birthPicture: draft.birthPicture, walkSprite: draft.walkSprite })
+  // Her pictures that are still PNGs, her room's among them: everything the optimize button would turn into WebP.
+  const pngs = pngsIn({ outfits: draft.outfits, animations: draft.animations, birthPicture: draft.birthPicture, walkSprite: draft.walkSprite, room: draft.room?.images })
 
   /**
    * Turns every PNG of hers into a WebP of the same picture, one after another, and puts each in every slot the PNG
    * was in as it is done. Nothing is kept until she is saved; the PNGs go once a save no longer names them.
    */
   async function optimize() {
-    const paths = pngsIn({ outfits: latest.current.outfits, animations: latest.current.animations, birthPicture: latest.current.birthPicture, walkSprite: latest.current.walkSprite })
+    const paths = pngsIn({ outfits: latest.current.outfits, animations: latest.current.animations, birthPicture: latest.current.birthPicture, walkSprite: latest.current.walkSprite, room: latest.current.room?.images })
     if (paths.length === 0 || batch) return
     setNotice('')
     const put = forOwner(latest.current.id)
-    const { failed } = await run(OPTIMIZE_BATCH, 'Optimizing', paths, fileName, async (path) => {
+    const { failed } = await run(OPTIMIZE_BATCH, t('editor.common.optimizing'), paths, fileName, async (path) => {
       try {
         const to = await toWebp(path)
-        put({ outfits: renamed(latest.current.outfits, path, to), animations: renamed(latest.current.animations, path, to), birthPicture: renamed(latest.current.birthPicture, path, to), walkSprite: renamed(latest.current.walkSprite, path, to) })
+        put({ outfits: renamed(latest.current.outfits, path, to), animations: renamed(latest.current.animations, path, to), birthPicture: renamed(latest.current.birthPicture, path, to), walkSprite: renamed(latest.current.walkSprite, path, to), room: latest.current.room && { ...latest.current.room, images: renamed(latest.current.room.images, path, to) } })
         return { ok: true }
       } catch (error) {
         return { ok: false, message: errorMessage(error) }
       }
     })
-    setNotice(failed.length > 0 ? `Could not optimize: ${failed.join('; ')}` : 'Optimized. Save the character to keep it.')
+    setNotice(failed.length > 0 ? t('editor.common.optimizeFailed', { failed: failed.join('; ') }) : t('editor.sprites.optimized'))
   }
 
   /** Whether a sprite still has its flat background: a PNG of hers in the add-on folder that is not already a cut-out. */
@@ -174,12 +181,12 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
     setNotice('')
     const owner = latest.current.id
     const put = forOwner(owner)
-    const { failed } = await run(outfitId, 'Cutting out', names, (name) => name, async (name) => {
+    const { failed } = await run(outfitId, t('editor.sprites.cuttingOut'), names, (name) => name, async (name) => {
       const stopped = gone(owner)
       if (stopped) return stopped
       const from = latest.current.outfits.find((o) => o.id === outfitId)?.sprites[name]?.image
       if (!from) return { ok: true }
-      const cut = await window.api.comfy.cutout({ path: from })
+      const cut = await window.api.comfy.cutout({ path: from, mode: edgesOnly ? 'edge' : 'gaps' })
       // One that can't be keyed is left as it is, and the rest go on.
       if (!cut.ok || !cut.path) return { ok: false, message: cut.message }
       const to = cut.path
@@ -192,7 +199,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
       })
       return { ok: true }
     })
-    setNotice(failed.length > 0 ? `Could not cut out: ${failed.join('; ')}` : 'Cut out. Save the character to keep them.')
+    setNotice(failed.length > 0 ? t('editor.sprites.cutFailed', { failed: failed.join('; ') }) : t('editor.sprites.cutAll'))
   }
 
   const setOutfit = (index: number, patch: Partial<Outfit>) =>
@@ -236,8 +243,8 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
     const sprite = outfit.sprites[name]
     setNotice('')
     try {
-      const cut = await window.api.comfy.cutout({ path: sprite.image })
-      if (!cut.ok || !cut.path) return setNotice(cut.colour ? `${cut.message} (The background it found is ${cut.colour}.)` : cut.message)
+      const cut = await window.api.comfy.cutout({ path: sprite.image, mode: edgesOnly ? 'edge' : 'gaps' })
+      if (!cut.ok || !cut.path) return setNotice(cut.colour ? t('editor.sprites.cutColour', { message: cut.message, colour: cut.colour }) : cut.message)
       // Every sprite on the old file moves, since that file is gone.
       const from = sprite.image
       const to = cut.path
@@ -247,7 +254,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
           sprites: Object.fromEntries(Object.entries(o.sprites).map(([key, s]) => [key, s.image === from ? { ...s, image: to } : s]))
         }))
       })
-      setNotice(cut.message || 'Cut out. Save the character to keep it.')
+      setNotice(cut.message || t('editor.sprites.cutOne'))
     } catch (error) {
       setNotice(errorMessage(error))
     }
@@ -279,6 +286,17 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
   function addOutfit() {
     const id = unique('outfit', draft.outfits.map((o) => o.id))
     set({ outfits: [...draft.outfits, { id, name: 'New outfit', description: '', sprites: {}, pregnant: false }] })
+  }
+
+  // What the trip to the springs starts her in, and its pregnant form: without it she goes into the bath dressed.
+  function addBathrobe() {
+    set({
+      outfits: [
+        ...draft.outfits,
+        { id: 'bathrobe', name: 'Bathrobe', description: 'a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs', sprites: {}, pregnant: false },
+        { id: 'bathrobe-pregnant', name: 'Bathrobe, pregnant', inherits: 'bathrobe', description: 'She has a round, pregnant belly.', sprites: {}, pregnant: true }
+      ]
+    })
   }
 
   function removeOutfit(index: number) {
@@ -342,7 +360,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
     const size = sizeFor(settings, 'nsfw')
     const owner = latest.current.id
     const put = forOwner(owner)
-    const { failed } = await run(at, 'Drawing', missing, (pose) => pose.name, async (pose) => {
+    const { failed } = await run(at, t('editor.common.drawing'), missing, (pose) => pose.name, async (pose) => {
       const stopped = gone(owner)
       if (stopped) return stopped
       const who = latest.current
@@ -361,7 +379,30 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
       setPose(pose.id, { image: result.path }, put)
       return { ok: true }
     })
-    if (failed.length > 0) setNotice(`Stopped at ${failed[0]}`)
+    if (failed.length > 0) setNotice(t('editor.common.stoppedAt', { name: failed[0] }))
+  }
+
+  // The sex-acts that have a picture and no clip yet, in the order they are shown.
+  const unclipped = [...poses, ...pregnantPoses].filter((pose) => pose.image !== undefined && pose.clip === undefined)
+
+  /** Makes a clip of every sex-act that has a picture and no clip, one after another, as the clip tool would with nothing changed. */
+  async function generateMissingClips() {
+    const missing = [...latest.current.animations].filter((pose) => pose.image !== undefined && pose.clip === undefined)
+    setNotice('')
+    const [settings, list] = await Promise.all([window.api.comfy.getSettings(), window.api.comfy.workflows()])
+    const owner = latest.current.id
+    const put = forOwner(owner)
+    const { failed } = await run(CLIPS_BATCH, t('editor.sprites.animating'), missing, (pose) => pose.name, async (pose) => {
+      const stopped = gone(owner)
+      if (stopped) return stopped
+      const asked = clipRequest(settings, list, owner, { id: pose.id, image: pose.image!, clipPrompt: pose.clipPrompt })
+      if (!asked) return { ok: false, message: t('editor.sprites.noClipWorkflow'), fatal: true }
+      const result = await window.api.comfy.generateVideo(asked.request)
+      if (!result.ok || !result.path) return { ok: false, message: result.message, fatal: true }
+      setPose(pose.id, asked.loop === undefined ? { clip: result.path } : { clip: result.path, loop: asked.loop }, put)
+      return { ok: true }
+    })
+    if (failed.length > 0) setNotice(t('editor.common.stoppedAt', { name: failed[0] }))
   }
 
   // The picture being looked at, among the others of its outfit, in the order they are shown.
@@ -386,7 +427,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
         onView={() => setPoseViewing(pose.id)}
         badge={
           pose.clip && (
-            <button type="button" className="sprite-badge" title="This sex-act has a video clip. Open it to play, replace or remove it." aria-label={`${pose.name}: video clip`} onClick={() => setClipping(pose.id)}>
+            <button type="button" className="sprite-badge" title={t('editor.sprites.clipBadge')} aria-label={t('editor.sprites.clipLabel', { name: pose.name })} onClick={() => setClipping(pose.id)}>
               <VideoIcon size={18} />
             </button>
           )
@@ -400,31 +441,31 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
                 if (picked) setPose(pose.id, { image: picked })
               }}
             >
-              Replace
+              {t('editor.common.replace')}
             </Button>
-            <Button disabled={!ready} title="Draw this sex-act again with ComfyUI" onClick={() => setPosing(pose.id)}>
-              Generate
+            <Button disabled={!ready} title={t('editor.sprites.drawPoseAgain')} onClick={() => setPosing(pose.id)}>
+              {t('editor.common.generate')}
             </Button>
             {/* The clip is a layer over the picture: each is made, replaced and removed without touching the other. */}
-            <Button disabled={!ready} title="The sex-act's video clip: make one from this picture with ComfyUI, upload one, or replace or remove the one it has" onClick={() => setClipping(pose.id)}>
-              Video
+            <Button disabled={!ready} title={t('editor.sprites.videoTitle')} onClick={() => setClipping(pose.id)}>
+              {t('editor.sprites.video')}
             </Button>
-            <Button onClick={() => removePose(pose.id)}>Remove</Button>
+            <Button onClick={() => removePose(pose.id)}>{t('editor.common.remove')}</Button>
           </>
         }
       >
         <input
-          aria-label="Sex-act name"
+          aria-label={t('editor.sprites.poseName')}
           defaultValue={pose.id}
           key={pose.id}
           disabled={standard !== undefined}
           onBlur={(e) => renamePose(pose.id, slugify(e.target.value) || pose.id)}
         />
         <textarea
-          aria-label="Sex-act description"
+          aria-label={t('editor.sprites.poseDescription')}
           rows={2}
           value={pose.description}
-          placeholder={standard?.description ?? 'what it shows, so the LLM knows when it fits'}
+          placeholder={standard?.description ?? t('editor.sprites.descriptionPlaceholder')}
           onChange={(e) => setPose(pose.id, { description: e.target.value })}
         />
       </PictureSlot>
@@ -447,9 +488,9 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
       {viewedOutfit && viewed && (
         <Lightbox
           image={viewed[1].image}
-          name={`${viewedOutfit.name}: ${viewed[0]}`}
+          name={t('editor.sprites.viewing', { outfit: viewedOutfit.name, name: viewed[0] })}
           onClose={() => setViewing(null)}
-          position={viewedAll.length > 1 ? `${viewedAt + 1} of ${viewedAll.length}` : undefined}
+          position={viewedAll.length > 1 ? t('editor.common.position', { at: viewedAt + 1, total: viewedAll.length }) : undefined}
           onStep={viewedAll.length > 1 ? step : undefined}
         />
       )}
@@ -475,7 +516,8 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
               name: poseOf(clipping)!.name,
               image: poseOf(clipping)!.image!,
               clip: poseOf(clipping)!.clip,
-              loop: poseOf(clipping)!.loop
+              loop: poseOf(clipping)!.loop,
+              clipPrompt: poseOf(clipping)!.clipPrompt
             },
             onUse: (poseId, clip, loop) => setPose(poseId, loop === undefined ? { clip } : { clip, loop }),
             onUpload: async () => {
@@ -483,7 +525,8 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
               if (clip) setPose(clipping, { clip })
             },
             onRemove: () => setPose(clipping, { clip: undefined }),
-            onLoop: (loop) => setPose(clipping, { loop })
+            onLoop: (loop) => setPose(clipping, { loop }),
+            onKeepPrompt: (clipPrompt) => setPose(clipping, { clipPrompt })
           }}
           onClose={() => setClipping(null)}
         />
@@ -493,7 +536,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
           image={poseOf(poseViewing)!.image!}
           name={poseOf(poseViewing)!.name}
           onClose={() => setPoseViewing(null)}
-          position={`${withPictures.findIndex((pose) => pose.id === poseViewing) + 1} of ${withPictures.length}`}
+          position={t('editor.common.position', { at: withPictures.findIndex((pose) => pose.id === poseViewing) + 1, total: withPictures.length })}
           onStep={
             withPictures.length > 1
               ? (by) => setPoseViewing(withPictures[(withPictures.findIndex((pose) => pose.id === poseViewing) + by + withPictures.length) % withPictures.length].id)
@@ -507,95 +550,140 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
           onClose={() => setDrawing(null)}
         />
       )}
-      {!ready && <p className="notice">Give the character an id before adding pictures: they are filed under it.</p>}
+      {!ready && <p className="notice">{t('editor.common.idFirst')}</p>}
       {notice && <p className="notice">{notice}</p>}
 
       <div className="outfit-actions">
         <Button
           disabled={!ready || batch !== null || pngs.length === 0}
-          title="Turn every PNG of hers into a WebP of the same picture, a fraction of the size, and put it in the same places"
+          title={t('editor.sprites.optimizeTitle')}
           onClick={optimize}
         >
-          {pngs.length > 0 ? `Optimize (${pngs.length} PNG${pngs.length === 1 ? '' : 's'})` : 'Optimized'}
+          {pngs.length > 0 ? t('editor.common.optimize', { count: pngs.length }) : t('editor.common.optimizedButton')}
         </Button>
       </div>
       <BatchProgress batch={batch} at={OPTIMIZE_BATCH} onStop={stop} />
 
-      <Group title="Portrait" hint="The small round picture used on the map and in lists is cut from the default outfit's first sprite.">
+      <Group title={t('editor.sprites.portrait')} hint={t('editor.sprites.portraitHint')}>
         <div className="portrait-crop">
           <Portrait who={draft} caption />
           <label>
-            How far down the picture the face is: {draft.faceY}%
+            {t('editor.sprites.faceY', { y: draft.faceY })}
             <input type="range" min={0} max={100} value={draft.faceY} onChange={(e) => set({ faceY: Number(e.target.value) })} />
           </label>
         </div>
       </Group>
 
       <Group
-        title="Height on stage"
-        hint="An image model draws everyone filling the frame, however short she is meant to be. Draw her full-frame like anyone else, and set how tall she stands here: she is scaled from the floor up, in every outfit and expression. Portraits are not affected."
+        title={t('editor.sprites.height')}
+        hint={t('editor.sprites.heightHint')}
       >
         <div className="percent-field">
           <input
             type="range"
-            aria-label="Height on stage"
+            aria-label={t('editor.sprites.height')}
             min={40}
             max={115}
             value={draft.stageHeight}
             onChange={(e) => set({ stageHeight: Number(e.target.value) })}
           />
           <PercentBox value={draft.stageHeight} min={30} max={120} onChange={(stageHeight) => set({ stageHeight })} />
-          <span className="hint">{draft.stageHeight === 100 ? 'Full height' : draft.stageHeight < 100 ? 'Shorter than most' : 'Taller than most'}</span>
+          <span className="hint">{draft.stageHeight === 100 ? t('editor.sprites.fullHeight') : draft.stageHeight < 100 ? t('editor.sprites.shorter') : t('editor.sprites.taller')}</span>
           {draft.stageHeight !== 100 && (
             <Button variant="quiet" size="small" onClick={() => set({ stageHeight: 100 })}>
-              Reset
+              {t('editor.sprites.reset')}
             </Button>
           )}
         </div>
       </Group>
 
-      <Group title="Image generation" hint="Used by the art tool whenever it draws her.">
+      <Group title={t('editor.sprites.imageGen')} hint={t('editor.sprites.imageGenHint')}>
         <label className="studio-narrow">
-          ImageGen preferred seed
+          {t('editor.common.seed')}
           <input
             inputMode="numeric"
             value={draft.imageSeed ?? ''}
-            placeholder="Random"
+            placeholder={t('editor.common.random')}
             onChange={(e) => {
               const digits = e.target.value.replace(/\D/g, '')
               set({ imageSeed: digits === '' ? undefined : Number(digits) })
             }}
           />
-          <span className="hint">The same seed keeps her face and build alike from one picture to the next. Empty, each picture gets a seed of its own.</span>
+          <span className="hint">{t('editor.sprites.seedHint')}</span>
         </label>
       </Group>
 
       <Group
-        title="Outfits"
+        title={t('editor.sprites.outfits')}
         hint={
           plain
-            ? 'Each outfit has its own pictures. The LLM reads every name and description to decide which to show, so describe them.'
-            : `Every love interest has four outfits: her usual clothes, nude, and each of those pregnant, worn once a pregnancy shows. Each has seven faces (${EXPRESSIONS.join(', ')}), and in a scene the LLM picks one for her in every reply. A face that has not been drawn shows the neutral one, and an outfit with no pictures borrows from the one nearest it.`
+            ? t('editor.sprites.outfitsHintPlain')
+            : t('editor.sprites.outfitsHint', { faces: EXPRESSIONS.join(', ') })
         }
       >
+        <label className="inline" title={t('editor.sprites.edgesTitle')}>
+          <input type="checkbox" checked={edgesOnly} onChange={(e) => setEdgesOnly(e.target.checked)} />
+          {t('editor.sprites.edges')}
+        </label>
+        <label>
+          {t('editor.sprites.usualOutfit')}
+          <select value={draft.defaultOutfitId} onChange={(e) => set({ defaultOutfitId: e.target.value })}>
+            {draft.outfits
+              .filter((outfit) => !outfit.pregnant)
+              .map((outfit) => (
+                <option key={outfit.id} value={outfit.id}>
+                  {outfit.name} ({outfit.id})
+                </option>
+              ))}
+          </select>
+        </label>
         {draft.outfits.map((outfit, index) => (
           <div key={index} className="outfit card">
             <div className="row">
-              <Text label="Id" value={outfit.id} disabled={isStandardOutfit(outfit.id)} onChange={(id) => {
+              <Text label={t('editor.common.id')} value={outfit.id} disabled={isStandardOutfit(outfit.id)} onChange={(id) => {
                 const next = slugify(id)
                 setOutfit(index, { id: next })
                 if (draft.defaultOutfitId === outfit.id) set({ outfits: draft.outfits.map((o, i) => (i === index ? { ...o, id: next } : o)), defaultOutfitId: next })
               }} />
-              <Text label="Name" value={outfit.name} onChange={(name) => setOutfit(index, { name })} />
+              <Text label={t('editor.common.name')} value={outfit.name} onChange={(name) => setOutfit(index, { name })} />
+              {/* An outfit by the id an event names is the one she wears there. */}
+              {!isStandardOutfit(outfit.id) && eventOutfits.length > 0 && (
+                <label>
+                  {t('editor.sprites.wornFor')}
+                  <select
+                    value={eventOutfits.some((one) => one.id === outfit.id) ? outfit.id : ''}
+                    onChange={(e) => {
+                      if (!e.target.value) return
+                      const next = e.target.value
+                      set({ outfits: draft.outfits.map((o, i) => (i === index ? { ...o, id: next } : o)), ...(draft.defaultOutfitId === outfit.id && { defaultOutfitId: next }) })
+                    }}
+                  >
+                    <option value="">{t('editor.sprites.ownChoosing')}</option>
+                    {eventOutfits
+                      .filter((one) => one.id === outfit.id || !draft.outfits.some((o) => o.id === one.id))
+                      .map((one) => (
+                        <option key={one.id} value={one.id}>
+                          {one.worn.join('; ')}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+              )}
             </div>
+            {!isStandardOutfit(outfit.id) && (
+              <label className="inline">
+                <input type="checkbox" checked={outfit.oneOff === true} onChange={(e) => setOutfit(index, { oneOff: e.target.checked || undefined })} />
+                {t('editor.sprites.oneOff')}
+              </label>
+            )}
             <label>
-              Parent outfit
+              {t('editor.sprites.parent')}
               <select
                 value={outfit.inherits ?? ''}
                 disabled={isStandardOutfit(outfit.id)}
                 onChange={(e) => setOutfit(index, { inherits: e.target.value || undefined })}
               >
-                <option value="">None: its description is its own</option>
+                <option value="">{t('editor.sprites.noParent')}</option>
                 {draft.outfits
                   .filter((other) => other.id !== outfit.id)
                   .map((other) => (
@@ -606,7 +694,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
               </select>
               {outfit.inherits && (
                 <span className="hint">
-                  Starts from that outfit's description: “{outfitDescription(draft.outfits, draft.outfits.find((o) => o.id === outfit.inherits)) || 'nothing written yet'}”
+                  {t('editor.sprites.inherits', { description: outfitDescription(draft.outfits, draft.outfits.find((o) => o.id === outfit.inherits)) || t('editor.sprites.nothingWritten') })}
                 </span>
               )}
             </label>
@@ -619,36 +707,35 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
                   disabled={isStandardOutfit(outfit.id) || (!outfit.pregnant && !outfit.inherits)}
                   onChange={(e) => setOutfit(index, { pregnant: e.target.checked })}
                 />
-                The pregnant form of its parent: worn in the parent's place once her pregnancy shows
+                {t('editor.sprites.pregnantForm')}
               </label>
             )}
             <Text
-              label={outfit.inherits ? 'Adds to it' : 'Description'}
+              label={outfit.inherits ? t('editor.sprites.addsToIt') : t('editor.common.description')}
               value={outfit.description}
               onChange={(description) => setOutfit(index, { description })}
               rows={outfit.inherits ? 2 : 3}
-              placeholder={outfit.inherits ? 'what is different about this one, as a sentence of its own' : 'what she is wearing, as the LLM should understand it'}
+              placeholder={outfit.inherits ? t('editor.sprites.addsPlaceholder') : t('editor.sprites.wearingPlaceholder')}
             />
             <label>
-              Pictures
+              {t('editor.sprites.pictures')}
               <select
                 value={outfit.fallback ?? ''}
                 disabled={outfit.id === draft.defaultOutfitId}
                 onChange={(e) => setOutfit(index, { fallback: e.target.value || undefined })}
               >
-                <option value="">Its own</option>
+                <option value="">{t('editor.room.itsOwn')}</option>
                 {draft.outfits
                   .filter((other) => other.id !== outfit.id && other.fallback !== outfit.id)
                   .map((other) => (
                     <option key={other.id} value={other.id}>
-                      Same as {other.name} ({other.id})
+                      {t('editor.sprites.sameAs', { name: other.name, id: other.id })}
                     </option>
                   ))}
               </select>
               {outfit.fallback && (
                 <span className="hint">
-                  She looks the same in this outfit as in that one, so its pictures are shown and this one needs none.
-                  {Object.keys(outfit.sprites).length > 0 && ` The ${Object.keys(outfit.sprites).length} it already has are kept, and come back if this is set to its own.`}
+                  {t('editor.sprites.fallbackHint', { kept: Object.keys(outfit.sprites).length > 0, count: Object.keys(outfit.sprites).length })}
                 </span>
               )}
             </label>
@@ -658,45 +745,45 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
               {!plain && EXPRESSIONS.some((face) => !(face in outfit.sprites)) && (
                 <Button
                   disabled={!ready || batch !== null}
-                  title="Draws every expression this outfit does not have yet with your own ComfyUI, and sets each as it is finished"
+                  title={t('editor.sprites.generateMissingTitle')}
                   onClick={() => generateMissing(outfit.id)}
                 >
-                  Generate all {EXPRESSIONS.filter((face) => !(face in outfit.sprites)).length} missing expressions
+                  {t('editor.sprites.generateMissing', { count: EXPRESSIONS.filter((face) => !(face in outfit.sprites)).length })}
                 </Button>
               )}
               {!plain && EXPRESSIONS.some((face) => !(face in outfit.sprites)) && (
                 <input
                   className="batch-seed"
                   inputMode="numeric"
-                  aria-label="Seed for the missing expressions"
-                  title="The seed for every picture in that run, in place of her preferred seed. Empty, her preferred seed is used."
+                  aria-label={t('editor.sprites.batchSeed')}
+                  title={t('editor.sprites.batchSeedTitle')}
                   value={batchSeeds[outfit.id] ?? ''}
-                  placeholder={draft.imageSeed === undefined ? 'Seed: random' : `Seed: ${draft.imageSeed}`}
+                  placeholder={draft.imageSeed === undefined ? t('editor.sprites.seedRandom') : t('editor.sprites.seedIs', { seed: draft.imageSeed })}
                   disabled={batch !== null}
                   onChange={(e) => setBatchSeeds({ ...batchSeeds, [outfit.id]: e.target.value.replace(/\D/g, '').slice(0, 15) })}
                 />
               )}
               <Button
                 disabled={!ready}
-                title="Draw a sprite of this outfit with your own ComfyUI"
+                title={t('editor.sprites.drawSpriteTitle')}
                 onClick={() => setDrawing({ outfitId: outfit.id, expression: EXPRESSIONS.find((face) => !(face in outfit.sprites)) ?? '' })}
               >
-                Generate a picture
+                {t('editor.player.generate')}
               </Button>
               <Button disabled={!ready} onClick={() => addSprite(index)}>
-                {plain ? 'Add a picture' : 'Add another picture'}
+                {plain ? t('editor.player.addPicture') : t('editor.sprites.addAnother')}
               </Button>
               {Object.values(outfit.sprites).some((sprite) => uncut(sprite.image)) && (
                 <Button
                   disabled={batch !== null}
-                  title="Makes the flat background transparent on every sprite of this outfit that still has one"
+                  title={t('editor.sprites.cutAllTitle')}
                   onClick={() => cutOutAll(outfit.id)}
                 >
-                  Cut out all {Object.values(outfit.sprites).filter((sprite) => uncut(sprite.image)).length}
+                  {t('editor.sprites.cutAllButton', { count: Object.values(outfit.sprites).filter((sprite) => uncut(sprite.image)).length })}
                 </Button>
               )}
               <Button variant="quiet" className="outfit-remove" disabled={draft.outfits.length <= 1 || isStandardOutfit(outfit.id) || outfit.id === draft.defaultOutfitId} onClick={() => removeOutfit(index)}>
-                Remove outfit
+                {t('editor.sprites.removeOutfit')}
               </Button>
             </div>
             <BatchProgress batch={batch} at={outfit.id} onStop={stop} />
@@ -717,14 +804,14 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
                           if (image) setOutfit(index, { sprites: { ...outfit.sprites, [name]: { ...sprite, image } } })
                         }}
                       >
-                        Replace
+                        {t('editor.common.replace')}
                       </Button>
-                      <Button disabled={!ready} title="Draw this sprite again with ComfyUI" onClick={() => setDrawing({ outfitId: outfit.id, expression: name })}>
-                        Generate
+                      <Button disabled={!ready} title={t('editor.sprites.drawSpriteAgain')} onClick={() => setDrawing({ outfitId: outfit.id, expression: name })}>
+                        {t('editor.common.generate')}
                       </Button>
                       {sprite.image.startsWith(assetPrefix) && sprite.image.toLowerCase().endsWith('.png') && (
-                        <Button title="Make its flat background transparent" onClick={() => cutOut(index, name)}>
-                          Cut out
+                        <Button title={t('editor.sprites.cutOutTitle')} onClick={() => cutOut(index, name)}>
+                          {t('editor.sprites.cutOut')}
                         </Button>
                       )}
                       <Button
@@ -733,23 +820,23 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
                           setOutfit(index, { sprites: rest })
                         }}
                       >
-                        Remove
+                        {t('editor.common.remove')}
                       </Button>
                     </>
                   }
                 >
                   <input
-                    aria-label="Sprite name"
+                    aria-label={t('editor.sprites.spriteName')}
                     defaultValue={name}
                     key={name}
                     disabled={isFace(name)}
                     onBlur={(e) => renameSprite(index, name, slugify(e.target.value) || name)}
                   />
                   <textarea
-                    aria-label="Sprite description"
+                    aria-label={t('editor.sprites.spriteDescription')}
                     rows={2}
                     value={sprite.description}
-                    placeholder="what it shows, so the LLM knows when it fits"
+                    placeholder={t('editor.sprites.descriptionPlaceholder')}
                     onChange={(e) => setOutfit(index, { sprites: { ...outfit.sprites, [name]: { ...sprite, description: e.target.value } } })}
                   />
                 </PictureSlot>
@@ -764,40 +851,51 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
             {outfit.fallback && (
               <div className="outfit-actions">
                 <Button variant="quiet" className="outfit-remove" disabled={draft.outfits.length <= 1 || isStandardOutfit(outfit.id)} onClick={() => removeOutfit(index)}>
-                  Remove outfit
+                  {t('editor.sprites.removeOutfit')}
                 </Button>
               </div>
             )}
           </div>
         ))}
-        <Button onClick={addOutfit}>
-          Add an outfit
-        </Button>
+        <div className="row checks">
+          <Button onClick={addOutfit}>{t('editor.sprites.addOutfit')}</Button>
+          {!plain && !draft.outfits.some((outfit) => outfit.id === 'bathrobe') && eventOutfits.some((one) => one.id === 'bathrobe') && (
+            <Button title={eventOutfits.find((one) => one.id === 'bathrobe')?.worn.join(', ')} onClick={addBathrobe}>
+              {t('editor.sprites.addBathrobe')}
+            </Button>
+          )}
+        </div>
       </Group>
 
       <Group
-        title="NSFW"
-        hint="Explicit pictures that take the sprite's place, one to a sex-act, as an outfit has one to a face. The LLM shows one when the scene reaches what its description says, and takes it down when it no longer fits. A sex-act can have a video clip as a layer over its picture: where it has one the clip is played, and the picture is what it falls back on. The picture is always what is shown here, marked in its corner when it has a clip. A clip is uploaded, or made from the picture with a video workflow on your own ComfyUI, and either can be replaced without touching the other."
+        title={t('editor.sprites.nsfw')}
+        hint={t('editor.sprites.nsfwHint')}
       >
         <div className="outfit-actions">
           {NSFW_POSES.some((pose) => !poseOf(pose.id)?.image) && (
             <Button
               variant="primary"
               disabled={!ready || batch !== null}
-              title="Draw every sex-act that has no picture yet with your own ComfyUI, one after another"
+              title={t('editor.sprites.generatePosesTitle')}
               onClick={() => generateMissingPoses()}
             >
-              Generate missing sex-acts ({NSFW_POSES.filter((pose) => !poseOf(pose.id)?.image).length})
+              {t('editor.sprites.generatePoses', { count: NSFW_POSES.filter((pose) => !poseOf(pose.id)?.image).length })}
             </Button>
           )}
-          <Button disabled={!ready} title="Draw a sex-act with your own ComfyUI" onClick={() => setPosing(NSFW_POSES.find((pose) => !poseOf(pose.id)?.image)?.id ?? NSFW_POSES[0].id)}>
-            Generate a picture
+          <Button disabled={!ready} title={t('editor.sprites.drawPoseTitle')} onClick={() => setPosing(NSFW_POSES.find((pose) => !poseOf(pose.id)?.image)?.id ?? NSFW_POSES[0].id)}>
+            {t('editor.player.generate')}
           </Button>
           <Button disabled={!ready} onClick={addPose}>
-            Add another picture
+            {t('editor.sprites.addAnother')}
           </Button>
+          {unclipped.length > 0 && (
+            <Button disabled={!ready || batch !== null} title={t('editor.sprites.clipsTitle')} onClick={generateMissingClips}>
+              {t('editor.sprites.clips', { count: unclipped.length })}
+            </Button>
+          )}
         </div>
         <BatchProgress batch={batch} at={NSFW_BATCH} onStop={stop} />
+        <BatchProgress batch={batch} at={CLIPS_BATCH} onStop={stop} />
 
         <SlotGrid wide>
           {poses.map(poseSlot)}
@@ -807,18 +905,18 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
       {/* The same poses drawn pregnant: shown in their place once a pregnancy shows. Only a love interest can be. */}
       {!plain && (
         <Group
-          title="NSFW, pregnant"
-          hint="The sex-acts above, drawn pregnant. Each is built on the sex-act over it: the same wording, with her pregnant nude in place of her nude. Once her pregnancy shows, the game puts this one up whenever the LLM asks for the sex-act. One with no picture here simply shows the one above."
+          title={t('editor.sprites.nsfwPregnant')}
+          hint={t('editor.sprites.nsfwPregnantHint')}
         >
           <div className="outfit-actions">
             {NSFW_PREGNANT_POSES.some((pose) => !poseOf(pose.id)?.image) && (
               <Button
                 variant="primary"
                 disabled={!ready || batch !== null}
-                title="Draw every pregnant sex-act that has no picture yet with your own ComfyUI, one after another"
+                title={t('editor.sprites.generatePregnantTitle')}
                 onClick={() => generateMissingPoses(NSFW_PREGNANT_POSES, NSFW_PREGNANT_BATCH)}
               >
-                Generate missing sex-acts ({NSFW_PREGNANT_POSES.filter((pose) => !poseOf(pose.id)?.image).length})
+                {t('editor.sprites.generatePoses', { count: NSFW_PREGNANT_POSES.filter((pose) => !poseOf(pose.id)?.image).length })}
               </Button>
             )}
           </div>
@@ -828,26 +926,32 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX }: Pr
       )}
 
       {!plain && (
-        <Group title="Walking" hint="Her in profile, walking right, in her usual clothes: she walks across the loading screen of a scene with her.">
+        <Group title={t('editor.sprites.walking')} hint={t('editor.sprites.walkingHint')}>
           {walking && <ArtTool target={{ kind: 'walk', who: draft, onUse: (walkSprite) => set({ walkSprite }) }} onClose={() => setWalking(false)} />}
-          {walkViewing && draft.walkSprite && <Lightbox image={draft.walkSprite} name="Walking" onClose={() => setWalkViewing(false)} />}
+          {walkViewing && draft.walkSprite && <Lightbox image={draft.walkSprite} name={t('editor.sprites.walking')} onClose={() => setWalkViewing(false)} />}
           <SlotGrid>
             {draft.walkSprite ? (
               <PictureSlot
                 image={draft.walkSprite}
-                name="Walking"
+                name={t('editor.sprites.walking')}
                 onView={() => setWalkViewing(true)}
                 actions={
                   <>
                     <Button disabled={!isSafeId(draft.id)} onClick={() => setWalking(true)}>
-                      Generate
+                      {t('editor.common.generate')}
                     </Button>
-                    <Button onClick={() => set({ walkSprite: undefined })}>Remove</Button>
+                    <Button disabled={!isSafeId(draft.id)} onClick={async () => {
+                      const picked = await window.api.editor.importAsset({ loveInterestId: draft.id, kind: 'image' })
+                      if (picked) set({ walkSprite: picked })
+                    }}>
+                      {t('editor.common.replace')}
+                    </Button>
+                    <Button onClick={() => set({ walkSprite: undefined })}>{t('editor.common.remove')}</Button>
                   </>
                 }
               />
             ) : (
-              <EmptySlot name="Walking" disabled={!isSafeId(draft.id)} onAdd={async () => {
+              <EmptySlot name={t('editor.sprites.walking')} disabled={!isSafeId(draft.id)} onAdd={async () => {
                 const picked = await window.api.editor.importAsset({ loveInterestId: draft.id, kind: 'image' })
                 if (picked) set({ walkSprite: picked })
               }} onGenerate={() => setWalking(true)} />

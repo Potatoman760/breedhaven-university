@@ -4,6 +4,7 @@ import type { ContentPack, GameState } from '../../../shared/model'
 import { Button } from './Button'
 import { Dialog } from './Dialog'
 import { Portrait } from './Portrait'
+import { t } from '../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -28,7 +29,7 @@ export function MasqueradeGuess({ content, state, onGuess }: Props) {
   const known = content.loveInterests.filter((li) => state.met.includes(li.id) && !standIns.has(li.id)).sort((a, b) => a.name.localeCompare(b.name))
 
   return picked ? (
-    <Dialog title={`Who is ${picked.mask.name}?`} onClose={() => setChosen(null)} ornate wide>
+    <Dialog title={t('panels.masquerade.whoIs', { mask: picked.mask.name })} onClose={() => setChosen(null)} ornate wide>
       <div className="masquerade-names">
         {known.map((li) => (
           <Button key={li.id} className="masquerade-name" onClick={() => onGuess(picked.id, li.id)}>
@@ -39,7 +40,7 @@ export function MasqueradeGuess({ content, state, onGuess }: Props) {
       </div>
     </Dialog>
   ) : (
-    <Dialog title="Unmask one" onClose={() => undefined} ornate noClose>
+    <Dialog title={t('panels.masquerade.unmask')} onClose={() => undefined} ornate noClose>
       <div className="masquerade-dancers">
         {dancers.map((one) => (
           <Button key={one.id} className="masquerade-dancer" onClick={() => setChosen(one.id)}>

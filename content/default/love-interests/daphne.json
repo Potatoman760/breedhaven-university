@@ -294,8 +294,8 @@
   "schedule": [
     {
       "weekdays": [
-        "Tidesday",
-        "Hearthday"
+        "Wednesday",
+        "Friday"
       ],
       "periods": [
         "evening"
@@ -304,7 +304,7 @@
     },
     {
       "weekdays": [
-        "Restday"
+        "Sunday"
       ],
       "periods": [
         "morning"
@@ -340,7 +340,9 @@
     "name": "a duty flat over the Cloister Halls gate",
     "description": "A modern Breedhaven university apartment bedroom belonging to a fourth-year female volleyball captain: spacious and stylish, with magitech touches, a large bed, university volleyball trophies and medals, framed team photos, volleyball gear, athletic shoes, and a captain’s jacket. Warm wood furniture, soft ambient magical lighting, subtle Bloom-inspired decorations, laptop and textbooks on a desk, lived-in but tidy, confident sporty atmosphere.",
     "locationId": "dormitories",
-    "background": "generated/backgrounds/daphne/view.webp"
+    "images": {
+      "day": "generated/backgrounds/daphne/view.webp"
+    }
   },
   "birthPicture": "sprites/daphne/birth.webp",
   "walkSprite": "sprites/daphne/walk-cutout.webp",

@@ -16,7 +16,6 @@ import {
   sizeFor,
   SLOT_LABELS,
   videoPromptFor,
-  WORKFLOW_KIND_LABELS,
   WORKFLOW_KINDS,
   type ArtKind,
   type BindingSlot,
@@ -28,6 +27,7 @@ import {
   type WorkflowSummary
 } from '../../../../shared/comfy'
 import { NSFW_POSES } from '../../../../shared/model'
+import { t } from '../../../../shared/i18n'
 
 interface Props {
   settings: ComfySettings
@@ -99,10 +99,10 @@ export function ComfySetup({ settings, list, onSave, connectionOnly }: Props) {
     <section className="studio-main">
       <div className="studio-form editor-body">
         <div className="editor-group">
-          <h2>Server</h2>
+          <h2>{t('comfy.setup.server')}</h2>
           <div className="row">
             <label>
-              ComfyUI address
+              {t('comfy.setup.address')}
               <input
                 value={url}
                 placeholder={COMFY_DEFAULT_BASE_URL}
@@ -112,22 +112,22 @@ export function ComfySetup({ settings, list, onSave, connectionOnly }: Props) {
               />
             </label>
             <Button disabled={testing} onClick={runTest}>
-              {testing ? 'Testing...' : 'Test'}
+              {testing ? t('comfy.setup.testing') : t('comfy.setup.test')}
             </Button>
           </div>
           {typed.problem !== null && url.trim() !== '' && <p className="notice">{typed.problem}</p>}
-          {test && <p className={test.ok ? 'hint' : 'notice'}>{test.ok ? `Answered. ${test.device ?? ''}` : test.message}</p>}
+          {test && <p className={test.ok ? 'hint' : 'notice'}>{test.ok ? t('comfy.setup.answered', { device: test.device ?? '' }) : test.message}</p>}
 
           {list && !list.ok && list.message && <p className="notice">{list.message}</p>}
 
           {/* Level at their boxes, however their labels wrap. */}
           <div className="row level-inputs">
             <label className="studio-narrow">
-              Give up after (seconds)
+              {t('comfy.setup.timeout')}
               <input type="number" min={COMFY_MIN_TIMEOUT_SECONDS} max={COMFY_MAX_TIMEOUT_SECONDS} value={timeout} onChange={(e) => setTimeoutSeconds(e.target.value)} onBlur={commitTimeout} />
             </label>
             <label className="studio-narrow">
-              On a clip, after
+              {t('comfy.setup.videoTimeout')}
               <input type="number" min={COMFY_MIN_TIMEOUT_SECONDS} max={COMFY_MAX_VIDEO_TIMEOUT_SECONDS} value={videoTimeout} onChange={(e) => setVideoTimeout(e.target.value)} onBlur={commitVideoTimeout} />
             </label>
           </div>
@@ -138,20 +138,16 @@ export function ComfySetup({ settings, list, onSave, connectionOnly }: Props) {
         {!connectionOnly && (
         <>
         <div className="editor-group">
-          <h2>Kinds of picture</h2>
-          <p className="hint">Each kind has its own size and its own framing words, which close every prompt of that kind, after its subject. They say how the picture is composed, not what is in it.</p>
+          <h2>{t('comfy.setup.kinds')}</h2>
+          <p className="hint">{t('comfy.setup.kindsHint')}</p>
           {ART_KINDS.map((kind) => (
             <KindRow key={kind} kind={kind} settings={settings} onChange={(change) => setKind(kind, change)} />
           ))}
         </div>
 
         <div className="editor-group">
-          <h2>Video clips</h2>
-          <p className="hint">
-            A clip is made from a sex-act's NSFW picture, which is its first frame, with the prompt kept here for that sex-act. It says what moves and
-            nothing of who she is, since the picture already shows her, so one prompt serves every character. A sex-act drawn pregnant uses the
-            prompt of the sex-act it is built on.
-          </p>
+          <h2>{t('comfy.setup.videoClips')}</h2>
+          <p className="hint">{t('comfy.setup.videoClipsHint')}</p>
           {NSFW_POSES.map((pose) => (
             <VideoPromptRow key={pose.id} pose={pose} settings={settings} onChange={(prompt) => patch({ videoPrompts: { ...settings.videoPrompts, [pose.id]: prompt } })} />
           ))}
@@ -162,8 +158,8 @@ export function ComfySetup({ settings, list, onSave, connectionOnly }: Props) {
 
       {!connectionOnly && (
       <div className="studio-results">
-        <h2>Workflows</h2>
-        {workflows.length === 0 && <p className="hint">The game has none.</p>}
+        <h2>{t('comfy.setup.workflows')}</h2>
+        {workflows.length === 0 && <p className="hint">{t('comfy.setup.noWorkflows')}</p>}
         <div className="studio-workflows">
           {workflows.map((w) => (
             <button key={w.file} className={w.file === current?.file ? 'courier-person selected' : 'courier-person'} onClick={() => setSelected(w.file)}>
@@ -171,12 +167,12 @@ export function ComfySetup({ settings, list, onSave, connectionOnly }: Props) {
                 <strong>{w.name}</strong>
                 <span className="hint">
                   {w.problem !== null
-                    ? 'Unreadable'
+                    ? t('comfy.setup.unreadable')
                     : w.bindings.positive === null
-                      ? 'Nowhere to put a prompt'
+                      ? t('comfy.setup.noPrompt')
                       : WORKFLOW_KINDS.filter((kind) => settings.defaults[kind] === w.file)
-                          .map((kind) => `Default for ${WORKFLOW_KIND_LABELS[kind].toLowerCase()}s`)
-                          .join(' · ') || (w.bindings.firstFrame !== null ? 'Ready, for video clips' : 'Ready')}
+                          .map((kind) => t('comfy.setup.defaultForKind', { kind }))
+                          .join(' · ') || (w.bindings.firstFrame !== null ? t('comfy.setup.readyVideo') : t('comfy.setup.ready'))}
                 </span>
               </span>
             </button>
@@ -203,15 +199,15 @@ function KindRow({ kind, settings, onChange }: KindRowProps) {
       <strong>{ART_KIND_LABELS[kind]}</strong>
       <div className="row">
         <label>
-          Framing
+          {t('comfy.setup.framing')}
           <textarea rows={3} value={framing} placeholder={DEFAULT_FRAMING[kind]} onChange={(e) => setFraming(e.target.value)} onBlur={() => framing !== framingFor(settings, kind) && onChange({ framing })} />
         </label>
         <label className="studio-narrow">
-          Width
+          {t('comfy.setup.width')}
           <input type="number" min={64} max={8192} step={8} defaultValue={size.width} onBlur={(e) => Number(e.target.value) !== size.width && onChange({ width: Number(e.target.value) })} />
         </label>
         <label className="studio-narrow">
-          Height
+          {t('comfy.setup.height')}
           <input type="number" min={64} max={8192} step={8} defaultValue={size.height} onBlur={(e) => Number(e.target.value) !== size.height && onChange({ height: Number(e.target.value) })} />
         </label>
       </div>
@@ -284,17 +280,17 @@ function WorkflowEditor({ workflow, settings, onPatch }: WorkflowEditorProps) {
       ))}
 
       <div className="row checks">
-        <span className="field-label">Default for</span>
+        <span className="field-label">{t('comfy.setup.defaultFor')}</span>
         {kindsOf(workflow).map((kind) => (
           <label key={kind} className="inline">
             <input type="checkbox" checked={settings.defaults[kind] === file} onChange={(e) => setDefault(kind, e.target.checked)} />
-            {WORKFLOW_KIND_LABELS[kind]}s
+            {t('comfy.setup.kindPlural', { kind })}
           </label>
         ))}
       </div>
 
       <label>
-        Prompt prefix
+        {t('comfy.setup.promptPrefix')}
         <textarea
           rows={2}
           value={prefix}
@@ -302,10 +298,10 @@ function WorkflowEditor({ workflow, settings, onPatch }: WorkflowEditorProps) {
           onChange={(e) => setPrefix(e.target.value)}
           onBlur={() => prefix !== (settings.promptPrefixes[file] ?? '') && onPatch({ promptPrefixes: { ...settings.promptPrefixes, [file]: prefix } })}
         />
-        <span className="hint">Put in front of every prompt sent through this workflow: model tokens, quality tags, LoRA triggers.</span>
+        <span className="hint">{t('comfy.setup.promptPrefixHint')}</span>
       </label>
       <label>
-        Negative prefix
+        {t('comfy.setup.negativePrefix')}
         <textarea
           rows={2}
           value={negative}
@@ -316,8 +312,8 @@ function WorkflowEditor({ workflow, settings, onPatch }: WorkflowEditorProps) {
       </label>
 
       <div className="editor-group">
-        <h2>Where things go</h2>
-        <p className="hint">Worked out by reading the workflow. Repoint one if it chose the wrong node. A workflow with a first frame makes clips from pictures, and is not used to draw them.</p>
+        <h2>{t('comfy.setup.bindings')}</h2>
+        <p className="hint">{t('comfy.setup.bindingsHint')}</p>
         {BINDING_SLOTS.map((slot) => {
           const bound = workflow.bindings[slot]
           const value = slot in override ? (override[slot] ? key(override[slot]) : NONE) : AUTO
@@ -326,15 +322,15 @@ function WorkflowEditor({ workflow, settings, onPatch }: WorkflowEditorProps) {
             <label key={slot}>
               {SLOT_LABELS[slot]}
               <select value={value} onChange={(e) => bind(slot, e.target.value)}>
-                <option value={AUTO}>{detected ? `Detected: ${analysis.notes[slot] ?? `#${detected.node} ${detected.field}`}` : 'Detected: nothing'}</option>
-                <option value={NONE}>Leave as the workflow has it</option>
+                <option value={AUTO}>{detected ? t('comfy.setup.detected', { note: analysis.notes[slot] ?? `#${detected.node} ${detected.field}` }) : t('comfy.setup.detectedNothing')}</option>
+                <option value={NONE}>{t('comfy.setup.leave')}</option>
                 {options(slot).map((option) => (
                   <option key={key(option.at)} value={key(option.at)}>
                     {option.label}
                   </option>
                 ))}
               </select>
-              {!bound && slot !== 'negative' && slot !== 'firstFrame' && slot !== 'lastFrame' && slot !== 'length' && <span className="hint">Not bound: {slot === 'output' ? 'any picture the run makes is taken.' : 'this value is not sent.'}</span>}
+              {!bound && slot !== 'negative' && slot !== 'firstFrame' && slot !== 'lastFrame' && slot !== 'length' && <span className="hint">{slot === 'output' ? t('comfy.setup.unboundOutput') : t('comfy.setup.unbound')}</span>}
             </label>
           )
         })}
@@ -372,7 +368,7 @@ export function ComfySetupPanel({ connectionOnly }: Pick<Props, 'connectionOnly'
   return (
     <>
       {status && <p className="notice">{status}</p>}
-      {settings ? <ComfySetup settings={settings} list={list} onSave={save} connectionOnly={connectionOnly} /> : <p className="hint">Reading the ComfyUI settings...</p>}
+      {settings ? <ComfySetup settings={settings} list={list} onSave={save} connectionOnly={connectionOnly} /> : <p className="hint">{t('comfy.setup.loading')}</p>}
     </>
   )
 }

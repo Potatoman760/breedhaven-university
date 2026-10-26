@@ -2,6 +2,7 @@ import { kindOf, type ContentPack, type GameState, type Intro, type OrientationS
 import { toDate } from './calendar'
 import { courseMembers } from './courses'
 import { sceneBaseline } from './scene'
+import { t } from '../i18n'
 
 // How many love interests the player meets at one step: one, so that the first day introduces them slowly.
 const MET_AT_A_STEP = 1
@@ -74,7 +75,7 @@ export function attendOrientation(content: ContentPack, state: GameState): { sta
           nsfw: false,
           beats: [
             {
-              activityName: `Orientation: ${step.name}`,
+              activityName: t('game.orientation.activity', { step: step.name }),
               locationName: place?.name,
               description: step.description || undefined,
               direction: step.direction || undefined

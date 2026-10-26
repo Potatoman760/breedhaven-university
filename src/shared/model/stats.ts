@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { t } from '../i18n'
 
 /** The player's six abilities. Classes mostly raise the last three; the rest come from how free time is spent. */
 export const STATS = ['strength', 'dexterity', 'endurance', 'intelligence', 'charisma', 'wisdom'] as const
@@ -7,12 +8,22 @@ export type Stat = z.infer<typeof StatSchema>
 
 /** Three-letter labels for tight spaces. */
 export const STAT_LABELS: Record<Stat, string> = {
-  strength: 'STR',
-  dexterity: 'DEX',
-  endurance: 'END',
-  intelligence: 'INT',
-  charisma: 'CHA',
-  wisdom: 'WIS'
+  get strength() { return t('game.stats.strengthShort') },
+  get dexterity() { return t('game.stats.dexterityShort') },
+  get endurance() { return t('game.stats.enduranceShort') },
+  get intelligence() { return t('game.stats.intelligenceShort') },
+  get charisma() { return t('game.stats.charismaShort') },
+  get wisdom() { return t('game.stats.wisdomShort') }
+}
+
+/** Each ability's name, as it is shown. */
+export const STAT_NAMES: Record<Stat, string> = {
+  get strength() { return t('game.stats.strength') },
+  get dexterity() { return t('game.stats.dexterity') },
+  get endurance() { return t('game.stats.endurance') },
+  get intelligence() { return t('game.stats.intelligence') },
+  get charisma() { return t('game.stats.charisma') },
+  get wisdom() { return t('game.stats.wisdom') }
 }
 
 /** A note sent between the player and a love interest by the intercampus courier. */

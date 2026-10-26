@@ -3,6 +3,7 @@ import { bondOf } from './bonds'
 import { toDate } from './calendar'
 import { applyFeelings } from './memory'
 import { sceneBaseline } from './scene'
+import { t } from '../i18n'
 
 type Masquerade = NonNullable<EventPart['masquerade']>
 type Dancer = NonNullable<GameState['masquerade']>['dancers'][number]
@@ -10,7 +11,7 @@ type Dancer = NonNullable<GameState['masquerade']>['dancers'][number]
 // The outfit a masked woman is in: the one the mask gives her, whatever she came in.
 const GOWN = 'masquerade'
 // A dance stays a dance: whatever she wants, it is on the dance floor, and what more there is waits for the terrace.
-const NO_SEX = 'This is a dance on a crowded ballroom floor: flirt, tease and dance, but start no sex-act and use no [SEX-ACT] tag.'
+const noSex = () => t('scene.masquerade.noSex', { tag: '[SEX-ACT]' })
 
 /** The ball a save is in the middle of: its event, its part and its masks. */
 export function ballUnderway(content: ContentPack, state: GameState): { event: CalendarEvent; part: EventPart; ball: Masquerade } | undefined {
@@ -68,19 +69,16 @@ function danceScene(content: ContentPack, state: GameState, event: CalendarEvent
   const place = content.locations.find((one) => one.id === (part.locationId ?? event.locationId))
   const player = state.player.name
   const arrival = mask
-    ? `A woman in ${mask.description.split(',')[0]} comes out of the crowd of dancers and holds out a gloved hand to you.`
-    : `Through the masks and gowns comes someone wearing a mask and nothing else at all, waving at you.`
+    ? t('scene.masquerade.arrival', { mask: mask.description.split(',')[0] })
+    : t('scene.masquerade.arrivalBare')
   const secret = mask
-    ? `You are wearing ${mask.description}. The mask is enchanted: nobody can tell who is under it, not by face, figure, hair or voice. ` +
-      `You have come to dance with ${player} without his knowing it is you, and you keep it secret: never say your name, nor anything that gives it away outright, ` +
-      `and in narration you are "the Lady in ${mask.name}". In every other way you are yourself, in how you talk, tease and move, so that he might guess. ` +
-      `If he guesses, neither confirm nor deny it. One dance, and you slip back into the crowd.`
-    : `You have come to the masquerade as you always are: in nothing but a mask, which hides nobody. Dance with ${player}, and enjoy the stir you cause.`
+    ? t('scene.masquerade.secret', { description: mask.description, player, mask: mask.name })
+    : t('scene.masquerade.secretBare', { player })
   return {
     loveInterestId: dancer.id,
     companionIds: [],
     nsfw: false,
-    beats: [{ activityName: `${event.name}: ${part.name}`, locationName: place?.name, description: `${first && part.description ? `${part.description} ` : ''}${arrival}`, direction: `${part.direction} ${secret} ${NO_SEX}`.trim() }],
+    beats: [{ activityName: `${event.name}: ${part.name}`, locationName: place?.name, description: `${first && part.description ? `${part.description} ` : ''}${arrival}`, direction: `${part.direction} ${secret} ${noSex()}`.trim() }],
     viewId: part.viewId,
     ...(mask && { outfitId: GOWN, mask: { maskId: mask.id, revealed: false } }),
     dance: true,
@@ -137,7 +135,7 @@ export function guessDancer(content: ContentPack, state: GameState, dancerId: st
   if (!now || !dancer || !mask) throw new Error('She is not one of the masked dancers')
   const over = endMasquerade(state)
   if (guessedId !== dancerId) {
-    return { correct: false, state: applyFeelings(content, over, dancerId, { affection: -now.ball.loss, trust: 0, desire: 0, reason: 'He did not know her under her mask.' }, true) }
+    return { correct: false, state: applyFeelings(content, over, dancerId, { affection: -now.ball.loss, trust: 0, desire: 0, reason: t('scene.masquerade.notKnown') }, true) }
   }
   const place = content.locations.find((one) => one.id === (now.part.locationId ?? now.event.locationId))
   const player = state.player.name
@@ -151,13 +149,10 @@ export function guessDancer(content: ContentPack, state: GameState, dancerId: st
       uninhibited: [dancerId],
       beats: [
         {
-          activityName: `${now.event.name}: found out`,
+          activityName: t('scene.masquerade.foundOut', { event: now.event.name }),
           locationName: place?.name,
-          description: `You say her name. The Lady in ${mask.name} goes still, then laughs, takes your hand, and leads you out through the glass doors onto the moonlit terrace.`,
-          direction:
-            `It is the end of ${now.event.name}. ${player} saw through your enchanted mask and named you, and you are glad to be found out. You are still in ${mask.description}. ` +
-            `You lead him out onto the terrace, away from the ball, and make love to him there in your gown and mask: on your knees with him in your mouth, bent over the stone balustrade with your skirt hiked up, ` +
-            `on the garden bench with your skirt hiked up, and at the last him finishing inside you.`
+          description: t('scene.masquerade.named', { mask: mask.name }),
+          direction: t('scene.masquerade.terrace', { event: now.event.name, player, description: mask.description })
         }
       ],
       viewId: now.ball.privateViewId,
@@ -178,7 +173,7 @@ export function masked(li: LoveInterest, mask: Mask, hideName: boolean): LoveInt
   return {
     ...li,
     name: hideName ? mask.name : li.name,
-    outfits: [{ id: GOWN, name: 'Masquerade gown', description: mask.description, sprites: mask.sprites, pregnant: false }],
+    outfits: [{ id: GOWN, name: t('scene.masquerade.gown'), description: mask.description, sprites: mask.sprites, pregnant: false }],
     defaultOutfitId: GOWN,
     animations: mask.animations,
     faceY: mask.faceY,

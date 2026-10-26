@@ -307,7 +307,7 @@
   "schedule": [
     {
       "weekdays": [
-        "Tidesday"
+        "Wednesday"
       ],
       "periods": [
         "evening"
@@ -316,8 +316,8 @@
     },
     {
       "weekdays": [
-        "Hearthday",
-        "Marketday"
+        "Friday",
+        "Saturday"
       ],
       "periods": [
         "night"
@@ -353,7 +353,9 @@
     "name": "an apartment over a boutique on Lantern Row",
     "description": "a bedroom with silk hangings, a dressing table crowded with bottles, a computer with a second monitor running market feeds, a small licensed still for her tonics, a small cauldron, and gold on market scales. The bed is lavish and feminine",
     "locationId": "lantern-row",
-    "background": "generated/backgrounds/faye/view.webp"
+    "images": {
+      "day": "generated/backgrounds/faye/view.webp"
+    }
   },
   "birthPicture": "sprites/faye/birth.webp",
   "walkSprite": "sprites/faye/walk-cutout.webp",

@@ -1,8 +1,9 @@
-import { type Background, type ContentPack, type GameState, type Location, type LoveInterest, type Room, type Scene, type WeatherType } from '../model'
+import { type Background, type ContentPack, type GameState, type Light, type Location, type LoveInterest, type Room, type Scene, type WeatherType } from '../model'
 import { isGameOver, toDate } from './calendar'
 import { sceneCast } from './scene'
 import { eventsOn } from './events'
 import { backgroundFor, isIndoors, isOpen } from './schedule'
+import { t } from '../i18n'
 
 // The most a single reply can carry the story forward. More than this is a new day's business.
 const MAX_HOURS_PER_REPLY = 12
@@ -58,7 +59,7 @@ export function sceneDestinations(
     return [
       {
         id: `${ROOM_PREFIX}${id}`,
-        name: `${li.name.split(' ')[0]}'s room: ${li.room.name}, at ${location.name}`,
+        name: t('scene.sceneMoves.room', { owner: li.name.split(' ')[0], room: li.room.name, place: location.name }),
         locationId: location.id,
         indoors: true,
         roomOf: id
@@ -71,7 +72,7 @@ export function sceneDestinations(
   if (own && ownPlace && scene.roomOf !== PLAYER_ROOM && reachable(ownPlace.id) && open(ownPlace)) {
     rooms.push({
       id: `${ROOM_PREFIX}${PLAYER_ROOM}`,
-      name: `${state.player.name}'s room: ${own.name}, at ${ownPlace.name}`,
+      name: t('scene.sceneMoves.room', { owner: state.player.name, room: own.name, place: ownPlace.name }),
       locationId: ownPlace.id,
       indoors: true,
       roomOf: PLAYER_ROOM
@@ -84,7 +85,7 @@ export function sceneDestinations(
       if (room.role !== 'common' || (state.housing.rooms[room.key] ?? 0) < 1) continue
       // The room he is in already, or the one a scene at the house's door is in, is not somewhere to go.
       if (scene.roomOf === undefined && (state.housing.room ?? config.rooms.find((r) => r.viewId === 'default')?.key) === room.key) continue
-      rooms.push({ id: `${HOUSE_PREFIX}${room.key}`, name: `${room.name.toLowerCase()} of ${config.name}`, locationId: config.locationId, indoors: !room.plan.outdoors, houseRoom: room.key })
+      rooms.push({ id: `${HOUSE_PREFIX}${room.key}`, name: t('scene.sceneMoves.houseRoom', { room: room.name.toLowerCase(), house: config.name }), locationId: config.locationId, indoors: !room.plan.outdoors, houseRoom: room.key })
     }
   }
   const places = content.locations
@@ -123,7 +124,7 @@ export function movedScene<S extends Pick<Scene, 'beats' | 'roomOf' | 'backgroun
     beats: [
       ...scene.beats.map((beat) => ({ ...beat, finished: true })),
       {
-        activityName: 'arrived',
+        activityName: t('scene.sceneMoves.arrived'),
         locationName: destination.roomOf ? destination.name.replace(/^(.*?'s room): /, '$1, ') : destination.name
       }
     ],
@@ -184,35 +185,44 @@ export function viewFor(content: ContentPack, state: GameState, location: Locati
 /** Told to a character: exactly where they are, and whether there is a roof over them. */
 export function describePlace(location: Location, view: Background | undefined): string {
   const spot = view && view.name.toLowerCase() !== location.name.toLowerCase() ? `, ${view.name.toLowerCase()}` : ''
-  const shelter = isIndoors(location, view) ? 'You are indoors, under a roof.' : 'You are out of doors, under the open sky.'
-  return `${location.name}${spot}. ${shelter} ${location.description} ${view?.description ?? ''}`.trim()
+  const shelter = isIndoors(location, view) ? t('scene.sceneMoves.indoors') : t('scene.sceneMoves.outdoors')
+  return t('scene.sceneMoves.place', { name: location.name, spot, shelter, description: location.description, view: view?.description ?? '' }).trim()
 }
 
 /**
  * How a room is put on the stage: by its own picture, or when it is a view of the place it is in, by that view, which
  * has a picture for the day and one for the night. Nothing for no room.
  */
-export function roomBackdrop(room: Room | undefined, key: string): { room?: { image: string | undefined; key: string }; viewId?: string } {
+export function roomBackdrop(room: Room | undefined, key: string, light: Light): { room?: { image: string | undefined; key: string }; viewId?: string } {
   if (!room) return {}
-  return room.viewId !== undefined ? { viewId: room.viewId } : { room: { image: room.background, key } }
+  return room.viewId !== undefined ? { viewId: room.viewId } : { room: { image: roomImage(room, light), key } }
+}
+
+/** A room's own picture in this light, or the other one when only one was drawn. */
+export function roomImage(room: Pick<Room, 'images'>, light: Light): string | undefined {
+  return room.images?.[light] ?? Object.values(room.images ?? {})[0]
 }
 
 /** Told to the characters in a scene that is in the player's own room. */
 export function describePlayerRoom(room: Room, location: Location | undefined, playerName: string): string {
-  return `${playerName}'s room: ${room.name}${location ? `, at ${location.name}` : ''}. You are indoors, in private, with the door shut. ${room.description}`.trim()
+  return t('scene.sceneMoves.inRoom', { own: false, owner: playerName, room: room.name, there: location !== undefined, place: location?.name, description: room.description }).trim()
 }
 
 /** Told to the characters in a scene that is in one of their own rooms. */
 export function describeRoom(owner: LoveInterest, location: Location | undefined, speakerId: string): string {
   const room = owner.room
-  const whose = owner.id === speakerId ? 'your room' : `${owner.name.split(' ')[0]}'s room`
-  return `${whose}: ${room?.name ?? 'her room'}${location ? `, at ${location.name}` : ''}. You are indoors, in private, with the door shut. ${room?.description ?? ''}`.trim()
+  return t('scene.sceneMoves.inRoom', {
+    own: owner.id === speakerId,
+    owner: owner.name.split(' ')[0],
+    room: room?.name ?? t('scene.sceneMoves.herRoom'),
+    there: location !== undefined,
+    place: location?.name,
+    description: room?.description ?? ''
+  }).trim()
 }
 
 /** Told to a character: the weather, and how it reaches them where they are. */
 export function describeWeather(weather: WeatherType, indoors: boolean): string {
-  const what = `${weather.name}. ${weather.description}`.trim()
-  return indoors
-    ? `The weather outside today: ${what} You are indoors and out of it: you may hear it, see it at a window, or have come in from it, but it does not fall on you.`
-    : `The weather today: ${what} You are out in it: it is on your skin and clothes, and shapes what you do and say.`
+  const what = t('scene.sceneMoves.weather', { name: weather.name, description: weather.description }).trim()
+  return indoors ? t('scene.sceneMoves.weatherIndoors', { what }) : t('scene.sceneMoves.weatherOutdoors', { what })
 }

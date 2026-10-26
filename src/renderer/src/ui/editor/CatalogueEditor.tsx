@@ -1,9 +1,10 @@
 import { useState, type ReactNode } from 'react'
-import { buildCatalogue, catalogueBasis, catalogueOf, describeMeetings, dormantCourses, skillFor, topicsOf } from '../../../../shared/game'
-import type { ContentPack, Course } from '../../../../shared/model'
+import { buildCatalogue, catalogueBasis, catalogueOf, courseLabel, describeMeetings, dormantCourses, skillFor, topicsOf } from '../../../../shared/game'
+import { courseOf, type ContentPack, type Course } from '../../../../shared/model'
 import { errorMessage } from '../../errors'
 import { Button } from '../Button'
 import { WeekPlanner } from '../WeekPlanner'
+import { t } from '../../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -35,7 +36,7 @@ export function CatalogueEditor({ content, onContent, switcher }: Props) {
   const config = content.coursework
   const stale = saved !== undefined && saved.basis !== catalogueBasis(content)
   const dirty = !same(courses, saved?.courses ?? [])
-  const mayLeave = () => !dirty || window.confirm('Discard the schedule you have not saved?')
+  const mayLeave = () => !dirty || window.confirm(t('editor.catalogue.discard'))
   const focus = courses.find((c) => c.id === focusId)
   const majors = [...new Map(courses.map((c) => [c.code, c.subject])).entries()]
   const shown = only ? courses.filter((c) => c.code === only) : courses
@@ -47,7 +48,7 @@ export function CatalogueEditor({ content, onContent, switcher }: Props) {
     setCourses(buildCatalogue(content, withSeed))
     setFocusId(null)
     setIssues([])
-    setStatus('Schedule built. Save to use it in new games.')
+    setStatus(t('editor.catalogue.built'))
   }
 
   async function save() {
@@ -56,7 +57,7 @@ export function CatalogueEditor({ content, onContent, switcher }: Props) {
       setIssues(result.issues)
       if (result.issues.length > 0) return
       onContent(result.content)
-      setStatus('Saved. Every new game starts with this schedule.')
+      setStatus(t('editor.catalogue.saved'))
     } catch (error) {
       setStatus(errorMessage(error))
     }
@@ -68,26 +69,26 @@ export function CatalogueEditor({ content, onContent, switcher }: Props) {
       <aside className="editor-list">
         <p className="hint">
           {!config || !content.curriculum
-            ? 'This game has no coursework.'
+            ? t('editor.catalogue.noCoursework')
             : saved === undefined
-              ? 'No schedule has been saved yet. A new game cannot start without one.'
+              ? t('editor.catalogue.noneSaved')
               : stale
-                ? 'The saved schedule is out of date: a character was added or changed what she studies or teaches, or the curriculum has changed. Build it again.'
-                : `The saved schedule has ${saved.courses.length} courses.`}
+                ? t('editor.catalogue.stale')
+                : t('editor.catalogue.savedCount', { count: saved.courses.length })}
         </p>
         <label>
-          Seed
+          {t('editor.catalogue.seed')}
           <input inputMode="numeric" value={seed} onChange={(e) => setSeed(Number(e.target.value.replace(/\D/g, '').slice(0, 9)) || 0)} />
-          <span className="hint">The same seed and the same characters always give the same schedule.</span>
+          <span className="hint">{t('editor.catalogue.seedHint')}</span>
         </label>
         <Button variant="primary" disabled={!config} onClick={() => generate(seed)}>
-          Generate schedule
+          {t('editor.catalogue.generate')}
         </Button>
         <Button disabled={!config} onClick={() => generate(Math.floor(Math.random() * 1_000_000))}>
-          Generate with a new seed
+          {t('editor.catalogue.generateNewSeed')}
         </Button>
         <Button variant="primary" disabled={!dirty || courses.length === 0} onClick={save}>
-          Save schedule
+          {t('editor.catalogue.save')}
         </Button>
         {status && <p className="status">{status}</p>}
         {issues.map((issue) => (
@@ -97,7 +98,7 @@ export function CatalogueEditor({ content, onContent, switcher }: Props) {
         ))}
         {dormant.length > 0 && (
           <p className="hint">
-            Written but not given this term, because no love interest studies or teaches them: {dormant.map((course) => `${course.number} ${course.title}`).join('; ')}.
+            {t('editor.catalogue.dormant', { courses: dormant.map((course) => `${course.number} ${course.title}`).join('; ') })}
           </p>
         )}
       </aside>
@@ -105,21 +106,21 @@ export function CatalogueEditor({ content, onContent, switcher }: Props) {
       <section className="editor-main">
         <div className="editor-head">
           <div>
-            <h1>Courses</h1>
+            <h1>{t('editor.sides.courses')}</h1>
             <span className="hint">
               {courses.length === 0
-                ? 'Nothing built yet.'
-                : `${courses.length} courses in ${majors.length} subjects, ${courses.reduce((sum, c) => sum + c.meetings.length, 0)} meetings a week.${dirty ? ' Not saved.' : ''}`}
+                ? t('editor.catalogue.nothingBuilt')
+                : t('editor.catalogue.summary', { courses: courses.length, subjects: majors.length, meetings: courses.reduce((sum, c) => sum + c.meetings.length, 0), dirty })}
             </span>
           </div>
           {courses.length > 0 && (
             <label className="catalogue-filter">
-              Show
+              {t('editor.catalogue.show')}
               <select value={only} onChange={(e) => setOnly(e.target.value)}>
-                <option value="">Every subject</option>
+                <option value="">{t('editor.catalogue.everySubject')}</option>
                 {majors.map(([code, subject]) => (
                   <option key={code} value={code}>
-                    {code}: {subject}
+                    {t('editor.catalogue.subjectOption', { code, subject })}
                   </option>
                 ))}
               </select>
@@ -135,29 +136,29 @@ export function CatalogueEditor({ content, onContent, switcher }: Props) {
                 <div className="chips">
                   <span className="chip dark">{focus.number}</span>
                   <span className="chip">{focus.subject}</span>
-                  {focus.general && <span className="chip">General education</span>}
+                  {focus.general && <span className="chip">{t('editor.catalogue.general')}</span>}
                 </div>
                 {/* What it is and what it teaches is the curriculum's: shown, and changed there. */}
                 <strong>{focus.title}</strong>
                 <p>{focus.description}</p>
                 <span className="hint">
                   {focus.professor} · {describeMeetings(focus)}
-                  {focus.studentIds.length > 0 && ` · taken by ${focus.studentIds.map(nameOf).join(', ')}`}
+                  {focus.studentIds.length > 0 && t('editor.catalogue.takenBy', { names: focus.studentIds.map(nameOf).join(', ') })}
                 </span>
                 {skillFor(content, focus) && (
                   <span className="hint">
-                    Teaches at {skillFor(content, focus)!.at} marks: {skillFor(content, focus)!.name}. {skillFor(content, focus)!.description}
+                    {t('editor.catalogue.teaches', { at: skillFor(content, focus)!.at, name: skillFor(content, focus)!.name, description: skillFor(content, focus)!.description })}
                   </span>
                 )}
                 <span className="hint">
-                  Classes: {topicsOf(content, focus.id).map((topic) => topic.title).join(' · ') || 'none written'}
+                  {t('editor.catalogue.classes', { classes: topicsOf(content, courseOf(focus)).map((topic) => topic.title).join(' · ') || t('editor.catalogue.noClasses') })}
                 </span>
               </div>
             )}
             <div className="catalogue-list">
               {shown.map((course) => (
                 <button key={course.id} type="button" className={course.id === focusId ? 'trait-row picked' : 'trait-row'} onClick={() => setFocusId(course.id)}>
-                  <strong>{course.number}</strong>
+                  <strong>{courseLabel(course)}</strong>
                   <span className="trait-text">
                     <span>{course.title}</span>
                     <span className="hint">

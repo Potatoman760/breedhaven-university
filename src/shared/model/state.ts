@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { t } from '../i18n'
 import { BoonSchema } from './modifier'
 import { ExpeditionStateSchema } from './expedition'
 import { HousingStateSchema } from './housing'
@@ -42,7 +43,11 @@ export type RelationshipState = z.infer<typeof RelationshipStateSchema>
  */
 export const MEMORY_LEVELS = ['core', 'normal', 'fleeting'] as const
 export type MemoryLevel = (typeof MEMORY_LEVELS)[number]
-export const MEMORY_LEVEL_LABELS: Record<MemoryLevel, string> = { core: 'Core', normal: 'Normal', fleeting: 'Fleeting' }
+export const MEMORY_LEVEL_LABELS: Record<MemoryLevel, string> = {
+  get core() { return t('game.memoryLevel.core') },
+  get normal() { return t('game.memoryLevel.normal') },
+  get fleeting() { return t('game.memoryLevel.fleeting') }
+}
 
 /** What a love interest retains of one scene: a short summary, not the transcript. */
 export const MemorySchema = z.object({

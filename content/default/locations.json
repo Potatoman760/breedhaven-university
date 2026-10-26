@@ -442,7 +442,7 @@
     "id": "honeyed-bee-inn",
     "name": "the Honeyed Bee",
     "icon": "glass",
-    "description": "The Honeyed Bee, the student pub on Lantern Row, in a building older than most of the colleges. It has card games at the back tables, a quiz night, the house ale brewed on the premises, a jukebox that takes requests from a phone, and rooms upstairs. It is cheap, loud and friendly; everyone ends up here on Marketday night. People drink, flirt, gamble small sums and say more than they meant to.",
+    "description": "The Honeyed Bee, the student pub on Lantern Row, in a building older than most of the colleges. It has card games at the back tables, a quiz night, the house ale brewed on the premises, a jukebox that takes requests from a phone, and rooms upstairs. It is cheap, loud and friendly; everyone ends up here on Saturday night. People drink, flirt, gamble small sums and say more than they meant to.",
     "appearance": "The interior of an old student pub with low dark ceiling beams, uneven plaster walls and a worn wooden floor. A long polished bar with brass beer taps and shelves of bottles lit from behind, a chalkboard listing ales, and a hanging wooden sign carved with a golden bee. Round tables with mismatched chairs, a card game laid out on one, a dartboard, a glowing jukebox with a touchscreen in the corner, and a small stage with a quiz-night banner. Warm amber light from hanging lamps and a fireplace, strings of fairy lights along the beams, a wooden staircase leading up.",
     "backgrounds": [
       {
@@ -479,7 +479,7 @@
     "id": "market",
     "name": "the Market Square",
     "icon": "crate",
-    "description": "Seedblossom's old open market, a short walk from the South Gate: a sea of awnings selling flowers, food, books, second-hand tech and charms of doubtful license. It is cheaper than the shops and more fun. Stallholders haggle and gossip, and students come for supplies, odd jobs and gifts. Busiest on Marketday, when half the University is here. A good place to buy someone a present, to be jostled close in a crowd, and to hear what the town is saying.",
+    "description": "Seedblossom's old open market, a short walk from the South Gate: a sea of awnings selling flowers, food, books, second-hand tech and charms of doubtful license. It is cheaper than the shops and more fun. Stallholders haggle and gossip, and students come for supplies, odd jobs and gifts. Busiest on Saturday, when half the University is here. A good place to buy someone a present, to be jostled close in a crowd, and to hear what the town is saying.",
     "appearance": "A large open-air market in an old cobbled town square, crowded with stalls under striped canvas awnings in many colors. Stalls piled with flowers, fruit, bread, stacks of second-hand books, tables of used phones and laptops, and trays of glowing charms, crystals and small bottled potions. Hand-painted signs and price tags, strings of bunting and small floating lights overhead. Tall timber-framed townhouses surround the square, and a stone gateway with a clock stands at one end. Crates, handcarts and a food stall with rising steam.",
     "backgrounds": [
       {
@@ -605,17 +605,18 @@
   },
   {
     "id": "pixel-and-rune",
-    "name": "Pixel and Rune",
     "icon": "gamepad",
+    "iconImage": "sprites/icons/places-pixel-and-rune-cutout.webp",
+    "name": "Pixel and Rune",
     "description": "Pixel and Rune, an arcade in an old print works off Lantern Row: rows of cabinets, a rhythm game with a line, air hockey, and a claw machine everyone agrees is hexed. Upstairs is the Mana Bar, a gaming lounge and also a bar: PCs, consoles, VR booths, tournament nights and cocktails that glow. Critical Hit, the game shop next door, does well out of both. It is noisy, competitive and cheap, and good for a date with someone who would rather play than talk. Losing gracefully is optional.",
-    "appearance": "The interior of a video arcade in a converted old industrial building with brick walls and iron columns. Rows of arcade cabinets with glowing screens, a large dance rhythm game with a lit floor pad, air hockey tables, racing seats and a claw machine full of plush toys with a faint purple shimmer around it. Neon signs in pink, blue and green, a carpet with a bright geometric pattern, and glowing runes worked into the neon. An iron staircase leads up to a mezzanine bar with gaming computers, VR booths and shelves of bottles lit from below, glasses of luminous cocktails on the counter.",
+    "appearance": "The interior of a video arcade in a converted old industrial building with brick walls and iron columns. Rows of arcade cabinets with glowing screens, a large dance rhythm game with a lit floor pad, air hockey tables, racing seats and a claw machine labeled \"UFO Catch\" full of plush toys with a faint purple shimmer around it. The neon sign on the wall says \"Pixel and Rune\", a carpet with a bright geometric pattern, and glowing runes worked into the neon. An iron staircase leads up to a mezzanine bar with gaming computers, VR booths and shelves of bottles lit from below, glasses of luminous cocktails on the counter.",
     "backgrounds": [
       {
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/pixel-and-rune/default-day.webp",
-          "night": "generated/backgrounds/pixel-and-rune/default-night.webp"
+          "day": "generated/backgrounds/pixel-and-rune/default-day-2.png",
+          "night": "generated/backgrounds/pixel-and-rune/default-night.png"
         }
       }
     ],
@@ -625,14 +626,14 @@
     },
     "indoors": true,
     "private": false,
+    "eventOnly": false,
     "drills": [
       {
         "stat": "dexterity",
         "title": "The rhythm game",
         "description": "You feed the machine and step onto the pad as the first track starts."
       }
-    ],
-    "iconImage": "sprites/icons/places-pixel-and-rune-cutout.webp"
+    ]
   },
   {
     "id": "boba-blossom",
@@ -703,17 +704,18 @@
   },
   {
     "id": "ironroot",
-    "name": "Ironroot Fitness",
     "icon": "dumbbell",
+    "iconImage": "sprites/icons/places-ironroot-cutout.webp",
+    "name": "Ironroot Fitness",
     "description": "Ironroot Fitness, a gym of racks, treadmills and loud music. It shares a wall and a student membership with Aether, the magical training center next door: spell rooms, an elemental arena, an obstacle course and containment chambers. Men and unaugmented athletes lift on one side and mages drill on the other, and there is a window between the two that both sides pretend not to look through. People spot each other, compare progress and show off a little. A good place to work on strength and endurance.",
-    "appearance": "The interior of a modern gym with black rubber flooring, exposed ducts and bright overhead lights. Rows of squat racks, barbells, weight plates, benches, dumbbell racks and a line of treadmills facing mirrored walls. A large window in one wall looks through into a second hall: a magical training arena with a floor of scorched stone, targets, and a domed barrier of shimmering blue energy. Motivational banners, wall-mounted screens, water fountains and a front desk with towels.",
+    "appearance": "The interior of a modern gym with black rubber flooring, exposed ducts and bright overhead lights. Rows of squat racks, barbells, weight plates, benches, dumbbell racks and a line of treadmills facing mirrored walls. A large window in one wall looks through into a second hall: a magical training arena with a floor of scorched stone, targets, and a domed barrier of shimmering blue energy. Motivational banners that read \"Ironfoot fitness\", wall-mounted screens, water fountains and a front desk with towels.",
     "backgrounds": [
       {
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/ironroot/default-day.webp",
-          "night": "generated/backgrounds/ironroot/default-night.webp"
+          "day": "generated/backgrounds/ironroot/default-day-2.png",
+          "night": "generated/backgrounds/ironroot/default-night-3.png"
         }
       }
     ],
@@ -723,6 +725,7 @@
     },
     "indoors": true,
     "private": false,
+    "eventOnly": false,
     "drills": [
       {
         "stat": "strength",
@@ -734,14 +737,13 @@
         "title": "The treadmill and the circuit",
         "description": "An hour of running that goes nowhere, and then the circuit."
       }
-    ],
-    "iconImage": "sprites/icons/places-ironroot-cutout.webp"
+    ]
   },
   {
     "id": "lumen",
     "name": "the Lumen",
     "icon": "ticket",
-    "description": "The Lumen, a three-screen cinema in a converted music hall: red velvet seats, a balcony, illusion-enhanced screenings on Hearthdays, and cheap student tickets on Marketday night. It is dark, close and quiet during the film, which makes it a classic date: whispering, shared snacks, an arm on the armrest. The balcony's back row has a reputation.",
+    "description": "The Lumen, a three-screen cinema in a converted music hall: red velvet seats, a balcony, illusion-enhanced screenings on Fridays, and cheap student tickets on Saturday night. It is dark, close and quiet during the film, which makes it a classic date: whispering, shared snacks, an arm on the armrest. The balcony's back row has a reputation.",
     "appearance": "The auditorium of an old music hall converted into a cinema. Rows of red velvet seats slope down toward a large screen framed by an ornate gilded proscenium arch and heavy red curtains. A curved balcony with a gilded front runs around the back, under a ceiling of painted plaster and a glass chandelier. Small floating lights mark the aisles, and a faint shimmer of illusion magic spills out from the edges of the glowing screen. Brass railings, patterned carpet, wall sconces with warm amber lamps.",
     "backgrounds": [
       {

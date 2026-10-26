@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { buildEpilogue, spriteFor, wornOutfit } from '../../../shared/game'
 import type { ContentPack, GameState, LoveInterest } from '../../../shared/model'
 import { ChevronIcon } from './icons'
+import { t } from '../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -80,7 +81,7 @@ export function EpilogueView({ content, state, onExit }: Props) {
               onExit()
             }}
           >
-            Return to the title
+            {t('screens.epilogue.returnToTitle')}
           </button>
         )}
       </div>
@@ -90,7 +91,7 @@ export function EpilogueView({ content, state, onExit }: Props) {
         </span>
         {!last && (
           <span className="epilogue-next">
-            Continue <ChevronIcon size={14} />
+            {t('screens.sceneView.continue')} <ChevronIcon size={14} />
           </span>
         )}
       </div>

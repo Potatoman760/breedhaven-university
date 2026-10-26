@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import type { ComfySettings, WorkflowListResult } from '../../../../shared/comfy'
 import { errorMessage } from '../../errors'
+import { t } from '../../../../shared/i18n'
 import { ComfySetup } from '../art/ComfySetup'
 import { EditorFoot } from './fields'
 
@@ -37,7 +38,7 @@ export function ComfyEditor({ switcher }: Props) {
   }, [reload])
 
   const dirty = typed || !same(draft, original)
-  const mayLeave = () => !dirty || window.confirm('Discard the changes you have not saved?')
+  const mayLeave = () => !dirty || window.confirm(t('comfy.editor.discard'))
 
   async function save() {
     if (!draft) return
@@ -50,7 +51,7 @@ export function ComfyEditor({ switcher }: Props) {
       setOriginal(saved)
       setDraft(saved)
       setTyped(false)
-      setStatus('Saved.')
+      setStatus(t('comfy.editor.saved'))
       // How a workflow reads may have changed with its bindings.
       await reload()
     } catch (error) {
@@ -75,13 +76,13 @@ export function ComfyEditor({ switcher }: Props) {
         <div className="editor-head">
           <div>
             <h1>ComfyUI</h1>
-            <span className="hint">How the art tool draws: the server, each kind of picture, the clips' prompts and the workflows.</span>
+            <span className="hint">{t('comfy.editor.hint')}</span>
           </div>
         </div>
         {draft ? (
           <ComfySetup key={round} settings={draft} list={list} onSave={async (next) => (setDraft(next), setStatus(''))} />
         ) : (
-          <p className="hint">Reading the ComfyUI settings...</p>
+          <p className="hint">{t('comfy.setup.loading')}</p>
         )}
         <EditorFoot issues={issues} status={status} busy={busy} dirty={dirty} onUndo={undo} onSave={save} />
       </section>

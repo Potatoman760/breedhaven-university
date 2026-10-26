@@ -10,6 +10,7 @@ import {
   type SaveSummary,
   type SlotId
 } from '../../shared/saves'
+import { t } from '../../shared/i18n'
 
 /** Stores each save slot as one JSON file in a directory. */
 export class SaveStore {
@@ -38,7 +39,7 @@ export class SaveStore {
   /** Calls a save something else, or with an empty name, nothing: it then goes by its slot. When it was saved is left as it was. */
   rename(slotId: SlotId, name: string): SaveSummary {
     const path = this.path(slotId)
-    if (!existsSync(path)) throw new Error(`${slotLabel(slotId)} is empty`)
+    if (!existsSync(path)) throw new Error(t('llm.saves.empty', { slot: slotLabel(slotId) }))
     const { name: _old, ...rest } = this.read(path)
     const file: SaveFile = name ? { ...rest, name } : rest
     this.write(slotId, file)
@@ -64,14 +65,12 @@ export class SaveStore {
 
   load(slotId: SlotId): SaveData {
     const path = this.path(slotId)
-    if (!existsSync(path)) throw new Error(`${slotLabel(slotId)} is empty`)
+    if (!existsSync(path)) throw new Error(t('llm.saves.empty', { slot: slotLabel(slotId) }))
     try {
       const { state, scene, turns } = this.read(path)
       return { state, scene, turns }
     } catch {
-      throw new Error(
-        `${slotLabel(slotId)} could not be read. It may be damaged or from a different version of the game.`
-      )
+      throw new Error(t('llm.saves.unreadable', { slot: slotLabel(slotId) }))
     }
   }
 

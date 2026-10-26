@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { EffectSchema } from './condition'
 import { ModifierSchema } from './modifier'
+import { t } from '../i18n'
 
 /**
  * What a sight lets him tell about a woman. The game knows what each of these means; a skill in the content only says
@@ -63,7 +64,7 @@ export const SkillSchema = z
     below: ModifierSchema.optional(),
     upgrade: SkillUpgradeSchema.optional()
   })
-  .refine((skill) => [skill.grants, skill.passive, skill.ability].filter((one) => one !== undefined).length === 1, 'A skill is a sight, a passive or an ability: one of them, and only one.')
+  .refine((skill) => [skill.grants, skill.passive, skill.ability].filter((one) => one !== undefined).length === 1, { error: () => t('game.skill.oneKind') })
 export type Skill = z.infer<typeof SkillSchema>
 
 /** A skill as he has it: at its first level, or at its second with what that changes. */

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
 import { GrandButton } from './GrandButton'
+import { t } from '../../../shared/i18n'
 
 interface Question {
   title: string
@@ -48,7 +49,7 @@ export function useConfirm(): { ask: (question: Question) => Promise<boolean>; d
         {open.question.detail && <p>{open.question.detail}</p>}
         <div className="confirm-actions">
           {/* Enter takes the safe answer: going ahead, unless that cannot be undone. */}
-          <GrandButton label={open.question.cancel ?? 'Cancel'} chevron={false} className="confirm-no" autoFocus={open.question.grave === true} onClick={() => close(false)} />
+          <GrandButton label={open.question.cancel ?? t('shell.common.cancel')} chevron={false} className="confirm-no" autoFocus={open.question.grave === true} onClick={() => close(false)} />
           <GrandButton label={open.question.confirm} chevron={false} className={open.question.grave ? 'grave' : undefined} autoFocus={!open.question.grave} onClick={() => close(true)} />
         </div>
       </div>

@@ -225,7 +225,7 @@
   "schedule": [
     {
       "weekdays": [
-        "Hearthday"
+        "Friday"
       ],
       "periods": [
         "afternoon"
@@ -234,7 +234,7 @@
     },
     {
       "weekdays": [
-        "Marketday"
+        "Saturday"
       ],
       "periods": [
         "afternoon"
@@ -249,7 +249,7 @@
     },
     {
       "weekdays": [
-        "Restday"
+        "Sunday"
       ],
       "periods": [
         "afternoon"
@@ -267,7 +267,9 @@
     "name": "her alcove off the Bathhouse pool",
     "description": "A warm, dripping stone alcove behind a tiled bathhouse pool, with a low vaulted ceiling and steam in the air. Smooth river stones are laid out in neat rows along a ledge, bright green moss grows across the wet walls, a shallow water-filled hollow is worn into the blue and white floor tiles, and old copper pipes run overhead. Soft turquoise light ripples across the walls from the pool beyond an archway.",
     "locationId": "bathhouse",
-    "background": "generated/backgrounds/lira/view.webp"
+    "images": {
+      "day": "generated/backgrounds/lira/view.webp"
+    }
   },
   "birthPicture": "sprites/lira/birth.webp",
   "walkSprite": "sprites/lira/walk-cutout.webp",

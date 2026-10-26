@@ -12,6 +12,7 @@ import { toDate } from './calendar'
 import { applyEffect, applyEffects } from './conditions'
 import { isOpen } from './schedule'
 import { factor } from './modifiers'
+import { t } from '../i18n'
 
 /** The stalls trading at a location. */
 export function stallsAt(content: ContentPack, locationId: string): Stall[] {
@@ -37,14 +38,14 @@ export function priceOf(content: ContentPack, state: GameState, item: Pick<Item,
 export function canBuy(content: ContentPack, state: GameState, itemId: string, byPhone = false): PerformCheck {
   const item = content.items.find((i) => i.id === itemId)
   const sold = (byPhone ? content.stalls : stallsAt(content, state.locationId)).some((stall) => stall.itemIds.includes(itemId))
-  if (!item || !sold) return { ok: false, reasons: [byPhone ? 'Not sold anywhere' : 'Not sold here'] }
+  if (!item || !sold) return { ok: false, reasons: [byPhone ? t('game.market.notSoldAnywhere') : t('game.market.notSoldHere')] }
 
   const reasons: string[] = []
   const location = content.locations.find((l) => l.id === state.locationId)
   if (!byPhone && location && !isOpen(location, toDate(content.calendar, state.time).hour)) {
-    reasons.push(`${location.name} is closed`)
+    reasons.push(t('game.activities.closed', { place: location.name }))
   }
-  if (state.player.money < priceOf(content, state, item)) reasons.push('Not enough money')
+  if (state.player.money < priceOf(content, state, item)) reasons.push(t('game.market.notEnoughMoney'))
   return { ok: reasons.length === 0, reasons }
 }
 
@@ -71,9 +72,9 @@ export function consume(state: GameState, itemId: string): GameState {
 /** Whether he can use something he carries: it is a thing that is used, and where it is used on a woman, he is with one. */
 export function canUse(content: ContentPack, state: GameState, itemId: string, loveInterestId?: string): PerformCheck {
   const item = content.items.find((i) => i.id === itemId)
-  if (!item?.use) return { ok: false, reasons: ['It is not something to use'] }
-  if ((state.inventory[itemId] ?? 0) < 1) return { ok: false, reasons: ['You have none'] }
-  if (item.use.on === 'her' && loveInterestId === undefined) return { ok: false, reasons: ['It is for someone you are with'] }
+  if (!item?.use) return { ok: false, reasons: [t('game.market.notUsable')] }
+  if ((state.inventory[itemId] ?? 0) < 1) return { ok: false, reasons: [t('game.market.haveNone')] }
+  if (item.use.on === 'her' && loveInterestId === undefined) return { ok: false, reasons: [t('game.market.forSomeone')] }
   return { ok: true, reasons: [] }
 }
 
@@ -130,18 +131,11 @@ export function giveGift(
  * pass the recipient's first name so it is clear whose gift and whose taste it is.
  */
 export function describeGift(gift: SceneGift, recipient?: string): string {
+  const described = Boolean(gift.description)
   if (recipient) {
-    const taste = {
-      loved: `It is exactly the kind of thing ${recipient} loves.`,
-      liked: `${recipient} finds it a kind thought, though not especially to their taste.`,
-      disliked: `${recipient} dislikes this kind of thing, and is honest about it in their own way, without cruelty.`
-    }[gift.reaction]
-    return `To ${recipient}: ${gift.name}${gift.description ? ` (${gift.description})` : ''}. ${taste}`
+    const taste = t(`game.market.gift.theirs.${gift.reaction}`, { recipient })
+    return t('game.market.gift.to', { recipient, gift: gift.name, described, description: gift.description, taste })
   }
-  const taste = {
-    loved: 'This is exactly the kind of thing you love.',
-    liked: 'It is a kind thought, though not especially to your taste.',
-    disliked: 'You dislike this kind of thing. Be honest about it in your own way, without cruelty.'
-  }[gift.reaction]
-  return `${gift.name}${gift.description ? ` (${gift.description})` : ''}. ${taste}`
+  const taste = t(`game.market.gift.yours.${gift.reaction}`)
+  return t('game.market.gift.yours', { gift: gift.name, described, description: gift.description, taste })
 }

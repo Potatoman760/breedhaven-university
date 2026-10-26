@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { Button } from '../Button'
+import { t } from '../../../../shared/i18n'
 
 /** A run of work on several pictures, one after another: what it is on now, and how far along. */
 export interface BatchState {
@@ -81,12 +82,13 @@ export function BatchProgress({ batch, at, onStop }: { batch: BatchState | null;
   return (
     <div className="batch" role="status">
       <span>
-        {batch.verb} <strong>{batch.item}</strong>: {batch.done + 1} of {batch.total}
+        {batch.verb} <strong>{batch.item}</strong>
+        {t('comfy.batch.count', { n: batch.done + 1, total: batch.total })}
       </span>
       <div className="meter" role="progressbar" aria-valuemin={0} aria-valuemax={batch.total} aria-valuenow={batch.done}>
         <div style={{ width: `${(batch.done / batch.total) * 100}%` }} />
       </div>
-      <Button onClick={onStop}>Stop</Button>
+      <Button onClick={onStop}>{t('comfy.batch.stop')}</Button>
     </div>
   )
 }

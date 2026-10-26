@@ -218,6 +218,10 @@
       {
         "major": "WTC",
         "number": "101"
+      },
+      {
+        "major": "WTC",
+        "number": "128"
       }
     ]
   },
@@ -316,9 +320,9 @@
   "schedule": [
     {
       "weekdays": [
-        "Moonday",
-        "Tidesday",
-        "Windsday"
+        "Tuesday",
+        "Wednesday",
+        "Thursday"
       ],
       "periods": [
         "morning",
@@ -328,8 +332,8 @@
     },
     {
       "weekdays": [
-        "Tidesday",
-        "Windsday"
+        "Wednesday",
+        "Thursday"
       ],
       "periods": [
         "evening"
@@ -338,7 +342,7 @@
     },
     {
       "weekdays": [
-        "Hearthday"
+        "Friday"
       ],
       "periods": [
         "afternoon"
@@ -347,7 +351,7 @@
     },
     {
       "weekdays": [
-        "Marketday"
+        "Saturday"
       ],
       "periods": [
         "evening"
@@ -365,7 +369,9 @@
     "name": "a tower study above the Lecture Halls",
     "description": "A round stone room high in the old tower, cluttered with shelves of jars, dried herbs, bone-handled tools and stacked grimoires. Candle stubs crowd every surface, their wax trailing down the stone walls in pale stalactites. A heavy desk sits under the leaded window, lit by a single lamp and the glow of a ward-circle scratched into the floorboards. The air smells of smoke, dried lavender and something faintly metallic.",
     "locationId": "lecture-halls",
-    "background": "generated/backgrounds/vespera/view.webp"
+    "images": {
+      "day": "generated/backgrounds/vespera/view.webp"
+    }
   },
   "birthPicture": "sprites/vespera/birth.webp",
   "walkSprite": "sprites/vespera/walk-cutout.webp",

@@ -1,4 +1,4 @@
-import { MAX_SCENE_CAST, pronounWords, STATS, type ContentPack, type Employment, type GameState, type Job, type LoveInterest, type Scene, type Shift } from '../model'
+import { MAX_SCENE_CAST, pronounWords, STAT_NAMES, STATS, type ContentPack, type Employment, type GameState, type Job, type LoveInterest, type Scene, type Shift } from '../model'
 import type { PerformCheck } from './activities'
 import { timeOn } from './agenda'
 import { isGameOver, toDate } from './calendar'
@@ -9,6 +9,7 @@ import { statOf, trainStat } from './stats'
 import { factor } from './modifiers'
 import { joinedSocieties } from './societies'
 import { awayOnDay } from './trips'
+import { t } from '../i18n'
 
 const clock = (hour: number): string => `${String(hour).padStart(2, '0')}:00`
 
@@ -30,9 +31,9 @@ export function hoursPerWeek(job: Job): number {
   return job.shifts.reduce((sum, shift) => sum + shift.hours, 0)
 }
 
-/** "Solday 16:00-20:00" */
+/** "Monday 16:00-20:00" */
 export function describeShift(shift: Shift): string {
-  return `${shift.weekday} ${clock(shift.startHour)}-${clock(shift.startHour + shift.hours)}`
+  return t('game.jobs.shift', { weekday: shift.weekday, from: clock(shift.startHour), to: clock(shift.startHour + shift.hours) })
 }
 
 /** How a shift on a given day of the game is told apart from every other. */
@@ -44,20 +45,20 @@ export function shiftKey(dayIndex: number, shift: Pick<Shift, 'startHour'>): str
 export function unmetRequirements(state: GameState, job: Job): string[] {
   return STATS.flatMap((stat) => {
     const needed = job.requirements[stat]
-    return needed !== undefined && statOf(state, stat) < needed ? [`${stat} ${needed} (you have ${statOf(state, stat)})`] : []
+    return needed !== undefined && statOf(state, stat) < needed ? [t('game.jobs.unmet', { stat: STAT_NAMES[stat].toLowerCase(), needed, have: statOf(state, stat) })] : []
   })
 }
 
 /** Whether the player can be taken on: he qualifies, has no job already, and has not left this one before. */
 export function canApply(content: ContentPack, state: GameState, jobId: string): PerformCheck {
   const job = jobOf(content, jobId)
-  if (!job) return { ok: false, reasons: ['No such job'] }
+  if (!job) return { ok: false, reasons: [t('game.jobs.noSuchJob')] }
   const reasons: string[] = []
-  if (state.formerJobs.includes(jobId)) reasons.push('They will not have you back')
+  if (state.formerJobs.includes(jobId)) reasons.push(t('game.jobs.notBack'))
   const held = currentJob(content, state)
-  if (held) reasons.push(held.id === jobId ? 'You already work here' : `You already have a job: ${held.title}`)
+  if (held) reasons.push(held.id === jobId ? t('game.jobs.workHere') : t('game.jobs.haveJob', { job: held.title }))
   const unmet = unmetRequirements(state, job)
-  if (unmet.length > 0) reasons.push(`Needs ${unmet.join(', ')}`)
+  if (unmet.length > 0) reasons.push(t('game.jobs.needs', { unmet: unmet.join(', ') }))
   return { ok: reasons.length === 0, reasons }
 }
 
@@ -67,7 +68,7 @@ export function shiftClashes(state: GameState, job: Job): string[] {
   return job.shifts.flatMap((shift) =>
     mine
       .filter((course) => course.meetings.some((m) => m.weekday === shift.weekday && m.startHour < shift.startHour + shift.hours && shift.startHour < m.startHour + m.hours))
-      .map((course) => `${describeShift(shift)} clashes with ${course.number}`)
+      .map((course) => t('game.jobs.clash', { shift: describeShift(shift), course: course.number }))
   )
 }
 
@@ -84,7 +85,7 @@ export function applyForJob(content: ContentPack, state: GameState, jobId: strin
   const place = content.locations.find((l) => l.id === job.locationId)?.name ?? job.locationId
   return addNote(hired, job.bossId, {
     from: 'them',
-    text: `You've got the job: ${job.title} at ${place}. Your shifts are ${job.shifts.map(describeShift).join(', ')}. If you can't make one, tell me that day before it starts.`,
+    text: t('game.jobs.hired', { job: job.title, place, shifts: job.shifts.map(describeShift).join(', ') }),
     read: false
   })
 }
@@ -134,11 +135,11 @@ export function shiftLaterToday(content: ContentPack, state: GameState): { job: 
 
 export function canWork(content: ContentPack, state: GameState): PerformCheck {
   const now = shiftNow(content, state)
-  if (!now || !content.jobs) return { ok: false, reasons: ['You have no shift now'] }
+  if (!now || !content.jobs) return { ok: false, reasons: [t('game.jobs.noShift')] }
   const reasons: string[] = []
   if (state.locationId !== now.job.locationId) {
     const where = content.locations.find((l) => l.id === now.job.locationId)
-    reasons.push(`Go to ${where?.name ?? now.job.locationId} first`)
+    reasons.push(t('game.activities.goTo', { place: where?.name ?? now.job.locationId }))
   }
   return { ok: reasons.length === 0, reasons }
 }
@@ -162,16 +163,12 @@ export function startShift(content: ContentPack, state: GameState): { state: Gam
   const [lead, ...others] = approachableAt(content, state, job.locationId).slice(0, MAX_SCENE_CAST)
   const companionIds = others.map((li) => li.id)
   const leadId = lead?.id ?? job.bossId
-  const bossName = boss?.name ?? 'the boss'
-  const she = pronounWords(boss?.pronouns).subject
+  const bossName = boss?.name ?? t('game.jobs.theBoss')
+  const pronoun = pronounWords(boss?.pronouns).subject
   const direction =
-    `This is ${state.player.name}'s shift at work: he is ${job.title.toLowerCase()} at ${place?.name ?? job.locationId}, from ${clock(shift.startHour)} to ` +
-    `${clock(shift.startHour + shift.hours)}. ${job.description} ${bossName} is his boss and is here running the place: ${she} gives him things to do, ` +
-    `notices if he slacks, and can be spoken to at any time. He is on the clock, so the work goes on around whatever is said: customers, errands, things to carry and clean. ` +
+    t('game.jobs.direction', { player: state.player.name, job: job.title.toLowerCase(), place: place?.name ?? job.locationId, from: clock(shift.startHour), to: clock(shift.startHour + shift.hours), description: job.description, boss: bossName, pronoun }) +
     // A boss who is a love interest is at work like any boss, and is in the scene as herself.
-    (!lead || (lead.id === job.bossId && others.length === 0)
-      ? `Nobody else he knows is here. Keep it to the work and to what the two of you say over it.`
-      : `Whoever of you is not his boss is here as herself, not as staff: she happens to be at the place while he works, and may keep him company, distract him or wait for his break.`)
+    (!lead || (lead.id === job.bossId && others.length === 0) ? t('game.jobs.alone') : t('game.jobs.company'))
   // The work is work on a stat, like a class or a workout.
   const trained = job.trains ? trainStat(content, state, job.trains, left) : state
   const after: GameState = {
@@ -189,9 +186,9 @@ export function startShift(content: ContentPack, state: GameState): { state: Gam
       nsfw: false,
       beats: [
         {
-          activityName: `A shift as ${job.title.toLowerCase()}`,
+          activityName: t('game.jobs.activity', { job: job.title.toLowerCase() }),
           locationName: place?.name,
-          description: `You clock in. ${bossName} looks up: there is plenty to do.`,
+          description: t('game.jobs.clockIn', { boss: bossName }),
           direction
         }
       ],
@@ -266,10 +263,10 @@ export function settleShifts(content: ContentPack, state: GameState): GameState 
       next = addNote(next, job.bossId, {
         from: 'them',
         text: fired
-          ? `You missed ${describeShift(shift)}. That's ${strikes} strikes. Don't come back: you're done here.`
+          ? t('game.jobs.fired', { shift: describeShift(shift), strikes })
           : excused
-            ? `Covered your ${describeShift(shift)} shift. Thanks for telling me, but it still counts for half: you're on ${strikes} of ${config.strikes}.`
-            : `You missed your ${describeShift(shift)} shift without a word. That's ${strikes} of ${config.strikes} strikes.`,
+            ? t('game.jobs.excused', { shift: describeShift(shift), strikes, of: config.strikes })
+            : t('game.jobs.missed', { shift: describeShift(shift), strikes, of: config.strikes }),
         read: false
       })
       if (fired) return { ...next, job: null, formerJobs: [...next.formerJobs, job.id] }
@@ -286,15 +283,15 @@ export function jobFacts(content: ContentPack, state: GameState, npcId: string):
   const config = content.jobs
   if (!job || !state.job || !config || job.bossId !== npcId) {
     const former = content.jobs?.jobs.find((j) => j.bossId === npcId && state.formerJobs.includes(j.id))
-    return former ? [`${state.player.name} used to work for you as ${former.title.toLowerCase()} and no longer does. You will not take him back.`] : []
+    return former ? [t('game.jobs.facts.former', { player: state.player.name, job: former.title.toLowerCase() })] : []
   }
   const today = shiftLaterToday(content, state)
   const { dayIndex } = toDate(content.calendar, state.time)
   const told = shiftsOn(content, state, job, dayIndex).find((shift) => state.job!.excused.includes(shiftKey(dayIndex, shift)))
   return [
-    `${state.player.name} works for you as ${job.title.toLowerCase()}, paid $${job.hourlyRate} an hour${payBonus(content, state, job) > 0 ? `, and ${Math.round(payBonus(content, state, job) * 100)}% over that because he is better at it than the job asks` : ''}. His shifts are ${job.shifts.map(describeShift).join(', ')}.`,
-    `He has ${state.job.strikes} of ${config.strikes} strikes. A shift missed without a word is a full strike, and one he warned you of that day is half. At ${config.strikes} he is out.`,
-    today ? `He has a shift today at ${clock(today.shift.startHour)} that has not started yet.` : told ? `He has already told you he will miss today's ${clock(told.startHour)} shift.` : 'He has no shift still to come today.'
+    t('game.jobs.facts.works', { player: state.player.name, job: job.title.toLowerCase(), rate: job.hourlyRate, bonus: payBonus(content, state, job) > 0, percent: Math.round(payBonus(content, state, job) * 100), shifts: job.shifts.map(describeShift).join(', ') }),
+    t('game.jobs.facts.strikes', { strikes: state.job.strikes, of: config.strikes }),
+    today ? t('game.jobs.facts.today', { at: clock(today.shift.startHour) }) : told ? t('game.jobs.facts.told', { at: clock(told.startHour) }) : t('game.jobs.facts.none')
   ]
 }
 

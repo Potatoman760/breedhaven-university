@@ -13,7 +13,7 @@ An adult, LLM-driven dating sim: Electron, React 19, TypeScript, zod. The player
 | `npm test` | `vitest run` (about 640 tests, a few seconds) |
 | `npx vitest run src/shared/game/housing.test.ts` | One test file |
 | `npm run build` | Production build into `out/` |
-| `npm run build:win` | Windows build as a zip |
+| `npm run build:win` | Windows build, unpacked into `dist/win-unpacked/` |
 
 Run `npm run typecheck` and `npm test` after every change and say what they reported. Neither proves a screen looks right: say so when a change is to the interface and has not been seen in the running app.
 
@@ -40,6 +40,8 @@ content/default/        The game's content, as JSON. Hand-edited or written by t
   catalogue.json          Generated: who is in which course and when (never hand-edit)
 src/shared/model/       zod schemas. The shape of content and of a save.
 src/shared/game/        Pure game logic. No Electron, no React, no I/O. Tests sit beside each file.
+src/shared/i18n/        t(), the message format, and the English of every string the code writes (en/*.json)
+content/<language>/     A translation: language.json, strings/*.json, and content files holding only translated text
 src/main/               Electron main: content loading, saves, LLM calls, ComfyUI, IPC handlers (index.ts)
 src/preload/            The IPC bridge
 src/renderer/src/       React UI. App.tsx owns game state; ui/ holds the screens.
@@ -50,6 +52,7 @@ scripts/                One-off and maintenance scripts
 - Periodic work (settling rent, scheduling births, announcing skills) is an idle `useEffect` in `App.tsx` guarded by a marker in the state, so it runs once however far the clock jumped.
 - The content one game sees is derived: `withHousing(personalise(content, name), state)`. Use it wherever content is prepared for a state.
 - Anything that changes a number of the game for a while or for good goes through `src/shared/game/modifiers.ts` (`factor`, `bonus`), not a one-off `if`.
+- Text the code writes, for the player or for the LLM, is never a literal: it is `t('<namespace>.<module>.<name>', params)` from `src/shared/i18n`, with the English in `src/shared/i18n/en/<namespace>.json`. Tags the parser reads, ids and image prompts stay in code and go in as params. See "Languages" in `README.md`.
 
 ## Rules for this project
 

@@ -11,6 +11,7 @@ import { Button } from '../Button'
 import { Lightbox } from '../Lightbox'
 import { EditorFoot, Group, Text } from './fields'
 import { EmptySlot, PictureSlot, SlotGrid } from './slots'
+import { t } from '../../../../shared/i18n'
 
 // What the run that makes the place's pictures smaller is filed under, beside the runs of its views.
 const OPTIMIZE_BATCH = '(optimize)'
@@ -78,7 +79,7 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
     const paths = pngsIn(latest.current.backgrounds)
     if (paths.length === 0 || batch) return
     setStatus('')
-    const { failed } = await run(OPTIMIZE_BATCH, 'Optimizing', paths, fileName, async (path) => {
+    const { failed } = await run(OPTIMIZE_BATCH, t('editor.common.optimizing'), paths, fileName, async (path) => {
       try {
         const to = await toWebp(path)
         setDraft((current) => ({ ...current, backgrounds: renamed(current.backgrounds, path, to) }))
@@ -87,13 +88,13 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
         return { ok: false, message: errorMessage(error) }
       }
     })
-    setStatus(failed.length > 0 ? `Could not optimize: ${failed.join('; ')}` : 'Optimized. Save the place to keep it.')
+    setStatus(failed.length > 0 ? t('editor.common.optimizeFailed', { failed: failed.join('; ') }) : t('editor.locations.optimized'))
   }
 
   // A view is drawn twice, as an outfit is drawn once for each expression.
   const periods = LIGHTS
   const dirty = !same(draft, original)
-  const mayLeave = () => !dirty || window.confirm('Discard the changes you have not saved?')
+  const mayLeave = () => !dirty || window.confirm(t('editor.common.discard'))
   const set = (patch: Partial<Location>) => {
     // What was wrong with the last save may no longer be.
     setIssues([])
@@ -165,7 +166,7 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
     setStatus('')
     const settings = await window.api.comfy.getSettings()
     const size = sizeFor(settings, 'background')
-    const { failed } = await run(viewId, 'Drawing', missing, (p) => p.name, async (p) => {
+    const { failed } = await run(viewId, t('editor.common.drawing'), missing, (p) => p.name, async (p) => {
       const place = latest.current
       const now = place.backgrounds.find((v) => v.id === viewId)
       const result = await window.api.comfy.generate({
@@ -181,7 +182,7 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
       setImage(viewId, p.id, result.path)
       return { ok: true }
     })
-    if (failed.length > 0) setStatus(`Stopped at ${failed[0]}`)
+    if (failed.length > 0) setStatus(t('editor.common.stoppedAt', { name: failed[0] }))
   }
 
   const shown = content.locations.filter((l) => l.name.toLowerCase().includes(search.trim().toLowerCase()))
@@ -195,7 +196,7 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
     <main className="editor">
       {switcher(mayLeave)}
       {viewing && viewed?.images[viewing.period] && (
-        <Lightbox image={viewed.images[viewing.period] ?? ''} name={`${draft.name}, ${viewed.name}: ${periodName(viewing.period)}`} onClose={() => setViewing(null)} />
+        <Lightbox image={viewed.images[viewing.period] ?? ''} name={t('editor.locations.viewing', { place: draft.name, view: viewed.name, period: periodName(viewing.period) })} onClose={() => setViewing(null)} />
       )}
       {drawing && drawn && (
         <ArtTool
@@ -213,7 +214,7 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
       )}
 
       <aside className="editor-list">
-        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={`Search ${content.locations.length} locations`} aria-label="Search" />
+        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t('editor.locations.search', { count: content.locations.length })} aria-label={t('editor.common.search')} />
         <div className="editor-people">
           {shown.map((location) => {
             const first = viewImage(location.backgrounds[0], 'day')
@@ -224,17 +225,16 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
                 <span>
                   <strong>{location.name}</strong>
                   <span className="hint">
-                    {pictures} picture{pictures === 1 ? '' : 's'}
-                    {location.private ? ' · private' : ''}
+                    {t('editor.locations.listed', { count: pictures, private: location.private })}
                   </span>
                 </span>
               </button>
             )
           })}
-          {shown.length === 0 && <p className="hint">No place by that name.</p>}
+          {shown.length === 0 && <p className="hint">{t('editor.locations.noneFound')}</p>}
         </div>
         <Button variant="quiet" onClick={() => window.api.editor.openFolder()} title={info?.addonDir}>
-          Open the add-on folder
+          {t('editor.common.openFolder')}
         </Button>
       </aside>
 
@@ -243,51 +243,51 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
           <div>
             <h1>{draft.name || draft.id}</h1>
             <span className="hint">
-              {origin === 'override' ? 'Built in, with your changes.' : 'Built in. Saving keeps your version in your add-ons and leaves the original untouched.'}
+              {origin === 'override' ? t('editor.common.builtInChanged') : t('editor.common.builtIn')}
             </span>
           </div>
         </div>
 
         <div className="editor-body">
           <div className="row">
-            <Text label="Name" value={draft.name} onChange={(name) => set({ name })} />
-            <Text label="Id" value={draft.id} disabled onChange={() => undefined} />
+            <Text label={t('editor.common.name')} value={draft.name} onChange={(name) => set({ name })} />
+            <Text label={t('editor.common.id')} value={draft.id} disabled onChange={() => undefined} />
           </div>
           <Text
-            label="Description"
+            label={t('editor.common.description')}
             value={draft.description}
             onChange={(description) => set({ description })}
             rows={4}
-            hint="Told to the LLM in every scene here: what the place is, what goes on in it, who is found there and what a scene can draw on."
+            hint={t('editor.locations.descriptionHint')}
           />
           <Text
-            label="Appearance"
+            label={t('editor.common.appearance')}
             value={draft.appearance}
             onChange={(appearance) => set({ appearance })}
             rows={4}
-            hint="Sent to the image model when a picture of the place is generated, and to nothing else. Only what can be seen, with nobody in it."
+            hint={t('editor.locations.appearanceHint')}
           />
           <div className="row checks">
             <label className="inline">
               <input type="checkbox" checked={draft.indoors} onChange={(e) => set({ indoors: e.target.checked })} />
-              Indoors: under a roof, out of the weather
+              {t('editor.locations.indoors')}
             </label>
             <label className="inline">
               <input type="checkbox" checked={draft.private} onChange={(e) => set({ private: e.target.checked })} />
-              Private: nobody turns up here uninvited
+              {t('editor.locations.private')}
             </label>
           </div>
 
-          <Group title="Opening hours" hint="When the place can be gone to. From an hour up to, but not including, another; it may run past midnight.">
+          <Group title={t('editor.locations.hours')} hint={t('editor.locations.hoursHint')}>
             <div className="row checks">
               <label className="inline">
                 <input type="checkbox" checked={openAllDay} onChange={(e) => set({ open: e.target.checked ? undefined : { fromHour: 8, toHour: 22 } })} />
-                Always open
+                {t('editor.locations.alwaysOpen')}
               </label>
               {draft.open && (
                 <>
                   <label className="inline">
-                    From
+                    {t('editor.locations.from')}
                     <select value={draft.open.fromHour} onChange={(e) => set({ open: { ...draft.open!, fromHour: Number(e.target.value) } })}>
                       {Array.from({ length: content.calendar.hoursPerDay }, (_, hour) => (
                         <option key={hour} value={hour}>
@@ -297,7 +297,7 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
                     </select>
                   </label>
                   <label className="inline">
-                    to
+                    {t('editor.locations.to')}
                     <select value={draft.open.toHour} onChange={(e) => set({ open: { ...draft.open!, toHour: Number(e.target.value) } })}>
                       {Array.from({ length: content.calendar.hoursPerDay }, (_, hour) => (
                         <option key={hour} value={hour}>
@@ -312,8 +312,8 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
           </Group>
 
           <Group
-            title="Ways to raise a stat here"
-            hint="What the day view suggests when the player asks how to get better at something: one is picked for each stat from every place that has one. Each is two hours, a scene with whoever is there, and raises that stat. The stats named here are also what the place counts as good for."
+            title={t('editor.locations.drills')}
+            hint={t('editor.locations.drillsHint')}
           >
             {draft.drills.map((drill, index) => {
               const change = (patch: Partial<typeof drill>) => set({ drills: draft.drills.map((d, i) => (i === index ? { ...d, ...patch } : d)) })
@@ -321,7 +321,7 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
                 <div key={index} className="card">
                   <div className="row">
                     <label>
-                      Raises
+                      {t('editor.locations.raises')}
                       <select value={drill.stat} onChange={(e) => change({ stat: e.target.value as Stat })}>
                         {STATS.map((stat) => (
                           <option key={stat} value={stat}>
@@ -330,29 +330,29 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
                         ))}
                       </select>
                     </label>
-                    <Text label="What it is" value={drill.title} onChange={(title) => change({ title })} placeholder="A workout on the racks" />
+                    <Text label={t('editor.jobs.whatItIs')} value={drill.title} onChange={(title) => change({ title })} placeholder={t('editor.locations.drillPlaceholder')} />
                     <Button variant="quiet" onClick={() => set({ drills: draft.drills.filter((_, i) => i !== index) })}>
-                      Remove
+                      {t('editor.common.remove')}
                     </Button>
                   </div>
-                  <Text label="How it opens" value={drill.description} onChange={(description) => change({ description })} placeholder="You load a bar, chalk your hands and start on the first set." />
+                  <Text label={t('editor.locations.opens')} value={drill.description} onChange={(description) => change({ description })} placeholder={t('editor.locations.opensPlaceholder')} />
                 </div>
               )
             })}
-            <Button onClick={() => set({ drills: [...draft.drills, { stat: 'strength', title: '', description: '' }] })}>Add one</Button>
+            <Button onClick={() => set({ drills: [...draft.drills, { stat: 'strength', title: '', description: '' }] })}>{t('editor.locations.addDrill')}</Button>
           </Group>
 
           <Group
-            title="Views"
-            hint="A place has views, as a character has outfits. Every place has its default view. Another view is shown in its place on the day of an event or holiday of the same name: call one “Winter Break” and the place is dressed for it while it lasts. Each is drawn twice, by day and by night; whichever has not been drawn shows the other. Pictures are generated from the appearance above."
+            title={t('editor.locations.views')}
+            hint={t('editor.locations.viewsHint')}
           >
             <div className="outfit-actions">
               <Button
                 disabled={batch !== null || pngs.length === 0}
-                title="Turn every PNG of this place into a WebP of the same picture, a fraction of the size, and put it in the same views"
+                title={t('editor.locations.optimizeTitle')}
                 onClick={optimize}
               >
-                {pngs.length > 0 ? `Optimize (${pngs.length} PNG${pngs.length === 1 ? '' : 's'})` : 'Optimized'}
+                {pngs.length > 0 ? t('editor.common.optimize', { count: pngs.length }) : t('editor.common.optimizedButton')}
               </Button>
             </div>
             <BatchProgress batch={batch} at={OPTIMIZE_BATCH} onStop={stop} />
@@ -363,62 +363,62 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
                 <div key={view.id} className="outfit card">
                   <div className="row">
                     <Text
-                      label="Name"
+                      label={t('editor.common.name')}
                       value={view.name}
                       disabled={isDefault}
                       onChange={(name) => changeView(view.id, (v) => ({ ...v, name }))}
-                      hint={isDefault ? undefined : content.calendar.events.some((event) => event.name.toLowerCase() === view.name.trim().toLowerCase() || event.id === view.id) ? 'Shown all day while that event is on.' : 'Named after an event, it is shown all day while the event is on.'}
+                      hint={isDefault ? undefined : content.calendar.events.some((event) => event.name.toLowerCase() === view.name.trim().toLowerCase() || event.id === view.id) ? t('editor.locations.eventView') : t('editor.locations.eventViewHint')}
                     />
                     <label>
-                      Under a roof
+                      {t('editor.locations.underRoof')}
                       <select
                         value={view.indoors === undefined ? '' : view.indoors ? 'yes' : 'no'}
                         onChange={(e) => changeView(view.id, (v) => ({ ...v, indoors: e.target.value === '' ? undefined : e.target.value === 'yes' }))}
                       >
-                        <option value="">As the place is ({draft.indoors ? 'indoors' : 'out of doors'})</option>
-                        <option value="yes">Indoors</option>
-                        <option value="no">Out of doors</option>
+                        <option value="">{t('editor.locations.asPlace', { indoors: draft.indoors })}</option>
+                        <option value="yes">{t('editor.locations.indoorsOption')}</option>
+                        <option value="no">{t('editor.locations.outdoorsOption')}</option>
                       </select>
                     </label>
                   </div>
                   {/* A view that is a room of its own, such as one room of a house, can say what it is and what it looks like. */}
                   <Text
-                    label="What this view is"
+                    label={t('editor.locations.viewDescription')}
                     value={view.description ?? ''}
                     rows={2}
-                    placeholder="Left empty, the place's own description is all a character is told."
+                    placeholder={t('editor.locations.viewDescriptionPlaceholder')}
                     onChange={(description) => changeView(view.id, (v) => ({ ...v, description: description || undefined }))}
                   />
                   <Text
-                    label="What it looks like"
+                    label={t('editor.locations.viewAppearance')}
                     value={view.appearance ?? ''}
                     rows={2}
-                    placeholder="Left empty, it is drawn from the place's own appearance."
+                    placeholder={t('editor.locations.viewAppearancePlaceholder')}
                     onChange={(appearance) => changeView(view.id, (v) => ({ ...v, appearance: appearance || undefined }))}
                   />
                   <div className="outfit-actions">
                     {missing.length > 0 && (
                       <Button
                         disabled={batch !== null}
-                        title="Draws whichever of day and night this view does not have yet with your own ComfyUI, and sets each as it is finished"
+                        title={t('editor.locations.generateMissingTitle')}
                         onClick={() => generateMissing(view.id)}
                       >
-                        {missing.length === periods.length ? 'Generate day and night' : `Generate the missing ${missing[0].name.toLowerCase()} picture`}
+                        {missing.length === periods.length ? t('editor.locations.generateBoth') : t('editor.locations.generateMissing', { period: missing[0].name.toLowerCase() })}
                       </Button>
                     )}
                     <Button
                       disabled={isDefault || index <= 1}
-                      title="The order the other views are offered to the player in"
+                      title={t('editor.locations.moveUpTitle')}
                       onClick={() => {
                         const views = [...draft.backgrounds]
                         ;[views[index - 1], views[index]] = [views[index], views[index - 1]]
                         set({ backgrounds: views })
                       }}
                     >
-                      Move up
+                      {t('editor.common.moveUp')}
                     </Button>
-                    <Button variant="quiet" className="outfit-remove" disabled={isDefault} title={isDefault ? 'Every place has its default view' : undefined} onClick={() => set({ backgrounds: draft.backgrounds.filter((v) => v.id !== view.id) })}>
-                      Remove view
+                    <Button variant="quiet" className="outfit-remove" disabled={isDefault} title={isDefault ? t('editor.locations.defaultView') : undefined} onClick={() => set({ backgrounds: draft.backgrounds.filter((v) => v.id !== view.id) })}>
+                      {t('editor.locations.removeView')}
                     </Button>
                   </div>
                   <BatchProgress batch={batch} at={view.id} onStop={stop} />
@@ -433,11 +433,11 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
                           onView={() => setViewing({ viewId: view.id, period: p.id })}
                           actions={
                             <>
-                              <Button onClick={() => upload(view.id, p.id)}>Replace</Button>
-                              <Button title="Draw this one again with ComfyUI" onClick={() => setDrawing({ viewId: view.id, period: p.id })}>
-                                Generate
+                              <Button onClick={() => upload(view.id, p.id)}>{t('editor.common.replace')}</Button>
+                              <Button title={t('editor.common.drawThisAgain')} onClick={() => setDrawing({ viewId: view.id, period: p.id })}>
+                                {t('editor.common.generate')}
                               </Button>
-                              <Button onClick={() => setImage(view.id, p.id, undefined)}>Remove</Button>
+                              <Button onClick={() => setImage(view.id, p.id, undefined)}>{t('editor.common.remove')}</Button>
                             </>
                           }
                         />
@@ -449,7 +449,7 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
                 </div>
               )
             })}
-            <Button onClick={addView}>Add a view</Button>
+            <Button onClick={addView}>{t('editor.locations.addView')}</Button>
           </Group>
         </div>
 
@@ -462,12 +462,12 @@ export function LocationEditor({ content, onContent, switcher }: Props) {
             setDraft(original)
             setIssues([])
           }}
-          onSave={() => apply(window.api.editor.saveLocation(draft), 'Saved to your add-ons.')}
+          onSave={() => apply(window.api.editor.saveLocation(draft), t('editor.common.savedAddons'))}
           remove={
             origin === 'override'
               ? {
-                  label: 'Put back the original',
-                  onClick: () => window.confirm(`Put ${draft.name} back as it shipped? Your changes to it are lost.`) && apply(window.api.editor.deleteLocation(draft.id), 'Put back as shipped.')
+                  label: t('editor.common.putBack'),
+                  onClick: () => window.confirm(t('editor.common.putBackConfirm', { name: draft.name })) && apply(window.api.editor.deleteLocation(draft.id), t('editor.player.putBackDone'))
                 }
               : undefined
           }

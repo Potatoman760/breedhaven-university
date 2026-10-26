@@ -1,7 +1,9 @@
 import { useEffect, useState, type CSSProperties } from 'react'
 import { toDate, weatherOn } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
+import { useCueAt } from '../sound'
 import { WeatherIcon } from './icons'
+import { t } from '../../../shared/i18n'
 
 // How long the night takes to turn into the morning, in milliseconds; a click cuts it short.
 const LENGTH = 5400
@@ -10,6 +12,10 @@ const TURN_FROM = 0.15
 const TURN_TO = 0.62
 // The days either side of today in the carousel.
 const AROUND = 3
+
+
+// When the lipstick kiss lands on the day: 68% of its 5.4 second animation.
+const KISS_LANDS_MS = 3670
 
 /** How far along the turn is at a share of the whole: eased in and out, as the sky is. */
 const turned = (t: number): number => {
@@ -57,6 +63,8 @@ export function DawnTransition({ content, state, onDone }: { content: ContentPac
     return { offset, date: toDate(calendar, time), weather: offset >= 0 ? weatherOn(content, state, time) : undefined }
   })
 
+  // As the kiss comes down on the day: two thirds of the way through its animation (`dawn-kiss` in styles.css).
+  useCueAt('stamp', KISS_LANDS_MS)
   return (
     <div className="dawn" onClick={onDone} role="presentation">
       <img className="dawn-dial" src="content://pack/sprites/fx/dawn-dial.webp" alt="" />
@@ -80,7 +88,7 @@ export function DawnTransition({ content, state, onDone }: { content: ContentPac
         ))}
       </div>
       <div className="dawn-term">
-        <span className="dawn-term-label">Semester · day {Math.round(Math.max(1, shown))} of {calendar.lengthDays}</span>
+        <span className="dawn-term-label">{t('screens.dawn.semester', { day: Math.round(Math.max(1, shown)), days: calendar.lengthDays })}</span>
         <div className="dawn-term-bar">
           <i style={{ width: `${share}%` }} />
         </div>

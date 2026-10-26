@@ -1,4 +1,4 @@
-import type { ContentPack, Course, GameState, Topic } from '../model'
+import { courseOf, type ContentPack, type Course, type GameState, type Topic } from '../model'
 
 /** How many classes of a course he has sat. */
 export function classesSat(state: Pick<GameState, 'attendance'>, courseId: string): number {
@@ -17,10 +17,11 @@ export function topicsOf(content: Pick<ContentPack, 'syllabus'>, courseId: strin
 
 /**
  * What the class he is about to sit is on: the next topic of the course's syllabus after those of the classes he has
- * been to, coming round again when it has all been taught. It is read before the class is counted as attended.
+ * been to, coming round again when it has all been taught. It is read before the class is counted as attended. A
+ * section teaches its course's syllabus; what he has sat is his own section's.
  */
-export function lessonTopic(content: Pick<ContentPack, 'syllabus'>, state: Pick<GameState, 'attendance'>, course: Pick<Course, 'id'>): Topic | undefined {
-  const topics = topicsOf(content, course.id)
+export function lessonTopic(content: Pick<ContentPack, 'syllabus'>, state: Pick<GameState, 'attendance'>, course: Pick<Course, 'id' | 'courseId'>): Topic | undefined {
+  const topics = topicsOf(content, courseOf(course))
   return topics.length === 0 ? undefined : topics[classesSat(state, course.id) % topics.length]
 }
 
@@ -28,7 +29,7 @@ export function lessonTopic(content: Pick<ContentPack, 'syllabus'>, state: Pick<
  * The topics he has been taught, by their place in the syllabus: one for each class he sat, in the order the course
  * teaches them. A class he missed taught him nothing, so the next he sits takes up where he left off.
  */
-export function topicsCovered(content: Pick<ContentPack, 'syllabus'>, state: Pick<GameState, 'attendance'>, courseId: string): number[] {
-  const topics = topicsOf(content, courseId)
-  return topics.map((_, index) => index).slice(0, Math.min(classesSat(state, courseId), topics.length))
+export function topicsCovered(content: Pick<ContentPack, 'syllabus'>, state: Pick<GameState, 'attendance'>, course: Pick<Course, 'id' | 'courseId'>): number[] {
+  const topics = topicsOf(content, courseOf(course))
+  return topics.map((_, index) => index).slice(0, Math.min(classesSat(state, course.id), topics.length))
 }

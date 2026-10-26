@@ -4,6 +4,7 @@ import { dayIndexOf, toDate } from './calendar'
 import { applyEffects } from './conditions'
 import { factor } from './modifiers'
 import { timesIntimate } from './memory'
+import { t } from '../i18n'
 
 /** The game time at which the societies open: the hour their fair begins, in the year the game starts. */
 export function societiesOpenAt(content: ContentPack): number | undefined {
@@ -40,13 +41,13 @@ export function societiesClash(content: ContentPack, a: Society, b: Society): bo
 export function canJoinSociety(content: ContentPack, state: GameState, id: string): PerformCheck {
   const config = content.societies
   const society = societyOf(content, id)
-  if (!config || !society) return { ok: false, reasons: ['There is no such society'] }
+  if (!config || !society) return { ok: false, reasons: [t('game.societies.noSuch')] }
   const reasons: string[] = []
-  if (!societiesOpen(content, state)) reasons.push('The societies sign up new members at their fair')
-  if (state.societies.includes(id)) reasons.push('You already belong to it')
-  else if (state.societies.length >= config.maxJoined) reasons.push(`You can belong to ${config.maxJoined} societies at most`)
+  if (!societiesOpen(content, state)) reasons.push(t('game.societies.atFair'))
+  if (state.societies.includes(id)) reasons.push(t('game.societies.alreadyBelong'))
+  else if (state.societies.length >= config.maxJoined) reasons.push(t('game.societies.atMost', { max: config.maxJoined }))
   const clash = joinedSocieties(content, state).find((other) => societiesClash(content, society, other))
-  if (clash) reasons.push(`It meets when ${clash.name} does`)
+  if (clash) reasons.push(t('game.societies.clash', { society: clash.name }))
   return { ok: reasons.length === 0, reasons }
 }
 
@@ -84,14 +85,14 @@ export function societiesInSession(content: ContentPack, state: GameState): Soci
 export function canAttendSociety(content: ContentPack, state: GameState, id: string): PerformCheck {
   const config = content.societies
   const society = societyOf(content, id)
-  if (!config || !society) return { ok: false, reasons: ['There is no such society'] }
+  if (!config || !society) return { ok: false, reasons: [t('game.societies.noSuch')] }
   const reasons: string[] = []
-  if (!state.societies.includes(id)) reasons.push(`You do not belong to ${society.name}`)
-  if (!societyMeetingNow(content, state, society)) reasons.push(`${society.name} is not meeting now`)
-  if (state.locationId !== society.locationId) reasons.push(`${society.name} meets at ${content.locations.find((l) => l.id === society.locationId)?.name ?? society.locationId}`)
-  if (state.societyMeetings.includes(societyMeetingKey(id, toDate(content.calendar, state.time).dayIndex))) reasons.push('You have been to this meeting')
+  if (!state.societies.includes(id)) reasons.push(t('game.societies.notMember', { society: society.name }))
+  if (!societyMeetingNow(content, state, society)) reasons.push(t('game.societies.notMeeting', { society: society.name }))
+  if (state.locationId !== society.locationId) reasons.push(t('game.societies.meetsAt', { society: society.name, place: content.locations.find((l) => l.id === society.locationId)?.name ?? society.locationId }))
+  if (state.societyMeetings.includes(societyMeetingKey(id, toDate(content.calendar, state.time).dayIndex))) reasons.push(t('game.societies.beenToMeeting'))
   const cost = Math.round(config.energy * config.hours * factor(content, state, 'effort'))
-  if (state.player.energy < cost) reasons.push(`Needs ${cost} energy`)
+  if (state.player.energy < cost) reasons.push(t('game.societies.needsEnergy', { cost }))
   return { ok: reasons.length === 0, reasons }
 }
 

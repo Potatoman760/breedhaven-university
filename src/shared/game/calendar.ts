@@ -1,4 +1,5 @@
 import type { CalendarConfig, Month, Period } from '../model'
+import { t } from '../i18n'
 
 // Game time is a single integer: hours elapsed since the calendar's start moment.
 // Everything here derives the in-world date from that number.
@@ -93,5 +94,5 @@ export function formatTime(date: GameDate): string {
 
 export function formatDate(date: GameDate): string {
   // The year is left out: the game is one stretch of it, and nobody in it needs telling which.
-  return `${date.weekday}, ${date.day} ${date.month.name}`
+  return t('game.calendar.date', { weekday: date.weekday, day: date.day, month: date.month.name })
 }

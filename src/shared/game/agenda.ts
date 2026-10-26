@@ -8,6 +8,7 @@ import { householdCost, isHouseholdDay, rentOn } from './housing'
 import { firstNames } from './scene'
 import { joinedSocieties, societyMeetingNow } from './societies'
 import { awayOnDay } from './trips'
+import { t } from '../i18n'
 
 /** One thing on a day of the calendar. */
 export interface AgendaItem {
@@ -51,7 +52,7 @@ export function dayAgenda(content: ContentPack, state: GameState, dayIndex: numb
       title: event.name,
       detail: content.locations.find((l) => l.id === event.locationId)?.name,
       // Who has said she will be there is part of what there is to read of it.
-      description: [event.description, eventGoers(state, event.id).length > 0 && `${firstNames(content, eventGoers(state, event.id))} said ${eventGoers(state, event.id).length > 1 ? 'they' : 'she'} will be there.`].filter(Boolean).join(' '),
+      description: [event.description, eventGoers(state, event.id).length > 0 && t('game.agenda.goers', { names: firstNames(content, eventGoers(state, event.id)), count: eventGoers(state, event.id).length })].filter(Boolean).join(' '),
       startHour: event.startHour,
       hours: event.startHour === undefined ? undefined : (event.hours ?? 1)
     }))
@@ -59,15 +60,15 @@ export function dayAgenda(content: ContentPack, state: GameState, dayIndex: numb
   for (const [motherId, pregnancy] of Object.entries(state.pregnancies)) {
     // Once the hour of the birth is set it is on the day at that hour; until then, she is only known to be due.
     if (toDate(calendar, pregnancy.dueAt).dayIndex === dayIndex && !state.appointments.some((plan) => plan.kind === 'birth' && plan.loveInterestId === motherId)) {
-      whole.push({ kind: 'birth', id: `birth-${motherId}`, title: `${firstNames(content, [motherId])} is due` })
+      whole.push({ kind: 'birth', id: `birth-${motherId}`, title: t('game.agenda.due', { name: firstNames(content, [motherId]) }) })
     }
   }
   // What the house will cost him, on the days it does: only days still to come, since what is past is in its ledger.
   if (dayIndex >= toDate(calendar, state.time).dayIndex) {
     const rent = rentOn(content, state, dayIndex)
-    if (rent > 0) whole.push({ kind: 'rent', id: 'rent', title: `Rent due: $${rent}`, detail: content.housing?.name })
+    if (rent > 0) whole.push({ kind: 'rent', id: 'rent', title: t('game.agenda.rent', { amount: rent }), detail: content.housing?.name })
     const keep = householdCost(content, state)
-    if (keep > 0 && isHouseholdDay(content, dayIndex)) whole.push({ kind: 'household', id: 'household', title: `The children's week: $${keep}`, detail: content.housing?.name })
+    if (keep > 0 && isHouseholdDay(content, dayIndex)) whole.push({ kind: 'household', id: 'household', title: t('game.agenda.household', { amount: keep }), detail: content.housing?.name })
   }
   if (!inGame) return whole.filter((item) => item.startHour === undefined)
 
@@ -88,7 +89,7 @@ export function dayAgenda(content: ContentPack, state: GameState, dayIndex: numb
         kind: 'class',
         id: `class-${course.id}`,
         // The last class of the examination weeks is the examination.
-        title: `${exam ? (exam.kind === 'midterm' ? 'Midterm: ' : 'Final: ') : ''}${course.number} ${course.title}`,
+        title: exam ? t(exam.kind === 'midterm' ? 'game.agenda.midterm' : 'game.agenda.final', { course: `${course.number} ${course.title}` }) : `${course.number} ${course.title}`,
         detail: course.professor,
         startHour: meeting.startHour,
         hours: meeting.hours
@@ -108,7 +109,7 @@ export function dayAgenda(content: ContentPack, state: GameState, dayIndex: numb
     const place = content.locations.find((l) => l.id === job.locationId)?.name
     for (const shift of job.shifts) {
       if (shift.weekday !== weekday || timeOn(content, dayIndex, shift.startHour) < state.job.hiredAt) continue
-      timed.push({ kind: 'work', id: `work-${shift.startHour}`, title: `Shift: ${job.title}`, detail: place, startHour: shift.startHour, hours: shift.hours })
+      timed.push({ kind: 'work', id: `work-${shift.startHour}`, title: t('game.agenda.shift', { job: job.title }), detail: place, startHour: shift.startHour, hours: shift.hours })
     }
   }
   for (const plan of state.appointments) {
@@ -118,7 +119,7 @@ export function dayAgenda(content: ContentPack, state: GameState, dayIndex: numb
     timed.push({
       kind: plan.kind === 'birth' ? 'birth' : 'plan',
       id: `plan-${plan.id}`,
-      title: plan.kind === 'birth' ? `${firstNames(content, [plan.loveInterestId])} gives birth` : plan.kind === 'viewing' || plan.kind === 'below' ? plan.title : `${plan.title} with ${firstNames(content, attendees(plan))}`,
+      title: plan.kind === 'birth' ? t('game.agenda.givesBirth', { name: firstNames(content, [plan.loveInterestId]) }) : plan.kind === 'viewing' || plan.kind === 'below' ? plan.title : t('game.agenda.planWith', { plan: plan.title, names: firstNames(content, attendees(plan)) }),
       detail: place,
       startHour: date.hour,
       hours: plan.hours

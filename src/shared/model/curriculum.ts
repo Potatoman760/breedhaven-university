@@ -73,6 +73,26 @@ export function courseId(code: string, number: string): string {
   return `course-${courseNumber(code, number).toLowerCase().replace(/\s+/g, '-')}`
 }
 
+/** How many courses of her own major a student takes, and how many besides. */
+export const MAJOR_COURSES = 2
+export const ELECTIVES = 2
+
+/** A section of a course: the first is the course's own id, each further one that with its number after it, `course-pol-132-2`. */
+export function sectionId(code: string, number: string, section: number): string {
+  return section > 1 ? `${courseId(code, number)}-${section}` : courseId(code, number)
+}
+
+/** The written course a class is of, whichever section of it: what its syllabus and its skill are kept under. */
+export function courseOf(course: { id: string; courseId?: string }): string {
+  return course.courseId ?? course.id
+}
+
+/** A subject of the curriculum as a character has it: her own at a year, or one she teaches with a course's number. */
+export function studiesOf(curriculum: Curriculum, code: string, level: number): { subject: string; code: string; level: number; stats: Major['stats']; practical: boolean } | undefined {
+  const major = curriculum.majors.find((one) => one.code === code)
+  return major && { subject: major.subject, code: major.code, level, stats: major.stats, practical: major.practical }
+}
+
 type Raw = Record<string, unknown>
 const isObject = (value: unknown): value is Raw => typeof value === 'object' && value !== null && !Array.isArray(value)
 
@@ -128,12 +148,16 @@ export function resolveCurriculum(raw: unknown): unknown {
           ...catalogue,
           // A course the curriculum no longer has is not given.
           courses: catalogue['courses'].flatMap((given) => {
-            const found = isObject(given) ? written.find((one) => one.id === given['id']) : undefined
+            // A further section is found by the course it is a section of, and keeps its own id.
+            const of = isObject(given) ? (given['courseId'] ?? given['id']) : undefined
+            const found = isObject(given) ? written.find((one) => one.id === of) : undefined
             if (!found || !isObject(given)) return []
             const { major, course } = found
+            const section = typeof given['section'] === 'number' ? given['section'] : 1
             return [
               {
-                id: found.id,
+                id: section > 1 ? given['id'] : found.id,
+                ...(section > 1 && { courseId: found.id, section }),
                 number: courseNumber(major.code, course.number),
                 title: course.title,
                 description: course.description,

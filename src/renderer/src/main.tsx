@@ -12,6 +12,7 @@ import { TripPreview } from './TripPreview'
 import { LoadingPreview } from './LoadingPreview'
 import { CrashScreen } from './ui/CrashScreen'
 import { installMouseBack } from './mouseBack'
+import { loadLanguage } from './language'
 import './styles.css'
 
 installMouseBack()
@@ -19,7 +20,8 @@ installMouseBack()
 // A screen asked for on its own, by `npm run preview:loading` or `preview:lantern`: "loading" or "lantern", with ":<who>" after it.
 const preview = new URLSearchParams(window.location.hash.slice(1)).get('preview') ?? undefined
 
-createRoot(document.getElementById('root')!).render(
+// The language comes first, so that nothing is drawn in the wrong one. Without it, the game is in English.
+loadLanguage().catch(() => undefined).finally(() => createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <CrashScreen>
       {preview?.startsWith('loading') ? (
@@ -33,4 +35,4 @@ createRoot(document.getElementById('root')!).render(
       )}
     </CrashScreen>
   </StrictMode>
-)
+))

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { isCodexUnlocked } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
+import { t } from '../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -18,13 +19,13 @@ export function CodexBook({ content, state }: Props) {
   const pages = chapters.flatMap((chapter) => known.filter((entry) => entry.category === chapter))
   const [at, setAt] = useState(0)
   const page = pages[Math.min(at, pages.length - 1)]
-  if (!page) return <p className="hint">Nothing is written here yet.</p>
+  if (!page) return <p className="hint">{t('panels.codex.empty')}</p>
   const number = pages.indexOf(page)
 
   return (
     <div className="book">
-      <nav className="book-page book-contents" aria-label="Contents">
-        <h2>Contents</h2>
+      <nav className="book-page book-contents" aria-label={t('panels.codex.contents')}>
+        <h2>{t('panels.codex.contents')}</h2>
         {chapters.map((chapter) => (
           <section key={chapter}>
             <h3>{chapter}</h3>
@@ -57,13 +58,13 @@ export function CodexBook({ content, state }: Props) {
         </div>
         <footer>
           <button type="button" className="book-turn" disabled={number === 0} onClick={() => setAt(number - 1)}>
-            ‹ Previous
+            {t('panels.codex.previous')}
           </button>
           <span>
-            {number + 1} of {pages.length}
+            {t('panels.codex.pageOf', { n: number + 1, total: pages.length })}
           </span>
           <button type="button" className="book-turn" disabled={number === pages.length - 1} onClick={() => setAt(number + 1)}>
-            Next ›
+            {t('panels.codex.next')}
           </button>
         </footer>
       </article>

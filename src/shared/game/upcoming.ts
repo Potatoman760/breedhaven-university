@@ -8,6 +8,7 @@ import { canSitExam } from './exams'
 import { examOn } from './grades'
 import { canWork, shiftLaterToday, shiftNow } from './jobs'
 import { canAttendSociety, joinedSocieties, societyMeetingNow, societyPeople } from './societies'
+import { t } from '../i18n'
 
 /** Something on his timetable still to come today: a class he takes, a meeting of a society of his, a shift at his job, or a plan he has made. */
 export interface Upcoming {
@@ -40,7 +41,7 @@ export function nextUp(content: ContentPack, state: GameState): Upcoming | undef
     const time = timeOn(content, dayIndex, shift.shift.startHour)
     // Only a shift he could clock in for: one from before he was taken on, or already worked, is not to come.
     if (shiftNow(content, { ...state, time })?.key === shift.key) {
-      found.push({ kind: 'work', id: shift.job.id, title: `Your shift: ${shift.job.title}`, time, locationId: shift.job.locationId })
+      found.push({ kind: 'work', id: shift.job.id, title: t('game.upcoming.shift', { job: shift.job.title }), time, locationId: shift.job.locationId })
     }
   }
 
@@ -52,12 +53,12 @@ export function nextUp(content: ContentPack, state: GameState): Upcoming | undef
       // An examination takes the place of the class in its slot, and is something to turn up for like any other.
       const exam = examOn(content, course, dayIndex, meeting.startHour)
       if (exam) {
-        if (!state.grades[course.id]?.[exam.kind]) found.push({ kind: 'exam', id: course.id, title: `${exam.kind === 'midterm' ? 'Midterm' : 'Final'}: ${course.number}`, time, locationId: course.locationId })
+        if (!state.grades[course.id]?.[exam.kind]) found.push({ kind: 'exam', id: course.id, title: t(exam.kind === 'midterm' ? 'game.upcoming.midterm' : 'game.upcoming.final', { number: course.number }), time, locationId: course.locationId })
         continue
       }
       // No class meets on orientation day or a holiday.
       if (!meetingNow(content, { ...state, time }, course)) continue
-      found.push({ kind: 'class', id: course.id, title: `${course.number}: ${course.title}`, time, locationId: course.locationId })
+      found.push({ kind: 'class', id: course.id, title: t('game.focus.course', { number: course.number, title: course.title }), time, locationId: course.locationId })
     }
   }
 

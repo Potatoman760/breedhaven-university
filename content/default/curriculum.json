@@ -1269,6 +1269,121 @@
               "cooldownDays": 4
             }
           }
+        },
+        {
+          "number": "128",
+          "title": "Wards and Household Workings",
+          "description": "The witchcraft of a home: thresholds and wards, the workings that keep a house fed, warm and quiet, and how a ward is read, tended and taken down. Weekly bench work builds and tests a full set of household wards.",
+          "topics": [
+            {
+              "title": "The House as One Working",
+              "content": "A household witch treats a house as a single working with many anchors. Each door, hearth and window is a threshold, and a ward set on one changes how the others hold. Laid out well, a house keeps its own warmth, sours no milk and lets in only those its people welcome. Laid out badly, wards fight each other at the corners and every room is cold. The first bench task is to map a house: each threshold, what it divides, and what crosses it each day.",
+              "question": {
+                "ask": "What does a household witch treat a house as?",
+                "answer": "A single working with many anchors",
+                "wrong": [
+                  "A ring of separate charms",
+                  "A field drawn from the hearth",
+                  "A circle cast once a year"
+                ]
+              }
+            },
+            {
+              "title": "The Door Ward",
+              "content": "The door ward is the oldest working of the craft and the simplest to set badly. It is anchored in the sill, never in the door, since a door is opened a hundred times a day and a sill is not. It is keyed to the household: anyone who has slept under the roof three nights crosses freely, and anyone else feels a slight reluctance, enough to knock. A door ward does not stop a determined visitor. It is a courtesy made solid, and its real use is that it tells the house who has come in.",
+              "question": {
+                "ask": "Where is a door ward anchored?",
+                "answer": "In the sill",
+                "wrong": [
+                  "In the door",
+                  "In the lintel",
+                  "In the lock"
+                ]
+              }
+            },
+            {
+              "title": "Hearth, Larder and Cradle",
+              "content": "Three household workings are taught to every first-year. The hearth charm keeps a banked fire alive until morning on a single log. The larder ward slows spoiling, anchored on the shelf edge, and keeps bread a week and milk three days. The cradle charm is the gentlest working of the craft: a hum anchored in the rocker that settles a waking infant back to sleep. It is never set on the child itself, only on the cradle, and it fails on purpose if the child is hungry or ill.",
+              "question": {
+                "ask": "What is a cradle charm anchored in?",
+                "answer": "The rocker",
+                "wrong": [
+                  "The child",
+                  "The blanket",
+                  "The doorway"
+                ]
+              }
+            },
+            {
+              "title": "Reading a Ward",
+              "content": "Every ward leaves a signature a trained hand can read: its strength, its age and whose it is. A fresh ward feels sharp, like the cold of a window pane. An old one feels dull and spread, and a failing one has gaps, places along the threshold where the hand passes through. A ward carries something of its maker, so a practiced reader can tell two witches apart by their work alone. Reading comes before every repair, since a ward patched without being read is often made worse.",
+              "question": {
+                "ask": "How does a failing ward feel to a trained hand?",
+                "answer": "Gapped along the threshold",
+                "wrong": [
+                  "Sharp like window glass",
+                  "Warm like a hearthstone",
+                  "Heavy like wet cloth"
+                ]
+              }
+            },
+            {
+              "title": "Tending and Renewal",
+              "content": "A ward is renewed, not replaced. Renewal means tracing the working along its anchor and feeding it from the field already in the threshold, which keeps the original keying intact. A replaced ward must be keyed to the household again from nothing, and for three nights nobody crosses freely. Household wards are renewed at the turn of each season, and after any birth or death in the house, since either changes who the household is. A ward left untended fades in about a year.",
+              "question": {
+                "ask": "After what events must a household ward be renewed early?",
+                "answer": "A birth or a death in the house",
+                "wrong": [
+                  "A storm or a flood",
+                  "A guest staying a week",
+                  "A new door being hung"
+                ]
+              }
+            },
+            {
+              "title": "Taking a Ward Down",
+              "content": "Wards are taken down in the reverse of the order they were set: the inner rooms first and the front door last, so that no part of the house is left guarding against the rest. Each anchor is unpicked, not broken, because a broken ward releases its charge into the nearest glass and a house full of wards can crack every window it has. A witch moving out takes her wards with her or hands them on to the next household, and the law counts a ward left behind and keyed to the wrong people as a nuisance.",
+              "question": {
+                "ask": "Which ward is taken down last?",
+                "answer": "The front door",
+                "wrong": [
+                  "The hearth",
+                  "The inner rooms",
+                  "The larder"
+                ]
+              }
+            }
+          ],
+          "skill": {
+            "id": "household-wards",
+            "name": "Household wards",
+            "description": "You work with your hands and your head at once: training in intelligence and dexterity is 50% more effective.",
+            "at": 30,
+            "passive": {
+              "kind": "training",
+              "amount": 1.5,
+              "stats": [
+                "intelligence",
+                "dexterity"
+              ]
+            },
+            "below": {
+              "kind": "anchoring",
+              "amount": 1.25
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "Craft comes as easily as thought: training in intelligence and dexterity is 100% more effective.",
+              "passive": {
+                "kind": "training",
+                "amount": 2,
+                "stats": [
+                  "intelligence",
+                  "dexterity"
+                ]
+              }
+            }
+          }
         }
       ]
     },
@@ -1718,6 +1833,121 @@
               "passive": {
                 "kind": "fertility",
                 "amount": 2
+              }
+            }
+          }
+        },
+        {
+          "number": "146",
+          "title": "Inheritance and the Assay Lab",
+          "description": "The laboratory course of the major: how the assay is run and read in practice, how inheritance is traced through families and the Registry, and what the numbers can and cannot say about any one man. Weekly lab runs full assays on prepared samples.",
+          "topics": [
+            {
+              "title": "Running an Assay",
+              "content": "An assay is run in four steps. The sample is diluted to a standard count, stained with the Bloom-reactive dye, rested for twenty minutes in darkness, and read under the microscope across ten fields of view. Each field is scored separately for bound and unbound seed, and the bound fraction is the total bound over the total counted. Rushing the rest period is the most common error at the bench. A sample read early scores low, because the stain has not yet finished taking up.",
+              "question": {
+                "ask": "What is the most common error at the assay bench?",
+                "answer": "Rushing the rest period",
+                "wrong": [
+                  "Diluting too far",
+                  "Reading too few fields",
+                  "Using old stain"
+                ]
+              }
+            },
+            {
+              "title": "Error and the Second Sample",
+              "content": "No single assay is trusted. The bound fraction of one man varies from week to week with rest, fever, drink and the time since he last finished, by as much as ten points either way. This is why the Registry asks for two samples two weeks apart and records their mean. A man who scores four and then seven is reassayed a third time, since the line at five is too close to call. Most disputed assays turn out to be a single sample taken on a bad day.",
+              "question": {
+                "ask": "Why does the Registry ask for two samples two weeks apart?",
+                "answer": "One man varies from week to week",
+                "wrong": [
+                  "The stain fades after a week",
+                  "Two clinics must agree",
+                  "The law requires a witness"
+                ]
+              }
+            },
+            {
+              "title": "Tracing a Family",
+              "content": "Inheritance is studied through pedigrees: charts of a family over three or more generations showing every man, his assay where there is one, and every pregnancy. Because the Registry keeps assays private, a pedigree is built with the family's consent and from their own records. The patterns are faint. Fertile men cluster slightly in some families, sons of high-scoring Sires score a little higher, and daughters carry no measurable trace at all. A single pedigree proves nothing, and only hundreds together show a trend.",
+              "question": {
+                "ask": "How many pedigrees does it take to show a trend?",
+                "answer": "Hundreds together",
+                "wrong": [
+                  "A single one",
+                  "Two or three",
+                  "One per generation"
+                ]
+              }
+            },
+            {
+              "title": "The Mother's Part",
+              "content": "Studies of half-brothers give the strongest evidence for the mother's part in a son's fertility. Sons of one father by different mothers differ in fertility far more than full brothers do, which a father's inheritance alone cannot explain. A mother's Bloom field during the pregnancy appears to set part of her son's chance before birth. Mothers who had already borne several daughters raise slightly more fertile sons, a finding the Maternal Field hypothesis predicts and the others do not.",
+              "question": {
+                "ask": "Which studies give the strongest evidence for the mother's part?",
+                "answer": "Studies of half-brothers",
+                "wrong": [
+                  "Studies of twins",
+                  "Studies of grandfathers",
+                  "Studies of only sons"
+                ]
+              }
+            },
+            {
+              "title": "Reading the Registry Numbers",
+              "content": "Registry figures are read with care. The share of men who are Sires is counted only among men assayed, and men assayed are not a fair sample: those with reason to hope are tested more often. Regional differences are mostly differences in how often men are tested. Trends over time follow changes in law, as when the assay became free and the counted share fell. A careful paper states the assay rate beside every figure, so that a reader can tell a real difference from a change in who came forward.",
+              "question": {
+                "ask": "What should a careful paper state beside every Registry figure?",
+                "answer": "The assay rate",
+                "wrong": [
+                  "The names involved",
+                  "The clinic used",
+                  "The stain batch"
+                ]
+              }
+            },
+            {
+              "title": "Counseling and Disclosure",
+              "content": "A geneticist who runs assays will also tell men their results, and the telling is part of the craft. A result is given in person, never by message, with the bound fraction, what it means for the chance of a child and what it does not mean. A man who is not fertile is not ill, and is told so plainly. A Sire is told his legal duties, his rights over his own record, and that nobody else will be told without his consent, which includes his family and any woman he is seeing.",
+              "question": {
+                "ask": "How is an assay result given to a man?",
+                "answer": "In person",
+                "wrong": [
+                  "By message",
+                  "By letter",
+                  "Through his family"
+                ]
+              }
+            }
+          ],
+          "skill": {
+            "id": "assay-bench",
+            "name": "At the assay bench",
+            "description": "You think like a scientist: training in intelligence and wisdom is 50% more effective.",
+            "at": 30,
+            "passive": {
+              "kind": "training",
+              "amount": 1.5,
+              "stats": [
+                "intelligence",
+                "wisdom"
+              ]
+            },
+            "below": {
+              "kind": "surge",
+              "amount": 0.5
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You weigh evidence like a scholar: training in intelligence and wisdom is 100% more effective.",
+              "passive": {
+                "kind": "training",
+                "amount": 2,
+                "stats": [
+                  "intelligence",
+                  "wisdom"
+                ]
               }
             }
           }
@@ -2181,6 +2411,117 @@
               "passive": {
                 "kind": "escort",
                 "amount": 2
+              }
+            }
+          }
+        },
+        {
+          "number": "117",
+          "title": "Crowd Safety and Field Response",
+          "description": "The groundwork of public safety: how crowds behave and move, how to read one before it turns, first response to injury and panic, and the footwork and holds an officer needs on a crowded street. Weekly field drills run in the Tiltyard.",
+          "topics": [
+            {
+              "title": "How a Crowd Moves",
+              "content": "A crowd behaves less like many people and more like a fluid. Below about two people to the square meter it flows freely and anyone can cross it. Between two and four it slows and bunches at every narrowing. Above five it no longer chooses where it goes: pressure passes through it in waves, and people are carried. Almost every crowd injury happens at that density, and almost always at a gate, a stair or a corner, where a flow meets something it cannot pass.",
+              "question": {
+                "ask": "Above what density does a crowd stop choosing where it goes?",
+                "answer": "About five people to the square meter",
+                "wrong": [
+                  "About two people to the square meter",
+                  "About three people to the square meter",
+                  "About ten people to the square meter"
+                ]
+              }
+            },
+            {
+              "title": "Reading the Signs",
+              "content": "A crowd gives warning before it turns. The first sign is sound: chatter falls and a low murmur takes its place. The second is movement against the flow, as people at the edges try to leave. The third is the sway, a slow rolling motion that means pressure is building inside. An officer who sees the sway has minutes, not hours. The response is always to open space, by opening another gate, stopping the music or holding the flow at the back, and never to push from the front.",
+              "question": {
+                "ask": "What does a slow rolling sway in a crowd mean?",
+                "answer": "Pressure is building inside",
+                "wrong": [
+                  "The crowd is dispersing",
+                  "A fight has started",
+                  "The front has stopped moving"
+                ]
+              }
+            },
+            {
+              "title": "First Response",
+              "content": "The first officer at an injury does three things in order: makes the scene safe, calls for the Health Center, and keeps the injured person breathing. Safety comes first because an officer who is hurt helps nobody. Breathing is checked by sight and sound for ten seconds. A person who is breathing but not awake is rolled onto the side with the head tilted back, so the airway stays open. Healing charms are left to trained healers, since a mending charm on a bleeding wound seals it over damage still inside.",
+              "question": {
+                "ask": "What is the first of the three steps at an injury?",
+                "answer": "Making the scene safe",
+                "wrong": [
+                  "Calling for help",
+                  "Checking breathing",
+                  "Casting a healing charm"
+                ]
+              }
+            },
+            {
+              "title": "Panic and the Bloom",
+              "content": "Panic spreads through a crowd by sight and sound, and in Breedhaven also by the Bloom. A frightened woman's field sharpens, and those near her feel it as unease before they know why. Panic in a crowd of young women can run faster than any officer can follow. The counter is calm that can be seen: an officer who stands still, speaks slowly and lowers her own field steadies those around her. Women in their Second Bloom are steadier anchors in a crowd, and details place them at the narrow points.",
+              "question": {
+                "ask": "Besides sight and sound, how does panic spread in a Breedhaven crowd?",
+                "answer": "Through the Bloom",
+                "wrong": [
+                  "Through the air",
+                  "Through the ground",
+                  "Through wards"
+                ]
+              }
+            },
+            {
+              "title": "Footwork and Balance",
+              "content": "An officer in a crowd works from the feet up. The stance is wide and low, feet a shoulder apart and one ahead, knees soft, weight over the balls of the feet. From it an officer can turn, step back and take a push without falling. A fall in a dense crowd is the most dangerous thing that can happen to anyone in it, because those behind cannot stop. Drills train the reflex to stay upright and, failing that, to curl on the side with the arms over the head until the pressure passes.",
+              "question": {
+                "ask": "What is the most dangerous thing that can happen in a dense crowd?",
+                "answer": "A fall",
+                "wrong": [
+                  "A shout",
+                  "A shove",
+                  "A blocked view"
+                ]
+              }
+            },
+            {
+              "title": "Holds, Escorts and Restraint",
+              "content": "Public safety officers use the least force that will serve. A guiding hold at the elbow moves a willing person out of a crush. An escort hold, one arm locked and the other at the shoulder, moves an unwilling one without injury. Restraint on the ground is the last resort and lasts only until help arrives, since pressure on a person's chest or back can stop their breathing within minutes. Every use of force beyond a guiding hold is written up the same day, with names, times and the reason.",
+              "question": {
+                "ask": "Why does ground restraint last only until help arrives?",
+                "answer": "Pressure on the chest can stop breathing",
+                "wrong": [
+                  "The law forbids it longer",
+                  "Officers tire quickly",
+                  "Help is always minutes away"
+                ]
+              }
+            }
+          ],
+          "skill": {
+            "id": "field-ready",
+            "name": "Field ready",
+            "description": "You train for the street: training in strength and dexterity is 50% more effective.",
+            "at": 30,
+            "passive": {
+              "kind": "training",
+              "amount": 1.5,
+              "stats": [
+                "strength",
+                "dexterity"
+              ]
+            },
+            "upgrade": {
+              "at": 70,
+              "description": "You move like an officer on duty: training in strength and dexterity is 100% more effective.",
+              "passive": {
+                "kind": "training",
+                "amount": 2,
+                "stats": [
+                  "strength",
+                  "dexterity"
+                ]
               }
             }
           }

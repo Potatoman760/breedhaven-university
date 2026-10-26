@@ -7,6 +7,7 @@ import { isOpen, scheduledLocationId } from './schedule'
 import { societiesInSession, societyPeople } from './societies'
 import { atFair } from './fair'
 import type { PerformCheck } from './activities'
+import { t } from '../i18n'
 
 /**
  * The place someone is at work right now, if she is the boss of a job and one of its shifts
@@ -76,12 +77,12 @@ export function whereaboutsUnknown(content: ContentPack, state: GameState): Love
 export function canTravel(content: ContentPack, state: GameState, locationId: string): PerformCheck {
   const reasons: string[] = []
   const location = content.locations.find((l) => l.id === locationId)
-  if (!content.map || !location) return { ok: false, reasons: ['There is no way to get there'] }
+  if (!content.map || !location) return { ok: false, reasons: [t('game.map.noWay')] }
 
-  if (isGameOver(content.calendar, state.time)) reasons.push('The game is over')
-  if (locationId === state.locationId) reasons.push('You are already here')
-  if (location.eventOnly) reasons.push(`Only an event goes to ${location.name}`)
-  if (!isOpen(location, toDate(content.calendar, state.time).hour)) reasons.push(`${location.name} is closed`)
+  if (isGameOver(content.calendar, state.time)) reasons.push(t('game.activities.gameOver'))
+  if (locationId === state.locationId) reasons.push(t('game.map.alreadyHere'))
+  if (location.eventOnly) reasons.push(t('game.map.eventOnly', { place: location.name }))
+  if (!isOpen(location, toDate(content.calendar, state.time).hour)) reasons.push(t('game.activities.closed', { place: location.name }))
   return { ok: reasons.length === 0, reasons }
 }
 

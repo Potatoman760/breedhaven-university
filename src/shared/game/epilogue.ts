@@ -3,6 +3,7 @@ import { statusOf } from './bonds'
 import { gradeFor } from './exams'
 import { babiesAtHome, healthName } from './housing'
 import { seedOf } from './seed'
+import { t, type MessageKey } from '../i18n'
 
 /** How the year went for him as a student. */
 export type Standing = 'failing' | 'gettingBy' | 'excelling'
@@ -51,22 +52,21 @@ export function standingOf(grades: { letter: string; passed: boolean }[]): Stand
   return average >= EXCELLING && passed === grades.length ? 'excelling' : 'gettingBy'
 }
 
-const ACADEMICS: Record<Standing, string> = {
-  failing: "You didn't focus enough on academics, and were forced to drop out of Breedhaven University.",
-  gettingBy: 'You kept your head above water. Your grades were nothing to boast of, but you passed the year at Breedhaven University, and will be back for the next.',
-  excelling: 'You excelled in your studies, and finished the year near the top of your class at Breedhaven University.'
+const ACADEMICS: Record<Standing, MessageKey> = {
+  failing: 'game.epilogue.academics.failing',
+  gettingBy: 'game.epilogue.academics.gettingBy',
+  excelling: 'game.epilogue.academics.excelling'
 }
 
 /** "Faye", "Faye and Bea", "Faye, Bea and Cy". */
 function names(people: LoveInterest[]): string {
   const first = people.map((li) => li.name.split(' ')[0])
-  return first.length < 2 ? (first[0] ?? '') : `${first.slice(0, -1).join(', ')} and ${first.at(-1)}`
+  return first.length < 2 ? (first[0] ?? '') : t('game.epilogue.names', { rest: first.slice(0, -1).join(', '), last: first.at(-1) })
 }
 
-/** What she is to him in a couple: girlfriend, boyfriend, or partner. */
-function sweetheart(li: LoveInterest): string {
-  const { subject } = pronounWords(li.pronouns)
-  return subject === 'she' ? 'girlfriend' : subject === 'he' ? 'boyfriend' : 'partner'
+/** Which of her pronouns she goes by, as the messages choose between them: `she`, `he` or `they`. */
+function pronounOf(li: LoveInterest): string {
+  return pronounWords(li.pronouns).subject
 }
 
 /** A repeatable number in [0, 1) for one mother in one game. */
@@ -99,19 +99,17 @@ export function childrenBy(content: ContentPack, state: GameState, loveInterestI
   return [...born, { daughter: roll(state.weatherSeed, seedOf(loveInterestId)) < (content.pregnancy?.daughterChance ?? DAUGHTER_CHANCE) }]
 }
 
-/** "a beautiful baby girl", "two beautiful children, a girl and a boy". */
-function describeChildren(children: { daughter: boolean }[]): string {
-  const word = (child: { daughter: boolean }) => (child.daughter ? 'girl' : 'boy')
-  if (children.length === 1) return `a beautiful baby ${word(children[0])}`
+/** "a beautiful baby girl", "two beautiful children, a girl and a boy"; short, "a girl", "two children, a girl and a boy". */
+function describeChildren(children: { daughter: boolean }[], short = false): string {
+  if (children.length === 1) return t(short ? 'game.epilogue.babyShort' : 'game.epilogue.baby', { daughter: children[0].daughter })
   const girls = children.filter((child) => child.daughter).length
   const boys = children.length - girls
-  const count = ['no', 'one', 'two', 'three', 'four', 'five', 'six'][children.length] ?? String(children.length)
-  const of = (n: number, one: string) => (n === 1 ? `a ${one}` : `${['no', 'one', 'two', 'three', 'four', 'five', 'six'][n] ?? n} ${one}s`)
-  return `${count} beautiful children, ${[girls > 0 && of(girls, 'girl'), boys > 0 && of(boys, 'boy')].filter(Boolean).join(' and ')}`
+  const few = (n: number) => t('game.epilogue.fewCount', { n })
+  const which = [girls > 0 && t('game.epilogue.girls', { n: girls, count: few(girls) }), boys > 0 && t('game.epilogue.boys', { n: boys, count: few(boys) })].filter(Boolean) as string[]
+  return t(short ? 'game.epilogue.babiesShort' : 'game.epilogue.babies', { count: few(children.length), which: which.length === 2 ? t('game.epilogue.both', { first: which[0], second: which[1] }) : which[0] })
 }
 
-const COUNTS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve']
-const count = (n: number) => COUNTS[n] ?? String(n)
+const count = (n: number) => t('game.epilogue.count', { n })
 
 /** What the year left him, the thing a Sire is here for: how many children, by how many women. */
 function legacy(content: ContentPack, state: GameState): EpilogueScreen {
@@ -119,14 +117,13 @@ function legacy(content: ContentPack, state: GameState): EpilogueScreen {
   const total = mothers.reduce((sum, one) => sum + one.children.length, 0)
   const text =
     total === 0
-      ? 'You fathered no children this year. The Sire Relations Office noted it in your file, without comment.'
-      : `You fathered ${count(total)} ${total === 1 ? 'child' : 'children'} this year, by ${count(mothers.length)} ${mothers.length === 1 ? 'woman' : 'women'}.` +
-        (mothers.length >= 3 ? ' The Sire Relations Office has never had a year like it.' : '')
+      ? t('game.epilogue.legacyNone')
+      : t('game.epilogue.legacy', { total, count: count(total), mothers: mothers.length, motherCount: count(mothers.length), record: mothers.length >= 3 })
   return {
     kind: 'legacy',
-    heading: 'Your legacy',
+    heading: t('game.epilogue.legacyHeading'),
     text,
-    details: mothers.map(({ li, children }) => `${li.name.split(' ')[0]}: ${describeChildren(children).replace(/^a beautiful baby /, 'a ').replace(/ beautiful children/, ' children')}`),
+    details: mothers.map(({ li, children }) => t('game.epilogue.line', { label: li.name.split(' ')[0], value: describeChildren(children, true) })),
     loveInterestIds: mothers.slice(0, 3).map(({ li }) => li.id)
   }
 }
@@ -139,13 +136,11 @@ function childrenAtHome(content: ContentPack, state: GameState): { text: string;
   const thriving = home.filter((child) => (child.health ?? 0) >= config.babies.thrivingFrom).length
   const text =
     thriving === home.length
-      ? home.length === 1
-        ? ' The child raised there was thriving.'
-        : ` Every child raised there was thriving.`
+      ? t('game.epilogue.homeAllThriving', { n: home.length })
       : thriving === 0
-        ? ` The ${home.length === 1 ? 'child' : 'children'} raised there got by, but never thrived.`
-        : ` Of the ${count(home.length)} children raised there, ${count(thriving)} ${thriving === 1 ? 'was' : 'were'} thriving.`
-  return { text, details: home.map((child) => `${child.name}: ${healthName(config, child.health ?? 0)}`) }
+        ? t('game.epilogue.homeNoneThriving', { n: home.length })
+        : t('game.epilogue.homeSomeThriving', { count: count(home.length), thriving, thrivingCount: count(thriving) })
+  return { text, details: home.map((child) => t('game.epilogue.line', { label: child.name, value: healthName(config, child.health ?? 0) })) }
 }
 
 /**
@@ -159,8 +154,8 @@ function below(content: ContentPack, state: GameState): EpilogueScreen | undefin
   const all = config.depths.length
   const text =
     set >= all
-      ? `You set every anchor beneath the University and saved it from what was rising below. Nobody was meant to know, but rumors of your heroism are already spreading.`
-      : `${set === 0 ? 'You never set an anchor beneath the University.' : `You set ${count(set)} of the ${count(all)} anchors beneath the University.`} The ward-lines you left gave way, the monsters below overflowed onto the campus, and many students were injured.`
+      ? t('game.epilogue.belowSaved')
+      : t('game.epilogue.belowOverrun', { anchors: set === 0 ? t('game.epilogue.belowNone') : t('game.epilogue.belowSome', { set: count(set), all: count(all) }) })
   return { kind: 'below', heading: config.name.replace(/^the /, 'The '), text, image: set >= all ? config.endingImages.saved : config.endingImages.overrun }
 }
 
@@ -177,7 +172,7 @@ export function buildEpilogue(content: ContentPack, state: GameState): EpilogueS
 
   const grades = finalGrades(content, state)
   const standing = standingOf(grades)
-  screens.push({ kind: 'academics', heading: 'Academics', text: ACADEMICS[standing], standing, details: grades.map((grade) => `${grade.number} ${grade.title}: ${grade.letter}`) })
+  screens.push({ kind: 'academics', heading: t('game.epilogue.academicsHeading'), text: t(ACADEMICS[standing]), standing, details: grades.map((grade) => t('game.epilogue.line', { label: `${grade.number} ${grade.title}`, value: grade.letter })) })
 
   // What a Sire is here for, told before anything else that came of the year.
   // Told wherever a child can be had, and wherever one was, though it is nothing to boast of.
@@ -188,16 +183,15 @@ export function buildEpilogue(content: ContentPack, state: GameState): EpilogueS
     const children = childrenBy(content, state, li.id)
     if (children.length === 0) continue
     const first = li.name.split(' ')[0]
-    const { subject } = pronounWords(li.pronouns)
-    const alone = children.length === 1 ? 'the child' : 'the children'
+    const pronoun = pronounOf(li)
     // One who lived in his house when the year ended did not raise them alone, whatever else stood between them.
     const together = content.housing !== undefined && state.housing.status === 'resident' && (state.housing.residents[li.id] !== undefined || li.id === content.housing.nannyId)
     const ending = together
-      ? `and the two of you raised ${children.length === 1 ? 'the child' : 'them'} together at ${content.housing?.name}.`
+      ? t('game.epilogue.childTogether', { n: children.length, home: content.housing?.name })
       : onGoodTerms(content, state, li.id)
-        ? `and ${subject} was overjoyed.`
-        : `and ${subject} raised ${alone} by ${subject === 'they' ? 'themselves' : subject === 'he' ? 'himself' : 'herself'}.`
-    screens.push({ kind: 'child', heading: 'Family', text: `You impregnated ${first} and ${subject} gave birth to ${describeChildren(children)}, ${ending}`, loveInterestIds: [li.id] })
+        ? t('game.epilogue.childOverjoyed', { pronoun })
+        : t('game.epilogue.childAlone', { pronoun, n: children.length })
+    screens.push({ kind: 'child', heading: t('game.epilogue.familyHeading'), text: t('game.epilogue.child', { first, pronoun, children: describeChildren(children), ending }), loveInterestIds: [li.id] })
   }
 
   // Each arrangement that is a couple or more, in the order they were made.
@@ -207,8 +201,8 @@ export function buildEpilogue(content: ContentPack, state: GameState): EpilogueS
     if (!status?.committed || members.length === 0) continue
     const text =
       members.length === 1
-        ? `You found love with your ${sweetheart(members[0])} ${names(members)}${status.exclusive ? '' : ', in a relationship open to others'}.`
-        : `You found love with ${names(members)}: the ${members.length + 1 === 3 ? 'three' : members.length + 1} of you together${status.exclusive ? '' : ', and open to others'}.`
+        ? t('game.epilogue.loveOne', { pronoun: pronounOf(members[0]), names: names(members), exclusive: status.exclusive })
+        : t('game.epilogue.loveMany', { names: names(members), n: members.length + 1, exclusive: status.exclusive })
     screens.push({ kind: 'love', heading: status.name, text, loveInterestIds: members.map((li) => li.id) })
   }
 
@@ -217,24 +211,24 @@ export function buildEpilogue(content: ContentPack, state: GameState): EpilogueS
   if (housing && state.housing.status === 'resident') {
     const household = Object.keys(state.housing.residents).map(person).filter((li): li is LoveInterest => li !== undefined)
     const built = housing.rooms.filter((room) => (state.housing.rooms[room.key] ?? 0) > 0).length
-    const kept = `You kept ${housing.name}${built === housing.rooms.length ? ', and built it out to the last room' : ''}`
+    const kept = t('game.epilogue.kept', { home: housing.name, built: built === housing.rooms.length })
     const kids = childrenAtHome(content, state)
     screens.push({
       kind: 'home',
-      heading: 'Home',
+      heading: t('game.epilogue.homeHeading'),
       text:
-        (household.length > 0 ? `${kept}, and ${names(household)} made ${household.length === 1 ? 'her' : 'their'} home there with you.` : `${kept}, though nobody came to share it with you but the nanny.`) +
+        (household.length > 0 ? t('game.epilogue.household', { kept, names: names(household), n: household.length }) : t('game.epilogue.nobodyHome', { kept })) +
         (kids?.text ?? ''),
       details: kids?.details,
       loveInterestIds: household.map((li) => li.id)
     })
   } else if (housing && state.housing.status === 'evicted') {
-    screens.push({ kind: 'home', heading: 'Home', text: `You were let ${housing.name} and could not keep it: the rent went unpaid, and the year ended back in the Halls.` })
+    screens.push({ kind: 'home', heading: t('game.epilogue.homeHeading'), text: t('game.epilogue.evicted', { home: housing.name }) })
   }
 
   const way = below(content, state)
   if (way) screens.push(way)
 
-  screens.push({ kind: 'end', heading: 'The end', text: `So ended ${state.player.name}'s first year at Breedhaven University.` })
+  screens.push({ kind: 'end', heading: t('game.epilogue.endHeading'), text: t('game.epilogue.end', { player: state.player.name }) })
   return screens
 }

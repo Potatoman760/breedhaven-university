@@ -1,9 +1,10 @@
-import type { ContentPack, Course, GameState, LearntSkill, Skill, SkillGrant } from '../model'
+import { courseOf, type ContentPack, type Course, type GameState, type LearntSkill, type Skill, type SkillGrant } from '../model'
 import { factsOf, revealedIds } from './facts'
 import { coursePoints } from './grades'
 import { applyEffects } from './conditions'
 import { skillsLearnt } from './modifiers'
 import type { PerformCheck } from './activities'
+import { t, type MessageKey } from '../i18n'
 
 /**
  * What he has learnt to do. A course is worth more than its marks: far enough into one, he can do something he could
@@ -14,7 +15,7 @@ import type { PerformCheck } from './activities'
 type Learner = Pick<GameState, 'courses' | 'enrolment' | 'coursePoints'>
 
 /** Whether a course is the one that teaches a skill. */
-const teaches = (skill: Pick<Skill, 'courseId'>, course: Pick<Course, 'id'>) => course.id === skill.courseId
+const teaches = (skill: Pick<Skill, 'courseId'>, course: Pick<Course, 'id' | 'courseId'>) => courseOf(course) === skill.courseId
 
 /** The courses he takes that teach a skill. */
 function coursesFor(state: Learner, skill: Pick<Skill, 'courseId'>): Course[] {
@@ -22,7 +23,7 @@ function coursesFor(state: Learner, skill: Pick<Skill, 'courseId'>): Course[] {
 }
 
 /** The skill a course teaches, if it teaches one. */
-export function skillFor(content: Pick<ContentPack, 'skills'>, course: Pick<Course, 'id'>): Skill | undefined {
+export function skillFor(content: Pick<ContentPack, 'skills'>, course: Pick<Course, 'id' | 'courseId'>): Skill | undefined {
   return content.skills.find((skill) => teaches(skill, course))
 }
 
@@ -62,10 +63,10 @@ export function readyIn(content: Pick<ContentPack, 'calendar'>, state: Pick<Game
 /** Whether he can make or set off what a skill lets him: he has it, it is ready, and where it is done on a woman, he is with one. */
 export function canUseAbility(content: ContentPack, state: GameState, skillId: string, loveInterestId?: string): PerformCheck {
   const skill = skillsOf(content, state).find((one) => one.id === skillId)
-  if (!skill?.ability) return { ok: false, reasons: ['You have not learned that'] }
+  if (!skill?.ability) return { ok: false, reasons: [t('game.skills.notLearned')] }
   const wait = readyIn(content, state, skill)
-  if (wait > 0) return { ok: false, reasons: [`Ready in ${wait >= content.calendar.hoursPerDay ? `${Math.ceil(wait / content.calendar.hoursPerDay)} days` : `${wait} hours`}`] }
-  if (skill.ability.on === 'her' && loveInterestId === undefined) return { ok: false, reasons: ['It is for someone you are with'] }
+  if (wait > 0) return { ok: false, reasons: [wait >= content.calendar.hoursPerDay ? t('game.skills.readyInDays', { days: Math.ceil(wait / content.calendar.hoursPerDay) }) : t('game.skills.readyInHours', { hours: wait })] }
+  if (skill.ability.on === 'her' && loveInterestId === undefined) return { ok: false, reasons: [t('game.market.forSomeone')] }
   return { ok: true, reasons: [] }
 }
 
@@ -114,5 +115,10 @@ export function intuitTaste(content: ContentPack, state: GameState, loveInterest
   return open[pick].id
 }
 
-/** What a reading of her comfort is called. */
-export const COMFORT_WORDS = ['', 'wants to leave', 'uneasy', 'wary', 'at ease', 'glad to be here'] as const
+const COMFORT_KEYS: (MessageKey | undefined)[] = [undefined, 'game.skills.comfort.leave', 'game.skills.comfort.uneasy', 'game.skills.comfort.wary', 'game.skills.comfort.atEase', 'game.skills.comfort.glad']
+
+/** What a reading of her comfort is called. Each word is looked up as it is read, in the language of the moment. */
+export const COMFORT_WORDS: readonly string[] = Object.defineProperties(
+  [] as string[],
+  Object.fromEntries(COMFORT_KEYS.map((key, level) => [level, { get: () => (key ? t(key) : ''), enumerable: true }]))
+)

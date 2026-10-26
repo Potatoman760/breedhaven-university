@@ -1,5 +1,6 @@
 import { kindOf, type ContentPack, type GameState, type Rapport } from '../model'
 import { tieKey } from './bonds'
+import { t } from '../i18n'
 
 /** What two love interests are to each other, apart from anything either is to the player. */
 export const RELATIONS = ['friends', 'enemies', 'neither'] as const
@@ -99,8 +100,8 @@ export function describeRapport(content: ContentPack, state: GameState, presentI
   for (const [i, a] of presentIds.entries()) {
     for (const b of presentIds.slice(i + 1)) {
       const relation = relationBetween(state, a, b)
-      if (relation === 'friends') lines.push(`${first(a)} and ${first(b)} are friends: easy with each other, on each other's side, quick to share a joke or a look.`)
-      if (relation === 'enemies') lines.push(`${first(a)} and ${first(b)} are enemies: they dislike each other and it shows, in coldness, barbs or open quarrel, each in her own manner.`)
+      if (relation === 'friends') lines.push(t('scene.rapport.friends', { a: first(a), b: first(b) }))
+      if (relation === 'enemies') lines.push(t('scene.rapport.enemies', { a: first(a), b: first(b) }))
     }
   }
   return lines

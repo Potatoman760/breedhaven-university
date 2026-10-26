@@ -1,4 +1,4 @@
-import { type ContentPack, type Course, type CourseMeeting, type GameState } from '../model'
+import { courseOf, type ContentPack, type Course, type CourseMeeting, type GameState } from '../model'
 import type { PerformCheck } from './activities'
 import { toDate } from './calendar'
 import { applyEffects } from './conditions'
@@ -6,10 +6,11 @@ import { eventsOn } from './events'
 import { factor } from './modifiers'
 import { addCoursePoints, examNow, examOn, examWeek, pointsPerClassHour } from './grades'
 import { classKey } from './syllabus'
+import { t } from '../i18n'
 
 const clock = (hour: number): string => `${String(hour).padStart(2, '0')}:00`
 
-/** "Solday and Windsday 10:00, lab Hearthday 13:00-16:00" */
+/** "Monday and Thursday 10:00, lab Friday 13:00-16:00" */
 export function describeMeetings(course: Course): string {
   const lectures = course.meetings.filter((m) => m.kind === 'lecture')
   const labs = course.meetings.filter((m) => m.kind === 'lab')
@@ -18,9 +19,9 @@ export function describeMeetings(course: Course): string {
     lectures.length === 0
       ? ''
       : sameHour
-        ? `${lectures.map((m) => m.weekday).join(' and ')} ${clock(lectures[0].startHour)}`
-        : lectures.map((m) => `${m.weekday} ${clock(m.startHour)}`).join(' and '),
-    ...labs.map((m) => `lab ${m.weekday} ${clock(m.startHour)}-${clock(m.startHour + m.hours)}`)
+        ? `${lectures.map((m) => m.weekday).join(t('game.courses.and'))} ${clock(lectures[0].startHour)}`
+        : lectures.map((m) => `${m.weekday} ${clock(m.startHour)}`).join(t('game.courses.and')),
+    ...labs.map((m) => t('game.courses.lab', { weekday: m.weekday, from: clock(m.startHour), to: clock(m.startHour + m.hours) }))
   ]
   return said.filter(Boolean).join(', ')
 }
@@ -54,19 +55,27 @@ export function coursesClash(a: Course, b: Course): boolean {
 /** Whether a course can be added to a selection: room left, and no clash with one already picked. */
 export function canEnrol(content: ContentPack, state: GameState, selected: string[], courseId: string): PerformCheck {
   const course = state.courses.find((c) => c.id === courseId)
-  if (!course) return { ok: false, reasons: ['No such course'] }
+  if (!course) return { ok: false, reasons: [t('game.courses.noSuchCourse')] }
   const reasons: string[] = []
   const max = content.coursework?.maxCourses ?? 0
-  if (selected.length >= max) reasons.push(`You can take at most ${max} courses`)
+  if (selected.length >= max) reasons.push(t('game.courses.atMost', { max }))
+  // One section of a course is the course: he takes it once.
+  const twin = state.courses.find((c) => selected.includes(c.id) && c.id !== courseId && courseOf(c) === courseOf(course))
+  if (twin) reasons.push(t('game.courses.alreadyTaking', { course: courseLabel(twin) }))
   const clash = state.courses.find((c) => selected.includes(c.id) && c.id !== courseId && coursesClash(c, course))
-  if (clash) reasons.push(`Meets at the same time as ${clash.number}`)
+  if (clash) reasons.push(t('game.courses.clash', { course: courseLabel(clash) }))
   return { ok: reasons.length === 0, reasons }
+}
+
+/** A class as he is shown it: its number, and which section where it is given more than once. */
+export function courseLabel(course: Pick<Course, 'number' | 'section'>): string {
+  return course.section ? t('game.courses.section', { number: course.number, section: course.section }) : course.number
 }
 
 /** Whether the term can begin with these courses: he takes a full load, no fewer. */
 export function canBeginTerm(content: ContentPack, selected: string[]): PerformCheck {
   const load = content.coursework?.maxCourses ?? 0
-  return selected.length === load ? { ok: true, reasons: [] } : { ok: false, reasons: [`Choose ${load} courses`] }
+  return selected.length === load ? { ok: true, reasons: [] } : { ok: false, reasons: [t('game.courses.choose', { load })] }
 }
 
 /** The courses the player is taking. */
@@ -111,25 +120,25 @@ export function coursesInSession(content: ContentPack, state: GameState): Course
 export function canAttend(content: ContentPack, state: GameState, courseId: string): PerformCheck {
   const config = content.coursework
   const course = state.courses.find((c) => c.id === courseId)
-  if (!config || !course) return { ok: false, reasons: ['No such course'] }
+  if (!config || !course) return { ok: false, reasons: [t('game.courses.noSuchCourse')] }
 
   const reasons: string[] = []
   const date = toDate(content.calendar, state.time)
   const meeting = meetingNow(content, state, course)
-  if (!state.enrolment?.includes(courseId)) reasons.push('You are not taking this course')
-  if (!meeting) reasons.push('It is not meeting now')
+  if (!state.enrolment?.includes(courseId)) reasons.push(t('game.courses.notTaking'))
+  if (!meeting) reasons.push(t('game.courses.notMeeting'))
   // An examination takes the place of the class: it is sat, not attended.
   const exam = meeting && examNow(content, state, course)
-  if (exam) reasons.push(`The ${exam.kind} is being sat`)
+  if (exam) reasons.push(t('game.courses.examBeingSat', { kind: exam.kind }))
   if (state.locationId !== course.locationId) {
     const where = content.locations.find((l) => l.id === course.locationId)
-    reasons.push(`Go to ${where?.name ?? course.locationId} first`)
+    reasons.push(t('game.activities.goTo', { place: where?.name ?? course.locationId }))
   }
   if (meeting && state.attendance[courseId]?.sat.includes(classKey(date.dayIndex, meeting.startHour))) {
-    reasons.push('You have already sat this class')
+    reasons.push(t('game.courses.alreadySat'))
   }
   const energy = Math.round(config.energy * (meeting?.hours ?? 1) * factor(content, state, 'effort'))
-  if (state.player.energy < energy) reasons.push(`Requires ${energy} energy`)
+  if (state.player.energy < energy) reasons.push(t('game.courses.requiresEnergy', { energy }))
   return { ok: reasons.length === 0, reasons }
 }
 

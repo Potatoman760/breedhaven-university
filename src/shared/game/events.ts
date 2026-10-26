@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import type { CalendarEvent, ContentPack, GameState, Location } from '../model'
 import { dayIndexOf, formatDate, toDate } from './calendar'
+import { t } from '../i18n'
 
 const clock = (hour: number): string => `${String(hour).padStart(2, '0')}:00`
 
@@ -38,6 +39,20 @@ export function mapDressingAt(content: ContentPack, state: GameState, location: 
   return eventsOn(content, state).find((event) => event.mapDressing !== undefined && dressedFor(location, event))?.mapDressing
 }
 
+/**
+ * The outfits events put a woman in, for an outfit of hers to be made for: those a part starts its scene in (a
+ * bathrobe at the springs), and one named for an event, worn all that day. Each with where it is worn.
+ */
+export function eventOutfits(content: ContentPack): { id: string; worn: string[] }[] {
+  const found = new Map<string, string[]>()
+  const add = (id: string, where: string) => found.set(id, [...(found.get(id) ?? []), where])
+  for (const event of content.calendar.events) {
+    for (const part of event.program) if (part.outfitId) add(part.outfitId, t('llm.events.outfitPart', { event: event.name, part: part.name }))
+    add(event.id, t('llm.events.outfitAll', { event: event.name }))
+  }
+  return [...found].map(([id, worn]) => ({ id, worn }))
+}
+
 /** Whether a place is dressed for an event: it has a view named for it, as the one it shows while the event is on. */
 const dressedFor = (location: Location, event: CalendarEvent) =>
   location.backgrounds.some((view) => view.id === event.id || view.name.trim().toLowerCase() === event.name.trim().toLowerCase())
@@ -56,7 +71,7 @@ export function eventDay(content: ContentPack, event: CalendarEvent, time: numbe
 
 /** The hours an event keeps, when it keeps any: "10:00 to 16:00". */
 export function eventHours(event: Pick<CalendarEvent, 'startHour' | 'hours'>): string | undefined {
-  return event.startHour === undefined ? undefined : `${clock(event.startHour)} to ${clock(event.startHour + (event.hours ?? 1))}`
+  return event.startHour === undefined ? undefined : t('llm.events.hours', { from: clock(event.startHour), until: clock(event.startHour + (event.hours ?? 1)) })
 }
 
 /** Where an event is and when it is on, as a sentence for a prompt: "It is at the Great Court, from 10:00 to 16:00 each day." Nothing for a holiday. */
@@ -64,7 +79,9 @@ export function describeEventPlace(content: ContentPack, event: CalendarEvent): 
   const where = content.locations.find((l) => l.id === event.locationId)?.name
   const when = eventHours(event)
   if (!where && !when) return ''
-  return `It is${where ? ` at ${where}` : ' on'}${when ? `, from ${when}${event.durationDays > 1 ? ' each day' : ''}` : ''}.`
+  const each = event.durationDays > 1
+  if (!when) return t('llm.events.at', { where })
+  return where ? t('llm.events.atFrom', { where, when, each }) : t('llm.events.onFrom', { when, each })
 }
 
 /** An event as it is told to a character: what it is, then where and when. */
@@ -167,34 +184,32 @@ export function buildEventPrompt(input: EventGenerationInput): { system: string;
     `- ${e.name}: ${e.day} ${calendar.months.find((m) => m.id === e.month)?.name ?? e.month}`
 
   const system = [
-    'You invent calendar events for a dating sim set at a modern university in a magitech fantasy ' +
-      'city: festivals, markets, matches, gigs, society nights, visitors, campus and city happenings. ' +
-      'Keep them grounded and fit the setting.',
-    'Reply with only a JSON array and nothing else. Each element is an object with:',
-    '- "name": short event name',
-    '- "description": one or two sentences on what happens and why people care',
-    '- "month": one of the month ids given',
-    '- "day": day of that month, as a number',
-    `- "durationDays": how many days it lasts, 1 to ${MAX_GENERATED_DURATION_DAYS}`,
-    '- "locationId": one of the location ids given, or null if it is not tied to a place',
-    '- "startHour": the hour of the day it opens, 0 to 23, or null for a holiday or anything that is the whole day',
-    '- "hours": how many hours it runs from then each day, or null'
+    t('llm.events.systemRole'),
+    t('llm.events.systemReply'),
+    t('llm.events.fieldName', { field: '"name"' }),
+    t('llm.events.fieldDescription', { field: '"description"' }),
+    t('llm.events.fieldMonth', { field: '"month"' }),
+    t('llm.events.fieldDay', { field: '"day"' }),
+    t('llm.events.fieldDuration', { field: '"durationDays"', max: MAX_GENERATED_DURATION_DAYS }),
+    t('llm.events.fieldLocation', { field: '"locationId"', null: 'null' }),
+    t('llm.events.fieldStartHour', { field: '"startHour"', null: 'null' }),
+    t('llm.events.fieldHours', { field: '"hours"', null: 'null' })
   ].join('\n')
 
   const lore = content.codex.filter((entry) => entry.alwaysInclude && entry.startsUnlocked)
   const user = [
-    ...(lore.length > 0 ? ['Setting:', ...lore.map((e) => `- ${e.title}: ${e.content}`), ''] : []),
-    'Months, in order:',
-    ...calendar.months.map((m) => `- ${m.id} (${m.name}, ${m.days} days)`),
+    ...(lore.length > 0 ? [t('llm.events.setting'), ...lore.map((e) => `- ${e.title}: ${e.content}`), ''] : []),
+    t('llm.events.months'),
+    ...calendar.months.map((m) => t('llm.events.month', { id: m.id, name: m.name, days: m.days })),
     '',
-    'Locations:',
+    t('llm.events.locations'),
     ...content.locations.map((l) => `- ${l.id} (${l.name})`),
     '',
-    'Events that already exist; do not repeat them or share their dates:',
+    t('llm.events.existing'),
     ...allEvents(content, state).filter((event) => !event.secret).map(describe),
     '',
-    `Today is ${formatDate(today)}.`,
-    `Invent ${count} new events that start after today and no later than ${formatDate(latest)}.`
+    t('llm.events.today', { date: formatDate(today) }),
+    t('llm.events.invent', { count, latest: formatDate(latest) })
   ].join('\n')
 
   return { system, user }
@@ -232,7 +247,7 @@ export function parseGeneratedEvents(
     raw = undefined
   }
   if (start < 0 || !Array.isArray(raw)) {
-    throw new Error('The LLM did not return a list of events. Try again, or raise max reply tokens.')
+    throw new Error(t('llm.events.noList'))
   }
 
   const today = toDate(calendar, state.time)

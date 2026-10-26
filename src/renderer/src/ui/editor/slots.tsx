@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { Button } from '../Button'
+import { t } from '../../../../shared/i18n'
 
 /**
  * The grid a set of pictures is laid out in, one card to a slot: an outfit's expressions,
@@ -28,7 +29,7 @@ export function PictureSlot({ image, name, onView, children, actions, badge }: P
   return (
     <div className="sprite-card">
       <div className="sprite-frame">
-        <button type="button" className="sprite-thumb" title="Look at the whole picture" onClick={onView}>
+        <button type="button" className="sprite-thumb" title={t('editor.slots.view')} onClick={onView}>
           <img src={`content://pack/${image}`} alt={name} />
         </button>
         {badge}
@@ -53,13 +54,13 @@ export function EmptySlot({ name, disabled, onAdd, onGenerate }: EmptyProps) {
   return (
     <div className="sprite-card sprite-slot">
       <span className="caps">{name}</span>
-      <span className="hint">Not drawn yet</span>
+      <span className="hint">{t('editor.slots.notDrawn')}</span>
       <div className="row">
         <Button disabled={disabled} onClick={onAdd}>
-          Add
+          {t('editor.common.add')}
         </Button>
         <Button disabled={disabled} onClick={onGenerate}>
-          Generate
+          {t('editor.common.generate')}
         </Button>
       </div>
     </div>

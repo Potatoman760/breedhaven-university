@@ -4,6 +4,7 @@ import { approachableAt } from './map'
 import { isOpen } from './schedule'
 import { draws, seedOf } from './seed'
 import type { PerformCheck } from './activities'
+import { t, type MessageKey, type Params } from '../i18n'
 
 // ---- cards
 
@@ -13,7 +14,6 @@ export const rankOf = (card: Card): number => card % 13
 export const suitOf = (card: Card): number => Math.floor(card / 13)
 
 const RANK_LABELS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
-const RANK_WORDS = ['Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Jack', 'Queen', 'King', 'Ace']
 export const SUIT_SYMBOLS = ['♠', '♥', '♦', '♣']
 
 /** How a card is written: its rank and the symbol of its suit. */
@@ -21,7 +21,16 @@ export function cardLabel(card: Card): { rank: string; suit: string; red: boolea
   return { rank: RANK_LABELS[rankOf(card)], suit: SUIT_SYMBOLS[suitOf(card)], red: suitOf(card) === 1 || suitOf(card) === 2 }
 }
 
-const plural = (rank: number) => (rank === 4 ? 'Sixes' : `${RANK_WORDS[rank]}s`)
+const word = (rank: number) => t('game.poker.rank', { rank })
+const plural = (rank: number) => t('game.poker.ranks', { rank })
+
+// A hand's name is only looked up when it is read: the odds are worked out by valuing thousands of hands nobody sees.
+const valued = (score: number[], key: MessageKey, params?: () => Params): HandValue => ({
+  score,
+  get name() {
+    return t(key, params?.())
+  }
+})
 
 // ---- what a hand is worth
 
@@ -45,7 +54,7 @@ export function evaluate(cards: Card[]): HandValue {
   const flush = suited.find((ranks) => ranks.length >= 5)
   if (flush) {
     const high = straightHigh(new Set(flush))
-    if (high >= 0) return { score: [8, high], name: high === 12 ? 'Royal flush' : `Straight flush, ${RANK_WORDS[high]} high` }
+    if (high >= 0) return high === 12 ? valued([8, high], 'game.poker.hand.royalFlush') : valued([8, high], 'game.poker.hand.straightFlush', () => ({ high: word(high) }))
   }
   const counts = new Array<number>(13).fill(0)
   for (const card of cards) counts[rankOf(card)]++
@@ -63,26 +72,26 @@ export function evaluate(cards: Card[]): HandValue {
 
   if (groups[0].count === 4) {
     const quad = groups[0].rank
-    return { score: [7, quad, ...kickers([quad], 1)], name: `Four ${plural(quad)}` }
+    return valued([7, quad, ...kickers([quad], 1)], 'game.poker.hand.four', () => ({ ranks: plural(quad) }))
   }
   const trips = groups.filter((group) => group.count === 3).map((group) => group.rank)
   const pairs = groups.filter((group) => group.count === 2).map((group) => group.rank)
   if (trips.length > 0 && (trips.length > 1 || pairs.length > 0)) {
     const top = trips[0]
     const under = Math.max(trips[1] ?? -1, pairs[0] ?? -1)
-    return { score: [6, top, under], name: `${plural(top)} full of ${plural(under)}` }
+    return valued([6, top, under], 'game.poker.hand.fullHouse', () => ({ top: plural(top), under: plural(under) }))
   }
-  if (flush) return { score: [5, ...flush.slice(0, 5)], name: `Flush, ${RANK_WORDS[flush[0]]} high` }
+  if (flush) return valued([5, ...flush.slice(0, 5)], 'game.poker.hand.flush', () => ({ high: word(flush[0]) }))
   const straight = straightHigh(new Set(cards.map(rankOf)))
-  if (straight >= 0) return { score: [4, straight], name: `Straight, ${RANK_WORDS[straight]} high` }
-  if (trips.length > 0) return { score: [3, trips[0], ...kickers([trips[0]], 2)], name: `Three ${plural(trips[0])}` }
+  if (straight >= 0) return valued([4, straight], 'game.poker.hand.straight', () => ({ high: word(straight) }))
+  if (trips.length > 0) return valued([3, trips[0], ...kickers([trips[0]], 2)], 'game.poker.hand.three', () => ({ ranks: plural(trips[0]) }))
   if (pairs.length >= 2) {
     const [high, low] = pairs
-    return { score: [2, high, low, ...kickers([high, low], 1)], name: `Two pair, ${plural(high)} and ${plural(low)}` }
+    return valued([2, high, low, ...kickers([high, low], 1)], 'game.poker.hand.twoPair', () => ({ high: plural(high), low: plural(low) }))
   }
-  if (pairs.length === 1) return { score: [1, pairs[0], ...kickers([pairs[0]], 3)], name: `Pair of ${plural(pairs[0])}` }
+  if (pairs.length === 1) return valued([1, pairs[0], ...kickers([pairs[0]], 3)], 'game.poker.hand.pair', () => ({ ranks: plural(pairs[0]) }))
   const high = kickers([], 5)
-  return { score: [0, ...high], name: `${RANK_WORDS[high[0]]} high` }
+  return valued([0, ...high], 'game.poker.hand.high', () => ({ high: word(high[0]) }))
 }
 
 /** Which of two scores is better: above zero for the first. */
@@ -149,11 +158,11 @@ export function dealHand(rules: PokerRules, players: PokerPlayer[], dealer: numb
   // Heads up, the dealer posts the small blind.
   const small = n === 2 ? dealer : (dealer + 1) % n
   const big = (small + 1) % n
-  const post = (index: number, amount: number, label: string) => {
-    seats[index] = { ...seats[index], committed: amount, streetBet: amount, last: `${label} $${amount}` }
+  const post = (index: number, amount: number, label: MessageKey) => {
+    seats[index] = { ...seats[index], committed: amount, streetBet: amount, last: t(label, { amount }) }
   }
-  post(small, rules.smallBlind, 'Small blind')
-  post(big, rules.bigBlind, 'Big blind')
+  post(small, rules.smallBlind, 'game.poker.smallBlind')
+  post(big, rules.bigBlind, 'game.poker.bigBlind')
   return { seats, dealer, deck, board: [], street: 'preflop', toAct: (big + 1) % n, currentBet: rules.bigBlind, bets: 1 }
 }
 
@@ -201,17 +210,17 @@ export function playMove(hand: PokerHand, rules: PokerRules, move: PokerMove): P
   }
   if (move === 'fold' && toCall > 0) {
     seat.folded = true
-    seat.last = 'Folds'
+    seat.last = t('game.poker.folds')
   } else if (move === 'raise' && canRaise) {
     pay(raiseCost)
     currentBet = seat.streetBet
     bets += 1
-    seat.last = `${raiseLabel === 'Bet' ? 'Bets' : 'Raises to'} $${currentBet}`
+    seat.last = t(raiseLabel === 'Bet' ? 'game.poker.bets' : 'game.poker.raisesTo', { amount: currentBet })
     // A bet or raise is answered by everyone else still in.
     for (const other of seats) if (other !== seat) other.acted = false
   } else {
     pay(toCall)
-    seat.last = toCall > 0 ? `Calls $${toCall}` : 'Checks'
+    seat.last = toCall > 0 ? t('game.poker.calls', { amount: toCall }) : t('game.poker.checks')
   }
   seat.acted = true
   const next: PokerHand = { ...hand, seats, currentBet, bets }
@@ -316,11 +325,11 @@ export function styleOf(id: string): PokerStyle {
 /** Whether he can sit in for a hand here and now: the game is played here, the place is open, and he can cover the cap. */
 export function canPlayPoker(content: ContentPack, state: GameState): PerformCheck {
   const config = content.poker
-  if (!config || state.locationId !== config.locationId) return { ok: false, reasons: ['There is no game here'] }
+  if (!config || state.locationId !== config.locationId) return { ok: false, reasons: [t('game.poker.noGame')] }
   const place = content.locations.find((l) => l.id === config.locationId)
   const reasons: string[] = []
-  if (place && !isOpen(place, toDate(content.calendar, state.time).hour)) reasons.push(`${place.name} is closed`)
-  if (state.player.money < config.handCap) reasons.push(`You need $${config.handCap} to sit in`)
+  if (place && !isOpen(place, toDate(content.calendar, state.time).hour)) reasons.push(t('game.activities.closed', { place: place.name }))
+  if (state.player.money < config.handCap) reasons.push(t('game.poker.needCap', { cap: config.handCap }))
   return { ok: reasons.length === 0, reasons }
 }
 

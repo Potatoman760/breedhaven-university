@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { backgroundFor, isIndoors, viewImage } from '../../../shared/game'
 import type { Location, WeatherEffect, Light } from '../../../shared/model'
 import { FxLayer } from '../fx/FxLayer'
+import { t } from '../../../shared/i18n'
 
 interface Props {
   location: Location | undefined
@@ -38,8 +39,8 @@ export function Backdrop({ location, periodId, light, backgroundId, screen, room
     return (
       <>
         <div className="stage-art">
-          {background ? background.image : `No background set for ${location?.name ?? 'here'}`}
-          <span>{background ? 'Background file not found' : 'No background'}</span>
+          {background ? background.image : location ? t('screens.backdrop.noBackgroundFor', { name: location.name }) : t('screens.backdrop.noBackgroundHere')}
+          <span>{background ? t('screens.backdrop.fileNotFound') : t('screens.backdrop.noBackground')}</span>
         </div>
         {fx}
       </>

@@ -12,6 +12,7 @@ import {
   type GenerateVideoRequest
 } from '../../shared/comfy'
 import { ADDON_PREFIX, isSafeId, slugify } from '../../shared/editor'
+import { t, type MessageKey } from '../../shared/i18n'
 import { bundleDir, readBundleSettings, writeBundleSettings } from './bundle'
 import { generateImage, uploadImage } from './client'
 import { applyBindings, unplugLastFrame } from './graph'
@@ -65,7 +66,7 @@ export class ComfyStore {
   update(raw: unknown, toGame = false): ComfySettings {
     const next = ComfySettingsSchema.parse(raw)
     const { url, problem } = normaliseComfyUrl(next.baseUrl)
-    if (url === null) throw new Error(problem ?? 'That is not an address.')
+    if (url === null) throw new Error(problem ?? t('comfy.studio.notAddress'))
     const own: Record<string, unknown> = { ...next, baseUrl: url }
     if (toGame && this.packDir !== null) {
       this.shipped = ComfyBundleSettingsSchema.parse(next)
@@ -116,14 +117,14 @@ export async function generateArt(settings: ComfySettings, packDir: string, addo
   const failed = (message: string): GenerateArtResult => ({ ok: false, message, path: null, seed: null, workflow: null, positive: null, skipped: [] })
 
   const { url, problem } = normaliseComfyUrl(settings.baseUrl)
-  if (url === null) return failed(problem ?? 'The ComfyUI address is not set.')
+  if (url === null) return failed(problem ?? t('comfy.studio.noAddress'))
   const folder = loadWorkflows(bundleDir(packDir), settings.overrides)
-  if (!folder.ok) return failed(folder.message || folder.broken[0]?.problem || 'No workflow could be read.')
+  if (!folder.ok) return failed(folder.message || folder.broken[0]?.problem || t('comfy.studio.noWorkflowRead'))
   const resolved = resolveWorkflow(folder.loaded, request.workflow, request.kind, settings.defaults)
-  if (!resolved.workflow) return failed(resolved.problem ?? 'No workflow could be chosen.')
+  if (!resolved.workflow) return failed(resolved.problem ?? t('comfy.studio.noWorkflowChosen'))
   const workflow = resolved.workflow
   if (workflow.bindings.positive === null) {
-    return failed(`"${workflow.name}" has nowhere to put a prompt. Point its Prompt binding at a text node in the ComfyUI settings.`)
+    return failed(t('comfy.studio.noPromptBinding', { workflow: workflow.name }))
   }
 
   const seed = request.seed ?? Math.floor(Math.random() * 0xffffffff)
@@ -151,7 +152,7 @@ export async function generateArt(settings: ComfySettings, packDir: string, addo
     const path = fileArt(addonDir, request.kind, request.subjectId, request.name, made.bytes, prefix)
     return { ok: true, message: '', path, seed, workflow: workflow.file, positive, skipped }
   } catch (cause) {
-    return failed(`The picture was made but could not be saved: ${(cause as Error).message}`)
+    return failed(t('comfy.studio.pictureNotSaved', { reason: (cause as Error).message }))
   }
 }
 
@@ -178,38 +179,38 @@ export async function generateClip(
   const failed = (message: string): GenerateArtResult => ({ ok: false, message, path: null, seed: null, workflow: null, positive: null, skipped: [] })
 
   const { url, problem } = normaliseComfyUrl(settings.baseUrl)
-  if (url === null) return failed(problem ?? 'The ComfyUI address is not set.')
+  if (url === null) return failed(problem ?? t('comfy.studio.noAddress'))
   const folder = loadWorkflows(bundleDir(packDir), settings.overrides)
-  if (!folder.ok) return failed(folder.message || folder.broken[0]?.problem || 'No workflow could be read.')
+  if (!folder.ok) return failed(folder.message || folder.broken[0]?.problem || t('comfy.studio.noWorkflowRead'))
   const resolved = resolveWorkflow(folder.loaded, request.workflow, 'video', settings.defaults)
-  if (!resolved.workflow) return failed(resolved.problem ?? 'No workflow could be chosen.')
+  if (!resolved.workflow) return failed(resolved.problem ?? t('comfy.studio.noWorkflowChosen'))
   const workflow = resolved.workflow
   if (workflow.bindings.firstFrame === null) {
-    return failed(`"${workflow.name}" has nowhere to put a first frame, so it cannot make a clip from a picture. Point its First frame binding at the node that loads the picture in the ComfyUI settings.`)
+    return failed(t('comfy.studio.noFirstFrameBinding', { workflow: workflow.name }))
   }
   if (workflow.bindings.positive === null) {
-    return failed(`"${workflow.name}" has nowhere to put a prompt. Point its Prompt binding at a text node in the ComfyUI settings.`)
+    return failed(t('comfy.studio.noPromptBinding', { workflow: workflow.name }))
   }
 
   if (request.lastImage !== undefined && workflow.bindings.lastFrame === null) {
-    return failed(`"${workflow.name}" has nowhere to put a last frame, so it cannot be told where the clip ends.`)
+    return failed(t('comfy.studio.noLastFrameBinding', { workflow: workflow.name }))
   }
 
   /** Hands one of the content's pictures to ComfyUI under one name, replaced each time: ComfyUI tells a new picture from the last by what is in it, not by what it is called. */
-  const upload = async (path: string, as: string, what: string): Promise<{ name: string | null; message: string }> => {
+  const upload = async (path: string, as: string, unreadable: MessageKey): Promise<{ name: string | null; message: string }> => {
     const source = contentFile(packDir, addonDir, path)
     let picture: Buffer
     try {
-      if (source === null) throw new Error('it is not in the content')
+      if (source === null) throw new Error(t('comfy.studio.notInContent'))
       picture = readFileSync(source)
     } catch (cause) {
-      return { name: null, message: `The picture the clip ${what} could not be read: ${(cause as Error).message}` }
+      return { name: null, message: t(unreadable, { reason: (cause as Error).message }) }
     }
     return uploadImage(url, picture, `${as}${extname(source).toLowerCase() || '.png'}`, cancel)
   }
-  const first = await upload(request.image, 'breedhaven-first-frame', 'starts from')
+  const first = await upload(request.image, 'breedhaven-first-frame', 'comfy.studio.firstFrameUnreadable')
   if (first.name === null) return failed(first.message)
-  const last = request.lastImage === undefined ? null : request.lastImage === request.image ? first : await upload(request.lastImage, 'breedhaven-last-frame', 'ends on')
+  const last = request.lastImage === undefined ? null : request.lastImage === request.image ? first : await upload(request.lastImage, 'breedhaven-last-frame', 'comfy.studio.lastFrameUnreadable')
   if (last !== null && last.name === null) return failed(last.message)
 
   const seed = request.seed ?? Math.floor(Math.random() * 0xffffffff)
@@ -238,6 +239,6 @@ export async function generateClip(
     const path = fileArt(addonDir, 'nsfw', request.subjectId, request.name, made.bytes, prefix, made.extension ?? 'mp4')
     return { ok: true, message: '', path, seed, workflow: workflow.file, positive, skipped }
   } catch (cause) {
-    return failed(`The clip was made but could not be saved: ${(cause as Error).message}`)
+    return failed(t('comfy.studio.clipNotSaved', { reason: (cause as Error).message }))
   }
 }

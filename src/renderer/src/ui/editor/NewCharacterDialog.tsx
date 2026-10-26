@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react'
 import type { LoveInterest } from '../../../../shared/model'
 import { errorMessage } from '../../errors'
 import { Overlay } from '../Dialog'
+import { t } from '../../../../shared/i18n'
 
 interface Props {
   /** Open the profile the LLM wrote, unsaved. */
@@ -21,6 +22,35 @@ export function NewCharacterDialog({ onDraft, onSkip, onClose }: Props) {
   const [idea, setIdea] = useState('')
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState('')
+  // The name on the SillyTavern card picked, while one is: the card itself stays with the main process.
+  const [card, setCard] = useState<string | null>(null)
+
+  async function pickCard() {
+    setNotice('')
+    try {
+      const read = await window.api.editor.readCard()
+      if (!read) return
+      if (read.card) setCard(read.card.name)
+      else setNotice(read.error ?? t('editor.newCharacter.unreadableCard'))
+    } catch (error) {
+      setNotice(errorMessage(error))
+    }
+  }
+
+  /** Her from the card: as it has her, or with the rest written by the LLM, the idea box being notes on how. */
+  async function fromCard(generate: boolean) {
+    setBusy(true)
+    setNotice('')
+    try {
+      const result = await window.api.editor.fromCard({ generate, notes: idea })
+      if (result.loveInterest) onDraft(result.loveInterest)
+      else setNotice(result.error ?? t('editor.common.nothingBack'))
+    } catch (error) {
+      setNotice(errorMessage(error))
+    } finally {
+      setBusy(false)
+    }
+  }
 
   async function generate(event: FormEvent) {
     event.preventDefault()
@@ -30,7 +60,7 @@ export function NewCharacterDialog({ onDraft, onSkip, onClose }: Props) {
     try {
       const result = await window.api.editor.draftLoveInterest(idea)
       if (result.loveInterest) onDraft(result.loveInterest)
-      else setNotice(result.error ?? 'Nothing came back.')
+      else setNotice(result.error ?? t('editor.common.nothingBack'))
     } catch (error) {
       setNotice(errorMessage(error))
     } finally {
@@ -43,39 +73,54 @@ export function NewCharacterDialog({ onDraft, onSkip, onClose }: Props) {
     <Overlay onClose={busy ? () => undefined : onClose}>
       <form className="dialog" onSubmit={generate}>
         <div className="dialog-head">
-          <h1>New character</h1>
+          <h1>{t('editor.newCharacter.title')}</h1>
+        </div>
+        <div className="actions card-pick">
+          <Button disabled={busy} title={t('editor.newCharacter.cardTitle')} onClick={pickCard}>
+            {card ? t('editor.newCharacter.anotherCard') : t('editor.newCharacter.fromCard')}
+          </Button>
+          {card && (
+            <>
+              <span className="chip">{card}</span>
+              <Button disabled={busy} title={t('editor.newCharacter.importAsIsTitle')} onClick={() => fromCard(false)}>
+                {t('editor.newCharacter.importAsIs')}
+              </Button>
+              <Button variant="primary" disabled={busy} title={t('editor.newCharacter.importWriteTitle')} onClick={() => fromCard(true)}>
+                {t('editor.newCharacter.importWrite')}
+              </Button>
+            </>
+          )}
         </div>
         <label>
-          Who is she?
+          {card ? t('editor.newCharacter.notes') : t('editor.newCharacter.who')}
           <textarea
             rows={5}
             value={idea}
             maxLength={2000}
             autoFocus
             disabled={busy}
-            placeholder="A catkin exchange student from Veyra majoring in Journalism, who runs the student paper and is investigating who leaked the Sire Registry. Sharp, nosy, secretly lonely."
+            placeholder={t('editor.newCharacter.placeholder')}
             onChange={(e) => setIdea(e.target.value)}
           />
           <span className="hint">
-            A sentence or a paragraph. The Main LLM writes her whole profile from it, to fit the setting and the places in the game: appearance, clothes,
-            personality, studies, room, schedule, voice and backstory. She is written as a love interest; to make her an NPC, change her Kind on the profile, which hides what an NPC does not need. Nothing is saved until you have read it over and pressed Save.
+            {t('editor.newCharacter.hint')}
           </span>
         </label>
         {busy && (
           <p className="hint" role="status">
-            Writing her profile. This can take a minute...
+            {t('editor.newCharacter.writing')}
           </p>
         )}
         {notice && <p className="notice">{notice}</p>}
         <div className="actions">
-          <Button variant="primary" type="submit" disabled={busy || !idea.trim()}>
-            {busy ? 'Writing...' : 'Generate her profile'}
+          <Button variant="primary" type="submit" disabled={busy || !idea.trim() || card !== null}>
+            {busy ? t('editor.common.writing') : t('editor.newCharacter.generate')}
           </Button>
           <Button disabled={busy} onClick={onSkip}>
-            Skip: fill it in myself
+            {t('editor.newCharacter.skip')}
           </Button>
           <Button variant="quiet" disabled={busy} onClick={onClose}>
-            Cancel
+            {t('editor.common.cancel')}
           </Button>
         </div>
       </form>

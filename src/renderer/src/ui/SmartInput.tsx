@@ -1,6 +1,7 @@
 import { useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { completeName, plain, type Suggestion } from '../../../shared/game'
 import { Button } from './Button'
+import { t } from '../../../shared/i18n'
 
 interface Props {
   value: string
@@ -107,7 +108,7 @@ export function SmartInput({ value, onChange, suggestions, names, known, onPick,
   return (
     <div className="smart-input">
       {fix && !ghost && (
-        <Button size="small" variant="quiet" className="smart-fix" title="Tab to fix it" onClick={takeFix}>
+        <Button size="small" variant="quiet" className="smart-fix" title={t('screens.smartInput.fixTitle', { key: 'Tab' })} onClick={takeFix}>
           <s>{fix.word}</s> {fix.to} <kbd>Tab</kbd>
         </Button>
       )}

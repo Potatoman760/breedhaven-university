@@ -94,6 +94,11 @@
       "file": "sounds/events/relic.ogg",
       "volume": 0.6,
       "credit": "qubodup, \"Cliche Magic Spell Sound\" (CC0), https://freesound.org/people/qubodup/sounds/817466/"
+    },
+    "stamp": {
+      "file": "sounds/ui/stamp.ogg",
+      "volume": 0.35,
+      "credit": "I.fekry, \"traditional stamp.wav\" (CC0), https://freesound.org/people/I.fekry/sounds/470710/, trimmed to the hit"
     }
   },
   "ambience": {

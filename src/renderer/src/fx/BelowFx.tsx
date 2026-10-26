@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import { useEffect, useRef } from 'react'
 import type { FightEvent, FightFx } from '../../../shared/model'
+import { t } from '../../../shared/i18n'
 
 // How long after one line of what happened the next is played, so that they are read and seen in order.
 export const EVENT_GAP_MS = 350
@@ -477,7 +478,7 @@ class FxScene extends Phaser.Scene {
           g.fillStyle(BLUE, 0.3 * (1 - t))
           g.fillEllipse(spot.x, spot.y, spot.w * 0.95, spot.h * 0.95)
         })
-        this.rise(spot, `ward ${amount}`, BLUE, 26)
+        this.rise(spot, t('panels.belowFx.ward', { amount }), BLUE, 26)
         break
       case 'ward':
         this.picture('ward', spot, Math.max(spot.w, spot.h) * 0.95, { duration: 1000, from: 1.15, to: 0.95 })
@@ -553,11 +554,11 @@ class FxScene extends Phaser.Scene {
           0,
           'Linear'
         )
-        this.rise(spot, 'hexed', PURPLE, 24)
+        this.rise(spot, t('panels.belowFx.hexed'), PURPLE, 24)
         break
       case 'weaken':
         this.motes(spot, PURPLE, false, 9)
-        this.rise(spot, 'weakened', PURPLE, 24)
+        this.rise(spot, t('panels.belowFx.weakened'), PURPLE, 24)
         break
       case 'misfire':
         // Her surge breaking loose: a burst outward from each of them.

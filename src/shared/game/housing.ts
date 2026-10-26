@@ -6,6 +6,7 @@ import { addNote, courierThread, giveContact } from './courier'
 import { addMemory, applyFeelings } from './memory'
 import { childrenOf, pregnancyOf } from './pregnancy'
 import { bonus, factor } from './modifiers'
+import { t } from '../i18n'
 
 /**
  * Sire housing. The Sire Relations Office lets him a house once someone he is with is carrying his child. He pays
@@ -196,7 +197,7 @@ const made = new WeakMap<ContentPack, Map<string, ContentPack>>()
 
 /** A room of the house as a room someone lives in. */
 function asRoom(config: HousingConfig, room: HouseRoom): Room {
-  return { name: `${room.name.toLowerCase()} at ${config.name}`, description: room.description, locationId: config.locationId, viewId: room.viewId }
+  return { name: t('game.housing.roomAt', { room: room.name.toLowerCase(), house: config.name }), description: room.description, locationId: config.locationId, viewId: room.viewId }
 }
 
 /**
@@ -283,7 +284,7 @@ function lived(content: ContentPack, config: HousingConfig, state: Pick<GameStat
 
 /** A message of the house's, with its particulars written in. */
 function fill(config: HousingConfig, text: string, more: Record<string, string> = {}): string {
-  const values: Record<string, string> = { house: config.name, rent: `$${config.rent}`, ...more }
+  const values: Record<string, string> = { house: config.name, rent: t('game.housing.money', { amount: config.rent }), ...more }
   return text.replace(/\{(\w+)\}/g, (whole, name: string) => values[name] ?? whole)
 }
 
@@ -347,7 +348,7 @@ export function moveIn(content: ContentPack, state: GameState): GameState {
       settledTo: state.time,
       arrears: 0,
       arrearsSince: undefined,
-      ledger: [{ time: state.time, text: `Moved into ${config.name}`, amount: 0 }]
+      ledger: [{ time: state.time, text: t('game.housing.ledger.movedIn', { house: config.name }), amount: 0 }]
     }
   }
   next = addNote(giveContact(next, config.officerId), config.officerId, { from: 'them', text: fill(config, config.texts.welcome), read: false })
@@ -373,10 +374,10 @@ export function nextWork(config: HousingConfig, state: Pick<GameState, 'housing'
 
 export function canBuild(content: ContentPack, state: GameState, key: string): PerformCheck {
   const config = content.housing
-  if (!config || !isResident(content, state)) return { ok: false, reasons: ['You do not live there'] }
+  if (!config || !isResident(content, state)) return { ok: false, reasons: [t('game.housing.notResident')] }
   const work = nextWork(config, state, key, factor(content, state, 'build'))
-  if (!work) return { ok: false, reasons: ['There is nothing more to do to it'] }
-  return state.player.money >= work.cost ? { ok: true, reasons: [] } : { ok: false, reasons: [`You need $${work.cost}`] }
+  if (!work) return { ok: false, reasons: [t('game.housing.nothingMore')] }
+  return state.player.money >= work.cost ? { ok: true, reasons: [] } : { ok: false, reasons: [t('game.housing.youNeed', { cost: work.cost })] }
 }
 
 /** Builds a room, or fits out one that is built. The money is spent, and any child waiting for a cot is brought home. */
@@ -389,7 +390,7 @@ export function buildRoom(content: ContentPack, state: GameState, key: string): 
     player: { ...state.player, money: state.player.money - work.cost },
     housing: { ...state.housing, rooms: { ...state.housing.rooms, [key]: builtTier(state, key) + 1 } }
   }
-  return placeBabies(content, ledger(built, work.upgrade ? `${work.name} (${roomOf(config, key)?.name})` : `Built: ${work.name}`, -work.cost))
+  return placeBabies(content, ledger(built, work.upgrade ? t('game.housing.ledger.upgrade', { work: work.name, room: roomOf(config, key)?.name }) : t('game.housing.ledger.built', { work: work.name }), -work.cost))
 }
 
 /** Goes home: he is at the house, in the room one comes into. */
@@ -432,19 +433,19 @@ function isMother(state: GameState, id: string): boolean {
 
 export function canInvite(content: ContentPack, state: GameState, loveInterestId: string, roomKey: string): PerformCheck {
   const config = content.housing
-  if (!config || !isResident(content, state)) return { ok: false, reasons: ['You do not live there'] }
+  if (!config || !isResident(content, state)) return { ok: false, reasons: [t('game.housing.notResident')] }
   const li = content.loveInterests.find((c) => c.id === loveInterestId)
-  const first = li?.name.split(' ')[0] ?? 'She'
-  if (!li || loveInterestId === config.nannyId) return { ok: false, reasons: ['She lives here already'] }
-  if (state.housing.residents[loveInterestId] !== undefined) return { ok: false, reasons: [`${first} lives here already`] }
-  if (state.housing.left.includes(loveInterestId)) return { ok: false, reasons: [`${first} has left, and will not come back`] }
+  const first = li?.name.split(' ')[0] ?? t('game.births.she')
+  if (!li || loveInterestId === config.nannyId) return { ok: false, reasons: [t('game.housing.sheLivesHere')] }
+  if (state.housing.residents[loveInterestId] !== undefined) return { ok: false, reasons: [t('game.housing.livesHere', { first })] }
+  if (state.housing.left.includes(loveInterestId)) return { ok: false, reasons: [t('game.housing.hasLeft', { first })] }
   const reasons: string[] = []
-  if (!isMother(state, loveInterestId)) reasons.push(`The house is for the mothers of your children`)
-  if (bondOf(state, loveInterestId) === undefined) reasons.push(`You and ${first} are not in a relationship`)
-  if ((state.relationships[loveInterestId]?.affection ?? 0) < config.invite.minAffection) reasons.push(`${first} does not know you well enough`)
+  if (!isMother(state, loveInterestId)) reasons.push(t('game.housing.forMothers'))
+  if (bondOf(state, loveInterestId) === undefined) reasons.push(t('game.housing.notInRelationship', { first }))
+  if ((state.relationships[loveInterestId]?.affection ?? 0) < config.invite.minAffection) reasons.push(t('game.housing.notWellEnough', { first }))
   const room = roomOf(config, roomKey)
-  if (!room || builtTier(state, roomKey) < 1 || (room.role !== 'suite' && room.role !== 'master')) reasons.push('That is not a bedroom she could have')
-  else if (freeBeds(config, state, roomKey) < 1) reasons.push(`${room.name} has no room for her`)
+  if (!room || builtTier(state, roomKey) < 1 || (room.role !== 'suite' && room.role !== 'master')) reasons.push(t('game.housing.notABedroom'))
+  else if (freeBeds(config, state, roomKey) < 1) reasons.push(t('game.housing.noRoom', { room: room.name }))
   return { ok: reasons.length === 0, reasons }
 }
 
@@ -461,11 +462,11 @@ export function invite(content: ContentPack, state: GameState, loveInterestId: s
   if (!config || !canInvite(content, state, loveInterestId, roomKey).ok) return state
   const room = roomOf(config, roomKey)!
   let next: GameState = { ...state, housing: { ...state.housing, residents: { ...state.housing.residents, [loveInterestId]: roomKey } } }
-  next = applyFeelings(content, next, loveInterestId, feel(config.feelings.movedIn, 'He asked her to live with him.'))
-  next = addMemory(next, loveInterestId, `${state.player.name} asked you to come and live with him at ${config.name}, and you moved into ${room.name.toLowerCase()}. It is your home now.`, 'core')
+  next = applyFeelings(content, next, loveInterestId, feel(config.feelings.movedIn, t('game.housing.feel.movedIn')))
+  next = addMemory(next, loveInterestId, t('game.housing.memory.movedIn', { player: state.player.name, house: config.name, room: room.name.toLowerCase() }), 'core')
   // Living with him, she can be written to; what she makes of moving in, she says in the hour with him that follows.
   next = giveContact(next, loveInterestId)
-  return placeBabies(content, ledger(next, `${content.loveInterests.find((li) => li.id === loveInterestId)?.name.split(' ')[0] ?? 'She'} moved into ${room.name.toLowerCase()}`, 0))
+  return placeBabies(content, ledger(next, t('game.housing.ledger.herMovedIn', { first: content.loveInterests.find((li) => li.id === loveInterestId)?.name.split(' ')[0] ?? t('game.births.she'), room: room.name.toLowerCase() }), 0))
 }
 
 export type LeavingWhy = 'asked' | 'neglect' | 'evicted'
@@ -477,27 +478,23 @@ export type LeavingWhy = 'asked' | 'neglect' | 'evicted'
 export function leaveHouse(content: ContentPack, state: GameState, loveInterestId: string, why: LeavingWhy): GameState {
   const config = content.housing
   if (!config || state.housing.residents[loveInterestId] === undefined) return state
-  const first = content.loveInterests.find((li) => li.id === loveInterestId)?.name.split(' ')[0] ?? 'She'
+  const first = content.loveInterests.find((li) => li.id === loveInterestId)?.name.split(' ')[0] ?? t('game.births.she')
   const { [loveInterestId]: _room, ...residents } = state.housing.residents
   let next: GameState = {
     ...state,
     children: state.children.map((child) => (child.motherId === loveInterestId ? { ...child, health: undefined } : child)),
     housing: { ...state.housing, residents, left: [...state.housing.left, loveInterestId] }
   }
-  const told = {
-    asked: { change: config.feelings.askedToLeave, reason: 'He asked her to leave his house.', memory: `${state.player.name} asked you to leave ${config.name}, and you went back to your own room.`, note: 'I have taken my things. I did not think you would ask me to go.' },
-    neglect: {
-      change: config.feelings.leftOverNeglect,
-      reason: 'Her child went without in his house.',
-      memory: `Your child went without at ${config.name}: ${state.player.name} did not find the money week after week. You took the child back to the creche and left his house.`,
-      note: 'I have taken the baby back to the creche, and I have gone with it. I could not watch that any longer.'
-    },
-    evicted: { change: config.feelings.evicted, reason: 'The house was taken back and she had to go.', memory: `${state.player.name} lost ${config.name} for want of the rent, and you had to pack and go back to your own room.`, note: 'They gave us the afternoon to pack. I am back in my old room.' }
+  const change = {
+    asked: config.feelings.askedToLeave,
+    neglect: config.feelings.leftOverNeglect,
+    evicted: config.feelings.evicted
   }[why]
-  next = applyFeelings(content, next, loveInterestId, feel(told.change, told.reason))
-  next = addMemory(next, loveInterestId, told.memory, 'core')
-  next = addNote(giveContact(next, loveInterestId), loveInterestId, { from: 'them', text: told.note, read: false })
-  return ledger(next, `${first} left the house`, 0)
+  const told = { player: state.player.name, house: config.name }
+  next = applyFeelings(content, next, loveInterestId, feel(change, t(`game.housing.leave.${why}.reason`)))
+  next = addMemory(next, loveInterestId, t(`game.housing.leave.${why}.memory`, told), 'core')
+  next = addNote(giveContact(next, loveInterestId), loveInterestId, { from: 'them', text: t(`game.housing.leave.${why}.note`), read: false })
+  return ledger(next, t('game.housing.ledger.left', { first }), 0)
 }
 
 export function askToLeave(content: ContentPack, state: GameState, loveInterestId: string): GameState {
@@ -563,7 +560,7 @@ export function payArrears(content: ContentPack, state: GameState): GameState {
   const owed = state.housing.arrears
   if (!config || !isResident(content, state) || owed < 1 || state.player.money < owed) return state
   const paid: GameState = { ...state, player: { ...state.player, money: state.player.money - owed }, housing: { ...state.housing, arrears: 0, arrearsSince: undefined } }
-  return addNote(ledger(paid, 'Rent owed, paid', -owed), config.officerId, { from: 'them', text: fill(config, config.texts.paid, { amount: `$${owed}` }), read: false })
+  return addNote(ledger(paid, t('game.housing.ledger.arrearsPaid'), -owed), config.officerId, { from: 'them', text: fill(config, config.texts.paid, { amount: t('game.housing.money', { amount: owed }) }), read: false })
 }
 
 /**
@@ -585,7 +582,7 @@ export function evict(content: ContentPack, state: GameState): GameState {
     inOwnRoom: next.locationId === config.locationId ? false : next.inOwnRoom,
     housing: { ...next.housing, status: 'evicted', residents: {}, room: undefined, arrears: 0, arrearsSince: undefined }
   }
-  return addNote(ledger(next, `${config.name} was taken back`, 0), config.officerId, { from: 'them', text: fill(config, config.texts.evicted), read: false })
+  return addNote(ledger(next, t('game.housing.ledger.evicted', { house: config.name }), 0), config.officerId, { from: 'them', text: fill(config, config.texts.evicted), read: false })
 }
 
 /**
@@ -606,19 +603,19 @@ export function settleHousehold(content: ContentPack, state: GameState): { state
     const deadline = arrearsDeadline(content, next)
     if (deadline !== undefined && day >= deadline) {
       next = evict(content, next)
-      notices.push(`The rent was not found in time: ${config.name} has been taken back.`)
+      notices.push(t('game.housing.notice.evicted', { house: config.name }))
       break
     }
     const rent = rentOn(content, next, day)
     if (rent > 0) {
       if (next.player.money >= rent) {
-        next = ledger({ ...next, player: { ...next.player, money: next.player.money - rent } }, 'Rent', -rent)
-        notices.push(`Rent paid: $${rent}.`)
+        next = ledger({ ...next, player: { ...next.player, money: next.player.money - rent } }, t('game.housing.ledger.rent'), -rent)
+        notices.push(t('game.housing.notice.rentPaid', { rent }))
       } else {
         next = { ...next, housing: { ...next.housing, arrears: next.housing.arrears + rent, arrearsSince: next.housing.arrearsSince ?? day } }
         const by = formatDate(toDate(calendar, startOf(calendar, (next.housing.arrearsSince ?? day) + config.graceDays)))
-        next = addNote(ledger(next, 'Rent not paid', 0), config.officerId, { from: 'them', text: fill(config, config.texts.arrears, { amount: `$${next.housing.arrears}`, date: by }), read: false })
-        notices.push(`You could not pay the rent of $${rent}. It has to be found by ${by}.`)
+        next = addNote(ledger(next, t('game.housing.ledger.rentUnpaid'), 0), config.officerId, { from: 'them', text: fill(config, config.texts.arrears, { amount: t('game.housing.money', { amount: next.housing.arrears }), date: by }), read: false })
+        notices.push(t('game.housing.notice.rentUnpaid', { rent, by }))
       }
     }
     if (isHouseholdDay(content, day)) {
@@ -661,27 +658,27 @@ function settleWeek(content: ContentPack, config: HousingConfig, state: GameStat
     player: { ...state.player, money },
     children: state.children.map((child, index) => (health.has(index) ? { ...child, health: health.get(index) } : child))
   }
-  next = ledger(next, `The children's week: ${paid} of ${at.length} kept`, -paid * cost)
-  const notices = [paid === at.length ? `The children's week is paid: $${paid * cost}.` : `You could only pay for ${paid} of ${at.length} children this week.`]
+  next = ledger(next, t('game.housing.ledger.week', { paid, total: at.length }), -paid * cost)
+  const notices = [paid === at.length ? t('game.housing.notice.weekPaid', { amount: paid * cost }) : t('game.housing.notice.weekShort', { paid, total: at.length })]
 
-  for (const motherId of unpaid) next = applyFeelings(content, next, motherId, feel(config.babies.neglect, 'Her child went without this week.'))
+  for (const motherId of unpaid) next = applyFeelings(content, next, motherId, feel(config.babies.neglect, t('game.housing.feel.neglect')))
   // A mother whose children were all kept and are doing well is glad of it.
   for (const motherId of new Set(at.map(({ child }) => child.motherId))) {
     const hers = next.children.filter((child) => child.motherId === motherId && child.health !== undefined)
     if (!unpaid.has(motherId) && hers.every((child) => (child.health ?? 0) >= config.babies.thrivingFrom)) {
-      next = applyFeelings(content, next, motherId, feel(config.babies.thriving, 'Her child is thriving in his house.'))
+      next = applyFeelings(content, next, motherId, feel(config.babies.thriving, t('game.housing.feel.thriving')))
     }
   }
   // A child at the bottom is taken out of the house. Its mother goes with it, unless she is the nanny, whose post this is.
   for (const motherId of new Set(next.children.filter((child) => child.health === 0).map((child) => child.motherId))) {
-    const first = content.loveInterests.find((li) => li.id === motherId)?.name.split(' ')[0] ?? 'She'
+    const first = content.loveInterests.find((li) => li.id === motherId)?.name.split(' ')[0] ?? t('game.births.she')
     if (next.housing.residents[motherId] !== undefined) {
       next = leaveHouse(content, next, motherId, 'neglect')
-      notices.push(`${first} has taken her child back to the creche and left the house.`)
+      notices.push(t('game.housing.notice.leftOverNeglect', { first }))
     } else {
       next = { ...next, children: next.children.map((child) => (child.motherId === motherId ? { ...child, health: undefined } : child)) }
-      next = applyFeelings(content, next, motherId, feel(config.feelings.leftOverNeglect, 'Her child went without in his house.'))
-      notices.push(`${first} has taken her child to the creche.`)
+      next = applyFeelings(content, next, motherId, feel(config.feelings.leftOverNeglect, t('game.housing.leave.neglect.reason')))
+      notices.push(t('game.housing.notice.toCreche', { first }))
     }
   }
   return { state: next, notices }
@@ -703,30 +700,33 @@ export function describeHousehold(content: ContentPack, state: GameState, loveIn
   if (!config || !isResident(content, state)) return []
   const { name } = state.player
   const firstOf = (id: string) => content.loveInterests.find((li) => li.id === id)?.name.split(' ')[0] ?? id
-  const list = (ids: string[]) => ids.map(firstOf).join(', ').replace(/, ([^,]*)$/, ' and $1')
+  const list = (ids: string[]) => {
+    const names = ids.map(firstOf)
+    return names.length < 2 ? names.join('') : t('game.housing.list', { rest: names.slice(0, -1).join(', '), last: names.at(-1) })
+  }
   const residents = Object.keys(state.housing.residents)
   const nanny = firstOf(config.nannyId)
   const lines: string[] = []
   const mine = roomOf(config, state.housing.residents[loveInterestId])
   if (loveInterestId === config.nannyId) {
-    lines.push(`You are the live-in nanny at ${config.name}, the house the Sire Relations Office lets to ${name}. You are employed by the Office, not by him, and you have your own room there.`)
-    lines.push(residents.length > 0 ? `${list(residents)} live${residents.length === 1 ? 's' : ''} there too, at his asking.` : `Nobody else lives there yet but the two of you.`)
+    lines.push(t('game.housing.told.nanny', { house: config.name, player: name }))
+    lines.push(residents.length > 0 ? t('game.housing.told.nannyResidents', { names: list(residents), count: residents.length }) : t('game.housing.told.nannyAlone'))
     const babies = babiesAtHome(state)
     lines.push(
       babies.length > 0
-        ? `You mind ${babies.length === 1 ? 'the one child' : `the ${babies.length} children`} of the house: ${babies.map((child) => `${firstOf(child.motherId)}'s ${child.daughter ? 'daughter' : 'son'} (${healthName(config, child.health ?? 0).toLowerCase()})`).join('; ')}.`
-        : 'There is no child in the house yet for you to mind.'
+        ? t('game.housing.told.babies', { count: babies.length, babies: babies.map((child) => t('game.housing.told.baby', { mother: firstOf(child.motherId), daughter: child.daughter, health: healthName(config, child.health ?? 0).toLowerCase() })).join('; ') })
+        : t('game.housing.told.noBabies')
     )
   } else if (mine) {
     const others = residents.filter((id) => id !== loveInterestId)
-    lines.push(`You live with ${name} at ${config.name}, the house the Sire Relations Office lets him: you moved in at his asking, and ${mine.name.toLowerCase()} is yours.`)
-    lines.push(`${others.length > 0 ? `${list(others)} live${others.length === 1 ? 's' : ''} there as well. ` : ''}${nanny} is the live-in nanny, employed by the Office.`)
+    lines.push(t('game.housing.told.resident', { player: name, house: config.name, room: mine.name.toLowerCase() }))
+    lines.push(t('game.housing.told.residentOthers', { names: list(others), count: others.length, nanny }))
   } else {
-    lines.push(`${name} no longer lives in the halls: the Sire Relations Office has let him ${config.name}, a family house off campus${residents.length > 0 ? `, and ${list(residents)} live${residents.length === 1 ? 's' : ''} there with him` : ''}. A nanny, ${nanny}, lives in.`)
+    lines.push(t('game.housing.told.outsider', { player: name, house: config.name, names: list(residents), count: residents.length, nanny }))
   }
   const deadline = arrearsDeadline(content, state)
   if (deadline !== undefined && (mine || loveInterestId === config.nannyId)) {
-    lines.push(`${name} owes $${state.housing.arrears} in rent, and the house will be taken back if it is not found by ${formatDate(toDate(content.calendar, startOf(content.calendar, deadline)))}. Everyone in the house knows it.`)
+    lines.push(t('game.housing.told.arrears', { player: name, arrears: state.housing.arrears, by: formatDate(toDate(content.calendar, startOf(content.calendar, deadline))) }))
   }
   return lines
 }
@@ -737,19 +737,19 @@ export function housingFacts(content: ContentPack, state: GameState, characterId
   if (!config || characterId !== config.officerId) return []
   const { name } = state.player
   const { housing } = state
-  const terms = `The terms: ${config.name}, a secure family house with a live-in nanny employed by the Office; rent of $${config.rent} on the first of each month, which is the subsidised rate${config.rentRelief.perChild > 0 ? `, less $${config.rentRelief.perChild} for each child of his, to no less than $${Math.min(config.rent, config.rentRelief.floor)} (it stands at $${monthlyRent(content, state)} now)` : ''}; ${config.graceDays} days' grace on rent not paid, and then the house is taken back. He may build onto it and fit it out at his own cost, and may take in the mothers of his children.`
+  const terms = t('game.housing.officer.terms', { house: config.name, rent: config.rent, relief: config.rentRelief.perChild > 0, perChild: config.rentRelief.perChild, floor: Math.min(config.rent, config.rentRelief.floor), now: monthlyRent(content, state), grace: config.graceDays })
   if (housing.status === 'none') return []
-  if (housing.status === 'offered') return [`You have written to ${name} offering him Sire housing, and he has not answered yet. ${terms}`]
-  if (housing.status === 'accepted') return [`${name} has accepted Sire housing. You are to show him round ${config.name} yourself and introduce him to the nanny before the keys are his: the hour is in his calendar. ${terms}`]
-  if (housing.status === 'declined') return [`You offered ${name} Sire housing and he declined. The offer stands if he changes his mind. ${terms}`]
-  if (housing.status === 'evicted') return [`${name} held ${config.name} and lost it: the rent went unpaid past the days of grace and the Office took the house back. That cannot be undone, and there will not be another.`]
+  if (housing.status === 'offered') return [t('game.housing.officer.offered', { player: name, terms })]
+  if (housing.status === 'accepted') return [t('game.housing.officer.accepted', { player: name, house: config.name, terms })]
+  if (housing.status === 'declined') return [t('game.housing.officer.declined', { player: name, terms })]
+  if (housing.status === 'evicted') return [t('game.housing.officer.evicted', { player: name, house: config.name })]
   const residents = Object.keys(housing.residents).map((id) => content.loveInterests.find((li) => li.id === id)?.name ?? id)
   const deadline = arrearsDeadline(content, state)
   return [
-    `${name} is a tenant of the Office at ${config.name}. ${terms}`,
-    residents.length > 0 ? `Living there with him: ${residents.join(', ')}.` : 'He lives there alone but for the nanny.',
+    t('game.housing.officer.tenant', { player: name, house: config.name, terms }),
+    residents.length > 0 ? t('game.housing.officer.living', { names: residents.join(', ') }) : t('game.housing.officer.alone'),
     deadline !== undefined
-      ? `He owes $${housing.arrears} in rent, to be found by ${formatDate(toDate(content.calendar, startOf(content.calendar, deadline)))}, or the house is taken back.`
-      : 'His rent is paid up.'
+      ? t('game.housing.officer.owes', { arrears: housing.arrears, by: formatDate(toDate(content.calendar, startOf(content.calendar, deadline))) })
+      : t('game.housing.officer.paidUp')
   ]
 }

@@ -13,9 +13,10 @@ describe('the wording of the default pack', () => {
   const texts = (value: unknown): string[] =>
     typeof value === 'string' ? [value] : value !== null && typeof value === 'object' ? Object.values(value).flatMap(texts) : []
 
-  it('names no day or month of our calendar, only its own', () => {
+  // The week's days are ours, Sunday to Saturday, since an LLM loses track of days with names of their own. The months are the setting's.
+  it('names no month of our calendar, only its own', () => {
     // May and March are left out: they are words as well as months.
-    const ours = /\b(Mon|Tues|Wednes|Thurs|Fri|Satur|Sun)days?\b|\b(January|February|April|June|July|August|September|October|November|December)\b/i
+    const ours = /\b(January|February|April|June|July|August|September|October|November|December)\b/i
     const slips = files.flatMap((file) =>
       texts(JSON.parse(readFileSync(file, 'utf8')))
         .filter((text) => ours.test(text))

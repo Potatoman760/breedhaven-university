@@ -165,6 +165,45 @@ describe('the catalogue', () => {
       for (const number of ['POL 101', 'POL 120']) expect(buildCatalogue(three, seed).find((c) => c.number === number)!.studentIds.sort()).toEqual(['ana', 'bea', 'eve'])
     }
   })
+
+  it('opens another section of a course when its classes are full, so that everyone still has her full week', () => {
+    const more: ContentPack = { ...content, loveInterests: [...content.loveInterests, ...['eve', 'fay', 'gil'].map((id) => student(id, 'POL', 1))] }
+    const given = buildCatalogue(more, 7)
+    const pol = ['ana', 'bea', 'eve', 'fay', 'gil']
+    for (const id of pol) {
+      const hers = given.filter((c) => c.studentIds.includes(id))
+      // Two of her own subject, of two different courses, and two besides.
+      expect(hers.filter((c) => c.code === 'POL').map((c) => c.courseId ?? c.id).sort(), id).toEqual(['course-pol-101', 'course-pol-120'])
+      expect(hers, id).toHaveLength(4)
+      for (const a of hers) for (const b of hers) if (a !== b) expect(coursesClash(a, b), `${id}: ${a.id} and ${b.id}`).toBe(false)
+    }
+    const sections = given.filter((c) => c.section !== undefined)
+    expect(sections.length).toBeGreaterThan(0)
+    for (const section of sections) {
+      const of = given.find((c) => c.id === section.courseId)!
+      // A class of its own, of the course it names: its title and what it teaches, and its department's professor.
+      expect(section.id).toBe(`${section.courseId}-${section.section}`)
+      expect(section).toMatchObject({ number: of.number, title: of.title, code: of.code, teacherId: undefined })
+      expect(content.coursework!.professors).toContain(section.professor)
+    }
+    expect(new Set(given.map((c) => c.id)).size).toBe(given.length)
+    // Nobody is in a crowd for it.
+    for (const c of given) expect(inClass(c), c.id).toBeLessThanOrEqual(c.studentIds.some((id) => pol.includes(id)) && c.code === 'POL' ? 3 : 2)
+    expect(buildCatalogue(more, 7)).toEqual(given)
+  })
+
+  it('finds room for a crowd, whatever the seed', () => {
+    const crowd: ContentPack = { ...content, loveInterests: [...content.loveInterests, ...Array.from({ length: 12 }, (_, i) => student(`eng${i}`, 'ENG', 1))] }
+    for (const seed of [1, 7, 99]) {
+      const given = buildCatalogue(crowd, seed)
+      for (const li of crowd.loveInterests.filter((one) => one.studies)) {
+        const hers = given.filter((c) => c.studentIds.includes(li.id))
+        expect(hers, `${seed}: ${li.id}`).toHaveLength(4)
+        expect(new Set(hers.map((c) => c.courseId ?? c.id)).size, `${seed}: ${li.id}`).toBe(4)
+      }
+      for (const c of given) expect(inClass(c), `${seed}: ${c.id}`).toBeGreaterThan(0)
+    }
+  })
 })
 
 describe('the saved catalogue', () => {
@@ -205,6 +244,16 @@ describe('the saved catalogue', () => {
     const fewer = { ...curriculum, majors: curriculum.majors.filter((major) => major.code !== 'RID') }
     const without = resolveCurriculum({ curriculum: fewer, coursework: content.coursework, catalogue: kept, loveInterests: [] }) as { catalogue: { courses: Course[] } }
     expect(without.catalogue.courses.some((course) => course.code === 'RID')).toBe(false)
+  })
+
+  it('keeps a further section as a section of its course, and reads it back the same', () => {
+    const more: ContentPack = { ...content, loveInterests: [...content.loveInterests, ...['eve', 'fay', 'gil'].map((id) => student(id, 'POL', 1))] }
+    const given = buildCatalogue(more, 7)
+    const kept = writtenCatalogue(catalogueOf(more, 7, given))
+    const section = kept.courses.find((course) => course.section !== undefined)!
+    expect(Object.keys(section).sort()).toEqual(['courseId', 'id', 'meetings', 'professor', 'section', 'studentIds', 'teacherId'].sort())
+    const read = resolveCurriculum({ curriculum, coursework: content.coursework, catalogue: kept, loveInterests: [] }) as { catalogue: { courses: Course[] } }
+    expect(read.catalogue.courses).toEqual(given.map((course) => ({ ...course })))
   })
 })
 

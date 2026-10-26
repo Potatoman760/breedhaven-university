@@ -6,6 +6,7 @@ import { Dialog } from './Dialog'
 import { GrandButton } from './GrandButton'
 import { HeartIcon } from './icons'
 import { Portrait } from './Portrait'
+import { t } from '../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -25,13 +26,13 @@ export function DateDialog({ content, state, title, most, onGo, onClose }: Props
   const choices = dateChoices(content, state)
 
   return (
-    <Dialog title="Who will you take?" note={title} onClose={onClose} noClose wide ornate>
+    <Dialog title={t('screens.dateDialog.title')} note={title} onClose={onClose} noClose wide ornate>
       <div className="party-grid">
         {choices.map((li) => {
           const chosen = taking.includes(li.id)
           const full = !chosen && taking.length >= most
           return (
-            <button key={li.id} type="button" aria-pressed={chosen} className={`party-card${chosen ? ' picked' : ''}`} disabled={full} title={full ? `No more than ${most}` : undefined} onClick={() => toggle(li.id)}>
+            <button key={li.id} type="button" aria-pressed={chosen} className={`party-card${chosen ? ' picked' : ''}`} disabled={full} title={full ? t('screens.dateDialog.noMoreThan', { most }) : undefined} onClick={() => toggle(li.id)}>
               <Portrait who={li} image={spriteFor(li, wornOutfit(content, state, li), 'neutral')} size="fill" className="party-face" />
               <strong>{li.name.split(' ')[0]}</strong>
             </button>
@@ -39,8 +40,8 @@ export function DateDialog({ content, state, title, most, onGo, onClose }: Props
         })}
       </div>
       <div className="actions party-actions">
-        <BackButton label="Not now" onClick={onClose} />
-        <GrandButton label="Go" icon={<HeartIcon size={24} />} disabled={taking.length === 0} onClick={() => onGo(taking)} />
+        <BackButton label={t('screens.sceneView.notNow')} onClick={onClose} />
+        <GrandButton label={t('screens.dateDialog.go')}icon={<HeartIcon size={24} />} disabled={taking.length === 0} onClick={() => onGo(taking)} />
       </div>
     </Dialog>
   )

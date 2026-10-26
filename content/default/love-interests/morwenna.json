@@ -295,9 +295,9 @@
   "schedule": [
     {
       "weekdays": [
-        "Moonday",
-        "Tidesday",
-        "Windsday"
+        "Tuesday",
+        "Wednesday",
+        "Thursday"
       ],
       "periods": [
         "morning"
@@ -306,8 +306,8 @@
     },
     {
       "weekdays": [
-        "Moonday",
-        "Tidesday"
+        "Tuesday",
+        "Wednesday"
       ],
       "periods": [
         "afternoon"
@@ -316,8 +316,8 @@
     },
     {
       "weekdays": [
-        "Windsday",
-        "Hearthday"
+        "Thursday",
+        "Friday"
       ],
       "periods": [
         "evening"
@@ -326,8 +326,8 @@
     },
     {
       "weekdays": [
-        "Marketday",
-        "Restday"
+        "Saturday",
+        "Sunday"
       ],
       "periods": [
         "evening",
@@ -346,7 +346,9 @@
     "name": "a candlelit flat above the Honeyed Bee",
     "description": "A narrow top-floor flat with a flat white ceiling, its single window draped in black lace that turns the daylight violet. Bookshelves line every wall from floor to ceiling, crammed with annotated paperbacks and leather-bound theses, their spines cracked and bristling with bookmark ribbons. A low iron-framed bed sits in the corner under a dark velvet quilt, and a round table by the window holds a teapot, a stack of essays, and a cluster of black candles in silver holders. The air smells of dried lavender, old paper, and something faintly like incense.",
     "locationId": "honeyed-bee-inn",
-    "background": "generated/backgrounds/morwenna/view-2.webp"
+    "images": {
+      "day": "generated/backgrounds/morwenna/view-2.webp"
+    }
   },
   "birthPicture": "sprites/morwenna/birth.webp",
   "walkSprite": "sprites/morwenna/walk-cutout.webp",

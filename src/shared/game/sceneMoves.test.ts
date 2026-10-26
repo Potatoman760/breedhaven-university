@@ -149,9 +149,10 @@ describe('what the character is told of where she is', () => {
     // A view that says what it is has that said after the place.
     expect(describePlace(shop, { ...shop.backgrounds[0], description: 'The till is here.' })).toBe('the Shop, the counter. You are indoors, under a roof. Shelves to the ceiling. The till is here.')
     // A room is staged by its own picture, or by a view of the place it is in.
-    expect(roomBackdrop({ name: 'a loft', description: '', locationId: 'shop', background: 'loft.png' }, 'k')).toEqual({ room: { image: 'loft.png', key: 'k' } })
-    expect(roomBackdrop({ name: 'a loft', description: '', locationId: 'shop', viewId: 'yard' }, 'k')).toEqual({ viewId: 'yard' })
-    expect(roomBackdrop(undefined, 'k')).toEqual({})
+    expect(roomBackdrop({ name: 'a loft', description: '', locationId: 'shop', images: { day: 'loft.png' } }, 'k', 'night')).toEqual({ room: { image: 'loft.png', key: 'k' } })
+    expect(roomBackdrop({ name: 'a loft', description: '', locationId: 'shop', images: { day: 'loft.png', night: 'loft-night.png' } }, 'k', 'night')).toEqual({ room: { image: 'loft-night.png', key: 'k' } })
+    expect(roomBackdrop({ name: 'a loft', description: '', locationId: 'shop', viewId: 'yard' }, 'k', 'day')).toEqual({ viewId: 'yard' })
+    expect(roomBackdrop(undefined, 'k', 'day')).toEqual({})
     expect(sceneView(content, { ...state, locationId: 'shop' })?.id).toBe('counter')
     expect(sceneView(content, { ...state, locationId: 'shop' }, 'yard')?.id).toBe('yard')
   })
@@ -206,7 +207,7 @@ describe('what the character is told of where she is', () => {
 })
 
 describe("the player's own room", () => {
-  const roomed: ContentPack = { ...content, newGame: { ...content.newGame, room: { name: 'a small room under the eaves', description: 'A narrow bed and a desk.', locationId: 'home', background: 'addons/sprites/player/room.png' } } }
+  const roomed: ContentPack = { ...content, newGame: { ...content.newGame, room: { name: 'a small room under the eaves', description: 'A narrow bed and a desk.', locationId: 'home', images: { day: 'addons/sprites/player/room.png' } } } }
 
   it('is somewhere a scene can go, and is his while it is there', () => {
     const offered = sceneDestinations(roomed, state, scene)
@@ -216,7 +217,7 @@ describe("the player's own room", () => {
 
     const there = movedScene(scene, his)
     expect(there.roomOf).toBe(PLAYER_ROOM)
-    expect(playerRoom(roomed, there)?.background).toBe('addons/sprites/player/room.png')
+    expect(playerRoom(roomed, there)?.images?.day).toBe('addons/sprites/player/room.png')
     expect(playerRoom(roomed, scene)).toBeUndefined()
     // Once there it is not offered again, and the place it is in can be gone back down to.
     expect(sceneDestinations(roomed, state, there).map((d) => d.id)).toEqual(['room-of-ana', 'home', 'shop'])

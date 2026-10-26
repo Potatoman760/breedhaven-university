@@ -148,6 +148,8 @@ import {
   talkToNpc,
   withNpc,
   inMasks,
+  newStrangers,
+  withStrangers,
   nextDance,
   guessable,
   guessDancer,
@@ -176,6 +178,8 @@ import { CHAT_CANCELLED } from '../../shared/ipc'
 import { AUTO_SLOT_ID, type SaveData } from '../../shared/saves'
 import { errorMessage } from './errors'
 import { play, playSong, setAmbience, useSounds } from './sound'
+import { onLanguageContent } from './language'
+import { t } from '../../shared/i18n'
 import { EpilogueView } from './ui/EpilogueView'
 import { SavesPanel } from './SavesPanel'
 import { SettingsPanel } from './SettingsPanel'
@@ -213,9 +217,8 @@ import { MasqueradeGuess } from './ui/MasqueradeGuess'
 import { TripBooking } from './ui/TripBooking'
 import { SummaryView, type SceneSummary } from './ui/SummaryView'
 
-// The content editor is the developer's own: it is there when the game is run from its source, and a built game leaves
-// it out altogether, its code with it.
-const ContentEditor = import.meta.env.DEV ? lazy(() => import('./ui/editor/ContentEditor').then((module) => ({ default: module.ContentEditor }))) : undefined
+// The content editor, where a player makes characters and subjects of his own: loaded only when it is opened.
+const ContentEditor = lazy(() => import('./ui/editor/ContentEditor').then((module) => ({ default: module.ContentEditor })))
 
 // Where it is kept that the player has said he is an adult.
 const OF_AGE_KEY = 'breedhaven.ofAge'
@@ -236,6 +239,8 @@ export function App() {
   useEffect(() => {
     window.api.getContent().then(setContent, (e) => setError(String(e)))
   }, [])
+  // A change of language brings the content again, translated.
+  useEffect(() => onLanguageContent(setContent), [])
   useSounds(content?.sounds)
 
   // Each started or loaded game gets a new id so the Game component starts afresh.
@@ -254,8 +259,8 @@ export function App() {
   }
 
   if (!ofAge) return <AgeGate onConfirm={confirmOfAge} />
-  if (error) return <main className="title">Failed to load content: {error}</main>
-  if (!content) return <main className="title">Loading...</main>
+  if (error) return <main className="title">{t('shell.app.loadFailed', { error })}</main>
+  if (!content) return <main className="title">{t('shell.app.loading')}</main>
 
   const start = ({ state, scene }: SaveData) =>
     setSession({
@@ -270,13 +275,13 @@ export function App() {
       }
     })
 
-  if (editing && ContentEditor)
+  if (editing)
     return (
       <Suspense fallback={null}>
         <ContentEditor content={content} onContent={setContent} onClose={() => setEditing(false)} />
       </Suspense>
     )
-  if (!session) return <TitleScreen content={content} onStart={start} onEdit={ContentEditor ? () => setEditing(true) : undefined} />
+  if (!session) return <TitleScreen content={content} onStart={start} onEdit={() => setEditing(true)} />
   return (
     <Game
       key={session.id}
@@ -408,12 +413,16 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     }
     window.api
       .saveGame({ slotId: AUTO_SLOT_ID, ...savable(state, scene, turns) })
-      .catch((error) => setNotice(`Autosave failed: ${errorMessage(error)}`))
+      .catch((error) => setNotice(t('shell.app.autosaveFailed', { error: errorMessage(error) })))
   }, [state, scene])
 
-  // Whoever is in a scene has been met, from the moment it begins or she walks into it.
+  // Whoever is in a scene has been met, from the moment it begins or she walks into it. One he had never met is a stranger
+  // in it until her name is said.
   useEffect(() => {
-    if (scene) setState((current) => meet(content, current, sceneCast(scene)))
+    if (!scene) return
+    const fresh = newStrangers(content, state, scene)
+    if (fresh.length > 0) setScene((current) => current && { ...current, strangers: [...new Set([...(current.strangers ?? []), ...fresh])] })
+    setState((current) => meet(content, current, sceneCast(scene)))
   }, [content, scene])
 
   // On a day of presents, each woman brings him one the first time they meet: it is in his bag, and she hands it over in the scene.
@@ -424,7 +433,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setState((current) => bringPresents(content, current, sceneCast(scene)).state)
     if (brought.presents.length === 0) return
     setScene((current) => current && { ...current, presents: [...(current.presents ?? []), ...brought.presents] })
-    setNotice(brought.presents.map((present) => `${firstNames(content, [present.fromId])} gave you ${content.items.find((item) => item.id === present.itemId)?.name ?? 'a present'}.`).join(' '))
+    setNotice(brought.presents.map((present) => t('shell.app.gavePresent', { who: firstNames(content, [present.fromId]), item: content.items.find((item) => item.id === present.itemId)?.name ?? t('shell.app.aPresent') })).join(' '))
   }, [content, scene, state])
 
   // As time goes by, the shifts that have ended are counted: worked, or missed and held against him.
@@ -437,7 +446,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     const { missed } = settleAppointments(content, state)
     if (missed.length === 0) return
     setState((current) => settleAppointments(content, current).state)
-    setNotice(missed.map((plan) => `You missed ${plan.title} with ${firstNames(content, attendees(plan))}, and sent no word. It will be remembered.`).join(' '))
+    setNotice(missed.map((plan) => t('shell.app.missedPlan', { plan: plan.title, who: firstNames(content, attendees(plan)) })).join(' '))
   }, [content, state.time, state.appointments])
 
   // The small hours are for sleep and nothing else: whenever the clock stands in them and he is not in the middle of something, he sleeps till morning.
@@ -494,7 +503,10 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setState((current) => (feedRoundDue(content, current) ? feedRound(content, current).state : current))
   }, [idle, over, state, content])
   // Whatever is planned and not yet made is written and drawn in the background, one lot at a time. Each post is filed as its selfie
-  // arrives, and goes up at its own hour. A plan is tried once each time the game is run: one that fails is said, and waits for the next.
+  // arrives, and goes up at its own hour. A plan is tried once each time the game is run: one that fails waits for the next. Why it
+  // failed is said at the top of the feed and nowhere else, since many players never set up ComfyUI, and only for the game and day it
+  // was. Without a ComfyUI that answers, nothing is written, so no LLM call is spent on a post that cannot be.
+  const [feedError, setFeedError] = useState<{ seed: number; day: number; message: string } | null>(null)
   const drawing = useRef(false)
   const triedPlans = useRef(new Set<string>())
   const [drawn, setDrawn] = useState(0)
@@ -506,27 +518,34 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     if (plans.length === 0) return
     drawing.current = true
     for (const plan of plans) triedPlans.current.add(tryKey(plan))
+    const day = toDate(content.calendar, state.time).dayIndex
+    const said = (message: string | undefined) => setFeedError(message ? { seed: weatherSeed, day, message } : null)
     void (async () => {
+      const comfy = await window.api.comfy.getSettings()
+      const reached = await window.api.comfy.test(comfy.baseUrl)
+      if (!reached.ok) return said(t('shell.app.feedNoComfy', { message: reached.message }))
       const { drafts, error, shortfall } = await window.api.feed({ state, plans })
-      let failed = error ?? shortfall ?? (drafts.length < plans.length ? `${plans.length - drafts.length} of ${plans.length} posts could not be written.` : undefined)
+      let failed = error ?? shortfall ?? (drafts.length < plans.length ? t('shell.app.feedUnwritten', { missing: plans.length - drafts.length, total: plans.length }) : undefined)
       for (const draft of drafts) {
         const date = toDate(content.calendar, draft.time)
         const made = await window.api.feedPicture({ authorId: draft.authorId, name: `bloomr-day-${date.dayIndex + 1}-${date.hour}`, prompt: draft.prompt })
         // A post is its picture: one that could not be drawn is not made. Nor is one whose game has been left since.
         if (made.image) setState((current) => (current.weatherSeed === weatherSeed ? postMade(current, { ...draft, image: made.image ?? undefined }) : current))
-        else failed ??= `A picture could not be drawn: ${made.error ?? 'ComfyUI gave nothing back'}.`
+        else failed ??= t('shell.app.feedUndrawn', { error: made.error ?? t('shell.app.feedNothingBack') })
       }
-      if (failed) setAside(`Bloomr: some of today's posts could not be made. ${failed}`)
+      said(failed && t('shell.app.feedSome', { failed }))
     })()
-      .catch((error: unknown) => setAside(`Bloomr: today's posts could not be made. ${(error as Error).message}`))
+      .catch((error: unknown) => said(t('shell.app.feedFailed', { message: (error as Error).message })))
       .finally(() => {
         drawing.current = false
         setDrawn((count) => count + 1)
       })
   }, [state.feedPlans, state.weatherSeed, over, drawn])
   // In a scene with an NPC, the NPC stands among the characters for every screen that shows the scene.
-  // At a masked ball the lead is in her mask, and goes by its name until he has named her.
+  // At a masked ball the lead is in her mask, and goes by its name until he has named her. Whoever he is meeting for the
+  // first time is "???" on screen until her name is said: `cast` keeps her name, for telling who speaks a line.
   const cast = scene?.npc ? withNpc(content, scene.loveInterestId) : scene ? inMasks(content, scene, true) : content
+  const shownCast = withStrangers(cast, scene)
   const partner = cast.loveInterests.find((li) => li.id === partnerId)
   const examCourse = exam ? state.courses.find((course) => course.id === exam.courseId) : undefined
 
@@ -555,7 +574,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     const missed = settleMissedDates(content, state)
     if (missed.state === state) return
     setState(missed.state)
-    if (missed.hurt.length > 0) setNotice(`You took nobody to ${missed.eventName}. ${firstNames(content, missed.hurt)} ${missed.hurt.length === 1 ? 'is' : 'are'} hurt.`)
+    if (missed.hurt.length > 0) setNotice(t('shell.app.tookNobody', { event: missed.eventName, who: firstNames(content, missed.hurt), count: missed.hurt.length }))
   }, [idle, state, content])
 
   // Where he has learnt it, the mothers of his children want him as much as a woman can: kept so between scenes.
@@ -571,7 +590,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     if (earned.length === 0) return
     setState((current) => tellSkills(current, earned.flatMap(toldOf)))
     // One he already had and has taken further is improved, not new.
-    setNotice(earned.map((skill) => `${skill.level === 2 && state.skillsTold.includes(skill.id) ? 'Skill improved' : 'New skill'}: ${skill.name}${skill.level === 2 ? ' II' : ''}. ${skill.description}`).join(' '))
+    setNotice(earned.map((skill) => t('shell.app.skillEarned', { improved: skill.level === 2 && state.skillsTold.includes(skill.id), name: skill.level === 2 ? t('shell.common.skillTwo', { name: skill.name }) : skill.name, description: skill.description })).join(' '))
   }, [idle, state, content])
 
   // Once he has said yes to the house, the officer sets an hour to show him round it, and sets another if he does not come.
@@ -586,7 +605,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     const { missed } = settleBirths(content, state)
     if (missed.length === 0) return
     setState((current) => settleBirths(content, current).state)
-    setNotice(missed.map(({ motherId, child }) => `${firstNames(content, [motherId])} gave birth to your ${child.daughter ? 'daughter' : 'son'}, ${child.name}, and you were not there. She will not forget it.`).join(' '))
+    setNotice(missed.map(({ motherId, child }) => t('shell.app.birthMissed', { mother: firstNames(content, [motherId]), daughter: child.daughter === true, child: child.name })).join(' '))
   }, [idle, state, content])
 
   // Once the way down is open, whoever knows of it sets an hour to show him, and sets it again when he does not come.
@@ -668,8 +687,11 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     // And what he is asking, when the line was one of the text box's suggestions.
     // And what a relic he has just used has done.
     const cue = [arrival && from.drama ? arrivalCue(content, from.drama) : undefined, ask].filter(Boolean).join(' ') || undefined
+    // Whoever he is meeting for the first time is marked before her first reply is asked for, so that she is told to say her name in it.
+    const strangers = newStrangers(content, at, from)
     const asked: Scene = {
       ...from,
+      ...(strangers.length > 0 && { strangers: [...(from.strangers ?? []), ...strangers] }),
       backgroundId: from.viewId ?? backgroundId ?? from.backgroundId,
       messages: text === undefined ? from.messages : [...from.messages, { role: 'user', content: text, ...(cue && { cue }) }]
     }
@@ -689,7 +711,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       if (stopped.length > 0 || conceived.length > 0) {
         setState((current) => conceived.reduce((next, id) => conceive(content, next, id), stopped.reduce((next, id) => stopBirthControl(content, next, id), current)))
       }
-      if (stopped.length > 0) setAgreed(`${firstNames(content, stopped)} ${stopped.length === 1 ? 'has' : 'have'} stopped taking birth control.`)
+      if (stopped.length > 0) setAgreed(t('shell.app.stoppedControl', { who: firstNames(content, stopped), count: stopped.length }))
       // The story may have run on, or gone somewhere else: the clock and the place follow it.
       const { hours } = response
       // Where the character took the scene, checked again here against where it can go.
@@ -706,7 +728,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       const agreedTo = response.proposalAccepted ? asked.proposal : undefined
       if (agreedTo) {
         setState((current) => acceptProposal(current, agreedTo))
-        setAgreed(`${agreedTo.title} with ${firstNames(content, attendees(agreedTo))}: ${describeWhen(content, agreedTo.time)}. Added to your calendar.`)
+        setAgreed(t('shell.app.planAdded', { plan: agreedTo.title, who: firstNames(content, attendees(agreedTo)), when: describeWhen(content, agreedTo.time) }))
       }
       // Whoever said she would be at an event is put down for it: she is there when he goes.
       const { attending } = response
@@ -744,7 +766,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       setLearned([
         ...given.flatMap((id) => {
           const li = content.loveInterests.find((c) => c.id === id)
-          return li ? [`${li.name.split(' ')[0]} gave you her Bloomr: ${handleOf(li)}`] : []
+          return li ? [t('shell.app.gaveBloomr', { who: li.name.split(' ')[0], handle: handleOf(li) })] : []
         })
       ])
       setLastPrompt(response.systemPrompt)
@@ -756,7 +778,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       if (text !== undefined) setTurns((kept) => kept.slice(0, -1))
       setScene(from)
       // Stopped by the player, it is no failure: his line goes back in the box to say again or differently.
-      if (!errorMessage(error).includes(CHAT_CANCELLED)) setNotice(text === undefined ? errorMessage(error) : `${errorMessage(error)} Your line was: "${text}"`)
+      if (!errorMessage(error).includes(CHAT_CANCELLED)) setNotice(text === undefined ? errorMessage(error) : t('shell.app.lineWas', { error: errorMessage(error), text }))
     } finally {
       setBusy(false)
       setMovingTo(null)
@@ -860,7 +882,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     // Done alone, there is no scene to tell him what it did: a toast does. With company, the scene's summary does.
     if (!result.scene) {
       const gains = playerGains({ stats: state.player.stats, energy: state.player.energy, money: state.player.money, training: state.training, coursePoints: state.coursePoints }, result.state)
-      setToast({ title: `${plan.title} · ${plan.hours} hour${plan.hours === 1 ? '' : 's'}`, gains })
+      setToast({ title: t('shell.app.outingToast', { plan: plan.title, hours: plan.hours }), gains })
     }
   }
 
@@ -947,7 +969,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setDating(null)
     const result = attendEventPart(content, state, eventId, partId, dateIds)
     setState(result.state)
-    setNotice(result.hurt.length > 0 ? `${firstNames(content, result.hurt)} ${result.hurt.length === 1 ? 'is' : 'are'} hurt you did not ask ${result.hurt.length === 1 ? 'her' : 'them'}.` : '')
+    setNotice(result.hurt.length > 0 ? t('shell.app.notAsked', { who: firstNames(content, result.hurt), count: result.hurt.length }) : '')
     // A booking part ends on the booking screen, not a scene.
     const begin = () => (result.booking ? setBooking(result.booking) : setScene(result.scene))
     // Whatever the part plays as it begins comes first, in turn, with those in it; then its lines, then the scene.
@@ -999,7 +1021,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     const worked = spendOnFocus(content, state, hours)
     if (worked !== state) {
       const gains = playerGains({ stats: state.player.stats, energy: state.player.energy, money: state.player.money, training: state.training, coursePoints: state.coursePoints }, worked)
-      setToast({ title: `Focus: ${focusName(state)} · ${hours} hour${hours === 1 ? '' : 's'}`, gains })
+      setToast({ title: t('shell.app.focusToast', { focus: focusName(state), hours }), gains })
     }
     const there = arriveFor(worked, next)
     if (next.kind === 'class') attendClass(next.id, there, arrivedWith)
@@ -1051,12 +1073,10 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       nsfw: false,
       beats: [
         {
-          activityName: `${course.title} (${course.number}), a class taught by ${course.professor}`,
+          activityName: t('shell.app.classActivity', { title: course.title, number: course.number, professor: course.professor }),
           locationName: placeName(at),
-          description: `${course.professor} begins ${course.title}. ${course.description}`.trim(),
-          direction:
-            `You are in class together. The lecture runs its course as you talk and is over by the time on the ` +
-            `clock, so by the end of this scene everyone is free to leave: to walk back to a room, or go on somewhere.`
+          description: t('shell.app.classDescription', { professor: course.professor, title: course.title, description: course.description }).trim(),
+          direction: t('shell.app.classDirection')
         }
       ],
       messages: [],
@@ -1086,7 +1106,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     const there = societyPeople(society).filter((id) => locationOf(content, at, content.loveInterests.find((li) => li.id === id)!) === society.locationId)
     const present = [...new Set([...there, ...arrivedWith])].slice(0, MAX_SCENE_CAST)
     if (present.length === 0) {
-      setNotice(`Nobody you know came to ${society.name} tonight.`)
+      setNotice(t('shell.app.nobodyCame', { society: society.name }))
       return
     }
     const { event, topic } = plan
@@ -1110,13 +1130,12 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       looks: Object.fromEntries(companionIds.filter((id) => left[id]).map((id) => [id, left[id]])),
       beats: [
         {
-          activityName: event ? `${society.name}: ${event.name}` : `A meeting of ${society.name}`,
+          activityName: event ? `${society.name}: ${event.name}` : t('shell.app.meetingActivity', { society: society.name }),
           locationName: placeName(at),
           description: society.description,
           direction: event && gate
-            ? `This is ${event.name}, a night of ${society.name}, which ${at.player.name} has joined. ${gate.direction} Everyone here is willing tonight; how far it goes is up to ${at.player.name}.`
-            : `This is the weekly meeting of ${society.name}, which ${at.player.name} has joined; it runs for an hour, and by the end of this ` +
-              `scene it is over and everyone is free to go.${topic ? ` Tonight: ${topic}` : ''}`
+            ? t('shell.app.nightDirection', { event: event.name, society: society.name, player: at.player.name, direction: gate.direction })
+            : t('shell.app.meetingDirection', { society: society.name, player: at.player.name, tonight: Boolean(topic), topic: topic ?? '' })
         }
       ],
       messages: [],
@@ -1146,7 +1165,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     const result = sayHelloAll(content, state, ids, societyId)
     setState(result.state)
     const gift = result.gift ? content.items.find((item) => item.id === result.gift)?.name : undefined
-    if (gift) setNotice(`You were given: ${gift}.`)
+    if (gift) setNotice(t('shell.app.given', { gift }))
     if (intro) setCutscene({ intro, then: () => undefined })
   }
 
@@ -1161,7 +1180,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     const at = { ...stopped.state, time: stopped.state.time + 1 }
     setState(at)
     setPanel(null)
-    setNotice(stopped.gift ? `You were given: ${content.items.find((item) => item.id === stopped.gift)?.name}.` : '')
+    setNotice(stopped.gift ? t('shell.app.given', { gift: String(content.items.find((item) => item.id === stopped.gift)?.name) }) : '')
     setScene({
       loveInterestId: leadId,
       companionIds,
@@ -1170,12 +1189,12 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       returnTo: 'fair',
       beats: [
         {
-          activityName: society ? `Stopping at the ${society.name.replace(/^the /, '')} table at the Societies Fair` : 'Talking at the Societies Fair',
+          activityName: society ? t('shell.app.fairTableActivity', { society: society.name.replace(/^the /, '') }) : t('shell.app.fairActivity'),
           locationName: placeName(at),
           description: society?.description,
           direction: society
-            ? `It is the Societies Fair. ${firstNames(content, [leadId, ...companionIds])} ${companionIds.length > 0 ? 'are' : 'is'} at the ${society.name.replace(/^the /, '')} table, signing up new members, and ${at.player.name} has stopped to talk. It lasts about an hour.`
-            : `It is the Societies Fair, and ${at.player.name} has stopped to talk. It lasts about an hour.`
+            ? t('shell.app.fairTableDirection', { who: firstNames(content, [leadId, ...companionIds]), count: companionIds.length + 1, society: society.name.replace(/^the /, ''), player: at.player.name })
+            : t('shell.app.fairDirection', { player: at.player.name })
         }
       ],
       messages: [],
@@ -1213,8 +1232,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setPanel(null)
     const line =
       scene.companionIds.length > 0
-        ? `*hands ${firstNames(content, [toId])} a gift: ${gift.name}*`
-        : `*hands over a gift: ${gift.name}*`
+        ? t('shell.app.handsGiftTo', { who: firstNames(content, [toId]), gift: gift.name })
+        : t('shell.app.handsGift', { gift: gift.name })
     send(line, { ...scene, gifts: [...scene.gifts, gift] }, after)
   }
 
@@ -1226,7 +1245,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     if (after === state) return
     setState(after)
     setPanel(null)
-    setAgreed(onId ? `${name}: used on ${firstNames(content, [onId])}.` : `${name}: used.`)
+    setAgreed(onId ? t('shell.app.usedOn', { name, who: firstNames(content, [onId]) }) : t('shell.app.used', { name }))
   }
 
   /** Turns the finished scene into a memory and shows what came of it. */
@@ -1256,7 +1275,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setScene(null)
     setEnded(false)
     setLastPrompt('')
-    setNotice(pay > 0 ? `You were paid $${pay} for your shift.` : '')
+    setNotice(pay > 0 ? t('shell.app.paid', { pay, bonus: 0, extra: false }) : '')
     // Walking away from a table at the fair is back out onto it, as the end of a talk there is.
     setPanel(scene.returnTo === 'fair' && fairNow(content, state) ? { kind: 'fair' } : null)
   }
@@ -1271,7 +1290,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       const parting = scene.npc ? [] : sceneWitnesses(scene).filter((id) => offersContact(content, state, id))
       if (parting.length > 0) {
         setState((current) => parting.reduce(giveContact, current))
-        setNotice(`${firstNames(content, parting)} gave you ${parting.length > 1 ? 'their' : 'her'} Bloomr before you parted.`)
+        setNotice(t('shell.app.partingBloomr', { who: firstNames(content, parting), count: parting.length }))
       }
       // How each of them feels about him now is what she made of the scene, and nothing else moves it.
       // A scene in which they had sex is counted for each of them, once.
@@ -1305,7 +1324,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         learned: [
           ...result.rapport.map((c) => {
             const pair = firstNames(content, [c.a, c.b])
-            return c.relation === 'neither' ? `${pair} are no longer ${relationBetween(state, c.a, c.b)}` : `${pair} are now ${c.relation}`
+            return c.relation === 'neither' ? t('shell.app.noLonger', { pair, relation: relationBetween(state, c.a, c.b) }) : t('shell.app.nowRelation', { pair, relation: c.relation })
           }),
           ...revealed.map((r) => describeLearned(content, r.loveInterestId, r.factId)).filter((line): line is string => line !== undefined)
         ],
@@ -1349,7 +1368,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       setScene(null)
       setEnded(false)
       setLastPrompt('')
-      setNotice(pay > 0 ? `You were paid $${pay} for your shift${bonus > 0 ? `, ${bonus}% of it over the rate for your stats` : ''}.` : '')
+      setNotice(pay > 0 ? t('shell.app.paid', { pay, bonus, extra: bonus > 0 }) : '')
       setPanel(null)
     } catch (error) {
       setNotice(errorMessage(error))
@@ -1406,7 +1425,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         <ExpeditionView content={content} state={state} onChange={setState} />
       ) : summary ? (
         <SummaryView
-          content={summary.scene.npc ? withNpc(content, summary.scene.loveInterestId) : inMasks(content, summary.scene, true)}
+          content={withStrangers(summary.scene.npc ? withNpc(content, summary.scene.loveInterestId) : inMasks(content, summary.scene, true), summary.scene)}
           state={state}
           summary={summary}
           backgroundId={summary.scene.viewId ?? backgroundId}
@@ -1430,7 +1449,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         />
       ) : scene ? (
         <SceneView
-          content={cast}
+          content={shownCast}
+          speakers={cast}
           state={state}
           scene={scene}
           backgroundId={scene.viewId ?? backgroundId}
@@ -1456,10 +1476,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
             setState(acceptProposal(state, scene.proposal))
             setScene({ ...scene, proposal: undefined })
             setNotice('')
-            setAgreed(
-              `${scene.proposal.title} with ${firstNames(content, attendees(scene.proposal))}: ` +
-                `${describeWhen(content, scene.proposal.time)}. Added to your calendar.`
-            )
+            setAgreed(t('shell.app.planAdded', { plan: scene.proposal.title, who: firstNames(content, attendees(scene.proposal)), when: describeWhen(content, scene.proposal.time) }))
           }}
           onDeclineProposal={() => setScene({ ...scene, proposal: undefined })}
           onAnimationEnd={() => setScene((current) => current && { ...current, animationId: undefined, animationOf: undefined })}
@@ -1469,7 +1486,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
             setScene({ ...scene, bondProposal: undefined })
             if (!accept) return
             setState(acceptBond(content, state, asked))
-            setAgreed(`${describeBond(content, asked)}: agreed.`)
+            setAgreed(t('shell.app.bondAgreed', { bond: describeBond(content, asked) }))
           }}
           agreed={agreed}
           rolls={rolls}
@@ -1546,7 +1563,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
             if (result.scene) {
               setNotice('')
               setScene(result.scene)
-            } else setNotice(`It was ${firstNames(content, [dancerId])}. She is hurt you did not know her.`)
+            } else setNotice(t('shell.app.wrongGuess', { who: firstNames(content, [dancerId]) }))
           }}
         />
       )}
@@ -1574,7 +1591,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       {dawn && <DawnTransition content={content} state={state} onDone={endDawn} />}
 
       {panel?.kind === 'gifts' && scene && partner && (
-        <Dialog title="Your bag" onClose={close} sounds={['bagOpen', 'bagClose']} ornate>
+        <Dialog title={t('shell.app.bag')} onClose={close} sounds={['bagOpen', 'bagClose']} ornate>
           <Bag
             content={content}
             state={state}
@@ -1610,7 +1627,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
 
       {/* Out of a scene, a thing is used on himself: what is for a woman waits until he is with her. */}
       {panel?.kind === 'bag' && !scene && (
-        <Dialog title="Your bag" onClose={close} sounds={['bagOpen', 'bagClose']} ornate>
+        <Dialog title={t('shell.app.bag')} onClose={close} sounds={['bagOpen', 'bagClose']} ornate>
           <Bag
             content={content}
             state={state}
@@ -1630,7 +1647,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       )}
 
       {panel?.kind === 'courier' && (
-        <PhonePanel content={content} state={state} onChange={applyUpdate} onClose={close} initialId={panel.id} initialChat={panel.chat} app={panel.app} onGoToInvite={scene || summary ? undefined : goToInvite} canAct={!scene && !summary} />
+        <PhonePanel content={withStrangers(content, scene)} state={state} feedError={feedError && feedError.seed === state.weatherSeed && feedError.day === toDate(content.calendar, state.time).dayIndex ? feedError.message : undefined} onChange={applyUpdate} onClose={close} initialId={panel.id} initialChat={panel.chat} app={panel.app} onGoToInvite={scene || summary ? undefined : goToInvite} canAct={!scene && !summary} />
       )}
       <div className="toasts">
       {!scene && notice && (
@@ -1646,7 +1663,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       {toast && (
         <div className="toast" role="status" onClick={() => setToast(null)}>
           <strong>{toast.title}</strong>
-          {toast.gains.length === 0 && <span>Nothing came of it.</span>}
+          {toast.gains.length === 0 && <span>{t('shell.app.nothingCame')}</span>}
           {toast.gains.map((g) => (
             <span key={g.label} className={g.to > g.from ? 'up' : 'down'}>
               <span className="caps">{g.label}</span> {g.to > g.from ? '+' : '−'}
@@ -1660,11 +1677,11 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       )}
       </div>
       {panel?.kind === 'endDay' && (
-        <Dialog title="End the day" onClose={close} narrow noClose>
-          <p>You turn in and sleep until 06:00 tomorrow. Anything still to come today is let go.</p>
+        <Dialog title={t('shell.app.endDayTitle')} onClose={close} narrow noClose>
+          <p>{t('shell.app.endDayBody')}</p>
           {dayMisses(content, state).length > 0 && (
             <div className="notice">
-              <strong>You would miss:</strong>
+              <strong>{t('shell.app.wouldMiss')}</strong>
               <ul className="blockers">
                 {dayMisses(content, state).map((line) => (
                   <li key={line}>{line}</li>
@@ -1680,10 +1697,10 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
                 close()
               }}
             >
-              {dayMisses(content, state).length > 0 ? 'Sleep anyway' : 'Sleep'}
+              {dayMisses(content, state).length > 0 ? t('shell.app.sleepAnyway') : t('shell.app.sleep')}
             </button>
             <button className="secondary" onClick={close}>
-              Stay up
+              {t('shell.app.stayUp')}
             </button>
           </div>
         </Dialog>
@@ -1701,13 +1718,13 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       )}
       {panel?.kind === 'menu' && (
         // Back to the game is Escape, the mouse's back button, or a press outside it.
-        <Dialog title="Menu" onClose={close} narrow ornate noClose>
+        <Dialog title={t('shell.app.menu')} onClose={close} narrow ornate noClose>
           <div className="pause-menu">
-            <GrandButton label="Save" icon={<SaveIcon size={22} />} onClick={() => setPanel({ kind: 'save' })} />
-            <GrandButton label="Load" icon={<LoadIcon size={22} />} onClick={() => setPanel({ kind: 'load' })} />
-            <GrandButton label="Settings" icon={<GearIcon size={22} />} onClick={() => setPanel({ kind: 'settings' })} />
-            <GrandButton label="Exit to title" icon={<JobIcon name="door" size={22} />} onClick={onExit} />
-            <GrandButton label="Quit to desktop" icon={<PowerIcon size={22} />} onClick={() => window.close()} />
+            <GrandButton label={t('shell.app.save')} icon={<SaveIcon size={22} />} onClick={() => setPanel({ kind: 'save' })} />
+            <GrandButton label={t('shell.app.load')} icon={<LoadIcon size={22} />} onClick={() => setPanel({ kind: 'load' })} />
+            <GrandButton label={t('shell.app.settings')} icon={<GearIcon size={22} />} onClick={() => setPanel({ kind: 'settings' })} />
+            <GrandButton label={t('shell.app.exitToTitle')} icon={<JobIcon name="door" size={22} />} onClick={onExit} />
+            <GrandButton label={t('shell.app.quit')} icon={<PowerIcon size={22} />} onClick={() => window.close()} />
           </div>
         </Dialog>
       )}
@@ -1760,7 +1777,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         </Dialog>
       )}
       {panel?.kind === 'log' && scene && partner && (
-        <Dialog title="Log" onClose={close} wide ornate>
+        <Dialog title={t('shell.app.log')} onClose={close} wide ornate>
           <ol className="log sheet">
             {scene.messages.map((m, i) => (
               <li key={i} className={m.role}>
@@ -1772,10 +1789,10 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
               </li>
             ))}
           </ol>
-          {scene.messages.length === 0 && <p className="hint">Nothing has been said yet.</p>}
+          {scene.messages.length === 0 && <p className="hint">{t('shell.app.nothingSaid')}</p>}
           {lastPrompt && (
             <details className="log-prompt">
-              <summary>System prompt sent for the last message</summary>
+              <summary>{t('shell.app.lastPrompt')}</summary>
               <pre>{lastPrompt}</pre>
             </details>
           )}

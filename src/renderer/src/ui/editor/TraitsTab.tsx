@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { slugify, type EditorInfo, type EditorResult } from '../../../../shared/editor'
 import type { ContentPack, LoveInterest, Trait } from '../../../../shared/model'
 import { Text } from './fields'
+import { t } from '../../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -38,22 +39,22 @@ export function TraitsTab({ content, info, draft, set, onResult }: Props) {
   const trait = editing?.trait
   const patch = (change: Partial<Trait>) => editing && setEditing({ ...editing, trait: { ...editing.trait, ...change } })
   const has = (id: string) => draft.traitIds.includes(id)
-  const toggle = (id: string) => set({ traitIds: has(id) ? draft.traitIds.filter((t) => t !== id) : [...draft.traitIds, id] })
-  const picked = draft.traitIds.flatMap((id) => content.traits.filter((t) => t.id === id))
+  const toggle = (id: string) => set({ traitIds: has(id) ? draft.traitIds.filter((one) => one !== id) : [...draft.traitIds, id] })
+  const picked = draft.traitIds.flatMap((id) => content.traits.filter((one) => one.id === id))
   const first = draft.name.split(' ')[0] || 'Their'
 
   const form = editing && trait && (
     <div className="card trait-form">
       <div className="row">
-        <Text label="Name" value={trait.name} onChange={(name) => patch(editing.isNew ? { name, id: slugify(name) } : { name })} />
-        <Text label="Id" value={trait.id} disabled={!editing.isNew} onChange={(id) => patch({ id: slugify(id) })} />
+        <Text label={t('editor.common.name')} value={trait.name} onChange={(name) => patch(editing.isNew ? { name, id: slugify(name) } : { name })} />
+        <Text label={t('editor.common.id')} value={trait.id} disabled={!editing.isNew} onChange={(id) => patch({ id: slugify(id) })} />
       </div>
       <Text
-        label="Definition"
+        label={t('editor.traits.definition')}
         value={trait.definition}
         onChange={(definition) => patch({ definition })}
         rows={3}
-        hint="What the trait is and how it shows in what the character says and does. Given to the LLM as written."
+        hint={t('editor.traits.definitionHint')}
       />
       {issues.map((issue) => (
         <p key={issue} className="notice">
@@ -62,15 +63,15 @@ export function TraitsTab({ content, info, draft, set, onResult }: Props) {
       ))}
       <div className="actions">
         <Button variant="primary" onClick={() => apply(window.api.editor.saveTrait(trait))}>
-          Save trait
+          {t('editor.traits.save')}
         </Button>
         {!editing.isNew && info.traits[trait.id] !== 'base' && (
           <Button onClick={() => apply(window.api.editor.deleteTrait(trait.id))}>
-            {info.traits[trait.id] === 'addon' ? 'Delete trait' : 'Put back the original'}
+            {info.traits[trait.id] === 'addon' ? t('editor.traits.delete') : t('editor.common.putBack')}
           </Button>
         )}
         <Button variant="quiet" onClick={() => setEditing(null)}>
-          Cancel
+          {t('editor.common.cancel')}
         </Button>
       </div>
     </div>
@@ -80,45 +81,45 @@ export function TraitsTab({ content, info, draft, set, onResult }: Props) {
     <div className="traits">
       <aside className="trait-rail">
         <Button variant="primary" disabled={editing?.isNew} onClick={() => open(BLANK, true)}>
-          New trait
+          {t('editor.traits.new')}
         </Button>
         <span className="field-label">
-          {first === 'Their' ? 'Their traits' : `${first}'s traits`} · {picked.length}
+          {first === 'Their' ? t('editor.traits.theirs') : t('editor.traits.hers', { name: first })} · {picked.length}
         </span>
         <div className="trait-picked">
-          {picked.length === 0 && <span className="hint">None yet. Pick them from the list.</span>}
-          {picked.map((t) => (
-            <span key={t.id} className="pill" title={t.definition}>
-              {t.name}
-              <button type="button" aria-label={`Remove ${t.name}`} title={`Remove ${t.name}`} onClick={() => toggle(t.id)}>
+          {picked.length === 0 && <span className="hint">{t('editor.traits.none')}</span>}
+          {picked.map((one) => (
+            <span key={one.id} className="pill" title={one.definition}>
+              {one.name}
+              <button type="button" aria-label={t('editor.common.removeNamed', { name: one.name })} title={t('editor.common.removeNamed', { name: one.name })} onClick={() => toggle(one.id)}>
                 ×
               </button>
             </span>
           ))}
         </div>
         <span className="hint">
-          Each trait's definition is given to the LLM whenever the character speaks. Traits are shared by every character: changing one changes it for all of them.
+          {t('editor.traits.hint')}
         </span>
       </aside>
 
       <div className="trait-list">
         {editing?.isNew && form}
-        {content.traits.map((t) =>
-          editing && !editing.isNew && editing.trait.id === t.id ? (
-            <div key={t.id}>{form}</div>
+        {content.traits.map((one) =>
+          editing && !editing.isNew && editing.trait.id === one.id ? (
+            <div key={one.id}>{form}</div>
           ) : (
-            <div key={t.id} className={has(t.id) ? 'trait-row picked' : 'trait-row'}>
+            <div key={one.id} className={has(one.id) ? 'trait-row picked' : 'trait-row'}>
               <label className="trait-pick">
-                <input type="checkbox" checked={has(t.id)} onChange={() => toggle(t.id)} />
+                <input type="checkbox" checked={has(one.id)} onChange={() => toggle(one.id)} />
                 <span className="trait-text">
-                  <strong>{t.name}</strong>
-                  <span>{t.definition}</span>
+                  <strong>{one.name}</strong>
+                  <span>{one.definition}</span>
                 </span>
               </label>
               {/* Editing the game's own files, every trait is the game's own: there is no add-on to tell apart. */}
-              {!info.base && info.traits[t.id] === 'addon' && <span className="chip">add-on</span>}
-              <Button variant="quiet" size="small" onClick={() => open(t, false)}>
-                Edit
+              {!info.base && info.traits[one.id] === 'addon' && <span className="chip">{t('editor.common.addon')}</span>}
+              <Button variant="quiet" size="small" onClick={() => open(one, false)}>
+                {t('editor.common.edit')}
               </Button>
             </div>
           )

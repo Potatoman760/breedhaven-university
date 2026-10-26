@@ -43,6 +43,13 @@ export type CourseMeeting = z.infer<typeof CourseMeetingSchema>
 /** A course in the catalogue. Built in the editor before a game starts, and kept in the save. */
 export const CourseSchema = z.object({
   id: z.string(),
+  /**
+   * A course too full for everyone who wants it is given more than once. Each further section is a class of its own,
+   * with its own hours and roll, and names here the course it is a section of and which section it is. The first
+   * section is the course itself, and has neither.
+   */
+  courseId: z.string().optional(),
+  section: z.number().int().min(2).optional(),
   /** Catalog number, e.g. `POL 132`. */
   number: z.string(),
   title: z.string(),

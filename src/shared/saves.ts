@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { PackedTurnSchema } from './game/turns'
 import { GameStateSchema, SceneSchema } from './model'
+import { t } from './i18n'
 
 /** Bump when the save format changes in a way older code can't read. */
 export const SAVE_VERSION = 1
@@ -65,7 +66,7 @@ export type SaveSummary = { slotId: SlotId; savedAt: string } & (
 )
 
 export function slotLabel(slotId: SlotId): string {
-  return slotId === AUTO_SLOT_ID ? 'Autosave' : `Slot ${slotId.slice(4)}`
+  return slotId === AUTO_SLOT_ID ? t('llm.saves.autosave') : t('llm.saves.slot', { n: slotId.slice(4) })
 }
 
 /** What a save goes by: the name the player gave it, or failing one, the name of its slot. */

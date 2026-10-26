@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { t } from '../i18n'
 import { DramaConfigSchema } from './drama'
 import { ExpeditionConfigSchema, HIM } from './expedition'
 import { HousingConfigSchema } from './housing'
@@ -78,7 +79,7 @@ export type ContentPack = z.infer<typeof ContentPackSchema>
 
 export class ContentError extends Error {
   constructor(public readonly issues: string[]) {
-    super(`Invalid content pack:\n${issues.map((i) => `  - ${i}`).join('\n')}`)
+    super(t('game.content.invalid', { issues: issues.map((i) => `  - ${i}`).join('\n') }))
     this.name = 'ContentError'
   }
 }
@@ -104,6 +105,9 @@ export function validateContentPack(raw: unknown): ContentPack {
   return data
 }
 
+// What a reference that leads nowhere was meant to be, as its message names it.
+type Thing = 'ambience' | 'booth' | 'calendarEvent' | 'character' | 'codexEntry' | 'enemy' | 'item' | 'location' | 'loveInterest' | 'month' | 'outfit' | 'period' | 'relationshipStage' | 'society' | 'pregnancyStage' | 'trait' | 'weekday' | 'weather' | 'course' | 'college'
+
 function checkReferences(pack: ContentPack): string[] {
   const issues: string[] = []
   const { calendar } = pack
@@ -111,13 +115,16 @@ function checkReferences(pack: ContentPack): string[] {
   const idSet = (items: { id: string }[], label: string): Set<string> => {
     const seen = new Set<string>()
     for (const item of items) {
-      if (seen.has(item.id)) issues.push(`${label}: duplicate id "${item.id}"`)
+      if (seen.has(item.id)) issues.push(t('game.content.duplicateId', { where: label, id: item.id }))
       seen.add(item.id)
     }
     return seen
   }
-  const need = (set: Set<string>, id: string, where: string, what: string): void => {
-    if (!set.has(id)) issues.push(`${where}: unknown ${what} "${id}"`)
+  const unknown = (where: string, what: Thing, id: string): void => {
+    issues.push(t('game.content.unknown', { where, what: t(`game.content.thing.${what}`), id }))
+  }
+  const need = (set: Set<string>, id: string, where: string, what: Thing): void => {
+    if (!set.has(id)) unknown(where, what, id)
   }
 
   idSet(calendar.months, 'calendar.months')
@@ -126,7 +133,7 @@ function checkReferences(pack: ContentPack): string[] {
   const stages = idSet(pack.relationships.stages, 'relationships.stages')
   idSet(pack.relationships.statuses, 'relationships.statuses')
   pack.relationships.statuses.forEach((status, i) => {
-    if (status.minStage) need(stages, status.minStage, `relationships.statuses[${i}].minStage`, 'relationship stage')
+    if (status.minStage) need(stages, status.minStage, `relationships.statuses[${i}].minStage`, 'relationshipStage')
   })
   const traits = idSet(pack.traits, 'traits')
   const locations = idSet(pack.locations, 'locations')
@@ -137,12 +144,12 @@ function checkReferences(pack: ContentPack): string[] {
 
   const checkMonthDay = (monthId: string, day: number, where: string): void => {
     const month = calendar.months.find((m) => m.id === monthId)
-    if (!month) issues.push(`${where}: unknown month "${monthId}"`)
-    else if (day > month.days) issues.push(`${where}: ${month.name} has only ${month.days} days`)
+    if (!month) unknown(where, 'month', monthId)
+    else if (day > month.days) issues.push(t('game.content.shortMonth', { where, month: month.name, days: month.days }))
   }
   const checkHour = (hour: number | undefined, where: string): void => {
     if (hour !== undefined && hour >= calendar.hoursPerDay) {
-      issues.push(`${where}: hour ${hour} is outside a ${calendar.hoursPerDay}-hour day`)
+      issues.push(t('game.content.hourOutside', { where, hour, hours: calendar.hoursPerDay }))
     }
   }
   const checkWhen = (
@@ -154,17 +161,17 @@ function checkReferences(pack: ContentPack): string[] {
   }
   const checkRule = (rule: Condition | Effect, where: string): void => {
     if ('loveInterestId' in rule && rule.loveInterestId !== undefined) {
-      need(loveInterests, rule.loveInterestId, where, 'love interest')
+      need(loveInterests, rule.loveInterestId, where, 'loveInterest')
     }
-    if (rule.type === 'stage') need(stages, rule.min, where, 'relationship stage')
-    if (rule.type === 'unlockCodex') need(codex, rule.entryId, where, 'codex entry')
-    if (rule.type === 'event') need(events, rule.eventId, where, 'calendar event')
+    if (rule.type === 'stage') need(stages, rule.min, where, 'relationshipStage')
+    if (rule.type === 'unlockCodex') need(codex, rule.entryId, where, 'codexEntry')
+    if (rule.type === 'event') need(events, rule.eventId, where, 'calendarEvent')
   }
 
   checkMonthDay(calendar.start.month, calendar.start.day, 'calendar.start')
   checkHour(calendar.start.hour, 'calendar.start')
   if (calendar.startWeekday >= calendar.weekdays.length) {
-    issues.push('calendar.startWeekday: index is past the end of weekdays')
+    issues.push(t('game.content.startWeekday', { where: 'calendar.startWeekday' }))
   }
   for (const p of calendar.periods) checkHour(p.startHour, `calendar.periods.${p.id}`)
   idSet(calendar.weather, 'calendar.weather')
@@ -176,13 +183,13 @@ function checkReferences(pack: ContentPack): string[] {
   // Written lines read with nothing to answer: who says them has to be someone, and where, somewhere with that view.
   const checkCutscene = (intro: Intro, where: string): void => {
     const speaker = [...pack.npcs, ...pack.loveInterests].find((character) => character.id === intro.speakerId)
-    if (!speaker) issues.push(`${where}.speakerId: unknown character "${intro.speakerId}"`)
-    else if (intro.outfitId !== undefined && !speaker.outfits.some((outfit) => outfit.id === intro.outfitId)) issues.push(`${where}.outfitId: "${speaker.id}" has no outfit "${intro.outfitId}"`)
+    if (!speaker) unknown(`${where}.speakerId`, 'character', intro.speakerId)
+    else if (intro.outfitId !== undefined && !speaker.outfits.some((outfit) => outfit.id === intro.outfitId)) issues.push(t('game.content.noOutfit', { where: `${where}.outfitId`, owner: speaker.id, id: intro.outfitId }))
     intro.scenes.forEach((scene, i) => {
-      for (const id of scene.castIds ?? []) if (![...pack.npcs, ...pack.loveInterests].some((character) => character.id === id)) issues.push(`${where}.scenes[${i}].castIds: unknown character "${id}"`)
+      for (const id of scene.castIds ?? []) if (![...pack.npcs, ...pack.loveInterests].some((character) => character.id === id)) unknown(`${where}.scenes[${i}].castIds`, 'character', id)
       const place = pack.locations.find((l) => l.id === scene.locationId)
-      if (!place) issues.push(`${where}.scenes[${i}]: unknown location "${scene.locationId}"`)
-      else if (scene.backgroundId !== undefined && !place.backgrounds.some((view) => view.id === scene.backgroundId)) issues.push(`${where}.scenes[${i}]: "${place.id}" has no view "${scene.backgroundId}"`)
+      if (!place) unknown(`${where}.scenes[${i}]`, 'location', scene.locationId)
+      else if (scene.backgroundId !== undefined && !place.backgrounds.some((view) => view.id === scene.backgroundId)) issues.push(t('game.content.noView', { where: `${where}.scenes[${i}]`, owner: place.id, id: scene.backgroundId }))
     })
   }
 
@@ -191,24 +198,24 @@ function checkReferences(pack: ContentPack): string[] {
     if (e.locationId !== undefined) {
       need(locations, e.locationId, `calendar.events.${e.id}`, 'location')
     }
-    if (e.weatherId !== undefined && !calendar.weather.some((w) => w.id === e.weatherId)) issues.push(`calendar.events.${e.id}: unknown weather "${e.weatherId}"`)
+    if (e.weatherId !== undefined && !calendar.weather.some((w) => w.id === e.weatherId)) unknown(`calendar.events.${e.id}`, 'weather', e.weatherId)
     idSet(e.program, `calendar.events.${e.id}.program`)
     for (const part of e.program) {
       const where = `calendar.events.${e.id}.program.${part.id}`
-      if (part.day > e.durationDays) issues.push(`${where}: day ${part.day} is after the event is over`)
+      if (part.day > e.durationDays) issues.push(t('game.content.dayAfterEvent', { where, day: part.day }))
       checkHour(part.startHour, where)
       if (part.locationId !== undefined) need(locations, part.locationId, where, 'location')
       if (part.masquerade) {
         const ball = part.masquerade
-        if (!pack.loveInterests.some((li) => li.id === ball.standInId)) issues.push(`${where}: the stand-in "${ball.standInId}" is not a love interest`)
+        if (!pack.loveInterests.some((li) => li.id === ball.standInId)) issues.push(t('game.content.standIn', { where, id: ball.standInId }))
         const place = pack.locations.find((l) => l.id === (part.locationId ?? e.locationId))
-        if (place && !place.backgrounds.some((view) => view.id === ball.privateViewId)) issues.push(`${where}: ${place.name} has no view "${ball.privateViewId}"`)
+        if (place && !place.backgrounds.some((view) => view.id === ball.privateViewId)) issues.push(t('game.content.noViewNamed', { where, owner: place.name, id: ball.privateViewId }))
         idSet(ball.masks, `${where}.masquerade.masks`)
       }
-      else if (e.locationId === undefined) issues.push(`${where}: needs a place, since the event has none`)
+      else if (e.locationId === undefined) issues.push(t('game.content.partNeedsPlace', { where }))
       const partPlace = pack.locations.find((l) => l.id === (part.locationId ?? e.locationId))
-      if (part.viewId !== undefined && partPlace && !partPlace.backgrounds.some((view) => view.id === part.viewId)) issues.push(`${where}.viewId: "${partPlace.id}" has no view "${part.viewId}"`)
-      for (const id of part.castIds ?? []) if (!pack.loveInterests.some((li) => li.id === id)) issues.push(`${where}: unknown love interest "${id}"`)
+      if (part.viewId !== undefined && partPlace && !partPlace.backgrounds.some((view) => view.id === part.viewId)) issues.push(t('game.content.noView', { where: `${where}.viewId`, owner: partPlace.id, id: part.viewId }))
+      for (const id of part.castIds ?? []) if (!pack.loveInterests.some((li) => li.id === id)) unknown(where, 'loveInterest', id)
       if (part.cutscene) checkCutscene(part.cutscene, `${where}.cutscene`)
     }
   }
@@ -232,7 +239,7 @@ function checkReferences(pack: ContentPack): string[] {
   for (const c of pack.codex) {
     const where = `codex.${c.id}`
     for (const id of c.relatedLocationIds) need(locations, id, where, 'location')
-    for (const id of c.relatedCharacterIds) need(loveInterests, id, where, 'love interest')
+    for (const id of c.relatedCharacterIds) need(loveInterests, id, where, 'loveInterest')
     for (const r of c.unlockWhen) checkRule(r, `${where}.unlockWhen`)
   }
 
@@ -243,10 +250,10 @@ function checkReferences(pack: ContentPack): string[] {
     need(outfits, li.defaultOutfitId, where, 'outfit')
     idSet(li.animations, `${where}.animations`)
     for (const id of [...li.friends, ...li.enemies]) {
-      if (id === li.id || !pack.loveInterests.some((other) => other.id === id)) issues.push(`${where}: "${id}" among her friends or enemies is not another love interest`)
+      if (id === li.id || !pack.loveInterests.some((other) => other.id === id)) issues.push(t('game.content.notAnother', { where, id }))
     }
-    if (li.kind === 'student' && !li.studies) issues.push(`${where}: a student needs "studies"`)
-    if (li.kind === 'teacher' && !li.teaching) issues.push(`${where}: a teacher needs "teaching"`)
+    if (li.kind === 'student' && !li.studies) issues.push(t('game.content.studentNeeds', { where, field: 'studies' }))
+    if (li.kind === 'teacher' && !li.teaching) issues.push(t('game.content.teacherNeeds', { where, field: 'teaching' }))
     if (li.birthday) checkMonthDay(li.birthday.month, li.birthday.day, `${where}.birthday`)
     for (const s of li.schedule) {
       need(locations, s.locationId, `${where}.schedule`, 'location')
@@ -261,7 +268,7 @@ function checkReferences(pack: ContentPack): string[] {
   idSet(pack.npcs, 'npcs')
   for (const npc of pack.npcs) {
     const where = `npcs.${npc.id}`
-    if (loveInterests.has(npc.id)) issues.push(`${where}: a love interest already has this id`)
+    if (loveInterests.has(npc.id)) issues.push(t('game.content.npcClash', { where }))
     const outfits = idSet(npc.outfits, `${where}.outfits`)
     need(outfits, npc.defaultOutfitId, where, 'outfit')
     for (const s of npc.schedule) {
@@ -280,7 +287,7 @@ function checkReferences(pack: ContentPack): string[] {
   })
   if (pack.societies) {
     const { societies } = pack
-    need(events, societies.fairId, 'societies.fairId', 'calendar event')
+    need(events, societies.fairId, 'societies.fairId', 'calendarEvent')
     idSet(societies.societies, 'societies')
     for (const society of societies.societies) {
       const where = `societies (${society.id})`
@@ -289,25 +296,25 @@ function checkReferences(pack: ContentPack): string[] {
       checkHour(society.startHour + societies.hours - 1, where)
       // A society is a students' club, and as small as a class, so that a meeting is time with the few in it.
       for (const id of society.memberIds) {
-        need(loveInterests, id, where, 'love interest')
+        need(loveInterests, id, where, 'loveInterest')
         const li = pack.loveInterests.find((one) => one.id === id)
-        if (li && kindOf(li) !== 'student') issues.push(`${where}: ${li.name} is not a student`)
+        if (li && kindOf(li) !== 'student') issues.push(t('game.content.notStudent', { where, name: li.name }))
       }
-      if (new Set(society.memberIds).size !== society.memberIds.length) issues.push(`${where}: a member is listed twice`)
-      if (new Set(society.adultEvents.map((event) => event.meeting)).size !== society.adultEvents.length) issues.push(`${where}: two events are set for the same meeting`)
+      if (new Set(society.memberIds).size !== society.memberIds.length) issues.push(t('game.content.memberTwice', { where }))
+      if (new Set(society.adultEvents.map((event) => event.meeting)).size !== society.adultEvents.length) issues.push(t('game.content.eventsSameMeeting', { where }))
       society.adultEvents.forEach((event, i) => {
         checkCutscene(event.intro, `${where}.adultEvents[${i}].intro`)
         for (const held of event.reserved) {
-          need(loveInterests, held.loveInterestId, `${where}.adultEvents[${i}].reserved`, 'love interest')
+          need(loveInterests, held.loveInterestId, `${where}.adultEvents[${i}].reserved`, 'loveInterest')
           if (held.ifIntimate) checkCutscene(held.ifIntimate.intro, `${where}.adultEvents[${i}].reserved (${held.loveInterestId})`)
         }
       })
       if (society.sponsorId) {
-        need(loveInterests, society.sponsorId, where, 'love interest')
+        need(loveInterests, society.sponsorId, where, 'loveInterest')
         const sponsor = pack.loveInterests.find((one) => one.id === society.sponsorId)
-        if (sponsor && kindOf(sponsor) !== 'teacher') issues.push(`${where}: its sponsor, ${sponsor.name}, is not a teacher`)
+        if (sponsor && kindOf(sponsor) !== 'teacher') issues.push(t('game.content.sponsorNotTeacher', { where, name: sponsor.name }))
       }
-      if (society.memberIds.length > societies.maxMembers) issues.push(`${where}: ${society.memberIds.length} members, and a society holds ${societies.maxMembers}`)
+      if (society.memberIds.length > societies.maxMembers) issues.push(t('game.content.tooManyMembers', { where, count: society.memberIds.length, max: societies.maxMembers }))
     }
     if (societies.fair) {
       const { fair } = societies
@@ -336,39 +343,49 @@ function checkReferences(pack: ContentPack): string[] {
     checkHour(pack.coursework.dayStart, 'coursework.dayStart')
     checkHour(pack.coursework.dayEnd - 1, 'coursework.dayEnd')
     if (pack.coursework.dayEnd - pack.coursework.dayStart < Math.max(pack.coursework.lectureHours, pack.coursework.labHours)) {
-      issues.push('coursework: the teaching day is shorter than a class')
+      issues.push(t('game.content.shortDay', { where: 'coursework' }))
     }
     for (const entry of pack.syllabus) {
       // Written with its course in a curriculum, a syllabus cannot be for a course there is not; some of those courses are simply not given this term.
-      if (!pack.curriculum && pack.catalogue && !pack.catalogue.courses.some((course) => course.id === entry.courseId)) issues.push(`syllabus: unknown course "${entry.courseId}"`)
+      if (!pack.curriculum && pack.catalogue && !pack.catalogue.courses.some((course) => course.id === entry.courseId)) unknown('syllabus', 'course', entry.courseId)
     }
     for (const skill of pack.skills) {
-      if (!pack.curriculum && pack.catalogue && !pack.catalogue.courses.some((course) => course.code === skill.code)) issues.push(`skills (${skill.id}): no course of the subject "${skill.code}" teaches it`)
+      if (!pack.curriculum && pack.catalogue && !pack.catalogue.courses.some((course) => course.code === skill.code)) issues.push(t('game.content.skillNoCourse', { where: `skills (${skill.id})`, code: skill.code }))
     }
     // A class is time with the love interests in it: one with none is an empty hour, and one with too many is a crowd.
-    for (const course of pack.catalogue?.courses ?? []) {
+    const given = pack.catalogue?.courses ?? []
+    idSet(given, 'catalogue.courses')
+    for (const course of given) {
+      const label = course.section ? t('game.content.sectionLabel', { number: course.number, section: course.section }) : course.number
       const inClass = course.studentIds.length + (course.teacherId ? 1 : 0)
       // Those who read the subject sit its course whoever else is there; the cap is on the ones passing through.
       const reading = course.studentIds.filter((id) => pack.loveInterests.find((li) => li.id === id)?.studies?.code === course.code).length
       const most = reading > 0 ? Math.max(pack.coursework.maxPerClass, pack.coursework.maxMajorClass) : pack.coursework.maxPerClass
-      if (inClass === 0) issues.push(`catalogue (${course.number}): no love interest takes or teaches it`)
-      if (inClass > most) issues.push(`catalogue (${course.number}): ${inClass} love interests are in it, and a class holds ${most}`)
+      if (inClass === 0) issues.push(t('game.content.emptyClass', { where: `catalogue (${label})` }))
+      if (inClass > most) issues.push(t('game.content.crowdedClass', { where: `catalogue (${label})`, count: inClass, most }))
+      // A section is of a course there is, and no student sits two sections of one course.
+      if (course.section && !given.some((one) => one.id === course.courseId)) issues.push(t('game.content.sectionOfMissing', { where: `catalogue (${label})`, id: course.courseId }))
+      for (const id of course.studentIds) {
+        if (given.some((one) => one !== course && (one.courseId ?? one.id) === (course.courseId ?? course.id) && one.studentIds.includes(id) && given.indexOf(one) < given.indexOf(course))) {
+          issues.push(t('game.content.twoSections', { where: `catalogue (${label})`, id }))
+        }
+      }
     }
     // Nobody makes a subject up: what a character studies or teaches is one the curriculum has written.
     if (pack.curriculum) {
       const majors = pack.curriculum.majors
       idSet(majors.map((major) => ({ id: major.code })), 'curriculum.majors')
       for (const major of majors) {
-        if (!pack.curriculum.colleges.some((college) => college.id === major.college)) issues.push(`curriculum (${major.code}): unknown college "${major.college}"`)
-        if (new Set(major.courses.map((course) => course.number)).size !== major.courses.length) issues.push(`curriculum (${major.code}): two courses share a number`)
-        if (major.general && major.courses.length !== 1) issues.push(`curriculum (${major.code}): a general subject has one course`)
+        if (!pack.curriculum.colleges.some((college) => college.id === major.college)) unknown(`curriculum (${major.code})`, 'college', major.college)
+        if (new Set(major.courses.map((course) => course.number)).size !== major.courses.length) issues.push(t('game.content.sharedNumber', { where: `curriculum (${major.code})` }))
+        if (major.general && major.courses.length !== 1) issues.push(t('game.content.generalOneCourse', { where: `curriculum (${major.code})` }))
       }
       for (const character of [...pack.loveInterests, ...pack.npcs]) {
         const read = character.studies
-        if (read && !majors.some((major) => major.code === read.code && !major.general)) issues.push(`${character.id}: studies "${read.code}", which is not a subject the curriculum has`)
+        if (read && !majors.some((major) => major.code === read.code && !major.general)) issues.push(t('game.content.unknownStudies', { where: character.id, code: read.code }))
         for (const taught of character.teaching?.subjects ?? []) {
           if (!majors.some((major) => major.code === taught.code && major.courses.some((course) => course.number === taught.number))) {
-            issues.push(`${character.id}: teaches ${taught.code} ${taught.number}, which the curriculum has not written`)
+            issues.push(t('game.content.unknownTeaching', { where: character.id, code: taught.code, number: taught.number }))
           }
         }
       }
@@ -378,11 +395,11 @@ function checkReferences(pack: ContentPack): string[] {
   const jobIds = new Set<string>()
   pack.jobs?.jobs.forEach((job, i) => {
     const at = `jobs[${i}] (${job.id})`
-    if (jobIds.has(job.id)) issues.push(`${at}: duplicate id`)
+    if (jobIds.has(job.id)) issues.push(t('game.content.duplicate', { where: at }))
     jobIds.add(job.id)
     need(locations, job.locationId, at, 'location')
     // The boss is usually an NPC; one who has been made a love interest keeps her job.
-    if (![...pack.npcs, ...pack.loveInterests].some((character) => character.id === job.bossId)) issues.push(`${at}: unknown character "${job.bossId}"`)
+    if (![...pack.npcs, ...pack.loveInterests].some((character) => character.id === job.bossId)) unknown(at, 'character', job.bossId)
     job.shifts.forEach((shift, n) => {
       checkWhen({ weekdays: [shift.weekday] }, `${at}.shifts[${n}]`)
       checkHour(shift.startHour, `${at}.shifts[${n}].startHour`)
@@ -409,7 +426,7 @@ function checkReferences(pack: ContentPack): string[] {
   if (pack.poker) {
     need(locations, pack.poker.locationId, 'poker.locationId', 'location')
     idSet(pack.poker.regulars, 'poker.regulars')
-    if (pack.poker.smallBlind > pack.poker.bigBlind || pack.poker.bigBlind > pack.poker.handCap) issues.push('poker: the blinds must rise and fit under the cap on a hand')
+    if (pack.poker.smallBlind > pack.poker.bigBlind || pack.poker.bigBlind > pack.poker.handCap) issues.push(t('game.content.blinds', { where: 'poker' }))
   }
 
   const ambience = new Set(Object.keys(pack.sounds.ambience))
@@ -421,62 +438,62 @@ function checkReferences(pack: ContentPack): string[] {
 
   if (pack.pregnancy) {
     const place = pack.locations.find((l) => l.id === pack.pregnancy?.birthLocationId)
-    if (!place) issues.push(`pregnancy.birthLocationId: unknown location "${pack.pregnancy.birthLocationId}"`)
+    if (!place) unknown('pregnancy.birthLocationId', 'location', pack.pregnancy.birthLocationId)
     else if (pack.pregnancy.birthViewId !== undefined && !place.backgrounds.some((view) => view.id === pack.pregnancy?.birthViewId)) {
-      issues.push(`pregnancy.birthViewId: "${place.id}" has no view "${pack.pregnancy.birthViewId}"`)
+      issues.push(t('game.content.noView', { where: 'pregnancy.birthViewId', owner: place.id, id: pack.pregnancy.birthViewId }))
     }
   }
 
   const housing = pack.housing
   if (housing) {
     const house = pack.locations.find((l) => l.id === housing.locationId)
-    if (!house) issues.push(`housing.locationId: unknown location "${housing.locationId}"`)
-    if (![...pack.npcs, ...pack.loveInterests].some((character) => character.id === housing.officerId)) issues.push(`housing.officerId: unknown character "${housing.officerId}"`)
-    need(loveInterests, housing.nannyId, 'housing.nannyId', 'love interest')
-    if (housing.viewing && !pack.locations.some((l) => l.id === housing.viewing?.meetLocationId)) issues.push(`housing.viewing.meetLocationId: unknown location "${housing.viewing.meetLocationId}"`)
-    if (housing.viewing && !pack.npcs.some((npc) => npc.id === housing.officerId)) issues.push('housing.viewing: the officer who shows the house must be an NPC')
+    if (!house) unknown('housing.locationId', 'location', housing.locationId)
+    if (![...pack.npcs, ...pack.loveInterests].some((character) => character.id === housing.officerId)) unknown('housing.officerId', 'character', housing.officerId)
+    need(loveInterests, housing.nannyId, 'housing.nannyId', 'loveInterest')
+    if (housing.viewing && !pack.locations.some((l) => l.id === housing.viewing?.meetLocationId)) unknown('housing.viewing.meetLocationId', 'location', housing.viewing.meetLocationId)
+    if (housing.viewing && !pack.npcs.some((npc) => npc.id === housing.officerId)) issues.push(t('game.content.officerNpc', { where: 'housing.viewing' }))
     if (housing.viewing) checkCutscene(housing.viewing.cutscene, 'housing.viewing.cutscene')
     idSet(housing.rooms.map((room) => ({ id: room.key })), 'housing.rooms')
     for (const role of ['master', 'nanny'] as const) {
-      if (housing.rooms.filter((room) => room.role === role).length !== 1) issues.push(`housing.rooms: there must be exactly one room of the role "${role}"`)
+      if (housing.rooms.filter((room) => room.role === role).length !== 1) issues.push(t('game.content.oneRoomOfRole', { where: 'housing.rooms', role }))
     }
     housing.rooms.forEach((room) => {
       const at = `housing.rooms (${room.key})`
-      if (house && !house.backgrounds.some((view) => view.id === room.viewId)) issues.push(`${at}: "${house.id}" has no view "${room.viewId}"`)
-      if (room.plan.floor >= housing.floors.length) issues.push(`${at}: there is no floor ${room.plan.floor}`)
-      if (room.plan.x + room.plan.w > housing.grid.columns || room.plan.y + room.plan.h > housing.grid.rows) issues.push(`${at}: its plan runs off the grid`)
+      if (house && !house.backgrounds.some((view) => view.id === room.viewId)) issues.push(t('game.content.noView', { where: at, owner: house.id, id: room.viewId }))
+      if (room.plan.floor >= housing.floors.length) issues.push(t('game.content.noFloor', { where: at, floor: room.plan.floor }))
+      if (room.plan.x + room.plan.w > housing.grid.columns || room.plan.y + room.plan.h > housing.grid.rows) issues.push(t('game.content.offGrid', { where: at }))
     })
     housing.homePeriods.forEach((period) => need(periods, period, 'housing.homePeriods', 'period'))
     const levels = housing.babies.levels.length
-    if (housing.babies.startLevel >= levels) issues.push('housing.babies.startLevel: there is no such level')
-    if (housing.babies.thrivingFrom >= levels) issues.push('housing.babies.thrivingFrom: there is no such level')
+    if (housing.babies.startLevel >= levels) issues.push(t('game.content.noSuchLevel', { where: 'housing.babies.startLevel' }))
+    if (housing.babies.thrivingFrom >= levels) issues.push(t('game.content.noSuchLevel', { where: 'housing.babies.thrivingFrom' }))
     housing.babies.caps.forEach((cap, i) => {
-      if (cap.level >= levels) issues.push(`housing.babies.caps[${i}]: there is no level ${cap.level}`)
+      if (cap.level >= levels) issues.push(t('game.content.noLevel', { where: `housing.babies.caps[${i}]`, level: cap.level }))
     })
   }
 
   const below = pack.expedition
   if (below) {
     need(locations, below.entryLocationId, 'expedition.entryLocationId', 'location')
-    if (below.guideId) need(loveInterests, below.guideId, 'expedition.guideId', 'love interest')
+    if (below.guideId) need(loveInterests, below.guideId, 'expedition.guideId', 'loveInterest')
     if (below.intro) checkCutscene(below.intro.cutscene, 'expedition.intro.cutscene')
-    if (loveInterests.has(HIM)) issues.push(`expedition: no character may have the id "${HIM}"`)
+    if (loveInterests.has(HIM)) issues.push(t('game.content.himId', { where: 'expedition', id: HIM }))
     const roles = idSet(below.roles, 'expedition.roles')
     below.roles.forEach((role) => idSet(role.actions, `expedition.roles (${role.id})`))
     const enemies = idSet(below.enemies, 'expedition.enemies')
     idSet(below.depths.map((depth) => depth.relic), 'expedition relics')
     below.depths.forEach((depth, i) => {
       const at = `expedition.depths[${i}]`
-      if (depth.nodes.at(-1)?.kind !== 'guardian') issues.push(`${at}: its last stop must be its guardian`)
+      if (depth.nodes.at(-1)?.kind !== 'guardian') issues.push(t('game.content.lastGuardian', { where: at }))
       depth.nodes.forEach((node) => {
         node.enemyIds.forEach((id) => need(enemies, id, at, 'enemy'))
-        if ((node.kind === 'fight' || node.kind === 'guardian') && node.enemyIds.length === 0) issues.push(`${at}: a fight with nothing to fight`)
+        if ((node.kind === 'fight' || node.kind === 'guardian') && node.enemyIds.length === 0) issues.push(t('game.content.emptyFight', { where: at }))
         Object.keys(node.finds.items).forEach((id) => need(items, id, at, 'item'))
       })
     })
-    for (const li of pack.loveInterests) if (li.partyRole && !roles.has(li.partyRole)) issues.push(`loveInterests.${li.id}: the role "${li.partyRole}" is not one the expedition has`)
+    for (const li of pack.loveInterests) if (li.partyRole && !roles.has(li.partyRole)) issues.push(t('game.content.unknownRole', { where: `loveInterests.${li.id}`, role: li.partyRole }))
     const stages = new Set((pack.pregnancy?.stages ?? []).map((stage) => stage.id))
-    Object.keys(below.pregnancyPower).forEach((id) => need(stages, id, 'expedition.pregnancyPower', 'stage of pregnancy'))
+    Object.keys(below.pregnancyPower).forEach((id) => need(stages, id, 'expedition.pregnancyPower', 'pregnancyStage'))
   }
 
   need(locations, pack.newGame.locationId, 'newGame', 'location')

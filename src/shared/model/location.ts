@@ -1,10 +1,11 @@
 import { z } from 'zod'
 import { StatSchema, type Stat } from './stats'
+import { t } from '../i18n'
 
 /** The two lights a place is drawn in. Each period of the day is one or the other. */
 export const LIGHTS = [
-  { id: 'day', name: 'Day' },
-  { id: 'night', name: 'Night' }
+  { id: 'day', get name() { return t('game.light.day') } },
+  { id: 'night', get name() { return t('game.light.night') } }
 ] as const
 export type Light = (typeof LIGHTS)[number]['id']
 

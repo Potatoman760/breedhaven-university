@@ -4,6 +4,8 @@ import type { RendererApi } from '../shared/types'
 
 const api: RendererApi = {
   getContent: () => ipcRenderer.invoke(IPC.getContent),
+  getLanguage: () => ipcRenderer.invoke(IPC.getLanguage),
+  setLanguage: (language) => ipcRenderer.invoke(IPC.setLanguage, language),
   spell: {
     misspelled: (word) => webFrame.isWordMisspelled(word),
     suggestions: (word) => webFrame.getWordSuggestions(word)
@@ -38,6 +40,11 @@ const api: RendererApi = {
     saveLoveInterest: (loveInterest) => ipcRenderer.invoke(IPC.editorSaveLoveInterest, loveInterest),
     deleteLoveInterest: (id) => ipcRenderer.invoke(IPC.editorDeleteLoveInterest, id),
     draftLoveInterest: (idea) => ipcRenderer.invoke(IPC.editorDraftLoveInterest, idea),
+    readCard: () => ipcRenderer.invoke(IPC.editorReadCard),
+    fromCard: (request) => ipcRenderer.invoke(IPC.editorFromCard, request),
+    saveMajor: (request) => ipcRenderer.invoke(IPC.editorSaveMajor, request),
+    deleteMajor: (code) => ipcRenderer.invoke(IPC.editorDeleteMajor, code),
+    draftMajor: (idea) => ipcRenderer.invoke(IPC.editorDraftMajor, idea),
     saveTrait: (trait) => ipcRenderer.invoke(IPC.editorSaveTrait, trait),
     deleteTrait: (id) => ipcRenderer.invoke(IPC.editorDeleteTrait, id),
     saveCatalogue: (catalogue) => ipcRenderer.invoke(IPC.editorSaveCatalogue, catalogue),

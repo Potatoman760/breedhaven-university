@@ -8,6 +8,7 @@ import { GrandButton } from './GrandButton'
 import { ItemArt } from './ItemSquare'
 import { Portrait } from './Portrait'
 import { useBack } from '../mouseBack'
+import { t, type MessageKey } from '../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -23,7 +24,7 @@ const BANTER_LINE_MS = 2600
 const BANTER_MS_PER_CHAR = 55
 
 // What each kind of stop is, said when it is pointed at.
-const STOPS: Record<string, string> = { fight: 'A fight', find: 'Something to find', checkpoint: 'A checkpoint: what you have found is made safe, and you rest', guardian: 'The guardian of the anchor' }
+const STOPS: Record<string, MessageKey> = { fight: 'panels.expedition.stop.fight', find: 'panels.expedition.stop.find', checkpoint: 'panels.expedition.stop.checkpoint', guardian: 'panels.expedition.stop.guardian' }
 
 /** How full something is, as the width of a bar. */
 const share = (now: number, max: number): string => `${Math.max(0, Math.min(100, max > 0 ? (now / max) * 100 : 0))}%`
@@ -162,11 +163,11 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
 
   const status = (fighter: Fighter): string =>
     [
-      fighter.footing <= 0 ? 'down' : '',
-      fighter.guarding ? (fighter.taunting ? 'taunting' : 'defending') : '',
-      fighter.anchored ? 'empowered' : '',
-      fighter.covered ? 'protected' : '',
-      fighter.hexed > 0 ? 'hexed' : ''
+      fighter.footing <= 0 ? t('panels.expedition.status.down') : '',
+      fighter.guarding ? (fighter.taunting ? t('panels.expedition.status.taunting') : t('panels.expedition.status.defending')) : '',
+      fighter.anchored ? t('panels.expedition.status.empowered') : '',
+      fighter.covered ? t('panels.expedition.status.protected') : '',
+      fighter.hexed > 0 ? t('panels.expedition.status.hexed') : ''
     ]
       .filter(Boolean)
       .join(', ')
@@ -197,7 +198,7 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
               const enemy = config.enemies.find((one) => one.id === foe.enemyId)!
               const gone = foe.footing <= 0
               const pick = pending?.aim === 'foe' && !gone
-              const notes = [foe.weakened > 0 && 'faltering', enemy.sweeps && 'sweeps', enemy.hexes && 'hexes', sees && enemy.weakTo && `weak to a ${config.roles.find((role) => role.id === enemy.weakTo)?.name.toLowerCase()}`].filter(Boolean)
+              const notes = [foe.weakened > 0 && t('panels.expedition.note.faltering'), enemy.sweeps && t('panels.expedition.note.sweeps'), enemy.hexes && t('panels.expedition.note.hexes'), sees && enemy.weakTo && t('panels.expedition.note.weakTo', { role: config.roles.find((role) => role.id === enemy.weakTo)?.name.toLowerCase() })].filter(Boolean)
               return (
                 <div key={foe.key} data-fx={foe.key} className={`below-figure foe${gone ? ' down' : ''}${pick ? ' pick' : ''}`} onClick={() => pick && pending && go(pending, foe.key)}>
                   {enemy.image ? <img src={`content://pack/${enemy.image}`} alt="" /> : <span className="below-card">{enemy.name}</span>}
@@ -238,11 +239,11 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
               <div key={fighter.id} data-fx={fighter.id === HIM ? HIM : undefined} className={`below-row${actor?.id === fighter.id && fighting ? ' acting' : ''}${pick ? ' pick' : ''}${fighter.footing <= 0 ? ' down' : ''}`} onClick={() => pick && pending && go(pending, fighter.id)}>
                 <span className="below-who">
                   <strong>{fighterName(content, state, fighter.id)}</strong>
-                  <span className="below-small">{[fighter.id === HIM ? 'Sire' : roleOf(config, content.loveInterests.find((one) => one.id === fighter.id))?.name, status(fighter)].filter(Boolean).join(' · ')}</span>
+                  <span className="below-small">{[fighter.id === HIM ? t('panels.expedition.sire') : roleOf(config, content.loveInterests.find((one) => one.id === fighter.id))?.name, status(fighter)].filter(Boolean).join(' · ')}</span>
                 </span>
                 <span className="below-gauges">
                   {/* What she has left, with whatever ward is up drawn on the end of it: the ward is everyone's, and is spent before any of them is hurt. */}
-                  <span className="below-gauge" title={run.ward > 0 ? `Footing, and a ward that absorbs the next ${Math.round(run.ward)}` : 'Footing'}>
+                  <span className="below-gauge" title={run.ward > 0 ? t('panels.expedition.footingWarded', { ward: Math.round(run.ward) }) : t('panels.expedition.footing')}>
                     <span className="below-bar">
                       <span style={{ width: share(fighter.footing, fighter.max) }} />
                       {run.ward > 0 && fighter.footing > 0 && <i className="below-warded" style={{ width: share(Math.min(run.ward, fighter.max), fighter.max) }} />}
@@ -253,7 +254,7 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
                     </span>
                   </span>
                   {fighter.id === HIM && (
-                    <span className="below-gauge" title="Energy: what Anchor and Ground are paid in">
+                    <span className="below-gauge" title={t('panels.expedition.energy')}>
                       <span className="below-bar energy"><span style={{ width: share(state.player.energy, state.player.maxEnergy) }} /></span>
                       <span className="below-number">
                         {state.player.energy}/{state.player.maxEnergy}
@@ -261,7 +262,7 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
                     </span>
                   )}
                   {carrying && (
-                    <span className="below-gauge" title="Her surge: ground it before it fills and breaks loose">
+                    <span className="below-gauge" title={t('panels.expedition.surge')}>
                       <span className="below-surge">
                         {Array.from({ length: config.surgeLimit }, (_, index) => (
                           <i key={index} className={index < fighter.surge ? 'on' : undefined} />
@@ -283,10 +284,10 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
           {talking && (
             <div className="below-waiting">
               {/* Until something has come back to be said, that it is being thought of; after that the balloons speak for themselves. */}
-              <Thinking word={line ? 'Talking' : 'Thinking'} />
+              <Thinking word={line ? t('panels.expedition.talking') : t('panels.expedition.thinking')} />
               <button className="below-command below-skip" onClick={() => setOpened(fightKey)}>
                 <strong>
-                  Skip <ChevronIcon size={16} />
+                  {t('panels.expedition.skip')} <ChevronIcon size={16} />
                 </strong>
               </button>
             </div>
@@ -294,12 +295,12 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
           {/* Over a win, the same word while what they will say is waited on and said. There is nothing to skip: the reckoning is already up. */}
           {wonKey !== null && (wonWait === wonKey || (line && banter?.key === wonKey)) && (
             <div className="below-waiting">
-              <Thinking word={line ? 'Talking' : 'Thinking'} />
+              <Thinking word={line ? t('panels.expedition.talking') : t('panels.expedition.thinking')} />
             </div>
           )}
           {fighting && !talking && actor && (
             <>
-            <span className="caps below-turn">{pending ? `${pending.name}: on whom?` : actor.id === HIM ? 'Your turn' : `${fighterName(content, state, actor.id)}'s turn`}</span>
+            <span className="caps below-turn">{pending ? t('panels.expedition.onWhom', { action: pending.name }) : actor.id === HIM ? t('panels.expedition.yourTurn') : t('panels.expedition.herTurn', { name: fighterName(content, state, actor.id) })}</span>
             {pending ? (
               <>
                 {targetsFor(pending).map((target) => (
@@ -315,7 +316,7 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
                 ))}
                 <button className="below-command below-back" onClick={() => setPending(null)}>
                   <strong>
-                    <BackIcon size={18} /> Back
+                    <BackIcon size={18} /> {t('panels.expedition.back')}
                   </strong>
                 </button>
               </>
@@ -340,17 +341,17 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
             <span className="caps">{config.name}</span>
             <strong>{depth.name}</strong>
           </span>
-          <ol className="below-stops" aria-label={`Stop ${run.node + 1} of ${depth.nodes.length}`}>
+          <ol className="below-stops" aria-label={t('panels.expedition.stopOf', { n: run.node + 1, total: depth.nodes.length })}>
             {depth.nodes.map((stop, index) => (
-              <li key={index} className={index < run.node ? 'done' : index === run.node ? 'here' : undefined} title={STOPS[stop.kind]}>
+              <li key={index} className={index < run.node ? 'done' : index === run.node ? 'here' : undefined} title={STOPS[stop.kind] && t(STOPS[stop.kind])}>
                 <StopIcon kind={stop.kind} image={config.stopImages[stop.kind]} size={30} />
               </li>
             ))}
           </ol>
           {!report && (
-            <button className="below-command below-leave" title="Keeps only what was made safe at a checkpoint" onClick={() => onChange(turnBack(state))}>
+            <button className="below-command below-leave" title={t('panels.expedition.turnBackTitle')} onClick={() => onChange(turnBack(state))}>
               <strong>
-                <BackIcon size={18} /> Turn back
+                <BackIcon size={18} /> {t('panels.expedition.turnBack')}
               </strong>
             </button>
           )}
@@ -370,9 +371,9 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
       {/* What a stop came to, and at the end what the run did: a small dialog over the field. */}
       {report ? (
         <div className="below-dialog ornate" role="dialog">
-          <h2>{report.outcome === 'won' ? 'The anchor holds' : report.outcome === 'lost' ? 'Carried back up' : 'Back up the stair'}</h2>
+          <h2>{report.outcome === 'won' ? t('panels.expedition.won') : report.outcome === 'lost' ? t('panels.expedition.lost') : t('panels.expedition.left')}</h2>
           <p>{run.note}</p>
-          <p>You come up with {describeFinds(content, report.kept)}.</p>
+          <p>{t('panels.expedition.comeUpWith', { finds: describeFinds(content, report.kept) })}</p>
           {Object.keys(report.kept.items).length > 0 && (
             <p className="below-haul">
               {Object.entries(report.kept.items).map(([id, count]) => {
@@ -392,13 +393,13 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
               <ItemArt icon={report.relic.icon} image={report.relic.image} size={72} />
               <span>
                 <strong>{report.relic.name}</strong>. {report.relic.description}{' '}
-                <em>{report.relic.use ? 'Use it from your bag during a scene.' : 'Turn it on from the Relics tab of your bag.'}</em>
+                <em>{report.relic.use ? t('panels.expedition.relicUse') : t('panels.expedition.relicWear')}</em>
               </span>
             </p>
           )}
-          {report.outcome === 'lost' && <p>You have nothing left in you for the day.</p>}
+          {report.outcome === 'lost' && <p>{t('panels.expedition.spent')}</p>}
           <div className="actions center">
-            <GrandButton label="Come up" icon={<BackIcon size={22} />} chevron={false} onClick={() => onChange(comeUp(content, state))} />
+            <GrandButton label={t('panels.expedition.comeUp')} icon={<BackIcon size={22} />} chevron={false} onClick={() => onChange(comeUp(content, state))} />
           </div>
         </div>
       ) : (
@@ -407,46 +408,45 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
           // A checkpoint: a fire, everyone the better for it, and what was carried made safe.
           <div className="below-spoils ornate" role="dialog">
             <span className="caps">{depth.name}</span>
-            <h1>{node.name || 'A dry ledge'}</h1>
+            <h1>{node.name || t('panels.expedition.ledge')}</h1>
             {config.restImage && <img className="below-rest-art" src={`content://pack/${config.restImage}`} alt="" />}
-            <p className="below-beaten">You catch your breath.</p>
+            <p className="below-beaten">{t('panels.expedition.breath')}</p>
             <PartyBars content={content} state={state} party={run.party} healed={run.rest.healed} />
-            <span className="caps">Made safe</span>
-            <LootTiles content={content} finds={run.rest.secured} empty="Nothing carried yet." />
+            <span className="caps">{t('panels.expedition.madeSafe')}</span>
+            <LootTiles content={content} finds={run.rest.secured} empty={t('panels.expedition.nothingCarried')} />
             <div className="actions center">
-              <GrandButton label="Confirm" icon={<ChevronIcon size={20} />} chevron={false} onClick={() => onChange(goOn(content, state))} />
+              <GrandButton label={t('panels.expedition.confirm')} icon={<ChevronIcon size={20} />} chevron={false} onClick={() => onChange(goOn(content, state))} />
             </div>
           </div>
         ) : run.spoils ? (
           // A fight won, or something found lying there: what came of it, laid out to be enjoyed.
           <div className="below-spoils ornate" role="dialog">
-            <span className="caps">{fight ? `Round ${fight.round}` : depth.name}</span>
-            <h1>{fight ? 'Victory' : node.name || 'Something left behind'}</h1>
+            <span className="caps">{fight ? t('panels.expedition.round', { round: fight.round }) : depth.name}</span>
+            <h1>{fight ? t('panels.expedition.victory') : node.name || t('panels.expedition.leftBehind')}</h1>
             {fight && (
               <p className="below-beaten">
-                {Object.entries(
+                {t('panels.expedition.beaten', { names: Object.entries(
                   fight.foes.reduce<Record<string, number>>((count, foe) => {
                     const name = config.enemies.find((one) => one.id === foe.enemyId)?.name ?? foe.enemyId
                     return { ...count, [name]: (count[name] ?? 0) + 1 }
                   }, {})
                 )
                   .map(([name, count]) => (count > 1 ? `${name} ×${count}` : name))
-                  .join(' · ')}{' '}
-                beaten
+                  .join(' · ') })}
               </p>
             )}
             {fight && <PartyBars content={content} state={state} party={run.party} />}
-            <span className="caps">Found</span>
-            <LootTiles content={content} finds={run.spoils} empty="Nothing worth taking." />
+            <span className="caps">{t('panels.expedition.found')}</span>
+            <LootTiles content={content} finds={run.spoils} empty={t('panels.expedition.nothingWorth')} />
             <div className="actions center">
-              <GrandButton label="Confirm" icon={<ChevronIcon size={20} />} chevron={false} onClick={() => onChange(goOn(content, state))} />
+              <GrandButton label={t('panels.expedition.confirm')} icon={<ChevronIcon size={20} />} chevron={false} onClick={() => onChange(goOn(content, state))} />
             </div>
           </div>
         ) : (
           <div className="below-dialog ornate" role="dialog">
             {fight ? events.slice(-2).map((event, index) => <p key={index}>{event.text}</p>) : <p>{run.note || node.name}</p>}
             <div className="actions center">
-              <GrandButton label="Confirm" icon={<ChevronIcon size={20} />} chevron={false} onClick={() => onChange(goOn(content, state))} />
+              <GrandButton label={t('panels.expedition.confirm')} icon={<ChevronIcon size={20} />} chevron={false} onClick={() => onChange(goOn(content, state))} />
             </div>
           </div>
         ))

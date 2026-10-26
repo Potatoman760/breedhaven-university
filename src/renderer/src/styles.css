@@ -2226,6 +2226,28 @@ textarea.memory {
   min-width: 104px;
 }
 
+.editor-body.instructions ol {
+  display: grid;
+  gap: 20px;
+  max-width: 72ch;
+  padding-left: 24px;
+}
+
+.editor-body.instructions h2 {
+  margin: 0 0 6px;
+}
+
+.editor-body.instructions p,
+.editor-body.instructions ul {
+  margin: 0 0 10px;
+}
+
+.actions.card-pick {
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 0 0 12px;
+}
+
 .actions.end {
   align-items: center;
   justify-content: flex-end;
@@ -3052,19 +3074,21 @@ button.stat-grid:hover {
   background: rgba(138, 58, 63, 0.16);
 }
 
-.entry.event {
+/* Orientation happens once, at the start: it is shown as the event it is. */
+.entry.event,
+.entry.orientation {
   border-left-color: var(--ochre, #7a5418);
   background: rgba(122, 84, 24, 0.18);
 }
 
-.entry.orientation {
+.entry.work {
   border-left-color: #3d5a73;
   background: rgba(61, 90, 115, 0.18);
 }
 
 .entry.birth {
-  border-left-color: #8a4a78;
-  background: rgba(138, 74, 120, 0.16);
+  border-left-color: #6a4a9a;
+  background: rgba(106, 74, 154, 0.18);
 }
 
 /* What the house costs him: rent on the first of the month, the children's keep each week. */
@@ -3523,6 +3547,48 @@ button.btn.back-button.phone-back {
   flex: 1;
   height: 1px;
   background: linear-gradient(90deg, var(--gold), rgba(212, 175, 90, 0));
+}
+
+/* The model picker's list: as long as a dozen names, then it scrolls. */
+.model-search {
+  position: relative;
+}
+
+.model-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  max-height: 280px;
+  margin: 2px 0 0;
+  padding: 4px 0;
+  overflow-y: auto;
+  list-style: none;
+  border: 1px solid var(--line, rgba(42, 40, 31, 0.25));
+  border-radius: 6px;
+  background: var(--paper, #f7f1e1);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+.model-list li {
+  padding: 4px 10px;
+  font: 500 0.875rem/1.4 var(--ui);
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.model-list li.active {
+  background: rgba(76, 106, 58, 0.18);
+}
+
+.model-list li[aria-selected='true'] {
+  font-weight: 700;
+}
+
+.feed-error {
+  align-self: stretch;
+  margin: 0;
 }
 
 .phone-empty {
@@ -5167,16 +5233,17 @@ button.entry:hover,
   border-left-color: var(--madder);
 }
 
-.card.picked.event {
+.card.picked.event,
+.card.picked.orientation {
   border-left-color: var(--ochre);
 }
 
-.card.picked.orientation {
+.card.picked.work {
   border-left-color: #3d5a73;
 }
 
 .card.picked.birth {
-  border-left-color: #8a4a78;
+  border-left-color: #6a4a9a;
 }
 
 /* How long to stay at an event: an hour less, how long, an hour more. */
@@ -8529,6 +8596,12 @@ button.btn.grand.centred:has(.grand-icon) .grand-text {
   font-size: 0.75rem;
 }
 
+/* Beside the one to press, the others are outlined: at the fair, Hello stands out until it has been said. */
+.map-board button.btn.map-go.secondary {
+  background: rgba(20, 28, 18, 0.55);
+  color: var(--gold-soft);
+}
+
 .map-board button.btn.map-go:not(:disabled):hover {
   transform: none;
   filter: brightness(1.1);
@@ -8930,16 +9003,17 @@ button.btn.back-button.calendar-close {
   border-left-color: #e0838a;
 }
 
-.ornate .card.picked.event {
+.ornate .card.picked.event,
+.ornate .card.picked.orientation {
   border-left-color: #e6b85a;
 }
 
-.ornate .card.picked.orientation {
+.ornate .card.picked.work {
   border-left-color: #86b0d4;
 }
 
 .ornate .card.picked.birth {
-  border-left-color: #d496c4;
+  border-left-color: #b49ae6;
 }
 
 /* The kit's headings sit flush; the bag's keep their room above and below. */
@@ -10514,4 +10588,12 @@ button.trip-who-row.picked {
   gap: 10px;
   height: auto;
   padding: 6px 12px 6px 6px;
+}
+
+/* A subject of the game's own is shown in the same form, closed to changes: the form's wrapper draws nothing of its own. */
+fieldset.plain {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }

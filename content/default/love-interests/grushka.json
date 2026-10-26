@@ -223,6 +223,10 @@
       {
         "major": "PSF",
         "number": "101"
+      },
+      {
+        "major": "PSF",
+        "number": "117"
       }
     ]
   },
@@ -321,7 +325,7 @@
   "schedule": [
     {
       "weekdays": [
-        "Restday"
+        "Sunday"
       ],
       "periods": [
         "morning",
@@ -331,8 +335,8 @@
     },
     {
       "weekdays": [
-        "Hearthday",
-        "Marketday"
+        "Friday",
+        "Saturday"
       ],
       "periods": [
         "evening"
@@ -368,7 +372,9 @@
     "name": "her apartment overlooking the Tiltyard",
     "description": "A plain two-room apartment in a modern block beside a sports ground, with white walls and a wide floor-to-ceiling window. A wide, low bed under a thick red and gray woven wool blanket, a wall rack of training swords and wooden practice blades, children's crayon drawings pinned beside the door, an iron kettle and a cast-iron pan on an induction hob, a set of dumbbells in the corner, a tablet showing a training schedule on the counter. The window looks down onto a sanded arena ring under floodlights. Warm evening lamplight.",
     "locationId": "tiltyard",
-    "background": "generated/backgrounds/grushka/view.webp"
+    "images": {
+      "day": "generated/backgrounds/grushka/view.webp"
+    }
   },
   "birthPicture": "sprites/grushka/birth.webp",
   "walkSprite": "sprites/grushka/walk-cutout.webp",

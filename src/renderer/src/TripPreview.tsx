@@ -2,15 +2,16 @@ import { useEffect, useState } from 'react'
 import { spriteFor } from '../../shared/game'
 import type { ContentPack } from '../../shared/model'
 import { TripMoment, type TripMomentKind } from './ui/TripMoment'
+import { t, type MessageKey } from '../../shared/i18n'
 
 const KINDS: TripMomentKind[] = ['drive-there', 'soak', 'cascade', 'market', 'private-bath', 'fireworks', 'last-morning', 'drive-home']
-const TITLES: Partial<Record<TripMomentKind, string>> = {
-  soak: 'First soak',
-  cascade: 'The cascade walk',
-  market: 'The night market',
-  'private-bath': 'The private bath',
-  fireworks: 'Fireworks over the lake',
-  'last-morning': 'The last morning'
+const TITLES: Partial<Record<TripMomentKind, MessageKey>> = {
+  soak: 'shell.preview.soak',
+  cascade: 'shell.preview.cascade',
+  market: 'shell.preview.market',
+  'private-bath': 'shell.preview.privateBath',
+  fireworks: 'shell.preview.fireworks',
+  'last-morning': 'shell.preview.lastMorning'
 }
 
 /**
@@ -39,12 +40,13 @@ export function TripPreview({ who }: { who?: string }) {
   const pick = Math.floor(Math.random() * all.length)
   const shown = chosen.length > 0 ? chosen : [all[pick % all.length], all[(pick + 1) % all.length]]
   const kind = named ?? KINDS[turn % KINDS.length]
-  const sample = ["I've always wanted to try the hot springs. Four whole days!", 'Save me the window seat on the way back, at least.']
+  const sample = [t('shell.preview.tripFirst'), t('shell.preview.tripSecond')]
+  const title = TITLES[kind]
   return (
     <TripMoment
       key={turn}
       kind={kind}
-      title={TITLES[kind]}
+      title={title && t(title)}
       companions={shown.flatMap((li) => {
         const image = li && happy(li)
         return image ? [{ id: li.id, image, walk: li.walkSprite, stageHeight: li.stageHeight }] : []

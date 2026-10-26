@@ -1,6 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import type { ComfySettings, WorkflowAnalysis, WorkflowBindings, WorkflowKind, WorkflowListResult, WorkflowSummary } from '../../shared/comfy'
+import { t } from '../../shared/i18n'
 import { isWorkflow } from './bundle'
 import { analyse, effectiveBindings, noBindings, parseGraph, type ComfyGraph } from './graph'
 
@@ -40,9 +41,9 @@ export function loadWorkflows(dir: string, overrides: ComfySettings['overrides']
       .map((entry) => entry.name)
       .sort((a, b) => a.localeCompare(b))
   } catch (cause) {
-    return none((cause as NodeJS.ErrnoException).code === 'ENOENT' ? `The game has no workflows: there is no folder at ${dir}.` : `Could not read ${dir}: ${(cause as Error).message}`)
+    return none((cause as NodeJS.ErrnoException).code === 'ENOENT' ? t('comfy.workflows.noFolder', { dir }) : t('comfy.workflows.unreadableFolder', { dir, reason: (cause as Error).message }))
   }
-  if (names.length === 0) return none(`The game has no workflows: there are none in ${dir}.`)
+  if (names.length === 0) return none(t('comfy.workflows.emptyFolder', { dir }))
 
   const result: LoadResult = { ok: false, message: '', loaded: [], broken: [] }
   for (const file of names) {
@@ -51,16 +52,16 @@ export function loadWorkflows(dir: string, overrides: ComfySettings['overrides']
     try {
       text = readFileSync(join(dir, file), 'utf8')
     } catch (cause) {
-      result.broken.push({ file, name, problem: `Could not read it: ${(cause as Error).message}` })
+      result.broken.push({ file, name, problem: t('comfy.workflows.unreadableFile', { reason: (cause as Error).message }) })
       continue
     }
     if (text.length > MAX_WORKFLOW_BYTES) {
-      result.broken.push({ file, name, problem: 'This file is far too large to be a workflow.' })
+      result.broken.push({ file, name, problem: t('comfy.workflows.tooLarge') })
       continue
     }
     const { graph, problem } = parseGraph(text)
     if (!graph) {
-      result.broken.push({ file, name, problem: problem ?? 'This is not a workflow.' })
+      result.broken.push({ file, name, problem: problem ?? t('comfy.workflows.notWorkflow') })
       continue
     }
     const analysis = analyse(graph)
@@ -100,13 +101,13 @@ export function resolveWorkflow(
   kind: WorkflowKind,
   defaults: ComfySettings['defaults']
 ): { workflow: LoadedWorkflow | null; problem: string | null } {
-  if (loaded.length === 0) return { workflow: null, problem: 'None of the game\'s workflows could be read.' }
+  if (loaded.length === 0) return { workflow: null, problem: t('comfy.workflows.noneReadable') }
   const wanted = asked.trim()
   if (wanted !== '') {
     const named = loaded.find((one) => one.file === wanted || one.name === wanted.replace(/\.json$/i, ''))
     return named
       ? { workflow: named, problem: null }
-      : { workflow: null, problem: `There is no workflow called "${asked}". These are available: ${loaded.map((one) => one.name).join(', ')}.` }
+      : { workflow: null, problem: t('comfy.workflows.unknown', { asked, available: loaded.map((one) => one.name).join(', ') }) }
   }
   const fitting = loaded.filter((one) => (one.bindings.firstFrame !== null) === (kind === 'video'))
   const chosen = fitting.find((one) => one.file === defaults[kind]) ?? fitting.find((one) => one.bindings.positive !== null) ?? fitting[0]
@@ -115,7 +116,7 @@ export function resolveWorkflow(
     workflow: null,
     problem:
       kind === 'video'
-        ? 'None of the game\'s workflows makes a clip: none has somewhere to put a first frame.'
-        : 'Every one of the game\'s workflows makes clips: there is none to draw a picture with.'
+        ? t('comfy.workflows.noVideo')
+        : t('comfy.workflows.noPicture')
   }
 }

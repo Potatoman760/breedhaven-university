@@ -63,6 +63,14 @@ const NOTICE_GAP_MS = 300
 const EVENT_CUES: Cue[] = ['message', 'coins', 'skill', 'bond', 'pregnancy', 'birth', 'relic']
 let lastEventAt = 0
 
+/** Plays a cue once, this long after the component is first shown: as an animation lands. */
+export function useCueAt(cue: Cue, delayMs: number): void {
+  useEffect(() => {
+    const timer = window.setTimeout(() => play(cue), delayMs)
+    return () => window.clearTimeout(timer)
+  }, [])
+}
+
 /** Plays a cue once, over whatever else is playing. A cue the content has no sound for is silent. */
 export function play(cue: Cue): void {
   const sound = cues[cue]

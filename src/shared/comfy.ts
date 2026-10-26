@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { basePoseId, DEFAULT_VIEW, outfitParts, type Location, type LoveInterest, type Npc, pronounWords } from './model'
+import { t } from './i18n'
 
 /**
  * The art studio's link to the user's own ComfyUI. It is a tool the user calls directly to
@@ -16,19 +17,28 @@ export const ART_KINDS = ['sprite', 'background', 'photo', 'nsfw', 'birth', 'wal
 export type ArtKind = (typeof ART_KINDS)[number]
 
 export const ART_KIND_LABELS: Record<ArtKind, string> = {
-  sprite: 'Sprite',
-  background: 'Background',
-  photo: 'Photo',
-  nsfw: 'NSFW picture',
-  birth: 'Birth picture',
-  walk: 'Walking profile'
+  get sprite() { return t('comfy.artKind.sprite') },
+  get background() { return t('comfy.artKind.background') },
+  get photo() { return t('comfy.artKind.photo') },
+  get nsfw() { return t('comfy.artKind.nsfw') },
+  get birth() { return t('comfy.artKind.birth') },
+  get walk() { return t('comfy.artKind.walk') }
 }
 
 /** What a workflow can be the default for: each kind of picture, and the clips made from the NSFW pictures. */
 export const WORKFLOW_KINDS = [...ART_KINDS, 'video'] as const
 export type WorkflowKind = (typeof WORKFLOW_KINDS)[number]
 
-export const WORKFLOW_KIND_LABELS: Record<WorkflowKind, string> = { ...ART_KIND_LABELS, video: 'Video clip' }
+// Getters, not a spread of the above: a spread would read the labels once, at load, before the language is set.
+export const WORKFLOW_KIND_LABELS: Record<WorkflowKind, string> = {
+  get sprite() { return ART_KIND_LABELS.sprite },
+  get background() { return ART_KIND_LABELS.background },
+  get photo() { return ART_KIND_LABELS.photo },
+  get nsfw() { return ART_KIND_LABELS.nsfw },
+  get birth() { return ART_KIND_LABELS.birth },
+  get walk() { return ART_KIND_LABELS.walk },
+  get video() { return t('comfy.workflowKind.video') }
+}
 
 /**
  * A place in a graph the app may write to. Nothing is written to `output`: it names whose pictures to collect.
@@ -40,15 +50,15 @@ export const BINDING_SLOTS = ['positive', 'negative', 'width', 'height', 'seed',
 export type BindingSlot = (typeof BINDING_SLOTS)[number]
 
 export const SLOT_LABELS: Record<BindingSlot, string> = {
-  positive: 'Prompt',
-  negative: 'Negative prompt',
-  width: 'Width',
-  height: 'Height',
-  seed: 'Seed',
-  firstFrame: 'First frame',
-  lastFrame: 'Last frame',
-  length: 'Length (seconds)',
-  output: 'Saved image'
+  get positive() { return t('comfy.slot.positive') },
+  get negative() { return t('comfy.slot.negative') },
+  get width() { return t('comfy.slot.width') },
+  get height() { return t('comfy.slot.height') },
+  get seed() { return t('comfy.slot.seed') },
+  get firstFrame() { return t('comfy.slot.firstFrame') },
+  get lastFrame() { return t('comfy.slot.lastFrame') },
+  get length() { return t('comfy.slot.length') },
+  get output() { return t('comfy.slot.output') }
 }
 
 /** One writable place: a node and one of its inputs. */
@@ -257,21 +267,21 @@ export function prependPrompt(prefix: string | undefined, prompt: string): strin
 /** The address, tidied, or why it is not one. */
 export function normaliseComfyUrl(raw: string): { url: string | null; problem: string | null } {
   const trimmed = raw.trim()
-  if (trimmed.length === 0) return { url: null, problem: 'No address yet.' }
+  if (trimmed.length === 0) return { url: null, problem: t('comfy.url.empty') }
   // Checked before parsing: "127.0.0.1:8188" fails as unparseable, not as the missing scheme it is.
   if (!/^[a-z][a-z0-9+.-]*:\/\//i.test(trimmed)) {
-    return { url: null, problem: `Include the http://: ${COMFY_DEFAULT_BASE_URL}, not ${trimmed}.` }
+    return { url: null, problem: t('comfy.url.noScheme', { example: COMFY_DEFAULT_BASE_URL, typed: trimmed }) }
   }
   let parsed: URL
   try {
     parsed = new URL(trimmed)
   } catch {
-    return { url: null, problem: `"${trimmed}" is not an address. It should look like ${COMFY_DEFAULT_BASE_URL}.` }
+    return { url: null, problem: t('comfy.url.unparseable', { typed: trimmed, example: COMFY_DEFAULT_BASE_URL }) }
   }
   if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
-    return { url: null, problem: `Only http and https can be called, not ${parsed.protocol.replace(':', '')}.` }
+    return { url: null, problem: t('comfy.url.badProtocol', { protocol: parsed.protocol.replace(':', '') }) }
   }
-  if (parsed.hostname.length === 0) return { url: null, problem: `"${trimmed}" names no host.` }
+  if (parsed.hostname.length === 0) return { url: null, problem: t('comfy.url.noHost', { typed: trimmed }) }
   // Trailing slashes only: a reverse proxy may well serve ComfyUI from a sub-path.
   return { url: `${parsed.origin}${parsed.pathname}`.replace(/\/+$/, ''), problem: null }
 }
@@ -378,7 +388,9 @@ export const CutoutRequestSchema = z.object({
   /** The picture's content path, in the add-on folder. */
   path: z.string(),
   /** How far from the border's own colour still counts as card. Left out, the usual. */
-  tolerance: z.number().int().min(1).max(64).optional()
+  tolerance: z.number().int().min(1).max(64).optional(),
+  /** The card reachable from the border only, or the gaps the art has closed around as well: a gap can be meant, as between a hand and a cup. */
+  mode: z.enum(['edge', 'gaps']).default('gaps')
 })
 export type CutoutRequest = z.input<typeof CutoutRequestSchema>
 

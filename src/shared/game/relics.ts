@@ -2,6 +2,7 @@ import type { ContentPack, GameState, Relic, RelicUse, Scene } from '../model'
 import { relicsHeld } from './expedition'
 import { addBoon } from './modifiers'
 import { sceneCast } from './scene'
+import { t } from '../i18n'
 
 /**
  * What the relics he has brought up do beyond a number: traits every woman has while one is on, and what one does when
@@ -33,7 +34,13 @@ export function sceneRelicUses(content: ContentPack, scene: Pick<Scene, 'relicsU
 /** Whether he can use a relic in this scene: he holds it, it is one to use, and he has not used it in this one. */
 export function canUseRelic(content: ContentPack, state: GameState, scene: Pick<Scene, 'relicsUsed' | 'npc'>, relicId: string): { ok: boolean; reasons: string[] } {
   const relic = relicsHeld(content, state).find((one) => one.id === relicId)
-  const reasons = !relic?.use ? ['It is always at work'] : scene.npc ? ['Not with an NPC'] : scene.relicsUsed?.includes(relicId) ? ['Used in this scene'] : []
+  const reasons = !relic?.use
+    ? [t('scene.relics.alwaysOn')]
+    : scene.npc
+      ? [t('scene.relics.notWithNpc')]
+      : scene.relicsUsed?.includes(relicId)
+        ? [t('scene.relics.usedHere')]
+        : []
   return { ok: reasons.length === 0, reasons }
 }
 
@@ -41,10 +48,10 @@ export function canUseRelic(content: ContentPack, state: GameState, scene: Pick<
 // reaction. He uses it in secret: nobody knows it was him. The Mind's Eye changes nothing she could notice, so it is
 // not a turn at all: her thoughts are simply heard from her next reply on.
 const MOMENT: Record<Exclude<RelicUse, 'minds-eye'>, (player: string) => string> = {
-  unravel: (player) => `Every stitch of clothing on everyone here, ${player} included, has just vanished into thin air. Nobody knows why; react in surprise.`,
-  stillness: (player) => `Time has just stopped for everyone here but ${player} and you: everyone else is frozen where they stand, and will see and hear nothing. You do not know why.`,
-  sapphic: () => `A charm has just settled over the women here: you feel drawn to each other, and want to kiss. You do not know why.`,
-  'first-seed': () => `A warmth spreads low in every woman here: the Bloom is wide open in her tonight. You do not know why.`
+  unravel: (player) => t('scene.relics.moment.unravel', { player }),
+  stillness: (player) => t('scene.relics.moment.stillness', { player }),
+  sapphic: () => t('scene.relics.moment.sapphic'),
+  'first-seed': () => t('scene.relics.moment.firstSeed')
 }
 
 // How long what a relic sets going in a scene lasts, in hours: long enough for any scene.
@@ -68,15 +75,15 @@ export function useRelic(content: ContentPack, state: GameState, scene: Scene, r
     for (const id of sceneCast(scene)) after = addBoon(after, { kind: 'unguarded', amount: 1, until: state.time + SCENE_HOURS, source: relic.name, targetId: id })
   }
   if (relic.use === 'minds-eye') return { state: after, scene: next, line: '', cue: '' }
-  return { state: after, scene: next, line: `*secretly uses the ${relic.name}*`, cue: MOMENT[relic.use](state.player.name) }
+  return { state: after, scene: next, line: t('scene.relics.uses', { relic: relic.name }), cue: MOMENT[relic.use](state.player.name) }
 }
 
 /** Told to her for the rest of a scene a relic has been used in: what it has set going, as a rule of the scene. */
 export function describeRelicUses(uses: RelicUse[], player: string, group: boolean): string[] {
   return uses.flatMap((use) => {
-    if (use === 'stillness') return [`Time has stopped for everyone here but ${player} and ${group ? 'the two or three of you' : 'you'}. Nobody else moves, sees or hears anything; you are as alone as in a locked room.`]
-    if (use === 'sapphic') return [group ? 'A charm is on the women here: you are drawn to each other as well as to him, and feel the urge to kiss and touch each other.' : 'A charm is on you: you find yourself thinking of other women, and want to kiss someone.']
-    if (use === 'minds-eye') return [`${player} can hear your thoughts. After what you say, add what you are really thinking as a line in asterisks that begins with your first name and "thinks:", as *Name thinks: …*${group ? ', for each of you who speaks' : ''}.`]
+    if (use === 'stillness') return [t('scene.relics.rule.stillness', { player, group })]
+    if (use === 'sapphic') return [group ? t('scene.relics.rule.sapphicGroup') : t('scene.relics.rule.sapphic')]
+    if (use === 'minds-eye') return [t('scene.relics.rule.mindsEye', { player, group })]
     return []
   })
 }

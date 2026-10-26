@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { builtTier, canBuild, factor, houseLayout, inRoom, nextWork, roomHeIsIn, spriteFor, viewImage, wornOutfit } from '../../../../shared/game'
 import { Portrait } from '../Portrait'
 import type { ContentPack, GameState, HousingConfig, Light, LoveInterest } from '../../../../shared/model'
+import { t } from '../../../../shared/i18n'
 
 // How tall a row of the plan is drawn, as a share of how wide a column is: as near the shape of the space the house has
 // as rooms can be drawn, from a little squat to a little tall, so that a wide screen gets a wider, larger house.
@@ -152,7 +153,7 @@ export function HouseFacade({ content, state, config, light, picked, built, refu
             ))}
           </span>
         )}
-        {here === room.key && <span className="room-you">You</span>}
+        {here === room.key && <span className="room-you">{t('panels.houseFacade.you')}</span>}
         <span className="room-plate">
           <strong>{room.name}</strong>
           {tier < 1 && work && <span className={refused === room.key ? 'room-price refused' : 'room-price'}>${work.cost}</span>}

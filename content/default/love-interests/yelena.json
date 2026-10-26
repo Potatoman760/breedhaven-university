@@ -328,7 +328,7 @@
   "schedule": [
     {
       "weekdays": [
-        "Hearthday"
+        "Friday"
       ],
       "periods": [
         "evening"
@@ -337,7 +337,7 @@
     },
     {
       "weekdays": [
-        "Marketday"
+        "Saturday"
       ],
       "periods": [
         "evening"
@@ -346,7 +346,7 @@
     },
     {
       "weekdays": [
-        "Restday"
+        "Sunday"
       ],
       "periods": [
         "afternoon"
@@ -377,7 +377,9 @@
     "name": "a first-floor room in the Cloister Halls",
     "description": "A room furnished from home and slowly being undone: fine linen on a student bed, a trunk of gowns, sketches pinned over the Goldvine crest, ribbons on the mirror, and a family phone she keeps face down.",
     "locationId": "dormitories",
-    "background": "generated/backgrounds/yelena/view-2.webp"
+    "images": {
+      "day": "generated/backgrounds/yelena/view-2.webp"
+    }
   },
   "birthPicture": "sprites/yelena/birth.webp",
   "walkSprite": "sprites/yelena/walk-cutout.webp",

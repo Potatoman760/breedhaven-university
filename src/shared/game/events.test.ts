@@ -7,6 +7,7 @@ import {
   describeEvent,
   eventHours,
   eventsOn,
+  eventOutfits,
   mapDressingAt,
   songAt,
   parseGeneratedEvents,
@@ -37,6 +38,16 @@ const event = (extra: Partial<CalendarEvent>): CalendarEvent => ({
   durationDays: 1,
   generated: true,
   ...extra
+})
+
+describe('eventOutfits', () => {
+  it('are what a part starts its scene in, and an outfit named for each event, each with where it is worn', () => {
+    const spa = { ...content, calendar: { ...content.calendar, events: content.calendar.events.map((e) => ({ ...e, program: [{ id: 'soak', name: 'The soak', day: 1, startHour: 8, hours: 2, outfitId: 'bathrobe' } as never] })) } }
+    expect(eventOutfits(spa)).toEqual([
+      { id: 'bathrobe', worn: ['the Feast: The soak'] },
+      { id: 'feast', worn: ['all of the Feast'] }
+    ])
+  })
 })
 
 describe('mapDressingAt', () => {

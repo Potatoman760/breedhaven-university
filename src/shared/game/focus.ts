@@ -1,8 +1,9 @@
-import type { ContentPack, Focus, GameState } from '../model'
-import { STATS } from '../model'
+import type { ContentPack, Focus, GameState, Stat } from '../model'
+import { STAT_NAMES, STATS } from '../model'
 import { addCoursePoints } from './grades'
 import { trainStat } from './stats'
 import { factor } from './modifiers'
+import { t } from '../i18n'
 
 /**
  * His focus: the one stat or course he gives his spare hours to. When he skips ahead to the next thing on his
@@ -16,8 +17,8 @@ export const FOCUS_SHARE = 0.5
 /** What he can give his spare hours to: each stat, and each course he is taking. */
 export function focusChoices(state: Pick<GameState, 'courses' | 'enrolment'>): { focus: Focus; label: string }[] {
   return [
-    ...STATS.map((stat) => ({ focus: { kind: 'stat' as const, id: stat }, label: stat[0].toUpperCase() + stat.slice(1) })),
-    ...state.courses.filter((course) => state.enrolment?.includes(course.id)).map((course) => ({ focus: { kind: 'course' as const, id: course.id }, label: `${course.number}: ${course.title}` }))
+    ...STATS.map((stat) => ({ focus: { kind: 'stat' as const, id: stat }, label: STAT_NAMES[stat] })),
+    ...state.courses.filter((course) => state.enrolment?.includes(course.id)).map((course) => ({ focus: { kind: 'course' as const, id: course.id }, label: t('game.focus.course', { number: course.number, title: course.title }) }))
   ]
 }
 
@@ -31,7 +32,7 @@ export function focusOf(state: Pick<GameState, 'focus' | 'courses' | 'enrolment'
 export function focusName(state: Pick<GameState, 'focus' | 'courses' | 'enrolment'>): string | undefined {
   const focus = focusOf(state)
   if (!focus) return undefined
-  return focus.kind === 'stat' ? focus.id[0].toUpperCase() + focus.id.slice(1) : (state.courses.find((course) => course.id === focus.id)?.number ?? focus.id)
+  return focus.kind === 'stat' ? STAT_NAMES[focus.id as Stat] : (state.courses.find((course) => course.id === focus.id)?.number ?? focus.id)
 }
 
 /** Chooses what his spare hours go to, or nothing. */

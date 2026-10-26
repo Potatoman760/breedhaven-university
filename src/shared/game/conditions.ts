@@ -4,6 +4,7 @@ import { eventsOn } from './events'
 import { stageFor, stageRank } from './relationships'
 import { affectionGain, trainStat } from './stats'
 import { addBoon, feltChange, trustOf } from './modifiers'
+import { t } from '../i18n'
 
 export interface RuleContext {
   state: GameState
@@ -62,29 +63,29 @@ export function evaluateAll(conditions: Condition[], ctx: RuleContext): boolean 
 export function describeCondition(c: Condition, content: ContentPack): string {
   const who = (id?: string): string =>
     id === undefined
-      ? 'them'
+      ? t('scene.conditions.them')
       : (content.loveInterests.find((li) => li.id === id)?.name ?? id)
   switch (c.type) {
     case 'stat':
-      return c.min !== undefined ? `${c.stat} ${c.min}+` : `${c.stat} at most ${c.max}`
+      return c.min !== undefined ? t('scene.conditions.statMin', { stat: c.stat, min: c.min }) : t('scene.conditions.statMax', { stat: c.stat, max: c.max })
     case 'money':
-      return `${c.min} money`
+      return t('scene.conditions.money', { min: c.min })
     case 'energy':
-      return `${c.min} energy`
+      return t('scene.conditions.energy', { min: c.min })
     case 'meter':
-      return `${c.meter} ${c.min}+ with ${who(c.loveInterestId)}`
+      return t('scene.conditions.meter', { meter: c.meter, min: c.min, who: who(c.loveInterestId) })
     case 'stage': {
       const stage = content.relationships.stages.find((s) => s.id === c.min)
-      return `${stage?.name ?? c.min} or closer with ${who(c.loveInterestId)}`
+      return t('scene.conditions.stage', { stage: stage?.name ?? c.min, who: who(c.loveInterestId) })
     }
     case 'flag':
-      return c.value ? `"${c.flag}" has happened` : `"${c.flag}" has not happened`
+      return c.value ? t('scene.conditions.happened', { flag: c.flag }) : t('scene.conditions.notHappened', { flag: c.flag })
     case 'pregnant':
-      return `${who(c.loveInterestId)} ${c.value ? 'to be' : 'not to be'} with child`
+      return t('scene.conditions.pregnant', { who: who(c.loveInterestId), value: c.value })
     case 'event':
-      return `it to be ${content.calendar.events.find((e) => e.id === c.eventId)?.name ?? c.eventId}`
+      return t('scene.conditions.event', { event: content.calendar.events.find((e) => e.id === c.eventId)?.name ?? c.eventId })
     case 'day':
-      return c.min !== undefined ? `day ${c.min} or later` : `day ${c.max} or earlier`
+      return c.min !== undefined ? t('scene.conditions.dayMin', { min: c.min }) : t('scene.conditions.dayMax', { max: c.max })
   }
 }
 
@@ -120,7 +121,7 @@ export function applyEffect(state: GameState, e: Effect, ctx: Omit<RuleContext, 
     case 'boon':
       // One meant for her and used on nobody does nothing.
       if (e.on === 'her' && ctx.loveInterestId === undefined) return state
-      return addBoon(state, { ...e.modifier, until: state.time + e.hours, source: ctx.source ?? 'Something', targetId: e.on === 'her' ? ctx.loveInterestId : undefined, telling: e.telling })
+      return addBoon(state, { ...e.modifier, until: state.time + e.hours, source: ctx.source ?? t('scene.conditions.something'), targetId: e.on === 'her' ? ctx.loveInterestId : undefined, telling: e.telling })
     case 'item':
       return { ...state, inventory: { ...state.inventory, [e.itemId]: (state.inventory[e.itemId] ?? 0) + e.count } }
     case 'unlockCodex':

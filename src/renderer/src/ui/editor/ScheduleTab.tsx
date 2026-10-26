@@ -1,6 +1,7 @@
 import { Button } from "../Button";
 import type { ContentPack, ScheduleEntry } from "../../../../shared/model";
 import { CheckPills, Group } from "./fields";
+import { t } from "../../../../shared/i18n";
 
 interface Props {
   content: ContentPack;
@@ -14,7 +15,7 @@ interface Props {
 export function ScheduleTab({ content, schedule, onChange, before }: Props) {
   const weekdays = content.calendar.weekdays.map((day) => ({
     id: day,
-    name: day.replace(/day$/, ""),
+    name: day.slice(0, 3),
   }));
   const periods = content.calendar.periods.map((p) => ({
     id: p.id,
@@ -33,17 +34,17 @@ export function ScheduleTab({ content, schedule, onChange, before }: Props) {
   }));
   return (
     <Group
-      title="Where she is"
-      hint={`The first line that matches the day and time of day wins. ${before ?? ""} With no line that matches, she's in her room.`.replace(
+      title={t("editor.schedule.title")}
+      hint={t("editor.schedule.hint", { before: before ?? "" }).replace(
         /\s+/g,
         " ",
       )}
     >
       {/* What the times of day named below mean by the clock. */}
-      <div className="legend period-legend" aria-label="The hours of each time of day">
+      <div className="legend period-legend" aria-label={t("editor.schedule.hoursLabel")}>
         {hours.map((p) => (
           <span key={p.id} className="chip">
-            <strong>{p.name}</strong> {p.from} to {p.until}
+            <strong>{p.name}</strong> {t("editor.schedule.hours", { from: p.from, until: p.until })}
           </span>
         ))}
       </div>
@@ -62,7 +63,7 @@ export function ScheduleTab({ content, schedule, onChange, before }: Props) {
           <div key={index} className="card">
             <div className="row checks">
               <label>
-                At
+                {t("editor.schedule.at")}
                 <select
                   value={entry.locationId}
                   onChange={(e) => change({ locationId: e.target.value })}
@@ -79,39 +80,39 @@ export function ScheduleTab({ content, schedule, onChange, before }: Props) {
                 disabled={index === 0}
                 onClick={() => move(-1)}
               >
-                Up
+                {t("editor.common.up")}
               </Button>
               <Button
                 variant="quiet"
                 disabled={index === schedule.length - 1}
                 onClick={() => move(1)}
               >
-                Down
+                {t("editor.common.down")}
               </Button>
               <Button
                 variant="quiet"
                 onClick={() => onChange(schedule.filter((_, i) => i !== index))}
               >
-                Remove
+                {t("editor.common.remove")}
               </Button>
             </div>
             <CheckPills
-              label="On"
+              label={t("editor.schedule.on")}
               options={weekdays}
               value={entry.weekdays ?? []}
               onChange={(days) =>
                 change({ weekdays: days.length > 0 ? days : undefined })
               }
-              hint={entry.weekdays ? undefined : "Any day."}
+              hint={entry.weekdays ? undefined : t("editor.schedule.anyDay")}
             />
             <CheckPills
-              label="During"
+              label={t("editor.schedule.during")}
               options={periods}
               value={entry.periods ?? []}
               onChange={(chosen) =>
                 change({ periods: chosen.length > 0 ? chosen : undefined })
               }
-              hint={entry.periods ? undefined : "Any time of day."}
+              hint={entry.periods ? undefined : t("editor.schedule.anyTime")}
             />
           </div>
         );
@@ -121,7 +122,7 @@ export function ScheduleTab({ content, schedule, onChange, before }: Props) {
           onChange([...schedule, { locationId: content.locations[0].id }])
         }
       >
-        Add a line
+        {t("editor.schedule.addLine")}
       </Button>
     </Group>
   );

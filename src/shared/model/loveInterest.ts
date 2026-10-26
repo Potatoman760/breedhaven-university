@@ -4,6 +4,7 @@ import { StudiesSchema, TeachingSchema } from "./course";
 import { StatSchema } from "./stats";
 import { ChildNamesSchema } from "./pregnancy";
 import { RoleSchema } from "./expedition";
+import { t } from "../i18n";
 
 /**
  * One picture of the character. Written in content either as just the image path, or as
@@ -160,6 +161,8 @@ export const AnimationSchema = z.object({
   clip: z.string().optional(),
   /** For the clip: plays round and round until something ends it. When false it plays once, and the sprite comes back. A picture stays until something ends it. */
   loop: z.boolean().default(true),
+  /** What a clip of it is asked for with, in place of the one the settings keep for the sex-act: a pose of her own has none there. */
+  clipPrompt: z.string().optional(),
 });
 export type Animation = z.infer<typeof AnimationSchema>;
 
@@ -281,8 +284,9 @@ export function poseDescription(
 ): string {
   return (
     pose.description.trim() ||
-    NSFW_POSES.find((known) => known.id === pose.id)?.description ||
-    ""
+    (NSFW_POSES.some((known) => known.id === pose.id)
+      ? t(`game.pose.${pose.id as (typeof NSFW_POSES)[number]["id"]}`)
+      : "")
   );
 }
 
@@ -302,8 +306,8 @@ export const RoomSchema = z.object({
   description: z.string().default(""),
   /** The location it is in. Going there from that location takes no time. */
   locationId: z.string(),
-  /** Image path inside the content pack. Left out, the location's own artwork is shown. */
-  background: z.string().optional(),
+  /** Its pictures by day and by night, as a view has them: whichever is missing shows the other. None, the location's own artwork is shown. */
+  images: z.partialRecord(z.enum(["day", "night"]), z.string()).optional(),
   /** A view of its location that is this room's picture, by day and by night, in place of a picture of its own. */
   viewId: z.string().optional(),
 });
@@ -439,7 +443,7 @@ export type LoveInterest = z.infer<typeof LoveInterestSchema>;
 
 /** A student's year as an American university says it: "sophomore", or "graduate student" from the fifth on. */
 export function classYear(level: number): string {
-  return ["freshman", "sophomore", "junior", "senior"][level - 1] ?? "graduate student";
+  return t("game.classYear", { level });
 }
 
 /** Whether a character is a student, a teacher, a love interest from outside the University, or an NPC. */

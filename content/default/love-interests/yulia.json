@@ -4,7 +4,7 @@
   "role": "",
   "age": 21,
   "pronouns": "she/her",
-  "bio": "A third-year transfer from the Starkelands who studies Magical Engineering and treats every night like a festival. She is here for the parties, the potions, and a good time, in roughly that order.",
+  "bio": "A third-year transfer from the Starkelands who studies Magical Engineering and treats every night like a festival. She is here for the parties, the drugs, and a good time, in roughly that order.",
   "appearance": "A tall young woman of twenty-one with pale skin, high cheekbones, a heart-shaped face, and bright green eyes with winged eyeliners. Her lips are full and glossy pink. Her platinum blonde hair falls past her shoulders in thick, tousled waves. She has a curvaceous hourglass figure, big breasts, long legs",
   "personality": "Bold, hedonistic, and utterly without shame about what she enjoys. She is louder and sharper than she looks, and underneath the party-girl act she is lonely in a country that is not her own.",
   "traitIds": [
@@ -184,26 +184,26 @@
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",
-      "pregnant": false,
       "sprites": {
         "neutral": {
           "image": "sprites/yulia/bathrobe-neutral-cutout.webp",
           "description": ""
         }
-      }
+      },
+      "pregnant": false
     },
     {
       "id": "bathrobe-pregnant",
       "name": "Bathrobe, pregnant",
-      "inherits": "bathrobe",
       "description": "She has a round, pregnant belly.",
-      "pregnant": true,
+      "inherits": "bathrobe",
       "sprites": {
         "neutral": {
           "image": "sprites/yulia/bathrobe-pregnant-neutral-cutout.webp",
           "description": ""
         }
-      }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -304,9 +304,9 @@
   "schedule": [
     {
       "weekdays": [
-        "Moonday",
-        "Tidesday",
-        "Windsday"
+        "Tuesday",
+        "Wednesday",
+        "Thursday"
       ],
       "periods": [
         "morning"
@@ -315,8 +315,8 @@
     },
     {
       "weekdays": [
-        "Moonday",
-        "Tidesday"
+        "Tuesday",
+        "Wednesday"
       ],
       "periods": [
         "afternoon"
@@ -331,8 +331,8 @@
     },
     {
       "weekdays": [
-        "Marketday",
-        "Restday"
+        "Saturday",
+        "Sunday"
       ],
       "periods": [
         "night"
@@ -341,7 +341,7 @@
     },
     {
       "weekdays": [
-        "Solday"
+        "Monday"
       ],
       "periods": [
         "afternoon"
@@ -353,7 +353,9 @@
     "name": "an apartment above Byte & Bloom on Lantern Row",
     "description": "A studio apartment, small and cluttered and lit by strings of colored charms. The bed is unmade and heaped with cushions and coats. A shelf holds half-dead houseplants, a speaker stack, and a tray of vials and powders beside a cracked mirror. The window stands open to the street noise and the lantern-light, and the air smells of perfume and smoke.",
     "locationId": "lantern-row",
-    "background": "generated/backgrounds/yulia/view.webp"
+    "images": {
+      "day": "generated/backgrounds/yulia/view.webp"
+    }
   },
   "birthPicture": "sprites/yulia/birth.webp",
   "walkSprite": "sprites/yulia/walk-cutout.webp",
@@ -380,7 +382,7 @@
       "Says 'that's so Breedhaven' as a gentle tease about anything dull or proper"
     ],
     "exampleDialogue": [],
-    "backstory": "Yulia grew up in Hjalmark, a wind-bitten university town in the northern Starkelands, where the magic is older and rougher and the winters are six months long. Her mother is an elemental surveyor who maps storm-lines across the tundra; her older sister followed the same path. Yulia was the disappointment who preferred house parties to fieldwork and got through school on charm and last-minute cramming.\n\nShe transferred to Breedhaven University in her third year, nominally to finish her Magical Engineering degree at a better-equipped college, really because her mother told her to stop embarrassing the family in Hjalmark. The Starkelands are poorer and colder than Breedhaven, and Yulia arrived in Seedblossom with two bags, a fake ID that fooled nobody, and a determination to find out what a rich country feels like from the inside.\n\nShe rents a studio above Byte & Bloom, works the occasional bar shift at the Undergrowth when rent is due, and has built a wide and shallow network of friends across every college. She takes recreational potions the way other students take coffee: openly, often, and with strong opinions about which alchemist does the best work. The Bloom pulls at her the way it pulls at every woman, and she handles it by not handling it, by staying out late and staying close to whoever is closest.",
+    "backstory": "Yulia grew up in Hjalmark, a wind-bitten university town in the northern Starkelands, where the magic is older and rougher and the winters are six months long. Her mother is an elemental surveyor who maps storm-lines across the tundra; her older sister followed the same path. Yulia was the disappointment who preferred house parties to fieldwork and got through school on charm and last-minute cramming.\n\nShe transferred to Breedhaven University in her third year, nominally to finish her Magical Engineering degree at a better-equipped college, really because her mother told her to stop embarrassing the family in Hjalmark. The Starkelands are poorer and colder than Breedhaven, and Yulia arrived in Seedblossom with two bags, a fake ID that fooled nobody, and a determination to find out what a rich country feels like from the inside.\n\nShe rents a studio above Byte & Bloom, works the occasional bar shift at the Undergrowth when rent is due, and has built a wide and shallow network of friends across every college. She takes recreational drugs the way other students take coffee: openly, often, and with strong opinions about which alchemist does the best work. The Bloom pulls at her the way it pulls at every woman, and she handles it by not handling it, by staying out late and staying close to whoever is closest.",
     "knowledge": [],
     "secrets": [],
     "extraInstructions": "Play her as genuinely fun, not as a joke. She is careless, not stupid, and she notices more than she lets on. Let her Starklandish pride surface when someone assumes she is just a pretty face. She should flirt as easily as breathing but go still and quiet if someone is actually kind to her without wanting something."

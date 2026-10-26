@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react'
 import type { ComfyBundle, ComfyBundleCheck, ComfyDownloadList, ModelDownloadProgress } from '../../../../shared/comfy'
 import { errorMessage } from '../../errors'
 import { Button } from '../Button'
+import { t } from '../../../../shared/i18n'
 
-const gigabytes = (megabytes: number) => (megabytes >= 1024 ? `${(megabytes / 1024).toFixed(1)} GB` : `${Math.round(megabytes)} MB`)
+const gigabytes = (megabytes: number) => (megabytes >= 1024 ? t('comfy.bundlePanel.gigabytes', { size: (megabytes / 1024).toFixed(1) }) : t('comfy.bundlePanel.megabytes', { size: Math.round(megabytes) }))
 // A workflow names a file with whichever slash its author's system uses.
 const sameFile = (a: string, b: string) => a.replace(/\\/g, '/').toLowerCase() === b.replace(/\\/g, '/').toLowerCase()
 
@@ -56,7 +57,7 @@ export function ComfyBundlePanel() {
     run(async () => {
       setList(await window.api.comfy.setCivitaiKey(value))
       setKey('')
-      setStatus({ ok: true, text: value.trim() ? 'Your Civitai key is kept on this computer, and used only to download these files.' : 'The Civitai key has been forgotten.' })
+      setStatus({ ok: true, text: value.trim() ? t('comfy.bundlePanel.keyKept') : t('comfy.bundlePanel.keyForgotten') })
     })
 
   /** Downloads the given files one after another, stopping at the first that fails. */
@@ -75,7 +76,7 @@ export function ComfyBundlePanel() {
         }
       }
       setQueue([])
-      setStatus({ ok: true, text: files.length === 1 ? 'Downloaded. ComfyUI will find it the next time it is asked for.' : `${files.length} files downloaded. ComfyUI will find them the next time they are asked for.` })
+      setStatus({ ok: true, text: t('comfy.bundlePanel.downloaded', { count: files.length }) })
     })
 
   if (!bundle || bundle.workflows.length === 0) return null
@@ -89,14 +90,11 @@ export function ComfyBundlePanel() {
 
   return (
     <div className="editor-group">
-      <h2>The game's workflows</h2>
-      <p className="hint">
-        The game draws with {workflows.length === 1 ? 'a workflow' : `${workflows.length} workflows`} of its own: {workflows.map((w) => w.name).join(', ')}. Nothing of
-        {workflows.length === 1 ? ' it' : ' them'} needs installing. The models can be downloaded from here; custom nodes are yours to install.
-      </p>
+      <h2>{t('comfy.bundlePanel.title')}</h2>
+      <p className="hint">{t('comfy.bundlePanel.intro', { count: workflows.length, names: workflows.map((w) => w.name).join(', ') })}</p>
       <div className="row">
         <Button disabled={busy} onClick={look}>
-          Check my ComfyUI for what they need
+          {t('comfy.bundlePanel.check')}
         </Button>
       </div>
 
@@ -104,42 +102,42 @@ export function ComfyBundlePanel() {
         <>
           <div className="row">
             <label>
-              Models folder
-              <input readOnly value={list?.modelsDir ?? ''} placeholder="Not found yet: choose your ComfyUI folder" />
-              <span className="hint">Where ComfyUI keeps its models. Each download goes into the folder inside it that it belongs in.</span>
+              {t('comfy.bundlePanel.modelsFolder')}
+              <input readOnly value={list?.modelsDir ?? ''} placeholder={t('comfy.bundlePanel.modelsFolderPlaceholder')} />
+              <span className="hint">{t('comfy.bundlePanel.modelsFolderHint')}</span>
             </label>
             <Button disabled={busy} onClick={chooseFolder}>
-              Choose...
+              {t('comfy.bundlePanel.choose')}
             </Button>
           </div>
           <div className="row">
             <label>
-              Civitai API key
+              {t('comfy.bundlePanel.civitaiKey')}
               <input
                 type="password"
                 value={key}
                 onChange={(e) => setKey(e.target.value)}
-                placeholder={list?.hasCivitaiKey ? 'Saved. Type another to replace it.' : 'Needed for the adult-rated models on Civitai'}
+                placeholder={list?.hasCivitaiKey ? t('comfy.bundlePanel.keySavedPlaceholder') : t('comfy.bundlePanel.keyPlaceholder')}
               />
               <span className="hint">
-                Civitai only gives adult-rated models to someone signed in. Make a key under{' '}
+                {t('comfy.bundlePanel.keyHintBefore')}{' '}
                 <a href="https://civitai.com/user/account" target="_blank" rel="noreferrer">
-                  your Civitai account settings
+                  {t('comfy.bundlePanel.keyHintLink')}
                 </a>
-                , API Keys, and paste it here. It is kept on this computer and sent to Civitai alone.
+                {t('comfy.bundlePanel.keyHintAfter')}
               </span>
             </label>
             <Button disabled={busy || key.trim() === ''} onClick={() => saveKey(key)}>
-              Save key
+              {t('comfy.bundlePanel.saveKey')}
             </Button>
             {list?.hasCivitaiKey && (
               <Button variant="quiet" disabled={busy} onClick={() => saveKey('')}>
-                Forget it
+                {t('comfy.bundlePanel.forgetKey')}
               </Button>
             )}
           </div>
 
-          <span className="caps">Models they load</span>
+          <span className="caps">{t('comfy.bundlePanel.models')}</span>
           <div className="bundle-models">
             {models.map((model) => {
               const active = downloading && queue[0] === model.file
@@ -153,7 +151,7 @@ export function ComfyBundlePanel() {
                     <span className="hint">
                       {model.folder}/{model.file} · {gigabytes(model.sizeMb)} ·{' '}
                       <a href={model.page} target="_blank" rel="noreferrer">
-                        {model.civitaiVersionId !== undefined ? 'Civitai page' : 'its page'}
+                        {model.civitaiVersionId !== undefined ? t('comfy.bundlePanel.civitaiPage') : t('comfy.bundlePanel.itsPage')}
                       </a>
                     </span>
                     {active && (
@@ -161,17 +159,17 @@ export function ComfyBundlePanel() {
                         <div style={{ width: `${done && done.total > 0 ? Math.min(100, (done.received / done.total) * 100) : 0}%` }} />
                       </div>
                     )}
-                    {active && <span className="hint">{done ? `${gigabytes(done.received / 1048576)} of ${gigabytes(done.total / 1048576)}` : 'Starting...'}</span>}
+                    {active && <span className="hint">{done ? t('comfy.bundlePanel.progress', { received: gigabytes(done.received / 1048576), total: gigabytes(done.total / 1048576) }) : t('comfy.bundlePanel.starting')}</span>}
                   </div>
                   {model.present ? (
-                    <span className={notSeen ? 'chip madder' : 'chip'}>{notSeen ? 'Downloaded, but ComfyUI does not see it' : 'Installed'}</span>
+                    <span className={notSeen ? 'chip madder' : 'chip'}>{notSeen ? t('comfy.bundlePanel.notSeen') : t('comfy.bundlePanel.installed')}</span>
                   ) : active ? (
-                    <Button onClick={() => window.api.comfy.cancelDownload()}>Stop</Button>
+                    <Button onClick={() => window.api.comfy.cancelDownload()}>{t('comfy.bundlePanel.stop')}</Button>
                   ) : waiting ? (
-                    <span className="chip">Waiting</span>
+                    <span className="chip">{t('comfy.bundlePanel.waiting')}</span>
                   ) : (
-                    <Button disabled={busy || !list?.modelsDir} title={list?.modelsDir ? undefined : 'Choose your ComfyUI folder first'} onClick={() => download([model.file])}>
-                      Download
+                    <Button disabled={busy || !list?.modelsDir} title={list?.modelsDir ? undefined : t('comfy.bundlePanel.chooseFirst')} onClick={() => download([model.file])}>
+                      {t('comfy.bundlePanel.download')}
                     </Button>
                   )}
                 </div>
@@ -181,22 +179,22 @@ export function ComfyBundlePanel() {
           {missing.length > 1 && !downloading && (
             <div className="row">
               <Button variant="primary" disabled={busy || !list?.modelsDir} onClick={() => download(missing.map((model) => model.file))}>
-                Download all {missing.length} missing ({gigabytes(missing.reduce((sum, model) => sum + model.sizeMb, 0))})
+                {t('comfy.bundlePanel.downloadAll', { count: missing.length, size: gigabytes(missing.reduce((sum, model) => sum + model.sizeMb, 0)) })}
               </Button>
             </div>
           )}
-          {needsKey && <p className="hint">Some of these are on Civitai, which will want your key before it hands them over.</p>}
+          {needsKey && <p className="hint">{t('comfy.bundlePanel.needsKey')}</p>}
         </>
       )}
 
       {unlisted.length > 0 && (
         <div>
-          <span className="caps">Other files they load, to find yourself</span>
+          <span className="caps">{t('comfy.bundlePanel.unlisted')}</span>
           <ul className="bundle-needs">
             {unlisted.map((file) => (
               <li key={file} className={check?.missingModels.includes(file) ? 'missing' : undefined}>
                 {file}
-                {check?.missingModels.includes(file) && ' · not found'}
+                {check?.missingModels.includes(file) && t('comfy.bundlePanel.notFoundSuffix')}
               </li>
             ))}
           </ul>
@@ -205,7 +203,7 @@ export function ComfyBundlePanel() {
 
       {(list?.nodes.length ?? 0) > 0 && (
         <div>
-          <span className="caps">Custom nodes to install in ComfyUI</span>
+          <span className="caps">{t('comfy.bundlePanel.nodes')}</span>
           <ul className="bundle-needs">
             {list?.nodes.map((pack) => {
               const lacking = check?.missingNodes.some((node) => pack.provides.includes(node)) === true
@@ -215,7 +213,7 @@ export function ComfyBundlePanel() {
                     {pack.name}
                   </a>
                   {pack.provides.length > 0 && ` (${pack.provides.join(', ')})`}
-                  {lacking && ' · not installed'}
+                  {lacking && t('comfy.bundlePanel.notInstalledSuffix')}
                 </li>
               )
             })}
@@ -225,7 +223,7 @@ export function ComfyBundlePanel() {
       {/* Any kind of node a running ComfyUI lacks that no listed pack is known to bring. */}
       {check && check.missingNodes.filter((node) => !list?.nodes.some((pack) => pack.provides.includes(node))).length > 0 && (
         <div>
-          <span className="caps">Other nodes ComfyUI is missing</span>
+          <span className="caps">{t('comfy.bundlePanel.otherNodes')}</span>
           <ul className="bundle-needs">
             {check.missingNodes
               .filter((node) => !list?.nodes.some((pack) => pack.provides.includes(node)))

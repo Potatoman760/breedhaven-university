@@ -32,7 +32,7 @@ export class SettingsStore {
   }
 
   update(update: SettingsUpdate): Settings {
-    const next = {} as Settings
+    const next = { language: this.settings.language } as Settings
     for (const id of LLM_PROFILE_IDS) {
       const { apiKey, ...rest } = update[id]
       next[id] = { ...rest, apiKey: apiKey ?? this.settings[id].apiKey }
@@ -42,15 +42,21 @@ export class SettingsStore {
     return this.settings
   }
 
+  setLanguage(language: string): Settings {
+    this.settings = { ...this.settings, language }
+    this.write()
+    return this.settings
+  }
+
   private read(): Settings {
-    let raw: Record<string, Partial<StoredProfile> | undefined>
+    let raw: Record<string, Partial<StoredProfile> | undefined> & { language?: unknown }
     try {
       raw = JSON.parse(readFileSync(this.path, 'utf8'))
     } catch {
       // Missing or unreadable file: start from defaults.
       return SettingsSchema.parse({})
     }
-    const profiles: Record<string, unknown> = {}
+    const profiles: Record<string, unknown> = { language: raw.language }
     for (const id of LLM_PROFILE_IDS) {
       const { apiKeyEncrypted, ...profile } = raw[id] ?? {}
       if (apiKeyEncrypted) profile.apiKey = this.decrypt(profile.apiKey ?? '')
@@ -70,7 +76,7 @@ export class SettingsStore {
   }
 
   private write(): void {
-    const stored: Record<string, StoredProfile> = {}
+    const stored: Record<string, StoredProfile | string> = { language: this.settings.language }
     for (const id of LLM_PROFILE_IDS) {
       const profile = this.settings[id]
       const encrypt = this.cipher !== undefined && profile.apiKey.length > 0

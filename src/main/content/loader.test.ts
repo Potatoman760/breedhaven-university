@@ -28,10 +28,10 @@ describe('the default content pack', () => {
     const { calendar } = content
     const state = createInitialState(content)
     const first = toDate(calendar, 0)
-    expect([first.day, first.month.name, first.weekday, first.hour]).toEqual([15, 'Goldenhay', 'Solday', 8])
+    expect([first.day, first.month.name, first.weekday, first.hour]).toEqual([15, 'Goldenhay', 'Monday', 8])
     expect(calendar.lengthDays).toBe(19 * 7)
     const last = toDate(calendar, (calendar.lengthDays - 1) * calendar.hoursPerDay)
-    expect([last.day, last.month.name, last.weekday]).toEqual([25, 'Frostveil', 'Restday'])
+    expect([last.day, last.month.name, last.weekday]).toEqual([25, 'Frostveil', 'Sunday'])
     expect(isGameOver(calendar, calendar.lengthDays * calendar.hoursPerDay)).toBe(true)
     // A year is fifty-two weeks to the day, so a date falls on the same weekday every year.
     expect(calendar.months.reduce((sum, month) => sum + month.days, 0)).toBe(364)
@@ -49,14 +49,14 @@ describe('the default content pack', () => {
     const course = {
       id: 'c', number: 'X 101', title: 'X', professor: 'P', description: '', subject: 'X', code: 'X', level: 1, general: true,
       stats: ['wisdom' as const], studentIds: [], locationId: coursework!.locationId,
-      meetings: [{ weekday: 'Moonday', startHour: 10, hours: 2, kind: 'lecture' as const }]
+      meetings: [{ weekday: 'Tuesday', startHour: 10, hours: 2, kind: 'lecture' as const }]
     }
     const state = { ...createInitialState(content), courses: [course], enrolment: ['c'] }
-    // Moondays are days 1, 8, 15...; hour 10 is two hours after the 08:00 the game starts at.
-    const moonday = (week: number) => ({ ...state, time: (week * 7 + 1) * calendar.hoursPerDay + 2 })
-    expect(coursesInSession(content, moonday(1))).toHaveLength(1)
-    expect(coursesInSession(content, moonday(17))).toHaveLength(1)
-    expect(coursesInSession(content, moonday(18))).toEqual([])
+    // Tuesdays are days 1, 8, 15...; hour 10 is two hours after the 08:00 the game starts at.
+    const tuesday = (week: number) => ({ ...state, time: (week * 7 + 1) * calendar.hoursPerDay + 2 })
+    expect(coursesInSession(content, tuesday(1))).toHaveLength(1)
+    expect(coursesInSession(content, tuesday(17))).toHaveLength(1)
+    expect(coursesInSession(content, tuesday(18))).toEqual([])
   })
 
   it('gives every month weather that adds up to all of its days, in a temperate pattern', () => {

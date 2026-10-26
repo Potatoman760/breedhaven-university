@@ -333,7 +333,9 @@
     "name": "a study-bedroom on Lantern Row",
     "description": "A rented room that is more study than bedroom: a wide desk under two screens and a wall of modern art, shelves in strict order, and a posh modern bed",
     "locationId": "lantern-row",
-    "background": "generated/backgrounds/isolde/view-4.webp"
+    "images": {
+      "day": "generated/backgrounds/isolde/view-4.webp"
+    }
   },
   "birthPicture": "sprites/isolde/birth.webp",
   "walkSprite": "sprites/isolde/walk-cutout.webp",

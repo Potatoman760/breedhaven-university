@@ -3,6 +3,7 @@ import { basename, dirname, extname, join, resolve, sep } from 'node:path'
 import { nativeImage } from 'electron'
 import type { CutoutRequest, CutoutResult } from '../../shared/comfy'
 import { ADDON_PREFIX } from '../../shared/editor'
+import { t } from '../../shared/i18n'
 import { describeColour, keyBackground, type Raster } from './backgroundKey'
 
 /**
@@ -77,22 +78,22 @@ function toPng(image: Raster): Buffer {
  */
 export function cutoutArt(addonDir: string, request: CutoutRequest, prefix: string = ADDON_PREFIX): CutoutResult {
   const nothing = { ok: false, path: null, colour: null, cleared: 0, feathered: 0, enclosed: 0 }
-  if (!request.path.startsWith(prefix)) return { ...nothing, message: 'Only pictures in your add-on folder can be cut out.' }
+  if (!request.path.startsWith(prefix)) return { ...nothing, message: t('comfy.cutout.notAddon') }
   const root = resolve(addonDir)
   const source = resolve(root, request.path.slice(prefix.length))
-  if (!source.startsWith(root + sep) || !existsSync(source)) return { ...nothing, message: 'That picture is no longer there.' }
-  if (extname(source).toLowerCase() !== '.png') return { ...nothing, message: 'Only a PNG can be cut out.' }
+  if (!source.startsWith(root + sep) || !existsSync(source)) return { ...nothing, message: t('comfy.cutout.gone') }
+  if (extname(source).toLowerCase() !== '.png') return { ...nothing, message: t('comfy.cutout.notPng') }
 
   // An undecodable file comes back as an empty image rather than throwing.
   const image = nativeImage.createFromBuffer(readFileSync(source))
-  if (image.isEmpty()) return { ...nothing, message: 'That file could not be read as a picture.' }
+  if (image.isEmpty()) return { ...nothing, message: t('comfy.cutout.unreadable') }
   const { width, height } = image.getSize()
   const bitmap = image.toBitmap()
   if (bitmap.length !== width * height * 4) {
-    return { ...nothing, message: `The picture decoded to ${bitmap.length} bytes for ${width}×${height}, which does not add up. Nothing was changed.` }
+    return { ...nothing, message: t('comfy.cutout.badBitmap', { bytes: bitmap.length, width, height }) }
   }
 
-  const outcome = keyBackground(toRaster(bitmap, width, height), { tolerance: request.tolerance, mode: 'gaps' })
+  const outcome = keyBackground(toRaster(bitmap, width, height), { tolerance: request.tolerance, mode: request.mode ?? 'gaps' })
   if (!outcome.ok) return { ...nothing, colour: outcome.reading ? describeColour(outcome.reading.colour) : null, message: outcome.message }
 
   const stem = basename(source, extname(source))
@@ -102,7 +103,7 @@ export function cutoutArt(addonDir: string, request: CutoutRequest, prefix: stri
   try {
     writeFileSync(join(dirname(source), file), toPng(outcome.image))
   } catch (cause) {
-    return { ...nothing, colour, message: `Could not write it: ${(cause as Error).message}` }
+    return { ...nothing, colour, message: t('comfy.cutout.writeFailed', { reason: (cause as Error).message }) }
   }
 
   // Only after the new file is on disk. A failed delete is untidy, not broken.
@@ -110,7 +111,7 @@ export function cutoutArt(addonDir: string, request: CutoutRequest, prefix: stri
   try {
     rmSync(source)
   } catch (cause) {
-    message = `The original was kept: it could not be deleted (${(cause as Error).message}).`
+    message = t('comfy.cutout.originalKept', { reason: (cause as Error).message })
   }
   const path = `${request.path.slice(0, request.path.lastIndexOf('/') + 1)}${file}`
   return { ok: true, path, colour, cleared: outcome.cleared, feathered: outcome.feathered, enclosed: outcome.enclosed, message }

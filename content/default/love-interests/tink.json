@@ -328,11 +328,11 @@
   "schedule": [
     {
       "weekdays": [
-        "Solday",
-        "Moonday",
-        "Tidesday",
-        "Windsday",
-        "Hearthday"
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
       ],
       "periods": [
         "afternoon"
@@ -341,8 +341,8 @@
     },
     {
       "weekdays": [
-        "Marketday",
-        "Restday"
+        "Saturday",
+        "Sunday"
       ],
       "periods": [
         "afternoon"
@@ -367,7 +367,9 @@
     "name": "her room in the Cloister Halls",
     "description": "A small modern dormitory room turned into a workshop. A built-in desk buried under half-built gadgets, opened phones, loose wires, circuit boards etched with glowing runes and a soldering iron on its stand; tools hang from a pegboard on a smooth white wall. A narrow bed with a rumpled blanket and a deck of playing cards on the pillow, a small drone parked on the windowsill, a coil of rope under the open window, empty bottles on the floor. Cool blue light from two screens and a strip of ward-light along the ceiling.",
     "locationId": "dormitories",
-    "background": "generated/backgrounds/tink/view.webp"
+    "images": {
+      "day": "generated/backgrounds/tink/view.webp"
+    }
   },
   "birthPicture": "sprites/tink/birth.webp",
   "walkSprite": "sprites/tink/walk-cutout.webp",

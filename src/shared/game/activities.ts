@@ -3,6 +3,7 @@ import { isGameOver, toDate } from './calendar'
 import { applyEffects, describeCondition, evaluateCondition } from './conditions'
 import { inClass, locationOf } from './map'
 import { isOpen, matchesWhen } from './schedule'
+import { t } from '../i18n'
 
 export interface PerformCheck {
   ok: boolean
@@ -27,46 +28,46 @@ export function canPerform(
   const date = toDate(calendar, state.time)
   const { availability } = activity
 
-  if (isGameOver(calendar, state.time)) reasons.push('The game is over')
+  if (isGameOver(calendar, state.time)) reasons.push(t('game.activities.gameOver'))
 
   if (activity.locationId !== undefined && activity.locationId !== state.locationId) {
     const where = content.locations.find((l) => l.id === activity.locationId)
-    reasons.push(`Go to ${where?.name ?? activity.locationId} first`)
+    reasons.push(t('game.activities.goTo', { place: where?.name ?? activity.locationId }))
   }
   const partner = content.loveInterests.find((li) => li.id === loveInterestId)
   if (partner && !inScene && locationOf(content, state, partner) !== state.locationId) {
-    reasons.push(`${partner.name} is not here`)
+    reasons.push(t('game.activities.notHere', { name: partner.name }))
   } else if (partner && !inScene && inClass(content, state, partner)) {
-    reasons.push(`${partner.name} is in class`)
+    reasons.push(t('game.activities.inClass', { name: partner.name }))
   }
 
   if (availability.weekdays && !availability.weekdays.includes(date.weekday)) {
-    reasons.push(`Only on ${availability.weekdays.join(', ')}`)
+    reasons.push(t('game.activities.onlyOn', { days: availability.weekdays.join(', ') }))
   }
   if (availability.periods && !matchesWhen({ periods: availability.periods }, date)) {
     const names = availability.periods.map(
       (id) => calendar.periods.find((p) => p.id === id)?.name ?? id
     )
-    reasons.push(`Only during ${names.join(', ')}`)
+    reasons.push(t('game.activities.onlyDuring', { periods: names.join(', ') }))
   }
   if (availability.earliestHour !== undefined && date.hour < availability.earliestHour) {
-    reasons.push(`Not before ${availability.earliestHour}:00`)
+    reasons.push(t('game.activities.notBefore', { hour: availability.earliestHour }))
   }
   if (availability.latestHour !== undefined && date.hour > availability.latestHour) {
-    reasons.push(`Not after ${availability.latestHour}:00`)
+    reasons.push(t('game.activities.notAfter', { hour: availability.latestHour }))
   }
 
   const location = content.locations.find((l) => l.id === activity.locationId)
-  if (location && !isOpen(location, date.hour)) reasons.push(`${location.name} is closed`)
+  if (location && !isOpen(location, date.hour)) reasons.push(t('game.activities.closed', { place: location.name }))
 
   if (activity.withLoveInterest === 'required' && loveInterestId === undefined) {
-    reasons.push('Needs someone to do it with')
+    reasons.push(t('game.activities.needsPartner'))
   }
 
   const ctx = { state, content, loveInterestId }
   for (const requirement of activity.requirements) {
     if (!evaluateCondition(requirement, ctx)) {
-      reasons.push(`Requires ${describeCondition(requirement, content)}`)
+      reasons.push(t('game.activities.requires', { condition: describeCondition(requirement, content) }))
     }
   }
 
@@ -83,7 +84,7 @@ export function describeEffects(activity: Activity): string[] {
       case 'money':
         return [`${e.amount < 0 ? '−' : '+'}$${Math.abs(e.amount)}`]
       case 'energy':
-        return [`${signed(e.amount)} energy`]
+        return [t('game.activities.energy', { amount: signed(e.amount) })]
       case 'meter':
         return [`${signed(e.amount)} ${e.meter}`]
       default:

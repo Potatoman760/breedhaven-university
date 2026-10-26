@@ -4,6 +4,7 @@ import { babiesAtHome, builtTier, goToRoom, householdIds, isResident, roomOf } f
 import { inClass, locationOf } from './map'
 import { sceneBaseline } from './scene'
 import { seedOf } from './seed'
+import { t } from '../i18n'
 
 /**
  * Where in the house each of the household is, hour by hour, so that walking through it he finds them in it: asleep
@@ -85,10 +86,10 @@ export function movingInScene(content: ContentPack, state: GameState, loveIntere
       viewId: room.viewId,
       beats: [
         {
-          activityName: `Moving into ${config.name}`,
-          locationName: `${config.name}, ${room.name.toLowerCase()}`,
-          description: `${first} has carried the last of her things into ${room.name.toLowerCase()}. It is hers now.`,
-          direction: `${first} has just said yes to moving in with ${player} at ${config.name}, and has moved into ${room.name.toLowerCase()}. She is excited about it. Stay in the house.`
+          activityName: t('game.homeLife.movingIn', { house: config.name }),
+          locationName: t('game.homeLife.place', { house: config.name, room: room.name.toLowerCase() }),
+          description: t('game.homeLife.movedIn', { first, room: room.name.toLowerCase() }),
+          direction: t('game.homeLife.direction', { first, player, house: config.name, room: room.name.toLowerCase() })
         }
       ],
       messages: [],

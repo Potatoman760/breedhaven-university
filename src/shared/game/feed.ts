@@ -7,6 +7,7 @@ import { locationOf, loveInterestsAt } from './map'
 import { wornOutfit } from './pregnancy'
 import { weatherOn } from './weather'
 import { seedOf } from './seed'
+import { t } from '../i18n'
 
 // Nobody posts before breakfast, or once the evening is over.
 const POST_HOURS = { from: 8, until: 22 } as const
@@ -158,42 +159,38 @@ export function feedRound(content: ContentPack, state: GameState): { state: Game
 export function buildFeedPrompt(content: ContentPack, state: GameState, plans: PostPlan[]): { system: string; user: string } {
   const player = state.player.name
   const system = [
-    'You write social media posts for the characters of a dating sim set at a modern university in a ' +
-      'magitech fantasy city, where everyday magic and modern technology exist side by side. Bloomr is the ' +
-      'photo feed app every student has on their phone; these are public posts anyone at the University can see. ' +
-      'Every post is a picture with a caption: of the character alone, or with the friend named.',
-    'Reply with only a JSON array and nothing else, with one object per post, in the order given. Each object has:',
-    '- "n": the number of the post',
-    '- "text": the caption',
-    '- "shot": "selfie" or "candid"',
-    '- "picture": what the picture shows',
-    'Rules for the caption:',
-    "- One or two short sentences, under 40 words, in that character's own voice, typed the way they would type on their phone.",
-    '- About that moment of their own day: where they are, what they are doing, eating, complaining about or looking forward to. ' +
-      'Use the place, the hour, the weather and the events given where they fit. When a friend is in the picture, say so in passing.',
-    `- Public: nothing private, nothing intimate, and never name ${player} or hint at what the two of them have done.`,
-    '- No hashtags or emoji unless they suit the character, and then one at most. Do not repeat a last post, and when one character posts twice make the two different.',
-    'Rules for the shot:',
-    '- "selfie": she holds the phone up and looks into it. Her face and shoulders, and nothing she is doing with her hands.',
-    '- "candid": a picture of her doing something, taken by someone out of the frame. She does not hold a phone or look at one.',
-    '- Choose whichever suits the caption, and vary them.',
-    'Rules for the picture:',
-    '- One whole sentence, under 30 words, for an image model, beginning "She is", "He is" or "They are", and with a friend "She and her friend are".',
-    '- A selfie: the look on her face. A candid: what she is doing, and the look on her face.',
-    '- Nobody else is in it, whatever the caption says of company: alone, only her; with a friend, only the two.',
-    '- Only what can be seen. Name nobody: write "she", "he" or "they", and "her friend" for the friend.',
-    '- Do not describe bodies, hair, clothes, phones or the place itself: those are added for you.'
+    t('llm.feed.systemRole'),
+    t('llm.feed.systemReply'),
+    t('llm.feed.fieldN', { field: '"n"' }),
+    t('llm.feed.fieldText', { field: '"text"' }),
+    t('llm.feed.fieldShot', { field: '"shot"', selfie: '"selfie"', candid: '"candid"' }),
+    t('llm.feed.fieldPicture', { field: '"picture"' }),
+    t('llm.feed.captionRules'),
+    t('llm.feed.captionShort'),
+    t('llm.feed.captionMoment'),
+    t('llm.feed.captionPublic', { player }),
+    t('llm.feed.captionNoTags'),
+    t('llm.feed.shotRules'),
+    t('llm.feed.shotSelfie', { selfie: '"selfie"' }),
+    t('llm.feed.shotCandid', { candid: '"candid"' }),
+    t('llm.feed.shotVary'),
+    t('llm.feed.pictureRules'),
+    t('llm.feed.pictureSentence'),
+    t('llm.feed.pictureLook'),
+    t('llm.feed.pictureNobody'),
+    t('llm.feed.pictureVisible'),
+    t('llm.feed.pictureNoBodies')
   ].join('\n')
 
   const weather = weatherOn(content, state)
   const events = eventsOn(content, state).filter((event) => !event.secret)
   const everyone = [...content.loveInterests, ...content.npcs]
   const user = [
-    `Today is ${formatDate(toDate(content.calendar, state.time))}.`,
-    weather && `Weather: ${weather.name}. ${weather.description}`,
-    ...events.map((e) => `Today is ${e.name}. ${describeEvent(content, e)}`.trim()),
+    t('llm.feed.today', { date: formatDate(toDate(content.calendar, state.time)) }),
+    weather && t('llm.feed.weather', { name: weather.name, description: weather.description }),
+    ...events.map((e) => t('llm.feed.event', { name: e.name, description: describeEvent(content, e) }).trim()),
     '',
-    `Write ${plans.length} posts:`,
+    t('llm.feed.write', { count: plans.length }),
     ...plans.flatMap((plan, i) => {
       const li = everyone.find((c) => c.id === plan.authorId)
       if (!li) return []
@@ -201,12 +198,12 @@ export function buildFeedPrompt(content: ContentPack, state: GameState, plans: P
       const friend = everyone.find((c) => c.id === plan.withId)
       const last = recentPostsBy(state, li.id, 1)[0]
       return [
-        `${i + 1}. ${li.name}, ${li.age}, at ${formatTime(toDate(content.calendar, plan.time))}. ${li.bio}`,
-        `   Personality: ${li.personality}`,
-        li.ai.speechPattern && `   Voice: ${li.ai.speechPattern}`,
-        `   Where: ${where ? `${where.name}. ${where.description}` : 'at home.'}`,
-        friend ? `   With a friend: ${friend.name}. ${friend.bio}` : '   Alone.',
-        last && `   Last post: ${last.text}`
+        t('llm.feed.post', { n: i + 1, name: li.name, age: li.age, time: formatTime(toDate(content.calendar, plan.time)), bio: li.bio }),
+        t('llm.feed.personality', { text: li.personality }),
+        li.ai.speechPattern && t('llm.feed.voice', { text: li.ai.speechPattern }),
+        t('llm.feed.where', { where: where ? `${where.name}. ${where.description}` : t('llm.feed.atHome') }),
+        friend ? t('llm.feed.withFriend', { name: friend.name, bio: friend.bio }) : t('llm.feed.alone'),
+        last && t('llm.feed.lastPost', { text: last.text })
       ]
     })
   ]
@@ -274,11 +271,11 @@ export function feedShortfall(content: ContentPack, reply: string, plans: PostPl
   const start = reply.indexOf('[')
   const why =
     start < 0
-      ? 'its reply had no list of posts in it'
+      ? t('llm.feed.noList')
       : !/\]\s*$/.test(reply.trim())
-        ? 'its reply stopped before the end, most likely out of room'
-        : 'it left some out, or wrote them in a shape that could not be read'
-  return `The LLM wrote ${written.length} of ${plans.length} posts (missing: ${missing.join(', ')}): ${why}.`
+        ? t('llm.feed.stopped')
+        : t('llm.feed.leftOut')
+  return t('llm.feed.shortfall', { written: written.length, planned: plans.length, missing: missing.join(', '), why })
 }
 
 /** A planned post with its caption written and the prompt its picture is drawn from: all but the picture. */

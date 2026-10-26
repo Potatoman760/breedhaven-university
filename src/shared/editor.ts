@@ -31,6 +31,8 @@ export interface EditorInfo {
   traits: Record<string, ContentOrigin>
   /** By location id. A location is only ever the game's own, or the game's own with changes. */
   locations: Record<string, ContentOrigin>
+  /** By subject code: the game's own subjects, and those made in the editor. */
+  majors: Record<string, ContentOrigin>
   /** The player a new game starts with has been changed from the game's own. */
   playerChanged: boolean
   /**
@@ -51,6 +53,8 @@ export interface EditorResult {
   info: EditorInfo
   /** How many of the character's pictures and videos were deleted on saving her, because nothing of hers uses them any more. */
   removed?: number
+  /** The term's catalogue was laid out again for the change, for new games. */
+  catalogueRebuilt?: boolean
 }
 
 /** Asks for a file to be picked and copied into a character's add-on folder. `loveInterestId` may be an NPC's id. */

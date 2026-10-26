@@ -5,19 +5,20 @@ import { Overlay } from './ui/Dialog'
 import { ModelField } from './ModelField'
 import { ComfySetupPanel } from './ui/art/ComfySetup'
 import { setVolume, useVolumes, VOLUME_KINDS, type VolumeKind } from './sound'
+import { chooseLanguage, useLanguageView } from './language'
+import { t, type MessageKey } from '../../shared/i18n'
 
 // What the settings are for, a tab each.
-const TABS = ['LLMs', 'ComfyUI', 'Sound'] as const
+const TABS = ['llms', 'comfy', 'sound'] as const
 type Tab = (typeof TABS)[number]
 
-const VOLUME_LABELS: Record<VolumeKind, string> = { effects: 'Effects', ambience: 'Ambience', music: 'Music' }
+const TAB_LABELS: Record<Tab, MessageKey> = { llms: 'shell.settings.tabLlms', comfy: 'shell.settings.tabComfy', sound: 'shell.settings.tabSound' }
 
-const LABELS: Record<LlmProfileId, { title: string; hint: string }> = {
-  main: { title: 'Main LLM', hint: 'Used for all scenes and memory summaries by default.' },
-  nsfw: {
-    title: 'NSFW LLM',
-    hint: 'Used for scenes marked NSFW. Leave blank to use the Main LLM for those too.'
-  }
+const VOLUME_LABELS: Record<VolumeKind, MessageKey> = { effects: 'shell.settings.effects', ambience: 'shell.settings.ambience', music: 'shell.settings.music' }
+
+const LABELS: Record<LlmProfileId, { title: MessageKey; hint: MessageKey }> = {
+  main: { title: 'shell.settings.mainTitle', hint: 'shell.settings.mainHint' },
+  nsfw: { title: 'shell.settings.nsfwTitle', hint: 'shell.settings.nsfwHint' }
 }
 
 // What the form holds per profile: the saved view plus the key being typed.
@@ -39,8 +40,9 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   const [form, setForm] = useState<Form | null>(null)
   const [status, setStatus] = useState<Partial<Record<LlmProfileId, string>>>({})
   const [busy, setBusy] = useState(false)
-  const [tab, setTab] = useState<Tab>('LLMs')
+  const [tab, setTab] = useState<Tab>('llms')
   const volumes = useVolumes()
+  const languages = useLanguageView()
 
   useEffect(() => {
     window.api.getSettings().then((view) => setForm(toForm(view)))
@@ -77,13 +79,13 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
     event.preventDefault()
     run(async () => {
       await save()
-      setStatus({ main: 'Saved.', nsfw: 'Saved.' })
+      setStatus({ main: t('shell.settings.saved'), nsfw: t('shell.settings.saved') })
     })
   }
 
   const onTest = (id: LlmProfileId) =>
     run(async () => {
-      setStatus({ ...status, [id]: 'Testing...' })
+      setStatus({ ...status, [id]: t('shell.settings.testing') })
       await save()
       const result = await window.api.testConnection(id)
       setStatus({ ...status, [id]: result.message })
@@ -92,58 +94,68 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
   return (
     <Overlay onClose={onClose}>
       <div className="settings wide">
-        <h1>Settings</h1>
+        <h1>{t('shell.settings.title')}</h1>
+        {/* Offered once there is a translation to choose; changed as soon as it is picked. */}
+        {languages && languages.languages.length > 1 && (
+          <label className="language">
+            {t('core.settings.language')}
+            <select value={languages.language} disabled={busy} onChange={(e) => run(() => chooseLanguage(e.target.value))}>
+              {languages.languages.map((one) => (
+                <option key={one.id} value={one.id}>
+                  {one.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
         <div className="tabs" role="tablist">
           {TABS.map((name) => (
             <button key={name} type="button" role="tab" aria-selected={tab === name} className={tab === name ? 'tab selected' : 'tab'} onClick={() => setTab(name)}>
-              {name}
+              {t(TAB_LABELS[name])}
             </button>
           ))}
         </div>
         {/* ComfyUI draws the pictures: Bloomr's selfies in play. Here is only how it is reached. Each change is saved as it is made. */}
-        {tab === 'ComfyUI' && (
+        {tab === 'comfy' && (
           <>
             <ComfySetupPanel connectionOnly />
             <div className="actions">
               <button type="button" className="secondary" onClick={onClose}>
-                Close
+                {t('shell.common.close')}
               </button>
             </div>
           </>
         )}
         {/* How loud each kind of sound is, kept on this computer and applied as the slider moves. */}
-        {tab === 'Sound' && (
+        {tab === 'sound' && (
           <>
             <div className="volumes">
               {VOLUME_KINDS.map((kind) => (
                 <label key={kind}>
-                  {VOLUME_LABELS[kind]} · {Math.round(volumes[kind] * 100)}%
+                  {t('shell.settings.volume', { kind: t(VOLUME_LABELS[kind]), percent: Math.round(volumes[kind] * 100) })}
                   <input type="range" min={0} max={100} value={Math.round(volumes[kind] * 100)} onChange={(e) => setVolume(kind, Number(e.target.value) / 100)} />
                 </label>
               ))}
             </div>
             <div className="actions">
               <button type="button" className="secondary" onClick={onClose}>
-                Close
+                {t('shell.common.close')}
               </button>
             </div>
           </>
         )}
-        {tab === 'LLMs' && (
+        {tab === 'llms' && (
       <form className="settings-form" onSubmit={onSave}>
-        <p className="hint">
-          Each LLM is an OpenAI-compatible endpoint. The base URL is everything before
-          /chat/completions, for example https://api.openai.com/v1.
-        </p>
+        <p className="hint">{t('shell.settings.endpointHint', { path: '/chat/completions', example: 'https://api.openai.com/v1' })}</p>
         <div className="profiles">
           {LLM_PROFILE_IDS.map((id) => {
             const p = form[id]
             return (
               <fieldset key={id}>
-                <legend>{LABELS[id].title}</legend>
-                <p className="hint">{LABELS[id].hint}</p>
+                <legend>{t(LABELS[id].title)}</legend>
+                <p className="hint">{t(LABELS[id].hint)}</p>
                 <label>
-                  Base URL
+                  {t('shell.settings.baseUrl')}
                   <input
                     value={p.baseUrl}
                     onChange={(e) => set(id, { baseUrl: e.target.value })}
@@ -151,13 +163,13 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                   />
                 </label>
                 <label>
-                  API key
+                  {t('shell.settings.apiKey')}
                   <input
                     type="password"
                     value={p.apiKeyInput}
                     disabled={p.clearKey}
                     onChange={(e) => set(id, { apiKeyInput: e.target.value })}
-                    placeholder={p.hasApiKey ? 'Saved. Leave blank to keep it.' : 'Optional for local servers'}
+                    placeholder={p.hasApiKey ? t('shell.settings.keySaved') : t('shell.settings.keyOptional')}
                   />
                 </label>
                 {p.hasApiKey && (
@@ -167,7 +179,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                       checked={p.clearKey}
                       onChange={(e) => set(id, { clearKey: e.target.checked })}
                     />
-                    Remove the saved key
+                    {t('shell.settings.removeKey')}
                   </label>
                 )}
                 <ModelField
@@ -178,7 +190,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                   onChange={(model) => set(id, { model })}
                 />
                 <label>
-                  Temperature
+                  {t('shell.settings.temperature')}
                   <input
                     type="number"
                     min={0}
@@ -189,7 +201,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                   />
                 </label>
                 <label>
-                  Max reply tokens
+                  {t('shell.settings.maxTokens')}
                   <input
                     type="number"
                     min={1}
@@ -199,16 +211,16 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                   />
                 </label>
                 <label>
-                  Extra instructions
+                  {t('shell.settings.instructions')}
                   <textarea
                     rows={3}
                     value={p.instructions}
                     onChange={(e) => set(id, { instructions: e.target.value })}
-                    placeholder="Appended to every system prompt sent to this LLM"
+                    placeholder={t('shell.settings.instructionsPlaceholder')}
                   />
                 </label>
                 <button type="button" disabled={busy} onClick={() => onTest(id)}>
-                  Save and test
+                  {t('shell.settings.saveAndTest')}
                 </button>
                 {status[id] && <p className="status">{status[id]}</p>}
               </fieldset>
@@ -217,10 +229,10 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
         </div>
         <div className="actions">
           <button type="submit" disabled={busy}>
-            Save
+            {t('shell.settings.save')}
           </button>
           <button type="button" className="secondary" onClick={onClose}>
-            Close
+            {t('shell.common.close')}
           </button>
         </div>
       </form>

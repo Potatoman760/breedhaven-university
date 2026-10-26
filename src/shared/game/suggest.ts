@@ -4,6 +4,7 @@ import { hasContact } from './courier'
 import { handleOf } from './feed'
 import { stageFor, stageRank } from './relationships'
 import { sceneCast } from './scene'
+import { t } from '../i18n'
 
 /**
  * What the scene's text box can offer him to say: an ask the rules allow right now, written out, and the note that goes
@@ -39,8 +40,8 @@ export function sceneSuggestions(content: ContentPack, state: GameState, scene: 
     if (hasContact(state, li.id) || !reached(content, state, li, CONTACT_STAGE)) continue
     suggestions.push({
       id: `contact:${li.id}`,
-      text: `${first(li)}, could I get your Bloomr?`,
-      cue: `${player} is asking ${first(li)} for her Bloomr. If she gives it, she says her handle: ${handleOf(li)}.`
+      text: t('game.suggest.contact', { first: first(li) }),
+      cue: t('game.suggest.contactCue', { player, first: first(li), handle: handleOf(li) })
     })
   }
 
@@ -55,11 +56,11 @@ export function sceneSuggestions(content: ContentPack, state: GameState, scene: 
       if (!members.every((li) => reached(content, state, li, status.minStage))) continue
       if (!canBond(content, state, { statusId: status.id, memberIds }).ok) continue
       const names = members.map(first)
-      const asked = names.length === 1 ? names[0] : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`
+      const asked = names.length === 1 ? names[0] : t('game.suggest.list', { rest: names.slice(0, -1).join(', '), last: names.at(-1) })
       suggestions.push({
         id: `bond:${status.id}:${memberIds.join('+')}`,
-        text: `${asked}, do you think we're ready for ${status.name.toLowerCase().replace(/^an? /, '')}?`,
-        cue: `${player} is asking ${asked} for ${status.name}${statusOf(content, current) ? `, in place of ${statusOf(content, current)!.name}` : ''}. It is possible: if ${names.length === 1 ? 'she wants' : 'they want'} it, call propose_relationship with ${status.id}; if not, say why, in character.`
+        text: t('game.suggest.bond', { asked, status: status.name.toLowerCase().replace(/^an? /, '') }),
+        cue: t('game.suggest.bondCue', { player, asked, status: status.name, replacing: statusOf(content, current) !== undefined, current: statusOf(content, current)?.name, count: names.length, tool: 'propose_relationship', id: status.id })
       })
     }
   }

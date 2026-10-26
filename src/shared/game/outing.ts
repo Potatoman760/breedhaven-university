@@ -13,6 +13,7 @@ import { PLAYER_ROOM } from './sceneMoves'
 import { isOpen, isOpenFor } from './schedule'
 import { factor } from './modifiers'
 import { seedOf } from './seed'
+import { t } from '../i18n'
 
 // The hour he wakes: from midnight until then is for sleep (`SLEEP_HOURS` in sleep.ts).
 const SLEEP_UNTIL = 6
@@ -107,10 +108,10 @@ interface OutingRoom {
 export function outingRooms(content: ContentPack, state: GameState): OutingRoom[] {
   const own = content.newGame.room
   return [
-    ...(own ? [{ id: `room-of-${PLAYER_ROOM}`, name: `${state.player.name}'s room`, locationId: own.locationId ?? content.newGame.locationId, ownerId: PLAYER_ROOM }] : []),
+    ...(own ? [{ id: `room-of-${PLAYER_ROOM}`, name: t('llm.outing.roomOf', { name: state.player.name }), locationId: own.locationId ?? content.newGame.locationId, ownerId: PLAYER_ROOM }] : []),
     ...content.loveInterests
       .filter((li) => li.room && hasMet(state, li.id))
-      .map((li) => ({ id: `room-of-${li.id}`, name: `${li.name.split(' ')[0]}'s room`, locationId: li.room!.locationId, ownerId: li.id }))
+      .map((li) => ({ id: `room-of-${li.id}`, name: t('llm.outing.roomOf', { name: li.name.split(' ')[0] }), locationId: li.room!.locationId, ownerId: li.id }))
   ]
 }
 
@@ -143,7 +144,7 @@ export function fallbackOuting(content: ContentPack, state: GameState, text: str
       : undefined
   const outing: Outing = {
     trains,
-    title: text.trim().slice(0, TITLE_CHARS) || 'Something else',
+    title: text.trim().slice(0, TITLE_CHARS) || t('llm.outing.somethingElse'),
     description: '',
     withIds,
     locationId: place?.id ?? state.locationId,
@@ -156,37 +157,36 @@ export function fallbackOuting(content: ContentPack, state: GameState, text: str
 /** The prompt asking the LLM to turn what the player typed into an outing. */
 export function buildOutingPrompt(content: ContentPack, state: GameState, text: string): { system: string; user: string } {
   const here = content.locations.find((l) => l.id === state.locationId)
+  const player = state.player.name
   const system = [
-    `You turn what a player types into a plan in a dating sim. ${state.player.name} is the player.`,
-    'Reply with one JSON object and nothing else:',
+    t('llm.outing.systemRole', { player }),
+    t('llm.outing.systemReply'),
     '{"title": string, "description": string, "with": string[], "place": string, "hours": number, "trains": string}',
-    '- "title": what they will do, in a few words, like "Dinner" or "A walk by the river".',
-    `- "description": one sentence of narration that opens the scene, in the second person and present tense.`,
-    `- "with": the ids of the people ${state.player.name} names or plainly means, at most ${MAX_SCENE_CAST}. ` +
-      `Use [] when ${state.player.name} means to go alone. Never add someone who was not asked.`,
-    '- "place": the id of the place it would happen. Choose the place that suits it best when none is named. ' +
-      `When ${state.player.name} names a room ("her room", "my room", "Ana's room"), use that room's id from the list of rooms.`,
-    `- "hours": how long it takes, a whole number from 1 to ${MAX_HOURS}, or up to ${MAX_REST_HOURS} for sleep. Going to talk to someone, or to see them with nothing more said, is 1.`,
-    `- "trains": what it does for ${state.player.name}. One of ${STATS.join(', ')} when it works on that ` +
-      `(sparring is strength, archery dexterity, running endurance, study intelligence, company and ` +
-      `performance charisma, prayer and reflection wisdom); "rest" for sleeping or resting; "none" otherwise.`,
-    'Use only the ids listed.'
+    t('llm.outing.systemTitle', { field: '"title"' }),
+    t('llm.outing.systemDescription', { field: '"description"' }),
+    t('llm.outing.systemWith', { field: '"with"', player, max: MAX_SCENE_CAST }),
+    t('llm.outing.systemPlace', { field: '"place"', player }),
+    t('llm.outing.systemHours', { field: '"hours"', max: MAX_HOURS, maxRest: MAX_REST_HOURS }),
+    t('llm.outing.systemTrains', { field: '"trains"', player, stats: STATS.join(', '), rest: '"rest"', none: '"none"' }),
+    t('llm.outing.systemIds')
   ].join('\n')
   const user = [
-    `${state.player.name} is at ${here?.name ?? state.locationId} (${state.locationId}).`,
+    t('llm.outing.at', { player, place: here?.name ?? state.locationId, id: state.locationId }),
     '',
-    'People:',
+    t('llm.outing.people'),
     ...content.loveInterests.map(
-      (li) => `- ${li.id}: ${li.name}${inClass(content, state, li) ? ' (in class)' : locationOf(content, state, li) === state.locationId ? ' (here now)' : ''}`
+      (li) => `- ${li.id}: ${li.name}${inClass(content, state, li) ? t('llm.outing.inClass') : locationOf(content, state, li) === state.locationId ? t('llm.outing.hereNow') : ''}`
     ),
     '',
-    'Places:',
+    t('llm.outing.places'),
     ...content.locations.map(
-      (l) => `- ${l.id}: ${l.name}${trainsAt(l).length > 0 ? ` (a good place to work on ${trainsAt(l).join(', ')})` : ''}`
+      (l) => `- ${l.id}: ${l.name}${trainsAt(l).length > 0 ? t('llm.outing.trainsAt', { stats: trainsAt(l).join(', ') }) : ''}`
     ),
-    ...(outingRooms(content, state).length > 0 ? ['', 'Rooms:', ...outingRooms(content, state).map((r) => `- ${r.id}: ${r.name}, at ${content.locations.find((l) => l.id === r.locationId)?.name ?? r.locationId}`)] : []),
+    ...(outingRooms(content, state).length > 0
+      ? ['', t('llm.outing.rooms'), ...outingRooms(content, state).map((r) => t('llm.outing.room', { id: r.id, name: r.name, place: content.locations.find((l) => l.id === r.locationId)?.name ?? r.locationId }))]
+      : []),
     '',
-    `${state.player.name} typed: ${text}`
+    t('llm.outing.typed', { player, text })
   ].join('\n')
   return { system, user }
 }
@@ -198,7 +198,7 @@ export function buildOutingPrompt(content: ContentPack, state: GameState, text: 
 export function parseOuting(reply: string, content: ContentPack, state: GameState, text: string): Outing {
   const guess = fallbackOuting(content, state, text)
   const json = /\{[\s\S]*\}/.exec(reply)
-  if (!json) throw new Error('The LLM did not reply with a plan')
+  if (!json) throw new Error(t('llm.outing.noPlan'))
   const raw = JSON.parse(json[0]) as Record<string, unknown>
 
   const idOf = (list: { id: string }[], value: unknown) =>
@@ -241,21 +241,21 @@ export function outingEffects(outing: Outing): Effect[] {
 /** Why a love interest can't come to something that runs over the given hours, if they can't. */
 function busyReason(content: ContentPack, state: GameState, id: string, from: number, hours: number): string | undefined {
   const li = content.loveInterests.find((c) => c.id === id)
-  if (!li) return 'nobody by that name'
+  if (!li) return t('llm.outing.nobody')
   const name = li.name.split(' ')[0]
   // In the hours her child is being born she is nowhere else.
   const birth = state.appointments.find((plan) => plan.kind === 'birth' && plan.loveInterestId === id && plan.time < from + hours && from < plan.time + plan.hours)
-  if (birth) return `${name} is at ${content.locations.find((l) => l.id === birth.locationId)?.name ?? 'the Health Center'}: the child is coming`
+  if (birth) return t('llm.outing.birth', { name, place: content.locations.find((l) => l.id === birth.locationId)?.name ?? t('llm.outing.healthCenter') })
   for (let time = from; time < from + hours; time++) {
     const then = { ...state, time }
     for (const course of state.courses.filter((c) => courseMembers(c).includes(id))) {
       const meeting = meetingNow(content, then, course)
       if (!meeting) continue
       const ends = String(meeting.startHour + meeting.hours).padStart(2, '0')
-      if (course.teacherId === id && time === from) return `${name} is teaching ${course.number} until ${ends}:00`
+      if (course.teacherId === id && time === from) return t('llm.outing.teaching', { name, course: course.number, ends })
       return time === from
-        ? `${name} is in ${course.number} until ${ends}:00`
-        : `${name} has ${course.number} at ${String(meeting.startHour).padStart(2, '0')}:00`
+        ? t('llm.outing.inCourse', { name, course: course.number, ends })
+        : t('llm.outing.hasCourse', { name, course: course.number, starts: String(meeting.startHour).padStart(2, '0') })
     }
   }
   // With nothing on her schedule at that hour she is at home, and can be asked out like anyone.
@@ -279,17 +279,17 @@ function blockersAt(content: ContentPack, state: GameState, outing: Outing, time
   const arrive = toDate(content.calendar, start)
   const leave = toDate(content.calendar, start + outing.hours - 1)
   if (place && !(isOpen(place, arrive.hour) && isOpen(place, leave.hour))) {
-    other.push(isOpen(place, arrive.hour) ? `${place.name} closes too soon` : `${place.name} is closed`)
+    other.push(isOpen(place, arrive.hour) ? t('llm.outing.closesSoon', { place: place.name }) : t('llm.outing.closed', { place: place.name }))
   }
   // An event is gone to while it is on: he may come late and leave early, but not before it opens or after it shuts.
-  if (outing.window && start < outing.window.from) other.push(`${outing.title} opens at ${formatTime(toDate(content.calendar, outing.window.from))}`)
-  if (outing.window && start + outing.hours > outing.window.until) other.push(`${outing.title} is over at ${formatTime(toDate(content.calendar, outing.window.until))}`)
-  if (isGameOver(content.calendar, start + outing.hours - 1)) other.push('There is not enough of the season left')
+  if (outing.window && start < outing.window.from) other.push(t('llm.outing.opensAt', { title: outing.title, time: formatTime(toDate(content.calendar, outing.window.from)) }))
+  if (outing.window && start + outing.hours > outing.window.until) other.push(t('llm.outing.overAt', { title: outing.title, time: formatTime(toDate(content.calendar, outing.window.until)) }))
+  if (isGameOver(content.calendar, start + outing.hours - 1)) other.push(t('llm.outing.seasonOver'))
   // The small hours are for sleep: nothing starts in them or runs into them, but sleep itself.
   const last = toDate(content.calendar, start + outing.hours - 1)
-  if (outing.trains !== 'rest' && (arrive.hour < SLEEP_UNTIL || last.hour < SLEEP_UNTIL || last.dayIndex !== arrive.dayIndex)) other.push('It would run past midnight, and the night is for sleeping')
+  if (outing.trains !== 'rest' && (arrive.hour < SLEEP_UNTIL || last.hour < SLEEP_UNTIL || last.dayIndex !== arrive.dayIndex)) other.push(t('llm.outing.pastMidnight'))
   if (((outing.trains && outing.trains !== 'rest') || outing.studyCourseId) && state.player.energy < ENERGY_PER_HOUR * outing.hours) {
-    other.push('You are too tired for that. Rest first')
+    other.push(t('llm.outing.tooTired'))
   }
 
   const people = new Map<string, string>()
@@ -335,7 +335,7 @@ export function startOuting(
   const waited = { ...state, time: state.time + waitHours }
   const { people, other } = blockersAt(content, state, outing, waited.time)
   const problems = [...people.values(), ...other]
-  if (problems.length > 0) throw new Error(`Cannot do "${outing.title}": ${problems.join('; ')}`)
+  if (problems.length > 0) throw new Error(t('llm.outing.cannot', { title: outing.title, problems: problems.join('; ') }))
 
   // His own room is where he is from then on, until he goes somewhere else.
   const there = { ...waited, locationId: outing.locationId, inOwnRoom: outing.ownRoom === true }
@@ -361,15 +361,21 @@ export function startOuting(
   const found = [...promised, ...chance].slice(0, MAX_SCENE_CAST)
   // With no love interest about he is alone, whoever works at the place: there is no scene, only what the work did.
   const [leadId, ...companionIds] = outing.withIds.length > 0 ? outing.withIds : found
-  const what = outing.studyCourseId ? 'to study' : outing.trains && outing.trains !== 'rest' ? `to work on his ${outing.trains}` : 'on his own'
+  const what = outing.studyCourseId ? t('llm.outing.whatStudy') : outing.trains && outing.trains !== 'rest' ? t('llm.outing.whatTrain', { stat: outing.trains }) : t('llm.outing.whatAlone')
   const direction = !outing.dropIn
     ? undefined
-    : `${state.player.name} has come here ${what}: ${outing.title.toLowerCase()}. ${outing.description} ` +
-      (promised.length > 0
-        ? `${firstNames(content, promised)} said ${promised.length > 1 ? 'they' : 'she'} would be here, and ${promised.length > 1 ? 'are' : 'is'}: ${state.player.name} finds ${promised.length > 1 ? 'them' : 'her'} as he arrives. ` +
-          `Open with him arriving and the finding each other, as people who said they would. Anyone else here is run into by chance.`
-        : `Nobody arranged this: you happen to be here, and run into him while he is at it. Open with him at his work, and then the running into each other. You may watch, join in, tease him, help or get in his way, as you would.`) +
-      ` By the end of the scene the ${outing.hours === 1 ? 'hour is' : `${outing.hours} hours are`} up${outing.eventId ? '' : ' and he is the better for it'}.`
+    : t('llm.outing.direction', {
+        player: state.player.name,
+        what,
+        title: outing.title.toLowerCase(),
+        description: outing.description,
+        meeting:
+          promised.length > 0
+            ? t('llm.outing.promised', { names: firstNames(content, promised), many: promised.length > 1, player: state.player.name })
+            : t('llm.outing.chance'),
+        hours: outing.hours,
+        event: Boolean(outing.eventId)
+      })
   return {
     state: { ...after, time: after.time + outing.hours },
     scene: leadId
@@ -393,11 +399,16 @@ export function startOuting(
 export function describeOuting(content: ContentPack, outing: Outing): string {
   const place = content.locations.find((l) => l.id === outing.locationId)
   // A title that already says who with is not told it twice.
-  const named = outing.withIds.length > 0 && outing.title.toLowerCase().includes(`with ${firstNames(content, outing.withIds).toLowerCase()}`)
-  const company = named ? '' : outing.withIds.length > 0 ? ` with ${firstNames(content, outing.withIds)}` : ', alone'
+  const named = outing.withIds.length > 0 && outing.title.toLowerCase().includes(t('llm.outing.titledWith', { names: firstNames(content, outing.withIds) }).toLowerCase())
+  const company = named ? '' : outing.withIds.length > 0 ? t('llm.outing.with', { names: firstNames(content, outing.withIds) }) : t('llm.outing.alone')
   // In someone's room, the room is where it is.
-  const where = outing.roomOf === PLAYER_ROOM ? 'in your room' : outing.roomOf && !outing.studyCourseId ? `in ${firstNames(content, [outing.roomOf])}'s room` : `at ${place?.name ?? outing.locationId}`
-  return `${outing.title}${company} ${where}, ${outing.hours} hour${outing.hours === 1 ? '' : 's'}`
+  const where =
+    outing.roomOf === PLAYER_ROOM
+      ? t('llm.outing.inYourRoom')
+      : outing.roomOf && !outing.studyCourseId
+        ? t('llm.outing.inRoomOf', { name: firstNames(content, [outing.roomOf]) })
+        : t('llm.outing.atPlace', { place: place?.name ?? outing.locationId })
+  return t('llm.outing.describe', { title: outing.title, company, where, hours: outing.hours })
 }
 
 /** An event that can be gone to today: the outing going to it is, and the most hours of it that are left to be had. */
@@ -504,7 +515,7 @@ export function outingMisses(content: ContentPack, state: GameState, outing: Out
   const clock = (hour: number) => `${String(hour).padStart(2, '0')}:00`
   const missed: string[] = []
   for (const plan of state.appointments) {
-    if (plan.time < until && from < plan.time + plan.hours) missed.push(`your plan at ${formatTime(toDate(content.calendar, plan.time))}: ${plan.title}`)
+    if (plan.time < until && from < plan.time + plan.hours) missed.push(t('llm.outing.missPlan', { time: formatTime(toDate(content.calendar, plan.time)), title: plan.title }))
   }
   for (let time = from; time < until; time++) {
     const then = { ...state, time }
@@ -514,14 +525,14 @@ export function outingMisses(content: ContentPack, state: GameState, outing: Out
       // Counted at the hour it begins, or at the first hour if it is already under way; not one he has sat.
       if (!meeting || (meeting.startHour !== hour && time !== from)) continue
       if (state.attendance[course.id]?.sat.includes(`${dayIndex}:${meeting.startHour}`)) continue
-      missed.push(`${course.number} ${course.title}, ${meeting.kind === 'lab' ? 'a lab' : 'a lecture'} at ${clock(meeting.startHour)}`)
+      missed.push(t('llm.outing.missClass', { course: course.number, title: course.title, kind: meeting.kind, time: clock(meeting.startHour) }))
     }
     const job = content.jobs?.jobs.find((j) => j.id === state.job?.jobId)
     for (const shift of job?.shifts ?? []) {
       if (shift.weekday !== weekday || hour < shift.startHour || hour >= shift.startHour + shift.hours) continue
       if (shift.startHour !== hour && time !== from) continue
       if (timeOn(content, dayIndex, shift.startHour) < (state.job?.hiredAt ?? 0) || state.job?.worked.includes(shiftKey(dayIndex, shift))) continue
-      missed.push(`your shift as ${job!.title.toLowerCase()} at ${clock(shift.startHour)}, which would be a strike`)
+      missed.push(t('llm.outing.missShift', { job: job!.title.toLowerCase(), time: clock(shift.startHour) }))
     }
   }
   return [...new Set(missed)]

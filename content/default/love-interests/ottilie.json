@@ -218,6 +218,10 @@
       {
         "major": "RBI",
         "number": "101"
+      },
+      {
+        "major": "SGN",
+        "number": "146"
       }
     ]
   },
@@ -309,7 +313,7 @@
   "schedule": [
     {
       "weekdays": [
-        "Marketday"
+        "Saturday"
       ],
       "periods": [
         "morning"
@@ -318,7 +322,7 @@
     },
     {
       "weekdays": [
-        "Restday"
+        "Sunday"
       ],
       "periods": [
         "afternoon"
@@ -327,11 +331,11 @@
     },
     {
       "weekdays": [
-        "Solday",
-        "Moonday",
-        "Tidesday",
-        "Windsday",
-        "Hearthday"
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
       ],
       "periods": [
         "morning",
@@ -341,11 +345,11 @@
     },
     {
       "weekdays": [
-        "Solday",
-        "Moonday",
-        "Tidesday",
-        "Windsday",
-        "Hearthday"
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
       ],
       "periods": [
         "evening"
@@ -363,7 +367,9 @@
     "name": "her apartment above Petal & Pill",
     "description": "A bare, bright flat over the pharmacy: journals in stacks on the floor, one good chair, a very expensive coffee machine, a whiteboard where a picture should be, and a bed she treats as a place to read.",
     "locationId": "lantern-row",
-    "background": "generated/backgrounds/ottilie/view-5.webp"
+    "images": {
+      "day": "generated/backgrounds/ottilie/view-5.webp"
+    }
   },
   "birthPicture": "sprites/ottilie/birth.webp",
   "walkSprite": "sprites/ottilie/walk-cutout.webp",

@@ -17,14 +17,17 @@ import { errorMessage } from "./errors";
 import { useConfirm } from "./ui/Confirm";
 import { Button } from "./ui/Button";
 import { Dialog } from "./ui/Dialog";
+import { t } from "../../shared/i18n";
 
 export function describeSave(content: ContentPack, save: SaveSummary): string {
-  if (save.unreadable) return "Incompatible save";
+  if (save.unreadable) return t("shell.saves.incompatible");
   const date = toDate(content.calendar, save.time);
-  return (
-    `${save.playerName} · Day ${date.dayIndex + 1} · ${formatDate(date)}` +
-    (save.inScene ? " · mid-scene" : "")
-  );
+  return t("shell.saves.describe", {
+    name: save.playerName,
+    day: date.dayIndex + 1,
+    date: formatDate(date),
+    inScene: save.inScene === true,
+  });
 }
 
 interface Props {
@@ -94,9 +97,9 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
       if (
         occupied &&
         !(await ask({
-          title: `Overwrite ${saveLabel(slotId, summaryOf(slotId))}?`,
-          detail: "The game saved there is replaced by this one.",
-          confirm: "Overwrite",
+          title: t("shell.saves.overwriteTitle", { slot: saveLabel(slotId, summaryOf(slotId)) }),
+          detail: t("shell.saves.overwriteDetail"),
+          confirm: t("shell.saves.overwrite"),
         }))
       )
         return;
@@ -108,7 +111,7 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
       });
       setNames(({ [slotId]: _typed, ...rest }) => rest);
       await refresh();
-      setNotice(`Saved to ${saveLabel(slotId, saved)}.`);
+      setNotice(t("shell.saves.savedTo", { slot: saveLabel(slotId, saved) }));
     });
 
   /** Keeps a name typed for a save that is already there. For an empty slot it waits for the save. */
@@ -130,9 +133,9 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
     run(async () => {
       if (
         !(await ask({
-          title: `Delete ${saveLabel(slotId, summaryOf(slotId))}?`,
-          detail: "This cannot be undone.",
-          confirm: "Delete",
+          title: t("shell.saves.deleteTitle", { slot: saveLabel(slotId, summaryOf(slotId)) }),
+          detail: t("shell.saves.deleteDetail"),
+          confirm: t("shell.saves.delete"),
           grave: true,
         }))
       )
@@ -143,7 +146,7 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
     });
 
   return (
-    <Dialog title={mode === "save" ? "Save game" : "Load game"} onClose={onClose} ornate className="saves-dialog">
+    <Dialog title={mode === "save" ? t("shell.saves.saveTitle") : t("shell.saves.loadTitle")} onClose={onClose} ornate className="saves-dialog">
       <div className="saves">
         {[AUTO_SLOT_ID, ...SLOT_PAGES[page]].map((slotId) => {
           const summary = saves.find((s) => s.slotId === slotId);
@@ -162,7 +165,7 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
                     value={nameOf(slotId)}
                     maxLength={SAVE_NAME_CHARS}
                     placeholder={slotLabel(slotId)}
-                    aria-label={`Name of ${slotLabel(slotId)}`}
+                    aria-label={t("shell.saves.nameOf", { slot: slotLabel(slotId) })}
                     onChange={(e) =>
                       setNames({ ...names, [slotId]: e.target.value })
                     }
@@ -173,21 +176,21 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
                   />
                 )}
                 <span>
-                  {summary ? describeSave(content, summary) : "Empty"}
+                  {summary ? describeSave(content, summary) : t("shell.saves.empty")}
                 </span>
                 {summary && (
                   <span>
-                    Saved {new Date(summary.savedAt).toLocaleString()}
+                    {t("shell.saves.savedAt", { when: new Date(summary.savedAt).toLocaleString() })}
                   </span>
                 )}
               </div>
               {mode === "save" ? (
                 auto ? (
                   // The game writes this one itself, as he plays: it is not his to save over.
-                  <span className="hint slot-auto-note">Saved as you play</span>
+                  <span className="hint slot-auto-note">{t("shell.saves.autoNote")}</span>
                 ) : (
                   <Button variant="primary" size="small" onClick={() => save(slotId, summary !== undefined)}>
-                    Save here
+                    {t("shell.saves.saveHere")}
                   </Button>
                 )
               ) : (
@@ -197,7 +200,7 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
                   disabled={!summary || summary.unreadable}
                   onClick={() => load(slotId)}
                 >
-                  Load
+                  {t("shell.saves.load")}
                 </Button>
               )}
               {!(auto && mode === "save") && (
@@ -206,7 +209,7 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
                   disabled={!summary}
                   onClick={() => remove(slotId)}
                 >
-                  Delete
+                  {t("shell.saves.delete")}
                 </Button>
               )}
             </div>
@@ -215,13 +218,13 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
         <div
           className="slot-pages"
           role="tablist"
-          aria-label="Pages of save slots"
+          aria-label={t("shell.saves.pages")}
         >
           <Button
             size="small"
             disabled={page === 0}
             onClick={() => setPage(page - 1)}
-            aria-label="Previous page"
+            aria-label={t("shell.saves.previousPage")}
           >
             ‹
           </Button>
@@ -233,7 +236,7 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
               variant={i === page ? "primary" : "secondary"}
               size="small"
               className="slot-page"
-              title={`Slots ${i * slots.length + 1} to ${i * slots.length + slots.length}`}
+              title={t("shell.saves.pageSlots", { from: i * slots.length + 1, to: i * slots.length + slots.length })}
               onClick={() => setPage(i)}
             >
               {i + 1}
@@ -245,7 +248,7 @@ export function SavesPanel({ content, mode, current, onLoad, onClose }: Props) {
             size="small"
             disabled={page === SLOT_PAGES.length - 1}
             onClick={() => setPage(page + 1)}
-            aria-label="Next page"
+            aria-label={t("shell.saves.nextPage")}
           >
             ›
           </Button>

@@ -1,9 +1,10 @@
-import { MAX_SCENE_CAST, type Appointment, type ContentPack, type Course, type GameState, type Proposal } from '../model'
+import { MAX_SCENE_CAST, type Appointment, type ContentPack, type GameState, type Proposal } from '../model'
 import type { PerformCheck } from './activities'
 import { formatDate, formatTime, isGameOver, toDate } from './calendar'
-import { courseMembers, meetingNow } from './courses'
+import { busyWith } from './freeTime'
 import { firstNames } from './scene'
 import { isOpen } from './schedule'
+import { t } from '../i18n'
 
 // Plans are made for these hours of the day, and no further ahead than this.
 const EARLIEST_HOUR = 8
@@ -12,24 +13,10 @@ const SEARCH_DAYS = 14
 // How long a planned meeting lasts.
 const MEETING_HOURS = 2
 
-/** "Windsday, 4 Bloomtide at 13:00" */
+/** "Thursday, 4 Bloomtide at 13:00" */
 export function describeWhen(content: ContentPack, time: number): string {
   const date = toDate(content.calendar, time)
-  return `${formatDate(date)} at ${formatTime(date)}`
-}
-
-function overlaps(a: { time: number; hours: number }, time: number, hours: number): boolean {
-  return a.time < time + hours && time < a.time + a.hours
-}
-
-/** Whether any of the courses has a class during the given hours. */
-function inClass(content: ContentPack, state: GameState, courses: Course[], time: number, hours: number): boolean {
-  for (let t = time; t < time + hours; t++) {
-    // Asked of the timetable itself, so that days without classes are free.
-    const then = { ...state, time: t }
-    if (courses.some((course) => meetingNow(content, then, course) !== undefined)) return true
-  }
-  return false
+  return t('game.appointments.when', { date: formatDate(date), time: formatTime(date) })
 }
 
 /** Everyone a plan is with: whoever suggested it, then the others. */
@@ -37,7 +24,7 @@ export function attendees(plan: Pick<Proposal, 'loveInterestId' | 'companionIds'
   return [plan.loveInterestId, ...plan.companionIds]
 }
 
-/** Whether the player and every one of the love interests are free of classes and other plans for those hours. */
+/** Whether the player and every one of the love interests are free for those hours: nothing on his calendar he is held to, nor on theirs (`busyWith`). */
 export function allFree(
   content: ContentPack,
   state: GameState,
@@ -45,13 +32,7 @@ export function allFree(
   time: number,
   hours: number
 ): boolean {
-  const mine = state.courses.filter((c) => state.enrolment?.includes(c.id))
-  const theirs = state.courses.filter((c) => courseMembers(c).some((id) => loveInterestIds.includes(id)))
-  return (
-    !inClass(content, state, [...mine, ...theirs], time, hours) &&
-    // Every plan is with the player, so any plan at that time is a clash.
-    !state.appointments.some((a) => overlaps(a, time, hours))
-  )
+  return busyWith(content, state, loveInterestIds, time, hours).length === 0
 }
 
 export interface MeetingRequest {
@@ -80,13 +61,15 @@ function companionsOf(content: ContentPack, loveInterestId: string, request: Mee
 /**
  * Finds the first time the player, a love interest and anyone else asked along can meet: all free, the place
  * open throughout, at a civil hour, and matching any preference for how soon and what
- * time of day. Returns undefined if nothing fits in the next two weeks.
+ * time of day. Returns undefined if nothing fits in the next two weeks. With `free` false, whether they are free
+ * is not asked: the first time that fits what was asked, taken or not.
  */
 export function findMeetingTime(
   content: ContentPack,
   state: GameState,
   loveInterestId: string,
-  request: MeetingRequest
+  request: MeetingRequest,
+  free = true
 ): number | undefined {
   const { calendar } = content
   const location = content.locations.find((l) => l.id === request.place)
@@ -115,7 +98,7 @@ export function findMeetingTime(
     if (date.hour < EARLIEST_HOUR || date.hour + MEETING_HOURS > latestEnd) continue
     if (period && date.period.id.toLowerCase() !== period && date.period.name.toLowerCase() !== period) continue
     if (!isOpen(location, date.hour) || !isOpen(location, date.hour + MEETING_HOURS - 1)) continue
-    if (!allFree(content, state, everyone, time, MEETING_HOURS)) continue
+    if (free && !allFree(content, state, everyone, time, MEETING_HOURS)) continue
     return time
   }
   return undefined
@@ -135,7 +118,7 @@ export function proposeMeeting(
   const location = content.locations.find((l) => l.id === request.place)
   if (!location) {
     const known = content.locations.map((l) => l.id).join(', ')
-    return { message: `There is no place called "${request.place}". Choose one of: ${known}.` }
+    return { message: t('game.appointments.noPlace', { place: request.place, known }) }
   }
   const companionIds = companionsOf(content, loveInterestId, request)
   const unknown = (request.with ?? []).filter(
@@ -143,30 +126,40 @@ export function proposeMeeting(
   )
   if (unknown.length > 0) {
     const known = content.loveInterests.filter((li) => li.id !== loveInterestId).map((li) => li.id)
-    return { message: `Nobody is called "${unknown.join('", "')}". Choose from: ${known.join(', ')}.` }
+    return { message: t('game.appointments.nobody', { names: unknown.join('", "'), known: known.join(', ') }) }
   }
   const group = companionIds.length > 0
+  const everyone = [loveInterestId, ...companionIds]
   const time = findMeetingTime(content, state, loveInterestId, request)
+  // A time that fits what was asked and was passed over is said, with what is in the way, so that nobody makes up why.
+  const asked = findMeetingTime(content, state, loveInterestId, request, false)
+  const taken =
+    asked !== undefined && asked !== time
+      ? t('game.appointments.taken', { when: describeWhen(content, asked), busy: busyWith(content, state, everyone, asked, MEETING_HOURS).join('; ') })
+      : ''
+  // A plan she has with him already, so that one is not made twice, nor taken for something else that is in the way.
+  const already = upcomingAppointments(state).filter((plan) => plan.kind === undefined && attendees(plan).includes(loveInterestId))
+  const booked =
+    already.length > 0
+      ? t('game.appointments.booked', { player: state.player.name, plans: already.map((plan) => t('game.appointments.bookedPlan', { title: plan.title, when: describeWhen(content, plan.time) })).join('; ') })
+      : ''
+  const note = booked + taken
   if (time === undefined) {
     return {
       message:
-        `No time could be found in the next two weeks when ${group ? 'all of you are' : 'you are both'} free and ${location.name} is open. ` +
-        `Say that you can't find a time, and suggest trying another place or time of day${group ? ', or fewer people' : ''}.`
+        note +
+        t('game.appointments.noTime', { group, place: location.name })
     }
   }
-  const title = request.activity.trim() || 'Meet up'
+  const title = request.activity.trim() || t('game.appointments.meetUp')
   // How far off it is, said outright, so that a time found for today is not spoken of as next week.
   const inDays = toDate(content.calendar, time).dayIndex - toDate(content.calendar, state.time).dayIndex
-  const off = inDays === 0 ? 'today' : inDays === 1 ? 'tomorrow' : `${inDays} days from now`
+  const off = t('game.appointments.off', { days: inDays })
   return {
     proposal: { loveInterestId, companionIds, title, time, hours: MEETING_HOURS, locationId: location.id },
     message:
-      (group
-        ? `You, ${state.player.name}, ${firstNames(content, companionIds)} are all free on ${describeWhen(content, time)}, which is ${off}, at ${location.name}. `
-        : `You are both free on ${describeWhen(content, time)}, which is ${off}, at ${location.name}. `) +
-      `Suggest exactly that day, time and place to ${state.player.name}, in character, and ask whether it suits. ` +
-      `Do not name any other time, and do not call it next week or another day if it is not: if this is sooner or later than you meant, call the tool again with "earliest" or "weekday" set. ` +
-      ` ${state.player.name} will accept or decline.`
+      note +
+      t('game.appointments.found', { group, player: state.player.name, names: firstNames(content, companionIds), when: describeWhen(content, time), off, place: location.name, earliest: 'earliest', weekday: 'weekday' })
   }
 }
 
@@ -190,12 +183,12 @@ export function appointmentsNow(state: GameState): Appointment[] {
 
 export function canKeep(content: ContentPack, state: GameState, appointmentId: string): PerformCheck {
   const appointment = state.appointments.find((a) => a.id === appointmentId)
-  if (!appointment) return { ok: false, reasons: ['No such plan'] }
+  if (!appointment) return { ok: false, reasons: [t('game.appointments.noSuchPlan')] }
   const reasons: string[] = []
-  if (!appointmentsNow(state).includes(appointment)) reasons.push('It is not time yet')
+  if (!appointmentsNow(state).includes(appointment)) reasons.push(t('game.appointments.notYet'))
   if (state.locationId !== appointment.locationId) {
     const where = content.locations.find((l) => l.id === appointment.locationId)
-    reasons.push(`Go to ${where?.name ?? appointment.locationId} first`)
+    reasons.push(t('game.activities.goTo', { place: where?.name ?? appointment.locationId }))
   }
   return { ok: reasons.length === 0, reasons }
 }

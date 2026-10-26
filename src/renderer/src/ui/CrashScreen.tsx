@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react'
+import { t } from '../../../shared/i18n'
 
 interface State {
   error: Error | null
@@ -30,13 +31,13 @@ export class CrashScreen extends Component<{ children: ReactNode }, State> {
     const detail = [`${error.name}: ${error.message}`, error.stack?.split('\n').slice(1, 6).join('\n'), where.trim().split('\n').slice(0, 8).join('\n')].filter(Boolean).join('\n\n')
     return (
       <main className="crash">
-        <h1>Something went wrong</h1>
-        <p>The screen could not be drawn. Your game is safe: it is saved as you play, and Continue on the title screen picks it up from there.</p>
+        <h1>{t('shell.crash.title')}</h1>
+        <p>{t('shell.crash.body')}</p>
         <pre>{detail}</pre>
         <div className="row">
-          <button onClick={() => window.location.reload()}>Start again</button>
+          <button onClick={() => window.location.reload()}>{t('shell.crash.startAgain')}</button>
           <button className="secondary" onClick={() => void navigator.clipboard.writeText(detail)}>
-            Copy the error
+            {t('shell.crash.copyError')}
           </button>
         </div>
       </main>

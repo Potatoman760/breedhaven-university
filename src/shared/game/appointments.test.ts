@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { CourseSchema, CourseworkConfigSchema, type ContentPack } from '../model'
+import { CourseSchema, CourseworkConfigSchema, JobsConfigSchema, OrientationSchema, SocietiesConfigSchema, type ContentPack } from '../model'
 import {
   acceptProposal,
   appointmentsNow,
@@ -92,6 +92,35 @@ describe('proposeMeeting', () => {
     expect(never.proposal).toBeUndefined()
     expect(never.message).toMatch(/No time could be found/)
   })
+
+  it('plans nothing on orientation day, and says so while it is still to come', () => {
+    const inducted = { ...content, orientation: OrientationSchema.parse({ day: 1, steps: [{ id: 'tour', name: 'The tour', locationId: 'home', startHour: 8 }] }) }
+    const today = proposeMeeting(inducted, state, 'ana', { activity: 'tea', place: 'home', earliest: 'today' })
+    expect(today.proposal?.time).toBe(22)
+    expect(today.message).toMatch(/^Two, 2 A at 08:00, the first time that fits what was asked, is taken: it is orientation day\. .*which is tomorrow/)
+    const after = proposeMeeting(inducted, { ...state, time: 22 }, 'ana', { activity: 'tea', place: 'home' })
+    expect(after.message).not.toContain('orientation')
+  })
+
+  it('keeps clear of his shifts and of her society, and says what was in the way of the time that was asked for', () => {
+    const jobs = JobsConfigSchema.parse({ jobs: [{ id: 'clerk', title: 'Clerk', locationId: 'shop', bossId: 'bea', hourlyRate: 4, shifts: [{ weekday: 'Two', startHour: 8, hours: 2 }] }] })
+    const working = { ...state, job: { jobId: 'clerk', hiredAt: 0, strikes: 0, settledTo: 0, worked: [], excused: [] } }
+    const shifted = proposeMeeting({ ...content, jobs }, working, 'ana', { activity: 'tea', place: 'home' })
+    expect(shifted.proposal?.time).toBe(4)
+    expect(shifted.message).toMatch(/^Two, 2 A at 08:00, the first time that fits what was asked, is taken: he works a shift at the Shop\. /)
+
+    // Societies meet once their fair has been, here the Feast on the third day; three days in, it is a Two again.
+    const societies = SocietiesConfigSchema.parse({ fairId: 'feast', hours: 2, societies: [{ id: 'chess', name: 'the Chess Club', description: '', locationId: 'shop', weekday: 'Two', startHour: 8, stats: ['charisma'], memberIds: ['ana'] }] })
+    const hers = proposeMeeting({ ...content, societies }, { ...state, time: 3 * 20 }, 'ana', { activity: 'tea', place: 'home' })
+    expect(hers.proposal?.time).toBe(3 * 20 + 4)
+    expect(hers.message).toContain('is taken: Ana has her Chess Club meeting.')
+  })
+
+  it('names a plan she already has with him, so that it is not made twice', () => {
+    const booked = acceptProposal(state, { loveInterestId: 'ana', companionIds: [], title: 'Tea', time: 22, hours: 2, locationId: 'home' })
+    const { message } = proposeMeeting(content, booked, 'ana', { activity: 'tea', place: 'home', earliest: 'tomorrow' })
+    expect(message).toMatch(/^Already on Pat's calendar with you: "Tea", .*it is booked: say so, and do not suggest another time for it\. .*is taken: he already has a plan \(Tea with Ana\)\./)
+  })
 })
 
 describe('keeping a plan', () => {
@@ -132,6 +161,9 @@ describe('keeping a plan', () => {
     const prompt = buildCharacterPrompt({ content, state: booked, loveInterestId: 'ana' })
     expect(prompt).toContain('Tea')
     expect(prompt).toContain('at 08:00')
+    // Said as the whole of them, so that a meeting she only remembers talking of is not taken for one.
+    expect(prompt).toContain('These are all of them, and each is on his calendar.')
+    expect(buildCharacterPrompt({ content, state, loveInterestId: 'ana' })).toContain(`Plans you have made with ${state.player.name}\nNone. A meeting talked of`)
   })
 })
 

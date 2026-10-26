@@ -321,9 +321,9 @@
   "schedule": [
     {
       "weekdays": [
-        "Solday",
-        "Moonday",
-        "Tidesday"
+        "Monday",
+        "Tuesday",
+        "Wednesday"
       ],
       "periods": [
         "morning",
@@ -333,8 +333,8 @@
     },
     {
       "weekdays": [
-        "Windsday",
-        "Hearthday"
+        "Thursday",
+        "Friday"
       ],
       "periods": [
         "evening",
@@ -344,8 +344,8 @@
     },
     {
       "weekdays": [
-        "Marketday",
-        "Restday"
+        "Saturday",
+        "Sunday"
       ],
       "periods": [
         "morning",
@@ -361,7 +361,9 @@
     "name": "an apartment above the Honeyed Bee's kitchen",
     "description": "A narrow flat above a pub kitchen, warm from the ovens below, with a single bed pushed against the wall and a counter crowded with jars of fermenting things. Copper pans hang from a rack above a scrubbed table, and a window looks out over Lantern Row's lanterns. The air smells of yeast, toasted grain and dried lavender. Light comes from a bare bulb and the orange glow rising through the floorboards.",
     "locationId": "honeyed-bee-inn",
-    "background": "generated/backgrounds/lola-hopworth/view-2.webp"
+    "images": {
+      "day": "generated/backgrounds/lola-hopworth/view-2.webp"
+    }
   },
   "birthPicture": "sprites/lola-hopworth/birth.webp",
   "walkSprite": "sprites/lola-hopworth/walk-cutout.webp",

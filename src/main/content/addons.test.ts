@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { resolveContentPath } from './assets'
-import { deleteLocation, deleteLoveInterest, deleteTrait, importAsset, loadWithAddons, removeUnusedAssets, resetPlayer, saveLocation, saveLoveInterest, savePlayer, saveTrait } from './addons'
+import { deleteLocation, deleteLoveInterest, deleteTrait, importAsset, loadWithAddons, rebuildCatalogue, saveMajor, deleteMajor, removeUnusedAssets, resetPlayer, saveLocation, saveLoveInterest, savePlayer, saveTrait } from './addons'
 
 // The game's own pack is the base; each test gets an empty add-on folder of its own.
 const packDir = join(process.cwd(), 'content', 'default')
@@ -182,7 +182,7 @@ describe('tidying up on save', () => {
       id: 'mira',
       outfits: [{ id: 'default', name: 'Usual', description: '', pregnant: false, sprites: { neutral: { image: 'addons/sprites/mira/neutral.png', description: '' } } }],
       animations: [{ id: 'dance', name: 'Dance', description: '', clip: 'addons/sprites/mira/dance.mp4', loop: true }],
-      room: { background: 'addons/generated/backgrounds/mira/kept.png' },
+      room: { images: { night: 'addons/generated/backgrounds/mira/kept.png' } },
       birthPicture: 'addons/sprites/mira/birth.png',
       walkSprite: 'addons/sprites/mira/walk.png'
     }
@@ -233,7 +233,7 @@ describe('the player as an add-on', () => {
   it('changes how a new game starts him, room and all, and puts him back', () => {
     const dir = addons()
     expect(base.info.playerChanged).toBe(false)
-    const room = { name: 'a single room on the third floor', description: 'A narrow bed under a round window.', locationId: base.content.newGame.locationId, background: 'addons/sprites/player/room.png' }
+    const room = { name: 'a single room on the third floor', description: 'A narrow bed under a round window.', locationId: base.content.newGame.locationId, images: { day: 'addons/sprites/player/room.png', night: 'addons/sprites/player/room-night.png' } }
     expect(savePlayer(dir, base.content, { ...base.content.newGame, player: { ...base.content.newGame.player, name: 'Wren', money: 75 }, room })).toEqual([])
     const { content, info } = loadWithAddons(packDir, dir)
     expect(info.playerChanged).toBe(true)
@@ -307,5 +307,68 @@ describe('societies, which are the game\'s own', () => {
 
     expect(deleteSociety(pack, 'chess-club')).toEqual([])
     expect(deleteSociety(pack, 'chess-club')).toEqual(['There is no such society.'])
+  })
+})
+
+describe('the catalogue, as characters are added', () => {
+  it('is laid out again for a new student, with the old seed, and given back to the game once she is gone', () => {
+    const dir = addons()
+    // A student of a full subject: she has her week all the same.
+    const politics = base.content.loveInterests.find((li) => li.studies?.code === 'POL')!.studies!
+    const nova = { ...faye, id: 'nova', name: 'Nova Lark', handle: undefined, studies: { ...politics, level: 1 } }
+    expect(saveLoveInterest(dir, base.content, nova)).toEqual([])
+    const withHer = loadWithAddons(packDir, dir).content
+    expect(rebuildCatalogue(packDir, dir, withHer, false)).toBe(true)
+    const rebuilt = loadWithAddons(packDir, dir).content
+    expect(rebuilt.catalogue!.seed).toBe(base.content.catalogue!.seed)
+    const hers = rebuilt.catalogue!.courses.filter((course) => course.studentIds.includes('nova'))
+    expect(hers).toHaveLength(4)
+    expect(hers.filter((course) => course.code === 'POL')).toHaveLength(2)
+    // Built for who is there, it is not built again.
+    expect(rebuildCatalogue(packDir, dir, rebuilt, false)).toBe(false)
+    // Without her the game's own catalogue is right again, and the add-on one goes.
+    expect(deleteLoveInterest(dir, 'nova')).toEqual([])
+    expect(rebuildCatalogue(packDir, dir, loadWithAddons(packDir, dir).content, false)).toBe(true)
+    expect(existsSync(join(dir, 'catalogue.json'))).toBe(false)
+  })
+})
+
+describe('a subject made in the editor', () => {
+  const topics = Array.from({ length: 6 }, (_, i) => ({ title: `Class ${i + 1}`, content: 'What is taught.', question: { ask: `Question ${i + 1}?`, answer: 'Yes', wrong: ['No', 'Maybe', 'Never'] } }))
+  const course = (number: string, id: string) => ({ number, title: `Astronomy ${number}`, topics, skill: { id, name: id, description: 'You read the sky.', passive: { kind: 'training', amount: 1.5, stats: ['wisdom'] } } })
+  const astronomy = { code: 'AST', subject: 'Astronomy', college: 'observatory', stats: ['wisdom'], courses: [course('101', 'star-reader'), course('130', 'sky-chart')] }
+  const observatory = { id: 'observatory', name: 'the Observatory' }
+
+  it('joins the University with a college of its own, is read by a student made for it, and gives her a full week', () => {
+    const dir = addons()
+    expect(saveMajor(dir, base.content, { major: astronomy, college: observatory })).toEqual([])
+    const loaded = loadWithAddons(packDir, dir)
+    expect(loaded.info.issues).toEqual([])
+    expect(loaded.info.majors).toMatchObject({ AST: 'addon', POL: 'base' })
+    expect(loaded.content.curriculum!.majors.find((major) => major.code === 'AST')?.college).toBe('observatory')
+    expect(loaded.content.skills.some((skill) => skill.id === 'star-reader')).toBe(true)
+    // A student of it is filled in from it, and the term is laid out for her.
+    const vega = { ...faye, id: 'vega', name: 'Vega Lune', handle: undefined, studies: { subject: 'Astronomy', code: 'AST', level: 1, stats: ['wisdom'], practical: false } }
+    expect(saveLoveInterest(dir, loaded.content, vega)).toEqual([])
+    const withHer = loadWithAddons(packDir, dir).content
+    expect(rebuildCatalogue(packDir, dir, withHer, false)).toBe(true)
+    const hers = loadWithAddons(packDir, dir).content.catalogue!.courses.filter((one) => one.studentIds.includes('vega'))
+    expect(hers).toHaveLength(4)
+    expect(hers.filter((one) => one.code === 'AST').map((one) => one.number).sort()).toEqual(['AST 101', 'AST 130'])
+    // Not taken away while she reads it.
+    expect(deleteMajor(dir, withHer, 'AST')[0]).toMatch(/Vega reads or teaches it/)
+    expect(deleteMajor(dir, withHer, 'POL')).toEqual(['That subject was not made in the editor.'])
+  })
+
+  it('is refused when it could not be one, and left out of the game, saying why, when its file is wrong', () => {
+    const dir = addons()
+    expect(saveMajor(dir, base.content, { major: { ...astronomy, college: 'arts-and-humanities', courses: [course('101', 'star-reader')] } })[0]).toMatch(/at least 2 courses/)
+    expect(saveMajor(dir, base.content, { major: { ...astronomy, college: 'arts-and-humanities', code: 'astro' } })[0]).toMatch(/capital letters/)
+    expect(saveMajor(dir, base.content, { major: astronomy })[0]).toMatch(/college/)
+    mkdirSync(dir, { recursive: true })
+    writeFileSync(join(dir, 'curriculum.json'), JSON.stringify({ colleges: [], majors: [{ ...astronomy, college: 'arts-and-humanities', courses: [course('101', 'star-reader')] }] }))
+    const loaded = loadWithAddons(packDir, dir)
+    expect(loaded.info.issues[0]).toMatch(/AST was left out/)
+    expect(loaded.content.curriculum!.majors.some((major) => major.code === 'AST')).toBe(false)
   })
 })

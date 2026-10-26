@@ -1,11 +1,12 @@
 import { describeModifier, describeStat, STAT_CAP, STAT_TIERS, statOf, skillFor, skillProgress, skillsOf, trainingToward } from '../../../shared/game'
-import { STATS, type ContentPack, type GameState } from '../../../shared/model'
+import { STATS, courseOf, type ContentPack, type GameState } from '../../../shared/model'
 import { Dialog } from './Dialog'
+import { t } from '../../../shared/i18n'
 
 /** The player's stats in full: each score, how far he is toward its next point, and where it stands on the scale of what a score is called. */
 export function StatsDialog({ content, state, onClose }: { content: ContentPack; state: GameState; onClose: () => void }) {
   return (
-    <Dialog title="Stats" onClose={onClose} wide ornate>
+    <Dialog title={t('screens.dayView.stats')} onClose={onClose} wide ornate>
       <div className="stat-sheet">
         {STATS.map((stat) => {
           const score = statOf(state, stat)
@@ -46,7 +47,7 @@ export function StatsDialog({ content, state, onClose }: { content: ContentPack;
                 <div className="meter">
                   <div style={{ width: `${capped ? 100 : Math.min(100, (banked / needed) * 100)}%` }} />
                 </div>
-                <span>{capped ? 'As high as it goes' : `${banked} of ${needed} training points toward ${score + 1}`}</span>
+                <span>{capped ? t('screens.stats.maxed') : t('screens.stats.training', { banked, needed, next: score + 1 })}</span>
               </div>
             </section>
           )
@@ -54,16 +55,16 @@ export function StatsDialog({ content, state, onClose }: { content: ContentPack;
       </div>
       {content.skills.length > 0 && (
         <div className="skill-list">
-          <h2>Skills</h2>
+          <h2>{t('screens.stats.skills')}</h2>
           {/* What he has learnt first, then what the courses he is taking are teaching him, then the rest. */}
           <div className="sheet">
           <table>
             <thead>
               <tr>
-                <th>Skill</th>
-                <th>What it does</th>
-                <th>Taught by</th>
-                <th>Marks</th>
+                <th>{t('screens.stats.skill')}</th>
+                <th>{t('screens.stats.whatItDoes')}</th>
+                <th>{t('screens.stats.taughtBy')}</th>
+                <th>{t('screens.exam.marks')}</th>
               </tr>
             </thead>
             <tbody>
@@ -75,23 +76,23 @@ export function StatsDialog({ content, state, onClose }: { content: ContentPack;
                 })
                 .sort((a, b) => Number(b.has) - Number(a.has) || Number(!!b.taking) - Number(!!a.taking) || b.marks - a.marks)
                 .map(({ skill, taking, has, marks, at, level }) => {
-                  const course = taking ?? state.courses.find((one) => one.id === skill.courseId)
+                  const course = taking ?? state.courses.find((one) => courseOf(one) === skill.courseId)
                   // What it does as he has it; what it would do next is in the tooltip.
                   const now = skillsOf(content, state).find((one) => one.id === skill.id) ?? skill
-                  const next = level === 1 && skill.upgrade ? `At ${skill.upgrade.at} marks: ${skill.upgrade.description}` : undefined
+                  const next = level === 1 && skill.upgrade ? t('screens.stats.upgradeAt', { at: skill.upgrade.at, description: skill.upgrade.description }) : undefined
                   return (
                     <tr
                       key={skill.id}
                       className={level === 2 ? 'has second' : has ? 'has' : taking ? 'studying' : undefined}
-                      title={!has && taking ? `You are learning this in ${taking.number}` : next}
+                      title={!has && taking ? t('screens.stats.learningIn', { number: taking.number }) : next}
                     >
                       <td>
                         <strong>{skill.name}</strong>
                         {level === 2 && <span className="skill-level">II</span>}
                       </td>
                       <td>{now.description}</td>
-                      <td title={course?.title}>{course ? course.number : `${skill.code}, not given this term`}</td>
-                      <td>{level === 2 ? 'Mastered' : has && skill.upgrade ? `${Math.round(marks)} of ${at} for II` : has ? 'Learnt' : `${Math.round(marks)} of ${at}`}</td>
+                      <td title={course?.title}>{course ? course.number : t('screens.stats.notGiven', { code: skill.code })}</td>
+                      <td>{level === 2 ? t('screens.stats.mastered') : has && skill.upgrade ? t('screens.stats.marksForII', { n: Math.round(marks), at }) : has ? t('screens.stats.learnt') : t('screens.exam.outOf', { n: Math.round(marks), total: at })}</td>
                     </tr>
                   )
                 })}

@@ -316,7 +316,7 @@
   "schedule": [
     {
       "weekdays": [
-        "Marketday"
+        "Saturday"
       ],
       "periods": [
         "afternoon"
@@ -325,7 +325,7 @@
     },
     {
       "weekdays": [
-        "Hearthday"
+        "Friday"
       ],
       "periods": [
         "evening"
@@ -340,11 +340,11 @@
     },
     {
       "weekdays": [
-        "Solday",
-        "Moonday",
-        "Tidesday",
-        "Windsday",
-        "Hearthday"
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
       ],
       "periods": [
         "afternoon"
@@ -363,7 +363,9 @@
     "name": "her tall house by Riverside Park",
     "description": "The sitting room of a tall, narrow old house, lined with bookshelves from floor to ceiling. Framed photographs crowd the mantelpiece, the oldest in sepia. An upright piano with sheet music, deep armchairs with knitted throws, a long worn kitchen table visible through an archway, and glass doors opening onto a conservatory full of large, very old potted plants and ferns. Soft green-tinted daylight, lived-in and quiet.",
     "locationId": "riverside-park",
-    "background": "generated/backgrounds/caelwen/view-2.webp"
+    "images": {
+      "day": "generated/backgrounds/caelwen/view-2.webp"
+    }
   },
   "birthPicture": "sprites/caelwen/birth.webp",
   "walkSprite": "sprites/caelwen/walk-cutout.webp",

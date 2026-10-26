@@ -11,6 +11,7 @@ import {
 } from '../model'
 import { standardExpression } from './looks'
 import { stageFor } from './relationships'
+import { t } from '../i18n'
 
 /** The LLM puts this at the end of a reply to say the scene has reached its close. */
 export const SCENE_END_TAG = '[END SCENE]'
@@ -274,7 +275,7 @@ export function sceneCast(scene: Pick<Scene, 'loveInterestId' | 'companionIds'>)
 /** "Ana", "Ana and Bea", "Ana, Bea and Cy": first names, for headings and prompts. */
 export function firstNames(content: ContentPack, ids: string[]): string {
   const names = ids.map((id) => content.loveInterests.find((li) => li.id === id)?.name.split(' ')[0] ?? id)
-  return names.length < 2 ? names.join('') : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`
+  return names.length < 2 ? names.join('') : t('scene.list.last', { rest: names.slice(0, -1).join(', '), last: names.at(-1) })
 }
 
 /** One beat of a reply as the text box shows it. */
@@ -364,9 +365,9 @@ export function playerGains(before: Pick<SceneBaseline, 'stats' | 'energy' | 'mo
     // Training that became a point is told by the point; the rest by what is banked toward the next.
     ...(before.training ? Object.keys(state.training) : [])
       .filter((stat) => !raised(stat))
-      .map((stat) => ({ label: `${stat} training`, from: before.training?.[stat] ?? 0, to: state.training[stat] ?? 0 })),
+      .map((stat) => ({ label: t('scene.gains.training', { stat }), from: before.training?.[stat] ?? 0, to: state.training[stat] ?? 0 })),
     ...(before.coursePoints ? Object.keys(state.coursePoints) : []).map((id) => ({
-      label: `${state.courses.find((course) => course.id === id)?.number ?? id} marks`,
+      label: t('scene.gains.marks', { course: state.courses.find((course) => course.id === id)?.number ?? id }),
       from: before.coursePoints?.[id] ?? 0,
       to: state.coursePoints[id] ?? 0
     })),

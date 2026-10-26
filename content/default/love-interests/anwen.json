@@ -294,11 +294,11 @@
   "schedule": [
     {
       "weekdays": [
-        "Solday",
-        "Moonday",
-        "Tidesday",
-        "Windsday",
-        "Hearthday"
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
       ],
       "periods": [
         "afternoon"
@@ -307,7 +307,7 @@
     },
     {
       "weekdays": [
-        "Restday"
+        "Sunday"
       ],
       "periods": [
         "afternoon"
@@ -316,7 +316,7 @@
     },
     {
       "weekdays": [
-        "Marketday"
+        "Saturday"
       ],
       "periods": [
         "evening"
@@ -325,8 +325,8 @@
     },
     {
       "weekdays": [
-        "Marketday",
-        "Restday"
+        "Saturday",
+        "Sunday"
       ],
       "periods": [
         "night"
@@ -347,7 +347,9 @@
     "name": "her room in the Cloister Halls",
     "description": "A small, dark modern dormitory room, its smooth white walls covered in wordless motorcycle posters under a red neon sign that says VACANCY. A black leather jacket and a helmet hang on the door; a half-stripped engine part sits on newspaper on the desk beside a toolkit and a laptop. A single bed with a black quilt, a shelf of tools and spare parts, a rune-lit panel by the door, a phone on a glowing charging plate. Low warm light from a desk lamp, the blinds half drawn.",
     "locationId": "dormitories",
-    "background": "generated/backgrounds/anwen/view-5.webp"
+    "images": {
+      "day": "generated/backgrounds/anwen/view-5.webp"
+    }
   },
   "birthPicture": "sprites/anwen/birth.webp",
   "walkSprite": "sprites/anwen/walk-cutout.webp",

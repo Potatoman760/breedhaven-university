@@ -4,6 +4,7 @@ import { Portrait } from './Portrait'
 import type { LoveInterest } from '../../../shared/model'
 import { Button } from './Button'
 import { isMouseBack } from '../mouseBack'
+import { t } from '../../../shared/i18n'
 
 export interface TourStep {
   /** What she points at, as a selector. Left out, she speaks from the middle of the screen. */
@@ -101,11 +102,11 @@ export function Tour({ guide, steps, onDone, onSkip }: { guide: LoveInterest; st
           {!last && (
             <div className="tour-actions">
               <Button variant="quiet" size="small" onClick={(event) => (event.stopPropagation(), finish(true))}>
-                Skip
+                {t('shell.tour.skip')}
               </Button>
               {!step.waits && (
                 <Button size="small" onClick={(event) => (event.stopPropagation(), next())}>
-                  {index === steps.length - 2 ? 'Got it' : 'Next'}
+                  {index === steps.length - 2 ? t('shell.tour.gotIt') : t('shell.tour.next')}
                 </Button>
               )}
             </div>

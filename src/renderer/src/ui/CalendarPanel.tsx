@@ -6,6 +6,7 @@ import { Dialog } from './Dialog'
 import { BackButton } from './BackButton'
 import { ChevronIcon } from './icons'
 import { Portrait } from './Portrait'
+import { t } from '../../../shared/i18n'
 
 // How far ahead the "Coming up" list looks: the week ahead, and no further.
 const UPCOMING_DAYS = 7
@@ -98,36 +99,36 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
 
   const title =
     mode === 'month'
-      ? `${month.name}, Year ${year}`
+      ? t('screens.calendar.monthTitle', { month: month.name, year })
       : firstShown && lastShown
         ? firstShown.month.id === lastShown.month.id
-          ? `${firstShown.day} to ${lastShown.day} ${lastShown.month.name}`
-          : `${firstShown.day} ${firstShown.month.name} to ${lastShown.day} ${lastShown.month.name}`
-        : 'Before term'
+          ? t('screens.calendar.weekTitle', { from: firstShown.day, to: lastShown.day, month: lastShown.month.name })
+          : t('screens.calendar.weekTitleAcross', { from: firstShown.day, fromMonth: firstShown.month.name, to: lastShown.day, month: lastShown.month.name })
+        : t('screens.calendar.beforeTerm')
 
   return (
-    <Dialog title="Calendar" note={`Day ${today.dayIndex + 1} of ${calendar.lengthDays}`} onClose={onClose} wide ornate noClose>
+    <Dialog title={t('screens.calendar.title')} note={t('screens.dayView.dayOf', { day: today.dayIndex + 1, days: calendar.lengthDays })} onClose={onClose} wide ornate noClose>
       <div className="calendar">
         <div className="calendar-main">
           <div className="month-nav">
-            <Button className="icon flip" aria-label={mode === 'week' ? 'Previous week' : 'Previous month'} onClick={() => setOffset(offset - 1)}>
+            <Button className="icon flip" aria-label={mode === 'week' ? t('screens.calendar.previousWeek') : t('screens.calendar.previousMonth')} onClick={() => setOffset(offset - 1)}>
               <ChevronIcon size={16} />
             </Button>
             <div>
               <h2>{title}</h2>
             </div>
-            <Button className="icon" disabled={atEnd} aria-label={mode === 'week' ? 'Next week' : 'Next month'} onClick={() => setOffset(offset + 1)}>
+            <Button className="icon" disabled={atEnd} aria-label={mode === 'week' ? t('screens.calendar.nextWeek') : t('screens.calendar.nextMonth')} onClick={() => setOffset(offset + 1)}>
               <ChevronIcon size={16} />
             </Button>
             <Button variant="quiet" disabled={offset === 0} onClick={() => setOffset(0)}>
-              Today
+              {t('screens.calendar.today')}
             </Button>
             <div className="tabs" role="tablist">
               <button role="tab" aria-selected={mode === 'week'} className={mode === 'week' ? 'tab selected' : 'tab'} onClick={() => switchTo('week')}>
-                Week
+                {t('screens.calendar.week')}
               </button>
               <button role="tab" aria-selected={mode === 'month'} className={mode === 'month' ? 'tab selected' : 'tab'} onClick={() => switchTo('month')}>
-                Month
+                {t('screens.calendar.month')}
               </button>
             </div>
           </div>
@@ -147,12 +148,12 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
                     key={d.dayIndex}
                     className={['week-head', d.dayIndex === today.dayIndex && 'today', (d.dayIndex < today.dayIndex || d.dayIndex >= calendar.lengthDays) && 'faded'].filter(Boolean).join(' ')}
                   >
-                    <span className="caps">{calendar.weekdays[weekdayOf(d.dayIndex)].replace(/day$/, '')}</span>
+                    <span className="caps">{calendar.weekdays[weekdayOf(d.dayIndex)].slice(0, 3)}</span>
                     <strong>{d.date ? d.date.day : ''}</strong>
                   </div>
                 ))}
 
-                <span className="week-time">All day</span>
+                <span className="week-time">{t('screens.calendar.allDay')}</span>
                 {weekDays.map((d) => (
                   <div key={d.dayIndex} className="week-whole">
                     {d.whole.map((item) => (
@@ -192,7 +193,7 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
                           onClick={() => setPicked({ item, dayIndex: d.dayIndex })}
                           onKeyDown={(e) => e.key === 'Enter' && setPicked({ item, dayIndex: d.dayIndex })}
                           className={`entry timed ${item.kind}`}
-                          title={[`${clock(item.startHour ?? 0)} to ${clock((item.startHour ?? 0) + (item.hours ?? 1))}`, item.title, item.detail].filter(Boolean).join(' · ')}
+                          title={[t('screens.calendar.fromTo', { from: clock(item.startHour ?? 0), to: clock((item.startHour ?? 0) + (item.hours ?? 1)) }), item.title, item.detail].filter(Boolean).join(' · ')}
                           style={{
                             top: `${((start - FIRST_HOUR) / hours.length) * 100}%`,
                             height: `${((end - start) / hours.length) * 100}%`,
@@ -217,7 +218,7 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
               >
                 {calendar.weekdays.map((name) => (
                   <div key={name} className="caps weekday">
-                    {name.replace(/day$/, '')}
+                    {name.slice(0, 3)}
                   </div>
                 ))}
                 {Array.from({ length: lead }, (_, i) => (
@@ -231,7 +232,7 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
                     <button
                       key={i}
                       className={['day', dayIndex === today.dayIndex && 'today', (dayIndex < today.dayIndex || dayIndex >= calendar.lengthDays) && 'faded'].filter(Boolean).join(' ')}
-                      title="See this week"
+                      title={t('screens.calendar.seeWeek')}
                       onClick={() => switchTo('week', weeksAway)}
                     >
                       <span className="day-number">{i + 1}</span>
@@ -241,23 +242,23 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
                           {item.title}
                         </span>
                       ))}
-                      {items.length > MONTH_LINES && <span className="hint">+{items.length - MONTH_LINES} more</span>}
+                      {items.length > MONTH_LINES && <span className="hint">{t('screens.calendar.more', { n: items.length - MONTH_LINES })}</span>}
                     </button>
                   )
                 })}
               </div>
             )}
             <div className="legend">
-              <span className="entry class">Class</span>
-            {state.societies.length > 0 && <span className="entry society">Society</span>}
-              <span className="entry plan">Plan</span>
-              <span className="entry event">Event</span>
-              <span className="entry orientation">Orientation</span>
-              <span className="entry birth">Birth</span>
+              <span className="entry class">{t('screens.dayView.class')}</span>
+            {state.societies.length > 0 && <span className="entry society">{t('screens.dayView.society')}</span>}
+              <span className="entry plan">{t('screens.dayView.plan')}</span>
+              <span className="entry event">{t('screens.dayView.eventChip')}</span>
+              {state.job && <span className="entry work">{t('screens.dayView.work')}</span>}
+              <span className="entry birth">{t('screens.dayView.birth')}</span>
               {content.housing && state.housing.status === 'resident' && (
                 <>
-                  <span className="entry rent">Rent</span>
-                  <span className="entry household">Children's week</span>
+                  <span className="entry rent">{t('screens.calendar.rent')}</span>
+                  <span className="entry household">{t('screens.calendar.childrensWeek')}</span>
                 </>
               )}
             </div>
@@ -272,7 +273,10 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
                 {(() => {
                   const date = label(picked.dayIndex)
                   const { startHour, hours: length } = picked.item
-                  return `${calendar.weekdays[weekdayOf(picked.dayIndex)]} ${date.day} ${date.month.name}${startHour === undefined ? ' · all day' : ` · ${clock(startHour)} to ${clock(startHour + (length ?? 1))}`}`
+                  const day = { weekday: calendar.weekdays[weekdayOf(picked.dayIndex)], day: date.day, month: date.month.name }
+                  return startHour === undefined
+                    ? t('screens.calendar.pickedAllDay', day)
+                    : t('screens.calendar.pickedHours', { ...day, from: clock(startHour), to: clock(startHour + (length ?? 1)) })
                 })()}
               </span>
               <strong>{picked.item.title}</strong>
@@ -285,7 +289,7 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
                 const people = [course.teacherId, ...course.studentIds].flatMap((id) => content.loveInterests.find((li) => li.id === id) ?? [])
                 return (
                   <>
-                    <span className="caps">In this class</span>
+                    <span className="caps">{t('screens.calendar.inThisClass')}</span>
                     {people.length > 0 ? (
                       <div className="portraits">
                         {people.map((li) => (
@@ -293,41 +297,41 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
                         ))}
                       </div>
                     ) : (
-                      <span className="hint">No one you know.</span>
+                      <span className="hint">{t('screens.calendar.noOneYouKnow')}</span>
                     )}
                   </>
                 )
               })()}
             </div>
           )}
-          {onNow.length > 0 && <h2>On today</h2>}
+          {onNow.length > 0 && <h2>{t('screens.calendar.onToday')}</h2>}
           {onNow.map((event) => (
             <div key={event.id} className="card">
-              <span className="hint">{[eventHours(event) ?? 'All day', placeName(event.locationId)].filter(Boolean).join(' · ')}</span>
+              <span className="hint">{[eventHours(event) ?? t('screens.calendar.allDay'), placeName(event.locationId)].filter(Boolean).join(' · ')}</span>
               <strong>{event.name}</strong>
               {event.description && <span>{event.description}</span>}
             </div>
           ))}
-          <h2>Coming up</h2>
+          <h2>{t('screens.calendar.comingUp')}</h2>
           {upcomingEvents(content, state, UPCOMING_DAYS).map(({ event, inDays }) => (
             <div key={event.id} className="card">
               <span className="hint">
-                {inDays === 1 ? 'Tomorrow' : `In ${inDays} days`}
-                {event.durationDays > 1 && ` · ${event.durationDays} days long`}
+                {t('screens.calendar.inDays', { n: inDays })}
+                {event.durationDays > 1 && t('screens.calendar.daysLong', { n: event.durationDays })}
                 {eventHours(event) && ` · ${eventHours(event)}`}
                 {placeName(event.locationId) && ` · ${placeName(event.locationId)}`}
-                {event.generated && ' · invented by the AI'}
+                {event.generated && t('screens.calendar.invented')}
               </span>
               <strong>{event.name}</strong>
               {event.description && <span>{event.description}</span>}
               {event.generated && (
                 <Button variant="quiet" size="small" onClick={() => onChange(removeEvent(state, event.id))}>
-                  Remove
+                  {t('screens.calendar.remove')}
                 </Button>
               )}
             </div>
           ))}
-          {upcomingEvents(content, state, UPCOMING_DAYS).length === 0 && <p className="hint">Nothing in the next {UPCOMING_DAYS} days.</p>}
+          {upcomingEvents(content, state, UPCOMING_DAYS).length === 0 && <p className="hint">{t('screens.calendar.nothingAhead', { n: UPCOMING_DAYS })}</p>}
           {/* The way out, at the foot of this column: the bottom left corner, as on every main screen. */}
           <BackButton className="calendar-close" onClick={onClose} />
         </div>

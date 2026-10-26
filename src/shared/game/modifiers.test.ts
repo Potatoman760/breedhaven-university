@@ -53,6 +53,16 @@ const known = (state: GameState, id: string, desire = 0): GameState => ({
 })
 
 describe('what he has learnt', () => {
+  it('is learnt in whichever section of its course he is in, on that section’s marks', () => {
+    const { content, plain } = learnt(passive('HSP', { kind: 'wages', amount: 1.15 }))
+    const second: Course = { ...course('HSP'), id: 'hsp-2', courseId: 'hsp', section: 2 }
+    const inSecond: GameState = { ...plain, courses: [course('HSP'), second], enrolment: ['hsp-2'], coursePoints: { 'hsp-2': 30 } }
+    expect(skillsLearnt(content, inSecond).map((skill) => skill.id)).toEqual(['hsp'])
+    expect(skillsOf(content, inSecond).map((skill) => skill.id)).toEqual(['hsp'])
+    // Marks in the section he is not in count for nothing.
+    expect(skillsLearnt(content, { ...inSecond, coursePoints: { hsp: 30 } })).toEqual([])
+  })
+
   it('changes a number only once he has the marks, in a course he is taking', () => {
     const { content, state, plain } = learnt(passive('HSP', { kind: 'wages', amount: 1.15 }))
     expect(skillsLearnt(content, plain)).toEqual([])

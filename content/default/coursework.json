@@ -1,10 +1,10 @@
 {
   "weekdays": [
-    "Solday",
-    "Moonday",
-    "Tidesday",
-    "Windsday",
-    "Hearthday"
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday"
   ],
   "dayStart": 8,
   "dayEnd": 18,

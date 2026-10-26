@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { LlmProfileSchema } from '../../shared/settings'
-import { AFTER_TOOL, chatCompletion, isRefusalResponse, listModels, RefusalError, WROTE_BESIDE_TOOL } from './openai'
+import { afterTool, chatCompletion, isRefusalResponse, listModels, RefusalError, wroteBesideTool } from './openai'
 import { excuseTool, moveTool, revealTool, type Revelation } from './tools'
 import { createInitialState } from '../../shared/game/state'
 import { fixture } from '../../shared/game/testFixture'
@@ -205,7 +205,7 @@ describe('chatCompletion', () => {
         { role: 'assistant', tool_calls: [{ id: 'c1' }] },
         { role: 'tool', tool_call_id: 'c1', content: `Free on Twoday at 08:00.
 
-${AFTER_TOOL}` }
+${afterTool()}` }
       ])
     })
 
@@ -216,8 +216,8 @@ ${AFTER_TOOL}` }
       expect(await chatCompletion(profile, { ...input, tools: [tool] }, impl)).toBe('She waves and goes. "Well," says Ana.')
       expect(bodies[1].messages.at(-1)?.content).toBe(`Free on Twoday at 08:00.
 
-${WROTE_BESIDE_TOOL}`)
-      expect(WROTE_BESIDE_TOOL).toContain('was not shown to anyone')
+${wroteBesideTool()}`)
+      expect(wroteBesideTool()).toContain('was not shown to anyone')
     })
 
     it('tells the model when a call fails, names no tool, or has broken arguments', async () => {
@@ -229,10 +229,10 @@ ${WROTE_BESIDE_TOOL}`)
       expect(await chatCompletion(profile, { ...input, tools: [tool] }, impl)).toBe('Never mind.')
       expect(bodies[1].messages.at(-1)?.content).toBe(`The tool could not be used: no such place
 
-${AFTER_TOOL}`)
+${afterTool()}`)
       expect(bodies[2].messages.at(-1)?.content).toBe(`There is no tool called "fly".
 
-${AFTER_TOOL}`)
+${afterTool()}`)
       // Two rounds of tools are the limit; after that the model has to answer in words.
       expect(bodies[2].tools).toBeUndefined()
     })

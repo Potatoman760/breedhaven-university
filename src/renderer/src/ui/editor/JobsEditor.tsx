@@ -7,6 +7,7 @@ import { Button } from '../Button'
 import { useConfirm } from '../Confirm'
 import { JOB_ICON_PATHS, JobIcon } from '../icons'
 import { EditorFoot, Group, Text } from './fields'
+import { t } from '../../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -46,7 +47,7 @@ export function JobsEditor({ content, onContent, switcher }: Props) {
 
   const isNew = original === null
   const dirty = !same(draft, original ?? blank())
-  const mayLeave = () => !dirty || window.confirm('Discard the changes you have not saved?')
+  const mayLeave = () => !dirty || window.confirm(t('editor.common.discard'))
   const set = (patch: Partial<Job>) => {
     // What was wrong with the last save may no longer be.
     setIssues([])
@@ -93,7 +94,7 @@ export function JobsEditor({ content, onContent, switcher }: Props) {
       {dialog}
       <aside className="editor-list">
         <Button variant="primary" onClick={() => open(null)}>
-          New job
+          {t('editor.jobs.new')}
         </Button>
         <div className="editor-people">
           {listed.map((job) => (
@@ -102,33 +103,33 @@ export function JobsEditor({ content, onContent, switcher }: Props) {
               <span>
                 <strong>{job.title}</strong>
                 <span className="hint">
-                  {placeName(job.locationId)} · ${job.hourlyRate} an hour
+                  {t('editor.jobs.listed', { place: placeName(job.locationId), rate: job.hourlyRate })}
                 </span>
               </span>
             </button>
           ))}
-          {listed.length === 0 && <p className="hint">No jobs yet.</p>}
+          {listed.length === 0 && <p className="hint">{t('editor.jobs.none')}</p>}
         </div>
       </aside>
 
       <section className="editor-main">
         <div className="editor-head">
           <div>
-            <h1>{draft.title || (isNew ? 'New job' : draft.id)}</h1>
-            <span className="hint">{isNew ? 'Not saved yet.' : `${placeName(draft.locationId)} · ${draft.shifts.map(describeShift).join(', ')}`}</span>
+            <h1>{draft.title || (isNew ? t('editor.jobs.new') : draft.id)}</h1>
+            <span className="hint">{isNew ? t('editor.common.notSaved') : `${placeName(draft.locationId)} · ${draft.shifts.map(describeShift).join(', ')}`}</span>
           </div>
         </div>
 
         <div className="editor-body">
-          <Group title="What it is">
+          <Group title={t('editor.jobs.whatItIs')}>
             <div className="row">
-              <Text label="Title" llm value={draft.title} onChange={(title) => set(isNew ? { title, id: slugify(title) } : { title })} />
-              <Text label="Id" value={draft.id} disabled={!isNew} onChange={(id) => set({ id: slugify(id) })} hint={isNew ? 'It cannot be changed later.' : undefined} />
+              <Text label={t('editor.common.title')} llm value={draft.title} onChange={(title) => set(isNew ? { title, id: slugify(title) } : { title })} />
+              <Text label={t('editor.common.id')} value={draft.id} disabled={!isNew} onChange={(id) => set({ id: slugify(id) })} hint={isNew ? t('editor.common.idFixed') : undefined} />
             </div>
-            <Text label="Description" llm value={draft.description} rows={2} onChange={(description) => set({ description })} hint="A line or two for the job board: what the work is." />
+            <Text label={t('editor.common.description')} llm value={draft.description} rows={2} onChange={(description) => set({ description })} hint={t('editor.jobs.descriptionHint')} />
             <div className="row">
               <label>
-                Where
+                {t('editor.jobs.where')}
                 <select value={draft.locationId} onChange={(e) => set({ locationId: e.target.value })}>
                   {content.locations.map((location) => (
                     <option key={location.id} value={location.id}>
@@ -138,7 +139,7 @@ export function JobsEditor({ content, onContent, switcher }: Props) {
                 </select>
               </label>
               <label>
-                Boss
+                {t('editor.jobs.boss')}
                 <select value={draft.bossId} onChange={(e) => set({ bossId: e.target.value })}>
                   {bosses.map((who) => (
                     <option key={who.id} value={who.id}>
@@ -146,14 +147,14 @@ export function JobsEditor({ content, onContent, switcher }: Props) {
                     </option>
                   ))}
                 </select>
-                <span className="hint">She is at work for every shift, and in his DMs from the day he is taken on.</span>
+                <span className="hint">{t('editor.jobs.bossHint')}</span>
               </label>
               <label>
-                Icon
+                {t('editor.common.icon')}
                 <span className="row checks">
                   <JobIcon name={draft.icon} image={draft.iconImage} size={26} />
                   <select value={draft.icon ?? ''} onChange={(e) => set({ icon: e.target.value || undefined })}>
-                    <option value="">Briefcase</option>
+                    <option value="">{t('editor.jobs.briefcase')}</option>
                     {Object.keys(JOB_ICON_PATHS).map((name) => (
                       <option key={name} value={name}>
                         {name}
@@ -165,16 +166,16 @@ export function JobsEditor({ content, onContent, switcher }: Props) {
             </div>
           </Group>
 
-          <Group title="Pay and what it asks">
+          <Group title={t('editor.jobs.pay')}>
             <div className="row">
               <label>
-                Pay ($ an hour)
+                {t('editor.jobs.rate')}
                 <input type="number" min={0} value={draft.hourlyRate} onChange={(e) => set({ hourlyRate: Math.max(0, Number(e.target.value) || 0) })} />
               </label>
               <label>
-                The work builds
+                {t('editor.jobs.trains')}
                 <select value={draft.trains ?? ''} onChange={(e) => set({ trains: (e.target.value || undefined) as Stat | undefined })}>
-                  <option value="">Nothing</option>
+                  <option value="">{t('editor.common.nothing')}</option>
                   {STATS.map((stat) => (
                     <option key={stat} value={stat}>
                       {stat}
@@ -183,7 +184,7 @@ export function JobsEditor({ content, onContent, switcher }: Props) {
                 </select>
               </label>
             </div>
-            <span className="field-label">The least he must have to be taken on</span>
+            <span className="field-label">{t('editor.jobs.requirements')}</span>
             <div className="row">
               {STATS.map((stat) => (
                 <label key={stat}>
@@ -192,7 +193,7 @@ export function JobsEditor({ content, onContent, switcher }: Props) {
                     type="number"
                     min={0}
                     value={draft.requirements[stat] ?? ''}
-                    placeholder="any"
+                    placeholder={t('editor.jobs.any')}
                     onChange={(e) => {
                       const { [stat]: _gone, ...rest } = draft.requirements
                       set({ requirements: e.target.value === '' || Number(e.target.value) <= 0 ? rest : { ...rest, [stat]: whole(e.target.value, 1) } })
@@ -203,11 +204,11 @@ export function JobsEditor({ content, onContent, switcher }: Props) {
             </div>
           </Group>
 
-          <Group title="Shifts" hint="The shifts he is expected at each week. They are the same in every game.">
+          <Group title={t('editor.jobs.shifts')} hint={t('editor.jobs.shiftsHint')}>
             {draft.shifts.map((shift, index) => (
               <div key={index} className="row checks">
                 <label>
-                  Day
+                  {t('editor.jobs.day')}
                   <select value={shift.weekday} onChange={(e) => setShift(index, { weekday: e.target.value })}>
                     {weekdays.map((day) => (
                       <option key={day} value={day}>
@@ -217,19 +218,19 @@ export function JobsEditor({ content, onContent, switcher }: Props) {
                   </select>
                 </label>
                 <label>
-                  Starts at (hour)
+                  {t('editor.jobs.startHour')}
                   <input type="number" min={0} max={content.calendar.hoursPerDay - 1} value={shift.startHour} onChange={(e) => setShift(index, { startHour: Math.min(content.calendar.hoursPerDay - 1, whole(e.target.value, 0)) })} />
                 </label>
                 <label>
-                  Hours
+                  {t('editor.jobs.hours')}
                   <input type="number" min={1} max={12} value={shift.hours} onChange={(e) => setShift(index, { hours: Math.min(12, whole(e.target.value, 1)) })} />
                 </label>
                 <Button variant="quiet" disabled={draft.shifts.length <= 1} onClick={() => set({ shifts: draft.shifts.filter((_, i) => i !== index) })}>
-                  Remove
+                  {t('editor.common.remove')}
                 </Button>
               </div>
             ))}
-            <Button onClick={() => set({ shifts: [...draft.shifts, { weekday: weekdays[0], startHour: 9, hours: 4 }] })}>Add a shift</Button>
+            <Button onClick={() => set({ shifts: [...draft.shifts, { weekday: weekdays[0], startHour: 9, hours: 4 }] })}>{t('editor.jobs.addShift')}</Button>
           </Group>
         </div>
 
@@ -240,14 +241,14 @@ export function JobsEditor({ content, onContent, switcher }: Props) {
           dirty={dirty}
           canSave={isSafeId(draft.id) && draft.title.trim() !== ''}
           onUndo={() => (setDraft(original ?? blank()), setIssues([]))}
-          onSave={() => apply(window.api.editor.saveJob(draft), 'Saved.', draft.id)}
+          onSave={() => apply(window.api.editor.saveJob(draft), t('editor.common.saved'), draft.id)}
           remove={
             !isNew
               ? {
-                  label: 'Delete',
+                  label: t('editor.common.delete'),
                   onClick: async () =>
-                    (await ask({ title: `Delete ${draft.title}?`, detail: 'It is taken off the job board. Anyone holding it in a running game is simply out of work.', confirm: 'Delete', grave: true })) &&
-                    apply(window.api.editor.deleteJob(draft.id), 'Deleted.', '')
+                    (await ask({ title: t('editor.common.deleteNamed', { name: draft.title }), detail: t('editor.jobs.deleteDetail'), confirm: t('editor.common.delete'), grave: true })) &&
+                    apply(window.api.editor.deleteJob(draft.id), t('editor.common.deleted'), '')
                 }
               : undefined
           }

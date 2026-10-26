@@ -8,6 +8,12 @@ const fromMouse = new WeakSet<Event>()
 
 export const isMouseBack = (event: Event): boolean => fromMouse.has(event)
 
+function back(): void {
+  const escape = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
+  fromMouse.add(escape)
+  ;(document.activeElement ?? document.body).dispatchEvent(escape)
+}
+
 export function installMouseBack(): void {
   // Pressed, it is not a step back through the page's history.
   window.addEventListener('mousedown', (event) => {
@@ -16,10 +22,22 @@ export function installMouseBack(): void {
   window.addEventListener('mouseup', (event) => {
     if (event.button !== 3) return
     event.preventDefault()
-    const escape = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })
-    fromMouse.add(escape)
-    ;(document.activeElement ?? document.body).dispatchEvent(escape)
+    back()
   })
+  // With a menu open (the map, the phone, the calendar, any dialog), a right click is the back button too. It is caught
+  // first, so that what is under the menu (a scene, which hides its interface on one) never hears of it. In something
+  // being typed it is still the usual menu, with the spelling checker's suggestions; with no menu open it is the screen's own.
+  window.addEventListener(
+    'contextmenu',
+    (event) => {
+      if (event.target instanceof Element && event.target.closest('input, textarea, [contenteditable="true"]')) return
+      if (!document.querySelector('.overlay, .lightbox')) return
+      event.preventDefault()
+      event.stopPropagation()
+      back()
+    },
+    true
+  )
 }
 
 /**

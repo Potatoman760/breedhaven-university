@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from 'react'
 import type { Cue } from '../../../shared/model'
+import { t } from '../../../shared/i18n'
 import { play } from '../sound'
 import { BackButton } from './BackButton'
 
@@ -60,7 +61,7 @@ export function Dialog({ title, note, onClose, narrow, wide, noClose, ornate, so
           </h1>
           {!noClose && !ornate && (
             <button className="secondary" onClick={onClose}>
-              Close
+              {t('shell.common.close')}
             </button>
           )}
         </div>
@@ -80,7 +81,7 @@ export function Dialog({ title, note, onClose, narrow, wide, noClose, ornate, so
 export function ToBeImplemented({ note }: { note: string }) {
   return (
     <div className="tbi">
-      <strong>To be implemented</strong>
+      <strong>{t('shell.dialog.toBeImplemented')}</strong>
       <span>{note}</span>
     </div>
   )

@@ -3,6 +3,7 @@ import { toDate } from './calendar'
 import { eventDay, eventsOn } from './events'
 import { addMemory } from './memory'
 import { meet } from './scene'
+import { t } from '../i18n'
 
 /**
  * The societies' fair: a day or two on which every society has a table, staffed by its students, for him to walk round.
@@ -127,7 +128,7 @@ export function sayHello(content: ContentPack, state: GameState, id: string, soc
   const remembered =
     state.met.includes(id) || !content.loveInterests.some((li) => li.id === id)
       ? met
-      : addMemory(met, id, `You met ${state.player.name} at the Societies Fair${society ? `, when he stopped at the ${society.name.replace(/^the /, '')} table` : ''}, and said hello.`, 'fleeting')
+      : addMemory(met, id, t('game.fair.metMemory', { player: state.player.name, atTable: society !== undefined, society: society?.name.replace(/^the /, '') }), 'fleeting')
   return society ? stopAtTable(content, remembered, society.id) : { state: remembered }
 }
 
@@ -147,9 +148,9 @@ export function sayHelloAll(content: ContentPack, state: GameState, ids: string[
 export function canTalkAtFair(content: ContentPack, state: GameState, ids: string[]): { ok: boolean; reasons: string[] } {
   const event = fairNow(content, state)
   const reasons: string[] = []
-  if (!event) reasons.push('The fair is not on')
-  else if (toDate(content.calendar, state.time).hour + 1 > fairCloses(event)) reasons.push('The fair is packing up')
-  if (ids.filter((id) => content.loveInterests.some((li) => li.id === id)).length === 0) reasons.push('Nobody to talk to')
+  if (!event) reasons.push(t('game.fair.notOn'))
+  else if (toDate(content.calendar, state.time).hour + 1 > fairCloses(event)) reasons.push(t('game.fair.packingUp'))
+  if (ids.filter((id) => content.loveInterests.some((li) => li.id === id)).length === 0) reasons.push(t('game.fair.nobody'))
   return { ok: reasons.length === 0, reasons }
 }
 

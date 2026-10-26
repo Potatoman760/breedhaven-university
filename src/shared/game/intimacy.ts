@@ -2,6 +2,7 @@ import type { ContentPack, GameState, LoveInterest } from '../model'
 import { addMemory } from './memory'
 import { stageFor, stageRank } from './relationships'
 import { bonus, liveBoons } from './modifiers'
+import { t } from '../i18n'
 
 /**
  * Whether she will go to bed with him, and what comes of it. Most women have to want him first: it is not on the day
@@ -59,7 +60,7 @@ export function onBirthControl(content: ContentPack, state: Pick<GameState, 'off
 /** She stops, and remembers that she chose to. Nothing changes for a woman who was not taking it. */
 export function stopBirthControl(content: ContentPack, state: GameState, loveInterestId: string): GameState {
   if (!onBirthControl(content, state, loveInterestId)) return state
-  return addMemory({ ...state, offBirthControl: [...state.offBirthControl, loveInterestId] }, loveInterestId, `You stopped taking your contraceptive draught for ${state.player.name}: you chose to let the Bloom take, and want his child.`, 'core')
+  return addMemory({ ...state, offBirthControl: [...state.offBirthControl, loveInterestId] }, loveInterestId, t('scene.intimacy.stoppedControl', { player: state.player.name }), 'core')
 }
 
 /** Told to her: whether she will, and what she takes. Nothing about sex for a woman it is open to as it always was. */
@@ -67,15 +68,14 @@ export function describeSexGate(content: ContentPack, state: GameState, li: Pick
   const player = state.player.name
   const gate = sexGate(content, state, li, uninhibited)
   const control = onBirthControl(content, state, li.id)
-    ? `You are on birth control, so you are unlikely to conceive. If you want his child, whether ${player} asks you to stop or you decide it yourself, say so in your own words and ` +
-      `write ${OFF_CONTROL_TAG}${group ? ` (in a group, ${OFF_CONTROL_TAG.replace(']', ': Name]')})` : ''} on a line of its own at the end of that reply. If he asks and you do not, refuse or say not yet.`
-    : `You take nothing against the Bloom: if ${player} finishes inside you, you will very likely conceive.`
+    ? t('scene.intimacy.onControl', { player, tag: OFF_CONTROL_TAG, group, groupTag: OFF_CONTROL_TAG.replace(']', ': Name]') })
+    : t('scene.intimacy.offControl', { player })
   // Whatever of his is working on her is told to her as something she feels, not as something done to her.
   const charmed = liveBoons(state).filter((boon) => boon.targetId === li.id && boon.telling).map((boon) => boon.telling!)
   if (gate.open) return [...charmed, control]
-  const why = gate.why === 'first' ? `You have only just met ${player}, and you do not have sex with a man the day you meet him.` : `You do not want ${player} enough yet to have sex with him.`
+  const why = gate.why === 'first' ? t('scene.intimacy.justMet', { player }) : t('scene.intimacy.notYet', { player })
   return [
-    `${why} Nothing he says or does in this scene changes that. Flirt or kiss as you feel; if he presses for more, turn him down in your own way.`,
+    t('scene.intimacy.shut', { why }),
     ...charmed,
     control
   ]

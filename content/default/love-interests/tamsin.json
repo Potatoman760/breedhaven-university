@@ -310,7 +310,7 @@
   "schedule": [
     {
       "weekdays": [
-        "Restday"
+        "Sunday"
       ],
       "periods": [
         "afternoon"
@@ -319,7 +319,7 @@
     },
     {
       "weekdays": [
-        "Marketday"
+        "Saturday"
       ],
       "periods": [
         "evening"
@@ -328,7 +328,7 @@
     },
     {
       "weekdays": [
-        "Marketday"
+        "Saturday"
       ],
       "periods": [
         "morning"
@@ -337,11 +337,11 @@
     },
     {
       "weekdays": [
-        "Solday",
-        "Moonday",
-        "Tidesday",
-        "Windsday",
-        "Hearthday"
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
       ],
       "periods": [
         "morning"
@@ -350,11 +350,11 @@
     },
     {
       "weekdays": [
-        "Solday",
-        "Moonday",
-        "Tidesday",
-        "Windsday",
-        "Hearthday"
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
       ],
       "periods": [
         "afternoon"
@@ -369,7 +369,9 @@
     "name": "her room in the Cloister Halls",
     "description": "A modern dormitory room with smooth white walls and a flat ceiling with a strip of warm ward-light. Half of it is a tomboy's room: a game console and two controllers under a wall screen, a football and muddy sneakers by the door, a hoodie thrown over a desk chair, potted plants and seedling trays crowding the windowsill under a small violet grow-light. The other half is newer: a full-length mirror, a short rail of dresses with the shop tags still on, a few make-up pots lined up neatly on the desk. A single bed with a rumpled green duvet, and above it a framed photograph of two muddy, grinning children with their arms round each other. Warm golden afternoon light.",
     "locationId": "dormitories",
-    "background": "generated/backgrounds/tamsin/view-5.webp"
+    "images": {
+      "day": "generated/backgrounds/tamsin/view-5.webp"
+    }
   },
   "birthPicture": "sprites/tamsin/birth.webp",
   "walkSprite": "sprites/tamsin/walk-cutout.webp",

@@ -7,6 +7,7 @@ import { JobIcon } from './icons'
 import { Ornate } from './Ornate'
 import { Portrait } from './Portrait'
 import { settle } from './pinLayout'
+import { t } from '../../../shared/i18n'
 
 // The shape of the fair's picture, for it to cover the screen without being stretched.
 const PICTURE_SHAPE = 1920 / 1080
@@ -64,19 +65,21 @@ export function FairView({ content, state, onHello, onTalk, onJoin, onLeave }: P
     return <Portrait key={id} who={one} size="clamp(44px, 3.2vw, 64px)" className="map-face" caption />
   }
 
-  /** Hello from the whole booth at once, while it has one for whoever is there. */
+  /** Hello from the whole booth at once, while it has one for whoever is there: the thing to do first, so it is the one that stands out. */
   const hello = (ids: string[], societyId?: string) =>
     helloDue(content, state, ids, societyId ?? ids[0]) && (
-      <Button size="small" className="map-go" onClick={() => onHello(ids, societyId)}>
-        Hello
+      <Button variant="primary" size="small" className="map-go" onClick={() => onHello(ids, societyId)}>
+        {t('panels.fair.hello')}
       </Button>
     )
 
+  // Talking is the thing to do once the hello is said; until then it gives way to it.
   const talk = (ids: string[], societyId?: string) => {
     const check = canTalkAtFair(content, state, ids)
+    const greeted = !helloDue(content, state, ids, societyId ?? ids[0])
     return (
-      <Button variant="primary" size="small" className="map-go" disabled={!check.ok} title={check.ok ? 'An hour' : check.reasons.join(' · ')} onClick={() => onTalk(ids, societyId)}>
-        Talk
+      <Button variant={greeted ? 'primary' : 'secondary'} size="small" className="map-go" disabled={!check.ok} title={check.ok ? t('panels.fair.anHour') : check.reasons.join(' · ')} onClick={() => onTalk(ids, societyId)}>
+        {t('panels.fair.talk')}
       </Button>
     )
   }
@@ -90,7 +93,7 @@ export function FairView({ content, state, onHello, onTalk, onJoin, onLeave }: P
         // It opens a little small: the tables are spread apart again once it is at its size, so none lies over another.
         onAnimationEnd={(event) => event.target === event.currentTarget && settle(event.currentTarget)}
       >
-        {picture && <img className="map-art" src={`content://pack/${picture}`} alt={event?.name ?? 'The fair'} />}
+        {picture && <img className="map-art" src={`content://pack/${picture}`} alt={event?.name ?? t('panels.fair.theFair')} />}
         {fairTables(content).map(({ society, x, y }) => {
           const staff = atTable(content, state, society.id)
           const mine = state.societies.includes(society.id)
@@ -104,14 +107,14 @@ export function FairView({ content, state, onHello, onTalk, onJoin, onLeave }: P
                 <span className="map-plate" title={society.description}>
                   {society.name.replace(/^the /, '')}
                   <span className="fair-when">
-                    {society.weekday}s {clock(society.startHour)}
+                    {t('panels.fair.weekly', { weekday: society.weekday, time: clock(society.startHour) })}
                   </span>
                 </span>
                 {mine ? (
-                  <span className="map-state">Joined</span>
+                  <span className="map-state">{t('panels.fair.joined')}</span>
                 ) : (
                   <Button size="small" className="map-go" disabled={!join.ok} title={join.reasons.join(' · ') || undefined} onClick={() => onJoin(society.id)}>
-                    Join
+                    {t('panels.fair.join')}
                   </Button>
                 )}
                 {hello(staff, society.id)}
@@ -139,14 +142,14 @@ export function FairView({ content, state, onHello, onTalk, onJoin, onLeave }: P
       </div>
 
       <Ornate className="fair-plaque pin-keepout">
-        <h2>{event?.name.replace(/^the /, 'The ') ?? 'The fair'}</h2>
+        <h2>{event?.name.replace(/^the /, 'The ') ?? t('panels.fair.theFair')}</h2>
         <span className="caps">
           {clock(hour)}
-          {event && ` · until ${clock(fairCloses(event))}`} · {state.societies.length} of {config?.maxJoined} joined
+          {event && t('panels.fair.until', { time: clock(fairCloses(event)) })} · {t('panels.fair.joinedOf', { n: state.societies.length, max: config?.maxJoined })}
         </span>
       </Ornate>
 
-      <BackButton label="Leave" className="map-close pin-keepout" onClick={onLeave} />
+      <BackButton label={t('panels.fair.leave')} className="map-close pin-keepout" onClick={onLeave} />
     </main>
   )
 }

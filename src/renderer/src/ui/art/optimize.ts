@@ -1,3 +1,5 @@
+import { t } from '../../../../shared/i18n'
+
 /**
  * Making the content's pictures smaller: a PNG turned into a WebP of the same picture, a fraction of the size. The
  * encoding is the browser's own (a canvas writes WebP), so nothing needs installing; the files are read and written
@@ -22,7 +24,7 @@ export async function toWebp(path: string): Promise<string> {
   bitmap.close()
   const blob = await canvas.convertToBlob({ type: 'image/webp', quality: QUALITY })
   // A browser that cannot write WebP hands back a PNG instead, which would be no smaller.
-  if (blob.type !== 'image/webp') throw new Error('This build cannot write WebP.')
+  if (blob.type !== 'image/webp') throw new Error(t('comfy.optimize.noWebp'))
   return window.api.editor.saveOptimized({ path, bytes: new Uint8Array(await blob.arrayBuffer()) })
 }
 

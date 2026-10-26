@@ -19,9 +19,9 @@ extraResources:
     to: content
 
 win:
-  # A zip of the app folder: unzip anywhere and run the .exe. No installer, and none of an installer's 2 GB limit.
+  # The app folder as it is (win-unpacked): run the .exe inside it. No installer, and none of an installer's 2 GB limit.
   # For an installer instead: npm run build:win:installer
-  target: zip
+  target: dir
   icon: build/icon.ico
 
 nsis:

@@ -8,6 +8,7 @@ import houseArt from '../../../assets/tiles/house.png'
 import mapArt from '../../../assets/tiles/map.png'
 import phoneArt from '../../../assets/tiles/phone.png'
 import type { Panel, PhoneApp } from './panels'
+import { t } from '../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -37,7 +38,7 @@ export function NavTiles({ content, state, onOpen, phoneId, phoneApp, bag = { ki
     <div className="tiles">
       {/* His house, once he has one: its plan, who lives in it, and its accounts. */}
       {home && content.housing && state.housing.status === 'resident' && (
-        <button className="tile glass home" disabled={away} title={away ? 'You are away' : undefined} onClick={() => onOpen({ kind: 'house' })}>
+        <button className="tile glass home" disabled={away} title={away ? t('screens.navTiles.away') : undefined} onClick={() => onOpen({ kind: 'house' })}>
           <Art src={houseArt} />
           {content.housing.name}
           {state.housing.arrears > 0 && <span className="badge">!</span>}
@@ -45,21 +46,21 @@ export function NavTiles({ content, state, onOpen, phoneId, phoneApp, bag = { ki
       )}
       <button className="tile glass" data-tour="map" onClick={() => onOpen({ kind: 'map' })}>
         <Art src={mapArt} />
-        Map
+        {t('screens.navTiles.map')}
       </button>
       <button className="tile glass" data-tour="phone" onClick={() => onOpen({ kind: 'courier', id: phoneId, app: phoneApp })}>
         <Art src={phoneArt} />
-        Phone
+        {t('screens.navTiles.phone')}
         {phoneUnread(state) > 0 && <span className="badge">{phoneUnread(state)}</span>}
       </button>
       <button className="tile glass" data-tour="calendar" onClick={() => onOpen({ kind: 'calendar' })}>
         <Art src={calendarArt} />
-        Calendar
+        {t('screens.calendar.title')}
       </button>
       {/* What he carries, can make and has brought up from below. */}
       <button className="tile glass" data-tour="bag" disabled={bagDisabled} onClick={() => onOpen(bag)}>
         <Art src={bagArt} />
-        Bag
+        {t('screens.navTiles.bag')}
       </button>
       {/* The menu, for whoever does not reach for Escape: continue, save, load, settings, and the way out. Small, and last, so that it sits in the corner. */}
       <div className="tile-row">
@@ -67,11 +68,11 @@ export function NavTiles({ content, state, onOpen, phoneId, phoneApp, bag = { ki
         {/* How the game works, a click away from the day and from a scene alike. */}
         <button className="tile-menu glass" data-tour="help-menu" onClick={() => onOpen({ kind: 'help' })}>
           <HelpIcon size={18} />
-          Help
+          {t('screens.navTiles.help')}
         </button>
-        <button className="tile-menu glass" title="Menu (Esc)" onClick={() => onOpen({ kind: 'menu' })}>
+        <button className="tile-menu glass" title={t('screens.navTiles.menuTitle', { key: 'Esc' })} onClick={() => onOpen({ kind: 'menu' })}>
           <MenuIcon size={18} />
-          Menu
+          {t('screens.navTiles.menu')}
         </button>
       </div>
     </div>

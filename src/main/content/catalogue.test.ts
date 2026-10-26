@@ -1,7 +1,7 @@
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { catalogueIsStale, coursesClash } from '../../shared/game'
-import { kindOf } from '../../shared/model'
+import { courseOf, kindOf } from '../../shared/model'
 import { loadContentPack } from './loader'
 
 /** The game's own catalogue, as it ships: built for the characters there are, with company in every class and a crowd in none. */
@@ -28,7 +28,11 @@ describe('the catalogue of the default pack', () => {
       if (kindOf(li) === 'outsider' || kindOf(li) === 'npc') continue
       const hers = courses.filter((course) => course.teacherId === li.id || course.studentIds.includes(li.id))
       expect(hers.length, li.id).toBeGreaterThanOrEqual(1)
-      if (kindOf(li) === 'student') expect(hers, li.id).toHaveLength(4)
+      if (kindOf(li) === 'student') {
+        expect(hers, li.id).toHaveLength(4)
+        // Four courses, not one taken twice in two of its sections.
+        expect(new Set(hers.map(courseOf)).size, li.id).toBe(4)
+      }
       for (const a of hers) for (const b of hers) if (a !== b) expect(coursesClash(a, b), `${li.id}: ${a.number} and ${b.number}`).toBe(false)
     }
   })

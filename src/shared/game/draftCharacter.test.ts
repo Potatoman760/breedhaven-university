@@ -1,8 +1,21 @@
 import { describe, expect, it } from 'vitest'
+import { CurriculumSchema, type ContentPack } from '../model'
 import { buildDraftPrompt, draftSchema, parseDraft } from './draftCharacter'
 import { fixture } from './testFixture'
 
-const content = fixture()
+// Two subjects to read, each with its courses written, and a general one nobody reads as her own.
+const topics = Array.from({ length: 6 }, (_, i) => ({ title: `Class ${i + 1}`, content: 'What is taught.' }))
+const content: ContentPack = {
+  ...fixture(),
+  curriculum: CurriculumSchema.parse({
+    colleges: [{ id: 'arts', name: 'Arts' }],
+    majors: [
+      { code: 'JRN', subject: 'Journalism', college: 'arts', stats: ['charisma'], courses: [{ number: '101', title: 'Reporting', topics }, { number: '140', title: 'Editing', topics }] },
+      { code: 'RHT', subject: 'Rhetoric', college: 'arts', stats: ['charisma'], courses: [{ number: '101', title: 'Argument', topics }, { number: '120', title: 'Speech', topics }] },
+      { code: 'HIS', subject: 'History', college: 'arts', general: true, courses: [{ number: '101', title: 'History', topics }] }
+    ]
+  })
+}
 const place = content.locations[0].id
 const stages = content.relationships.stages
 
@@ -22,8 +35,8 @@ const written = (patch: Record<string, unknown> = {}) => ({
   admires: ['wisdom'],
   childNames: { daughters: ['Ada', 'Bea', 'Cora', 'Dell', 'Etta'], sons: ['Finn', 'Gus'] },
   kind: 'student',
-  studies: { subject: 'Journalism', code: 'JRN', level: 2, stats: ['charisma'] },
-  teaching: { department: 'the College of Arts', title: 'Dr', subjects: [{ subject: 'Rhetoric', code: 'RHT', level: 1, stats: ['charisma'] }] },
+  studies: { major: 'JRN', level: 2 },
+  teaching: { department: 'the College of Arts', title: 'Dr', subjects: ['RHT 120'] },
   room: { name: 'a flat over the print shop', description: 'A cramped attic flat with a desk under a skylight.', locationId: place },
   schedule: [{ periods: [content.calendar.periods[0].id], locationId: place }, { locationId: place }],
   ai: {
@@ -64,6 +77,22 @@ describe('writing a new love interest', () => {
     // The names she would give her children come with her.
     expect(li.childNames).toEqual({ daughters: ['Ada', 'Bea', 'Cora', 'Dell', 'Etta'], sons: ['Finn', 'Gus'] })
     expect(li.ai.secrets).toEqual([{ text: 'She already knows who leaked it.', revealWhen: [{ type: 'stage', min: stages.at(-2)!.id }] }])
+  })
+
+  it('reads or teaches only what the curriculum has, filled in from it', () => {
+    const student = parseDraft(content, JSON.stringify(written()))
+    expect(student.studies).toEqual({ subject: 'Journalism', code: 'JRN', level: 2, stats: ['charisma'], practical: false })
+    // A teacher gives the course she named, not the first of its subject.
+    const teacher = parseDraft(content, JSON.stringify(written({ kind: 'teacher' })))
+    expect(teacher.teaching?.subjects).toEqual([{ subject: 'Rhetoric', code: 'RHT', number: '120', stats: ['charisma'], practical: false }])
+    expect(teacher.studies).toBeUndefined()
+    // A subject made up, or a general one, is not hers to read; a course not written is not hers to teach.
+    expect(() => parseDraft(content, JSON.stringify(written({ studies: { major: 'XYZ', level: 1 } })))).toThrow('studies.major')
+    expect(() => parseDraft(content, JSON.stringify(written({ studies: { major: 'HIS', level: 1 } })))).toThrow('studies.major')
+    expect(() => parseDraft(content, JSON.stringify(written({ kind: 'teacher', teaching: { department: 'x', title: 'Dr', subjects: ['RHT 199'] } })))).toThrow('teaching.subjects')
+    const { user } = buildDraftPrompt(content, 'A journalist.')
+    expect(user).toContain('- JRN: Journalism. JRN 101 Reporting; JRN 140 Editing')
+    expect(user).not.toContain('- HIS:')
   })
 
   it('gives her an id nobody has, and refuses a reply that does not fit', () => {

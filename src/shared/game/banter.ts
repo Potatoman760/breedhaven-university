@@ -3,6 +3,7 @@ import { nodeAt, pregnancyPower, roleOf } from './expedition'
 import { pregnancyStage } from './pregnancy'
 import { stageFor } from './relationships'
 import { namesHer } from './scene'
+import { t } from '../i18n'
 
 /**
  * A few words between the party as a fight below begins, and again when a depth's guardian is down and its anchor
@@ -49,20 +50,24 @@ export function buildBanterPrompt(content: ContentPack, state: GameState, moment
   // What is lying by the anchor, the first time it is set.
   const won = moment === 'won' && !state.expedition.relics.includes(depth.relic.id) ? depth.relic : undefined
   const system = [
-    `You write a few lines of talk between the women with ${player} ${moment === 'won' ? 'just after a hard fight is won' : 'as a fight is about to begin'}, in a fantasy game. They are in ${config.name}: the old places under their University, where slipped ward-lines have let raw magic pool and take shape. ${player} is the one man with them; he has no magic, and the anchors down here only hold under his hands. They are here in secret.`,
-    `Reply with ${party.length === 1 ? '2 or 3' : '3 or 4'} lines and nothing else, each on its own line as "Name: what she says", using only ${names.join(' and ')}.`,
-    `- Each line under 25 words, in her own voice, about ${moment === 'won' ? 'what they just did' : 'what is in front of them'}, each other, or ${player}. They may tease, steady or needle one another.`,
-    `- Spoken words only: no narration, no asterisks, no hidden tags. Nothing said by ${player}, and nothing that waits on an answer from him.`,
-    'Write in US English.'
+    t('llm.banter.systemRole', { player, moment, place: config.name }),
+    t('llm.banter.systemReply', { single: party.length === 1, names: names.join(t('llm.banter.and')) }),
+    t('llm.banter.systemLines', { moment, player }),
+    t('llm.banter.systemSpoken', { player }),
+    t('llm.banter.systemEnglish')
   ].join('\n')
   const user = [
-    `Where: ${depth.name}. ${depth.appearance}`,
-    `${moment === 'won' ? 'What they have just beaten, the guardian of this depth' : `What they face${node.kind === 'guardian' ? ', the guardian of this depth' : ''}`}: ${[...new Set(foes)].map((enemy) => `${foes.filter((one) => one === enemy).length > 1 ? `${foes.filter((one) => one === enemy).length} of ` : ''}${enemy.name} (${enemy.appearance})`).join('; ')}`,
+    t('llm.banter.where', { name: depth.name, appearance: depth.appearance }),
+    t('llm.banter.foes', {
+      moment,
+      guardian: node.kind === 'guardian',
+      foes: [...new Set(foes)].map((enemy) => t('llm.banter.foe', { count: foes.filter((one) => one === enemy).length, name: enemy.name, appearance: enemy.appearance })).join('; ')
+    }),
     moment === 'won'
-      ? `${player} has set his hands on the anchor of ${depth.name}, and it holds. They are done here, and about to climb back up.${won ? ` Lying by it: ${won.name}.` : ''}`
+      ? t('llm.banter.anchored', { player, depth: depth.name, found: won !== undefined, relic: won?.name })
       : run.node > 0
-        ? `They have already come through ${run.node} stop${run.node === 1 ? '' : 's'} on the way down.`
-        : 'They have only just come down the stair.',
+        ? t('llm.banter.stops', { count: run.node })
+        : t('llm.banter.justDown'),
     '',
     ...party.flatMap(({ li, fighter }) => {
       const role = roleOf(config, li)
@@ -71,11 +76,11 @@ export function buildBanterPrompt(content: ContentPack, state: GameState, moment
       const hurt = fighter.footing < fighter.max * 0.5
       const fell = run.downed.includes(li.id)
       return [
-        `${firstName(li.name)}, ${li.age}. ${li.personality}`,
-        li.ai.speechPattern ? `  Voice: ${li.ai.speechPattern}` : '',
-        `  Here as the party's ${role?.name.toLowerCase() ?? 'mage'}. To ${player} she is: ${stageFor(content.relationships, feelings?.affection ?? 0).name.toLowerCase()}.` +
-          `${stage && (pregnancyPower(content, state, li.id) ?? 1) > 1 ? ` She is carrying his child (${stage.name.toLowerCase()}), and her magic runs far stronger and wilder for it.` : ''}` +
-          `${moment === 'won' ? (fell ? ' She went down in the fight and had to be helped up.' : hurt ? ' She is hurt.' : '') : hurt ? ' She is already hurt.' : ''}`
+        t('llm.banter.woman', { name: firstName(li.name), age: li.age, personality: li.personality }),
+        li.ai.speechPattern ? t('llm.banter.voice', { text: li.ai.speechPattern }) : '',
+        t('llm.banter.role', { role: role?.name.toLowerCase() ?? t('llm.banter.mage'), player, stage: stageFor(content.relationships, feelings?.affection ?? 0).name.toLowerCase() }) +
+          `${stage && (pregnancyPower(content, state, li.id) ?? 1) > 1 ? t('llm.banter.carrying', { stage: stage.name.toLowerCase() }) : ''}` +
+          `${moment === 'won' ? (fell ? t('llm.banter.fell') : hurt ? t('llm.banter.hurt') : '') : hurt ? t('llm.banter.alreadyHurt') : ''}`
       ].filter(Boolean)
     })
   ].join('\n')

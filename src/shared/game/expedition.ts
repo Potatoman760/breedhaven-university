@@ -10,6 +10,7 @@ import { pregnancyStage } from './pregnancy'
 import { hasMet } from './scene'
 import { draws, seedOf } from './seed'
 import { abilityModifier, statOf } from './stats'
+import { t } from '../i18n'
 
 /**
  * Going below: a run through one depth of the Undercroft with a party of the women he knows, fought a turn at a
@@ -72,10 +73,10 @@ export function pregnancyPower(content: ContentPack, state: GameState, loveInter
 /** Why one of the women could not come below now, or nothing if she could. Being busy is asked of the party as a whole. */
 export function whyNot(content: ContentPack, state: GameState, li: LoveInterest): string | undefined {
   const config = content.expedition
-  if (!config || !roleOf(config, li)) return 'She would not be of use below'
-  if (!hasMet(state, li.id)) return 'You have not met'
-  if (trustOf(content, state, li.id) < config.trustNeeded) return `She does not trust you enough (${config.trustNeeded})`
-  if (pregnancyPower(content, state, li.id) === undefined) return 'She is too near her time'
+  if (!config || !roleOf(config, li)) return t('game.expedition.noUse')
+  if (!hasMet(state, li.id)) return t('game.expedition.notMet')
+  if (trustOf(content, state, li.id) < config.trustNeeded) return t('game.expedition.noTrust', { needed: config.trustNeeded })
+  if (pregnancyPower(content, state, li.id) === undefined) return t('game.expedition.nearHerTime')
   return undefined
 }
 
@@ -92,16 +93,16 @@ export function partyChoices(content: ContentPack, state: GameState): { li: Love
 /** Whether he can go below now, to a depth, with these women. */
 export function canGoBelow(content: ContentPack, state: GameState, partyIds: string[], depth: number): PerformCheck {
   const config = content.expedition
-  if (!config || !belowOpen(content, state) || !state.expedition.invited) return { ok: false, reasons: ['There is no way down'] }
+  if (!config || !belowOpen(content, state) || !state.expedition.invited) return { ok: false, reasons: [t('game.expedition.noWayDown')] }
   const reasons: string[] = []
-  if (state.expedition.run) reasons.push('You are already below')
-  if (state.locationId !== config.entryLocationId) reasons.push(`The way down is at ${content.locations.find((l) => l.id === config.entryLocationId)?.name ?? config.entryLocationId}`)
-  if (depth < 0 || depth >= depthsOpen(content, state)) reasons.push('You have not opened the way that deep')
-  if (partyIds.length > config.partySize) reasons.push(`No more than ${config.partySize} can come`)
+  if (state.expedition.run) reasons.push(t('game.expedition.alreadyBelow'))
+  if (state.locationId !== config.entryLocationId) reasons.push(t('game.expedition.wayDownAt', { place: content.locations.find((l) => l.id === config.entryLocationId)?.name ?? config.entryLocationId }))
+  if (depth < 0 || depth >= depthsOpen(content, state)) reasons.push(t('game.expedition.notThatDeep'))
+  if (partyIds.length > config.partySize) reasons.push(t('game.expedition.partySize', { size: config.partySize }))
   for (const id of partyIds) {
     const li = content.loveInterests.find((one) => one.id === id)
-    const why = li ? whyNot(content, state, li) : 'There is nobody of that name'
-    if (why) reasons.push(`${li ? firstName(li) : id}: ${why}`)
+    const why = li ? whyNot(content, state, li) : t('game.expedition.nobodyOfThatName')
+    if (why) reasons.push(t('game.expedition.whyNot', { name: li ? firstName(li) : id, why }))
   }
   // Whether the place is open, the hours are there, he has the energy and each of them is free is what any outing is asked.
   reasons.push(...checkOuting(content, state, { title: config.name, description: '', withIds: partyIds, locationId: config.entryLocationId, hours: config.hours }).blockers)
@@ -141,20 +142,20 @@ export function fighterName(content: ContentPack, state: GameState, id: string):
 
 /** "$40 and 2 Stillwater" */
 export function describeFinds(content: ContentPack, finds: Finds): string {
-  const things = Object.entries(finds.items).map(([id, count]) => `${count > 1 ? `${count} ` : ''}${content.items.find((item) => item.id === id)?.name ?? id}`)
-  const all = [...(finds.money > 0 ? [`$${finds.money}`] : []), ...things]
-  return all.length === 0 ? 'nothing' : all.length === 1 ? all[0] : `${all.slice(0, -1).join(', ')} and ${all.at(-1)}`
+  const things = Object.entries(finds.items).map(([id, count]) => t('game.expedition.findItem', { many: count > 1, count, name: content.items.find((item) => item.id === id)?.name ?? id }))
+  const all = [...(finds.money > 0 ? [t('game.expedition.findMoney', { amount: finds.money })] : []), ...things]
+  return all.length === 0 ? t('game.expedition.nothing') : all.length === 1 ? all[0] : t('game.expedition.list', { rest: all.slice(0, -1).join(', '), last: all.at(-1) })
 }
 
 /** Arrives at a stop of the run: a fight is set up, what is lying there is picked up, a checkpoint makes safe what has been found and rests everyone. */
 function arrive(content: ContentPack, state: GameState, run: ExpeditionRun): ExpeditionRun {
   const config = content.expedition!
   const node = depthAt(config, run).nodes[run.node]
-  if (node.kind === 'find') return { ...run, fight: undefined, done: true, found: add(run.found, node.finds), spoils: node.finds, note: `${node.name || 'Something left behind'}: ${describeFinds(content, node.finds)}.` }
+  if (node.kind === 'find') return { ...run, fight: undefined, done: true, found: add(run.found, node.finds), spoils: node.finds, note: t('game.expedition.findNote', { name: node.name || t('game.expedition.somethingLeft'), finds: describeFinds(content, node.finds) }) }
   if (node.kind === 'checkpoint') {
     const rested = run.party.map((fighter) => ({ ...fighter, footing: Math.min(fighter.max, Math.round(fighter.footing + fighter.max * config.checkpointRest)) }))
     const healed = Object.fromEntries(rested.map((fighter, index) => [fighter.id, fighter.footing - run.party[index].footing]))
-    return { ...run, fight: undefined, done: true, party: rested, banked: add(run.banked, run.found), found: NOTHING, rest: { healed, secured: run.found }, note: `${node.name || 'A dry ledge'}. You catch your breath, and what you have found is safe.` }
+    return { ...run, fight: undefined, done: true, party: rested, banked: add(run.banked, run.found), found: NOTHING, rest: { healed, secured: run.found }, note: t('game.expedition.checkpointNote', { name: node.name || t('game.expedition.dryLedge') }) }
   }
   const foes: Foe[] = node.enemyIds.map((enemyId, index) => {
     const enemy = config.enemies.find((one) => one.id === enemyId)!
@@ -167,7 +168,7 @@ function arrive(content: ContentPack, state: GameState, run: ExpeditionRun): Exp
     const roll = roller(state, entered)
     const caught = roll.next() < 0.5
     entered = { ...entered, rolls: entered.rolls + roll.used() }
-    if (caught) entered = enemiesAct(content, state, entered, [{ text: 'They were waiting for you.', faces: {}, fx: [] }])
+    if (caught) entered = enemiesAct(content, state, entered, [{ text: t('game.expedition.ambushed'), faces: {}, fx: [] }])
   }
   return entered
 }
@@ -208,7 +209,7 @@ export function practiceRun(content: ContentPack, state: GameState, partyIds: st
   ]
   const node = Math.max(0, config.depths[0].nodes.findIndex((one) => one.kind === 'fight'))
   // He sees it coming, so that the fight opens on his turn.
-  const ready: GameState = { ...state, boons: [...state.boons, { kind: 'ambush', amount: 1, until: state.time + 1, source: 'Practice' }] }
+  const ready: GameState = { ...state, boons: [...state.boons, { kind: 'ambush', amount: 1, until: state.time + 1, source: t('game.expedition.practice') }] }
   const run: ExpeditionRun = { depth: 0, node, startedAt: state.time, party, ward: 0, found: NOTHING, banked: NOTHING, downed: [], rolls: 0, done: false, note: '' }
   return { ...ready, expedition: { ...ready.expedition, run: arrive(content, ready, run) } }
 }
@@ -235,15 +236,15 @@ export interface TurnAction {
 
 /** What one of a role's actions does, in a line, with its numbers. */
 export function describeAction(action: PartyAction): string {
-  const about = `about ${Math.round(action.power + 2.5)}`
+  const about = Math.round(action.power + 2.5)
   const what =
-    action.kind === 'attack' ? `Hits one enemy for ${about}.`
-    : action.kind === 'weaken' ? `Hits one enemy for ${`about ${Math.round((action.power + 2.5) / 2)}`}, and it strikes weaker for ${WEAKEN_ROUNDS} rounds.`
-    : action.kind === 'shield' ? `Raises a ward that takes the next ${about} meant for any of you.`
-    : action.kind === 'heal' ? `Gives ${about} footing back to one of you.`
-    : action.kind === 'taunt' ? 'Draws every enemy to her this round, and she takes half.'
-    : 'She takes half of what hits her this round.'
-  return action.cooldown > 0 ? `${what} Then ${action.cooldown} round${action.cooldown === 1 ? '' : 's'} before she can again.` : what
+    action.kind === 'attack' ? t('game.expedition.action.attack', { about })
+    : action.kind === 'weaken' ? t('game.expedition.action.weaken', { about: Math.round((action.power + 2.5) / 2), rounds: WEAKEN_ROUNDS })
+    : action.kind === 'shield' ? t('game.expedition.action.shield', { about })
+    : action.kind === 'heal' ? t('game.expedition.action.heal', { about })
+    : action.kind === 'taunt' ? t('game.expedition.action.taunt')
+    : t('game.expedition.action.guard')
+  return action.cooldown > 0 ? t('game.expedition.action.cooldown', { what, rounds: action.cooldown }) : what
 }
 
 /** Whoever of the party it is the turn of, in a fight. */
@@ -263,25 +264,25 @@ export function turnActions(content: ContentPack, state: GameState): TurnAction[
     const role = roleOf(config, content.loveInterests.find((li) => li.id === actor.id))
     return (role?.actions ?? []).map((action) => {
       const wait = actor.cooldowns[action.id] ?? 0
-      return { id: action.id, name: action.name, description: describeAction(action), aim: action.kind === 'attack' || action.kind === 'weaken' ? 'foe' : action.kind === 'heal' ? 'ally' : undefined, ready: wait === 0, note: wait > 0 ? `ready in ${wait}` : undefined }
+      return { id: action.id, name: action.name, description: describeAction(action), aim: action.kind === 'attack' || action.kind === 'weaken' ? 'foe' : action.kind === 'heal' ? 'ally' : undefined, ready: wait === 0, note: wait > 0 ? t('game.expedition.readyIn', { wait }) : undefined }
     })
   }
   const women = run.party.filter((fighter) => fighter.id !== HIM && standing(fighter))
-  const energy = (cost: number) => (state.player.energy >= cost ? `${cost} energy` : `needs ${cost} energy`)
+  const energy = (cost: number) => (state.player.energy >= cost ? t('game.expedition.energy', { cost }) : t('game.expedition.needsEnergy', { cost }))
   const carried = content.items.filter((item) => item.below && (state.inventory[item.id] ?? 0) > 0)
   return [
-    { id: 'strike', name: 'Attack', description: 'Hits one enemy. Stronger with strength.', aim: 'foe', ready: true },
-    { id: 'cover', name: 'Protect', description: 'The next hit meant for her lands on you, and less of it for your endurance.', aim: 'her', ready: women.length > 0 },
-    { id: 'anchor', name: 'Empower', description: `Her next action is about ${Math.round((config.anchorPower - 1) * 100)}% stronger.`, aim: 'her', ready: women.length > 0 && state.player.energy >= config.anchorEnergy, note: energy(config.anchorEnergy) },
+    { id: 'strike', name: t('game.expedition.strike.name'), description: t('game.expedition.strike.description'), aim: 'foe', ready: true },
+    { id: 'cover', name: t('game.expedition.cover.name'), description: t('game.expedition.cover.description'), aim: 'her', ready: women.length > 0 },
+    { id: 'anchor', name: t('game.expedition.anchor.name'), description: t('game.expedition.anchor.description', { percent: Math.round((config.anchorPower - 1) * 100) }), aim: 'her', ready: women.length > 0 && state.player.energy >= config.anchorEnergy, note: energy(config.anchorEnergy) },
     {
       id: 'ground',
-      name: 'Ground',
-      description: inForce(content, state, 'grounding') ? "Draws all of a pregnant woman's surge out of her." : `Draws ${config.grounds} of a pregnant woman's surge out of her, before it breaks loose.`,
+      name: t('game.expedition.ground.name'),
+      description: inForce(content, state, 'grounding') ? t('game.expedition.ground.all') : t('game.expedition.ground.description', { grounds: config.grounds }),
       aim: 'pregnant',
       ready: women.some((fighter) => fighter.surge > 0) && state.player.energy >= config.groundEnergy,
       note: energy(config.groundEnergy)
     },
-    ...carried.map((item): TurnAction => ({ id: `item:${item.id}`, name: item.name, description: [item.below!.footing > 0 ? `Gives ${item.below!.footing} footing back to one of you.` : '', item.below!.calms ? 'Clears her surge.' : ''].filter(Boolean).join(' '), aim: 'ally', ready: true, note: `${state.inventory[item.id]} left` }))
+    ...carried.map((item): TurnAction => ({ id: `item:${item.id}`, name: item.name, description: [item.below!.footing > 0 ? t('game.expedition.item.footing', { footing: item.below!.footing }) : '', item.below!.calms ? t('game.expedition.item.calms') : ''].filter(Boolean).join(' '), aim: 'ally', ready: true, note: t('game.expedition.item.left', { count: state.inventory[item.id] }) }))
   ]
 }
 
@@ -343,10 +344,10 @@ function enemiesAct(content: ContentPack, state: GameState, before: ExpeditionRu
       const whom = name(target.id)
       events.push({
         text: [
-          `${enemy.name} hits ${whom}${stepsIn ? `, covering ${name(aimedAt.id)},` : ''} for ${result.dealt}.`,
-          result.warded === 0 ? '' : result.taken === 0 ? `The ward absorbs all ${result.warded}.` : `The ward absorbs ${result.warded}.`,
-          result.down ? `${whom} is down.` : '',
-          hexed ? `Hexed for ${steady ? 1 : HEX_ROUNDS} round${steady ? '' : 's'}.` : ''
+          t('game.expedition.log.enemyHits', { enemy: enemy.name, whom, covering: stepsIn, covered: name(aimedAt.id), dealt: result.dealt }),
+          result.warded === 0 ? '' : result.taken === 0 ? t('game.expedition.log.wardAll', { warded: result.warded }) : t('game.expedition.log.ward', { warded: result.warded }),
+          result.down ? t('game.expedition.log.down', { whom }) : '',
+          hexed ? t('game.expedition.log.hexed', { rounds: steady ? 1 : HEX_ROUNDS }) : ''
         ]
           .filter(Boolean)
           .join(' '),
@@ -371,7 +372,7 @@ function enemiesAct(content: ContentPack, state: GameState, before: ExpeditionRu
     cooldowns: Object.fromEntries(Object.entries(fighter.cooldowns).flatMap(([id, wait]) => (wait > 1 ? [[id, wait - 1]] : [])))
   }))
   run = { ...run, party, fight: { ...fight, turn: party.findIndex(standing) }, rolls: run.rolls + roll.used() }
-  if (!party.some(standing)) return { ...run, fight: { ...run.fight!, turn: 0 }, over: 'lost', found: NOTHING, note: 'Nobody is left standing. You are carried back up.' }
+  if (!party.some(standing)) return { ...run, fight: { ...run.fight!, turn: 0 }, over: 'lost', found: NOTHING, note: t('game.expedition.lost') }
   return run
 }
 
@@ -416,7 +417,7 @@ export function act(content: ContentPack, state: GameState, move: Move): GameSta
   // Said after a blow that finishes an enemy. What it has left otherwise is on its bar.
   const left = (target: Foe) => {
     const now = run.fight!.foes.find((one) => one.key === target.key)!
-    return now.footing === 0 ? ' It comes apart.' : ''
+    return now.footing === 0 ? t('game.expedition.log.comesApart') : ''
   }
   // What is seen of a blow on an enemy: the cut, and its coming apart if that finished it.
   const cut = (target: Foe, amount: number, kind: 'slash' | 'crit' = 'slash', look: Pick<FightFx, 'by' | 'style'> = {}): FightFx[] => [
@@ -428,19 +429,19 @@ export function act(content: ContentPack, state: GameState, move: Move): GameSta
     const her = ally && ally.id !== HIM ? ally : undefined
     if (move.actionId === 'strike') {
       const taken = strike(foe, (STRIKE + abilityModifier(statOf(state, 'strength')) * STRIKE_PER_STRENGTH + roll.die(6)) * factor(content, state, 'might') * (actor.hexed > 0 ? HEXED : 1))
-      events.push({ text: `${name(HIM)} hits ${enemyOf(config, foe).name} for ${taken}.${left(foe)}`, faces: {}, fx: cut(foe, taken) })
+      events.push({ text: t('game.expedition.log.heHits', { him: name(HIM), enemy: enemyOf(config, foe).name, taken, left: left(foe) }), faces: {}, fx: cut(foe, taken) })
     } else if (move.actionId === 'cover' && her) {
       setFighter(her.id, { covered: true })
-      events.push({ text: `${name(HIM)} protects ${name(her.id)}.`, faces: { [her.id]: 'happy' }, fx: [{ kind: 'guard', on: her.id }] })
+      events.push({ text: t('game.expedition.log.protects', { him: name(HIM), her: name(her.id) }), faces: { [her.id]: 'happy' }, fx: [{ kind: 'guard', on: her.id }] })
     } else if (move.actionId === 'anchor' && her) {
       spend(config.anchorEnergy)
       setFighter(her.id, { anchored: true })
-      events.push({ text: `${name(HIM)} empowers ${name(her.id)}: +${Math.round((anchorWorth(content, state) - 1) * 100)}% to her next action.`, faces: { [her.id]: 'happy' }, fx: [{ kind: 'anchor', on: her.id }] })
+      events.push({ text: t('game.expedition.log.empowers', { him: name(HIM), her: name(her.id), percent: Math.round((anchorWorth(content, state) - 1) * 100) }), faces: { [her.id]: 'happy' }, fx: [{ kind: 'anchor', on: her.id }] })
     } else if (move.actionId === 'ground' && her && her.surge > 0) {
       spend(config.groundEnergy)
       const calmed = inForce(content, state, 'grounding') ? 0 : Math.max(0, her.surge - config.grounds)
       setFighter(her.id, { surge: calmed })
-      events.push({ text: `${name(HIM)} grounds ${name(her.id)}: surge -${her.surge - calmed}.`, faces: { [her.id]: 'neutral' }, fx: [{ kind: 'ground', on: her.id }] })
+      events.push({ text: t('game.expedition.log.grounds', { him: name(HIM), her: name(her.id), surge: her.surge - calmed }), faces: { [her.id]: 'neutral' }, fx: [{ kind: 'ground', on: her.id }] })
     } else if (move.actionId.startsWith('item:')) {
       const item = content.items.find((one) => `item:${one.id}` === move.actionId)
       const to = ally ?? actor
@@ -449,7 +450,7 @@ export function act(content: ContentPack, state: GameState, move: Move): GameSta
       const restored = Math.min(to.max, to.footing + item.below.footing)
       setFighter(to.id, { footing: restored, ...(item.below.calms ? { surge: 0 } : {}) })
       events.push({
-        text: `${name(HIM)} uses ${item.name} on ${to.id === HIM ? 'himself' : name(to.id)}: +${restored - to.footing}${item.below.calms && to.surge > 0 ? ', surge cleared' : ''}.`,
+        text: t('game.expedition.log.usesItem', { him: name(HIM), item: item.name, self: to.id === HIM, target: name(to.id), restored: restored - to.footing, cleared: item.below.calms && to.surge > 0 }),
         faces: to.id === HIM ? {} : { [to.id]: 'happy' },
         fx: [{ kind: 'heal', on: to.id, amount: restored - to.footing }]
       })
@@ -470,9 +471,9 @@ export function act(content: ContentPack, state: GameState, move: Move): GameSta
     if (action.kind === 'attack' || action.kind === 'weaken') {
       const weak = enemyOf(config, foe).weakTo === role.id ? WEAKNESS : 1
       const taken = strike(foe, worth * weak * (action.kind === 'weaken' ? 0.5 : 1), action.kind === 'weaken' ? { weakened: WEAKEN_ROUNDS } : {})
-      const why = [trueStrike && 'a true strike', weak > 1 && 'its weakness'].filter(Boolean)
+      const why = [trueStrike && t('game.expedition.log.trueStrike'), weak > 1 && t('game.expedition.log.weakness')].filter(Boolean)
       events.push({
-        text: `${who}'s ${action.name} hits ${enemyOf(config, foe).name} for ${taken}${why.length > 0 ? `, ${why.join(', ')}` : ''}.${left(foe)}${action.kind === 'weaken' && run.fight!.foes.find((one) => one.key === foe.key)!.footing > 0 ? ` Weakened for ${WEAKEN_ROUNDS} rounds.` : ''}`,
+        text: t('game.expedition.log.herHits', { who, action: action.name, enemy: enemyOf(config, foe).name, taken, why: why.length > 0 ? `, ${why.join(', ')}` : '', left: left(foe), weakened: action.kind === 'weaken' && run.fight!.foes.find((one) => one.key === foe.key)!.footing > 0 ? t('game.expedition.log.weakened', { rounds: WEAKEN_ROUNDS }) : '' }),
         faces: face,
         fx: [...cut(foe, taken, trueStrike ? 'crit' : 'slash', look), ...(action.kind === 'weaken' && run.fight!.foes.find((one) => one.key === foe.key)!.footing > 0 ? [{ kind: 'weaken' as const, on: foe.key }] : [])]
       })
@@ -480,13 +481,13 @@ export function act(content: ContentPack, state: GameState, move: Move): GameSta
       const to = ally ?? run.party.filter(standing).sort((a, b) => a.footing / a.max - b.footing / b.max)[0]
       const mended = Math.min(to.max, Math.round(to.footing + worth))
       setFighter(to.id, { footing: mended })
-      events.push({ text: `${who}'s ${action.name} restores ${mended - to.footing} to ${to.id === actor.id ? 'herself' : name(to.id)}.`, faces: { [actor.id]: 'happy' }, fx: [{ kind: 'heal', on: to.id, amount: mended - to.footing, ...look }] })
+      events.push({ text: t('game.expedition.log.restores', { who, action: action.name, amount: mended - to.footing, self: to.id === actor.id, target: name(to.id) }), faces: { [actor.id]: 'happy' }, fx: [{ kind: 'heal', on: to.id, amount: mended - to.footing, ...look }] })
     } else if (action.kind === 'shield') {
       run = { ...run, ward: run.ward + Math.round(worth) }
-      events.push({ text: `${who}'s ${action.name} adds ${Math.round(worth)} to the ward.`, faces: { [actor.id]: 'neutral' }, fx: run.party.filter(standing).map((fighter) => ({ kind: 'ward' as const, on: fighter.id, ...look })) })
+      events.push({ text: t('game.expedition.log.addsWard', { who, action: action.name, amount: Math.round(worth) }), faces: { [actor.id]: 'neutral' }, fx: run.party.filter(standing).map((fighter) => ({ kind: 'ward' as const, on: fighter.id, ...look })) })
     } else {
       setFighter(actor.id, { guarding: true, taunting: action.kind === 'taunt' })
-      events.push({ text: `${who} uses ${action.name}.`, faces: { [actor.id]: 'neutral' }, fx: [{ kind: 'guard', on: actor.id, ...look }] })
+      events.push({ text: t('game.expedition.log.uses', { who, action: action.name }), faces: { [actor.id]: 'neutral' }, fx: [{ kind: 'guard', on: actor.id, ...look }] })
     }
     setFighter(actor.id, { anchored: false, cooldowns: action.cooldown > 0 ? { ...actor.cooldowns, [action.id]: action.cooldown + 1 } : actor.cooldowns })
 
@@ -497,7 +498,7 @@ export function act(content: ContentPack, state: GameState, move: Move): GameSta
         setFighter(actor.id, { surge: 0 })
         const struck = run.party.filter(standing)
         for (const fighter of struck) run = hurt(run, fighter.id, config.misfire, true).run
-        events.push({ text: `${who}'s surge breaks loose: ${config.misfire} to everyone.`, faces: { [actor.id]: 'embarrassed' }, fx: struck.map((fighter) => ({ kind: 'misfire' as const, on: fighter.id, amount: config.misfire })) })
+        events.push({ text: t('game.expedition.log.surge', { who, misfire: config.misfire }), faces: { [actor.id]: 'embarrassed' }, fx: struck.map((fighter) => ({ kind: 'misfire' as const, on: fighter.id, amount: config.misfire })) })
       } else setFighter(actor.id, { surge })
     }
   }
@@ -511,18 +512,18 @@ export function act(content: ContentPack, state: GameState, move: Move): GameSta
     const spoils: Finds = { money: Math.round(node.finds.money * factor(content, state, 'spoils')), items: node.finds.items }
     const helpedUp = run.party.map((fighter) => (standing(fighter) ? fighter : { ...fighter, footing: Math.max(1, Math.round(fighter.max * HELPED_UP)) }))
     const faces = Object.fromEntries(run.party.filter((fighter) => fighter.id !== HIM).map((fighter) => [fighter.id, 'happy']))
-    const won = { ...run, party: helpedUp, done: true, found: add(run.found, spoils), spoils, fight: { ...fight, events: [...events, { text: `It is over. You find ${describeFinds(content, spoils)}.`, faces, fx: [] }] } }
+    const won = { ...run, party: helpedUp, done: true, found: add(run.found, spoils), spoils, fight: { ...fight, events: [...events, { text: t('game.expedition.log.won', { finds: describeFinds(content, spoils) }), faces, fx: [] }] } }
     const guardian = node.kind === 'guardian'
     return {
       ...after,
       expedition: {
         ...after.expedition,
-        run: guardian ? { ...won, over: 'won', banked: add(won.banked, won.found), found: NOTHING, note: `You set your hands on the anchor of ${depthAt(config, run).name}, and it holds.` } : won
+        run: guardian ? { ...won, over: 'won', banked: add(won.banked, won.found), found: NOTHING, note: t('game.expedition.anchorHolds', { depth: depthAt(config, run).name }) } : won
       }
     }
   }
   if (!run.party.some(standing)) {
-    return { ...after, expedition: { ...after.expedition, run: { ...run, fight: { ...fight, events }, over: 'lost', found: NOTHING, note: 'Nobody is left standing. You are carried back up.' } } }
+    return { ...after, expedition: { ...after.expedition, run: { ...run, fight: { ...fight, events }, over: 'lost', found: NOTHING, note: t('game.expedition.lost') } } }
   }
 
   // The turn passes to the next of the party still up; when there is none, the enemies answer.
@@ -535,7 +536,7 @@ export function act(content: ContentPack, state: GameState, move: Move): GameSta
 export function turnBack(state: GameState): GameState {
   const run = state.expedition.run
   if (!run || run.over) return state
-  return { ...state, expedition: { ...state.expedition, run: { ...run, fight: undefined, over: 'left', found: NOTHING, note: 'You turn back while you can.' } } }
+  return { ...state, expedition: { ...state.expedition, run: { ...run, fight: undefined, over: 'left', found: NOTHING, note: t('game.expedition.turnBack') } } }
 }
 
 /** What a run that is over came to, for the reckoning. */
@@ -590,13 +591,13 @@ export function comeUp(content: ContentPack, state: GameState): GameState {
     }
   }
   for (const id of report.wentIds) {
-    const role = roleOf(config, content.loveInterests.find((li) => li.id === id))?.name.toLowerCase() ?? 'company'
+    const role = roleOf(config, content.loveInterests.find((li) => li.id === id))?.name.toLowerCase() ?? t('game.expedition.company')
     const down = report.downedIds.includes(id)
     const told = won
-      ? `You went below ${content.locations.find((l) => l.id === config.entryLocationId)?.name ?? 'the University'} with ${state.player.name}, into ${config.name}, as his ${role}, and held while he re-seated the anchor of ${report.depth.name}.${down ? ' You went down once and he got you back on your feet.' : ''}`
+      ? t('game.expedition.memory.won', { place: content.locations.find((l) => l.id === config.entryLocationId)?.name ?? t('game.expedition.theUniversity'), player: state.player.name, below: config.name, role, depth: report.depth.name, down })
       : report.outcome === 'lost'
-        ? `You went into ${config.name} with ${state.player.name} and it went badly at ${report.depth.name}: all of you had to be got back up the stairs.`
-        : `You went into ${config.name} with ${state.player.name} as far as ${report.depth.name}, and he turned you back before it went wrong.`
+        ? t('game.expedition.memory.lost', { below: config.name, player: state.player.name, depth: report.depth.name })
+        : t('game.expedition.memory.left', { below: config.name, player: state.player.name, depth: report.depth.name })
     after = addMemory(after, id, told)
     const trust = won ? config.trustWon : report.outcome === 'lost' && down ? -config.trustLost : 0
     if (trust !== 0) after = applyFeelings(content, after, id, { affection: 0, trust, desire: 0, reason: '' }, true)

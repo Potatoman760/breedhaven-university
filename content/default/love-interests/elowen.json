@@ -302,7 +302,7 @@
   "schedule": [
     {
       "weekdays": [
-        "Restday"
+        "Sunday"
       ],
       "periods": [
         "night"
@@ -311,11 +311,11 @@
     },
     {
       "weekdays": [
-        "Solday",
-        "Moonday",
-        "Tidesday",
-        "Windsday",
-        "Hearthday"
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
       ],
       "periods": [
         "morning"
@@ -324,7 +324,7 @@
     },
     {
       "weekdays": [
-        "Marketday"
+        "Saturday"
       ],
       "periods": [
         "afternoon"
@@ -352,7 +352,9 @@
     "name": "her streaming room in the Cloister Halls",
     "description": "A cozy, cluttered modern dormitory room lit pink and purple by strips of LED light along the ceiling and the desk. A gaming desk with two glowing monitors, a mechanical keyboard with rainbow keys, a microphone on a boom arm, a ring light and a pink gaming chair. An unmade single bed heaped with plushies and patterned cushions, game posters on the smooth white walls, empty energy drink cans and a cup of bubble tea by the keyboard, a phone on a glowing charging plate. Soft neon light, the window dark behind blinds.",
     "locationId": "dormitories",
-    "background": "generated/backgrounds/elowen/view.webp"
+    "images": {
+      "day": "generated/backgrounds/elowen/view.webp"
+    }
   },
   "birthPicture": "sprites/elowen/birth-2.webp",
   "walkSprite": "sprites/elowen/walk-cutout.webp",

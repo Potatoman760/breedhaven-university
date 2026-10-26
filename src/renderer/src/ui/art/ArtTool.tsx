@@ -8,12 +8,12 @@ import {
   nsfwPrompt,
   sizeFor,
   spritePrompt,
-  WORKFLOW_KIND_LABELS,
   type ComfySettings,
   type GenerateArtResult,
   type WorkflowListResult
 } from '../../../../shared/comfy'
 import { isPregnantPose, EXPRESSIONS, type Location, type LoveInterest, type Npc } from '../../../../shared/model'
+import { t, type MessageKey } from '../../../../shared/i18n'
 import { errorMessage } from '../../errors'
 import { Overlay } from '../Dialog'
 import { Text } from '../editor/fields'
@@ -78,6 +78,7 @@ interface Props {
 
 const TABS = ['Generate', 'ComfyUI setup'] as const
 type Tab = (typeof TABS)[number]
+const TAB_LABELS: Record<Tab, MessageKey> = { Generate: 'comfy.art.tabGenerate', 'ComfyUI setup': 'comfy.art.tabSetup' }
 
 
 /** One picture made while the tool was open, with what it was made for. */
@@ -135,26 +136,25 @@ export function ArtTool({ target, onClose }: Props) {
       <div className="dialog art-tool">
         <div className="dialog-head">
           <h1>
-            {target.kind === 'video' ? 'Video clip' : `Generate a ${WORKFLOW_KIND_LABELS[target.kind].toLowerCase()}`}
-            {subject && `: ${subject}`}
+            {t(subject ? 'comfy.art.titleOf' : 'comfy.art.title', { kind: target.kind, subject })}
           </h1>
           <div className="tabs" role="tablist">
             {TABS.map((name) => (
               <button key={name} type="button" role="tab" aria-selected={tab === name} className={tab === name ? 'tab selected' : 'tab'} onClick={() => setTab(name)}>
-                {name}
+                {t(TAB_LABELS[name])}
               </button>
             ))}
           </div>
           <Button onClick={onClose}>
-            Close
+            {t('comfy.art.close')}
           </Button>
         </div>
         {status && <p className="notice">{status}</p>}
         {list && !list.ok && tab === 'Generate' && (
-          <p className="notice">{list.message || 'No workflow could be read.'}</p>
+          <p className="notice">{list.message || t('comfy.art.noWorkflowRead')}</p>
         )}
         {!settings ? (
-          <p className="hint">Loading...</p>
+          <p className="hint">{t('comfy.art.loading')}</p>
         ) : tab !== 'Generate' ? (
           <ComfySetup settings={settings} list={list} onSave={save} />
         ) : target.kind === 'video' ? (
@@ -190,6 +190,8 @@ function Generate({ target, settings, list }: GenerateProps) {
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState('')
   const [made, setMade] = useState<Made[]>([])
+  // Cutting out leaves the gaps the art closes around.
+  const [edgesOnly, setEdgesOnly] = useState(false)
   // The picture opened to be looked at whole, while one is.
   const [viewing, setViewing] = useState<string | null>(null)
 
@@ -234,8 +236,8 @@ function Generate({ target, settings, list }: GenerateProps) {
       })
       if (!result.ok) setNotice(result.message)
       else {
-        setMade((before) => [{ result, outfitId, expression: expression.trim() || 'neutral', view: view || 'New view', period }, ...before])
-        if (result.skipped.length > 0) setNotice(`Drawn, but "${chosen?.name}" had nowhere to put: ${result.skipped.join(', ')}.`)
+        setMade((before) => [{ result, outfitId, expression: expression.trim() || 'neutral', view: view || t('comfy.art.newView'), period }, ...before])
+        if (result.skipped.length > 0) setNotice(t('comfy.art.skipped', { workflow: String(chosen?.name), slots: result.skipped.join(', ') }))
       }
     } catch (error) {
       setNotice(errorMessage(error))
@@ -254,10 +256,10 @@ function Generate({ target, settings, list }: GenerateProps) {
       else if (target.kind === 'birth' || target.kind === 'walk') await target.onUse(m.result.path)
       const used =
         target.kind === 'sprite'
-          ? `Set as the “${m.expression}” sprite. Save the character to keep it.`
+          ? t('comfy.art.usedSprite', { expression: m.expression })
           : target.kind === 'nsfw'
-            ? `Set as the “${m.expression}” picture. Save the character to keep it.`
-            : 'Set as the picture. Save to keep it.'
+            ? t('comfy.art.usedPose', { pose: m.expression })
+            : t('comfy.art.used')
       setMade((before) => before.map((one) => (one.result.path === m.result.path ? { ...one, used } : one)))
     } catch (error) {
       setNotice(errorMessage(error))
@@ -273,8 +275,8 @@ function Generate({ target, settings, list }: GenerateProps) {
     setBusy(true)
     setNotice('')
     try {
-      const cut = await window.api.comfy.cutout({ path: m.result.path })
-      if (!cut.ok || !cut.path) return setNotice(cut.colour ? `${cut.message} (The background it found is ${cut.colour}.)` : cut.message)
+      const cut = await window.api.comfy.cutout({ path: m.result.path, mode: edgesOnly ? 'edge' : 'gaps' })
+      if (!cut.ok || !cut.path) return setNotice(cut.colour ? t('comfy.art.cutFailedColour', { message: cut.message, colour: cut.colour }) : cut.message)
       const next: Made = { ...m, result: { ...m.result, path: cut.path }, cut: true }
       setMade((before) => before.map((one) => (one.result.path === m.result.path ? next : one)))
       setNotice(cut.message)
@@ -292,7 +294,7 @@ function Generate({ target, settings, list }: GenerateProps) {
         {target.kind === 'sprite' && (
           <div className="row">
             <label>
-              Outfit
+              {t('comfy.art.outfit')}
               <select value={outfitId} onChange={(e) => (setOutfitId(e.target.value), setEdited(false))}>
                 {target.who.outfits.map((o) => (
                   <option key={o.id} value={o.id}>
@@ -302,7 +304,7 @@ function Generate({ target, settings, list }: GenerateProps) {
               </select>
             </label>
             <label>
-              Expression
+              {t('comfy.art.expression')}
               <input list="art-expressions" value={expression} placeholder="neutral" onChange={(e) => (setExpression(e.target.value), setEdited(false))} />
               <datalist id="art-expressions">
                 {EXPRESSIONS.map((e) => (
@@ -316,7 +318,7 @@ function Generate({ target, settings, list }: GenerateProps) {
         {target.kind === 'nsfw' && (
           <div className="row">
             <label>
-              Sex-act
+              {t('comfy.art.pose')}
               <select value={expression} onChange={(e) => (setExpression(e.target.value), setEdited(false))}>
                 {target.poses.map((pose) => (
                   <option key={pose.id} value={pose.id}>
@@ -331,13 +333,13 @@ function Generate({ target, settings, list }: GenerateProps) {
         {target.kind === 'background' && (
           <div className="row">
             <label>
-              View
-              <input value={view} placeholder="Counter, Dance floor, Outside" onChange={(e) => (setView(e.target.value), setEdited(false))} />
+              {t('comfy.art.view')}
+              <input value={view} placeholder={t('comfy.art.viewPlaceholder')} onChange={(e) => (setView(e.target.value), setEdited(false))} />
             </label>
             <label>
-              Light
+              {t('comfy.art.light')}
               <select value={period} onChange={(e) => (setPeriod(e.target.value), setEdited(false))}>
-                <option value="">Any</option>
+                <option value="">{t('comfy.art.anyLight')}</option>
                 {target.periods.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
@@ -348,58 +350,57 @@ function Generate({ target, settings, list }: GenerateProps) {
           </div>
         )}
 
-        {target.kind === 'photo' && <Text label="What the photo shows" value={subject} onChange={(value) => (setSubject(value), setEdited(false))} />}
+        {target.kind === 'photo' && <Text label={t('comfy.art.photoShows')} value={subject} onChange={(value) => (setSubject(value), setEdited(false))} />}
 
         <label>
-          Prompt
+          {t('comfy.art.prompt')}
           <textarea rows={9} value={positive} onChange={(e) => (setPositive(e.target.value), setEdited(true))} />
           <span className="hint">
-            {target.kind === 'sprite' ? "Written from her appearance and the outfit's description. " : target.kind === 'nsfw' ? 'Written from her appearance and the sex-act. ' : target.kind === 'birth' ? 'Written from her appearance. ' : target.kind === 'walk' ? "Written from her appearance and her usual outfit. " : 'Written from the content. '}
-            Edit it freely.{' '}
-            {chosen && settings.promptPrefixes[chosen.file]?.trim() && <>“{settings.promptPrefixes[chosen.file]}” is put in front of it by {chosen.name}. </>}
+            {t('comfy.art.writtenFrom', { kind: target.kind })}{' '}
+            {chosen && settings.promptPrefixes[chosen.file]?.trim() && <>{t('comfy.art.prefixed', { prefix: settings.promptPrefixes[chosen.file], workflow: chosen.name })} </>}
             {edited && (
               <Button variant="quiet" onClick={() => setEdited(false)}>
-                Rewrite from the content
+                {t('comfy.art.rewrite')}
               </Button>
             )}
           </span>
         </label>
-        <Text label="Negative prompt" value={negative} onChange={setNegative} rows={2} hint="Left empty, the workflow's own is kept." />
+        <Text label={t('comfy.art.negative')} value={negative} onChange={setNegative} rows={2} hint={t('comfy.art.negativeHint')} />
 
         <div className="row">
           <label>
-            Workflow
+            {t('comfy.art.workflow')}
             <select value={chosen?.file ?? ''} onChange={(e) => setWorkflow(e.target.value)} disabled={usable.length === 0}>
-              {usable.length === 0 && <option value="">None set up</option>}
+              {usable.length === 0 && <option value="">{t('comfy.art.noneSetUp')}</option>}
               {usable.map((w) => (
                 <option key={w.file} value={w.file}>
                   {w.name}
-                  {w.file === settings.defaults[kind] ? ' (default)' : ''}
+                  {w.file === settings.defaults[kind] ? t('comfy.art.defaultSuffix') : ''}
                 </option>
               ))}
             </select>
           </label>
           <label className="studio-narrow">
-            Width
+            {t('comfy.art.width')}
             <input type="number" min={64} max={8192} step={8} value={size.width} onChange={(e) => setSize({ ...size, width: Number(e.target.value) })} />
           </label>
           <label className="studio-narrow">
-            Height
+            {t('comfy.art.height')}
             <input type="number" min={64} max={8192} step={8} value={size.height} onChange={(e) => setSize({ ...size, height: Number(e.target.value) })} />
           </label>
           <label className="studio-narrow">
-            Seed
-            <input value={seed} placeholder="Random" inputMode="numeric" onChange={(e) => setSeed(e.target.value.replace(/\D/g, ''))} />
+            {t('comfy.art.seed')}
+            <input value={seed} placeholder={t('comfy.art.random')} inputMode="numeric" onChange={(e) => setSeed(e.target.value.replace(/\D/g, ''))} />
           </label>
         </div>
 
         <div className="editor-foot">
           <Button variant="primary" disabled={busy || !chosen || positive.trim() === ''} onClick={generate}>
-            {busy ? 'Working...' : 'Generate'}
+            {busy ? t('comfy.art.working') : t('comfy.art.generate')}
           </Button>
           {busy && (
             <Button onClick={() => window.api.comfy.cancel()}>
-              Cancel
+              {t('comfy.art.cancel')}
             </Button>
           )}
           <div className="editor-status">{notice && <p className="notice">{notice}</p>}</div>
@@ -410,31 +411,35 @@ function Generate({ target, settings, list }: GenerateProps) {
         <figure className="lightbox over" onClick={() => setViewing(null)}>
           <img src={`content://pack/${viewing}`} alt="" />
           <figcaption>
-            <code>{viewing}</code> · click to close
+            <code>{viewing}</code> {t('comfy.art.clickToClose')}
           </figcaption>
         </figure>
       )}
       <div className="studio-results">
-        {made.length === 0 && <p className="hint">Pictures you generate appear here, saved in your add-on folder. Nothing is kept on the character until you choose it.</p>}
+        {made.length === 0 && <p className="hint">{t('comfy.art.empty')}</p>}
         {made.map((m) => (
           <figure key={m.result.path} className={`studio-result of-${kind}`}>
-            <a className="studio-thumb" href={`content://pack/${m.result.path}`} title="Look at the whole picture" onClick={(e) => (e.preventDefault(), setViewing(m.result.path))}>
+            <a className="studio-thumb" href={`content://pack/${m.result.path}`} title={t('comfy.art.lookWhole')} onClick={(e) => (e.preventDefault(), setViewing(m.result.path))}>
               <img src={`content://pack/${m.result.path}`} alt="" />
             </a>
             <figcaption>
               <span className="hint">
-                {m.result.workflow?.replace(/\.json$/i, '')} · seed {m.result.seed}
+                {t('comfy.art.madeWith', { workflow: m.result.workflow?.replace(/\.json$/i, '') ?? '', seed: m.result.seed ?? '' })}
               </span>
               <code>{m.result.path}</code>
               {kind !== 'background' && kind !== 'nsfw' && kind !== 'birth' && (
                 <div className="row">
                   <Button
                     disabled={busy}
- title="Makes the flat background transparent, including the gaps the art has closed around, such as inside a loop of hair or between an arm and the body."
- onClick={() => cutout(m)}
+                    title={edgesOnly ? t('comfy.art.cutEdgesTitle') : t('comfy.art.cutGapsTitle')}
+                    onClick={() => cutout(m)}
                   >
-                    {m.cut ? 'Cut out again' : 'Cut out background and gaps'}
+                    {m.cut ? t('comfy.art.cutAgain') : edgesOnly ? t('comfy.art.cutEdges') : t('comfy.art.cutGaps')}
                   </Button>
+                  <label className="inline">
+                    <input type="checkbox" checked={edgesOnly} onChange={(e) => setEdgesOnly(e.target.checked)} />
+                    {t('comfy.art.edgesOnly')}
+                  </label>
                 </div>
               )}
               {m.used ? (
@@ -443,31 +448,31 @@ function Generate({ target, settings, list }: GenerateProps) {
                 <div className="row">
                   {target.kind === 'sprite' && (
                     <Button variant="primary" onClick={() => use(m)}>
-                      Use as the “{m.expression}” sprite
+                      {t('comfy.art.useSprite', { expression: m.expression })}
                     </Button>
                   )}
                   {target.kind === 'nsfw' && (
                     <Button variant="primary" onClick={() => use(m)}>
-                      Use for “{target.poses.find((pose) => pose.id === m.expression)?.name ?? m.expression}”
+                      {t('comfy.art.usePose', { pose: target.poses.find((pose) => pose.id === m.expression)?.name ?? m.expression })}
                     </Button>
                   )}
                   {target.kind === 'birth' && (
                     <Button variant="primary" onClick={() => use(m)}>
-                      Use as her birth picture
+                      {t('comfy.art.useBirth')}
                     </Button>
                   )}
                   {target.kind === 'walk' && (
                     <Button variant="primary" onClick={() => use(m)}>
-                      Use as her walking profile
+                      {t('comfy.art.useWalk')}
                     </Button>
                   )}
                   {target.kind === 'background' && (
                     <Button variant="primary" onClick={() => use(m)}>
-                      {m.period ? `Use for ${target.periods.find((p) => p.id === m.period)?.name.toLowerCase() ?? m.period}` : 'Use this picture'}
+                      {m.period ? t('comfy.art.useForPeriod', { period: target.periods.find((p) => p.id === m.period)?.name.toLowerCase() ?? m.period }) : t('comfy.art.useBackground')}
                     </Button>
                   )}
                   <Button variant="quiet" onClick={() => setSeed(String(m.result.seed ?? ''))}>
-                    Reuse seed
+                    {t('comfy.art.reuseSeed')}
                   </Button>
                 </div>
               )}

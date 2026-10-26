@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Button } from './Button'
 import { Overlay } from './Dialog'
 import { ChevronIcon } from './icons'
+import { t } from '../../../shared/i18n'
 
 interface Props {
   image: string
@@ -34,7 +35,7 @@ export function Lightbox({ image, name, onClose, position, onStep }: Props) {
       <Button
         className={by < 0 ? 'lightbox-step flip' : 'lightbox-step next'}
         aria-label={label}
-        title={`${label} (${by < 0 ? 'left' : 'right'} arrow)`}
+        title={by < 0 ? t('screens.lightbox.leftArrow', { label }) : t('screens.lightbox.rightArrow', { label })}
         onClick={(event) => {
           event.stopPropagation()
           onStep(by)
@@ -46,9 +47,9 @@ export function Lightbox({ image, name, onClose, position, onStep }: Props) {
   return (
     <Overlay onClose={onClose}>
       <figure className="lightbox" onClick={onClose}>
-        {arrow(-1, 'The picture before')}
+        {arrow(-1, t('screens.lightbox.before'))}
         <img src={`content://pack/${image}`} alt={name} />
-        {arrow(1, 'The picture after')}
+        {arrow(1, t('screens.lightbox.after'))}
         <figcaption>
           {name}
           {position && ` (${position})`} · <code>{image}</code>

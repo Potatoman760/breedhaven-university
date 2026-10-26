@@ -8,6 +8,7 @@ import { Facts } from './Facts'
 import { GrandButton } from './GrandButton'
 import { ChevronIcon, StopIcon } from './icons'
 import { BackButton } from './BackButton'
+import { t } from '../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -32,19 +33,19 @@ export function PartyDialog({ content, state, onGo, onClose }: Props) {
   const toggle = (id: string) => setParty(party.includes(id) ? party.filter((one) => one !== id) : party.length < config.partySize ? [...party, id] : party)
 
   return (
-    <Dialog title="Go below" note={config.name} onClose={onClose} noClose wide ornate>
+    <Dialog title={t('screens.party.title')} note={config.name} onClose={onClose} noClose wide ornate>
       <Facts
         facts={[
-          { label: 'Takes', value: `${config.hours} hours` },
-          { label: 'Anchors set', value: `${state.expedition.cleared} of ${config.depths.length}` },
-          { label: 'Relics', value: relics.length, title: relics.map((relic) => `${relic.name}: ${relic.description}`).join('\n') || undefined },
-          { label: 'Party', value: `${party.length} of ${config.partySize}` }
+          { label: t('screens.party.takes'), value: t('screens.party.hours', { n: config.hours }) },
+          { label: t('screens.party.anchorsSet'), value: t('screens.exam.outOf', { n: state.expedition.cleared, total: config.depths.length }) },
+          { label: t('screens.party.relics'), value: relics.length, title: relics.map((relic) => t('screens.party.relic', { name: relic.name, description: relic.description })).join('\n') || undefined },
+          { label: t('screens.party.party'), value: t('screens.exam.outOf', { n: party.length, total: config.partySize }) }
         ]}
       />
 
       {/* One depth at a time, with room for its picture, and a way to the one above or below it among those he has opened. It opens on the deepest. */}
       <div className="depth-carousel">
-        <Button variant="secondary" className="flip" aria-label="The depth above" disabled={depth <= 0} onClick={() => setDepth(depth - 1)}>
+        <Button variant="secondary" className="flip" aria-label={t('screens.party.depthAbove')} disabled={depth <= 0} onClick={() => setDepth(depth - 1)}>
           <ChevronIcon size={24} />
         </Button>
         <div className="depth-card">
@@ -55,15 +56,15 @@ export function PartyDialog({ content, state, onGo, onClose }: Props) {
             {depth + 1}. {shown.name}
           </strong>
           <span className="caps">
-            {depth < state.expedition.cleared ? 'Anchor set' : 'Anchor unset'} · {depth + 1} of {config.depths.length}
+            {t('screens.party.anchorState', { set: depth < state.expedition.cleared, n: depth + 1, total: config.depths.length })}
           </span>
         </div>
-        <Button variant="secondary" aria-label="The depth below" disabled={depth >= open - 1} title={depth >= open - 1 && open < config.depths.length ? 'Set this anchor to open the next' : undefined} onClick={() => setDepth(depth + 1)}>
+        <Button variant="secondary" aria-label={t('screens.party.depthBelow')} disabled={depth >= open - 1} title={depth >= open - 1 && open < config.depths.length ? t('screens.party.setToOpen') : undefined} onClick={() => setDepth(depth + 1)}>
           <ChevronIcon size={24} />
         </Button>
       </div>
 
-      <h2 className="party-heading">Who comes</h2>
+      <h2 className="party-heading">{t('screens.party.whoComes')}</h2>
       <div className="party-grid">
         {choices.map(({ li, role, reason }) => {
           const power = pregnancyPower(content, state, li.id) ?? 1
@@ -71,7 +72,7 @@ export function PartyDialog({ content, state, onGo, onClose }: Props) {
           const full = !chosen && party.length >= config.partySize
           const sprite = spriteFor(li, wornOutfit(content, state, li), 'neutral')
           return (
-            <button key={li.id} type="button" aria-pressed={chosen} className={`party-card${chosen ? ' picked' : ''}`} disabled={reason !== undefined || full} title={reason ?? (full ? `No more than ${config.partySize} can come` : power > 1 ? `Carrying: x${power} power, and a surge to ground` : undefined)} onClick={() => toggle(li.id)}>
+            <button key={li.id} type="button" aria-pressed={chosen} className={`party-card${chosen ? ' picked' : ''}`} disabled={reason !== undefined || full} title={reason ?? (full ? t('screens.party.full', { n: config.partySize }) : power > 1 ? t('screens.party.carrying', { power }) : undefined)} onClick={() => toggle(li.id)}>
               <Portrait who={li} image={sprite} size="fill" className="party-face" />
               <strong>{li.name.split(' ')[0]}</strong>
               <span className="caps">{role.name}</span>
@@ -79,16 +80,16 @@ export function PartyDialog({ content, state, onGo, onClose }: Props) {
             </button>
           )
         })}
-        {choices.length === 0 && <p className="hint">Nobody you have met could come.</p>}
+        {choices.length === 0 && <p className="hint">{t('screens.party.nobody')}</p>}
       </div>
 
       {!check.ok && <p className="notice">{check.reasons.join(' · ')}</p>}
-      {check.ok && missed.length > 0 && <p className="notice">You would miss {missed.join('; ')}.</p>}
+      {check.ok && missed.length > 0 && <p className="notice">{t('screens.party.wouldMiss', { missed: missed.join('; ') })}</p>}
       {/* The way back at the left, as on every main screen; the way down at the right. */}
       <div className="actions party-actions">
-        <BackButton label="Not now" onClick={onClose} />
+        <BackButton label={t('screens.sceneView.notNow')} onClick={onClose} />
         <GrandButton
-          label="Go down"
+          label={t('screens.party.goDown')}
           icon={<StopIcon kind="guardian" size={24} />}
           disabled={!check.ok}
           tip={check.reasons.join(' · ') || undefined}

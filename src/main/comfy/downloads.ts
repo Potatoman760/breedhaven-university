@@ -3,6 +3,7 @@ import { createWriteStream, existsSync, mkdirSync, readFileSync, renameSync, rmS
 import { once } from 'node:events'
 import { dirname, join, resolve, sep } from 'node:path'
 import { ComfyDownloadsSchema, type ComfyDownloads, type ModelDownload, type ModelDownloadResult } from '../../shared/comfy'
+import { t } from '../../shared/i18n'
 
 /**
  * Fetching the models the game's workflows call for. What there is to fetch is written
@@ -40,7 +41,7 @@ export function findModelsDir(picked: string): string | null {
 export function modelPath(modelsDir: string, model: Pick<ModelDownload, 'folder' | 'file'>): string {
   const root = resolve(modelsDir)
   const path = resolve(root, model.folder, model.file)
-  if (!path.startsWith(root + sep)) throw new Error(`"${model.file}" would be written outside the models folder.`)
+  if (!path.startsWith(root + sep)) throw new Error(t('comfy.downloads.outsideFolder', { file: model.file }))
   return path
 }
 
@@ -96,9 +97,9 @@ export async function downloadModel(
   } catch (cause) {
     return fail((cause as Error).message)
   }
-  if (hasModel(modelsDir, model)) return { ok: true, file: model.file, message: 'Already there.' }
+  if (hasModel(modelsDir, model)) return { ok: true, file: model.file, message: t('comfy.downloads.present') }
   const url = downloadUrl(model, civitaiKey)
-  if (!url) return fail('There is no address to download it from.')
+  if (!url) return fail(t('comfy.downloads.noAddress'))
 
   const part = `${target}.part`
   try {
@@ -107,7 +108,7 @@ export async function downloadModel(
     const disk = statfsSync(dirname(target))
     const free = Number(disk.bavail) * Number(disk.bsize)
     if (free < (model.sizeMb + 512) * MB) {
-      return fail(`Not enough room on that drive: it needs ${(model.sizeMb / 1024).toFixed(1)} GB and there is ${(free / MB / 1024).toFixed(1)} GB free.`)
+      return fail(t('comfy.downloads.noRoom', { needed: (model.sizeMb / 1024).toFixed(1), free: (free / MB / 1024).toFixed(1) }))
     }
 
     const response = await fetchImpl(url, { signal, redirect: 'follow' })
@@ -115,12 +116,12 @@ export async function downloadModel(
       return fail(
         model.civitaiVersionId !== undefined
           ? civitaiKey
-            ? 'Civitai refused the key. Check it is typed in whole, and that your Civitai account is set to show this kind of model.'
-            : 'Civitai wants you signed in for this one. Add your Civitai API key above and try again.'
-          : `The server refused it (${response.status}).`
+            ? t('comfy.downloads.keyRefused')
+            : t('comfy.downloads.needsKey')
+          : t('comfy.downloads.refused', { status: response.status })
       )
     }
-    if (!response.ok || !response.body) return fail(`The server answered ${response.status} ${response.statusText}.`)
+    if (!response.ok || !response.body) return fail(t('comfy.downloads.badStatus', { status: response.status, statusText: response.statusText }))
 
     const total = Number(response.headers.get('content-length')) || model.sizeMb * MB
     const hash = createHash('sha256')
@@ -146,14 +147,14 @@ export async function downloadModel(
 
     if (model.sha256 && hash.digest('hex').toLowerCase() !== model.sha256.toLowerCase()) {
       rmSync(part, { force: true })
-      return fail('What arrived is not the file that was expected, and has been thrown away. Try again, or fetch it from its page.')
+      return fail(t('comfy.downloads.wrongHash'))
     }
     renameSync(part, target)
-    return { ok: true, file: model.file, message: `Saved to ${target}.` }
+    return { ok: true, file: model.file, message: t('comfy.downloads.saved', { path: target }) }
   } catch (cause) {
     rmSync(part, { force: true })
-    if (signal.aborted) return fail('Stopped.')
-    return fail(`The download failed: ${(cause as Error).message}`)
+    if (signal.aborted) return fail(t('comfy.downloads.stopped'))
+    return fail(t('comfy.downloads.failed', { reason: (cause as Error).message }))
   }
 }
 

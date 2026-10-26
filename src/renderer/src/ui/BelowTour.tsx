@@ -1,6 +1,7 @@
 import type { ContentPack, GameState, LoveInterest } from '../../../shared/model'
 import type { Panel } from './panels'
 import { Tour, type TourStep } from './Tour'
+import { t } from '../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -33,42 +34,42 @@ export function BelowTour({ content, panel, onOpen, practice, onPractice, onDone
       before: close,
       waits: true,
       done: panel?.kind === 'below',
-      text: `Whenever you're here at ${content.locations.find((l) => l.id === config.entryLocationId)?.name ?? 'the bathhouse'}, this is the way down. Open it.`
+      text: t('shell.belowTour.wayDown', { place: content.locations.find((l) => l.id === config.entryLocationId)?.name ?? t('shell.belowTour.bathhouse') })
     },
-    { target: '.dialog .facts', text: `How long a trip takes out of your day, how many anchors you've set, the relics you've brought back, and how many can come with you.` },
+    { target: '.dialog .facts', text: t('shell.belowTour.facts') },
     {
       target: '.depth-carousel',
-      text: `Each depth has an anchor at the bottom. Set it and the next depth opens. You can always go back to one you've cleared: the arrows pick among them.`,
+      text: t('shell.belowTour.depths'),
       expression: 'happy'
     },
     {
       target: '.party-grid',
-      text: `Who comes with you. Each of them has a part to play: a guard holds the line, a healer keeps you standing, a hexer spoils what's coming. She has to trust you enough to follow you down, and a mother-to-be hits a great deal harder.`
+      text: t('shell.belowTour.party')
     },
-    { target: '.party-actions > :last-child', text: `Pick your company, then go down. It takes a few hours, however it ends.` },
+    { target: '.party-actions > :last-child', text: t('shell.belowTour.partyActions') },
     // The window is put away before the practice: it would stand over the fight.
-    { before: close, text: `Rather than talk you through the rest, I'll show you. A practice round, just you and me. Nothing down here is real yet.`, expression: 'happy' },
+    { before: close, text: t('shell.belowTour.practice'), expression: 'happy' },
     {
       target: '.below-party',
       before: () => {
         close()
         onPractice(true)
       },
-      text: `That's us. You, and whoever you brought.` },
-    { target: '.below-foes', text: `And that's what the Bloom made. The bar is how much fight it has left. Under it, what it's about to do.` },
-    { target: '.below-status', text: `How much each of us can take before we go down. Lose everyone and the trip is over, and you come up with only what you'd made safe.` },
-    { target: '.below-bar.energy', text: `Your own energy. What you do in a fight costs some, so don't spend it all on the first thing you meet.` },
+      text: t('shell.belowTour.ourParty') },
+    { target: '.below-foes', text: t('shell.belowTour.foes') },
+    { target: '.below-status', text: t('shell.belowTour.status') },
+    { target: '.below-bar.energy', text: t('shell.belowTour.energy') },
     {
       target: '.below-surge',
-      text: `This is the part to watch. The Bloom builds in us while we work. Let it fill and it spills over. Ground it before then: that's your job.`,
+      text: t('shell.belowTour.surge'),
       expression: 'embarrassed'
     },
-    { target: '.below-menu', waits: true, done: moved, text: `Your turn. Pick Attack, then pick what to hit.` },
+    { target: '.below-menu', waits: true, done: moved, text: t('shell.belowTour.menu') },
     {
       target: '.below-way',
-      text: `The stops on the way to the anchor: fights, things left lying around, a dry ledge to rest on. Turn back whenever you like, but you only keep what you'd made safe.`
+      text: t('shell.belowTour.way')
     },
-    { before: () => onPractice(false), text: `That's all there is to it, sugar. Bring company you trust, mind the Bloom, and come back up in one piece.`, expression: 'happy' }
+    { before: () => onPractice(false), text: t('shell.belowTour.farewell'), expression: 'happy' }
   ]
 
   return (

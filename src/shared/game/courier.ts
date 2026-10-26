@@ -6,6 +6,7 @@ import { bondOf, statusOf } from './bonds'
 import { addMemory } from './memory'
 import { appealLevel } from './stats'
 import { seedOf } from './seed'
+import { t } from '../i18n'
 
 // About 600 tokens of the exchange are shown to a character, at four characters a token.
 export const COURIER_HISTORY_CHARS = 2400
@@ -156,7 +157,7 @@ export function settleAppointments(content: ContentPack, state: GameState): { st
       const rel = next.relationships[id]
       if (!rel) continue
       next = { ...next, relationships: { ...next.relationships, [id]: { ...rel, affection: within(rel.affection + STOOD_UP.affection), trust: within(rel.trust + STOOD_UP.trust) } } }
-      next = addMemory(next, id, `${state.player.name} never turned up for "${plan.title}" at ${where}, ${describeWhen(content, plan.time)}, and sent no word. You waited for him.`)
+      next = addMemory(next, id, t('scene.courier.stoodUp', { player: state.player.name, title: plan.title, where, when: describeWhen(content, plan.time) }))
     }
   }
   return { state: next, missed }
@@ -170,7 +171,7 @@ export function plansWith(state: GameState, loveInterestId: string): Appointment
 
 /** What he writes to call a plan off. */
 export function cancelText(content: ContentPack, plan: Appointment): string {
-  return `I'm sorry, I can't make ${plan.title} on ${describeWhen(content, plan.time)}. Something has come up.`
+  return t('scene.courier.cancel', { title: plan.title, when: describeWhen(content, plan.time) })
 }
 
 /**
@@ -233,9 +234,9 @@ export function courierExcerpt(
   for (let i = thread.length - 1; i >= 0; i--) {
     const note = thread[i]
     const plan = note.proposal
-      ? ` [invitation: ${note.proposal.title}, ${describeWhen(content, note.proposal.time)}; ${note.answer === 'cancelled' ? `accepted, then called off by ${state.player.name}` : (note.answer ?? 'not yet answered')}]`
+      ? t('scene.courier.invitation', { title: note.proposal.title, when: describeWhen(content, note.proposal.time), answer: note.answer, player: state.player.name })
       : ''
-    const offer = note.offer === 'housing' ? ` [offer of Sire housing: ${note.answer ?? 'not yet answered'}]` : ''
+    const offer = note.offer === 'housing' ? t('scene.courier.housingOffer', { answer: note.answer, player: state.player.name }) : ''
     const line = `${note.from === 'player' ? state.player.name : them}: ${note.text}${plan}${offer}`
     used += line.length
     if (lines.length > 0 && used > budgetChars) break
@@ -351,14 +352,14 @@ export function fallbackInvite(
   const li = content.loveInterests.find((c) => c.id === loveInterestId)
   const place = li?.schedule.map((s) => s.locationId).find((id) => id !== content.coursework?.locationId)
   const { proposal } = proposeMeeting(content, state, loveInterestId, {
-    activity: 'Meet up',
+    activity: t('scene.courier.meetUp'),
     place: place ?? state.locationId
   })
   if (!li || !proposal) return undefined
   const where = content.locations.find((l) => l.id === proposal.locationId)?.name ?? proposal.locationId
   return {
     proposal,
-    text: `${state.player.name}, come and find me at ${where}: ${describeWhen(content, proposal.time)}. Let me know?`
+    text: t('scene.courier.invite', { player: state.player.name, where, when: describeWhen(content, proposal.time) })
   }
 }
 

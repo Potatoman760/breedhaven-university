@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import type { ComfyTestResult } from '../../shared/comfy'
+import { t } from '../../shared/i18n'
 
 /**
  * Talking to ComfyUI: one function per endpoint, then one generation from queueing it to
@@ -31,11 +32,11 @@ interface ComfyImageRef {
 }
 
 function describe(cause: unknown, baseUrl: string): string {
-  if (cause instanceof Error && (cause.name === 'AbortError' || cause.name === 'TimeoutError')) return `${baseUrl} did not answer in time.`
+  if (cause instanceof Error && (cause.name === 'AbortError' || cause.name === 'TimeoutError')) return t('comfy.client.timedOut', { url: baseUrl })
   const raw = cause instanceof Error ? cause.message : String(cause)
   // Node buries the useful part: "fetch failed", with the cause underneath.
   const inner = cause instanceof Error && cause.cause instanceof Error ? cause.cause.message : ''
-  if (/ECONNREFUSED|ENOTFOUND|EHOSTUNREACH|ETIMEDOUT/.test(`${raw} ${inner}`)) return `Nothing is answering at ${baseUrl}. Is ComfyUI running?`
+  if (/ECONNREFUSED|ENOTFOUND|EHOSTUNREACH|ETIMEDOUT/.test(`${raw} ${inner}`)) return t('comfy.client.notAnswering', { url: baseUrl })
   return `${baseUrl}: ${inner || raw}`
 }
 
@@ -53,8 +54,8 @@ export async function testComfy(baseUrl: string): Promise<ComfyTestResult> {
     const device = body.devices?.[0]
     // "cuda:0 NVIDIA GeForce RTX 4090 : cudaMallocAsync": the index and the allocator are noise here.
     if (typeof device?.name === 'string') parts.push(device.name.replace(/^\w+:\d+\s+/, '').replace(/\s*:\s*\w*[Mm]alloc\w*$/, ''))
-    if (typeof device?.vram_total === 'number' && device.vram_total > 0) parts.push(`${(device.vram_total / 1024 ** 3).toFixed(1)} GB`)
-    return { ok: true, message: 'ComfyUI answered.', device: parts.length > 0 ? parts.join(' · ') : null }
+    if (typeof device?.vram_total === 'number' && device.vram_total > 0) parts.push(t('comfy.client.vram', { size: (device.vram_total / 1024 ** 3).toFixed(1) }))
+    return { ok: true, message: t('comfy.client.answered'), device: parts.length > 0 ? parts.join(' · ') : null }
   } catch (cause) {
     return { ok: false, message: describe(cause, baseUrl), device: null }
   }
@@ -67,17 +68,17 @@ function describeRefusal(body: unknown, status: number): string {
   if (typeof record?.node_errors === 'object' && record.node_errors !== null) {
     for (const [id, value] of Object.entries(record.node_errors as Record<string, unknown>)) {
       const detail = value as { class_type?: unknown; errors?: { message?: unknown; details?: unknown }[] }
-      const type = typeof detail.class_type === 'string' ? detail.class_type : 'node'
+      const type = typeof detail.class_type === 'string' ? detail.class_type : t('comfy.client.node')
       for (const one of detail.errors ?? []) {
         const extra = typeof one.details === 'string' && one.details.length > 0 ? ` (${one.details})` : ''
-        reasons.push(`${type} #${id}: ${typeof one.message === 'string' ? one.message : 'was refused'}${extra}`)
+        reasons.push(`${type} #${id}: ${typeof one.message === 'string' ? one.message : t('comfy.client.wasRefused')}${extra}`)
       }
     }
   }
-  if (reasons.length > 0) return `ComfyUI refused the workflow: ${reasons.slice(0, 4).join('; ')}.`
+  if (reasons.length > 0) return t('comfy.client.refusedNodes', { reasons: reasons.slice(0, 4).join('; ') })
   const error = record?.error
   const message = typeof error === 'string' ? error : (error as { message?: unknown } | null)?.message
-  return typeof message === 'string' ? `ComfyUI refused the workflow: ${message}` : `ComfyUI refused the workflow (${status}).`
+  return typeof message === 'string' ? t('comfy.client.refused', { reason: message }) : t('comfy.client.refusedStatus', { status })
 }
 
 async function submitPrompt(baseUrl: string, prompt: Record<string, unknown>, signal: AbortSignal): Promise<{ promptId: string | null; message: string }> {
@@ -92,7 +93,7 @@ async function submitPrompt(baseUrl: string, prompt: Record<string, unknown>, si
     if (!response.ok) return { promptId: null, message: describeRefusal(body, response.status) }
     const promptId = (body as { prompt_id?: unknown } | null)?.prompt_id
     if (typeof promptId !== 'string' || promptId.length === 0) {
-      return { promptId: null, message: 'ComfyUI accepted the workflow but did not say which job it is.' }
+      return { promptId: null, message: t('comfy.client.noJobId') }
     }
     return { promptId, message: '' }
   } catch (cause) {
@@ -126,10 +127,12 @@ function executionError(messages: unknown): string {
     if (!Array.isArray(message) || message[0] !== 'execution_error') continue
     const detail = message[1] as { exception_message?: unknown; node_type?: unknown } | undefined
     if (typeof detail?.exception_message === 'string') {
-      return `ComfyUI failed to run the workflow${typeof detail.node_type === 'string' ? ` in ${detail.node_type}` : ''}: ${detail.exception_message}`
+      return typeof detail.node_type === 'string'
+        ? t('comfy.client.failedIn', { node: detail.node_type, reason: detail.exception_message })
+        : t('comfy.client.failedWith', { reason: detail.exception_message })
     }
   }
-  return 'ComfyUI failed to run the workflow.'
+  return t('comfy.client.failed')
 }
 
 /** How a job went, or `done: false` while it is still going. The only thing that decides a run is over. */
@@ -175,7 +178,7 @@ async function fetchImage(baseUrl: string, ref: ComfyImageRef, limit: number, si
   const query = new URLSearchParams({ filename: ref.filename, subfolder: ref.subfolder, type: ref.type })
   try {
     const response = await fetch(`${baseUrl}/view?${query.toString()}`, { signal })
-    if (!response.ok || !response.body) return { bytes: null, message: `Could not fetch what ComfyUI made (${response.status}).` }
+    if (!response.ok || !response.body) return { bytes: null, message: t('comfy.client.fetchFailed', { status: response.status }) }
     // Read in pieces: a wrong port pointed at something that never stops sending must not take the app's memory with it.
     const reader = response.body.getReader()
     const chunks: Uint8Array[] = []
@@ -186,7 +189,7 @@ async function fetchImage(baseUrl: string, ref: ComfyImageRef, limit: number, si
       total += value.byteLength
       if (total > limit) {
         await reader.cancel().catch(() => {})
-        return { bytes: null, message: 'That file is larger than the app will accept.' }
+        return { bytes: null, message: t('comfy.client.tooLarge') }
       }
       chunks.push(value)
     }
@@ -207,12 +210,12 @@ export async function uploadImage(baseUrl: string, bytes: Buffer, filename: stri
   const deadline = AbortSignal.timeout(FIRST_CALL_MS * 3)
   try {
     const response = await fetch(`${baseUrl}/upload/image`, { method: 'POST', body: form, signal: signal ? AbortSignal.any([signal, deadline]) : deadline })
-    if (!response.ok) return { name: null, message: `ComfyUI would not take the picture (${response.status} ${response.statusText}).` }
+    if (!response.ok) return { name: null, message: t('comfy.client.uploadRefused', { status: response.status, statusText: response.statusText }) }
     const body = (await response.json().catch(() => null)) as { name?: unknown; subfolder?: unknown } | null
-    if (typeof body?.name !== 'string' || body.name === '') return { name: null, message: 'ComfyUI took the picture but did not say what it called it.' }
+    if (typeof body?.name !== 'string' || body.name === '') return { name: null, message: t('comfy.client.uploadNoName') }
     return { name: typeof body.subfolder === 'string' && body.subfolder !== '' ? `${body.subfolder}/${body.name}` : body.name, message: '' }
   } catch (cause) {
-    return { name: null, message: signal?.aborted ? 'Cancelled.' : describe(cause, baseUrl) }
+    return { name: null, message: signal?.aborted ? t('comfy.client.cancelled') : describe(cause, baseUrl) }
   }
 }
 
@@ -271,15 +274,15 @@ export async function generateImage(request: GenerateRequest): Promise<GenerateR
   const signal = request.cancel ? AbortSignal.any([deadline, request.cancel]) : deadline
 
   const submitted = await submitPrompt(baseUrl, request.prompt, AbortSignal.any([signal, AbortSignal.timeout(FIRST_CALL_MS)]))
-  if (submitted.promptId === null) return failed(request.cancel?.aborted ? 'Cancelled.' : submitted.message)
+  if (submitted.promptId === null) return failed(request.cancel?.aborted ? t('comfy.client.cancelled') : submitted.message)
 
   for (;;) {
     if (signal.aborted) {
       await abandon(baseUrl, submitted.promptId)
       return failed(
         request.cancel?.aborted
-          ? 'Cancelled. Nothing was saved.'
-          : `ComfyUI did not finish within ${Math.round(request.timeoutMs / 1000)} seconds, so the job was cancelled. Nothing was saved.`
+          ? t('comfy.client.cancelledUnsaved')
+          : t('comfy.client.timeout', { seconds: Math.round(request.timeoutMs / 1000) })
       )
     }
     const history = await readHistory(baseUrl, submitted.promptId, request.outputNode, video, signal)
@@ -288,8 +291,8 @@ export async function generateImage(request: GenerateRequest): Promise<GenerateR
       if (history.images.length === 0) {
         return failed(
           video
-            ? 'The workflow ran but saved no .mp4 or .webm clip. It needs a node that saves the video in one of those formats: add one in ComfyUI and export it again.'
-            : 'The workflow ran but saved no picture. It probably has no SaveImage node: add one in ComfyUI and export it again.'
+            ? t('comfy.client.noClip')
+            : t('comfy.client.noPicture')
         )
       }
       const made = history.images[0]

@@ -43,6 +43,14 @@ describe('asking for his courses to be chosen', () => {
     expect(parseCoursePick('{"courses": ["BIO 201", "BIO 201"]}', content, state)).toEqual({ courseIds: ['bio'], why: '', dropped: [] })
   })
 
+  it('takes the section named, or of a course given twice and named by its number, whichever section he can take', () => {
+    // Riddles is given again at 10:00, when Biology meets: section 2 clashes with it, section 1 does not.
+    const twice: GameState = { ...state, courses: [...state.courses, course('rid-2', 'RID 101', 'Riddles', 10, { courseId: 'rid', section: 2 })] }
+    expect(parseCoursePick('{"courses": ["RID 101 (section 2)"]}', content, twice).courseIds).toEqual(['rid-2'])
+    expect(parseCoursePick('{"courses": ["LOG 101", "RID 101"]}', content, twice)).toEqual({ courseIds: ['log', 'rid-2'], why: '', dropped: [] })
+    expect(parseCoursePick('{"courses": ["BIO 201", "RID 101"]}', content, twice).courseIds).toEqual(['bio', 'rid'])
+  })
+
   it('says so when the reply cannot be read as a choice', () => {
     expect(() => parseCoursePick('I would suggest biology.', content, state)).toThrow('not a choice of courses')
     expect(() => parseCoursePick('{"courses": ["XYZ 999"]}', content, state)).toThrow('None of the courses')

@@ -227,8 +227,8 @@ describe('going straight to what an invitation is for', () => {
 
 describe('what she sends', () => {
   const thinking =
-    'Looking at the conversation, Pat\'s last message was "No problem, see you then Morwenna" — a simple, slightly flat sign-off. Morwenna would respond with something teasing but brief.\n\nSee you then, darling. Try not to miss me too terribly before Windsday.'
-  const message = 'See you then, darling. Try not to miss me too terribly before Windsday.'
+    'Looking at the conversation, Pat\'s last message was "No problem, see you then Morwenna" — a simple, slightly flat sign-off. Morwenna would respond with something teasing but brief.\n\nSee you then, darling. Try not to miss me too terribly before Thursday.'
+  const message = 'See you then, darling. Try not to miss me too terribly before Thursday.'
 
   it('is what is between the tags, and nothing she said to herself around it', () => {
     expect(messageText(`Let me think.\n\n${DM_OPEN}${message}${DM_CLOSE}\n\nThat fits her.`, 'Morwenna Thriceborn')).toBe(message)

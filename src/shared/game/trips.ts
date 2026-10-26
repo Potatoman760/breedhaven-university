@@ -5,6 +5,7 @@ import { eventDay, eventsOn } from './events'
 import { partKey } from './eventParts'
 import { addGroupNote, startGroupChat } from './courier'
 import { stageFor, stageRank } from './relationships'
+import { t } from '../i18n'
 
 /**
  * A trip away over a break: booked at a part of an event before it (who comes, and what it costs), then the trip's
@@ -28,10 +29,10 @@ export const tripCost = (booking: Pick<Booking, 'price'>, ids: string[]): number
 export function canBookTrip(content: ContentPack, state: GameState, booking: Booking, ids: string[]): PerformCheck {
   const willing = tripChoices(content, state, booking).map((li) => li.id)
   const reasons = [
-    ids.length === 0 && 'Take someone',
-    ids.length > booking.most && `No more than ${booking.most}`,
-    ids.some((id) => !willing.includes(id)) && 'Not everyone would come',
-    state.player.money < tripCost(booking, ids) && `It costs $${tripCost(booking, ids)}`
+    ids.length === 0 && t('game.trips.takeSomeone'),
+    ids.length > booking.most && t('game.trips.noMoreThan', { most: booking.most }),
+    ids.some((id) => !willing.includes(id)) && t('game.trips.notEveryone'),
+    state.player.money < tripCost(booking, ids) && t('game.trips.costs', { cost: tripCost(booking, ids) })
   ].filter((one): one is string => typeof one === 'string')
   return { ok: reasons.length === 0, reasons }
 }
@@ -47,10 +48,10 @@ export function bookTrip(content: ContentPack, state: GameState, booking: Bookin
   if (!canBookTrip(content, state, booking, ids).ok) return state
   const trip = content.calendar.events.find((event) => event.id === booking.eventId)
   const place = content.locations.find((location) => location.id === trip?.locationId)
-  const name = (trip?.name ?? 'The trip').replace(/^the /i, '')
+  const name = (trip?.name ?? t('game.trips.theTrip')).replace(/^the /i, '')
   const paid: GameState = { ...state, player: { ...state.player, money: state.player.money - tripCost(booking, ids) }, trips: { ...state.trips, [booking.eventId]: ids } }
   const chat = startGroupChat(paid, tripChatId(booking.eventId), name, ids)
-  const told = `I booked us${place ? ` at ${place.name}` : ''} for the ${name}! ${trip?.durationDays ?? 4} days away together.`
+  const told = t('game.trips.booked', { at: place !== undefined, place: place?.name, name, days: trip?.durationDays ?? 4 })
   return addGroupNote(chat, tripChatId(booking.eventId), { from: 'player', text: told, read: true })
 }
 

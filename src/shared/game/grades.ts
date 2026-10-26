@@ -4,6 +4,7 @@ import { toDate } from './calendar'
 import type { Outing } from './outing'
 import { hasMet } from './scene'
 import { isOpenFor } from './schedule'
+import { t } from '../i18n'
 
 /** The rules for marks, where the game has coursework. */
 export function gradingOf(content: ContentPack): Grading | undefined {
@@ -118,25 +119,25 @@ export function studyPlaces(content: ContentPack, state: GameState, course: Cour
   })
   const classmates = content.loveInterests
     .filter((li) => course.studentIds.includes(li.id) && li.room && hasMet(state, li.id))
-    .map((li) => ({ name: `${li.name.split(' ')[0]}'s room`, locationId: li.room!.locationId, roomOf: li }))
+    .map((li) => ({ name: t('game.grades.herRoom', { first: li.name.split(' ')[0] }), locationId: li.room!.locationId, roomOf: li }))
   // Only somewhere that is open now, and stays open for as long as the session takes.
   const open = (place: StudyPlace) => {
     const location = content.locations.find((l) => l.id === place.locationId)
     return !location || isOpenFor(content.calendar, location, state.time, grading.studyHours)
   }
-  return [...fixed, { name: 'My room', locationId: content.newGame.room?.locationId ?? content.newGame.locationId, own: true }, ...classmates].filter(open)
+  return [...fixed, { name: t('game.grades.myRoom'), locationId: content.newGame.room?.locationId ?? content.newGame.locationId, own: true }, ...classmates].filter(open)
 }
 
 /** The outing a session of study is: a couple of hours on one course at one place. */
 export function studyOuting(content: ContentPack, course: Course, place: StudyPlace): Outing {
   const hours = gradingOf(content)?.studyHours ?? 2
   return {
-    title: `Study for ${course.number}`,
+    title: t('game.grades.studyTitle', { number: course.number }),
     description: place.own
-      ? `You shut the door, clear the desk and open your notes for ${course.title}.`
+      ? t('game.grades.studyOwn', { title: course.title })
       : place.roomOf
-        ? `You take your notes for ${course.title} round to ${place.roomOf.name.split(' ')[0]}'s.`
-        : `You find a seat, spread out your notes for ${course.title} and get down to it.`,
+        ? t('game.grades.studyHers', { title: course.title, first: place.roomOf.name.split(' ')[0] })
+        : t('game.grades.studyPublic', { title: course.title }),
     withIds: place.roomOf ? [place.roomOf.id] : [],
     locationId: place.locationId,
     hours,

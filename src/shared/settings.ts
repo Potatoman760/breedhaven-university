@@ -20,7 +20,9 @@ export type LlmProfile = z.infer<typeof LlmProfileSchema>
 
 export const SettingsSchema = z.object({
   main: LlmProfileSchema.prefault({}),
-  nsfw: LlmProfileSchema.prefault({})
+  nsfw: LlmProfileSchema.prefault({}),
+  /** What the game is played in: its interface, its content and what the LLM is told and writes. */
+  language: z.string().default('en')
 })
 export type Settings = z.infer<typeof SettingsSchema>
 

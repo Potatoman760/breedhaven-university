@@ -1,7 +1,7 @@
 import { Button } from './Button'
 import { useConfirm } from './Confirm'
 import { useEffect, useMemo, useRef, useState, type FormEvent, type CSSProperties, type KeyboardEvent } from 'react'
-import { MAX_CHILD_NAME, COMFORT_WORDS, hasSkill, attendees, bondLifts, describeBond, describeWhen, statusOf, dialogueLines, firstNames, sceneCast, sceneClock, toDate, weatherOn, wornOutfit, lookOf, spriteFor, npcAsCharacter, playerRoom, roomBackdrop, roomOwner, sceneExtras, sceneSuggestions, plain, type Suggestion } from '../../../shared/game'
+import { MAX_CHILD_NAME, COMFORT_WORDS, hasSkill, attendees, bondLifts, describeBond, describeWhen, statusOf, dialogueLines, firstNames, sceneCast, sceneClock, toDate, weatherOn, wornOutfit, lookOf, spriteFor, npcAsCharacter, UNNAMED, playerRoom, roomBackdrop, roomOwner, sceneExtras, sceneSuggestions, plain, type Suggestion } from '../../../shared/game'
 import { Portrait } from './Portrait'
 import { basePoseId, poseMedia, type ContentPack, type GameState, type LoveInterest, type Scene } from '../../../shared/model'
 import { playSong, setPoseLoop, stopSong, useVolumes } from '../sound'
@@ -13,11 +13,15 @@ import { NavTiles } from './NavTiles'
 import { ChevronIcon, HaltIcon, HideIcon, LogIcon } from './icons'
 import type { Panel } from './panels'
 import { useModelName } from '../modelName'
+import { t } from '../../../shared/i18n'
 
 // What he is taken to say when he ends a shift with the button: enough for the scene to be closed on.
 
 interface Props {
+  /** The content as the scene is shown: anyone he is meeting for the first time is "???" in it until her name is said. */
   content: ContentPack
+  /** The same, with every name as it is: who speaks a line is told by her name. Left out, the content. */
+  speakers?: ContentPack
   state: GameState
   scene: Scene
   /** The view of the current location the player picked, if any. */
@@ -105,7 +109,7 @@ export function SceneView(props: Props) {
   // own words, which no dictionary has.
   const suggestions = useMemo(() => sceneSuggestions(content, state, scene), [content, state, scene])
   const nameList = useMemo(
-    () => [...new Set(sceneCast(scene).flatMap((id) => [...content.loveInterests, ...content.npcs].find((one) => one.id === id)?.name.split(' ')[0] ?? []))],
+    () => [...new Set(sceneCast(scene).flatMap((id) => [...content.loveInterests, ...content.npcs].find((one) => one.id === id && one.name !== UNNAMED)?.name.split(' ')[0] ?? []))],
     [content, scene]
   )
   const knownWords = useMemo(
@@ -138,6 +142,8 @@ export function SceneView(props: Props) {
   const cast = [...sceneCast(scene), ...goingNow]
     .map((id) => content.loveInterests.find((li) => li.id === id))
     .filter((li): li is LoveInterest => li !== undefined)
+  // The same, by the names a reply labels its lines with.
+  const speaking = cast.map((li) => props.speakers?.loveInterests.find((one) => one.id === li.id) ?? li)
   const group = cast.length > 1
   // Those left behind in the reply on screen, by first name: they have a last line in it, and no place in the picture.
   const leftBehind = scene.departed
@@ -209,7 +215,7 @@ export function SceneView(props: Props) {
   const viewed = back === 0 ? reply : scene.messages[viewIndex]?.role === 'assistant' ? scene.messages[viewIndex] : undefined
   // Whoever speaks in a reply without being on stage: the teacher of a class, and for the latest reply anyone left behind in it, whose parting line is still hers.
   const voices = [...(scene.lesson ? [scene.lesson.speaker] : []), ...(back === 0 ? leftBehind : [])]
-  const lines = viewed ? dialogueLines(viewed.content, group || extras.length > 0 || voices.length > 0 ? [...cast, ...extras] : [], voices) : []
+  const lines = viewed ? dialogueLines(viewed.content, group || extras.length > 0 || voices.length > 0 ? [...speaking, ...extras] : [], voices) : []
   const shown = current ? Math.min(progress.shown, Math.max(0, lines.length - 1)) : 0
   const setShown = (next: number) => setProgress({ message: lastIndex, back, shown: next })
   // When the wheel last turned a beat, so that one turn of it is one beat.
@@ -258,10 +264,10 @@ export function SceneView(props: Props) {
   // Or the player's own room.
   const his = playerRoom(content, scene)
   // Where the scene is, in a word or two: someone's room is hers and no more, without the building it is in.
-  const placeName = his ? 'Your room' : owner ? `${owner.name.split(' ')[0]}'s room` : (beat?.locationName ?? location?.name)
+  const placeName = his ? t('screens.sceneView.yourRoom') : owner ? t('screens.sceneView.herRoom', { name: owner.name.split(' ')[0] }) : (beat?.locationName ?? location?.name)
 
   // What is behind them: a picture the scene is set in, else the room it is in, else the place.
-  const staged = scene.picture ? { room: { image: scene.picture, key: 'scene-picture' }, viewId: undefined } : his ? roomBackdrop(his, 'room-of-player') : roomBackdrop(owner?.room, `room-of-${owner?.id}`)
+  const staged = scene.picture ? { room: { image: scene.picture, key: 'scene-picture' }, viewId: undefined } : his ? roomBackdrop(his, 'room-of-player', date.period.light) : roomBackdrop(owner?.room, `room-of-${owner?.id}`, date.period.light)
 
   function submit(event: FormEvent) {
     event.preventDefault()
@@ -356,13 +362,13 @@ export function SceneView(props: Props) {
         />
       ) : (
         <div className="sprite">
-          {sprite ?? `No sprite set for ${partner.name}`}
-          <span>{sprite ? 'Sprite file not found' : 'Add one to the character file'}</span>
+          {sprite ?? t('screens.sceneView.noSprite', { name: partner.name })}
+          <span>{sprite ? t('screens.sceneView.spriteNotFound') : t('screens.sceneView.addSprite')}</span>
         </div>
       )}
 
       {hidden ? (
-        <button className="unhide" aria-label="Show the interface" onClick={() => setHidden(false)} />
+        <button className="unhide" aria-label={t('screens.sceneView.showInterface')} onClick={() => setHidden(false)} />
       ) : (
         <>
           {/* Where the scene is, and the class it is while it is still in the classroom it began in. */}
@@ -370,7 +376,7 @@ export function SceneView(props: Props) {
             date={cardDate}
             minute={shownAt.minute}
             weather={weather}
-            notes={[`Day ${cardDate.dayIndex + 1} of ${content.calendar.lengthDays}`, placeName, scene.lesson && scene.beats.length === 1 && scene.lesson.course]}
+            notes={[t('screens.dayView.dayOf', { day: cardDate.dayIndex + 1, days: content.calendar.lengthDays }), placeName, scene.lesson && scene.beats.length === 1 && scene.lesson.course]}
           />
 
           <div className="textbox-wrap">
@@ -415,7 +421,7 @@ export function SceneView(props: Props) {
               ? {
                   role: 'button',
                   tabIndex: 0,
-                  'aria-label': 'Next',
+                  'aria-label': t('screens.sceneView.next'),
                   autoFocus: true,
                   ref: (box: HTMLDivElement | null) => box?.focus(),
                   onClick: () => setShown(shown + 1)
@@ -426,8 +432,8 @@ export function SceneView(props: Props) {
               <div className="comfort-read" onClick={(event) => event.stopPropagation()}>
                 {reading.map(({ id, name, level, reason }) => (
                   <span key={id} className={level <= 2 ? 'chip madder' : 'chip'} title={reason || undefined}>
-                    {name}: {COMFORT_WORDS[level]}
-                    <span className="house-pips" role="img" aria-label={`${level} of 5`}>
+                    {t('screens.sceneView.comfort', { name, word: COMFORT_WORDS[level] })}
+                    <span className="house-pips" role="img" aria-label={t('screens.sceneView.pips', { level })}>
                       {[1, 2, 3, 4, 5].map((pip) => (
                         <i key={pip} className={pip <= level ? (level <= 2 ? 'on low' : 'on') : undefined} />
                       ))}
@@ -447,14 +453,14 @@ export function SceneView(props: Props) {
                 }}
               >
                 <span>
-                  She would like to call your {newborn.daughter ? 'daughter' : 'son'} <strong>{newborn.name}</strong>
+                  {t('screens.sceneView.callChild', { daughter: newborn.daughter })} <strong>{newborn.name}</strong>
                 </span>
                 <Button variant="primary" size="small" disabled={busy} onClick={() => props.onNameChild('')}>
-                  Keep {newborn.name}
+                  {t('screens.sceneView.keepName', { name: newborn.name })}
                 </Button>
-                <input aria-label="Another name" placeholder="Or another name" maxLength={MAX_CHILD_NAME} value={childName} onChange={(event) => setChildName(event.target.value)} />
+                <input aria-label={t('screens.sceneView.anotherName')} placeholder={t('screens.sceneView.orAnotherName')} maxLength={MAX_CHILD_NAME} value={childName} onChange={(event) => setChildName(event.target.value)} />
                 <Button type="submit" size="small" disabled={busy || childName.trim() === '' || childName.trim() === newborn.name}>
-                  Name {newborn.daughter ? 'her' : 'him'}
+                  {t('screens.sceneView.nameChild', { daughter: newborn.daughter })}
                 </Button>
               </form>
             )}
@@ -462,7 +468,7 @@ export function SceneView(props: Props) {
               <div className="notice">
                 {props.aside}
                 <Button variant="quiet" size="small" onClick={props.onDismissAside}>
-                  Dismiss
+                  {t('screens.sceneView.dismiss')}
                 </Button>
               </div>
             )}
@@ -471,7 +477,7 @@ export function SceneView(props: Props) {
                 {notice}
                 {/* The way out when the AI can't be reached to end the scene itself. */}
                 <button className="quiet" disabled={busy} onClick={onContinue}>
-                  End the scene here
+                  {t('screens.sceneView.endSceneHere')}
                 </button>
               </div>
             )}
@@ -482,7 +488,7 @@ export function SceneView(props: Props) {
             )}
             {waiting ? (
               <div className="speech" role="status">
-                <p className="thinking">Thinking</p>
+                <p className="thinking">{t('screens.sceneView.thinking')}</p>
               </div>
             ) : line?.action ? (
               <p className="narration action">{line.text}</p>
@@ -493,48 +499,48 @@ export function SceneView(props: Props) {
                 <p>{emphasise(line.text)}</p>
               </div>
             ) : (
-              <p className="narration">{narration || `You and ${together} have a moment together.`}</p>
+              <p className="narration">{narration || t('screens.sceneView.moment', { together })}</p>
             )}
             {!waiting && back === 0 && props.rolls.map((roll, i) => (
               <p key={i} className="roll">
-                Dice · {roll}
+                {t('screens.sceneView.dice', { roll })}
               </p>
             ))}
             {!waiting && !more && back === 0 && props.learned.map((line) => (
               <p key={line} className="agreed">
-                Learned: {line}
+                {t('screens.sceneView.learned', { line })}
               </p>
             ))}
             {props.agreed && <p className="agreed">{props.agreed}</p>}
             {!more && !waiting && back === 0 && scene.bondProposal && (
               <div className="proposal">
                 <div>
-                  <span className="caps">{firstNames(content, [scene.bondProposal.memberIds[0]])} asks</span>
+                  <span className="caps">{t('screens.sceneView.asks', { name: firstNames(content, [scene.bondProposal.memberIds[0]]) })}</span>
                   <strong>{describeBond(content, scene.bondProposal)}</strong>
                   <span>{statusOf(content, scene.bondProposal)?.description}</span>
                   {/* Agreeing brings anyone not yet that far along with him up to the stage the arrangement is for. */}
                   {bondLifts(content, state, scene.bondProposal).map(({ id, stage }) => (
                     <span key={id} className="hint">
-                      Agreeing brings you and {firstNames(content, [id])} to {stage.name}.
+                      {t('screens.sceneView.bondLift', { name: firstNames(content, [id]), stage: stage.name })}
                     </span>
                   ))}
                 </div>
                 <button disabled={busy} onClick={() => props.onAnswerBond(true)}>
-                  Yes
+                  {t('screens.sceneView.yes')}
                 </button>
                 <button className="secondary" disabled={busy} onClick={() => props.onAnswerBond(false)}>
-                  Not now
+                  {t('screens.sceneView.notNow')}
                 </button>
               </div>
             )}
             {!more && !waiting && back === 0 && scene.proposal && (
               <div className="proposal">
                 <div>
-                  <span className="caps">{firstNames(content, [scene.proposal.loveInterestId])} suggests</span>
+                  <span className="caps">{t('screens.sceneView.suggests', { name: firstNames(content, [scene.proposal.loveInterestId]) })}</span>
                   <strong>
-                    {scene.proposal.title}
-                    {scene.proposal.companionIds.length > 0 &&
-                      ` with ${firstNames(content, attendees(scene.proposal))}`}
+                    {scene.proposal.companionIds.length > 0
+                      ? t('screens.sceneView.proposalWith', { title: scene.proposal.title, who: firstNames(content, attendees(scene.proposal)) })
+                      : scene.proposal.title}
                   </strong>
                   <span>
                     {describeWhen(content, scene.proposal.time)} ·{' '}
@@ -542,10 +548,10 @@ export function SceneView(props: Props) {
                   </span>
                 </div>
                 <button disabled={busy} onClick={props.onAcceptProposal}>
-                  Accept
+                  {t('screens.sceneView.accept')}
                 </button>
                 <button className="secondary" disabled={busy} onClick={props.onDeclineProposal}>
-                  Not now
+                  {t('screens.sceneView.notNow')}
                 </button>
               </div>
             )}
@@ -557,14 +563,14 @@ export function SceneView(props: Props) {
               </span>
             ) : ended && back === 0 ? (
               <button className="continue-scene" disabled={busy} onClick={onContinue} autoFocus>
-                {busy ? 'Remembering...' : 'Continue'}
+                {busy ? t('screens.sceneView.remembering') : t('screens.sceneView.continue')}
                 <ChevronIcon size={16} />
               </button>
             ) : (
               <form onSubmit={submit} className={back > 0 ? 'looking-back' : undefined}>
                 {back > 0 && (
                   <span className="hint look-back">
-                    {back === 1 ? 'Your last turn' : `${back} turns back`}. Send a line to redo the scene from here, or scroll down to return.
+                    {t('screens.sceneView.lookBack', { back })}
                   </span>
                 )}
                 <SmartInput
@@ -574,16 +580,16 @@ export function SceneView(props: Props) {
                   names={nameList}
                   known={knownWords}
                   onPick={setPicked}
-                  ariaLabel="Your reply"
-                  placeholder={back > 0 ? 'Say something else here to redo the scene from this point' : `Say something to ${together}, or say goodbye to end the scene`}
+                  ariaLabel={t('screens.sceneView.yourReply')}
+                  placeholder={back > 0 ? t('screens.sceneView.redoPlaceholder') : t('screens.sceneView.replyPlaceholder', { together })}
                   autoFocus
                 />
                 {/* While her reply is being written, the way to stop it: his line comes back to say again or differently. */}
                 {waiting ? (
                   <button
                     type="button"
-                    aria-label="Stop the reply"
-                    title="Stop the reply"
+                    aria-label={t('screens.sceneView.stopReply')}
+                    title={t('screens.sceneView.stopReply')}
                     className="icon"
                     onClick={() => {
                       void window.api.cancelChat()
@@ -593,7 +599,7 @@ export function SceneView(props: Props) {
                     <HaltIcon size={18} />
                   </button>
                 ) : (
-                  <button type="submit" disabled={busy} aria-label="Send" className="icon" title={model || undefined} onMouseEnter={whichModel}>
+                  <button type="submit" disabled={busy} aria-label={t('screens.sceneView.send')} className="icon" title={model || undefined} onMouseEnter={whichModel}>
                     <ChevronIcon size={18} />
                   </button>
                 )}
@@ -605,17 +611,17 @@ export function SceneView(props: Props) {
                     disabled={busy}
                     onClick={async () =>
                       (await ask({
-                        title: 'Are you sure?',
+                        title: t('screens.sceneView.areYouSure'),
                         detail: scene.shift
-                          ? 'You will earn money but no relationship changes.'
+                          ? t('screens.sceneView.endShiftDetail')
                           : scene.lesson
-                            ? 'You will earn marks but no relationship changes.'
-                            : 'You will still train, but no relationship changes.',
-                        confirm: scene.shift ? 'End shift' : scene.lesson ? 'End class' : 'End meeting'
+                            ? t('screens.sceneView.endClassDetail')
+                            : t('screens.sceneView.endMeetingDetail'),
+                        confirm: scene.shift ? t('screens.sceneView.endShift') : scene.lesson ? t('screens.sceneView.endClass') : t('screens.sceneView.endMeeting')
                       })) && onSkip()
                     }
                   >
-                    {scene.shift ? 'End shift' : scene.lesson ? 'End class' : 'End meeting'}
+                    {scene.shift ? t('screens.sceneView.endShift') : scene.lesson ? t('screens.sceneView.endClass') : t('screens.sceneView.endMeeting')}
                   </Button>
                 ) : (
                   // Any other conversation can be walked out of: the time is gone, and nothing between them changes. Not a
@@ -626,10 +632,10 @@ export function SceneView(props: Props) {
                       className="end-shift"
                       disabled={busy}
                       onClick={async () =>
-                        (await ask({ title: 'Are you sure?', detail: 'You will lose all relationship progress.', confirm: 'Leave', grave: true })) && onSkip()
+                        (await ask({ title: t('screens.sceneView.areYouSure'), detail: t('screens.sceneView.leaveDetail'), confirm: t('screens.sceneView.leave'), grave: true })) && onSkip()
                       }
                     >
-                      Leave
+                      {t('screens.sceneView.leave')}
                     </Button>
                   )
                 )}
@@ -642,9 +648,9 @@ export function SceneView(props: Props) {
             content={content}
             state={state}
             onOpen={onOpen}
-            // Masked, she is nobody yet: the phone opens on everyone he knows, not on her.
-            phoneId={scene.npc || (scene.mask && !scene.mask.revealed) ? undefined : partner.id}
-            phoneApp={scene.mask && !scene.mask.revealed ? 'friends' : undefined}
+            // Masked, or not yet named, she is nobody yet: the phone opens on everyone he knows, not on her.
+            phoneId={scene.npc || (scene.mask && !scene.mask.revealed) || partner.name === UNNAMED ? undefined : partner.id}
+            phoneApp={(scene.mask && !scene.mask.revealed) || partner.name === UNNAMED ? 'friends' : undefined}
             bag={{ kind: 'gifts' }}
             bagDisabled={busy || ended || scene.npc}
             extras={
@@ -652,11 +658,11 @@ export function SceneView(props: Props) {
                 {/* The scene so far, and the picture without the interface over it. */}
                 <button className="tile-menu glass" onClick={() => onOpen({ kind: 'log' })}>
                   <LogIcon size={16} />
-                  Log
+                  {t('screens.sceneView.log')}
                 </button>
                 <button className="tile-menu glass" onClick={() => setHidden(true)}>
                   <HideIcon size={16} />
-                  Hide
+                  {t('screens.sceneView.hide')}
                 </button>
               </>
             }
@@ -671,7 +677,7 @@ export function SceneView(props: Props) {
             .map((id) => content.loveInterests.find((li) => li.id === id))
             .flatMap((li) => (li?.walkSprite ? [{ image: li.walkSprite, stageHeight: li.stageHeight }] : []))
             .at(0)}
-          label={props.movingTo !== null && scene.messages.length > 0 ? props.movingTo : 'Loading'}
+          label={props.movingTo !== null && scene.messages.length > 0 ? props.movingTo : t('screens.sceneView.loading')}
           tip={tip}
         />
       )}

@@ -7,6 +7,7 @@ import {
   type WorkflowBindings,
   type WorkflowNodeSummary
 } from '../../shared/comfy'
+import { t } from '../../shared/i18n'
 
 /**
  * Reading a ComfyUI workflow well enough to put someone else's words in it.
@@ -77,10 +78,10 @@ export function parseGraph(json: string): { graph: ComfyGraph | null; problem: s
   try {
     parsed = JSON.parse(json.replace(/^﻿/, ''))
   } catch (cause) {
-    return { graph: null, problem: `This file is not readable JSON: ${cause instanceof Error ? cause.message : String(cause)}` }
+    return { graph: null, problem: t('comfy.graph.notJson', { reason: cause instanceof Error ? cause.message : String(cause) }) }
   }
   if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
-    return { graph: null, problem: 'This file is not a ComfyUI workflow.' }
+    return { graph: null, problem: t('comfy.graph.notWorkflow') }
   }
   const source = parsed as Record<string, unknown>
 
@@ -88,8 +89,7 @@ export function parseGraph(json: string): { graph: ComfyGraph | null; problem: s
   if (Array.isArray(source['nodes'])) {
     return {
       graph: null,
-      problem:
-        'This is a workflow saved from the ComfyUI canvas, which cannot be run over the API. In ComfyUI use Workflow → Export (API) and save that file here instead.'
+      problem: t('comfy.graph.canvasFormat')
     }
   }
 
@@ -117,7 +117,7 @@ export function parseGraph(json: string): { graph: ComfyGraph | null; problem: s
   if (nodes.size === 0) {
     return {
       graph: null,
-      problem: 'Nothing in this file looks like a ComfyUI node. Export it again with Workflow → Export (API).'
+      problem: t('comfy.graph.noNodes')
     }
   }
   return { graph: { nodes, order, source }, problem: null }
@@ -174,7 +174,7 @@ function samplerCandidates(graph: ComfyGraph): string[] {
  */
 function pickSampler(graph: ComfyGraph, candidates: string[], problems: string[]): string | null {
   if (candidates.length === 0) {
-    problems.push('No sampler here: nothing in this workflow takes a positive and a negative conditioning, so there is nowhere to put a prompt.')
+    problems.push(t('comfy.graph.noSampler'))
     return null
   }
   if (candidates.length === 1) return candidates[0]
@@ -185,10 +185,7 @@ function pickSampler(graph: ComfyGraph, candidates: string[], problems: string[]
 
   const pool = downstream.length > 0 ? downstream : candidates
   const chosen = [...pool].sort((a, b) => Number(b) - Number(a) || b.localeCompare(a))[0]
-  problems.push(
-    `There are ${pool.length} samplers with no link between them (${pool.map((id) => label(graph, id)).join(', ')}). ` +
-      `The prompt was bound to ${label(graph, chosen)}; the others keep whatever text was saved in them. Repoint it if that is the wrong one.`
-  )
+  problems.push(t('comfy.graph.manySamplers', { count: pool.length, samplers: pool.map((id) => label(graph, id)).join(', '), chosen: label(graph, chosen) }))
   return chosen
 }
 
@@ -376,17 +373,15 @@ export function analyse(graph: ComfyGraph): WorkflowAnalysis {
       followToText(graph, input.node, found, new Set(), 0)
       if (found.length === 0) continue
       detected[slot] = found[0]
-      notes[slot] = `followed ${label(graph, sampler)} ${slot} → ${label(graph, found[0].node)} ${found[0].field}`
+      notes[slot] = t('comfy.graph.followedNote', { sampler: label(graph, sampler), slot, node: label(graph, found[0].node), field: found[0].field })
       if (found.length > 1) {
-        problems.push(
-          `${found.length} text nodes lead to ${slot} (${found.map((one) => label(graph, one.node)).join(', ')}). ${label(graph, found[0].node)} was chosen; pick another if that is wrong.`
-        )
+        problems.push(t('comfy.graph.manyTextNodes', { count: found.length, slot, nodes: found.map((one) => label(graph, one.node)).join(', '), chosen: label(graph, found[0].node) }))
       }
     }
 
     // Both arriving at one node would make the prompt its own negative.
     if (detected.positive && detected.negative && detected.positive.node === detected.negative.node && detected.positive.field === detected.negative.field) {
-      problems.push(`Positive and negative both lead to ${label(graph, detected.positive.node)}, so the negative is left unbound.`)
+      problems.push(t('comfy.graph.sameNode', { node: label(graph, detected.positive.node) }))
       detected.negative = null
       delete notes.negative
     }
@@ -409,17 +404,17 @@ export function analyse(graph: ComfyGraph): WorkflowAnalysis {
   }
 
   if (detected.positive === null) {
-    problems.push('No prompt node is bound, so there is nowhere to put what is asked for. Point "Prompt" at the text node this workflow uses.')
+    problems.push(t('comfy.graph.noPrompt'))
   }
   if (detected.seed === null) {
-    problems.push('No seed was found. ComfyUI caches by workflow, so the same prompt will return the same picture every time.')
+    problems.push(t('comfy.graph.noSeed'))
   }
 
   if (output) {
     detected.output = { node: output, field: 'images' }
     notes.output = label(graph, output)
   } else {
-    problems.push('No node saves an image, so this workflow would run and produce nothing to keep.')
+    problems.push(t('comfy.graph.noOutput'))
   }
 
   return { nodes: summarise(graph), sampler, detected, notes, problems }
@@ -464,8 +459,9 @@ export function effectiveBindings(
     const usable = detected !== null && stillValid(graph, slot, detected)
     if (usable) bindings[slot] = detected
     problems.push(
-      `The saved binding for "${slot}" points at node #${chosen.node} ${chosen.field}, which this workflow no longer has.` +
-        (usable ? ` Using ${label(graph, detected.node)} ${detected.field} instead.` : '')
+      usable
+        ? t('comfy.graph.staleBindingReplaced', { slot, node: chosen.node, field: chosen.field, detected: label(graph, detected.node), detectedField: detected.field })
+        : t('comfy.graph.staleBinding', { slot, node: chosen.node, field: chosen.field })
     )
   }
   return { bindings, problems }

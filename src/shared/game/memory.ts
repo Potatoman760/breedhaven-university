@@ -1,4 +1,4 @@
-import { MEMORY_LEVELS, type ContentPack, type GameState, type Memory, type MemoryLevel, type Scene, type SceneBeat } from '../model'
+import { MEMORY_LEVELS, type ContentPack, type DepartureFeeling, type GameState, type Memory, type MemoryLevel, type Scene, type SceneBeat } from '../model'
 import { formatDate, toDate } from './calendar'
 import { describeBonds } from './bonds'
 import { stageFor } from './relationships'
@@ -7,12 +7,23 @@ import { describeAppeal } from './stats'
 import { feltChange, trustOf } from './modifiers'
 import { hiddenFacts } from './facts'
 import { RELATIONS, relationBetween, type Relation } from './rapport'
+import { t } from '../i18n'
 
 // Transcripts longer than this are trimmed from the start before summarising.
 const MAX_TRANSCRIPT_CHARS = 12000
 
+// The answer the summary asks for: its keys and the levels it may give are read back by `parseSummary`, so they stay as they are.
+const SUMMARY_SHAPE = '{"memory": string, "level": string, "affection": number, "trust": number, "desire": number, "reason": string, "sex": boolean, "learned": string[]'
+const RAPPORT_SHAPE = ', "rapport": {"with": string, "relation": string}[]'
+const SPENDING_SHAPE = '{"spent": number, "on": string}'
+
 export function describeBeat(beat: SceneBeat): string {
-  return beat.locationName ? `${beat.activityName} at ${beat.locationName}` : beat.activityName
+  return beat.locationName ? t('scene.memory.beatAt', { activity: beat.activityName, place: beat.locationName }) : beat.activityName
+}
+
+/** How she went, as it is said of her: the feeling is the game's to keep, the word the language's. */
+export function feelingWord(feeling: DepartureFeeling): string {
+  return feeling === 'hurt' ? t('scene.feeling.hurt') : feeling === 'angry' ? t('scene.feeling.angry') : t('scene.feeling.content')
 }
 
 function loveInterestName(content: ContentPack, id: string): string {
@@ -52,56 +63,37 @@ export function buildSummaryPrompt(input: SummaryInput): { system: string; user:
   // What he does not yet know of her: anything of it that came out in the scene is recorded when the scene is over.
   const unknown = feels && li ? hiddenFacts(content, state, li) : []
   const system = [
-    `You write what characters in a dating sim take away from a scene. Given what happened during one ` +
-      `outing between ${player} and ${name}, write the single memory ${name} keeps of it` +
-      `${feels ? `, and decide how it has changed what she feels for ${player}` : ''}.`,
-    feels
-      ? `Reply with only a JSON object and nothing else: {"memory": string, "level": string, "affection": number, "trust": number, "desire": number, "reason": string, "sex": boolean, "learned": string[]${group ? ', "rapport": {"with": string, "relation": string}[]' : ''}}`
-      : 'Reply with only the memory itself.',
-    'The memory:',
-    '- Exactly one sentence, plain prose, past tense, third person, using both names.',
-    others &&
-      `- ${others} ${otherIds.length > 1 ? 'were' : 'was'} there too. Say so, but this is ${name}'s own ` +
-        `memory: keep to what ${name} said, did, noticed and felt, and how ${player} treated ${name} in particular.`,
-    departure &&
-      `- ${name} left before it was over${departure.reason ? ` (${departure.reason})` : ''}, feeling ${departure.feeling}. ` +
-        `Her memory ends with her leaving, and that is what stays with her.`,
+    t('scene.memory.task', { player, name, feels }),
+    feels ? t('scene.memory.json', { shape: `${SUMMARY_SHAPE}${group ? RAPPORT_SHAPE : ''}}` }) : t('scene.memory.plain'),
+    t('scene.memory.heading'),
+    t('scene.memory.oneSentence'),
+    others && t('scene.memory.others', { others, count: otherIds.length, name, player }),
+    departure && t('scene.memory.left', { name, why: Boolean(departure.reason), reason: departure.reason, feeling: feelingWord(departure.feeling) }),
     ...scene.departed
       .filter((d) => d.id !== forId && !departure)
-      .map((d) => `- ${firstNames(content, [d.id])} left part-way through${d.reason ? ` (${d.reason})` : ''}. Say so if it mattered.`),
-    `- End with what ${name} remembered most: one thing, chosen from the conversation.`,
-    '- No preamble, no quotation marks, no lists.',
-    'Example for two other people: Alex took Sam up to the lighthouse with a bottle of wine, ' +
-      'and what Sam remembered most was the way Alex kissed her.',
-    feels && `How much the memory will matter to ${name}, as "level":`,
-    feels &&
-      `- "core": a moment that defines what she and ${player} are to each other, which she will carry for good: a first kiss, the first time they slept together, ` +
-        'a confession, a promise made or broken, a real fight or a betrayal, something she had never told anyone. Rare.',
-    feels && '- "normal": time together that meant something, but changed nothing deep. Most scenes are this.',
-    feels && '- "fleeting": little happened; she will soon forget the details.',
+      .map((d) => t('scene.memory.otherLeft', { name: firstNames(content, [d.id]), why: Boolean(d.reason), reason: d.reason })),
+    t('scene.memory.endWith', { name }),
+    t('scene.memory.noPreamble'),
+    t('scene.memory.example'),
+    feels && t('scene.memory.levelHeading', { name, key: 'level' }),
+    feels && t('scene.memory.core', { player, level: 'core' }),
+    feels && t('scene.memory.normal', { level: 'normal' }),
+    feels && t('scene.memory.fleeting', { level: 'fleeting' }),
     ...(feels
       ? [
-          `How ${name} feels:`,
-          `- "affection", "trust" and "desire" are how much each has CHANGED because of this scene: whole numbers from ${FEELING_RANGE.min} to ${FEELING_RANGE.max}. ` +
-            `Each is kept on a scale of 0 to ${max}, and it takes a whole term of scenes to cross it.`,
-          `- Judge as ${name} herself: from who she is, what she wants in a man, how things already stand between them, and above all what ${player} said and did here. ` +
-            `Nothing is owed for turning up: time together that left no mark is 0.`,
-          '- 0: nothing changed. 1 to 2: a pleasant time, a small kindness, a good laugh. 3 to 5: he really reached her, or something happened between them. ' +
-            '6 to 10: rare, a moment she will come back to for weeks.',
-          '- Negative when he bored her, ignored her, pushed when she was uneasy, embarrassed or insulted her, broke a promise or showed her something she dislikes in him; ' +
-            'as far down as he earned.',
-          '- The three move on their own. Affection is fondness and warmth. Trust is whether she can rely on him and be honest with him: kept words, discretion, not being pressed. ' +
-            'Desire is wanting him: it rises with attraction and tension, and can rise while trust falls.',
-          `- What she admires in a man tilts all of it: where ${player} has it she warms to the same behaviour sooner, and where he lacks it he has more to prove.`,
-          '- "reason": one short sentence, in the third person, on why it moved as it did.',
-          `- "sex": true only if ${name} and ${player} had sex with each other in this scene, of any kind; false for kissing, flirting, talk of it, or sex that involved only others.`,
-          unknown.length > 0
-            ? `- "learned": the ids of the things below that ${player} found out about ${name} in this scene, because she plainly said or showed them; [] when none did. Only ids from this list, and only what really came out:`
-            : '- "learned": always [].',
+          t('scene.memory.feelsHeading', { name }),
+          t('scene.memory.change', { affection: 'affection', trust: 'trust', desire: 'desire', min: FEELING_RANGE.min, max: FEELING_RANGE.max, scale: max }),
+          t('scene.memory.judge', { name, player }),
+          t('scene.memory.amounts'),
+          t('scene.memory.negative'),
+          t('scene.memory.three'),
+          t('scene.memory.admires', { player }),
+          t('scene.memory.reason', { key: 'reason' }),
+          t('scene.memory.sex', { key: 'sex', name, player }),
+          unknown.length > 0 ? t('scene.memory.learned', { key: 'learned', player, name }) : t('scene.memory.learnedNone', { key: 'learned' }),
           ...unknown.map((fact) => `  - ${fact.id}: ${fact.telling}`),
           group &&
-            `- "rapport": how ${name} stands with any of the others where this scene truly changed it from how they stood before (said below): a quarrel that will not be forgotten, a peace made, a friendship struck up. ` +
-              `Not for a passing mood or one sharp remark; [] when nothing changed. Each entry: "with" is one of ${otherIds.join(', ')}, and "relation" is one of ${RELATIONS.join(', ')}.`
+            t('scene.memory.rapport', { key: 'rapport', name, withKey: 'with', relationKey: 'relation', ids: otherIds.join(', '), relations: RELATIONS.join(', ') })
         ]
       : [])
   ]
@@ -115,44 +107,46 @@ export function buildSummaryPrompt(input: SummaryInput): { system: string; user:
     )
     .join('\n')
   if (transcript.length > MAX_TRANSCRIPT_CHARS) {
-    transcript = `[earlier conversation omitted]\n${transcript.slice(-MAX_TRANSCRIPT_CHARS)}`
+    transcript = `${t('scene.memory.omitted')}\n${transcript.slice(-MAX_TRANSCRIPT_CHARS)}`
   }
 
   const comfort = scene.comfort?.[forId]
   const about = feels
     ? [
-        `About ${name}:`,
+        t('scene.memory.about', { name }),
         `- ${li.personality}`,
-        ...content.traits.filter((t) => li.traitIds.includes(t.id)).map((t) => `- ${t.name}: ${t.definition}`),
-        li.admires.length > 0 ? `- She is drawn to ${li.admires.join(' and ')} in a man. ${describeAppeal(state, li).join(' ') || `${player} is ordinary in that so far.`}` : '',
-        `- With ${player} she is at the stage "${stageFor(content.relationships, rel.affection).name}": affection ${rel.affection}, trust ${trustOf(content, state, forId)}, desire ${rel.desire}, each of ${max}.`,
+        ...content.traits.filter((trait) => li.traitIds.includes(trait.id)).map((trait) => `- ${trait.name}: ${trait.definition}`),
+        li.admires.length > 0
+          ? t('scene.memory.drawnTo', { admires: li.admires.join(t('scene.list.and')), appeal: describeAppeal(state, li).join(' ') || t('scene.memory.ordinary', { player }) })
+          : '',
+        t('scene.memory.stage', { player, stage: stageFor(content.relationships, rel.affection).name, affection: rel.affection, trust: trustOf(content, state, forId), desire: rel.desire, max }),
         ...describeBonds(content, state, forId, otherIds).map((line) => `- ${line}`),
         // How she stood with each of the others before this scene, so that what changed is told from what did not.
         ...(group
           ? otherIds.map((id) => {
               const relation = relationBetween(state, forId, id)
               const other = firstNames(content, [id])
-              return `- Before this scene she and ${other} were ${relation === 'neither' ? 'neither friends nor enemies' : relation}.`
+              return t('scene.memory.before', { other, relation })
             })
           : []),
-        comfort ? `- By the end she put how much she wanted to be there at ${comfort.level} of 5${comfort.reason ? `: ${comfort.reason}` : ''}.` : '',
+        comfort ? t('scene.memory.comfort', { level: comfort.level, why: Boolean(comfort.reason), reason: comfort.reason }) : '',
         ''
       ].filter((line, i, all) => line !== '' || i === all.length - 1)
     : []
   const user = [
-    `Date: ${formatDate(toDate(content.calendar, state.time))}`,
+    t('scene.memory.date', { date: formatDate(toDate(content.calendar, state.time)) }),
     '',
     ...about,
-    'What they did, in order:',
+    t('scene.memory.did'),
     ...(scene.beats.length > 0
       ? scene.beats.map((beat, i) => `${i + 1}. ${describeBeat(beat)}`)
-      : ['(nothing in particular)']),
+      : [t('scene.memory.nothing')]),
     ...(gifts.length > 0
-      ? ['', `Gifts ${player} gave ${name}:`, ...gifts.map((gift) => `- ${gift.name} (${name} ${gift.reaction} it)`)]
+      ? ['', t('scene.memory.gifts', { player, name }), ...gifts.map((gift) => t('scene.memory.gift', { gift: gift.name, name, reaction: gift.reaction }))]
       : []),
     '',
-    'Conversation:',
-    transcript || '(They did not say much.)'
+    t('scene.memory.conversation'),
+    transcript || t('scene.memory.silent')
   ].join('\n')
 
   return { system, user }
@@ -306,18 +300,19 @@ export function addIntimacy(state: GameState, loveInterestIds: string[]): GameSt
 
 /** What is told of it, to her and on her profile: "Times had sex: 2". */
 export function describeIntimacy(state: GameState, loveInterestId: string): string {
-  return `Times had sex: ${timesIntimate(state, loveInterestId)}`
+  return t('scene.memory.timesIntimate', { count: timesIntimate(state, loveInterestId) })
 }
 
 /** A plain memory built from the activity list alone, for when no LLM is available. */
 export function fallbackSummary(input: SummaryInput): string {
   const { content, state, scene } = input
-  const who = [state.player.name, ...sceneCast(scene).map((id) => loveInterestName(content, id))]
-    .join(', ')
-    .replace(/, ([^,]*)$/, ' and $1')
+  const names = [state.player.name, ...sceneCast(scene).map((id) => loveInterestName(content, id))]
+  const joined = names.join(', ')
+  const last = /, ([^,]*)$/.exec(joined)
+  const who = last ? t('scene.list.last', { rest: joined.slice(0, last.index), last: last[1] }) : joined
   return scene.beats.length > 0
-    ? `${who} spent time together: ${scene.beats.map(describeBeat).join(', then ')}.`
-    : `${who} talked.`
+    ? t('scene.memory.fallback', { who, beats: scene.beats.map(describeBeat).join(t('scene.list.then')) })
+    : t('scene.memory.fallbackTalked', { who })
 }
 
 /** Returns a new state with the memory recorded at the current game time. */
@@ -366,8 +361,7 @@ export function selectMemories(memories: Memory[], limit = MAX_PROMPT_MEMORIES):
 export function describeAge(content: ContentPack, memory: Pick<Memory, 'time'>, now: number): string {
   const days =
     toDate(content.calendar, now).dayIndex - toDate(content.calendar, memory.time).dayIndex
-  if (days <= 0) return 'earlier today'
-  return days === 1 ? 'yesterday' : `${days} days ago`
+  return t('scene.memory.age', { days: Math.max(0, days) })
 }
 
 /** What the player paid out of his own pocket in the course of a scene. */
@@ -385,30 +379,29 @@ export interface Spending {
  */
 export function buildSpendingPrompt(content: ContentPack, state: GameState, scene: Scene): { system: string; user: string } {
   const player = state.player.name
+  const keys = { spent: 'spent', on: 'on' }
   const system = [
-    `You keep the accounts of a dating sim. Given what was said in one scene, work out what ${player} himself paid for in it, and what it came to.`,
-    'Reply with only a JSON object and nothing else: {"spent": number, "on": string}',
-    `- Count only what ${player} plainly paid for or said he would: "the drinks are on me", buying a round, paying for dinner, tickets, a cab, something bought for someone. ` +
-      `What someone else paid for, what was free, what was only talked about, and what he was given are not his.`,
-    '- "spent" is a whole number of dollars, with no $ sign. Price it as it would be priced in the United States: a coffee or a tea $4 to $6, a drink at a bar $8 to $12, ' +
-      'a casual meal for one $15 to $25, a good dinner for two $80 to $150. Count each person he paid for.',
-    '- If he paid for nothing, "spent" is 0 and "on" is empty. Most scenes cost nothing; do not look for a reason to charge him.',
-    '- "on" says what it went on in a few words, with the place when there is one: "drinks for two at Boba Blossom".',
-    scene.gifts.length > 0 && `- Gifts he handed over were paid for when he bought them: leave them out (${scene.gifts.map((gift) => gift.name).join(', ')}).`,
-    scene.shift && '- He is at work in this scene: what he serves or sells as part of the job is not his money.'
+    t('scene.spending.task', { player }),
+    t('scene.spending.json', { shape: SPENDING_SHAPE }),
+    t('scene.spending.count', { player }),
+    t('scene.spending.price', keys),
+    t('scene.spending.nothing', keys),
+    t('scene.spending.on', keys),
+    scene.gifts.length > 0 && t('scene.spending.gifts', { gifts: scene.gifts.map((gift) => gift.name).join(', ') }),
+    scene.shift && t('scene.spending.shift')
   ]
     .filter((line): line is string => typeof line === 'string')
     .join('\n')
 
   const place = content.locations.find((l) => l.id === state.locationId)
   let transcript = scene.messages.map((m) => (m.role === 'user' ? `${player}: ${m.content}` : m.content)).join('\n')
-  if (transcript.length > MAX_TRANSCRIPT_CHARS) transcript = `[earlier conversation omitted]\n${transcript.slice(-MAX_TRANSCRIPT_CHARS)}`
+  if (transcript.length > MAX_TRANSCRIPT_CHARS) transcript = `${t('scene.memory.omitted')}\n${transcript.slice(-MAX_TRANSCRIPT_CHARS)}`
   const user = [
-    `${player} has $${state.player.money}.`,
-    `What they did: ${scene.beats.map(describeBeat).join('; then ')}.`,
-    place && `Where it ended: ${place.name}.`,
+    t('scene.spending.purse', { player, money: state.player.money }),
+    t('scene.spending.did', { beats: scene.beats.map(describeBeat).join(t('scene.list.thenSemicolon')) }),
+    place && t('scene.spending.ended', { place: place.name }),
     '',
-    'What was said:',
+    t('scene.spending.said'),
     transcript
   ]
     .filter((line): line is string => typeof line === 'string')

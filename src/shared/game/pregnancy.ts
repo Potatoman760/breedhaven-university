@@ -4,6 +4,7 @@ import { eventsOn } from './events'
 import { onBirthControl } from './intimacy'
 import { factor, inForce } from './modifiers'
 import { seedOf } from './seed'
+import { t } from '../i18n'
 
 /** A repeatable number in [0, 1) for one love interest on one day of one game, by purpose. */
 function roll(seed: number, dayIndex: number, index: number, salt: number): number {
@@ -136,7 +137,7 @@ export const MAX_CHILD_NAME = 24
 /** "Colette", "Colette and Rémy", "Colette, Rémy and Anaïs". */
 export function namesOf(children: Pick<Child, 'name'>[]): string {
   const names = children.map((child) => child.name)
-  return names.length < 2 ? (names[0] ?? '') : `${names.slice(0, -1).join(', ')} and ${names.at(-1)}`
+  return names.length < 2 ? (names[0] ?? '') : t('scene.list.last', { rest: names.slice(0, -1).join(', '), last: names.at(-1) })
 }
 
 /**
@@ -209,9 +210,45 @@ export function ordinaryOutfit(li: Pick<LoveInterest, 'outfits' | 'defaultOutfit
 
 /** "a daughter", "two daughters and a son" */
 export function describeChildren(children: Child[]): string {
-  const count = (n: number, one: string, many: string) => (n === 0 ? '' : n === 1 ? `a ${one}` : `${n} ${many}`)
   const daughters = children.filter((c) => c.daughter).length
-  return [count(daughters, 'daughter', 'daughters'), count(children.length - daughters, 'son', 'sons')].filter(Boolean).join(' and ')
+  return [t('scene.pregnancy.daughters', { n: daughters }), t('scene.pregnancy.sons', { n: children.length - daughters })].filter(Boolean).join(t('scene.list.and'))
+}
+
+/** Told to her of her own child: that she is carrying it, from the day the Bloom took. */
+function carryingLine(content: ContentPack, state: GameState, loveInterestId: string): string | undefined {
+  const mine = pregnancyOf(state, loveInterestId)
+  const stage = pregnancyStage(content, state, loveInterestId)
+  if (!mine || !stage) return undefined
+  const hoursPerDay = content.calendar.hoursPerDay
+  const day = Math.floor((state.time - mine.conceivedAt) / hoursPerDay) + 1
+  const length = Math.round((mine.dueAt - mine.conceivedAt) / hoursPerDay)
+  const player = state.player.name
+  return day === 1 && state.time - mine.conceivedAt < hoursPerDay
+    ? t('scene.pregnancy.justConceived', { player })
+    : t('scene.pregnancy.carrying', { player, day, length, stage: stage.name })
+}
+
+/** Told to her of the children she has borne him: who they are, how young, and where. */
+function borneLine(content: ContentPack, state: GameState, loveInterestId: string): string | undefined {
+  const born = childrenOf(state, loveInterestId)
+  if (born.length === 0) return undefined
+  const newest = Math.max(...born.map((c) => c.bornAt))
+  const ago = Math.floor((state.time - newest) / content.calendar.hoursPerDay)
+  return t('scene.pregnancy.borne', {
+    player: state.player.name,
+    children: describeChildren(born),
+    count: born.length,
+    names: namesOf(born),
+    ago: t('scene.pregnancy.ago', { days: ago }),
+    days: ago,
+    where: whereChildrenAre(content, state, loveInterestId, born)
+  })
+}
+
+/** What she says of her own children by him, in her own words: the one she carries and those she has borne. */
+export function describeOwnChildren(content: ContentPack, state: GameState, loveInterestId: string): string[] {
+  if (!content.pregnancy) return []
+  return [carryingLine(content, state, loveInterestId), borneLine(content, state, loveInterestId)].filter((line): line is string => line !== undefined)
 }
 
 /**
@@ -221,41 +258,22 @@ export function describeChildren(children: Child[]): string {
 export function describePregnancy(content: ContentPack, state: GameState, loveInterestId: string): string[] {
   if (!content.pregnancy) return []
   const { name } = state.player
-  const hoursPerDay = content.calendar.hoursPerDay
   const lines: string[] = []
-  const mine = pregnancyOf(state, loveInterestId)
   const stage = pregnancyStage(content, state, loveInterestId)
+  const carrying = carryingLine(content, state, loveInterestId)
 
-  if (mine && stage) {
-    const day = Math.floor((state.time - mine.conceivedAt) / hoursPerDay) + 1
-    const length = Math.round((mine.dueAt - mine.conceivedAt) / hoursPerDay)
-    lines.push(
-      day === 1 && state.time - mine.conceivedAt < hoursPerDay
-        ? `Today the Bloom locked in: you felt it take, and you know you are carrying ${name}'s child. ` +
-            `If this has only just happened, it changes the moment; say so in your own way.`
-        : `You are carrying ${name}'s child: day ${day} of about ${length}, ${stage.name}. ${name} knows.`
-    )
+  if (carrying && stage) {
+    lines.push(carrying)
     if (stage.description) lines.push(stage.description)
     const left = daysUntilDue(content, state, loveInterestId) ?? 0
-    lines.push(left <= 1 ? 'The child could come any hour now.' : `The child is due in about ${left} days.`)
+    lines.push(left <= 1 ? t('scene.pregnancy.anyHour') : t('scene.pregnancy.dueIn', { days: left }))
   }
   const bleeding = periodDay(content, state, loveInterestId)
   if (bleeding !== undefined) {
-    lines.push(
-      `You are on your period: day ${bleeding} of ${content.pregnancy.periodDays}. You know it and feel it, as you do each month, and it colors your mood and what you are up for in your own way. ` +
-        `You cannot conceive while it lasts, and you know that too. Mention it only when it comes up naturally.`
-    )
+    lines.push(t('scene.pregnancy.period', { day: bleeding, days: content.pregnancy.periodDays }))
   }
-  const born = childrenOf(state, loveInterestId)
-  if (born.length > 0) {
-    const newest = Math.max(...born.map((c) => c.bornAt))
-    const ago = Math.floor((state.time - newest) / hoursPerDay)
-    lines.push(
-      `You have borne ${name} ${describeChildren(born)}, ${born.length === 1 ? 'whose name is' : 'whose names are'} ${namesOf(born)}` +
-        `${born.length === 1 ? `, born ${ago === 0 ? 'today' : ago === 1 ? 'yesterday' : `${ago} days ago`}` : `, the youngest ${ago} days ago`}. ` +
-        whereChildrenAre(content, state, loveInterestId, born)
-    )
-  }
+  const borne = borneLine(content, state, loveInterestId)
+  if (borne) lines.push(borne)
 
   // What anyone can see, or would have heard: a belly that shows, a child born.
   for (const other of content.loveInterests) {
@@ -263,9 +281,9 @@ export function describePregnancy(content: ContentPack, state: GameState, loveIn
     const first = other.name.split(' ')[0]
     const theirs = childrenOf(state, other.id)
     if (pregnancyStage(content, state, other.id)?.showing) {
-      lines.push(`${first} is visibly pregnant, and the whole University knows the child is ${name}'s.`)
+      lines.push(t('scene.pregnancy.visible', { first, player: name }))
     }
-    if (theirs.length > 0) lines.push(`${first} has borne ${name} ${describeChildren(theirs)}, ${namesOf(theirs)}.`)
+    if (theirs.length > 0) lines.push(t('scene.pregnancy.othersBorne', { first, player: name, children: describeChildren(theirs), names: namesOf(theirs) }))
   }
   return lines
 }
@@ -275,20 +293,28 @@ export function describePregnancy(content: ContentPack, state: GameState, loveIn
  * the nanny, and as well or as poorly as the house has kept it; any other is at the University's creche.
  */
 function whereChildrenAre(content: ContentPack, state: GameState, motherId: string, born: Child[]): string {
-  const creche = "nursed and minded at the University's creche while you study, and never far from your thoughts"
+  const creche = t('scene.pregnancy.creche')
   const housing = content.housing
   const home = born.filter((child) => child.health !== undefined)
-  if (!housing || home.length === 0) return `${born.length === 1 ? 'The child is' : 'They are'} ${creche}.`
+  if (!housing || home.length === 0) return t('scene.pregnancy.atCreche', { count: born.length, creche })
   const nanny = content.loveInterests.find((li) => li.id === housing.nannyId)?.name.split(' ')[0]
   // One child is "her" or "him"; more are "them".
-  const them = home.length === 1 ? (home[0].daughter ? 'her' : 'him') : 'them'
-  const minded = motherId === housing.nannyId || !nanny ? `and you mind ${them} yourself` : `where ${nanny}, the nanny, minds ${them} when you cannot`
+  const them = t('scene.pregnancy.them', { count: home.length, daughter: home[0].daughter })
   const worst = Math.min(...home.map((child) => child.health ?? 0))
   const level = housing.babies.levels[Math.min(worst, housing.babies.levels.length - 1)]
   const away = born.length - home.length
   return (
-    `${home.length === born.length ? (born.length === 1 ? 'The child lives' : 'They live') : `${home.length} of them live${home.length === 1 ? 's' : ''}`} with you at ${housing.name}, ${state.player.name}'s house, ${minded}. ` +
+    t('scene.pregnancy.atHome', {
+      all: home.length === born.length,
+      count: born.length,
+      home: home.length,
+      house: housing.name,
+      player: state.player.name,
+      self: motherId === housing.nannyId || !nanny,
+      nanny,
+      them
+    }) +
     `${level ? `${level.name}: ${level.description}` : ''}` +
-    `${away > 0 ? ` The other${away === 1 ? ' is' : 's are'} ${creche}, for want of a cot.` : ''}`
+    `${away > 0 ? t('scene.pregnancy.away', { away, creche }) : ''}`
   ).trim()
 }

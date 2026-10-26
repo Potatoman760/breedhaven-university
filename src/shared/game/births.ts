@@ -8,6 +8,7 @@ import { addMemory, applyFeelings } from './memory'
 import { deliverChild, nameChild } from './pregnancy'
 import { sceneBaseline } from './scene'
 import { isOpen } from './schedule'
+import { t } from '../i18n'
 
 /**
  * The birth of a child. It is not something that happens to him while he is elsewhere: a few days before her time the
@@ -23,7 +24,8 @@ const IN_THE_WAY: Record<AgendaItem['kind'], number> = { event: 1, rent: 0, hous
 // Nobody is brought to bed before the day has begun.
 const EARLIEST_HOUR = 6
 
-const childWord = (child: Pick<Child, 'daughter'>) => (child.daughter ? 'daughter' : 'son')
+// Which word the messages choose for the child: a select over these, `none` before it is born.
+const childKind = (child: Pick<Child, 'daughter'> | undefined) => (child === undefined ? 'none' : child.daughter ? 'daughter' : 'son')
 
 /** The hour set for a mother's child to be born, once there is one. */
 export function birthAppointment(state: Pick<GameState, 'appointments'>, motherId: string): Appointment | undefined {
@@ -81,12 +83,12 @@ export function scheduleBirths(content: ContentPack, state: GameState): { state:
     const day = Math.max(due, today)
     const time = birthSlot(content, next, day, config.birthHours) ?? birthSlot(content, next, day + 1, config.birthHours)
     if (time === undefined) continue
-    const plan: Appointment = { id: `birth-${motherId}`, kind: 'birth', loveInterestId: motherId, companionIds: [], title: 'The birth of your child', time, hours: config.birthHours, locationId: config.birthLocationId }
+    const plan: Appointment = { id: `birth-${motherId}`, kind: 'birth', loveInterestId: motherId, companionIds: [], title: t('game.births.planTitle'), time, hours: config.birthHours, locationId: config.birthLocationId }
     scheduled.push(plan)
     const place = content.locations.find((l) => l.id === config.birthLocationId)?.name ?? config.birthLocationId
     next = addNote(giveContact({ ...next, appointments: [...next.appointments, plan].sort((a, b) => a.time - b.time) }, motherId), motherId, {
       from: 'them',
-      text: `They have given me a time at ${place}: ${describeWhen(content, time)}. That is when our child comes. I want you there, ${state.player.name}. Please be there.`,
+      text: t('game.births.notice', { place, when: describeWhen(content, time), player: state.player.name }),
       read: false
     })
   }
@@ -104,10 +106,9 @@ export function attendBirth(content: ContentPack, state: GameState, appointmentI
   const mother = content.loveInterests.find((li) => li.id === motherId)
   const delivered = deliverChild(content, kept, motherId, appointment.time)
   const place = content.locations.find((l) => l.id === appointment.locationId)
-  const first = mother?.name.split(' ')[0] ?? 'She'
+  const first = mother?.name.split(' ')[0] ?? t('game.births.she')
   const child = delivered.child
-  const what = child ? childWord(child) : 'child'
-  const place_ = place?.name ?? 'the Health Center'
+  const place_ = place?.name ?? t('game.births.healthCenter')
   return {
     state: placeBabies(content, delivered.state),
     child,
@@ -118,9 +119,9 @@ export function attendBirth(content: ContentPack, state: GameState, appointmentI
       nsfw: false,
       beats: [
         {
-          activityName: 'The birth',
+          activityName: t('game.births.activity'),
           locationName: place?.name,
-          description: `It is over, and they are both well. ${first} is propped on the pillows with your ${what} in her arms.${child ? ` She would like to call ${child.daughter ? 'her' : 'him'} ${child.name}.` : ''}`,
+          description: t('game.births.description', { first, child: childKind(child), named: child !== undefined, daughter: child?.daughter, name: child?.name }),
           direction: birthDirection(state.player.name, place_, child)
         }
       ],
@@ -139,18 +140,12 @@ export function attendBirth(content: ContentPack, state: GameState, appointmentI
 
 /** Told to the mother in the scene of a birth: what has just happened, and what the child is called. */
 function birthDirection(player: string, place: string, child: Child | undefined, suggested?: string): string {
-  const what = child ? childWord(child) : 'child'
   const naming = !child
     ? ''
     : suggested !== undefined && suggested !== child.name
-      ? `You had thought of ${suggested} for a name; ${player} has chosen ${child.name} instead, and you took to it at once and gladly. ${child.daughter ? 'Her' : 'His'} name is ${child.name}, and that is settled. `
-      : `You want to call ${child.daughter ? 'her' : 'him'} ${child.name}, and have told ${player} so; unless he chooses another, which you would accept gladly, that is ${child.daughter ? 'her' : 'his'} name. `
-  return (
-    `You have just given birth to ${player}'s child, a ${what}, here in the maternity room of ${place}. ` +
-    `You are sitting up in the hospital bed in a hospital gown, worn out and overjoyed, with the newborn in your arms. ${player} was with you through all of it. ` +
-    naming +
-    `This is the first hour afterwards, the three of you. Stay in this room and in this bed: do not move the scene anywhere, and nothing sexual happens here.`
-  )
+      ? t('game.births.renamed', { suggested, player, name: child.name, daughter: child.daughter })
+      : t('game.births.naming', { player, name: child.name, daughter: child.daughter })
+  return t('game.births.direction', { player, child: childKind(child), place, naming })
 }
 
 /**
@@ -163,7 +158,7 @@ export function renameNewborn(content: ContentPack, state: GameState, scene: Sce
   const named = nameChild(state, before.motherId, before.bornAt, name)
   const child = named.children.find((one) => one.motherId === before.motherId && one.bornAt === before.bornAt)
   if (named === state || !child || child.name === before.name) return { state, scene }
-  const place = content.locations.find((l) => l.id === content.pregnancy?.birthLocationId)?.name ?? 'the Health Center'
+  const place = content.locations.find((l) => l.id === content.pregnancy?.birthLocationId)?.name ?? t('game.births.healthCenter')
   const [first, ...rest] = scene.beats
   // What she first thought of is kept, so that naming the child twice still tells her what she gave up.
   const suggested = scene.suggestedName ?? before.name
@@ -186,12 +181,12 @@ export function settleBirths(content: ContentPack, state: GameState): { state: G
     const child = delivered.child
     missed.push({ motherId, child })
     next = placeBabies(content, delivered.state)
-    next = applyFeelings(content, next, motherId, { ...MISSED_BIRTH, reason: 'He was not there for the birth.' }, true)
+    next = applyFeelings(content, next, motherId, { ...MISSED_BIRTH, reason: t('game.births.missedReason') }, true)
     const where = content.locations.find((l) => l.id === plan.locationId)?.name ?? plan.locationId
-    next = addMemory(next, motherId, `${state.player.name} was not there when you gave birth to his ${childWord(child)} at ${where}. You went through it without him, and he sent no word.`, 'core')
+    next = addMemory(next, motherId, t('game.births.missedMemory', { player: state.player.name, child: childKind(child), where }), 'core')
     next = addNote(giveContact(next, motherId), motherId, {
       from: 'them',
-      text: `It's done. You have a ${childWord(child)}. I have named ${child.daughter ? 'her' : 'him'} ${child.name}. We are both well. You weren't here.`,
+      text: t('game.births.missedNote', { child: childKind(child), daughter: child.daughter, name: child.name }),
       read: false
     })
   }

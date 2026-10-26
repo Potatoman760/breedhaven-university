@@ -9,6 +9,7 @@ import { BackButton } from './BackButton'
 import { Ornate } from './Ornate'
 import { Portrait } from './Portrait'
 import { settle } from './pinLayout'
+import { t } from '../../../shared/i18n'
 
 // Faces shown beside a pin before the rest collapse into a "+2".
 const MAX_FACES = 3
@@ -44,8 +45,8 @@ export function MapPanel({ content, state, onTravel, withHim = [], onClose }: Pr
   }, [])
   if (!map) {
     return (
-      <Dialog title="Map" onClose={onClose} narrow>
-        <ToBeImplemented note="This content pack has no map." />
+      <Dialog title={t('screens.navTiles.map')} onClose={onClose} narrow>
+        <ToBeImplemented note={t('screens.map.noMap')} />
       </Dialog>
     )
   }
@@ -68,7 +69,7 @@ export function MapPanel({ content, state, onTravel, withHim = [], onClose }: Pr
       here,
       closed: !here && !isOpen(location, hour),
       ok: Boolean(onTravel) && check.ok,
-      why: onTravel ? check.reasons.join(' · ') : 'You are in the middle of something'
+      why: onTravel ? check.reasons.join(' · ') : t('screens.map.busy')
     }
   }
 
@@ -85,7 +86,7 @@ export function MapPanel({ content, state, onTravel, withHim = [], onClose }: Pr
     return (
       <div key={location.id} className={classes.filter(Boolean).join(' ')} style={{ left: `${spot.x}%`, top: `${spot.y}%` }}>
         <span className="map-pin-head">
-          <span className="map-medallion" title={portal ? `${location.name}: the way down into ${content.expedition?.name}` : location.name}>
+          <span className="map-medallion" title={portal ? t('screens.map.wayDown', { place: location.name, below: String(content.expedition?.name) }) : location.name}>
             {/* The way down: a ring of runes turning around it. */}
             {portal && <span className="map-runes" aria-hidden="true" />}
             <PlaceIcon name={location.icon} image={location.iconImage} size={20} />
@@ -95,12 +96,12 @@ export function MapPanel({ content, state, onTravel, withHim = [], onClose }: Pr
           <span className="map-plate">{placeName(location)}</span>
           {portal && <span className="map-below">{content.expedition?.name.replace(/^the /, '')}</span>}
           {here ? (
-            <span className="map-state">Here</span>
+            <span className="map-state">{t('screens.dayView.here')}</span>
           ) : closed ? (
-            <span className="map-state">Closed</span>
+            <span className="map-state">{t('screens.map.closed')}</span>
           ) : (
             <Button variant="primary" size="small" className="map-go" disabled={!ok} title={why || undefined} onClick={() => go(location.id)}>
-              Go
+              {t('screens.dateDialog.go')}
             </Button>
           )}
         </span>
@@ -136,7 +137,7 @@ export function MapPanel({ content, state, onTravel, withHim = [], onClose }: Pr
           // It opens a little small: measured again once it is at its size.
           onAnimationEnd={(event) => event.target === event.currentTarget && settle(event.currentTarget)}
         >
-          <img className="map-art" src={`content://pack/${map.image}`} alt={`Map of ${map.name}`} />
+          <img className="map-art" src={`content://pack/${map.image}`} alt={t('screens.map.mapOf', { name: map.name })} />
           {map.regions.map((region) => (
             <span key={region.name} className="map-region" style={{ left: `${region.x}%`, top: `${region.y}%` }}>
               {region.name}
@@ -147,7 +148,7 @@ export function MapPanel({ content, state, onTravel, withHim = [], onClose }: Pr
 
         {/* Those with nothing on their schedule are in their own rooms: shown, but not somewhere to go. */}
         {unknown.length > 0 && (
-          <Ornate title="In her room" className="map-rooms">
+          <Ornate title={t('screens.map.inHerRoom')} className="map-rooms">
             <div className="portraits">
               {unknown.map((li) => (
                 <Portrait key={li.id} who={li} size="clamp(56px, 4vw, 80px)" caption />
@@ -171,7 +172,7 @@ export function MapPanel({ content, state, onTravel, withHim = [], onClose }: Pr
                       <Portrait key={li.id} who={li} size="clamp(34px, 2.5vw, 50px)" className="map-face" />
                     ))}
                   </span>
-                  {here ? <span className="chip">You are here</span> : <GrandButton label="Go" chevron disabled={!ok} tip={why} onClick={() => go(location.id)} />}
+                  {here ? <span className="chip">{t('screens.map.youAreHere')}</span> : <GrandButton label={t('screens.dateDialog.go')} chevron disabled={!ok} tip={why} onClick={() => go(location.id)} />}
                 </div>
               )
             })}

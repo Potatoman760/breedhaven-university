@@ -11,6 +11,7 @@ import { appealLevel } from './stats'
 import { factor } from './modifiers'
 import { seedOf } from './seed'
 import { sceneRelicUses } from './relics'
+import { t, type MessageKey } from '../i18n'
 
 /**
  * The drama engine. When the player starts a scene it weighs what is simmering around
@@ -67,10 +68,10 @@ function claimOf(content: ContentPack, state: GameState, li: LoveInterest): { va
   const status = statusOf(content, bondOf(state, li.id))
   const stages = content.relationships
   const dating = stageRank(stages, stageFor(stages, rel.affection).id) >= stageRank(stages, 'dating')
-  if (status?.exclusive) return { value: config.claim.exclusive, why: `She and ${player} are ${status.name.toLowerCase()}: they have promised to see only each other` }
-  if (status) return { value: config.claim.open, why: `She and ${player} have an arrangement (${status.name.toLowerCase()}) that lets him see others, so this is no betrayal, but she did not expect to walk in on it` }
-  if (dating) return { value: config.claim.dating, why: `She and ${player} are dating, with nothing said about anyone else` }
-  if (rel.desire >= config.claim.wantingDesire) return { value: config.claim.wanting, why: `She and ${player} are only friends so far, but she wants him` }
+  if (status?.exclusive) return { value: config.claim.exclusive, why: t('game.drama.claimExclusive', { player, status: status.name.toLowerCase() }) }
+  if (status) return { value: config.claim.open, why: t('game.drama.claimOpen', { player, status: status.name.toLowerCase() }) }
+  if (dating) return { value: config.claim.dating, why: t('game.drama.claimDating', { player }) }
+  if (rel.desire >= config.claim.wantingDesire) return { value: config.claim.wanting, why: t('game.drama.claimWanting', { player }) }
   return { value: 0, why: '' }
 }
 
@@ -119,7 +120,7 @@ export function dramaHooks(content: ContentPack, state: GameState, scene: Pick<S
       const near = score + (nearby ? config.nearby : 0)
       return near * (where === undefined ? config.unplaced : 1)
     }
-    const nearbyReason = nearby ? ['She was already here'] : []
+    const nearbyReason = nearby ? [t('game.drama.nearby')] : []
 
     const claim = claimOf(content, state, actor)
     if (claim.value > 0) {
@@ -137,9 +138,9 @@ export function dramaHooks(content: ContentPack, state: GameState, scene: Pick<S
         score: placed(score),
         reasons: [
           claim.why,
-          `She did not know ${player} would be here with ${leadName}${isDate ? ', on what is plainly a date' : ''}`,
-          ...jealous.map((trait) => `She is ${trait.name.toLowerCase()}: ${trait.definition}`),
-          relation === 'enemies' ? `She and ${leadName} are enemies already` : relation === 'friends' ? `She and ${leadName} are friends, which makes it worse and harder at once` : '',
+          t('game.drama.didNotKnow', { player, lead: leadName, date: isDate }),
+          ...jealous.map((trait) => t('game.drama.jealousTrait', { trait: trait.name.toLowerCase(), definition: trait.definition })),
+          relation === 'enemies' ? t('game.drama.enemiesAlready', { lead: leadName }) : relation === 'friends' ? t('game.drama.friendsWorse', { lead: leadName }) : '',
           ...nearbyReason
         ].filter(Boolean)
       })
@@ -152,8 +153,8 @@ export function dramaHooks(content: ContentPack, state: GameState, scene: Pick<S
         kind: 'rival',
         score: placed(config.rival + (rel.affection + rel.desire) / 10 + (competitive ? 10 : 0)),
         reasons: [
-          `She and ${leadName} are enemies`,
-          rel.affection + rel.desire > 0 ? `She likes ${player} herself` : `She has no feelings for ${player} to speak of; it is ${leadName} she has come to needle`,
+          t('game.drama.enemies', { lead: leadName }),
+          rel.affection + rel.desire > 0 ? t('game.drama.likesHim', { player }) : t('game.drama.needles', { player, lead: leadName }),
           ...nearbyReason
         ]
       })
@@ -166,8 +167,8 @@ export function dramaHooks(content: ContentPack, state: GameState, scene: Pick<S
         kind: 'friend',
         score: placed(config.friend + (unmet ? config.unmet : 0) + traits.reduce((sum, trait) => sum + trait.drama.sociable, 0)),
         reasons: [
-          `She is a friend of ${leadName}'s`,
-          unmet ? `${player} has never spent time with her: ${leadName} introduces them` : `${player} knows her already`,
+          t('game.drama.friendOf', { lead: leadName }),
+          unmet ? t('game.drama.introduces', { player, lead: leadName }) : t('game.drama.knowsHer', { player }),
           ...nearbyReason
         ]
       })
@@ -235,43 +236,27 @@ export function describeDrama(content: ContentPack, state: GameState, scene: Pic
   const lead = firstNames(content, [scene.loveInterestId])
   if (drama.kind === 'friend' && drama.afterLines === 0) {
     return [
-      `${lead} has brought ${actor} along: the three of you are here together from the start.`,
+      t('game.drama.alongOpening', { lead, actor }),
       ...drama.reasons.map((reason) => (/[.!?]$/.test(reason) ? reason : `${reason}.`)),
-      `${actor} is easy, friendly and curious about ${player}, and takes part as herself throughout. Nobody is wronged by her being here.`
+      t('game.drama.alongPlaying', { actor, player })
     ].join(' ')
   }
-  const opening = {
-    confrontation: `${actor} has just walked in and found ${player} here with ${here}.`,
-    rival: `${actor} has just turned up, uninvited, where ${player} is with ${here}.`,
-    friend: `${actor} has just come over to where ${player} is with ${here}.`
-  }[drama.kind]
+  const opening = t(`game.drama.opening.${drama.kind}`, { actor, player, here })
   // How she carries on once she is here. Her entrance itself is asked for beside his line as she walks in (`arrivalCue`).
-  const playing = {
-    confrontation:
-      `${actor} is in the scene now and speaks as herself. It is not resolved at once: let the others answer for themselves, each as she would. ` +
-      `How it goes from here depends on what ${player} says. ` +
-      `Anyone hurt or angry enough may walk out: write her going, and a [LEAVES: Name=feeling why] line at the end of the reply.`,
-    rival:
-      `${actor} is in the scene now and speaks as herself. She is not here to make peace: she needles, competes for ${player}'s attention or ` +
-      `simply refuses to leave, in her own manner, and the others answer in theirs.`,
-    friend:
-      `${actor} is in the scene now and speaks as herself: easy, friendly, and curious about ${player}. She stays a while; ` +
-      `nobody is wronged by it, though whoever he came here with may or may not be glad of the company.`
-  }[drama.kind]
+  const playing = t(`game.drama.playing.${drama.kind}`, { actor, player, leaves: '[LEAVES: Name=feeling why]' })
   return [opening, ...drama.reasons.map((reason) => (/[.!?]$/.test(reason) ? reason : `${reason}.`)), playing].join(' ')
 }
 
 /** What is said beside his line as she walks in, where it cannot be missed: who it is, and that the reply opens with her. */
 export function arrivalCue(content: ContentPack, drama: SceneDrama): string {
   const actor = firstNames(content, [drama.actorId])
-  const how = { confrontation: 'walks in on them', rival: 'turns up, uninvited', friend: 'comes over to join them' }[drama.kind]
-  return `${actor} ${how} as he says this. Open your reply with her arrival, in her own voice, and let her speak in it.`
+  return t(`game.drama.arrival.${drama.kind}`, { actor })
 }
 
-const HEADLINES: Record<DramaKind, string> = {
-  confrontation: 'walks in on you',
-  rival: 'turns up uninvited',
-  friend: 'comes over to join you'
+const HEADLINES: Record<DramaKind, MessageKey> = {
+  confrontation: 'game.drama.headline.confrontation',
+  rival: 'game.drama.headline.rival',
+  friend: 'game.drama.headline.friend'
 }
 
 /**
@@ -285,7 +270,7 @@ export function fireDrama<S extends Scene>(content: ContentPack, state: GameStat
   const actor = firstNames(content, [drama.actorId])
   const place = content.locations.find((l) => l.id === state.locationId)
   const along = drama.kind === 'friend' && drama.afterLines === 0
-  const headline = along ? `${firstNames(content, [scene.loveInterestId])} has brought ${actor} along` : `${actor} ${HEADLINES[drama.kind]}`
+  const headline = along ? t('game.drama.headline.along', { lead: firstNames(content, [scene.loveInterestId]), actor }) : t(HEADLINES[drama.kind], { actor })
   return {
     state: { ...state, dramaDay: toDate(content.calendar, state.time).dayIndex },
     scene: {
@@ -299,6 +284,6 @@ export function fireDrama<S extends Scene>(content: ContentPack, state: GameStat
       ],
       drama: { ...drama, fired: true }
     },
-    notice: `${headline}.`
+    notice: t('game.drama.notice', { headline })
   }
 }

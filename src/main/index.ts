@@ -1,9 +1,9 @@
 import { app, BrowserWindow, dialog, ipcMain, Menu, protocol, safeStorage, session, shell, type MenuItemConstructorOptions } from 'electron'
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
-import { dirname, join, resolve, sep } from 'node:path'
+import { dirname, extname, join, resolve, sep } from 'node:path'
 import { z } from 'zod'
 import { chatCompletion, listModels } from './ai/openai'
-import { completeWithFallback, NOT_CONFIGURED } from './ai/router'
+import { completeWithFallback, notConfigured } from './ai/router'
 import { leavers, lookLines, namesHer, parseDirectives, sceneCast, sceneWitnesses, validLook, whoSpoke } from '../shared/game/scene'
 import { canSleepOver } from '../shared/game/sleep'
 import { sexGate } from '../shared/game/intimacy'
@@ -11,7 +11,7 @@ import { sceneRelicUses } from '../shared/game/relics'
 import { CONTENT_SCHEME, resolveContentPath, serveContent } from './content/assets'
 import { deleteLoveInterest,
   removeUnusedAssets,
-  deleteTrait, deleteJob, saveJob, deleteSociety, saveSociety, importAsset, loadBase, loadWithAddons, saveCatalogue, saveLocation, deleteLocation, saveLoveInterest, saveTrait,
+  deleteTrait, deleteJob, saveJob, deleteSociety, saveSociety, importAsset, loadBase, loadWithAddons, rebuildCatalogue, saveCatalogue, saveMajor, deleteMajor, saveLocation, deleteLocation, saveLoveInterest, saveTrait,
   resetPlayer,
   savePlayer
 } from './content/addons'
@@ -25,6 +25,7 @@ import { attendableEvents, buildEventPrompt, parseGeneratedEvents } from '../sha
 import { buildSpendingPrompt, buildSummaryPrompt, fallbackSummary, parseSpending, parseSummary, PLAIN_FEELINGS, sceneRapport, sceneRevelations, type Spending, type Summary } from '../shared/game/memory'
 import { npcOf, sceneExtras, withNpc } from '../shared/game/npcs'
 import { inMasks } from '../shared/game/masquerade'
+import { unnamedIn } from '../shared/game/strangers'
 import { sceneHours } from '../shared/game/sceneMoves'
 import { exchanges, windingDown } from '../shared/game/windDown'
 import { asEventOuting, buildOutingPrompt, fallbackOuting, parseOuting } from '../shared/game/outing'
@@ -35,6 +36,8 @@ import { personalise } from '../shared/game/personalise'
 import { withHousing } from '../shared/game/housing'
 import { buildCharacterPrompt, clockNote, sceneTurns } from '../shared/game/prompt'
 import { CHAT_CANCELLED, IPC } from '../shared/ipc'
+import { DEFAULT_LANGUAGE, setLanguage, t, type Messages } from '../shared/i18n'
+import { languagesIn, readStrings } from './content/language'
 import {
   CutoutRequestSchema,
   GenerateArtRequestSchema,
@@ -56,9 +59,11 @@ import { ComfyStore, generateArt, generateClip } from './comfy/studio'
 import { listWorkflows } from './comfy/workflows'
 import { bundleDir, checkBundle, readBundle } from './comfy/bundle'
 import { CivitaiKeyStore, downloadModel, findModelsDir, hasModel, readDownloads } from './comfy/downloads'
-import { basePoseId, isMoment, isSeeding, poseMedia, pregnantPoseId, type BondProposal, type ContentPack, type GameState, type LoveInterest, type Proposal } from '../shared/model'
+import { basePoseId, isMoment, isSeeding, poseMedia, pregnantPoseId, type BondProposal, type ContentPack, type GameState, type LoveInterest, type Major, type Proposal } from '../shared/model'
 import { pregnancyStage, wornOutfit } from '../shared/game/pregnancy'
 import { buildDraftPrompt, DRAFT_MAX_IDEA_CHARS, DRAFT_MIN_TOKENS, parseDraft } from '../shared/game/draftCharacter'
+import { cardFromJson, cardFromPng, characterFromCard, type Card } from '../shared/game/sillyCard'
+import { buildMajorDraftPrompt, MAJOR_DRAFT_MIN_TOKENS, parseMajorDraft } from '../shared/game/draftMajor'
 import { excuseTool, meetingTool, moveTool, relationshipTool, revealTool, type Leaving } from './ai/tools'
 import {
   isConfigured,
@@ -100,9 +105,31 @@ const EVENT_MIN_TOKENS = 800
 const DRAFT_TIMEOUT_MS = 180_000
 
 
+/** Where the game's content is: its own, in English, and a folder beside it for each language it is translated into. */
+function contentRoot(): string {
+  return join(app.isPackaged ? process.resourcesPath : app.getAppPath(), 'content')
+}
+
 function contentDir(): string {
-  const root = app.isPackaged ? process.resourcesPath : app.getAppPath()
-  return join(root, 'content', 'default')
+  return join(contentRoot(), 'default')
+}
+
+/** The language the game is in, and the folder its translation is in: none for English, or for a language that is not there any more. */
+interface InLanguage {
+  language: string
+  languageDir?: string
+  messages: Messages
+}
+
+/** Puts this process into a language, which is what the LLM is told everything in. */
+function useLanguage(wanted: string): InLanguage {
+  const dir = join(contentRoot(), wanted)
+  const languageDir = wanted !== DEFAULT_LANGUAGE && existsSync(join(dir, 'language.json')) ? dir : undefined
+  const { messages, issues } = languageDir ? readStrings(languageDir) : { messages: {}, issues: [] }
+  for (const issue of issues) console.warn(`${wanted}: ${issue}`)
+  const language = languageDir ? wanted : DEFAULT_LANGUAGE
+  setLanguage(language, messages)
+  return { language, languageDir, messages }
 }
 
 // Must happen before the app is ready. Lets the renderer load pack artwork as images.
@@ -159,9 +186,9 @@ function createWindow(): void {
     const items: MenuItemConstructorOptions[] = []
     if (params.misspelledWord) {
       for (const word of params.dictionarySuggestions) items.push({ label: word, click: () => win.webContents.replaceMisspelling(word) })
-      if (params.dictionarySuggestions.length === 0) items.push({ label: 'No suggestions', enabled: false })
+      if (params.dictionarySuggestions.length === 0) items.push({ label: t('llm.main.noSuggestions'), enabled: false })
       items.push(
-        { label: 'Add to dictionary', click: () => win.webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord) },
+        { label: t('llm.main.addToDictionary'), click: () => win.webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord) },
         { type: 'separator' }
       )
     }
@@ -203,10 +230,23 @@ function registerIpc(
   /** The player's Civitai key, for downloading models that want him signed in. */
   civitaiKey: CivitaiKeyStore,
   /** The user's own add-on folder, where what the game makes as it is played (the selfies on the feed) is always filed. */
-  userDir: string
+  userDir: string,
+  /** The language the content was loaded in. */
+  inLanguage: InLanguage
 ): void {
   // Replaced whenever the editor changes an add-on; every handler below reads the current one.
   let { content, info } = loaded
+  let lang = inLanguage
+  // Read afresh the way it was first read: the game's own files when they are what is being edited, and otherwise with the add-ons over them.
+  const reload = () => ({ content, info } = info.base ? loadBase(packDir, lang.languageDir) : loadWithAddons(packDir, info.addonDir, lang.languageDir))
+  const languageView = () => ({ language: lang.language, messages: lang.messages, languages: languagesIn(contentRoot(), t('core.language.en')) })
+  ipcMain.handle(IPC.getLanguage, () => languageView())
+  ipcMain.handle(IPC.setLanguage, (_event, raw: unknown) => {
+    lang = useLanguage(z.string().parse(raw))
+    settings.setLanguage(lang.language)
+    reload()
+    return { ...languageView(), content }
+  })
   /** The content as the game with this state reads it: the player's name filled in wherever the content wrote the token. */
   // And with the house he has been let in it or out of it, as his game has it.
   const readBy = (state: Pick<GameState, 'player' | 'housing'>): ContentPack => withHousing(personalise(content, state.player.name), state)
@@ -228,13 +268,19 @@ function registerIpc(
 
   /** Makes a change to the add-ons, then loads the content afresh so the game and the editor agree. */
   const change = (apply: () => string[]): EditorResult => {
-    const issues = apply()
-    // Read afresh the way it was first read: the game's own files when they are what is being edited, and otherwise with the add-ons over them.
+    // What the editor has in another language is a translation: saved, it would be written over the English.
+    const issues = lang.languageDir ? [t('core.editor.englishOnly')] : apply()
+    let catalogueRebuilt = false
     if (issues.length === 0) {
-      ;({ content, info } = info.base ? loadBase(packDir) : loadWithAddons(packDir, info.addonDir))
+      reload()
+      // Whoever was saved has her classes in the next new game: the term is laid out again for her.
+      if (rebuildCatalogue(packDir, info.addonDir, content, info.base)) {
+        catalogueRebuilt = true
+        reload()
+      }
       tidyOptimized()
     }
-    return { issues, content, info }
+    return { issues, content, info, ...(catalogueRebuilt && { catalogueRebuilt }) }
   }
   ipcMain.handle(IPC.editorInfo, () => info)
   /** Saves a character, then clears out whatever of hers the saved file no longer uses. */
@@ -249,14 +295,12 @@ function registerIpc(
   ipcMain.handle(IPC.editorDeleteLoveInterest, (_event, raw: unknown) =>
     change(() => deleteLoveInterest(info.addonDir, z.string().parse(raw)))
   )
-  // Never fails: a character that can't be written comes back as the reason why.
-  ipcMain.handle(IPC.editorDraftLoveInterest, async (_event, raw: unknown): Promise<{ loveInterest?: LoveInterest; error?: string }> => {
-    const idea = z.string().trim().min(1).max(DRAFT_MAX_IDEA_CHARS).safeParse(raw)
-    if (!idea.success) return { error: 'Say something about who she is first.' }
+  /** A new character written by the Main LLM, from an idea or from a card. Never throws: what went wrong comes back as the reason. */
+  async function draftCharacter(idea: string, card?: Card): Promise<{ loveInterest?: LoveInterest; error?: string }> {
     const profile = settings.get().main
-    if (!isConfigured(profile)) return { error: NOT_CONFIGURED }
+    if (!isConfigured(profile)) return { error: notConfigured() }
     try {
-      const { system, user } = buildDraftPrompt(content, idea.data)
+      const { system, user } = buildDraftPrompt(content, idea, card)
       const reply = await chatCompletion(profile, {
         system,
         messages: [{ role: 'user', content: user }],
@@ -264,12 +308,67 @@ function registerIpc(
         timeoutMs: DRAFT_TIMEOUT_MS
       })
       try {
-        return { loveInterest: parseDraft(content, reply) }
+        return { loveInterest: parseDraft(content, reply, card) }
       } catch (error) {
         // What came back is kept, so that a reply that could not be read can be looked at.
         const kept = join(app.getPath('userData'), 'last-draft-reply.txt')
         writeFileSync(kept, reply)
-        return { error: `${(error as Error).message} (The reply is saved in ${kept}.)` }
+        return { error: t('llm.main.replySaved', { error: (error as Error).message, file: kept }) }
+      }
+    } catch (error) {
+      return { error: (error as Error).message }
+    }
+  }
+  ipcMain.handle(IPC.editorDraftLoveInterest, async (_event, raw: unknown) => {
+    const idea = z.string().trim().min(1).max(DRAFT_MAX_IDEA_CHARS).safeParse(raw)
+    if (!idea.success) return { error: t('llm.main.describeHer') }
+    return draftCharacter(idea.data)
+  })
+  // The card last picked: kept here, and only its words are used.
+  let pickedCard: Card | null = null
+  ipcMain.handle(IPC.editorReadCard, async (event): Promise<{ card?: Card; error?: string } | null> => {
+    const window = BrowserWindow.fromWebContents(event.sender)
+    const options = { properties: ['openFile' as const], filters: [{ name: t('llm.main.characterCards'), extensions: ['png', 'json'] }] }
+    const forced = app.isPackaged ? undefined : process.env['BREEDHAVEN_IMPORT_FILE']
+    const picked = forced ? { canceled: false, filePaths: [forced] } : await (window ? dialog.showOpenDialog(window, options) : dialog.showOpenDialog(options))
+    const file = picked.filePaths[0]
+    if (picked.canceled || !file) return null
+    try {
+      const card = extname(file).toLowerCase() === '.png' ? cardFromPng(new Uint8Array(readFileSync(file))) : cardFromJson(readFileSync(file, 'utf8'))
+      pickedCard = card
+      return { card }
+    } catch (error) {
+      return { error: (error as Error).message }
+    }
+  })
+  // Her from the card last picked: as the card has her, or written into the setting by the LLM. The card's picture is not hers.
+  ipcMain.handle(IPC.editorFromCard, async (_event, raw: unknown): Promise<{ loveInterest?: LoveInterest; error?: string }> => {
+    const { generate, notes } = z.object({ generate: z.boolean(), notes: z.string().max(DRAFT_MAX_IDEA_CHARS).default('') }).parse(raw)
+    if (!pickedCard) return { error: t('llm.main.pickCard') }
+    return generate ? draftCharacter(notes, pickedCard) : { loveInterest: characterFromCard(content, pickedCard) }
+  })
+  ipcMain.handle(IPC.editorSaveMajor, (_event, raw: unknown) => change(() => saveMajor(info.addonDir, content, raw)))
+  ipcMain.handle(IPC.editorDeleteMajor, (_event, raw: unknown) => change(() => deleteMajor(info.addonDir, content, z.string().parse(raw))))
+  // Never fails: a subject that can't be written comes back as the reason why. Written once here, and kept as written.
+  ipcMain.handle(IPC.editorDraftMajor, async (_event, raw: unknown): Promise<{ major?: Major; error?: string }> => {
+    const idea = z.object({ subject: z.string().trim().min(1), college: z.string(), notes: z.string().max(DRAFT_MAX_IDEA_CHARS).default('') }).safeParse(raw)
+    if (!idea.success) return { error: t('llm.main.nameSubject') }
+    const profile = settings.get().main
+    if (!isConfigured(profile)) return { error: notConfigured() }
+    try {
+      const { system, user } = buildMajorDraftPrompt(content, idea.data)
+      const reply = await chatCompletion(profile, {
+        system,
+        messages: [{ role: 'user', content: user }],
+        maxTokens: Math.max(profile.maxTokens, MAJOR_DRAFT_MIN_TOKENS),
+        timeoutMs: DRAFT_TIMEOUT_MS
+      })
+      try {
+        return { major: parseMajorDraft(content, idea.data, reply) }
+      } catch (error) {
+        const kept = join(app.getPath('userData'), 'last-draft-reply.txt')
+        writeFileSync(kept, reply)
+        return { error: t('llm.main.replySaved', { error: (error as Error).message, file: kept }) }
       }
     } catch (error) {
       return { error: (error as Error).message }
@@ -282,7 +381,7 @@ function registerIpc(
   ipcMain.handle(IPC.editorSaveLocation, (_event, raw: unknown) => change(() => saveLocation(info.addonDir, content, raw, info.base)))
   ipcMain.handle(IPC.editorDeleteLocation, (_event, raw: unknown) => change(() => deleteLocation(info.addonDir, z.string().parse(raw))))
   // Jobs and societies are the game's own: there to be changed only when it is run from source.
-  const ownOnly = (apply: () => string[]) => change(() => (info.base ? apply() : ['This can only be changed in the game\'s own files.']))
+  const ownOnly = (apply: () => string[]) => change(() => (info.base ? apply() : [t('llm.main.ownOnly')]))
   ipcMain.handle(IPC.editorSaveJob, (_event, raw: unknown) => ownOnly(() => saveJob(packDir, content, raw)))
   ipcMain.handle(IPC.editorDeleteJob, (_event, raw: unknown) => ownOnly(() => deleteJob(packDir, z.string().parse(raw))))
   ipcMain.handle(IPC.editorSaveSociety, (_event, raw: unknown) => ownOnly(() => saveSociety(packDir, content, raw)))
@@ -292,17 +391,17 @@ function registerIpc(
   ipcMain.handle(IPC.editorSaveCatalogue, (_event, raw: unknown) => change(() => saveCatalogue(info.addonDir, raw)))
   ipcMain.handle(IPC.editorImportAsset, async (event, raw: unknown): Promise<string | null> => {
     const { loveInterestId, kind } = z.object({ loveInterestId: z.string(), kind: z.enum(['image', 'video', 'media']) }).parse(raw)
-    if (!isSafeId(loveInterestId)) throw new Error('Give the character a usable id first.')
+    if (!isSafeId(loveInterestId)) throw new Error(t('llm.main.usableId'))
     const window = BrowserWindow.fromWebContents(event.sender)
     const options = {
-      title: kind === 'image' ? 'Choose a picture' : kind === 'video' ? 'Choose a video' : 'Choose a picture or a clip',
+      title: kind === 'image' ? t('llm.main.choosePicture') : kind === 'video' ? t('llm.main.chooseVideo') : t('llm.main.choosePictureOrClip'),
       properties: ['openFile' as const],
       filters: [
         kind === 'image'
-          ? { name: 'Pictures', extensions: ['png', 'webp', 'jpg', 'jpeg', 'gif'] }
+          ? { name: t('llm.main.pictures'), extensions: ['png', 'webp', 'jpg', 'jpeg', 'gif'] }
           : kind === 'video'
-            ? { name: 'Videos', extensions: ['mp4', 'webm'] }
-            : { name: 'Pictures and clips', extensions: ['png', 'webp', 'jpg', 'jpeg', 'gif', 'mp4', 'webm'] }
+            ? { name: t('llm.main.videos'), extensions: ['mp4', 'webm'] }
+            : { name: t('llm.main.picturesAndClips'), extensions: ['png', 'webp', 'jpg', 'jpeg', 'gif', 'mp4', 'webm'] }
       ]
     }
     // A test or a script can name the file outright instead of going through the dialog.
@@ -314,7 +413,7 @@ function registerIpc(
   /** Where one of the content's pictures is on disk, by its path; never outside the content. */
   const pictureFile = (path: string): string => {
     const file = resolveContentPath(packDir, `${CONTENT_SCHEME}://pack/${path.split('/').map(encodeURIComponent).join('/')}`, info.addonDir)
-    if (!file || !existsSync(file)) throw new Error(`There is no picture at ${path}.`)
+    if (!file || !existsSync(file)) throw new Error(t('llm.main.noPicture', { path }))
     return file
   }
   ipcMain.handle(IPC.editorReadPicture, (_event, raw: unknown): Uint8Array => readFileSync(pictureFile(z.string().min(1).parse(raw))))
@@ -323,7 +422,7 @@ function registerIpc(
     const source = pictureFile(path)
     // It has to be a WebP: "RIFF", its length, "WEBP".
     if (bytes.length < 12 || Buffer.from(bytes.subarray(0, 4)).toString('latin1') !== 'RIFF' || Buffer.from(bytes.subarray(8, 12)).toString('latin1') !== 'WEBP') {
-      throw new Error('That is not a WebP.')
+      throw new Error(t('llm.main.notWebp'))
     }
     // Beside the original: in the add-on folder at the same place, which for the game's own files being edited is the original's own folder.
     const own = info.assetPrefix !== '' && path.startsWith(info.assetPrefix)
@@ -332,7 +431,7 @@ function registerIpc(
     let rel = `${stem}.webp`
     for (let n = 2; existsSync(join(root, rel)); n++) rel = `${stem}-${n}.webp`
     const target = resolve(root, rel)
-    if (!target.startsWith(root + sep)) throw new Error('That picture is not in the content.')
+    if (!target.startsWith(root + sep)) throw new Error(t('llm.main.notInContent'))
     mkdirSync(dirname(target), { recursive: true })
     writeFileSync(target, bytes)
     // The original is deleted once nothing names it, and only if it is the editor's to delete: never the game's own while an add-on is edited.
@@ -345,7 +444,7 @@ function registerIpc(
   ipcMain.handle(IPC.comfySaveSettings, (_event, raw: unknown) => comfy.update(raw, info.base))
   ipcMain.handle(IPC.comfyTest, async (_event, raw: unknown): Promise<ComfyTestResult> => {
     const { url, problem } = normaliseComfyUrl(z.string().parse(raw))
-    return url === null ? { ok: false, message: problem ?? 'That is not an address.', device: null } : testComfy(url)
+    return url === null ? { ok: false, message: problem ?? t('llm.main.notAddress'), device: null } : testComfy(url)
   })
   // The game's own workflows, which are what is run: nobody points the game at a folder of them.
   ipcMain.handle(IPC.comfyWorkflows, () => listWorkflows(bundleDir(packDir), comfy.get().overrides))
@@ -360,12 +459,12 @@ function registerIpc(
   ipcMain.handle(IPC.comfyDownloads, () => downloadList())
   ipcMain.handle(IPC.comfyChooseModelsDir, async (event): Promise<ComfyDownloadList> => {
     const window = BrowserWindow.fromWebContents(event.sender)
-    const options = { title: 'Choose your ComfyUI folder, or the models folder inside it', properties: ['openDirectory' as const] }
+    const options = { title: t('llm.main.chooseComfyFolder'), properties: ['openDirectory' as const] }
     const picked = await (window ? dialog.showOpenDialog(window, options) : dialog.showOpenDialog(options))
     const dir = picked.canceled ? undefined : picked.filePaths[0]
     if (!dir) return downloadList()
     const found = findModelsDir(dir)
-    if (!found) throw new Error(`No models folder was found in ${dir}. Pick the folder ComfyUI is installed in, or its models folder.`)
+    if (!found) throw new Error(t('llm.main.noModelsFolder', { dir }))
     comfy.update({ ...comfy.get(), modelsDir: found })
     return downloadList()
   })
@@ -379,9 +478,9 @@ function registerIpc(
     const file = z.string().parse(raw)
     const model = readDownloads(packDir).models.find((m) => m.file === file)
     const { modelsDir } = comfy.get()
-    if (!model) return { ok: false, file, message: 'That is not one of the files listed.' }
-    if (!modelsDir) return { ok: false, file, message: 'Choose your ComfyUI folder first, so that the game knows where models go.' }
-    if (downloading) return { ok: false, file, message: 'Another download is still running.' }
+    if (!model) return { ok: false, file, message: t('llm.main.notListed') }
+    if (!modelsDir) return { ok: false, file, message: t('llm.main.comfyFolderFirst') }
+    if (downloading) return { ok: false, file, message: t('llm.main.downloadRunning') }
     const mine = new AbortController()
     downloading = mine
     try {
@@ -463,13 +562,13 @@ function registerIpc(
     IPC.testConnection,
     async (_event, raw: unknown): Promise<TestConnectionResponse> => {
       const profile = settings.get()[z.enum(LLM_PROFILE_IDS).parse(raw)]
-      if (!isConfigured(profile)) return { ok: false, message: 'Base URL and model are required.' }
+      if (!isConfigured(profile)) return { ok: false, message: t('llm.main.urlAndModel') }
       try {
         const reply = await chatCompletion(profile, {
-          system: 'This is a connection test.',
-          messages: [{ role: 'user', content: 'Reply with the single word OK.' }]
+          system: t('llm.main.testSystem'),
+          messages: [{ role: 'user', content: t('llm.main.testUser') }]
         })
-        return { ok: true, message: `Connected. The model replied: ${reply.slice(0, 80)}` }
+        return { ok: true, message: t('llm.main.connected', { reply: reply.slice(0, 80) }) }
       } catch (error) {
         return { ok: false, message: (error as Error).message }
       }
@@ -513,6 +612,7 @@ function registerIpc(
       comfort: scene.comfort,
       gifts: scene.gifts,
       presents: scene.presents,
+      strangers: unnamedIn(cast, scene),
       pendingProposal: scene.proposal && scene.proposal.time > state.time ? scene.proposal : undefined,
       // Everything said in the scene: lore that has come up stays for the rest of it.
       recentText: scene.messages.map((m) => m.content).join('\n')
@@ -535,15 +635,15 @@ function registerIpc(
           movedTo = destination.id
           movedPlace = destination.locationId
           // A room is named with what it is like after a colon: only its name is said.
-          moving(`Going to ${destination.name.split(':')[0]}`)
+          moving(t('llm.main.goingTo', { place: destination.name.split(':')[0] }))
           // A plan made a moment ago for the place they are now going to is the same thing asked for twice: the going is kept.
           if (proposal?.locationId === destination.locationId) proposal = undefined
           hoursPassed = hours
           // Whoever is left behind when the scene moves on is out of it, with no hard feelings unless she said otherwise.
-          if (stayingIds.length > 0 && !left) left = { ids: stayingIds, feeling: 'content', reason: 'stayed behind when the others left' }
+          if (stayingIds.length > 0 && !left) left = { ids: stayingIds, feeling: 'content', reason: t('llm.main.stayedBehind') }
         }, (next, withIds) => {
           walkTo = { withIds }
-          moving(`Going to ${content.locations.find((l) => l.id === next.locationId)?.name ?? next.title}`)
+          moving(t('llm.main.goingTo', { place: content.locations.find((l) => l.id === next.locationId)?.name ?? next.title }))
         })
     const { reply, profileId } = await completeWithFallback(settings.get(), scene.nsfw, {
       system: systemPrompt,
@@ -667,7 +767,7 @@ function registerIpc(
     // The content as this game reads it, with the player's name where the content wrote the token.
     const content = readBy(state)
     const profile = settings.get().main
-    if (!isConfigured(profile)) throw new Error(NOT_CONFIGURED)
+    if (!isConfigured(profile)) throw new Error(notConfigured())
 
     const { system, user } = buildEventPrompt({ content, state })
     const reply = await chatCompletion(profile, {
@@ -708,8 +808,8 @@ function registerIpc(
       // where it cannot be passed over for the weather or the hour: a reply is to that, and to nothing else.
       const said = [...thread].reverse().find((one) => one.from === 'player')?.text
       const cue = unprompted
-        ? `(Write your message now, between ${DM_OPEN} and ${DM_CLOSE}.)`
-        : `(${state.player.name} has just messaged you${said ? `: "${said}"` : ''}. Write your answer to that, in keeping with what the two of you have already said in this thread, between ${DM_OPEN} and ${DM_CLOSE}.)`
+        ? t('llm.main.cueUnprompted', { open: DM_OPEN, close: DM_CLOSE })
+        : t('llm.main.cueReply', { player: state.player.name, hasSaid: Boolean(said), said, open: DM_OPEN, close: DM_CLOSE })
       const { reply } = await completeWithFallback(settings.get(), false, {
         system,
         messages: [{ role: 'user', content: cue }],
@@ -723,7 +823,7 @@ function registerIpc(
       const goable = attendableEvents(content, state)
       const attending = npc ? [] : read.attending.flatMap((one) => (goable.some((e) => e.id.toLowerCase() === one.eventId) ? [{ eventId: goable.find((e) => e.id.toLowerCase() === one.eventId)!.id, ids: [loveInterestId] }] : []))
       // An invitation has to name a time the game has checked.
-      if (invite && news === undefined && !proposal) throw new Error('The note did not settle on a time.')
+      if (invite && news === undefined && !proposal) throw new Error(t('llm.main.noTime'))
       return { text: text || '...', proposal, revealed: told, excused, attending: attending.length > 0 ? attending : undefined }
     } catch (error) {
       if (!unprompted) throw error
@@ -742,8 +842,8 @@ function registerIpc(
     const content = readBy(state)
     const planned = plans.filter((plan) => content.loveInterests.some((li) => li.id === plan.authorId))
     const profile = settings.get().main
-    if (!isConfigured(profile)) return { drafts: [], error: NOT_CONFIGURED }
-    if (!comfyReady()) return { drafts: [], error: 'ComfyUI is not set up.' }
+    if (!isConfigured(profile)) return { drafts: [], error: notConfigured() }
+    if (!comfyReady()) return { drafts: [], error: t('llm.main.comfyNotSet') }
     if (planned.length === 0) return { drafts: [] }
     try {
       const { system, user } = buildFeedPrompt(content, state, planned)
@@ -878,24 +978,28 @@ app.whenReady().then(() => {
   // field that leaves the browser's own checking off would never wake it.
   session.defaultSession.setSpellCheckerEnabled(true)
   const addonDir = join(app.getPath('userData'), 'addons')
+  const settings = new SettingsStore(join(app.getPath('userData'), 'settings.json'), keyCipher())
+  const inLanguage = useLanguage(settings.get().language)
   let loaded: { content: ContentPack; info: EditorInfo }
   try {
     // Run from its source, the game is being written: the editor changes the base game itself, and add-ons are left out of it.
     // (BREEDHAVEN_ADDONS=1 runs it as a player has it, add-ons and all.) A packaged game keeps what the user makes apart, as add-ons.
     const authoring = !app.isPackaged && process.env['BREEDHAVEN_ADDONS'] !== '1'
-    loaded = authoring ? loadBase(contentDir()) : loadWithAddons(contentDir(), addonDir)
+    const { languageDir } = inLanguage
+    loaded = authoring ? loadBase(contentDir(), languageDir) : loadWithAddons(contentDir(), addonDir, languageDir)
+    // A player's own characters keep their classes across an update of the game: a term laid out before it is laid out again.
+    if (!authoring && rebuildCatalogue(contentDir(), addonDir, loaded.content, false)) loaded = loadWithAddons(contentDir(), addonDir, languageDir)
   } catch (error) {
-    dialog.showErrorBox('Could not load game content', (error as Error).message)
+    dialog.showErrorBox(t('llm.main.loadFailed'), (error as Error).message)
     app.quit()
     return
   }
 
   serveContentAssets(contentDir(), addonDir)
-  const settings = new SettingsStore(join(app.getPath('userData'), 'settings.json'), keyCipher())
   const saves = new SaveStore(join(app.getPath('userData'), 'saves'))
   const comfy = new ComfyStore(join(app.getPath('userData'), 'comfy.json'), contentDir())
   const civitaiKey = new CivitaiKeyStore(join(app.getPath('userData'), 'civitai.json'), keyCipher())
-  registerIpc(loaded, contentDir(), settings, saves, comfy, civitaiKey, addonDir)
+  registerIpc(loaded, contentDir(), settings, saves, comfy, civitaiKey, addonDir, inLanguage)
   createWindow()
 
   app.on('activate', () => {

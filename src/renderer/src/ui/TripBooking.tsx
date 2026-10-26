@@ -5,6 +5,7 @@ import { Button } from './Button'
 import { Overlay } from './Dialog'
 import { HeartIcon } from './icons'
 import { Portrait } from './Portrait'
+import { t } from '../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -54,14 +55,14 @@ export function TripBooking({ content, state, booking, onBook, onSkip }: Props) 
             <div className="trip-listing-head">
               <h1>{place?.name ?? trip?.name}</h1>
               {booking.rating !== undefined && (
-                <span className="trip-rating" title={`${booking.rating} out of 5`}>
+                <span className="trip-rating" title={t('panels.tripBooking.rating', { rating: booking.rating })}>
                   {'★'.repeat(Math.round(booking.rating))}
                   <b>{booking.rating.toFixed(1)}</b>
                 </span>
               )}
             </div>
             <p className="trip-meta">
-              {trip?.name} · {trip?.durationDays} days, {nights} nights
+              {t('panels.tripBooking.meta', { name: trip?.name, days: trip?.durationDays, nights })}
             </p>
             {booking.blurb && <p className="trip-blurb">{booking.blurb}</p>}
             <ul className="trip-highlights">
@@ -75,7 +76,7 @@ export function TripBooking({ content, state, booking, onBook, onSkip }: Props) 
           </section>
 
           <aside className="trip-who">
-            <h2>Who's coming</h2>
+            <h2>{t('panels.tripBooking.whoComing')}</h2>
             <div className="trip-who-list">
               {choices.map((li) => {
                 const chosen = taking.includes(li.id)
@@ -87,7 +88,7 @@ export function TripBooking({ content, state, booking, onBook, onSkip }: Props) 
                   </button>
                 )
               })}
-              {choices.length === 0 && <p className="hint">Nobody you are dating yet.</p>}
+              {choices.length === 0 && <p className="hint">{t('panels.tripBooking.nobody')}</p>}
             </div>
             <dl className="trip-price">
               <dt>
@@ -96,9 +97,9 @@ export function TripBooking({ content, state, booking, onBook, onSkip }: Props) 
               <dd>${tripCost(booking, taking)}</dd>
             </dl>
             <Button variant="primary" disabled={!check.ok} title={check.reasons.join(' · ') || undefined} onClick={() => onBook(taking)}>
-              Book
+              {t('panels.tripBooking.book')}
             </Button>
-            <Button onClick={onSkip}>Not this time</Button>
+            <Button onClick={onSkip}>{t('panels.tripBooking.skip')}</Button>
           </aside>
         </div>
       </div>

@@ -5,6 +5,7 @@ import { isGameOver, toDate } from './calendar'
 import { addNote, giveContact } from './courier'
 import { fillHousingText, moveIn } from './housing'
 import { sceneBaseline } from './scene'
+import { t } from '../i18n'
 
 /**
  * Being shown the house. Saying yes to the Office does not put the keys in his hand: the housing officer sets an hour
@@ -45,7 +46,7 @@ export function scheduleViewing(content: ContentPack, state: GameState): GameSta
     if (best?.cost === 0) break
   }
   if (!best || isGameOver(content.calendar, best.time)) return cleared
-  const plan: Appointment = { id: VIEWING_ID, kind: 'viewing', loveInterestId: config.officerId, companionIds: [], title: `Viewing of ${config.name}`, time: best.time, hours, locationId: meetLocationId }
+  const plan: Appointment = { id: VIEWING_ID, kind: 'viewing', loveInterestId: config.officerId, companionIds: [], title: t('scene.viewing.title', { house: config.name }), time: best.time, hours, locationId: meetLocationId }
   const place = content.locations.find((l) => l.id === meetLocationId)?.name ?? meetLocationId
   const text = fillHousingText(config, missed ? config.viewing.missedText : config.viewing.text, { date: describeWhen(content, best.time), place })
   return addNote(giveContact({ ...cleared, appointments: [...cleared.appointments, plan].sort((a, b) => a.time - b.time) }, config.officerId), config.officerId, { from: 'them', text, read: false })
@@ -59,7 +60,7 @@ export function attendViewing(content: ContentPack, state: GameState, appointmen
   const config = content.housing
   if (!config) throw new Error('There is no house to be shown.')
   const { state: kept } = keepAppointment(content, state, appointmentId)
-  const officer = content.npcs.find((npc) => npc.id === config.officerId)?.name ?? 'The housing officer'
+  const officer = content.npcs.find((npc) => npc.id === config.officerId)?.name ?? t('scene.viewing.officer')
   const player = state.player.name
   // He is at the house when the scene opens, and it is his: what the pack makes of that is the caller's to read afresh.
   const moved = { ...moveIn(content, kept), locationId: config.locationId, inOwnRoom: false }
@@ -74,13 +75,10 @@ export function attendViewing(content: ContentPack, state: GameState, appointmen
       guideId: config.officerId,
       beats: [
         {
-          activityName: `Being shown ${config.name}`,
+          activityName: t('scene.viewing.activity', { house: config.name }),
           locationName: config.name,
-          description: `${officer} has walked you through ${config.name} room by room, keys in hand, and brings you back to the hearth room, where the nanny is waiting to meet you.`,
-          direction:
-            `This is the hour ${player} is given ${config.name}. ${officer}, the housing officer of the Sire Relations Office, has just shown him round it: which rooms are furnished, which stand bare for him to build, ` +
-            `where the wards are, and the terms of the rent. She has introduced you, the nanny who lives in the house, and you have told him how the children are looked after here and what makes a child thrive. You are meeting ${player} for the first time, in what is now his home and yours. ` +
-            `${officer} is here and speaks for herself, exact and brief, and leaves once his questions are answered. Stay in the house: do not move the scene anywhere.`
+          description: t('scene.viewing.description', { officer, house: config.name }),
+          direction: t('scene.viewing.direction', { player, house: config.name, officer })
         }
       ],
       messages: [],

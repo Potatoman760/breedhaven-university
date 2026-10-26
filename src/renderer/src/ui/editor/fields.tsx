@@ -1,9 +1,11 @@
 import type { ReactNode } from 'react'
+import { METERS, STAT_LABELS, STATS, type Condition, type ContentPack, type Meter } from '../../../../shared/model'
 import { Button } from '../Button'
+import { t, type MessageKey } from '../../../../shared/i18n'
 
 /** Beside a field's label: what is written there is given to the LLM. Said once, in a word, in place of a sentence under every field. */
 export function LlmMark() {
-  return <span className="llm-mark">(sent to LLM)</span>
+  return <span className="llm-mark">{t('editor.fields.llmMark')}</span>
 }
 
 interface TextProps {
@@ -100,7 +102,7 @@ interface PickProps<T extends string> {
  * pills, each with a cross to take it off again, and a dropdown adds another from the
  * ones that are left.
  */
-export function PickList<T extends string>({ label, llm, addLabel = 'Add...', options, value, onChange, hint, max }: PickProps<T>) {
+export function PickList<T extends string>({ label, llm, addLabel = t('editor.fields.add'), options, value, onChange, hint, max }: PickProps<T>) {
   const full = max !== undefined && value.length >= max
   const picked = value.flatMap((id) => options.filter((option) => option.id === id))
   const left = options.filter((option) => !value.includes(option.id))
@@ -114,7 +116,7 @@ export function PickList<T extends string>({ label, llm, addLabel = 'Add...', op
         {picked.map((option) => (
           <span key={option.id} className="pill" title={option.title}>
             {option.name}
-            <button type="button" aria-label={`Remove ${option.name}`} title={`Remove ${option.name}`} onClick={() => onChange(value.filter((id) => id !== option.id))}>
+            <button type="button" aria-label={t('editor.common.removeNamed', { name: option.name })} title={t('editor.common.removeNamed', { name: option.name })} onClick={() => onChange(value.filter((id) => id !== option.id))}>
               ×
             </button>
           </span>
@@ -126,7 +128,7 @@ export function PickList<T extends string>({ label, llm, addLabel = 'Add...', op
           disabled={left.length === 0 || full}
           onChange={(e) => e.target.value && onChange([...value, e.target.value as T])}
         >
-          <option value="">{full ? `No more than ${max}` : left.length === 0 ? 'Nothing left to add' : addLabel}</option>
+          <option value="">{full ? t('editor.fields.noMoreThan', { max }) : left.length === 0 ? t('editor.fields.nothingLeft') : addLabel}</option>
           {left.map((option) => (
             <option key={option.id} value={option.id}>
               {option.name}
@@ -205,11 +207,133 @@ export function EditorFoot({ issues, status, busy, dirty, canSave = true, onUndo
         </Button>
       )}
       <Button disabled={!dirty || busy} onClick={onUndo}>
-        Undo changes
+        {t('editor.fields.undo')}
       </Button>
       <Button variant="primary" disabled={!dirty || busy || !canSave} onClick={onSave}>
-        {busy ? 'Saving...' : 'Save'}
+        {busy ? t('editor.common.saving') : t('editor.common.save')}
       </Button>
+    </div>
+  )
+}
+
+// The kinds of condition a secret can wait on, as the list offers them.
+const CONDITION_KINDS: { type: Condition['type']; label: MessageKey }[] = [
+  { type: 'stage', label: 'editor.fields.conditionStage' },
+  { type: 'meter', label: 'editor.fields.conditionMeter' },
+  { type: 'pregnant', label: 'editor.fields.conditionPregnant' },
+  { type: 'event', label: 'editor.fields.conditionEvent' },
+  { type: 'day', label: 'editor.fields.conditionDay' },
+  { type: 'stat', label: 'editor.fields.conditionStat' },
+  { type: 'flag', label: 'editor.fields.conditionFlag' }
+]
+
+/** A condition of a kind, as it starts when picked: the first of whatever it names. */
+function startingCondition(content: ContentPack, type: Condition['type']): Condition {
+  switch (type) {
+    case 'stage':
+      return { type, min: content.relationships.stages.at(-2)?.id ?? content.relationships.stages[0].id }
+    case 'meter':
+      return { type, meter: 'affection', min: 50 }
+    case 'pregnant':
+      return { type, value: true }
+    case 'event':
+      return { type, eventId: content.calendar.events[0]?.id ?? '' }
+    case 'day':
+      return { type, min: 1 }
+    case 'stat':
+      return { type, stat: STATS[0], min: 12 }
+    case 'flag':
+      return { type, flag: '', value: true }
+    case 'money':
+      return { type, min: 0 }
+    case 'energy':
+      return { type, min: 0 }
+  }
+}
+
+interface ConditionsProps {
+  content: ContentPack
+  label: string
+  value: Condition[]
+  onChange: (value: Condition[]) => void
+  hint?: string
+}
+
+/** What must be so before something happens: each condition a row, all of them needed. None, and it happens freely. */
+export function ConditionsField({ content, label, value, onChange, hint }: ConditionsProps) {
+  const setAt = (index: number, next: Condition) => onChange(value.map((one, i) => (i === index ? next : one)))
+  const number = (text: string) => Math.floor(Number(text)) || 0
+  return (
+    <div className="field">
+      <span className="field-label">{label}</span>
+      {value.map((condition, index) => (
+        <div key={index} className="row checks">
+          <select value={condition.type} onChange={(e) => setAt(index, startingCondition(content, e.target.value as Condition['type']))}>
+            {CONDITION_KINDS.map((kind) => (
+              <option key={kind.type} value={kind.type}>
+                {t(kind.label)}
+              </option>
+            ))}
+          </select>
+          {condition.type === 'stage' && (
+            <select value={condition.min} onChange={(e) => setAt(index, { ...condition, min: e.target.value })}>
+              {content.relationships.stages.map((stage) => (
+                <option key={stage.id} value={stage.id}>
+                  {stage.name}
+                </option>
+              ))}
+            </select>
+          )}
+          {condition.type === 'meter' && (
+            <>
+              <select value={condition.meter} onChange={(e) => setAt(index, { ...condition, meter: e.target.value as Meter })}>
+                {METERS.map((meter) => (
+                  <option key={meter} value={meter}>
+                    {meter}
+                  </option>
+                ))}
+              </select>
+              <input type="number" min={0} max={content.relationships.meterMax} value={condition.min} onChange={(e) => setAt(index, { ...condition, min: number(e.target.value) })} />
+            </>
+          )}
+          {condition.type === 'pregnant' && (
+            <label className="row checks">
+              <input type="checkbox" checked={condition.value} onChange={(e) => setAt(index, { ...condition, value: e.target.checked })} />
+              {condition.value ? t('editor.fields.is') : t('editor.fields.isNot')}
+            </label>
+          )}
+          {condition.type === 'event' && (
+            <select value={condition.eventId} onChange={(e) => setAt(index, { ...condition, eventId: e.target.value })}>
+              {content.calendar.events.map((event) => (
+                <option key={event.id} value={event.id}>
+                  {event.name}
+                </option>
+              ))}
+            </select>
+          )}
+          {condition.type === 'day' && <input type="number" min={1} value={condition.min ?? 1} onChange={(e) => setAt(index, { ...condition, min: Math.max(1, number(e.target.value)) })} />}
+          {condition.type === 'stat' && (
+            <>
+              <select value={condition.stat} onChange={(e) => setAt(index, { ...condition, stat: e.target.value })}>
+                {STATS.map((stat) => (
+                  <option key={stat} value={stat}>
+                    {STAT_LABELS[stat]}
+                  </option>
+                ))}
+              </select>
+              <input type="number" min={0} value={condition.min ?? 0} onChange={(e) => setAt(index, { ...condition, min: number(e.target.value) })} />
+            </>
+          )}
+          {condition.type === 'flag' && <input value={condition.flag} placeholder={t('editor.fields.flag')} onChange={(e) => setAt(index, { ...condition, flag: e.target.value.trim() })} />}
+          <Button variant="quiet" size="small" onClick={() => onChange(value.filter((_, i) => i !== index))}>
+            {t('editor.common.remove')}
+          </Button>
+        </div>
+      ))}
+      <Button size="small" onClick={() => onChange([...value, startingCondition(content, 'stage')])}>
+        {t('editor.fields.addCondition')}
+      </Button>
+      {hint && <span className="hint">{hint}</span>}
     </div>
   )
 }

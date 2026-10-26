@@ -3,6 +3,7 @@ import type { PerformCheck } from './activities'
 import { stageFor, stageRank } from './relationships'
 import { factor } from './modifiers'
 import { firstNames } from './scene'
+import { t } from '../i18n'
 
 // What sharing a scene does for how two love interests feel about each other.
 const SCENE_TIE_GAIN = 5
@@ -56,21 +57,21 @@ export function statusOf(content: ContentPack, bond: Pick<Bond, 'statusId'> | un
  */
 export function canBond(content: ContentPack, state: GameState, proposal: BondProposal): PerformCheck {
   const status = statusOf(content, proposal)
-  if (!status) return { ok: false, reasons: [`There is no arrangement called "${proposal.statusId}"`] }
+  if (!status) return { ok: false, reasons: [t('scene.bonds.noStatus', { id: proposal.statusId })] }
   const ids = [...new Set(proposal.memberIds)]
   const reasons: string[] = []
   const name = (id: string) => firstNames(content, [id])
 
-  if (ids.some((id) => !content.loveInterests.some((li) => li.id === id))) reasons.push('Someone named is not known')
+  if (ids.some((id) => !content.loveInterests.some((li) => li.id === id))) reasons.push(t('scene.bonds.unknown'))
   if (ids.length < status.minMembers || ids.length > status.maxMembers) {
-    const wanted = status.minMembers === status.maxMembers ? `${status.minMembers}` : `${status.minMembers} to ${status.maxMembers}`
-    reasons.push(`${status.name} is between ${state.player.name} and ${wanted} other${status.maxMembers === 1 ? '' : 's'}`)
+    const wanted = status.minMembers === status.maxMembers ? `${status.minMembers}` : t('scene.bonds.range', { min: status.minMembers, max: status.maxMembers })
+    reasons.push(t('scene.bonds.size', { status: status.name, player: state.player.name, wanted, max: status.maxMembers }))
   }
   if (status.mutual) {
     for (let i = 0; i < ids.length; i++) {
       for (let j = i + 1; j < ids.length; j++) {
         if (tieOf(content, state, ids[i], ids[j]) < status.minTie) {
-          reasons.push(`${name(ids[i])} and ${name(ids[j])} are not close enough to each other yet`)
+          reasons.push(t('scene.bonds.notClose', { a: name(ids[i]), b: name(ids[j]) }))
         }
       }
     }
@@ -79,10 +80,10 @@ export function canBond(content: ContentPack, state: GameState, proposal: BondPr
   const outside = state.bonds.filter((bond) => !bond.memberIds.every((id) => ids.includes(id)))
   const promised = outside.filter((bond) => statusOf(content, bond)?.exclusive)
   for (const bond of promised) {
-    reasons.push(`${state.player.name} has promised to see only ${firstNames(content, bond.memberIds)}`)
+    reasons.push(t('scene.bonds.promised', { player: state.player.name, names: firstNames(content, bond.memberIds) }))
   }
   if (status.exclusive && outside.length > 0) {
-    reasons.push(`${state.player.name} is also with ${firstNames(content, outside.flatMap((b) => b.memberIds))}, which ${status.name} would not allow`)
+    reasons.push(t('scene.bonds.exclusive', { player: state.player.name, names: firstNames(content, outside.flatMap((b) => b.memberIds)), status: status.name }))
   }
   return { ok: reasons.length === 0, reasons }
 }
@@ -143,9 +144,13 @@ export const END_BOND = 'none'
 
 /** "Open throuple with Faye and Seraphine", for the player to read. */
 export function describeBond(content: ContentPack, bond: Pick<Bond, 'statusId' | 'memberIds'>): string {
-  const status = statusOf(content, bond)
   const who = firstNames(content, bond.memberIds)
-  return bond.statusId === END_BOND ? `End things with ${who}` : `${status?.name ?? bond.statusId} with ${who}`
+  return bond.statusId === END_BOND ? t('scene.bonds.end', { who }) : t('scene.bonds.with', { status: bondName(content, bond), who })
+}
+
+/** "Open throuple", or the ending of one, without who it is with. */
+export function bondName(content: ContentPack, bond: Pick<Bond, 'statusId'>): string {
+  return bond.statusId === END_BOND ? t('scene.bonds.endName') : (statusOf(content, bond)?.name ?? bond.statusId)
 }
 
 /**
@@ -161,23 +166,20 @@ export function describeBonds(content: ContentPack, state: GameState, loveIntere
   const partners = bond?.memberIds.filter((id) => id !== loveInterestId) ?? []
 
   if (bond && status) {
-    lines.push(`You and ${name} are in a relationship: ${status.name}. ${status.description} ${status.guidance}`.trim())
+    lines.push(t('scene.bonds.inBond', { player: name, status: status.name, description: status.description, guidance: status.guidance }).trim())
     if (partners.length > 0) {
-      lines.push(
-        `${firstNames(content, partners)} ${partners.length > 1 ? 'are' : 'is'} part of it too` +
-          (status.mutual ? `: you are with ${partners.length > 1 ? 'them' : 'her'} as well as with ${name}.` : '.')
-      )
+      lines.push(t('scene.bonds.partners', { names: firstNames(content, partners), count: partners.length, mutual: status.mutual, player: name }))
     }
     if (!status.exclusive) {
       const elsewhere = state.bonds.filter((other) => other !== bond).flatMap((other) => other.memberIds)
       lines.push(
         elsewhere.length > 0
-          ? `You know ${name} is also with ${firstNames(content, elsewhere)}, and that is within what you agreed.`
-          : `${name} is free to see others under what you agreed, though you know of nobody else at present.`
+          ? t('scene.bonds.alsoWith', { player: name, names: firstNames(content, elsewhere) })
+          : t('scene.bonds.free', { player: name })
       )
     }
   } else if (content.relationships.statuses.length > 0) {
-    lines.push(`You and ${name} have made each other no promises.`)
+    lines.push(t('scene.bonds.none', { player: name }))
   }
 
   // Feelings about the others: partners, anyone here now, and anyone they have come to know.
@@ -188,7 +190,7 @@ export function describeBonds(content: ContentPack, state: GameState, loveIntere
     const note = content.relationships.ties.find((t) => tieKey(t.a, t.b) === tieKey(loveInterestId, other.id))?.note
     const relevant = partners.includes(other.id) || alsoPresent.includes(other.id) || value > 0 || note
     if (!relevant || !level) continue
-    lines.push([`You and ${other.name.split(' ')[0]}: ${level.name}.`, level.description, note].filter(Boolean).join(' '))
+    lines.push([t('scene.bonds.tie', { first: other.name.split(' ')[0], level: level.name }), level.description, note].filter(Boolean).join(' '))
   }
   return lines
 }

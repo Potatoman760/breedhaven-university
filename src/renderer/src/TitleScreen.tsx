@@ -9,6 +9,7 @@ import { useVolumes } from './sound'
 import { Overlay } from './ui/Dialog'
 import { describeSave, SavesPanel } from './SavesPanel'
 import { SettingsPanel } from './SettingsPanel'
+import { t } from '../../shared/i18n'
 
 // Where it is remembered that the player turned the menu's music off.
 const MUSIC_OFF = 'breedhaven.menuMusicOff'
@@ -81,29 +82,29 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
     <main className="title">
       <audio ref={player} src={music} autoPlay loop muted={muted} />
       <button type="button" className="quiet title-music" aria-pressed={!muted} onClick={toggleMusic}>
-        Music: {muted ? 'off' : 'on'}
+        {t('shell.title.music', { on: !muted })}
       </button>
       <div className="title-frame">
         {/* The game's name, as its own picture, at the head of the menu. */}
-        <img className="title-logo" src={titleArt} alt="Breedhaven University" />
+        <img className="title-logo" src={titleArt} alt={t('shell.common.gameTitle')} />
 
         <div className="menu">
           <button className="continue" disabled={!latest} onClick={resume}>
-            Continue
+            {t('shell.title.continue')}
             {latest && <span>{describeSave(content, latest)}</span>}
           </button>
           <button className="secondary" onClick={openNew}>
-            New Game
+            {t('shell.title.newGame')}
           </button>
           <button className="secondary" disabled={saves.length === 0} onClick={() => setPanel('load')}>
-            Load
+            {t('shell.title.load')}
           </button>
           <button className="secondary" onClick={() => setPanel('settings')}>
-            Settings
+            {t('shell.title.settings')}
           </button>
-          {import.meta.env.DEV && onEdit && (
+          {onEdit && (
             <button className="quiet" onClick={onEdit}>
-              Edit game content
+              {t('shell.title.edit')}
             </button>
           )}
         </div>
@@ -115,20 +116,20 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
         <Overlay onClose={() => setPanel(null)}>
           <form className="dialog" onSubmit={startNew}>
             <div className="dialog-head">
-              <h1>New game</h1>
+              <h1>{t('shell.title.newGameTitle')}</h1>
             </div>
             <label>
-              Your name
+              {t('shell.title.yourName')}
               <input value={name} onChange={(e) => setName(e.target.value)} autoFocus />
             </label>
             <label>
-              About you
+              {t('shell.title.aboutYou')}
               <span className="new-game-bio">{content.newGame.player.bio.split(PLAYER_TOKEN).join(name.trim() || content.newGame.player.name)}</span>
-              <textarea rows={3} value={about} placeholder="Anything more about you" title={`Told to everyone you meet, after the lines above. Write ${PLAYER_TOKEN} for your name.`} onChange={(e) => setAbout(e.target.value)} />
+              <textarea rows={3} value={about} placeholder={t('shell.title.aboutPlaceholder')} title={t('shell.title.aboutTip', { token: PLAYER_TOKEN })} onChange={(e) => setAbout(e.target.value)} />
             </label>
             <div className="field">
               <span className="field-label">
-                Your stats · {left} of {POINT_BUY.pool} points left
+                {t('shell.title.stats', { left, pool: POINT_BUY.pool })}
               </span>
               <div className="ability-grid">
                 {STATS.map((stat) => {
@@ -143,15 +144,15 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
                         {describeModifier(score)} · {describeStat(score)}
                       </span>
                       <div className="ability-steps">
-                        <button type="button" className="secondary" disabled={!down} aria-label={`Lower ${STAT_LABELS[stat].toLowerCase()}`} onClick={() => setStats(adjustStat(stats, stat, -1))}>
+                        <button type="button" className="secondary" disabled={!down} aria-label={t('shell.title.lower', { stat: STAT_LABELS[stat].toLowerCase() })} onClick={() => setStats(adjustStat(stats, stat, -1))}>
                           −
                         </button>
                         <button
                           type="button"
                           className="secondary"
                           disabled={!up}
-                          aria-label={`Raise ${STAT_LABELS[stat].toLowerCase()}`}
-                          title={score < POINT_BUY.max ? `${pointCost(score + 1) - pointCost(score)} point${pointCost(score + 1) - pointCost(score) === 1 ? '' : 's'}` : 'As high as it starts'}
+                          aria-label={t('shell.title.raise', { stat: STAT_LABELS[stat].toLowerCase() })}
+                          title={score < POINT_BUY.max ? t('shell.title.cost', { n: pointCost(score + 1) - pointCost(score) }) : t('shell.title.maxed')}
                           onClick={() => setStats(adjustStat(stats, stat, 1))}
                         >
                           +
@@ -163,34 +164,27 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
               </div>
               <div className="ability-foot">
                 <button type="button" className="secondary" disabled={left === POINT_BUY.pool} onClick={() => setStats(startingStats())}>
-                  Start over
+                  {t('shell.title.startOver')}
                 </button>
-                <button type="button" className="secondary" title="Spend the whole pool at random" onClick={() => setStats(randomStats())}>
-                  Randomize
+                <button type="button" className="secondary" title={t('shell.title.randomizeTip')} onClick={() => setStats(randomStats())}>
+                  {t('shell.title.randomize')}
                 </button>
               </div>
             </div>
             {noCatalogue && (
-              <p className="notice">
-                The game's course catalogue is missing, so a new game cannot start.
-              </p>
+              <p className="notice">{t('shell.title.noCatalogue')}</p>
             )}
-            {/* A warning for whoever is writing the game: a built one ships a catalogue its tests have checked. */}
-            {import.meta.env.DEV && staleCatalogue && (
-              <p className="hint">The course catalogue was built before the characters last changed. Rebuild it with scripts/build-catalogue.ts.</p>
-            )}
+            {/* Saving in the editor lays the term out again; this is for a catalogue changed some other way. */}
+            {staleCatalogue && <p className="hint">{t('shell.title.staleCatalogue')}</p>}
             {hasAutosave && (
-              <p className="hint">
-                The autosave will be replaced as soon as you act in the new game. Saves in
-                numbered slots are kept.
-              </p>
+              <p className="hint">{t('shell.title.autosaveReplaced')}</p>
             )}
             <div className="actions">
               <button type="submit" disabled={noCatalogue}>
-                Start
+                {t('shell.title.start')}
               </button>
               <button type="button" className="secondary" onClick={() => setPanel(null)}>
-                Cancel
+                {t('shell.common.cancel')}
               </button>
             </div>
           </form>

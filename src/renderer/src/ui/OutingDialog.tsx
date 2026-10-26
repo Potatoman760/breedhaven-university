@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { checkOuting, describeOuting, describeWhen, firstNames, formatTime, outingHourRange, outingMisses, studyPoints, toDate, type Outing } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { Dialog } from './Dialog'
+import { t } from '../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -12,7 +13,7 @@ interface Props {
   onClose: () => void
 }
 
-const hours = (n: number) => `${n} hour${n === 1 ? '' : 's'}`
+const hours = (n: number) => t('screens.activityList.hours', { n })
 
 /** Confirms something the player typed to do, and says what is in the way if it can't happen yet. */
 export function OutingDialog({ content, state, outing: asked, onGo, onClose }: Props) {
@@ -35,14 +36,16 @@ export function OutingDialog({ content, state, outing: asked, onGo, onClose }: P
       {range && range.max > range.min && (
         <div className="outing-hours">
           <span className="hint">
-            {window ? `It runs from ${formatTime(toDate(content.calendar, window.from))} to ${formatTime(toDate(content.calendar, window.until))}. How long will you stay?` : 'How long?'}
+            {window
+              ? t('screens.outing.runs', { from: formatTime(toDate(content.calendar, window.from)), to: formatTime(toDate(content.calendar, window.until)) })
+              : t('screens.outing.howLong')}
           </span>
           <div className="stepper">
-            <button type="button" className="secondary" aria-label="An hour less" disabled={outing.hours <= 1} onClick={() => setStay(outing.hours - 1)}>
+            <button type="button" className="secondary" aria-label={t('screens.outing.hourLess')} disabled={outing.hours <= 1} onClick={() => setStay(outing.hours - 1)}>
               −
             </button>
             <strong>{hours(outing.hours)}</strong>
-            <button type="button" className="secondary" aria-label="An hour more" disabled={outing.hours >= mostHours} onClick={() => setStay(outing.hours + 1)}>
+            <button type="button" className="secondary" aria-label={t('screens.outing.hourMore')} disabled={outing.hours >= mostHours} onClick={() => setStay(outing.hours + 1)}>
               +
             </button>
           </div>
@@ -50,15 +53,15 @@ export function OutingDialog({ content, state, outing: asked, onGo, onClose }: P
       )}
       {outing.studyCourseId && (
         <p className="hint">
-          It is worth {studyPoints(content, outing)} points in the course{outing.ownRoom ? ', one of them for the quiet of your room' : ''}.
+          {t('screens.outing.worth', { points: studyPoints(content, outing), own: Boolean(outing.ownRoom) })}
         </p>
       )}
       {outing.withIds.length === 0 && !outing.dropIn && (
-        <p className="hint">{outing.ownRoom ? 'On your own, so this passes the time without a scene.' : 'Nobody was invited, so this passes the time without a scene.'}</p>
+        <p className="hint">{outing.ownRoom ? t('screens.outing.onYourOwn') : t('screens.outing.nobodyInvited')}</p>
       )}
       {missed.length > 0 && (
         <div className="notice">
-          <strong>You would miss:</strong>
+          <strong>{t('screens.outing.wouldMiss')}</strong>
           <ul className="blockers">
             {missed.map((line) => (
               <li key={line}>{line}</li>
@@ -76,29 +79,29 @@ export function OutingDialog({ content, state, outing: asked, onGo, onClose }: P
       )}
       {wait === undefined && (
         <p className="notice">
-          No time in the next day works for everyone. Ask them to make a plan for another day instead.
+          {t('screens.outing.noTime')}
         </p>
       )}
 
       <div className="outing-options">
         {wait === 0 && (
           <button autoFocus onClick={() => onGo(outing, 0)}>
-            {missed.length > 0 ? 'Go anyway' : 'Go'}
+            {missed.length > 0 ? t('screens.outing.goAnyway') : t('screens.dateDialog.go')}
           </button>
         )}
         {wait !== undefined && wait > 0 && (
           <button autoFocus onClick={() => onGo(outing, wait)}>
-            Wait {hours(wait)}, then go
-            <span className="hint">Until {describeWhen(content, state.time + wait)}</span>
+            {t('screens.outing.waitThenGo', { n: wait })}
+            <span className="hint">{t('screens.outing.until', { when: describeWhen(content, state.time + wait) })}</span>
           </button>
         )}
         {check.freeNow.length > 0 && (
           <button className="secondary" onClick={() => onGo({ ...outing, withIds: check.freeNow }, 0)}>
-            Go now with just {firstNames(content, check.freeNow)}
+            {t('screens.outing.goNowWith', { names: firstNames(content, check.freeNow) })}
           </button>
         )}
         <button className="secondary" onClick={onClose}>
-          Never mind
+          {t('screens.outing.neverMind')}
         </button>
       </div>
     </Dialog>

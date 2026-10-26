@@ -1,5 +1,4 @@
 import { Button } from "../Button";
-import { Lightbox } from "../Lightbox";
 import { useEffect, useState, type ReactNode } from "react";
 import {
   isSafeId,
@@ -8,7 +7,6 @@ import {
   type EditorResult,
 } from "../../../../shared/editor";
 import {
-  LIGHTS,
   kindOf,
   LOVE_INTEREST_KINDS,
   LoveInterestSchema,
@@ -23,13 +21,16 @@ import {
 } from "../../../../shared/model";
 import { errorMessage } from "../../errors";
 import { describeShift, handleOf } from "../../../../shared/game";
+import { eventOutfits } from "../../../../shared/game/events";
+import { RoomPictures } from "./RoomPictures";
+import { InstructionsPage } from "./InstructionsPage";
 import { Portrait } from "../Portrait";
-import { EditorFoot, PickList, Group, List, Text, LlmMark } from "./fields";
-import { ArtTool } from "../art/ArtTool";
+import { ConditionsField, EditorFoot, PickList, Group, List, Text, LlmMark } from "./fields";
 import { ComfyEditor } from "./ComfyEditor";
 import { NewCharacterDialog } from "./NewCharacterDialog";
 import { CatalogueEditor } from "./CatalogueEditor";
 import { JobsEditor } from "./JobsEditor";
+import { MajorsEditor } from "./MajorsEditor";
 import { SocietiesEditor } from "./SocietiesEditor";
 import { LocationEditor } from "./LocationEditor";
 import { PlayerEditor } from "./PlayerEditor";
@@ -37,6 +38,7 @@ import { ScheduleTab } from "./ScheduleTab";
 import { FamilyTab } from "./FamilyTab";
 import { SpritesTab } from "./SpritesTab";
 import { TraitsTab } from "./TraitsTab";
+import { t, type MessageKey } from "../../../../shared/i18n";
 
 interface Props {
   content: ContentPack;
@@ -47,6 +49,14 @@ interface Props {
 
 const TABS = ["Profile", "Traits", "Media", "Family", "Academics"] as const;
 type Tab = (typeof TABS)[number];
+// What each tab is called where it is shown: the names above are how the editor knows them.
+const TAB_LABELS: Record<Tab, MessageKey> = {
+  Profile: "editor.tabs.profile",
+  Traits: "editor.tabs.traits",
+  Media: "editor.tabs.media",
+  Family: "editor.tabs.family",
+  Academics: "editor.tabs.academics",
+};
 
 /** A character with nothing filled in, valid enough to be edited. */
 function blank(): LoveInterest {
@@ -81,10 +91,23 @@ function firstSubject(content: ContentPack, teaching: boolean): Studies {
 const same = (a: unknown, b: unknown) =>
   JSON.stringify(a) === JSON.stringify(b);
 
-const SIDES = ["Characters", "Player", "Locations", "Courses", "Societies", "Jobs", "ComfyUI"] as const;
+const SIDES = ["Instructions", "Characters", "Majors", "Player", "Locations", "Courses", "Societies", "Jobs", "ComfyUI"] as const;
 type Side = (typeof SIDES)[number];
+const SIDE_LABELS: Record<Side, MessageKey> = {
+  Instructions: "editor.instructions.title",
+  Characters: "editor.sides.characters",
+  Majors: "editor.sides.majors",
+  Player: "editor.sides.player",
+  Locations: "editor.sides.locations",
+  Courses: "editor.sides.courses",
+  Societies: "editor.sides.societies",
+  Jobs: "editor.sides.jobs",
+  ComfyUI: "editor.sides.comfy",
+};
 // The sides that change the game itself and not what a player adds to it: there only when the game's own files are being edited.
 const AUTHORING: readonly Side[] = ["Player", "Locations", "Societies", "Jobs"];
+// The sides only a player has: how to add a character of one's own, which whoever writes the game knows.
+const PLAYING: readonly Side[] = ["Instructions"];
 
 /**
  * The editor: the characters (love interests and NPCs, who are written the same way and
@@ -93,28 +116,41 @@ const AUTHORING: readonly Side[] = ["Player", "Locations", "Societies", "Jobs"];
  * side is not content: it is how the editor's art tool draws, which only the editor uses.
  */
 // The kinds a character can be, as the filter over the list names them.
-const KIND_FILTERS: { kind: LoveInterestKind; label: string }[] = [
-  { kind: "student", label: "Students" },
-  { kind: "teacher", label: "Teachers" },
-  { kind: "outsider", label: "Outsiders" },
-  { kind: "npc", label: "NPCs" },
+const KIND_FILTERS: { kind: LoveInterestKind; label: MessageKey }[] = [
+  { kind: "student", label: "editor.characters.students" },
+  { kind: "teacher", label: "editor.characters.teachers" },
+  { kind: "outsider", label: "editor.characters.outsiders" },
+  { kind: "npc", label: "editor.characters.npcs" },
 ];
+// The feelings a character who knows him already starts at, as their boxes are labelled.
+const METER_LABELS: Record<"affection" | "trust" | "desire", MessageKey> = {
+  affection: "editor.characters.affection",
+  trust: "editor.characters.trust",
+  desire: "editor.characters.desire",
+};
 
 export function ContentEditor(props: Props) {
-  const [side, setSide] = useState<Side>("Characters");
+  // A player lands on the instructions; whoever is editing the game's own files goes straight to the characters.
+  const [side, setSide] = useState<Side>("Instructions");
   // Whether the game's own files are what is being edited: so it is run from source, and not in a game as a player has it.
   const [authoring, setAuthoring] = useState(false);
   useEffect(() => {
-    window.api.editor.info().then((info) => setAuthoring(info.base), () => undefined);
+    window.api.editor.info().then(
+      (info) => {
+        setAuthoring(info.base);
+        if (info.base) setSide((now) => (now === "Instructions" ? "Characters" : now));
+      },
+      () => undefined,
+    );
   }, []);
-  const sides = SIDES.filter((name) => authoring || !AUTHORING.includes(name));
+  const sides = SIDES.filter((name) => (authoring ? !PLAYING.includes(name) : !AUTHORING.includes(name)));
   /**
    * The rail down the left edge: the sides of the editor, one under another, and the way
    * out at its foot. Each asks the side being left whether it may be.
    */
   const switcher = (mayLeave: () => boolean) => (
     <nav className="editor-rail">
-      <span className="caps">Edit</span>
+      <span className="caps">{t("editor.characters.edit")}</span>
       <div className="editor-sides" role="tablist" aria-orientation="vertical">
         {sides.map((name) => (
           <button
@@ -124,15 +160,19 @@ export function ContentEditor(props: Props) {
             className={side === name ? "tab selected" : "tab"}
             onClick={() => name !== side && mayLeave() && setSide(name)}
           >
-            {name}
+            {t(SIDE_LABELS[name])}
           </button>
         ))}
       </div>
-      <Button onClick={() => mayLeave() && props.onClose()}>Done</Button>
+      <Button onClick={() => mayLeave() && props.onClose()}>{t("editor.characters.done")}</Button>
     </nav>
   );
-  return side === "Courses" ? (
+  return side === "Instructions" ? (
+    <InstructionsPage switcher={switcher} onGo={setSide} />
+  ) : side === "Courses" ? (
     <CatalogueEditor {...props} switcher={switcher} />
+  ) : side === "Majors" ? (
+    <MajorsEditor {...props} switcher={switcher} />
   ) : side === "Jobs" ? (
     <JobsEditor {...props} switcher={switcher} />
   ) : side === "Societies" ? (
@@ -185,11 +225,7 @@ function LoveInterestEditor({
   );
   const dirty = !same(draft, original ?? blank());
   const mayLeave = () =>
-    !dirty || window.confirm("Discard the changes you have not saved?");
-  // Whether the art tool is open on her room.
-  const [drawingRoom, setDrawingRoom] = useState(false);
-  // Whether her room's picture is open to be looked at whole.
-  const [viewingRoom, setViewingRoom] = useState(false);
+    !dirty || window.confirm(t("editor.common.discard"));
   const set = (patch: Partial<LoveInterest>) => {
     // What was wrong with the last save may no longer be.
     setIssues([]);
@@ -241,7 +277,7 @@ function LoveInterestEditor({
       setOriginal(saved);
       setDraft(saved);
       setStatus(
-        `Saved to your add-ons. It is in the game from the next scene.${result.removed ? ` ${result.removed} unused picture${result.removed === 1 ? " was" : "s were"} deleted.` : ""}`,
+        t("editor.common.doneRebuilt", { done: t("editor.characters.saved", { removed: result.removed ?? 0 }), rebuilt: !!result.catalogueRebuilt }),
       );
     } catch (error) {
       setStatus(errorMessage(error));
@@ -251,7 +287,7 @@ function LoveInterestEditor({
   }
 
   async function remove() {
-    const question = `Delete ${draft.name}? Saved games keep their history with her, but she will no longer appear.`;
+    const question = t("editor.characters.deleteConfirm", { name: draft.name });
     if (!window.confirm(question)) return;
     setBusy(true);
     try {
@@ -267,7 +303,7 @@ function LoveInterestEditor({
         null;
       setOriginal(next);
       setDraft(next ?? blank());
-      setStatus("Deleted.");
+      setStatus(t("editor.common.deleted"));
     } catch (error) {
       setStatus(errorMessage(error));
     } finally {
@@ -284,38 +320,30 @@ function LoveInterestEditor({
   const roomPlace = content.locations.find(
     (l) => l.id === draft.room?.locationId,
   );
-  // Every picture the place has, each view by day and by night as it is drawn.
-  const roomViews = (roomPlace?.backgrounds ?? []).flatMap((view) =>
-    Object.entries(view.images).map(([period, image]) => ({
-      id: `${view.id}-${period}`,
-      name: `${view.name}, ${period}`,
-      image,
-    })),
-  );
 
   return (
     <main className="editor">
       {switcher(mayLeave)}
       <aside className="editor-list">
         <Button variant="primary" onClick={() => mayLeave() && setCreating(true)}>
-          New character
+          {t("editor.newCharacter.title")}
         </Button>
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder={`Search ${everyone.length} characters`}
-          aria-label="Search"
+          placeholder={t("editor.characters.search", { count: everyone.length })}
+          aria-label={t("editor.common.search")}
         />
         {/* Narrows the list to one kind of character. Each is counted, so it is plain how many there are of it. */}
         <select
           value={kindShown}
           onChange={(e) => setKindShown(e.target.value as LoveInterestKind | "all")}
-          aria-label="Filter by type"
+          aria-label={t("editor.characters.filter")}
         >
-          <option value="all">All types ({everyone.length})</option>
+          <option value="all">{t("editor.characters.allTypes", { count: everyone.length })}</option>
           {KIND_FILTERS.map(({ kind, label }) => (
             <option key={kind} value={kind}>
-              {label} ({everyone.filter((li) => kindOf(li) === kind).length})
+              {t("editor.characters.kindOption", { label: t(label), count: everyone.filter((li) => kindOf(li) === kind).length })}
             </option>
           ))}
         </select>
@@ -330,7 +358,7 @@ function LoveInterestEditor({
               setCreating(false);
               start(written);
               setStatus(
-                "Written by the LLM. Read it over, change what you like, and save to keep her.",
+                t("editor.characters.drafted"),
               );
             }}
           />
@@ -353,17 +381,17 @@ function LoveInterestEditor({
                   {kindOf(li) === "npc"
                     ? li.role
                     : kindOf(li) === "teacher"
-                      ? `teaches ${li.teaching?.subjects[0]?.subject ?? ""}`
-                      : (li.studies?.subject ?? "outsider")}
+                      ? t("editor.characters.teaches", { subject: li.teaching?.subjects[0]?.subject ?? "" })
+                      : (li.studies?.subject ?? t("editor.characters.outsider"))}
                 </span>
               </span>
             </button>
           ))}
-          {shown.length === 0 && <p className="hint">Nobody by that name.</p>}
+          {shown.length === 0 && <p className="hint">{t("editor.characters.noneFound")}</p>}
         </div>
         {info && info.issues.length > 0 && (
           <div className="notice">
-            <strong>Left out of the game:</strong>
+            <strong>{t("editor.characters.leftOut")}</strong>
             {info.issues.map((issue) => (
               <div key={issue}>{issue}</div>
             ))}
@@ -373,22 +401,22 @@ function LoveInterestEditor({
           onClick={() => window.api.editor.openFolder()}
  title={info?.addonDir}
         >
-          Open the add-on folder
+          {t("editor.common.openFolder")}
         </Button>
       </aside>
 
       <section className="editor-main">
         <div className="editor-head">
           <div>
-            <h1>{draft.name || "New character"}</h1>
+            <h1>{draft.name || t("editor.newCharacter.title")}</h1>
             <span className="hint">
               {isNew
-                ? "Not saved yet"
+                ? t("editor.characters.notSaved")
                 : origin === "base"
-                  ? "Built in. Saving keeps your version in your add-ons and leaves the original untouched."
+                  ? t("editor.common.builtIn")
                   : origin === "override"
-                    ? "Built in, with your changes."
-                    : "One of your add-ons."}
+                    ? t("editor.common.builtInChanged")
+                    : t("editor.characters.yours")}
             </span>
           </div>
           <div className="tabs" role="tablist">
@@ -400,7 +428,7 @@ function LoveInterestEditor({
                 className={tab === name ? "tab selected" : "tab"}
                 onClick={() => setTab(name)}
               >
-                {name}
+                {t(TAB_LABELS[name])}
               </button>
             ))}
           </div>
@@ -411,7 +439,7 @@ function LoveInterestEditor({
             <>
               <div className="row">
                 <Text
-                  label="Name"
+                  label={t("editor.common.name")}
                 llm
                   value={draft.name}
                   onChange={(name) =>
@@ -419,13 +447,13 @@ function LoveInterestEditor({
                   }
                 />
                 <Text
-                  label="Id"
+                  label={t("editor.common.id")}
                   value={draft.id}
                   disabled={!isNew}
                   onChange={(id) => set({ id: slugify(id) })}
                   hint={
                     isNew
-                      ? "Names her files, and saved games refer to her by it. It cannot be changed later."
+                      ? t("editor.characters.idHint")
                       : undefined
                   }
                 />
@@ -433,14 +461,14 @@ function LoveInterestEditor({
               {/* Her name on Bloomr; left empty, one is made from her name, which is shown as the placeholder. */}
               {!isNpc && (
                 <Text
-                  label="Bloomr handle"
+                  label={t("editor.characters.handle")}
                   value={draft.handle ?? ""}
                   placeholder={handleOf({ ...draft, handle: undefined }).replace(/^@/, "")}
                   onChange={(handle) => set({ handle: handle.replace(/^@/, "").trim() || undefined })}
                 />
               )}
               <label>
-                Kind
+                {t("editor.characters.kind")}
                 <select
                   value={kind}
                   onChange={(e) => {
@@ -465,38 +493,38 @@ function LoveInterestEditor({
                   }}
                 >
                   <option value="student">
-                    a student: has a subject and a timetable of classes
+                    {t("editor.characters.kindStudent")}
                   </option>
                   <option value="teacher">
-                    a teacher: gives classes in her department
+                    {t("editor.characters.kindTeacher")}
                   </option>
                   <option value="outsider">
-                    another love interest: nothing to do with classes
+                    {t("editor.characters.kindOutsider")}
                   </option>
                   <option value="npc">
-                    an NPC: someone to talk to and work for, not a love interest
+                    {t("editor.characters.kindNpc")}
                   </option>
                 </select>
               </label>
 
               {isNpc && (
                 <Text
-                  label="Role"
+                  label={t("editor.characters.role")}
                 llm
                   value={draft.role}
                   onChange={(role) => set({ role })}
-                  placeholder="hall manager of the Cloister Halls"
+                  placeholder={t("editor.characters.rolePlaceholder")}
                 />
               )}
               {/* What she does in the Undercroft, when he takes her down with him. */}
               {!isNpc && content.expedition && (
                 <label>
-                  Role below
+                  {t("editor.characters.partyRole")}
                   <select
                     value={draft.partyRole ?? ""}
                     onChange={(e) => set({ partyRole: (e.target.value || undefined) as Role | undefined })}
                   >
-                    <option value="">None</option>
+                    <option value="">{t("editor.common.none")}</option>
                     {content.expedition.roles.map((role) => (
                       <option key={role.id} value={role.id}>
                         {role.name}
@@ -508,7 +536,7 @@ function LoveInterestEditor({
               <div className="row">
                 <label>
                   <span className="field-name">
-                    Age
+                    {t("editor.characters.age")}
                     <LlmMark />
                   </span>
                   <input
@@ -519,28 +547,80 @@ function LoveInterestEditor({
                   />
                 </label>
                 <Text
-                  label="Pronouns"
+                  label={t("editor.characters.pronouns")}
                 llm
                   value={draft.pronouns}
                   onChange={(pronouns) => set({ pronouns })}
                 />
+                <label>
+                  {t("editor.characters.birthday")}
+                  <select
+                    value={draft.birthday?.month ?? ""}
+                    onChange={(e) => set({ birthday: e.target.value ? { month: e.target.value, day: draft.birthday?.day ?? 1 } : undefined })}
+                  >
+                    <option value="">{t("editor.common.none")}</option>
+                    {content.calendar.months.map((month) => (
+                      <option key={month.id} value={month.id}>
+                        {month.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {draft.birthday && (
+                  <label>
+                    {t("editor.jobs.day")}
+                    <input
+                      type="number"
+                      min={1}
+                      max={content.calendar.months.find((month) => month.id === draft.birthday?.month)?.days ?? 30}
+                      value={draft.birthday.day}
+                      onChange={(e) => set({ birthday: { month: draft.birthday!.month, day: Math.max(1, Math.floor(Number(e.target.value)) || 1) } })}
+                    />
+                  </label>
+                )}
               </div>
+              {!isNpc && (
+                <div className="row checks">
+                  {/* Someone he already knows at the start of a game: an old friend, a cousin's flatmate. */}
+                  <label className="row checks">
+                    <input
+                      type="checkbox"
+                      checked={draft.startsAt !== undefined}
+                      onChange={(e) => set({ startsAt: e.target.checked ? { affection: 20, trust: 20, desire: 0 } : undefined })}
+                    />
+                    {t("editor.characters.knowsHim")}
+                  </label>
+                  {draft.startsAt &&
+                    (["affection", "trust", "desire"] as const).map((meter) => (
+                      <label key={meter}>
+                        {t(METER_LABELS[meter])}
+                        <input
+                          type="number"
+                          min={0}
+                          max={content.relationships.meterMax}
+                          value={draft.startsAt![meter]}
+                          onChange={(e) => set({ startsAt: { ...draft.startsAt!, [meter]: Math.max(0, Number(e.target.value) || 0) } })}
+                        />
+                      </label>
+                    ))}
+                </div>
+              )}
               <Text
-                label="Bio"
+                label={t("editor.player.bio")}
                 llm
                 value={draft.bio}
                 onChange={(bio) => set({ bio })}
                 rows={3}
               />
               <Text
-                label="Personality"
+                label={t("editor.characters.personality")}
                 llm
                 value={draft.personality}
                 onChange={(personality) => set({ personality })}
                 rows={3}
               />
               <Text
-                label="Appearance"
+                label={t("editor.common.appearance")}
                 llm
                 value={draft.appearance}
                 onChange={(appearance) => set({ appearance })}
@@ -550,21 +630,21 @@ function LoveInterestEditor({
                 <>
                                 <div className="row">
                 <List
-                  label="Likes"
+                  label={t("editor.characters.likes")}
                 llm
                   value={draft.likes}
                   onChange={(likes) => set({ likes })}
-                  hint="Separated by commas."
+                  hint={t("editor.characters.commas")}
                 />
                 <List
-                  label="Dislikes"
+                  label={t("editor.characters.dislikes")}
                 llm
                   value={draft.dislikes}
                   onChange={(dislikes) => set({ dislikes })}
                 />
               </div>
               <PickList
-                label="Admires in the player"
+                label={t("editor.characters.admires")}
                 llm
                 options={STATS.map((stat) => ({ id: stat, name: stat }))}
                 value={draft.admires}
@@ -572,8 +652,8 @@ function LoveInterestEditor({
                 max={3}
               />
               <PickList
-                addLabel="Add friends"
-                label="Friends"
+                addLabel={t("editor.characters.addFriends")}
+                label={t("editor.characters.friends")}
                 llm
                 options={content.loveInterests
                   .filter((other) => other.id !== draft.id)
@@ -584,8 +664,8 @@ function LoveInterestEditor({
                 }
               />
               <PickList
-                addLabel="Add enemies"
-                label="Enemies"
+                addLabel={t("editor.characters.addEnemies")}
+                label={t("editor.characters.enemies")}
                 llm
                 options={content.loveInterests
                   .filter((other) => other.id !== draft.id)
@@ -599,47 +679,45 @@ function LoveInterestEditor({
               )}
               {/* How she sounds and what she knows: all of it goes to the LLM. */}
               <Text
-                label="How she speaks"
+                label={t("editor.characters.speech")}
                 llm
                 value={draft.ai.speechPattern}
                 onChange={(speechPattern) => setAi({ speechPattern })}
                 rows={3}
               />
               <Text
-                label="Tone"
+                label={t("editor.characters.tone")}
                 llm
                 value={draft.ai.tone}
                 onChange={(tone) => setAi({ tone })}
               />
               <List
-                label="Verbal quirks"
+                label={t("editor.characters.quirks")}
                 llm
                 value={draft.ai.verbalQuirks}
                 onChange={(verbalQuirks) => setAi({ verbalQuirks })}
                 lines
-                hint="One a line."
+                hint={t("editor.characters.oneALine")}
               />
               <Text
-                label="Backstory"
+                label={t("editor.characters.backstory")}
                 llm
                 value={draft.ai.backstory}
                 onChange={(backstory) => setAi({ backstory })}
                 rows={5}
               />
-              {isNpc && (
-                <List
-                  label="What they know"
+              <List
+                label={t("editor.characters.knowledge")}
                 llm
-                  value={draft.ai.knowledge}
-                  onChange={(knowledge) => setAi({ knowledge })}
-                  lines
-                  hint="One a line."
-                />
-              )}
+                value={draft.ai.knowledge}
+                onChange={(knowledge) => setAi({ knowledge })}
+                lines
+                hint={t("editor.characters.oneALine")}
+              />
 {!isNpc && (
                 <>
                                 <Group
-                title="Example dialogue"
+                title={t("editor.characters.examples")}
                 llm
               >
                 {draft.ai.exampleDialogue.map((example, index) => {
@@ -652,12 +730,12 @@ function LoveInterestEditor({
                   return (
                     <div key={index} className="row">
                       <Text
-                        label="Them"
+                        label={t("editor.characters.them")}
                         value={example.user}
                         onChange={(user) => change({ user })}
                       />
                       <Text
-                        label="Her"
+                        label={t("editor.characters.her")}
                         value={example.reply}
                         onChange={(reply) => change({ reply })}
                       />
@@ -670,7 +748,7 @@ function LoveInterestEditor({
  })
  }
                       >
-                        Remove
+                        {t("editor.common.remove")}
                       </Button>
                     </div>
                   );
@@ -685,26 +763,34 @@ function LoveInterestEditor({
  })
  }
                 >
-                  Add an example
+                  {t("editor.characters.addExample")}
                 </Button>
               </Group>
               <Group
-                title="Secrets"
+                title={t("editor.characters.secrets")}
                 llm
               >
                 {draft.ai.secrets.map((secret, index) => (
-                  <div key={index} className="row">
+                  <div key={index} className="editor-group">
                     <Text
-                      label={
-                        secret.revealWhen.length > 0
-                          ? `Secret (shared once ${secret.revealWhen.length} condition${secret.revealWhen.length > 1 ? "s are" : " is"} met)`
-                          : "Secret (shared freely)"
-                      }
+                      label={t("editor.characters.secret")}
                       value={secret.text}
                       onChange={(text) =>
                         setAi({
                           secrets: draft.ai.secrets.map((s, i) =>
                             i === index ? { ...s, text } : s,
+                          ),
+                        })
+                      }
+                    />
+                    <ConditionsField
+                      content={content}
+                      label={secret.revealWhen.length > 0 ? t("editor.characters.revealWhen") : t("editor.characters.revealFreely")}
+                      value={secret.revealWhen}
+                      onChange={(revealWhen) =>
+                        setAi({
+                          secrets: draft.ai.secrets.map((s, i) =>
+                            i === index ? { ...s, revealWhen } : s,
                           ),
                         })
                       }
@@ -718,7 +804,7 @@ function LoveInterestEditor({
  })
  }
                     >
-                      Remove
+                      {t("editor.common.remove")}
                     </Button>
                   </div>
                 ))}
@@ -740,13 +826,13 @@ function LoveInterestEditor({
  })
  }
                 >
-                  Add a secret
+                  {t("editor.characters.addSecret")}
                 </Button>
               </Group>
                 </>
               )}
                             <Text
-                label="Further instructions"
+                label={t("editor.characters.extra")}
                 llm
                 value={draft.ai.extraInstructions}
                 onChange={(extraInstructions) => setAi({ extraInstructions })}
@@ -769,18 +855,18 @@ function LoveInterestEditor({
 
           {tab === "Media" && (
             <>
-              <SpritesTab draft={draft} set={set} assetPrefix={info?.assetPrefix} />
+              <SpritesTab draft={draft} set={set} assetPrefix={info?.assetPrefix} eventOutfits={eventOutfits(content)} />
 {!isNpc && (
                 <>
                                 <Group
-                title="Her room"
+                title={t("editor.characters.room")}
               >
                 <div className="row">
                   <Text
-                    label="What it is"
+                    label={t("editor.jobs.whatItIs")}
                 llm
                     value={draft.room?.name ?? ""}
-                    placeholder="a garret at the Honeyed Bee"
+                    placeholder={t("editor.characters.roomPlaceholder")}
                     onChange={(name) =>
                       set({
                         room:
@@ -797,7 +883,7 @@ function LoveInterestEditor({
                   />
                   {draft.room && (
                     <label>
-                      In
+                      {t("editor.characters.roomIn")}
                       <select
                         value={draft.room.locationId}
                         onChange={(e) =>
@@ -821,7 +907,7 @@ function LoveInterestEditor({
                 {draft.room && (
                   <>
                     <Text
-                      label="Description"
+                      label={t("editor.common.description")}
                 llm
                       value={draft.room.description}
                       rows={3}
@@ -829,121 +915,14 @@ function LoveInterestEditor({
                         set({ room: { ...draft.room!, description } })
                       }
                     />
-                    <div className="row checks">
-                      {draft.room.background ? (
-                        <>
-                          <button
-                            type="button"
-                            className="sprite-thumb room-thumb"
-                            title="Look at the whole picture"
-                            onClick={() => setViewingRoom(true)}
-                          >
-                            <img
-                              className="room-art"
-                              src={`content://pack/${draft.room.background}`}
-                              alt="Her room"
-                            />
-                          </button>
-                          {viewingRoom && (
-                            <Lightbox
-                              image={draft.room.background}
-                              name={draft.room.name || "Her room"}
-                              onClose={() => setViewingRoom(false)}
-                            />
-                          )}
-                        </>
-                      ) : (
-                        <span className="hint">No picture yet.</span>
-                      )}
-                      <Button
-                        disabled={!isSafeId(draft.id)}
- onClick={async () => {
- try {
- const background =
- await window.api.editor.importAsset({
- loveInterestId: draft.id,
- kind: "image",
- });
- if (background)
- set({ room: { ...draft.room!, background } });
- } catch (error) {
- setStatus(errorMessage(error));
- }
- }}
-                      >
-                        {draft.room.background
-                          ? "Replace the picture"
-                          : "Add a picture"}
-                      </Button>
-                      <Button
-                        disabled={!isSafeId(draft.id)}
- title="Draw her room with your own ComfyUI, from its description"
- onClick={() => setDrawingRoom(true)}
-                      >
-                        Generate a picture
-                      </Button>
-                      {roomViews.length > 0 && (
-                        <label className="inline">
-                          or use
-                          <select
-                            value={
-                              roomViews.some(
-                                (view) => view.image === draft.room!.background,
-                              )
-                                ? draft.room.background
-                                : ""
-                            }
-                            onChange={(e) =>
-                              set({
-                                room: {
-                                  ...draft.room!,
-                                  background: e.target.value || undefined,
-                                },
-                              })
-                            }
-                          >
-                            <option value="">
-                              a view of {roomPlace?.name}...
-                            </option>
-                            {roomViews.map((view) => (
-                              <option key={view.id} value={view.image}>
-                                {view.name}
-                              </option>
-                            ))}
-                          </select>
-                        </label>
-                      )}
-                      {draft.room.background && (
-                        <Button variant="quiet"
-                          onClick={() =>
- set({
- room: { ...draft.room!, background: undefined },
- })
- }
-                        >
-                          Remove the picture
-                        </Button>
-                      )}
-                    </div>
-                    {drawingRoom && (
-                      <ArtTool
-                        target={{
-                          kind: "background",
-                          location: {
-                            id: draft.id,
-                            // The room's name says whose it is ("her flat above the Honeyed Bee"), which is no use to an image model.
-                            name: "",
-                            appearance: draft.room.description,
-                            indoors: true,
-                          },
-                          title: draft.room.name,
-                          periods: [...LIGHTS],
-                          onUse: (_view, background) =>
-                            set({ room: { ...draft.room!, background } }),
-                        }}
-                        onClose={() => setDrawingRoom(false)}
-                      />
-                    )}
+                    <RoomPictures
+                      room={draft.room}
+                      place={roomPlace}
+                      owner={draft.id}
+                      disabled={!isSafeId(draft.id)}
+                      onChange={(patch) => set({ room: { ...draft.room!, ...patch } })}
+                      onStatus={setStatus}
+                    />
                   </>
                 )}
               </Group>
@@ -956,11 +935,11 @@ function LoveInterestEditor({
             <>
                             {kind === "teacher" && draft.teaching && (
                 <Group
-                  title="Teaching"
+                  title={t("editor.characters.teaching")}
                 >
                   <div className="row">
                     <Text
-                      label="Department"
+                      label={t("editor.characters.department")}
                 llm
                       value={draft.teaching.department}
                       onChange={(department) =>
@@ -968,19 +947,19 @@ function LoveInterestEditor({
                       }
                     />
                     <Text
-                      label="Styled"
+                      label={t("editor.characters.styled")}
                       value={draft.teaching.title}
                       onChange={(title) =>
                         set({ teaching: { ...draft.teaching!, title } })
                       }
-                      hint="Before her name in the catalog."
+                      hint={t("editor.characters.styledHint")}
                     />
                   </div>
                   {/* What she teaches is courses the curriculum has written: she is not asked to make one up. */}
                   {draft.teaching.subjects.map((subject, index) => (
                     <div key={index} className="row">
                       <label>
-                        Course
+                        {t("editor.characters.course")}
                         <select
                           value={`${subject.code}:${subject.number}`}
                           onChange={(e) => {
@@ -999,7 +978,7 @@ function LoveInterestEditor({
                           {(content.curriculum?.majors ?? []).flatMap((major) =>
                             major.courses.map((course) => (
                               <option key={`${major.code}:${course.number}`} value={`${major.code}:${course.number}`}>
-                                {major.code} {course.number}: {course.title}
+                                {t("editor.characters.courseOption", { code: major.code, number: course.number, title: course.title })}
                               </option>
                             )),
                           )}
@@ -1016,7 +995,7 @@ function LoveInterestEditor({
                           })
                         }
                       >
-                        Remove
+                        {t("editor.common.remove")}
                       </Button>
                     </div>
                   ))}
@@ -1034,15 +1013,15 @@ function LoveInterestEditor({
                         });
                     }}
                   >
-                    Add a course
+                    {t("editor.majors.addCourse")}
                   </Button>
                 </Group>
               )}
               {kind === "student" && (
-                <Group title="Studies" hint="She majors in one of the University's subjects, and sits two courses of it. After changing it, build the schedule again under Courses.">
+                <Group title={t("editor.characters.studies")} hint={t("editor.characters.studiesHint")}>
                   <div className="row">
                     <label>
-                      Subject
+                      {t("editor.majors.subject")}
                       <select
                         value={draft.studies?.code ?? ""}
                         onChange={(e) => {
@@ -1050,17 +1029,17 @@ function LoveInterestEditor({
                           if (picked) set({ studies: picked });
                         }}
                       >
-                        {!majorsToRead(content).some((major) => major.code === draft.studies?.code) && <option value="">Choose a subject</option>}
+                        {!majorsToRead(content).some((major) => major.code === draft.studies?.code) && <option value="">{t("editor.characters.chooseSubject")}</option>}
                         {majorsToRead(content).map((major) => (
                           <option key={major.code} value={major.code}>
-                            {major.code}: {major.subject}
+                            {t("editor.catalogue.subjectOption", { code: major.code, subject: major.subject })}
                           </option>
                         ))}
                       </select>
                     </label>
                     {draft.studies && (
                       <label>
-                        Year
+                        {t("editor.characters.year")}
                         <select
                           value={draft.studies.level}
                           onChange={(e) =>
@@ -1074,10 +1053,10 @@ function LoveInterestEditor({
                         >
                           {[1, 2, 3, 4].map((year) => (
                             <option key={year} value={year}>
-                              Year {year}
+                              {t("editor.characters.yearN", { year })}
                             </option>
                           ))}
-                          <option value={5}>Graduate</option>
+                          <option value={5}>{t("editor.characters.graduate")}</option>
                         </select>
                       </label>
                     )}
@@ -1089,13 +1068,12 @@ function LoveInterestEditor({
           {tab === "Academics" &&
             gives.map((job) => (
               <p key={job.id} className="status">
-                {draft.name || "This character"} gives the job of{" "}
-                {job.title.toLowerCase()}, and is at{" "}
-                {content.locations.find((l) => l.id === job.locationId)?.name ??
-                  job.locationId}{" "}
-                for exactly its shifts:{" "}
-                {job.shifts.map(describeShift).join(", ")}. Those hours come
-                from the job and are not set here.
+                {t("editor.characters.givesJob", {
+                  name: draft.name || t("editor.characters.thisCharacter"),
+                  job: job.title.toLowerCase(),
+                  place: content.locations.find((l) => l.id === job.locationId)?.name ?? job.locationId,
+                  shifts: job.shifts.map(describeShift).join(", "),
+                })}
               </p>
             ))}
           {tab === "Academics" && (
@@ -1103,7 +1081,7 @@ function LoveInterestEditor({
               content={content}
               schedule={draft.schedule}
               onChange={(schedule) => set({ schedule })}
-              before="Classes and plans with the player come before all of them."
+              before={t("editor.characters.scheduleBefore")}
             />
           )}
         </div>
@@ -1120,7 +1098,7 @@ function LoveInterestEditor({
           }}
           onSave={save}
           // Only a character made here can be deleted. One of the game's own that has been changed stays changed: there is no going back to how she shipped.
-          remove={!isNew && origin === 'addon' ? { label: 'Delete', onClick: remove } : undefined}
+          remove={!isNew && origin === 'addon' ? { label: t('editor.common.delete'), onClick: remove } : undefined}
         />
       </section>
     </main>

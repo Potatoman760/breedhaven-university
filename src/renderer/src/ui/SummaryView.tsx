@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { MEMORY_LEVEL_LABELS, MEMORY_LEVELS, type ContentPack, type GameState, type MemoryLevel, type Scene } from '../../../shared/model'
 import { Backdrop } from './Backdrop'
 import { ChevronIcon, Sprig } from './icons'
+import { t } from '../../../shared/i18n'
 
 /** Everything the summary screen shows about a scene that has just ended. */
 export interface SceneSummary {
@@ -36,7 +37,7 @@ interface Props {
 function change({ from, to }: Growth): string {
   // To a tenth: training comes in fractions, and a difference of two of them is not a round number as the machine holds it.
   const delta = Math.round((to - from) * 10) / 10
-  return delta > 0 ? `+${delta}` : delta < 0 ? `−${-delta}` : 'no change'
+  return delta > 0 ? `+${delta}` : delta < 0 ? `−${-delta}` : t('screens.summaryView.noChange')
 }
 
 /** Shown when a scene ends: what the player gained, how the relationship moved, and the memory kept. */
@@ -45,16 +46,13 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
   const partner = content.loveInterests.find((li) => li.id === scene.loveInterestId)
   const group = scene.companionIds.length > 0
   const everyone = firstNames(content, sceneCast(scene))
-  const name = group ? everyone : (partner?.name ?? 'them')
-  const firstName = partner?.name.split(' ')[0] ?? 'them'
+  const name = group ? everyone : (partner?.name ?? t('screens.summaryView.them'))
+  const firstName = partner?.name.split(' ')[0] ?? t('screens.summaryView.them')
   const date = toDate(content.calendar, state.time)
   const location = content.locations.find((l) => l.id === state.locationId)
   const max = content.relationships.meterMax
   const spent = sceneHours(state, scene)
-  const left = (id: string) => {
-    const departure = scene.departed.find((d) => d.id === id)
-    return departure && departure.feeling !== 'content' ? `, ${departure.feeling}` : ''
-  }
+  const left = (id: string) => t('screens.summaryView.leftEarly', { feeling: scene.departed.find((d) => d.id === id)?.feeling })
   // The memories as the player has reworded them. They are kept as they stand on leaving.
   const [drafts, setDrafts] = useState<Record<string, string>>(memories)
   // And how much each matters, as the player has set it.
@@ -67,16 +65,16 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
         <div className="summary-head">
           <span className="caps">
             {scene.beats.map(describeBeat).join(' · ')}
-            {spent !== undefined && spent > 0 && ` · ${spent} hour${spent === 1 ? '' : 's'}`}
+            {spent !== undefined && spent > 0 && t('screens.summaryView.hours', { n: spent })}
           </span>
-          <h1>Your time with {name}</h1>
+          <h1>{t('screens.summaryView.title', { name })}</h1>
           <Sprig width={220} />
         </div>
 
         <div className={group ? 'summary-columns wide' : 'summary-columns'}>
           <section>
-            <h2>You</h2>
-            {(!outcome || outcome.player.length === 0) && <p className="hint">Nothing changed.</p>}
+            <h2>{t('screens.summaryView.you')}</h2>
+            {(!outcome || outcome.player.length === 0) && <p className="hint">{t('screens.summaryView.nothingChanged')}</p>}
             {outcome?.player.map((g) => (
               <div key={g.label} className="growth">
                 <span>{g.label}</span>
@@ -90,8 +88,9 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
             ))}
             {summary.spending && (
               <p className="hint spent">
-                You paid ${summary.spending.amount}
-                {summary.spending.on ? `: ${summary.spending.on}` : ''}.
+                {summary.spending.on
+                  ? t('screens.summaryView.paidFor', { amount: summary.spending.amount, on: summary.spending.on })
+                  : t('screens.summaryView.paid', { amount: summary.spending.amount })}
               </p>
             )}
           </section>
@@ -115,13 +114,13 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
                 <strong className={g.to >= g.from ? 'up' : 'down'}>{change(g)}</strong>
               </div>
             ))}
-            {!outcome && <p className="hint">No record of how things stood before this scene.</p>}
+            {!outcome && <p className="hint">{t('screens.summaryView.noRecord')}</p>}
             {summary.reasons[scene.loveInterestId] && <p className="hint">{summary.reasons[scene.loveInterestId]}</p>}
             {scene.gifts.filter((gift) => gift.recipientId === scene.loveInterestId).map((gift, i) => (
               <div key={i} className="growth">
-                <span>Gift</span>
+                <span>{t('screens.summaryView.gift')}</span>
                 <span>{gift.name}</span>
-                <strong className={gift.reaction === 'disliked' ? 'down' : 'up'}>{gift.reaction}</strong>
+                <strong className={gift.reaction === 'disliked' ? 'down' : 'up'}>{t('screens.summaryView.reaction', { reaction: gift.reaction })}</strong>
               </div>
             ))}
           </section>}
@@ -130,7 +129,7 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
             <section key={id}>
               <h2>{firstNames(content, [id])}</h2>
               {scene.departed.some((d) => d.id === id) && (
-                <span className="hint">Left before the end{left(id)}</span>
+                <span className="hint">{left(id)}</span>
               )}
               {theirs && (
                 <div className="chips">
@@ -154,9 +153,9 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
                 .filter((gift) => gift.recipientId === id)
                 .map((gift, i) => (
                   <div key={i} className="growth">
-                    <span>Gift</span>
+                    <span>{t('screens.summaryView.gift')}</span>
                     <span>{gift.name}</span>
-                    <strong className={gift.reaction === 'disliked' ? 'down' : 'up'}>{gift.reaction}</strong>
+                    <strong className={gift.reaction === 'disliked' ? 'down' : 'up'}>{t('screens.summaryView.reaction', { reaction: gift.reaction })}</strong>
                   </div>
                 ))}
             </section>
@@ -165,29 +164,28 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
 
         {scene.conceived.length > 0 && (
           <p className="agreed">
-            The Bloom locked in: {firstNames(content, scene.conceived)} {scene.conceived.length > 1 ? 'are' : 'is'} carrying
-            your child.
+            {t('screens.summaryView.conceived', { names: firstNames(content, scene.conceived), many: scene.conceived.length > 1 })}
           </p>
         )}
 
         {/* An NPC keeps no memory of a scene: there is nothing of hers to read or reword. */}
         {(scene.npc ? [] : sceneWitnesses(scene)).map((id) => (
           <section key={id}>
-            <h2>What {firstNames(content, [id])} will remember</h2>
+            <h2>{t('screens.summaryView.willRemember', { name: firstNames(content, [id]) })}</h2>
             <textarea
               className="memory"
               rows={3}
               maxLength={600}
-              aria-label={`What ${firstNames(content, [id])} will remember`}
+              aria-label={t('screens.summaryView.willRemember', { name: firstNames(content, [id]) })}
               value={drafts[id] ?? ''}
-              placeholder="Nothing. She will not remember this."
+              placeholder={t('screens.summaryView.forget')}
               onChange={(e) => setDrafts({ ...drafts, [id]: e.target.value })}
             />
             <div className="memory-level">
               <label className="inline">
-                Memory
+                {t('screens.summaryView.memory')}
                 <select
-                  aria-label={`How much ${firstNames(content, [id])} will hold on to it`}
+                  aria-label={t('screens.summaryView.holdOn', { name: firstNames(content, [id]) })}
                   value={levelDrafts[id] ?? 'normal'}
                   onChange={(e) => setLevelDrafts({ ...levelDrafts, [id]: e.target.value as MemoryLevel })}
                 >
@@ -204,7 +202,7 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
                   className="quiet"
                   onClick={() => (setDrafts({ ...drafts, [id]: memories[id] ?? '' }), setLevelDrafts({ ...levelDrafts, [id]: levels[id] ?? 'normal' }))}
                 >
-                  Put back what was written
+                  {t('screens.summaryView.putBack')}
                 </button>
               )}
             </div>
@@ -212,15 +210,13 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
         ))}
         {!scene.npc && (
           <p className="hint">
-            This is what goes into her memory of you, and what she is told in later scenes. Reword it if it has
-            something wrong; clear it and she forgets. She is told her core memories first, and a fleeting one only
-            while there is room.
+            {t('screens.summaryView.memoryHint')}
           </p>
         )}
-        {memoryError && <p className="hint">Written as a plain note: {memoryError}</p>}
+        {memoryError && <p className="hint">{t('screens.summaryView.plainNote', { error: memoryError })}</p>}
         {summary.learned.length > 0 && (
           <section className="learned">
-            <span className="caps">You learned</span>
+            <span className="caps">{t('screens.summaryView.youLearned')}</span>
             <ul>
               {summary.learned.map((line) => (
                 <li key={line}>{line}</li>
@@ -230,7 +226,7 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
         )}
 
         <button onClick={() => onContinue(drafts, levelDrafts)} autoFocus>
-          Continue
+          {t('screens.sceneView.continue')}
           <ChevronIcon size={16} />
         </button>
       </div>

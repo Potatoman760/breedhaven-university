@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { ContentPack } from '../../shared/model'
 import { spriteFor } from '../../shared/game'
 import { LanternRelease } from './ui/LanternRelease'
+import { t } from '../../shared/i18n'
 
 /**
  * The lanterns let go at the festival date, on their own, for looking at without playing to it: opened by
@@ -38,7 +39,7 @@ export function LanternPreview({ who }: { who?: string }) {
       lines={() =>
         Promise.resolve(
           shown.flatMap((li, i) =>
-            li ? [{ speakerId: li.id, text: i === 0 ? 'I wrote my wish before you asked me. You can guess what it was.' : "Mine's going higher than hers. Watch." }] : []
+            li ? [{ speakerId: li.id, text: i === 0 ? t('shell.preview.lanternFirst') : t('shell.preview.lanternSecond') }] : []
           )
         )
       }
