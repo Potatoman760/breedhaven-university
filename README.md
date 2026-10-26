@@ -44,8 +44,7 @@ left unsigned.
 - `src/preload/` – Context-isolated bridge exposing `window.api` to the renderer.
 - `src/renderer/` – React UI. `styles.css` holds the design system (colour and type
   tokens, buttons, translucent "glass" panels, the double-rule frame); `ui/` holds the
-  day view, scene view and dialogs. Features the design calls for that don't exist yet
-  show a "To be implemented" note.
+  day view, scene view and dialogs.
 
 ## Game concepts
 
@@ -260,7 +259,13 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
 ## AI
 
 - **Settings** (the Settings button) hold two OpenAI-compatible endpoints: the **Main LLM**
-  and the **NSFW LLM**, each with base URL, API key, model, temperature, max reply tokens
+  and the **NSFW LLM**, each with base URL, API key, model, temperature, max reply tokens,
+  a timeout (two minutes by default; drafting a character or subject waits at least three),
+  and under Advanced: how hard a thinking model thinks (sent as `reasoning_effort`, OpenRouter's
+  `reasoning`, or a local chat template's `enable_thinking`, by default going by the address),
+  the samplers (top P, min P, top K, repetition, frequency and presence penalties, each sent
+  only when set), and OpenRouter's provider order, providers to avoid and fallbacks
+  (`extraParameters` in `src/main/ai/openai.ts`)
   and extra instructions. They are saved to `settings.json` in Electron's user-data folder,
   with keys encrypted by the OS keychain where available. Keys never reach the renderer.
 - **Scenes** start with an activity shared with a love interest. The character ends the

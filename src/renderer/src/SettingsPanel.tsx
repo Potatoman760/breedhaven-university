@@ -1,5 +1,16 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { LLM_PROFILE_IDS, type LlmProfileId, type LlmProfileView } from '../../shared/settings'
+import {
+  LLM_DEFAULT_TIMEOUT_SECONDS,
+  LLM_MAX_TIMEOUT_SECONDS,
+  LLM_MIN_TIMEOUT_SECONDS,
+  LLM_PROFILE_IDS,
+  REASONING_LEVELS,
+  REASONING_STYLES,
+  type LlmProfileId,
+  type LlmProfileView,
+  type ReasoningLevel,
+  type ReasoningStyle
+} from '../../shared/settings'
 import { errorMessage } from './errors'
 import { Overlay } from './ui/Dialog'
 import { ModelField } from './ModelField'
@@ -34,6 +45,113 @@ function toForm(view: Record<LlmProfileId, LlmProfileView>): Form {
     main: { ...view.main, apiKeyInput: '', clearKey: false },
     nsfw: { ...view.nsfw, apiKeyInput: '', clearKey: false }
   }
+}
+
+const SAMPLERS = [
+  { field: 'topP', label: 'shell.settings.topP', min: 0, max: 1, step: 0.01 },
+  { field: 'minP', label: 'shell.settings.minP', min: 0, max: 1, step: 0.01 },
+  { field: 'topK', label: 'shell.settings.topK', min: 0, step: 1 },
+  { field: 'repetitionPenalty', label: 'shell.settings.repetitionPenalty', min: 0, max: 3, step: 0.01 },
+  { field: 'frequencyPenalty', label: 'shell.settings.frequencyPenalty', min: -2, max: 2, step: 0.05 },
+  { field: 'presencePenalty', label: 'shell.settings.presencePenalty', min: -2, max: 2, step: 0.05 }
+] as const satisfies readonly { field: keyof LlmProfileView; label: MessageKey; min: number; max?: number; step: number }[]
+
+const REASONING_LABELS: Record<ReasoningLevel, MessageKey> = {
+  default: 'shell.settings.reasoningDefault',
+  off: 'shell.settings.reasoningOff',
+  minimal: 'shell.settings.reasoningMinimal',
+  low: 'shell.settings.reasoningLow',
+  medium: 'shell.settings.reasoningMedium',
+  high: 'shell.settings.reasoningHigh'
+}
+const STYLE_LABELS: Record<ReasoningStyle, MessageKey> = {
+  auto: 'shell.settings.styleAuto',
+  effort: 'shell.settings.styleEffort',
+  openrouter: 'shell.settings.styleOpenRouter',
+  template: 'shell.settings.styleTemplate'
+}
+
+/** A number that may be left blank, meaning the model's own. Held as typed, so that "0." is not lost on the way to "0.5". */
+function OptionalNumber({ label, value, min, max, step, onChange }: { label: string; value: number | undefined; min: number; max?: number; step: number; onChange: (value: number | undefined) => void }) {
+  const [text, setText] = useState(value === undefined ? '' : String(value))
+  return (
+    <label>
+      {label}
+      <input
+        type="number"
+        min={min}
+        max={max}
+        step={step}
+        value={text}
+        placeholder={t('shell.settings.modelDefault')}
+        onChange={(e) => {
+          setText(e.target.value)
+          const read = Number(e.target.value)
+          if (e.target.value.trim() === '') onChange(undefined)
+          else if (Number.isFinite(read)) onChange(Math.min(max ?? read, Math.max(min, step === 1 ? Math.round(read) : read)))
+        }}
+        // What was kept, once the field is left: a number out of range is shown as the nearest it can be.
+        onBlur={() => setText(value === undefined ? '' : String(value))}
+      />
+    </label>
+  )
+}
+
+/** What a power user tunes: thinking, the samplers, and OpenRouter's choice of provider. Shut until opened. */
+function AdvancedFields({ profile, onChange }: { profile: LlmProfileView; onChange: (patch: Partial<LlmProfileView>) => void }) {
+  return (
+    <details className="advanced">
+      <summary>{t('shell.settings.advanced')}</summary>
+      <div className="row">
+        <label>
+          {t('shell.settings.reasoning')}
+          <select value={profile.reasoning} onChange={(e) => onChange({ reasoning: e.target.value as ReasoningLevel })}>
+            {REASONING_LEVELS.map((level) => (
+              <option key={level} value={level}>
+                {t(REASONING_LABELS[level])}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label title={t('shell.settings.reasoningStyleTitle')}>
+          {t('shell.settings.reasoningStyle')}
+          <select value={profile.reasoningStyle} disabled={profile.reasoning === 'default'} onChange={(e) => onChange({ reasoningStyle: e.target.value as ReasoningStyle })}>
+            {REASONING_STYLES.map((style) => (
+              <option key={style} value={style}>
+                {t(STYLE_LABELS[style])}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <div className="sampler-grid">
+        {SAMPLERS.map((sampler) => (
+          <OptionalNumber
+            key={sampler.field}
+            label={t(sampler.label)}
+            value={profile[sampler.field]}
+            min={sampler.min}
+            max={'max' in sampler ? sampler.max : undefined}
+            step={sampler.step}
+            onChange={(value) => onChange({ [sampler.field]: value })}
+          />
+        ))}
+      </div>
+      <span className="field-label">{t('shell.settings.openRouter')}</span>
+      <label>
+        {t('shell.settings.providerOrder')}
+        <input value={profile.providerOrder} placeholder="Anthropic, Together" onChange={(e) => onChange({ providerOrder: e.target.value })} />
+      </label>
+      <label>
+        {t('shell.settings.providerIgnore')}
+        <input value={profile.providerIgnore} onChange={(e) => onChange({ providerIgnore: e.target.value })} />
+      </label>
+      <label className="inline">
+        <input type="checkbox" checked={profile.allowFallbacks} onChange={(e) => onChange({ allowFallbacks: e.target.checked })} />
+        {t('shell.settings.allowFallbacks')}
+      </label>
+    </details>
+  )
 }
 
 export function SettingsPanel({ onClose }: { onClose: () => void }) {
@@ -211,6 +329,18 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                   />
                 </label>
                 <label>
+                  {t('shell.settings.timeout')}
+                  <input
+                    type="number"
+                    min={LLM_MIN_TIMEOUT_SECONDS}
+                    max={LLM_MAX_TIMEOUT_SECONDS}
+                    step={1}
+                    value={p.timeoutSeconds}
+                    onChange={(e) => set(id, { timeoutSeconds: Math.round(e.target.valueAsNumber || LLM_DEFAULT_TIMEOUT_SECONDS) })}
+                    onBlur={() => set(id, { timeoutSeconds: Math.min(LLM_MAX_TIMEOUT_SECONDS, Math.max(LLM_MIN_TIMEOUT_SECONDS, p.timeoutSeconds)) })}
+                  />
+                </label>
+                <label>
                   {t('shell.settings.instructions')}
                   <textarea
                     rows={3}
@@ -219,6 +349,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                     placeholder={t('shell.settings.instructionsPlaceholder')}
                   />
                 </label>
+                <AdvancedFields profile={p} onChange={(patch) => set(id, patch)} />
                 <button type="button" disabled={busy} onClick={() => onTest(id)}>
                   {t('shell.settings.saveAndTest')}
                 </button>

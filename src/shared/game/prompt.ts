@@ -308,6 +308,8 @@ export function buildCharacterPrompt(input: PromptInput): string {
       lecture
         ? t('scene.prompt.reply.lectureEnd', { player: player.name })
         : t('scene.prompt.reply.end', { player: player.name }),
+      // A lecture has its own say on this: nothing made up for it is ever asked of him.
+      !lecture && t('scene.prompt.reply.unknowable', { player: player.name }),
       t('scene.prompt.reply.noLists')
     ]),
 

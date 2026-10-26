@@ -321,16 +321,6 @@
       "PowerLoraLoaderHeaderWidget": {
         "type": "PowerLoraLoaderHeaderWidget"
       },
-      "lora_1": {
-        "on": false,
-        "lora": "minimaxh3\\minimax_h3_turbo_v4_step600_ema_pruned_comfyui.safetensors",
-        "strength": 1
-      },
-      "lora_2": {
-        "on": false,
-        "lora": "h3\\MysticXXX_MMH3-V2.safetensors",
-        "strength": 0.8
-      },
       "➕ Add Lora": "",
       "model": [
         "6",

@@ -369,16 +369,6 @@ input:disabled {
   padding: 0;
 }
 
-.tbi {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 16px;
-  border: 1px dashed var(--rule-strong);
-  border-radius: var(--radius);
-  background: var(--parchment);
-}
-
 .sprig,
 .vine {
   color: var(--leaf);
@@ -435,6 +425,37 @@ input:disabled {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+/* A long tab scrolls the panel, rather than its parts being squeezed to fit. */
+.settings > * {
+  flex-shrink: 0;
+}
+
+/* A profile's power-user settings, shut until opened. */
+.settings .advanced {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings .advanced[open] {
+  padding-bottom: 4px;
+}
+
+.settings .advanced summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.settings .advanced > * + * {
+  margin-top: 10px;
+}
+
+.sampler-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
 }
 
 /* The volume sliders, a column of them no wider than a slider needs. */

@@ -1,8 +1,6 @@
 import type { ChatMessage } from '../../shared/model'
-import type { LlmProfile } from '../../shared/settings'
+import type { LlmProfile, ReasoningStyle } from '../../shared/settings'
 import { t } from '../../shared/i18n'
-
-const REQUEST_TIMEOUT_MS = 120_000
 
 export interface CompletionInput {
   system: string
@@ -11,7 +9,7 @@ export interface CompletionInput {
   temperature?: number
   /** Overrides the profile's max reply tokens for this call. */
   maxTokens?: number
-  /** Gives up on a request after this long, instead of the usual two minutes. */
+  /** Gives up on a request after this long, instead of after the profile's timeout. */
   timeoutMs?: number
   /** Things the model may do before it answers. */
   tools?: LlmTool[]
@@ -95,6 +93,42 @@ export class RefusalError extends Error {
   }
 }
 
+/** Which way of asking for less or more thinking an endpoint takes, going by its address when the profile does not say. */
+export function reasoningStyleOf(profile: Pick<LlmProfile, 'baseUrl' | 'reasoningStyle'>): Exclude<ReasoningStyle, 'auto'> {
+  if (profile.reasoningStyle !== 'auto') return profile.reasoningStyle
+  let host = ''
+  try {
+    host = new URL(profile.baseUrl.trim()).hostname
+  } catch {
+    // An address that does not read is asked the common way.
+  }
+  if (host === 'openrouter.ai' || host.endsWith('.openrouter.ai')) return 'openrouter'
+  // A server on this computer or this network is a local one, whose chat template has the switch.
+  if (/^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|\[?::1\]?$)/.test(host) || host.endsWith('.local')) return 'template'
+  return 'effort'
+}
+
+/** The profile's power-user settings, as the fields of a request. Whatever is left at its default is not sent. */
+export function extraParameters(profile: LlmProfile): Record<string, unknown> {
+  const extra: Record<string, unknown> = {}
+  const samplers = { top_p: profile.topP, min_p: profile.minP, top_k: profile.topK, repetition_penalty: profile.repetitionPenalty, frequency_penalty: profile.frequencyPenalty, presence_penalty: profile.presencePenalty }
+  for (const [name, value] of Object.entries(samplers)) if (value !== undefined) extra[name] = value
+  if (profile.reasoning !== 'default') {
+    const off = profile.reasoning === 'off'
+    const style = reasoningStyleOf(profile)
+    if (style === 'openrouter') extra['reasoning'] = off ? { enabled: false } : { effort: profile.reasoning }
+    else if (style === 'template') extra['chat_template_kwargs'] = { enable_thinking: !off }
+    else extra['reasoning_effort'] = off ? 'none' : profile.reasoning
+  }
+  const list = (text: string) => text.split(',').map((one) => one.trim()).filter((one) => one.length > 0)
+  const order = list(profile.providerOrder)
+  const ignore = list(profile.providerIgnore)
+  if (order.length > 0 || ignore.length > 0 || !profile.allowFallbacks) {
+    extra['provider'] = { ...(order.length > 0 && { order }), ...(ignore.length > 0 && { ignore }), ...(!profile.allowFallbacks && { allow_fallbacks: false }) }
+  }
+  return extra
+}
+
 /** Calls an OpenAI-compatible `/chat/completions` endpoint and returns the reply text. */
 export async function chatCompletion(
   profile: LlmProfile,
@@ -119,6 +153,7 @@ export async function chatCompletion(
           ...(profile.apiKey && { Authorization: `Bearer ${profile.apiKey}` })
         },
         body: JSON.stringify({
+          ...extraParameters(profile),
           model: profile.model,
           messages,
           temperature: input.temperature ?? profile.temperature,
@@ -130,7 +165,7 @@ export async function chatCompletion(
             }))
           })
         }),
-        signal: AbortSignal.any([AbortSignal.timeout(input.timeoutMs ?? REQUEST_TIMEOUT_MS), ...(input.signal ? [input.signal] : [])])
+        signal: AbortSignal.any([AbortSignal.timeout(input.timeoutMs ?? profile.timeoutSeconds * 1000), ...(input.signal ? [input.signal] : [])])
       })
     } catch (error) {
       if (input.signal?.aborted) throw input.signal.reason

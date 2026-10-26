@@ -2,7 +2,7 @@ import { useLayoutEffect, useRef, type CSSProperties } from 'react'
 import { canTravel, isOpen, loveInterestsAt, mapDressingAt, toDate, wayDownAt, whereaboutsUnknown } from '../../../shared/game'
 import type { ContentPack, GameState, Location, MapPin } from '../../../shared/model'
 import { Button } from './Button'
-import { Dialog, Overlay, ToBeImplemented } from './Dialog'
+import { Dialog, Overlay } from './Dialog'
 import { GrandButton } from './GrandButton'
 import { PlaceIcon } from './icons'
 import { BackButton } from './BackButton'
@@ -46,7 +46,7 @@ export function MapPanel({ content, state, onTravel, withHim = [], onClose }: Pr
   if (!map) {
     return (
       <Dialog title={t('screens.navTiles.map')} onClose={onClose} narrow>
-        <ToBeImplemented note={t('screens.map.noMap')} />
+        <p className="hint">{t('screens.map.noMap')}</p>
       </Dialog>
     )
   }

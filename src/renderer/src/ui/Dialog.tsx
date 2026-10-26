@@ -76,13 +76,3 @@ export function Dialog({ title, note, onClose, narrow, wide, noClose, ornate, so
     </Overlay>
   )
 }
-
-/** Stand-in for a feature the design calls for but the game doesn't have yet. */
-export function ToBeImplemented({ note }: { note: string }) {
-  return (
-    <div className="tbi">
-      <strong>{t('shell.dialog.toBeImplemented')}</strong>
-      <span>{note}</span>
-    </div>
-  )
-}

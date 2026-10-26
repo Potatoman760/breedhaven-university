@@ -101,7 +101,7 @@ const SUMMARY_TEMPERATURE = 0.3
 // Room enough for the lecture a class opens with, whatever the profile allows an ordinary reply.
 const LESSON_MIN_TOKENS = 900
 const EVENT_MIN_TOKENS = 800
-// A whole character takes a while to write.
+// A whole character takes a while to write: at least this long, however short the profile's timeout.
 const DRAFT_TIMEOUT_MS = 180_000
 
 
@@ -305,7 +305,7 @@ function registerIpc(
         system,
         messages: [{ role: 'user', content: user }],
         maxTokens: Math.max(profile.maxTokens, DRAFT_MIN_TOKENS),
-        timeoutMs: DRAFT_TIMEOUT_MS
+        timeoutMs: Math.max(profile.timeoutSeconds * 1000, DRAFT_TIMEOUT_MS)
       })
       try {
         return { loveInterest: parseDraft(content, reply, card) }
@@ -361,7 +361,7 @@ function registerIpc(
         system,
         messages: [{ role: 'user', content: user }],
         maxTokens: Math.max(profile.maxTokens, MAJOR_DRAFT_MIN_TOKENS),
-        timeoutMs: DRAFT_TIMEOUT_MS
+        timeoutMs: Math.max(profile.timeoutSeconds * 1000, DRAFT_TIMEOUT_MS)
       })
       try {
         return { major: parseMajorDraft(content, idea.data, reply) }

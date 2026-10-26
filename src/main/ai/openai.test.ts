@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { LlmProfileSchema } from '../../shared/settings'
-import { afterTool, chatCompletion, isRefusalResponse, listModels, RefusalError, wroteBesideTool } from './openai'
+import { afterTool, chatCompletion, extraParameters, isRefusalResponse, listModels, RefusalError, wroteBesideTool } from './openai'
 import { excuseTool, moveTool, revealTool, type Revelation } from './tools'
 import { createInitialState } from '../../shared/game/state'
 import { fixture } from '../../shared/game/testFixture'
@@ -38,6 +38,41 @@ const sceneOf = (patch: Partial<Scene> = {}): Scene => ({
   conceived: [],
   baseline: { stats: {}, energy: 0, money: 0, time: 0, relationship: { affection: 0, trust: 0, desire: 0 }, companions: {} },
   ...patch
+})
+
+describe('extraParameters', () => {
+  const at = (baseUrl: string, more: Record<string, unknown> = {}) => LlmProfileSchema.parse({ baseUrl, ...more })
+
+  it('sends nothing extra for a profile left at its defaults', () => {
+    expect(extraParameters(at('https://api.openai.com/v1'))).toEqual({})
+  })
+
+  it('sends only the samplers that are set, by their API names', () => {
+    expect(extraParameters(at('http://x/v1', { topP: 0.9, repetitionPenalty: 1.1, topK: 0 }))).toEqual({ top_p: 0.9, repetition_penalty: 1.1, top_k: 0 })
+  })
+
+  it('asks for less thinking the way each kind of endpoint takes it', () => {
+    expect(extraParameters(at('https://api.openai.com/v1', { reasoning: 'low' }))).toEqual({ reasoning_effort: 'low' })
+    expect(extraParameters(at('https://api.openai.com/v1', { reasoning: 'off' }))).toEqual({ reasoning_effort: 'none' })
+    expect(extraParameters(at('https://openrouter.ai/api/v1', { reasoning: 'off' }))).toEqual({ reasoning: { enabled: false } })
+    expect(extraParameters(at('https://openrouter.ai/api/v1', { reasoning: 'high' }))).toEqual({ reasoning: { effort: 'high' } })
+    expect(extraParameters(at('http://localhost:1234/v1', { reasoning: 'off' }))).toEqual({ chat_template_kwargs: { enable_thinking: false } })
+    expect(extraParameters(at('http://192.168.1.5:8080/v1', { reasoning: 'medium' }))).toEqual({ chat_template_kwargs: { enable_thinking: true } })
+    // Said outright, the style is kept whatever the address.
+    expect(extraParameters(at('http://localhost:1234/v1', { reasoning: 'low', reasoningStyle: 'effort' }))).toEqual({ reasoning_effort: 'low' })
+  })
+
+  it('names OpenRouter providers only when asked to', () => {
+    expect(extraParameters(at('https://openrouter.ai/api/v1', { providerOrder: 'Anthropic, Together ,', providerIgnore: 'Azure', allowFallbacks: false }))).toEqual({
+      provider: { order: ['Anthropic', 'Together'], ignore: ['Azure'], allow_fallbacks: false }
+    })
+  })
+
+  it('goes into the request, beside what the game itself sets', async () => {
+    const { impl, calls } = fakeFetch(200, { choices: [{ message: { content: 'Hello.' } }] })
+    await chatCompletion({ ...profile, minP: 0.05 }, input, impl)
+    expect(JSON.parse(String(calls[0]!.init.body))).toMatchObject({ min_p: 0.05, model: 'test-model', max_tokens: 50 })
+  })
 })
 
 describe('listModels', () => {

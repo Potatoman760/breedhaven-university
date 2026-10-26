@@ -58,6 +58,7 @@
   "prompt.reply.never": "- Never describe the scenery, and never write what {player} says, does or feels.",
   "prompt.reply.lectureEnd": "- End on something {player} can answer.",
   "prompt.reply.end": "- Say one thing and stop. End on something {player} can answer. This is a conversation, not a speech: short turns, back and forth.",
+  "prompt.reply.unknowable": "- {player} knows only what he has seen or been told. Anything you invent (a book's contents, a person, an event he wasn't at) he cannot know: tell him about it rather than ask him about it, and ask him only about himself, his opinions, and what has happened in front of him.",
   "prompt.reply.noLists": "- No lists, headings or summaries.",
   "prompt.who.title": "Who you are",
   "prompt.who.line": "{name}, age {age}, {pronouns}.",

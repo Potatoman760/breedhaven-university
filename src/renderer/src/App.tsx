@@ -196,7 +196,7 @@ import { DayView } from './ui/DayView'
 import { GrandButton } from './ui/GrandButton'
 import { isMouseBack } from './mouseBack'
 import { GearIcon, JobIcon, LoadIcon, PowerIcon, SaveIcon } from './ui/icons'
-import { Dialog, ToBeImplemented } from './ui/Dialog'
+import { Dialog } from './ui/Dialog'
 import { FairView } from './ui/FairView'
 import { InterfaceTour } from './ui/InterfaceTour'
 import { MapPanel } from './ui/MapPanel'
@@ -1770,11 +1770,6 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           }
           onClose={close}
         />
-      )}
-      {panel?.kind === 'tbi' && (
-        <Dialog title={panel.feature} onClose={close} narrow>
-          <ToBeImplemented note={panel.note} />
-        </Dialog>
       )}
       {panel?.kind === 'log' && scene && partner && (
         <Dialog title={t('shell.app.log')} onClose={close} wide ornate>
