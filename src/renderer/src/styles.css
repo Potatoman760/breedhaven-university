@@ -2422,6 +2422,13 @@ textarea.memory {
   background-repeat: no-repeat;
 }
 
+/* A picture that is the whole of what is shown, as his Bloomr picture is, and not a sprite to cut a face from. */
+.portrait-face.whole {
+  background-color: #fff;
+  background-size: cover;
+  background-position: center;
+}
+
 /* No picture of her: her initial. */
 :where(.portrait-face.initial) {
   background: var(--madder-deep);
@@ -4048,6 +4055,28 @@ button.btn.back-button.phone-back {
   border-top: 1px solid var(--rule-soft);
 }
 
+/* What those in his picture said under it: a face and a line each, below the caption. */
+.post-comments {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 0 8px;
+  list-style: none;
+  border-top: 1px solid var(--rule-soft);
+}
+
+.post-comments li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.9375rem;
+}
+
+.post-comments li > span {
+  padding-top: 4px;
+}
+
 .post footer button {
   min-height: 40px;
   color: var(--ink-soft);
@@ -5391,6 +5420,52 @@ button.entry:hover,
 /* Beside the send arrow, in class or at work: the way to end it at once. */
 .end-shift {
   flex: none;
+  white-space: nowrap;
+}
+
+/* A kind's name beside its width and height, one width for every kind so that the boxes stand in columns. */
+.size-kind {
+  flex: none;
+  align-self: center;
+  width: 110px;
+}
+
+/* The way out of a scene and what else is done on the way: a menu that opens upward from beside the send arrow. */
+.exit-menu {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-self: stretch;
+}
+
+/* The same square as the send arrow beside it, which is a plain button and not one of the interface's own. */
+.exit-menu > button.btn.icon {
+  width: 48px;
+  min-height: 44px;
+  padding: 0;
+}
+
+.exit-menu > button.btn.icon > svg {
+  flex: none;
+}
+
+.exit-flyout {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 8px);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 190px;
+  padding: 6px;
+  border-radius: var(--radius);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+
+.exit-flyout .btn {
+  justify-content: flex-start;
+  width: 100%;
   white-space: nowrap;
 }
 

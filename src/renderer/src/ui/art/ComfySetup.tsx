@@ -149,6 +149,16 @@ export function ComfySetup({ settings, list, onSave, connectionOnly }: Props) {
           )}
         </div>
 
+        {/* In the game's own settings, only how big sprites and backgrounds are drawn: the rest of each kind is the editor's. */}
+        {connectionOnly && (
+          <div className="editor-group">
+            <h2>{t('comfy.setup.sizes')}</h2>
+            {SIZED_KINDS.map((kind) => (
+              <SizeRow key={kind} kind={kind} settings={settings} onChange={(change) => setKind(kind, change)} />
+            ))}
+          </div>
+        )}
+
         {/* Read again for another clip workflow, since what is needed is that workflow's. */}
         <ComfyBundlePanel key={videoWorkflow?.file} />
 
@@ -228,6 +238,27 @@ function KindRow({ kind, settings, onChange }: KindRowProps) {
           <input type="number" min={64} max={8192} step={8} defaultValue={size.height} onBlur={(e) => Number(e.target.value) !== size.height && onChange({ height: Number(e.target.value) })} />
         </label>
       </div>
+    </div>
+  )
+}
+
+// The kinds a player is offered a size for in the game's settings.
+const SIZED_KINDS = ['sprite', 'background'] as const satisfies readonly ArtKind[]
+
+/** How big one kind of picture is drawn, and nothing else of it. A size left as it is stays the game's own. */
+function SizeRow({ kind, settings, onChange }: { kind: ArtKind; settings: ComfySettings; onChange: (change: { width?: number; height?: number }) => void }) {
+  const size = sizeFor(settings, kind)
+  return (
+    <div className="row level-inputs">
+      <strong className="size-kind">{ART_KIND_LABELS[kind]}</strong>
+      <label className="studio-narrow">
+        {t('comfy.setup.width')}
+        <input type="number" min={64} max={8192} step={8} defaultValue={size.width} onBlur={(e) => Number(e.target.value) !== size.width && onChange({ width: Number(e.target.value) })} />
+      </label>
+      <label className="studio-narrow">
+        {t('comfy.setup.height')}
+        <input type="number" min={64} max={8192} step={8} defaultValue={size.height} onBlur={(e) => Number(e.target.value) !== size.height && onChange({ height: Number(e.target.value) })} />
+      </label>
     </div>
   )
 }

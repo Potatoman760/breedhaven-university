@@ -114,6 +114,13 @@ export const MenuIcon = (p: IconProps) => (
   </Icon>
 )
 
+/** A wrench: the other things that can be done here, in a menu. */
+export const ToolIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 24 24" {...p}>
+    <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9l-3.8 3.8z" />
+  </Icon>
+)
+
 export const LogIcon = (p: IconProps) => (
   <Icon viewBox="0 0 18 14" strokeWidth={1.8} {...p}>
     <path d="M1 2h16M1 7h16M1 12h10" />

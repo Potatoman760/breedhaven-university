@@ -11,7 +11,7 @@ import { SmartInput } from './SmartInput'
 import { Backdrop } from './Backdrop'
 import { DateBanner } from './DateBanner'
 import { NavTiles } from './NavTiles'
-import { ChevronIcon, HaltIcon, HideIcon, LogIcon } from './icons'
+import { ChevronIcon, HaltIcon, HideIcon, LogIcon, ToolIcon } from './icons'
 import type { Panel } from './panels'
 import { useModelName } from '../modelName'
 import { t } from '../../../shared/i18n'
@@ -62,6 +62,64 @@ interface Props {
   onOpen: (panel: Panel) => void
   /** An animation that plays once has played: the sprite takes its place again. */
   onAnimationEnd: () => void
+  /** He takes his leave in words: the line is said, and the scene is summed up at once, with no reply to it. */
+  onGoodbye: () => void
+  /** He takes a picture of whoever is with him, for his own post on Bloomr. The scene goes on meanwhile. */
+  onPhoto: () => void
+  /** A picture is being taken: another waits until it is done. */
+  photoBusy: boolean
+}
+
+interface ExitMenuProps {
+  /** What the way out does where he is: leave, or end the class, the shift or the meeting. */
+  label: string
+  busy: boolean
+  photoBusy: boolean
+  onExit: () => void
+  onGoodbye: () => void
+  onPhoto: () => void
+}
+
+/** The way out of a scene, and the other things done on the way: a menu that opens upward from beside the text box. */
+function ExitMenu({ label, busy, photoBusy, onExit, onGoodbye, onPhoto }: ExitMenuProps) {
+  const [open, setOpen] = useState(false)
+  const menu = useRef<HTMLSpanElement>(null)
+  // A press anywhere else, or Escape, shuts it.
+  useEffect(() => {
+    if (!open) return
+    const away = (event: MouseEvent) => !menu.current?.contains(event.target as Node) && setOpen(false)
+    const escape = (event: globalThis.KeyboardEvent) => event.key === 'Escape' && setOpen(false)
+    document.addEventListener('mousedown', away)
+    document.addEventListener('keydown', escape)
+    return () => {
+      document.removeEventListener('mousedown', away)
+      document.removeEventListener('keydown', escape)
+    }
+  }, [open])
+  const pick = (action: () => void) => () => {
+    setOpen(false)
+    action()
+  }
+  return (
+    <span className="exit-menu" ref={menu}>
+      <Button className="icon" disabled={busy} aria-haspopup="menu" aria-expanded={open} aria-label={t('screens.sceneView.more')} title={t('screens.sceneView.more')} onClick={() => setOpen(!open)}>
+        <ToolIcon size={18} />
+      </Button>
+      {open && (
+        <span className="exit-flyout glass" role="menu">
+          <Button role="menuitem" variant="quiet" size="small" onClick={pick(onExit)}>
+            {label}
+          </Button>
+          <Button role="menuitem" variant="quiet" size="small" onClick={pick(onGoodbye)}>
+            {t('screens.sceneView.goodbye')}
+          </Button>
+          <Button role="menuitem" variant="quiet" size="small" disabled={photoBusy} onClick={pick(onPhoto)}>
+            {photoBusy ? t('screens.sceneView.takingPicture') : t('screens.sceneView.takePicture')}
+          </Button>
+        </span>
+      )}
+    </span>
+  )
 }
 
 /** Renders *asterisked* runs inside a spoken line as emphasis. */
@@ -608,10 +666,11 @@ export function SceneView(props: Props) {
                 {/* A class, a society's meeting or a shift can be brought to its end in a press, once he has said he is sure. Once
                     the scene has moved on somewhere else it is no longer that, and ends as any scene does. */}
                 {(scene.shift || scene.lesson || scene.societyId) && back === 0 && !scene.beats.some((beat) => beat.finished) ? (
-                  <Button
-                    className="end-shift"
-                    disabled={busy}
-                    onClick={async () =>
+                  <ExitMenu
+                    label={scene.shift ? t('screens.sceneView.endShift') : scene.lesson ? t('screens.sceneView.endClass') : t('screens.sceneView.endMeeting')}
+                    busy={busy}
+                    photoBusy={props.photoBusy}
+                    onExit={async () =>
                       (await ask({
                         title: t('screens.sceneView.areYouSure'),
                         detail: scene.shift
@@ -622,23 +681,24 @@ export function SceneView(props: Props) {
                         confirm: scene.shift ? t('screens.sceneView.endShift') : scene.lesson ? t('screens.sceneView.endClass') : t('screens.sceneView.endMeeting')
                       })) && onSkip()
                     }
-                  >
-                    {scene.shift ? t('screens.sceneView.endShift') : scene.lesson ? t('screens.sceneView.endClass') : t('screens.sceneView.endMeeting')}
-                  </Button>
+                    onGoodbye={props.onGoodbye}
+                    onPhoto={props.onPhoto}
+                  />
                 ) : (
                   // Any other conversation can be walked out of: the time is gone, and nothing between them changes. Not a
                   // birth, whose child is named as it ends, nor orientation, which goes on from it.
                   scene.newborn === undefined &&
                   !scene.guideId && (
-                    <Button
-                      className="end-shift"
-                      disabled={busy}
-                      onClick={async () =>
+                    <ExitMenu
+                      label={t('screens.sceneView.leave')}
+                      busy={busy}
+                      photoBusy={props.photoBusy}
+                      onExit={async () =>
                         (await ask({ title: t('screens.sceneView.areYouSure'), detail: t('screens.sceneView.leaveDetail'), confirm: t('screens.sceneView.leave'), grave: true })) && onSkip()
                       }
-                    >
-                      {t('screens.sceneView.leave')}
-                    </Button>
+                      onGoodbye={props.onGoodbye}
+                      onPhoto={props.onPhoto}
+                    />
                   )
                 )}
               </form>

@@ -20,7 +20,8 @@ import { SaveStore } from './saves/store'
 import { SettingsStore, type KeyCipher } from './settings/store'
 import { RenameSaveRequestSchema, SaveRequestSchema, SlotIdSchema } from '../shared/saves'
 import { contactsSaid, DM_CLOSE, DM_OPEN, fallbackInvite, messageText } from '../shared/game/courier'
-import { buildFeedPrompt, draftPosts, feedReplyTokens, feedShortfall, parseFeedReply } from '../shared/game/feed'
+import { buildFeedPrompt, buildScenePhotoPrompt, draftPosts, feedReplyTokens, feedShortfall, parseFeedReply, parseScenePhoto, PLAYER_POSTER, scenePhotoDraft } from '../shared/game/feed'
+import { toDate } from '../shared/game/calendar'
 import { attendableEvents, buildEventPrompt, parseGeneratedEvents } from '../shared/game/events'
 import { buildSpendingPrompt, buildSummaryPrompt, fallbackSummary, parseSpending, parseSummary, PLAIN_FEELINGS, sceneRapport, sceneRevelations, type Spending, type Summary } from '../shared/game/memory'
 import { npcOf, sceneExtras, withNpc } from '../shared/game/npcs'
@@ -80,6 +81,7 @@ import {
   type FeedPictureResponse,
   FeedRequestSchema,
   type FeedResponse,
+  type ScenePhotoResponse,
   PlanOutingRequestSchema,
   PickCoursesRequestSchema,
   BanterRequestSchema, MomentLinesRequestSchema,
@@ -869,6 +871,28 @@ function registerIpc(
     // Made by the game as it is played, not by the editor: it goes with the player's own files whatever is being edited.
     const made = await generateArt(comfy.get(), packDir, userDir, { kind: 'photo', subjectId: authorId, name, workflow: '', positive: prompt, negative: '', ...sizeFor(comfy.get(), 'photo') })
     return made.ok ? { image: made.path } : { image: null, error: made.message }
+  })
+
+  // Never fails: a picture the player takes in a scene, its caption written from the scene and the picture drawn of whoever is in it with him.
+  ipcMain.handle(IPC.scenePhoto, async (_event, raw: unknown): Promise<ScenePhotoResponse> => {
+    const { state, scene } = SceneRequestSchema.parse(raw)
+    const content = readBy(state)
+    if (!isConfigured(settings.get().main)) return { error: notConfigured() }
+    if (!comfyReady()) return { error: t('llm.scenePhoto.noComfy') }
+    try {
+      const { system, user } = buildScenePhotoPrompt(content, state, scene)
+      // Written by whichever LLM writes the scene: one the Main LLM would not go over is the NSFW one's.
+      const { reply } = await completeWithFallback(settings.get(), scene.nsfw, { system, messages: [{ role: 'user', content: user }] })
+      const written = parseScenePhoto(content, scene, reply)
+      if (!written) return { error: t('llm.scenePhoto.unread') }
+      const date = toDate(content.calendar, state.time)
+      const prompt = scenePhotoDraft(content, state, scene, written, framingFor(comfy.get(), 'photo'))
+      // Made as the game is played: filed with the player's own pictures whatever is being edited.
+      const made = await generateArt(comfy.get(), packDir, userDir, { kind: 'photo', subjectId: PLAYER_POSTER, name: `bloomr-day-${date.dayIndex + 1}-${date.hour}`, workflow: '', positive: prompt, negative: '', ...sizeFor(comfy.get(), 'photo') })
+      return made.ok && made.path ? { text: written.text, image: made.path, comments: written.comments } : { error: made.message }
+    } catch (error) {
+      return { error: (error as Error).message }
+    }
   })
 
   // Never fails: without an LLM the plan is read off the names and places in the player's words.

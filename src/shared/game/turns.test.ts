@@ -60,7 +60,7 @@ describe('turns that can be taken back', () => {
   })
 
   it('keep what reached his phone meanwhile when one is taken back', () => {
-    const posted = { ...now.state, feedDay: 3, feed: [{ id: 'post-1-ana', authorId: 'ana', time: 1, text: 'Rain.', liked: false, likeCounted: false }] }
+    const posted = { ...now.state, feedDay: 3, feed: [{ id: 'post-1-ana', authorId: 'ana', time: 1, text: 'Rain.', liked: false, likeCounted: false, comments: [] }] }
     const back = rewound(turns[1], posted)
     expect(back).toMatchObject({ time: start.time, locationId: start.locationId, feedDay: 3 })
     expect(back.feed).toBe(posted.feed)

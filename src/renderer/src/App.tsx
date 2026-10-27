@@ -118,6 +118,7 @@ import {
   sceneEndWriter,
   planKey,
   postMade,
+  addPlayerPost,
   applyLook,
   applyComfort,
   applyLooks,
@@ -329,6 +330,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   const [scene, setScene] = useState<Scene | null>(initial.scene)
   // The character has closed the scene and the player hasn't moved on yet.
   const [ended, setEnded] = useState(false)
+  // A picture he is taking in a scene, being written and drawn.
+  const [photoBusy, setPhotoBusy] = useState(false)
   // Where the scene is on its way to, while the reply that takes it there is still being written.
   const [movingTo, setMovingTo] = useState<string | null>(null)
   useEffect(() => window.api.onSceneMoving(setMovingTo), [])
@@ -1280,7 +1283,43 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setPanel(scene.returnTo === 'fair' && fairNow(content, state) ? { kind: 'fair' } : null)
   }
 
-  async function finishScene() {
+  /** He says his goodbye: the line goes into the scene, and it is summed up at once, with no reply to it. */
+  function sayGoodbye() {
+    if (!scene || busy) return
+    const said: Scene = { ...scene, messages: [...scene.messages, { role: 'user', content: t('shell.app.goodbyeLine') }] }
+    setScene(said)
+    void finishScene(said)
+  }
+
+  /**
+   * He takes a picture of whoever is with him and posts it on Bloomr. It is written and drawn in the background while the
+   * scene goes on, and goes on the feed when it is done: at the hour he took it, unless the game has been left since.
+   */
+  async function takePhoto() {
+    if (!scene || photoBusy) return
+    setPhotoBusy(true)
+    setAgreed(t('shell.app.photoTaking'))
+    const { weatherSeed, time } = state
+    try {
+      const taken = await window.api.scenePhoto({ state, scene })
+      if (taken.image && taken.text) {
+        const { text, image, comments } = taken
+        setState((current) => (current.weatherSeed === weatherSeed ? addPlayerPost(current, { time, text, image, comments }) : current))
+        setAgreed(t('shell.app.photoPosted', { text }))
+      } else setAgreed(t('shell.app.photoFailed', { error: taken.error ?? '' }))
+    } catch (error) {
+      setAgreed(t('shell.app.photoFailed', { error: errorMessage(error) }))
+    } finally {
+      setPhotoBusy(false)
+    }
+  }
+
+  /** Turns the finished scene into a memory: the one on screen, or the one just added to. */
+  async function finishScene(said?: Scene) {
+    return summarise(said ?? scene)
+  }
+
+  async function summarise(scene: Scene | null) {
     if (!scene || busy) return
     if (scene.dance) return endDance()
     setBusy(true)
@@ -1470,7 +1509,10 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           }}
           turnsKept={turns.length}
           onRedo={redoFrom}
-          onContinue={finishScene}
+          onContinue={() => void finishScene()}
+          onGoodbye={sayGoodbye}
+          onPhoto={() => void takePhoto()}
+          photoBusy={photoBusy}
           onAcceptProposal={() => {
             if (!scene.proposal) return
             setState(acceptProposal(state, scene.proposal))

@@ -201,6 +201,8 @@ export const PlayerLookSchema = z.object({
   sprite: z.string().optional(),
   /** How far down the sprite his face is, for the portrait cut from it. */
   faceY: z.number().min(0).max(100).default(4),
+  /** His picture on Bloomr, in place of his face: a picture in the pack. */
+  bloomrPicture: z.string().optional(),
   /** The seed the art tool draws him with, so that one picture of him looks like the next. */
   imageSeed: z.number().int().optional()
 })

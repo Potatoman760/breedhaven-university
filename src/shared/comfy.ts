@@ -610,6 +610,40 @@ export function postPrompt(
   ])
 }
 
+/** How a picture the player takes in a scene was taken: of them posing for him, or of them caught as they are. */
+export const SCENE_SHOTS = ['posed', 'candid'] as const
+export type SceneShot = (typeof SCENE_SHOTS)[number]
+
+const COUNT_WORDS = ['one', 'two', 'three', 'four']
+
+/**
+ * The prompt for a picture the player takes in a scene and posts: of whoever is there with him, never of himself. Each
+ * of them is said in a paragraph of her own, so that an image model draws as many people as there are and no more;
+ * then what they are doing, the place behind, the light, and how it is framed.
+ */
+export function scenePhotoPrompt(sitters: Sitter[], shot: SceneShot, moment: string, place: Pick<Location, 'appearance'> | undefined, light: string, framing: string): string {
+  const count = COUNT_WORDS[sitters.length - 1] ?? String(sitters.length)
+  const lead =
+    sitters.length === 1
+      ? shot === 'posed'
+        ? 'A phone photo of one woman, solo, posing for the camera and looking into it'
+        : 'A candid phone photo of one woman, solo, caught in the moment'
+      : shot === 'posed'
+        ? `A phone photo of ${count} women together, posing for the camera`
+        : `A candid phone photo of ${count} women together, caught in the moment`
+  const person = (who: Sitter, i: number): string => {
+    const { subject } = pronounWords(who.pronouns)
+    const wears = who.wears.trim() === '' ? '' : ` ${subject[0].toUpperCase()}${subject.slice(1)} ${subject === 'they' ? 'wear' : 'wears'} ${who.wears}`
+    return paragraph(`${sitters.length === 1 ? '' : `The ${['first', 'second', 'third', 'fourth'][i] ?? 'next'}: `}${who.appearance.trim().replace(/[.!?]+$/, '')}.${wears}`)
+  }
+  return paragraphs([
+    [paragraph(lead), ...sitters.map(person), paragraph(moment)].filter(Boolean).join(' '),
+    place && place.appearance.trim() !== '' && paragraph(`In the background: ${place.appearance}`),
+    LIGHT_WORDS[light.trim().toLowerCase()],
+    framing.trim()
+  ])
+}
+
 /**
  * The prompt for a background: the place, the view of it (unless it is the Default one), the time of day, and how the
  * picture is framed, each a paragraph. A place given no name (a character's room, whose

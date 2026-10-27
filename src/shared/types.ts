@@ -183,6 +183,15 @@ export const FeedPictureRequestSchema = z.object({
 })
 export type FeedPictureRequest = z.input<typeof FeedPictureRequestSchema>
 
+/** A picture the player took in a scene: its caption and its path in the content, or why there is none. */
+export interface ScenePhotoResponse {
+  text?: string
+  image?: string
+  /** What each of those in it said under it, posted with it. */
+  comments?: { authorId: string; text: string }[]
+  error?: string
+}
+
 export interface FeedPictureResponse {
   /** The selfie's path in the content, or null when it could not be drawn. */
   image: string | null
@@ -237,6 +246,7 @@ export interface RendererApi {
   feed(request: FeedRequest): Promise<FeedResponse>
   /** Draws the selfie for one Bloomr post on ComfyUI. Never rejects. */
   feedPicture(request: FeedPictureRequest): Promise<FeedPictureResponse>
+  scenePhoto(request: SceneRequest): Promise<ScenePhotoResponse>
   getSettings(): Promise<SettingsView>
   saveSettings(update: SettingsUpdate): Promise<SettingsView>
   /** Sends a tiny request through the saved settings of the given profile. */

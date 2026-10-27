@@ -592,6 +592,15 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
   five more each time the reader scrolls to the end. The player can like a post or
   message its author. Her two latest posts that have gone up, and whether he liked them,
   are put into her prompt.
+- **The player's own posts**: "Take a picture" in a scene's way-out menu (beside the send arrow,
+  with the leave or end-of-class action and "Say goodbye", which says "Gotta go, goodbye!" and sums
+  the scene up at once) has the LLM that writes the scene write a caption and a line of what the
+  picture shows from its last lines, and ComfyUI draw it with the Photo workflow: of whoever is in
+  the scene with him, as they are dressed in it, never of the player (`scenePhotoPrompt`). It is
+  drawn in the background while the scene goes on, and goes on the feed as his, from
+  `@2Sire2Serious` (`PLAYER_HANDLE`), at the hour he took it. The same request has each of
+  those in it comment on the post in her own voice; the comments go up with it, and one by
+  anyone who was not in the scene is dropped (`parseScenePhoto`).
 - **Your own activity**: the "Something else?" box on the day view takes anything the
   player types ("invite Seraphine and Faye out for dinner"). The Main LLM turns it into an
   outing: a title, an opening line, who is invited (up to three), where, and for how long

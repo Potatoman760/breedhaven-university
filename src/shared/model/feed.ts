@@ -25,6 +25,8 @@ export const PostSchema = z.object({
   /** The player has liked it. */
   liked: z.boolean().default(false),
   /** His like has warmed her to him: the first like of a post does, once, however often it is taken back and given again. */
-  likeCounted: z.boolean().default(false)
+  likeCounted: z.boolean().default(false),
+  /** What was said under it: on a picture he took, by each of those in it. */
+  comments: z.array(z.object({ authorId: z.string(), text: z.string() })).default([])
 })
 export type Post = z.infer<typeof PostSchema>

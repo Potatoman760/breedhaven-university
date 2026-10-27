@@ -65,6 +65,8 @@ import {
   tieOf,
   toDate,
   toggleLike,
+  PLAYER_HANDLE,
+  PLAYER_POSTER,
   unreadNotes,
   unreadPosts,
   markFeedSeen,
@@ -758,6 +760,43 @@ function Updates({ content, state, onChange, onMessage, canMessage, error }: Upd
         <p className="hint phone-empty">{t('panels.phone.noPosts')}</p>
       )}
       {posts.slice(0, shown).map((post) => {
+        // His own pictures, taken in scenes: his face and handle, and nothing to like or answer.
+        if (post.authorId === PLAYER_POSTER) {
+          const { look } = content.newGame
+          return (
+            <article key={post.id} className="post mine">
+              <header>
+                {/* His Bloomr picture where he has one, whole and centred; his face cut from his sprite where he has not. */}
+                <Portrait who={{ name: state.player.name, faceY: look.bloomrPicture ? 50 : look.faceY }} image={look.bloomrPicture ?? look.sprite} size={44} className={look.bloomrPicture ? 'avatar whole' : 'avatar'} />
+                <div>
+                  <strong>{state.player.name}</strong>
+                  <span className="handle">
+                    {PLAYER_HANDLE} · {describeAge(content, { time: post.time }, state.time)}
+                  </span>
+                </div>
+              </header>
+              {post.image && <img src={`content://pack/${post.image}`} alt="" loading="lazy" />}
+              <p>{post.text}</p>
+              {post.comments.length > 0 && (
+                <ul className="post-comments">
+                  {post.comments.map((comment) => {
+                    const who = everyone.find((one) => one.id === comment.authorId)
+                    return (
+                      who && (
+                        <li key={comment.authorId}>
+                          <Portrait who={who} size={28} />
+                          <span>
+                            <strong>{who.name.split(' ')[0]}</strong> {comment.text}
+                          </span>
+                        </li>
+                      )
+                    )
+                  })}
+                </ul>
+              )}
+            </article>
+          )
+        }
         const author = content.loveInterests.find((li) => li.id === post.authorId)
         if (!author) return null
         const friend = everyone.find((other) => other.id === post.withId)

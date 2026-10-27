@@ -1,5 +1,5 @@
-import { SHOTS, postPrompt, type Shot } from '../comfy'
-import { classYear, outfitDescription, type ContentPack, type GameState, type LoveInterest, type Post, type PostPlan } from '../model'
+import { SCENE_SHOTS, SHOTS, postPrompt, scenePhotoPrompt, type SceneShot, type Shot } from '../comfy'
+import { classYear, outfitDescription, type ContentPack, type GameState, type LoveInterest, type Post, type PostPlan, type Scene } from '../model'
 import { formatDate, formatTime, periodAt, toDate } from './calendar'
 import { applyEffect } from './conditions'
 import { describeEvent, eventsOn } from './events'
@@ -7,6 +7,7 @@ import { locationOf, loveInterestsAt } from './map'
 import { wornOutfit } from './pregnancy'
 import { weatherOn } from './weather'
 import { seedOf } from './seed'
+import { namesHer } from './scene'
 import { t } from '../i18n'
 
 // Nobody posts before breakfast, or once the evening is over.
@@ -29,6 +30,13 @@ const FEED_TOKENS = { base: 600, each: 250 } as const
 export function feedReplyTokens(plans: PostPlan[]): number {
   return FEED_TOKENS.base + FEED_TOKENS.each * plans.length
 }
+
+/** Who a post by the player is filed under: he is no love interest, and has no id of his own. */
+export const PLAYER_POSTER = 'player'
+/** The player's name on Bloomr. */
+export const PLAYER_HANDLE = '@2Sire2Serious'
+// How much of a scene a picture taken in it is written from: its last lines.
+const PHOTO_LINES = 10
 
 /** Her name on Bloomr: the one written for her, or one made from her name. */
 export function handleOf(li: LoveInterest): string {
@@ -71,10 +79,94 @@ export function recentPostsBy(state: GameState, authorId: string, count = 2): Po
 export function addPosts(state: GameState, posts: { authorId: string; time: number; text: string; image?: string; withId?: string }[]): GameState {
   const added: Post[] = posts
     .filter((post) => post.text.trim() !== '')
-    .map(({ authorId, time, text, image, withId }) => ({ id: `post-${time}-${authorId}`, authorId, time, text: text.trim(), image, withId, liked: false, likeCounted: false }))
+    .map(({ authorId, time, text, image, withId }) => ({ id: `post-${time}-${authorId}`, authorId, time, text: text.trim(), image, withId, liked: false, likeCounted: false, comments: [] }))
     .filter((post, i, all) => !state.feed.some((old) => old.id === post.id) && all.findIndex((other) => other.id === post.id) === i)
   if (added.length === 0) return state
   return { ...state, feed: [...state.feed, ...added].sort((a, b) => a.time - b.time).slice(-MAX_FEED_POSTS) }
+}
+
+/**
+ * Puts a picture the player took on the feed, as his post, at once, with what those in it said under it. He may take
+ * more than one in an hour, so each has an id of its own.
+ */
+export function addPlayerPost(state: GameState, post: { time: number; text: string; image: string; comments?: Post['comments'] }): GameState {
+  let n = 1
+  while (state.feed.some((old) => old.id === `post-${post.time}-${PLAYER_POSTER}-${n}`)) n++
+  const made: Post = { id: `post-${post.time}-${PLAYER_POSTER}-${n}`, authorId: PLAYER_POSTER, time: post.time, text: post.text.trim(), image: post.image, liked: false, likeCounted: false, comments: post.comments ?? [] }
+  return { ...state, feed: [...state.feed, made].sort((a, b) => a.time - b.time).slice(-MAX_FEED_POSTS) }
+}
+
+/** Who is in a picture the player takes in a scene: everyone in it with him, and never himself. */
+function photographed(content: ContentPack, scene: Pick<Scene, 'loveInterestId' | 'companionIds'>): LoveInterest[] {
+  const everyone = [...content.loveInterests, ...content.npcs]
+  return [scene.loveInterestId, ...scene.companionIds].flatMap((id) => everyone.find((c) => c.id === id) ?? [])
+}
+
+/** The prompt asking the LLM for a picture the player takes in a scene: its caption, how it was taken and what it shows, as a JSON object. */
+export function buildScenePhotoPrompt(content: ContentPack, state: GameState, scene: Scene): { system: string; user: string } {
+  const player = state.player.name
+  const people = photographed(content, scene)
+  const names = people.map((li) => li.name.split(' ')[0]).join(', ')
+  const system = [
+    t('llm.scenePhoto.systemRole', { player }),
+    t('llm.scenePhoto.systemReply', { text: '"text"', shot: '"shot"', picture: '"picture"', posed: '"posed"', candid: '"candid"', comments: '"comments"', name: '"name"', player }),
+    t('llm.scenePhoto.caption', { player }),
+    t('llm.scenePhoto.picture', { names, player, count: people.length }),
+    t('llm.scenePhoto.comments', { names, player, count: people.length })
+  ].join('\n')
+  const place = content.locations.find((l) => l.id === state.locationId)
+  const user = [
+    t('llm.feed.today', { date: formatDate(toDate(content.calendar, state.time)) }),
+    place && t('llm.scenePhoto.place', { name: place.name, description: place.description }),
+    ...people.flatMap((li) => [t('llm.scenePhoto.who', { name: li.name, bio: li.bio }), li.ai.speechPattern && t('llm.feed.voice', { text: li.ai.speechPattern })]),
+    '',
+    t('llm.scenePhoto.lately'),
+    ...scene.messages.slice(-PHOTO_LINES).map((m) => (m.role === 'user' ? `${player}: ${m.content}` : m.content))
+  ]
+    .filter((line): line is string => typeof line === 'string')
+    .join('\n')
+  return { system, user }
+}
+
+/**
+ * What the LLM wrote for the picture: undefined when its reply holds no caption. A comment is kept only from someone in
+ * the scene, named as the reply named her, once each and in the order written; one by anybody else is dropped.
+ */
+export function parseScenePhoto(content: ContentPack, scene: Pick<Scene, 'loveInterestId' | 'companionIds'>, reply: string): { text: string; shot: SceneShot; picture: string; comments: Post['comments'] } | undefined {
+  const start = reply.indexOf('{')
+  const end = reply.lastIndexOf('}')
+  if (start < 0 || end < start) return undefined
+  let read: { text?: unknown; shot?: unknown; picture?: unknown; comments?: unknown }
+  try {
+    read = JSON.parse(reply.slice(start, end + 1)) as typeof read
+  } catch {
+    return undefined
+  }
+  const text = typeof read.text === 'string' ? read.text.trim().replace(/^["“]|["”]$/g, '').slice(0, MAX_POST_CHARS) : ''
+  if (text === '') return undefined
+  const shot = SCENE_SHOTS.find((one) => one === (typeof read.shot === 'string' ? read.shot.trim().toLowerCase() : '')) ?? 'candid'
+  const people = photographed(content, scene)
+  const comments: Post['comments'] = []
+  for (const entry of Array.isArray(read.comments) ? read.comments : []) {
+    const { name, text: said } = (entry ?? {}) as { name?: unknown; text?: unknown }
+    const who = typeof name === 'string' ? people.find((li) => namesHer(name, li)) : undefined
+    const wording = typeof said === 'string' ? said.trim().replace(/^["“]|["”]$/g, '').slice(0, MAX_POST_CHARS) : ''
+    if (who && wording && !comments.some((one) => one.authorId === who.id)) comments.push({ authorId: who.id, text: wording })
+  }
+  return { text, shot, picture: typeof read.picture === 'string' ? read.picture.trim().slice(0, MAX_POST_CHARS) : '', comments }
+}
+
+/**
+ * The prompt a picture taken in a scene is drawn from: everyone in it as they are dressed in the scene, what the LLM said
+ * they are doing, and the place and the light now.
+ */
+export function scenePhotoDraft(content: ContentPack, state: GameState, scene: Scene, written: { shot: SceneShot; picture: string }, framing: string): string {
+  const people = photographed(content, scene)
+  const chosen = (id: string) => (id === scene.loveInterestId ? scene.outfitId : scene.looks?.[id]?.outfitId)
+  const sitters = people.map((li) => ({ appearance: li.appearance, pronouns: li.pronouns, wears: outfitDescription(li.outfits, wornOutfit(content, state, li, chosen(li.id))) }))
+  const place = content.locations.find((l) => l.id === state.locationId)
+  const light = periodAt(content.calendar, toDate(content.calendar, state.time).hour).light
+  return scenePhotoPrompt(sitters, written.shot, written.picture, place, light, framing)
 }
 
 /** One planned post, told from every other: nobody posts twice in an hour. */

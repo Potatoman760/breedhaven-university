@@ -14,9 +14,14 @@ import {
   feedShortfall, parseFeedReply,
   postMade,
   recentPostsBy,
-  toggleLike
+  toggleLike,
+  addPlayerPost,
+  buildScenePhotoPrompt,
+  parseScenePhoto,
+  PLAYER_POSTER,
+  scenePhotoDraft
 } from './feed'
-import type { ContentPack } from '../model'
+import type { ContentPack, Scene } from '../model'
 import { buildCharacterPrompt } from './prompt'
 import { createInitialState } from './state'
 import { fixture } from './testFixture'
@@ -201,5 +206,47 @@ describe('a reply that ran out of room', () => {
     const cut = '[{"n":1,"text":"Rain again.","picture":"she holds up a cup"}, {"n":2,"text":"Late.","picture":"she runs"}, {"n":3,"text":"Half a th'
     expect(parseFeedReply(cut, plans).map((post) => [post.index, post.text])).toEqual([[0, 'Rain again.'], [1, 'Late.']])
     expect(parseFeedReply('no posts today', plans)).toEqual([])
+  })
+})
+
+describe('a picture he takes in a scene', () => {
+  const scene = { loveInterestId: 'ana', companionIds: ['bea'], npc: false, nsfw: false, beats: [], messages: [{ role: 'user' as const, content: 'Smile!' }], gifts: [], conceived: [], departed: [], baseline: {} } as unknown as Scene
+
+  it('is of everyone with him and never of him', () => {
+    const prompt = scenePhotoDraft(content, start, scene, { shot: 'posed', picture: 'They are laughing at the counter.' }, '')
+    expect(prompt).toMatch(/^A phone photo of two women together, posing for the camera\./)
+    expect(prompt).toContain('The first: A tall woman with short black hair.')
+    expect(prompt).toContain('The second: A small woman with long red curls.')
+    expect(prompt).not.toMatch(/\b(man|he|him)\b/i)
+  })
+
+  it('asks for a caption and the picture as a JSON object, with the scene so far', () => {
+    const { system, user } = buildScenePhotoPrompt(content, start, scene)
+    expect(system).toContain('only Ana, Bea are')
+    expect(user).toContain(`${start.player.name}: Smile!`)
+  })
+
+  it('reads the reply, and reads nothing from one with no caption', () => {
+    expect(parseScenePhoto(content, scene, 'Sure: {"text": "Best study break", "shot": "POSED", "picture": "She is grinning."}')).toEqual({ text: 'Best study break', shot: 'posed', picture: 'She is grinning.', comments: [] })
+    expect(parseScenePhoto(content, scene, '{"text": "  ", "picture": "x"}')).toBeUndefined()
+    expect(parseScenePhoto(content, scene, 'no json')).toBeUndefined()
+  })
+
+  it('asks each of them in it for a comment', () => {
+    expect(buildScenePhotoPrompt(content, start, scene).system).toContain('each of Ana, Bea comments once')
+  })
+
+  it('keeps a comment from each of those in the scene, once, and none from anybody else', () => {
+    const reply = '{"text": "Shop day", "picture": "They wave.", "comments": [{"name": "Bea", "text": "Who let you hold the phone?"}, {"name": "ANA", "text": "Delete this."}, {"name": "Bea", "text": "again"}, {"name": "Cy", "text": "hi"}, {"name": "Ana"}]}'
+    expect(parseScenePhoto(content, scene, reply)?.comments).toEqual([
+      { authorId: 'bea', text: 'Who let you hold the phone?' },
+      { authorId: 'ana', text: 'Delete this.' }
+    ])
+  })
+
+  it('goes on the feed as his, with their comments, more than once in an hour if he takes more', () => {
+    const once = addPlayerPost(start, { time: start.time, text: 'One', image: 'a.webp', comments: [{ authorId: 'ana', text: 'Cute.' }] })
+    const twice = addPlayerPost(once, { time: start.time, text: 'Two', image: 'b.webp' })
+    expect(feedOf(twice).map((post) => [post.authorId, post.text, post.comments.length])).toEqual([[PLAYER_POSTER, 'Two', 0], [PLAYER_POSTER, 'One', 1]])
   })
 })
