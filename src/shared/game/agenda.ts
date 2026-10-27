@@ -25,6 +25,42 @@ export interface AgendaItem {
   description?: string
 }
 
+/** One hour of the day a plan is suggested for: what of his is then, and whether the plan is. */
+export interface PlanHour {
+  hour: number
+  /** What he has on at that hour, if anything. */
+  mine?: string
+  /** Whether what he has then holds him: an event is shown, but going to one is up to him. */
+  holds: boolean
+  plan: boolean
+}
+
+// What of his day a plan cannot share an hour with.
+const HOLDING: AgendaItem['kind'][] = ['class', 'society', 'work', 'plan', 'orientation', 'birth']
+
+/**
+ * A suggested plan laid over the day it falls on, hour by hour, for him to see before he says yes: what he has then, and
+ * what of it the plan would fall on. The hours run from his day's usual start to its end, widened to take in whatever
+ * is on it and the plan itself.
+ */
+export function dayAgainst(content: ContentPack, state: GameState, plan: { time: number; hours: number }): { allDay: AgendaItem[]; hours: PlanHour[]; clashes: string[] } {
+  const { dayIndex, hour: start } = toDate(content.calendar, plan.time)
+  const agenda = dayAgenda(content, state, dayIndex)
+  const timed = agenda.filter((item) => item.startHour !== undefined)
+  const end = start + plan.hours
+  const from = Math.min(content.coursework?.dayStart ?? 8, start, ...timed.map((item) => item.startHour!))
+  const until = Math.max(content.coursework?.dayEnd ?? 18, end, ...timed.map((item) => item.startHour! + (item.hours ?? 1)))
+  const at = (hour: number) => timed.find((item) => hour >= item.startHour! && hour < item.startHour! + (item.hours ?? 1))
+  const hours = Array.from({ length: until - from }, (_, i): PlanHour => {
+    const hour = from + i
+    const item = at(hour)
+    return { hour, mine: item?.title, holds: item !== undefined && HOLDING.includes(item.kind), plan: hour >= start && hour < end }
+  })
+  // Each thing it falls on is named once, however many of its hours it does.
+  const clashes = timed.filter((item) => HOLDING.includes(item.kind) && item.startHour! < end && start < item.startHour! + (item.hours ?? 1)).map((item) => item.title)
+  return { allDay: agenda.filter((item) => item.startHour === undefined), hours, clashes }
+}
+
 /** The game time at a given hour of a given day of the game, where day 0 is the day it starts. */
 export function timeOn(content: ContentPack, dayIndex: number, hour: number): number {
   const { calendar } = content

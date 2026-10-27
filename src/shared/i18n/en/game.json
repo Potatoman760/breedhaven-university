@@ -26,6 +26,7 @@
   "appointments.taken": "{when}, the first time that fits what was asked, is taken: {busy}. ",
   "appointments.booked": "Already on {player}'s calendar with you: {plans}. If that is what is being talked about, it is booked: say so, and do not suggest another time for it. ",
   "appointments.bookedPlan": "\"{title}\", {when}",
+  "appointments.same": "Already on {player}'s calendar with you at {place}: \"{title}\", {when}. Nothing new was suggested. Talk of that plan as it is booked; do not suggest another time for it.",
   "appointments.noTime": "No time could be found in the next two weeks when {group, select, true {all of you are} other {you are both}} free and {place} is open. Say that you can't find a time, and suggest trying another place or time of day{group, select, true {, or fewer people} other {}}.",
   "appointments.meetUp": "Meet up",
   "appointments.off": "{days, plural, =0 {today} =1 {tomorrow} other {# days from now}}",

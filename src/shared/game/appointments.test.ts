@@ -116,10 +116,19 @@ describe('proposeMeeting', () => {
     expect(hers.message).toContain('is taken: Ana has her Chess Club meeting.')
   })
 
-  it('names a plan she already has with him, so that it is not made twice', () => {
+  it('offers nothing for a plan she already has with him there, so that it is not booked twice', () => {
     const booked = acceptProposal(state, { loveInterestId: 'ana', companionIds: [], title: 'Tea', time: 22, hours: 2, locationId: 'home' })
-    const { message } = proposeMeeting(content, booked, 'ana', { activity: 'tea', place: 'home', earliest: 'tomorrow' })
-    expect(message).toMatch(/^Already on Pat's calendar with you: "Tea", .*it is booked: say so, and do not suggest another time for it\. .*is taken: he already has a plan \(Tea with Ana\)\./)
+    const { proposal, message } = proposeMeeting(content, booked, 'ana', { activity: 'tea', place: 'home', earliest: 'tomorrow' })
+    expect(proposal).toBeUndefined()
+    expect(message).toMatch(/^Already on Pat's calendar with you at .*: "Tea", .*Nothing new was suggested\./)
+  })
+
+  it('names a plan she has with him elsewhere, and still finds a time for the new one', () => {
+    const shop = content.locations.find((l) => l.id !== 'home')!.id
+    const booked = acceptProposal(state, { loveInterestId: 'ana', companionIds: [], title: 'Tea', time: 22, hours: 2, locationId: shop })
+    const { proposal, message } = proposeMeeting(content, booked, 'ana', { activity: 'study', place: 'home' })
+    expect(proposal).toBeDefined()
+    expect(message).toMatch(/^Already on Pat's calendar with you: "Tea", .*it is booked: say so, and do not suggest another time for it\./)
   })
 })
 

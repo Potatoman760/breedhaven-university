@@ -1,4 +1,4 @@
-import logo from '../../../assets/BreedhavenTitle.png'
+import logo from '../../../assets/BreedhavenTitle.webp'
 import { t } from '../../../shared/i18n'
 
 interface Props {

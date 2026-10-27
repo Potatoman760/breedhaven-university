@@ -3,6 +3,7 @@ import { useConfirm } from './Confirm'
 import { useEffect, useMemo, useRef, useState, type FormEvent, type CSSProperties, type KeyboardEvent } from 'react'
 import { MAX_CHILD_NAME, COMFORT_WORDS, hasSkill, attendees, bondLifts, describeBond, describeWhen, statusOf, dialogueLines, firstNames, sceneCast, sceneClock, toDate, weatherOn, wornOutfit, lookOf, spriteFor, npcAsCharacter, UNNAMED, playerRoom, roomBackdrop, roomOwner, sceneExtras, sceneSuggestions, plain, type Suggestion } from '../../../shared/game'
 import { Portrait } from './Portrait'
+import { PlanCompare } from './PlanCompare'
 import { basePoseId, poseMedia, type ContentPack, type GameState, type LoveInterest, type Scene } from '../../../shared/model'
 import { playSong, setPoseLoop, stopSong, useVolumes } from '../sound'
 import { LoadingScreen } from './LoadingScreen'
@@ -547,6 +548,7 @@ export function SceneView(props: Props) {
                     {content.locations.find((l) => l.id === scene.proposal?.locationId)?.name}
                   </span>
                 </div>
+                <PlanCompare content={content} state={state} plan={scene.proposal} id="scene" />
                 <button disabled={busy} onClick={props.onAcceptProposal}>
                   {t('screens.sceneView.accept')}
                 </button>

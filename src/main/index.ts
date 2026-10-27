@@ -703,8 +703,12 @@ function registerIpc(
           const event = goable.find((e) => e.id.toLowerCase() === one.eventId || e.name.toLowerCase().replace(/^the /, '') === one.eventId.replace(/^the /, ''))
           return id && event ? [{ eventId: event.id, ids: [id] }] : []
         })
+    // Agreed to in words and suggested again in the same reply, for the same place, it is the one plan: the first suggestion stands,
+    // not one at whatever time was free after it.
+    const pending = scene.proposal !== undefined && scene.proposal.time > state.time ? scene.proposal : undefined
+    if (agreed && pending && proposal?.locationId === pending.locationId) proposal = undefined
     // The plan she suggested earlier, agreed to in words: booked, unless a new one was suggested in its place.
-    const proposalAccepted = !npc && agreed && scene.proposal !== undefined && scene.proposal.time > state.time && !proposal
+    const proposalAccepted = !npc && agreed && pending !== undefined && !proposal
     // They go to sleep for the night where they are, when it is late enough for that.
     const sleptOver = !npc && slept && canSleepOver(content, state) && !walkTo && !movedTo
     // How comfortable each of them says she is, kept for the next prompt and for nothing else.

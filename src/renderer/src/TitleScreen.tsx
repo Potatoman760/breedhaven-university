@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import music from '../../assets/Magical College Days.mp3'
-import titleArt from '../../assets/BreedhavenTitle.png'
+import titleArt from '../../assets/BreedhavenTitle.webp'
 import { adjustStat, catalogueIsStale, createInitialState, describeModifier, describeStat, PLAYER_TOKEN, POINT_BUY, pointCost, pointsLeft, randomStats, startingStats } from '../../shared/game'
 import { STAT_LABELS, STATS, type ContentPack, type Stat } from '../../shared/model'
 import { AUTO_SLOT_ID, latestSave, type SaveData, type SaveSummary } from '../../shared/saves'

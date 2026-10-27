@@ -515,7 +515,7 @@ pre {
   box-sizing: border-box;
   height: 100vh;
   padding: 24px;
-  background: #0a1817 url('../../assets/BreedhavenSplash.png') center / cover no-repeat;
+  background: #0a1817 url('../../assets/BreedhavenSplash.webp') center / cover no-repeat;
 }
 
 /* The menu's music, turned on and off in a corner of it. */
@@ -548,7 +548,7 @@ pre {
      height: the slices are where the border meets the parchment in the picture, and it is drawn at about two-thirds. */
   border-style: solid;
   border-width: 96px 62px 88px;
-  border-image: url('../../assets/title/frame.png') 145 92 130 92 fill / 96px 62px 88px stretch;
+  border-image: url('../../assets/title/frame.webp') 145 92 130 92 fill / 96px 62px 88px stretch;
   filter: drop-shadow(0 18px 40px rgba(0, 0, 0, 0.5));
 }
 
@@ -1882,6 +1882,20 @@ textarea.memory {
   display: block;
 }
 
+/* A suggested plan's day: one column of hours, drawn over the whole window where it is placed from its button. */
+.compare-pop.day {
+  position: fixed;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 280px;
+}
+
+.compare-title {
+  font-size: 0.875rem;
+}
+
 .compare-grid {
   display: grid;
   gap: 2px;
@@ -1989,7 +2003,7 @@ textarea.memory {
   justify-content: center;
   background:
     linear-gradient(var(--scrim), var(--scrim)),
-    #0a1817 url('../../assets/BreedhavenSplash.png') center / cover no-repeat;
+    #0a1817 url('../../assets/BreedhavenSplash.webp') center / cover no-repeat;
   color: var(--on-wood);
   cursor: pointer;
 }
@@ -3364,8 +3378,8 @@ button.stat-grid:hover {
   padding: 46px 10px 18px;
   overflow: hidden;
   background:
-    url('../../assets/phone/vine.png') right -26px top 150px / 64px auto no-repeat,
-    url('../../assets/phone/vine.png') left -30px bottom -40px / 70px auto no-repeat,
+    url('../../assets/phone/vine.webp') right -26px top 150px / 64px auto no-repeat,
+    url('../../assets/phone/vine.webp') left -30px bottom -40px / 70px auto no-repeat,
     linear-gradient(180deg, #2c4127, var(--wood-deep));
   box-shadow: inset -1px 0 0 rgba(212, 175, 90, 0.5);
 }
@@ -3560,7 +3574,7 @@ button.btn.back-button.phone-back {
   flex: none;
   width: 44px;
   height: 30px;
-  background: url('../../assets/phone/sprig.png') center / contain no-repeat;
+  background: url('../../assets/phone/sprig.webp') center / contain no-repeat;
 }
 
 .section-rule::after {
@@ -5199,8 +5213,37 @@ select.pill-add {
 }
 
 /* A plan with her still to come, above where he writes: it can be called off from here. */
-.proposal.upcoming {
-  margin: 0 12px 8px;
+/* Plans with whoever the thread is with: a quiet line each above the messages, not a card. */
+.chat-plans {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 4px 0 6px;
+  list-style: none;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.chat-plans li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 0.875rem;
+  color: var(--wood);
+}
+
+.chat-plans li > svg {
+  flex: none;
+  color: var(--moss);
+}
+
+.chat-plans li > span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* What the game's workflows call for: file names, one to a line, with the ones a ComfyUI lacks marked. */

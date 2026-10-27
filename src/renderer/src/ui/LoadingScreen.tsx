@@ -1,7 +1,7 @@
 import { useState, type CSSProperties } from 'react'
 
 // The passers-by, drawn as white cut-outs from the hips up, all facing left.
-const CROWD = Object.values(import.meta.glob<string>('../../../assets/loading/crowd-*.png', { eager: true, import: 'default' }))
+const CROWD = Object.values(import.meta.glob<string>('../../../assets/loading/crowd-*.webp', { eager: true, import: 'default' }))
 
 // How far off each lane of the crowd is: the further, the smaller, fainter and slower, so that the street has depth.
 const LANES = [

@@ -76,6 +76,7 @@ import {
   leaveSociety
 } from '../../../shared/game'
 import { Button } from './Button'
+import { PlanCompare } from './PlanCompare'
 import { useModelName } from '../modelName'
 import type { PhoneApp } from './panels'
 import { Portrait } from './Portrait'
@@ -84,14 +85,14 @@ import { errorMessage } from '../errors'
 import { Overlay } from './Dialog'
 import { useConfirm } from './Confirm'
 import { BackIcon, BatteryIcon, CalendarIcon, ChatIcon, ChevronIcon, ClockIcon, CoinIcon, HeartIcon, PregnantIcon, SignalIcon, TagIcon, WeatherIcon, WifiIcon } from './icons'
-import crest from '../../../assets/phone/crest.png'
-import star from '../../../assets/phone/star.png'
-import chatsArt from '../../../assets/phone/apps/chats.png'
-import friendsArt from '../../../assets/phone/apps/friends.png'
-import updatesArt from '../../../assets/phone/apps/updates.png'
-import jobsArt from '../../../assets/phone/apps/jobs.png'
-import societiesArt from '../../../assets/phone/apps/societies.png'
-import shopArt from '../../../assets/phone/apps/shop.png'
+import crest from '../../../assets/phone/crest.webp'
+import star from '../../../assets/phone/star.webp'
+import chatsArt from '../../../assets/phone/apps/chats.webp'
+import friendsArt from '../../../assets/phone/apps/friends.webp'
+import updatesArt from '../../../assets/phone/apps/updates.webp'
+import jobsArt from '../../../assets/phone/apps/jobs.webp'
+import societiesArt from '../../../assets/phone/apps/societies.webp'
+import shopArt from '../../../assets/phone/apps/shop.webp'
 import { Stalls } from './MarketView'
 import { BackButton } from './BackButton'
 import { useBack } from '../mouseBack'
@@ -434,6 +435,24 @@ function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadPr
 
   return (
     <>
+      {/* What the two of them have planned, a line each at the head of the thread: there to be seen, and called off, without crowding what is said. */}
+      {plans.length > 0 && (
+        <ul className="chat-plans">
+          {plans.map((plan) => (
+            <li key={plan.id}>
+              <CalendarIcon size={14} />
+              <span>
+                <strong>{plan.title}</strong> · {describeWhen(content, plan.time)} · {content.locations.find((l) => l.id === plan.locationId)?.name}
+                {attendees(plan).length > 1 && ` · ${firstNames(content, attendees(plan))}`}
+              </span>
+              {/* Calling it off is a message: it comes off the calendar, and nothing is held against him for missing it. */}
+              <Button variant="quiet" size="small" disabled={waiting} onClick={() => void say((current) => cancelAppointment(content, current, plan.id))}>
+                {t('panels.phone.cancelPlan')}
+              </Button>
+            </li>
+          ))}
+        </ul>
+      )}
       <div className="chat-messages">
         {thread.length === 0 && <p className="hint center">{t('panels.phone.noMessages', { name: firstName })}</p>}
         {thread.map((note, i) => {
@@ -484,8 +503,10 @@ function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadPr
                       {describeWhen(content, plan.time)} · {content.locations.find((l) => l.id === plan.locationId)?.name}
                     </span>
                   </div>
+                  {/* What he has that day, while it is still his to answer. */}
+                  {!note.answer && inviteStands(content, state, plan) && <PlanCompare content={content} state={state} plan={plan} id={`${id}-${i}`} />}
                   {/* One for today can be gone to at once: the hours until it starts are skipped, and it begins. */}
-                  {goNow && <button onClick={() => onGoToInvite?.(id, i)}>{t('panels.phone.goNow')}</button>}
+                  {goNow &&<button onClick={() => onGoToInvite?.(id, i)}>{t('panels.phone.goNow')}</button>}
                   {note.answer ? (
                     <span className="chip">{t(ANSWERS[note.answer])}</span>
                   ) : inviteStands(content, state, plan) ? (
@@ -518,20 +539,6 @@ function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadPr
       </div>
 
       {notice && <p className="notice">{notice}</p>}
-      {plans.map((plan) => (
-        <div key={plan.id} className="proposal upcoming">
-          <div>
-            <strong>{t('panels.phone.planWith', { title: plan.title, names: firstNames(content, attendees(plan)) })}</strong>
-            <span>
-              {describeWhen(content, plan.time)} · {content.locations.find((l) => l.id === plan.locationId)?.name}
-            </span>
-          </div>
-          {/* Calling it off is a message: it comes off the calendar, and nothing is held against him for missing it. */}
-          <button className="secondary" disabled={waiting} onClick={() => void say((current) => cancelAppointment(content, current, plan.id))}>
-            {t('panels.phone.cancelPlan')}
-          </button>
-        </div>
-      ))}
       <form className="chat-compose" onSubmit={send}>
         <EmojiPicker onPick={addEmoji} />
         <input

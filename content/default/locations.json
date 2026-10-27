@@ -615,8 +615,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/pixel-and-rune/default-day-2.png",
-          "night": "generated/backgrounds/pixel-and-rune/default-night.png"
+          "day": "generated/backgrounds/pixel-and-rune/default-day-2.webp",
+          "night": "generated/backgrounds/pixel-and-rune/default-night-2.webp"
         }
       }
     ],
@@ -714,8 +714,8 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/ironroot/default-day-2.png",
-          "night": "generated/backgrounds/ironroot/default-night-3.png"
+          "day": "generated/backgrounds/ironroot/default-day-2.webp",
+          "night": "generated/backgrounds/ironroot/default-night-3.webp"
         }
       }
     ],
