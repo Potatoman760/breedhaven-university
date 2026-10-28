@@ -8,6 +8,7 @@ import {
   canWork,
   currentJob,
   excuseShift,
+  callOffShift,
   hoursPerWeek,
   jobFacts,
   payShift,
@@ -167,6 +168,17 @@ describe('missing a shift', () => {
     expect(after.job?.strikes).toBe(0.5)
     expect(courierThread(after, 'bryn').at(-1)?.text).toContain('it still counts for half: you\'re on 0.5 of 3')
     expect(shiftLaterToday(content, told)).toBeUndefined()
+  })
+
+  it('is called off by a message to his boss, which excuses it whatever her reply makes of it', () => {
+    const called = callOffShift(content, hired)
+    expect(called.job?.excused).toEqual(['0:8'])
+    expect(courierThread(called, 'bryn').at(-1)).toMatchObject({ from: 'player', text: "I can't make my 08:00 shift today. Sorry for the short notice." })
+    expect(settleShifts(content, at(called, 5)).job?.strikes).toBe(0.5)
+    // Once called off, or once it has begun, there is nothing left to call off.
+    expect(callOffShift(content, called)).toBe(called)
+    const begun = at(hired, 2)
+    expect(callOffShift(content, begun)).toBe(begun)
   })
 
   it('loses him the job at the third strike, for good', () => {

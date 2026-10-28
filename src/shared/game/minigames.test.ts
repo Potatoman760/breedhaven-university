@@ -1,36 +1,42 @@
 import { describe, expect, it } from 'vitest'
-import type { ContentPack } from '../model'
+import type { ContentPack, Mood } from '../model'
 import {
-  breathAt,
+  candleLit,
+  candlesDone,
+  candlesScore,
+  createCandles,
+  lightCandle,
+  stepCandles,
+  type CandleGame,
+  answerFace,
+  createFaces,
+  faceNow,
+  facesDone,
+  facesScore,
+  stepFaces,
+  TONE_FOR,
+  type FaceGame,
+  type Tone,
   circuitDone,
   circuitLit,
   circuitScore,
-  createBreath,
   createCircuit,
   createMiniGame,
   createPace,
   createPower,
-  createRoom,
   createWire,
   difficultyFor,
   drillPoints,
   finishDrill,
-  miniGameDone,
   moveWire,
   paceBand,
   paceScore,
   powerDone,
   powerScore,
-  pressBreath,
   pressPower,
-  releaseBreath,
   releasePower,
-  roomDone,
-  roomScore,
-  sayTopic,
   shownForce,
   SIDES,
-  stepBreath,
   stepPace,
   stepPower,
   tapPace,
@@ -38,7 +44,6 @@ import {
   turned,
   wireDone,
   wireScore,
-  breathScore,
   stepWire,
   type CircuitGame,
   type PowerGame
@@ -169,6 +174,7 @@ describe('the game for intelligence', () => {
   it('is bigger the better he is, and counts what is lit of a circuit not finished', () => {
     expect(createCircuit(1, 0).size).toBe(4)
     expect(createCircuit(1, 1).size).toBe(6)
+    expect([createCircuit(1, 0).limit, createCircuit(1, 1).limit]).toEqual([20, 30])
     const game = createCircuit(2, 0)
     expect(circuitScore(game)).toBeLessThan(0.6)
     expect(turned(SIDES.north)).toBe(SIDES.east)
@@ -178,52 +184,96 @@ describe('the game for intelligence', () => {
 })
 
 describe('the game for wisdom', () => {
-  it('is in step while he holds as the ring grows and lets go as it shrinks', () => {
-    let game = createBreath(4, 0)
-    let fumbled = createBreath(4, 0)
-    while (!miniGameDone(game)) {
-      game = breathAt(game).inhaling ? pressBreath(game) : releaseBreath(game)
-      game = stepBreath(game, DT)
+  /** Watches the showing to its end, writing down each candle as it flares, and takes his turn. */
+  const watch = (game: CandleGame) => {
+    const seen: number[] = []
+    // The candle he lit last flares on a moment into the showing: what is shown starts once it has gone dark.
+    let dark = false
+    let was: number | undefined
+    while (game.phase === 'showing' && !candlesDone(game)) {
+      const lit = candleLit(game)?.candle
+      if (lit === undefined) dark = true
+      else if (dark && lit !== was) seen.push(lit)
+      was = lit
+      game = stepCandles(game, DT)
     }
-    expect(breathScore(game)).toBeGreaterThan(0.95)
-    // Holding all the way through is in step for only half of it, and pressing as it shrinks breaks the quiet.
-    let held = pressBreath(createBreath(4, 0))
-    while (!miniGameDone(held)) held = stepBreath(held, DT)
-    expect(breathScore(held)).toBeLessThan(0.65)
-    fumbled = stepBreath({ ...fumbled, time: fumbled.breaths[0].inhale + 1 }, DT)
-    expect(pressBreath(fumbled).fumbles).toBe(1)
+    return { game, seen }
+  }
+
+  it('shows an order he lights again, one longer each round, until the time is up', () => {
+    let game = createCandles(4, 0)
+    expect(game.candles).toBe(4)
+    expect(game.order.slice(1).every((candle, i) => candle !== game.order[i] && candle < 4)).toBe(true)
+    // Lighting before the showing is over does nothing.
+    expect(lightCandle(game, game.order[0])).toBe(game)
+    for (;;) {
+      const watched = watch(game)
+      if (candlesDone(watched.game)) break
+      expect(watched.seen).toEqual(game.order.slice(0, game.length))
+      game = watched.seen.reduce(lightCandle, watched.game)
+    }
+    expect(game.rounds).toBeGreaterThanOrEqual(3)
+    expect(candlesScore(game)).toBe(Math.min(1, game.rounds / 5))
+  })
+
+  it('is over at the first wrong candle, and is harder the better he is', () => {
+    const { game } = watch(createCandles(4, 0))
+    const right = lightCandle(game, game.order[0])
+    expect(right).toMatchObject({ entered: 1, phase: 'repeating' })
+    const wrong = lightCandle(right, (game.order[1] + 1) % game.candles)
+    expect(wrong.phase).toBe('over')
+    expect(candlesDone(wrong)).toBe(true)
+    expect(candleLit(wrong)).toEqual({ candle: (game.order[1] + 1) % game.candles, right: false })
+    expect(candlesScore(wrong)).toBe(0)
+    const hard = createCandles(4, 1)
+    expect(hard.candles).toBe(6)
+    expect(hard.beat).toBeLessThan(game.beat)
   })
 })
 
 describe('the game for charisma', () => {
   const room: ContentPack = {
     ...content,
-    minigames: {
-      pieces: [],
-      topics: ['books', 'sport', 'food', 'music', 'magic'].map((id) => ({ id, name: id })),
-      listeners: [
-        { id: 'a', name: 'A', likes: ['books'], dislikes: ['sport'] },
-        { id: 'b', name: 'B', likes: ['books', 'food'], dislikes: [] },
-        { id: 'c', name: 'C', likes: ['music'], dislikes: ['books'] }
-      ]
+    minigames: { pieces: [], listeners: ['a', 'b', 'c'].map((id) => ({ id, name: id.toUpperCase(), faces: {} })) }
+  }
+  /** Plays a round, answering each face after waiting so long, in the tone `choose` picks for her mood. */
+  const play = (game: FaceGame, wait: number, choose: (mood: Mood) => Tone) => {
+    while (!facesDone(game)) {
+      const now = faceNow(game)
+      game = now && now.waited >= wait ? answerFace(game, choose(now.mood)) : stepFaces(game, DT)
     }
+    return game
   }
 
-  it('moves each of them by what she makes of the topic, less the second time, over six turns', () => {
-    let game = createRoom(room, 9, 0)
-    expect(game.listeners).toHaveLength(3)
-    expect(game.hand).toHaveLength(4)
-    const books = { ...game, hand: room.minigames.topics }
-    const once = sayTopic(books, 'books')
-    const byId = (g: typeof game, id: string) => g.last[g.listeners.findIndex((one) => one.id === id)]
-    expect([byId(once, 'a'), byId(once, 'b'), byId(once, 'c')]).toEqual([0.25, 0.25, -0.2])
-    const twice = sayTopic({ ...once, hand: room.minigames.topics }, 'books')
-    expect(byId(twice, 'a')).toBe(0.125)
-    // A topic not in his hand is not his to bring up.
-    expect(sayTopic({ ...game, hand: [] }, 'books')).toEqual({ ...game, hand: [] })
-    while (!roomDone(game)) game = sayTopic(game, game.hand[0].id)
-    expect(game.said).toHaveLength(6)
-    expect(roomScore(game)).toBeGreaterThanOrEqual(0)
+  it('is answered right in the tone each mood wants, worth more the sooner, and nothing for a wrong tone or none', () => {
+    const quick = play(createFaces(room, 9, 0), 0.2, (mood) => TONE_FOR[mood])
+    expect(quick.results.length).toBeGreaterThan(20)
+    expect(facesScore(quick)).toBeGreaterThan(0.9)
+    expect(facesScore(play(createFaces(room, 9, 0), 2, (mood) => TONE_FOR[mood]))).toBeLessThan(0.75)
+    expect(facesScore(play(createFaces(room, 9, 0), 0.2, (mood) => (TONE_FOR[mood] === 'joke' ? 'space' : 'joke')))).toBe(0)
+    // Left to wait, each face gives up, and the round comes to nothing.
+    let idle = createFaces(room, 9, 0)
+    while (!facesDone(idle)) idle = stepFaces(idle, DT)
+    expect(idle.results.length).toBeGreaterThan(3)
+    expect(facesScore(idle)).toBe(0)
+  })
+
+  it('never shows the same stranger or mood twice running, and at his best turns a mood part-way and waits less', () => {
+    const easy = createFaces(room, 9, 0)
+    easy.faces.slice(1).forEach((face, i) => {
+      expect(face.listenerId).not.toBe(easy.faces[i].listenerId)
+      expect(face.mood).not.toBe(easy.faces[i].mood)
+    })
+    expect(easy.faces.some((face) => face.turn)).toBe(false)
+    const hard = createFaces(room, 9, 1)
+    expect(hard.patience).toBeLessThan(easy.patience)
+    const turning = hard.faces.findIndex((face) => face.turn)
+    expect(turning).toBeGreaterThanOrEqual(0)
+    const at = { ...hard, current: turning, shownAt: 0, time: hard.faces[turning].turn!.after }
+    expect(faceNow(at)?.mood).toBe(hard.faces[turning].turn!.to)
+    // Between faces there is nothing to answer.
+    const between = answerFace(createFaces(room, 9, 0), 'joke')
+    expect(answerFace(between, 'joke')).toBe(between)
   })
 })
 

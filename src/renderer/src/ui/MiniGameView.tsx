@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import {
   backgroundFor,
   BOARD,
-  breathAt,
   circuitLit,
   createMiniGame,
   drillPoints,
@@ -10,21 +9,25 @@ import {
   miniGameScore,
   moveWire,
   paceBand,
-  pressBreath,
   pressPower,
-  releaseBreath,
+  lightCandle,
+  candleLit,
+  CANDLE_COLORS,
   releasePower,
-  sayTopic,
+  answerFace,
+  faceNow,
   shownForce,
   SIDES,
   stepMiniGame,
   tapPace,
   toDate,
+  TONES,
   turnTile,
   viewImage,
-  type MiniGame
+  type MiniGame,
+  type Tone
 } from '../../../shared/game'
-import { STAT_NAMES, type ContentPack, type GameState, type PendingDrill } from '../../../shared/model'
+import { MOODS, STAT_NAMES, type ContentPack, type GameState, type Mood, type PendingDrill } from '../../../shared/model'
 import { t, type MessageKey } from '../../../shared/i18n'
 import { Dialog } from './Dialog'
 import { Facts } from './Facts'
@@ -49,6 +52,16 @@ const HOW: Record<MiniGame['kind'], MessageKey> = {
   wisdom: 'screens.miniGame.how.wisdom',
   charisma: 'screens.miniGame.how.charisma'
 }
+const TONE_LABELS: Record<Tone, MessageKey> = {
+  compliment: 'screens.miniGame.tone.compliment',
+  joke: 'screens.miniGame.tone.joke',
+  comfort: 'screens.miniGame.tone.comfort',
+  space: 'screens.miniGame.tone.space'
+}
+// Where the tip of the wick is in the candle's picture, and where the flame's base is in a flame's, as shares of each:
+// the flame is set so that the one is on the other. Measured from the pictures; one drawn again may need them again.
+const WICK = { x: 0.5, y: 0.066 }
+const FLAME_BASE = 0.78
 const GOLD = '#e8c66a'
 const GOOD = '#7fd88a'
 const BAD = '#e57373'
@@ -98,7 +111,11 @@ export function MiniGameView({ content, state, drill, onFinish }: Props) {
   useEffect(() => {
     const down = (event: KeyboardEvent) => {
       if (!playing.current) return
+      // The tones, and the candles, can be chosen with the number keys as well, in the order they stand.
+      const nth = Number(event.key) - 1
       if (event.key === 'Escape') end()
+      else if (game.current.kind === 'charisma' && TONES[nth] && !event.repeat) act(answerFace(game.current, TONES[nth]))
+      else if (game.current.kind === 'wisdom' && nth >= 0 && !event.repeat) act(lightCandle(game.current, nth))
       else if (event.key === ' ' && !event.repeat) {
         event.preventDefault()
         press()
@@ -117,20 +134,22 @@ export function MiniGameView({ content, state, drill, onFinish }: Props) {
     const g = game.current
     const el = canvas.current
     if (g.kind === 'strength') act(pressPower(g))
-    else if (g.kind === 'wisdom') act(pressBreath(g))
     else if (g.kind === 'endurance') act(tapPace(g))
+    else if (at && el && g.kind === 'wisdom') {
+      const candle = candleSpots(board(el), g.candles).findIndex((rect) => inside(at, rect))
+      if (candle >= 0) act(lightCandle(g, candle))
+    }
     else if (at && el && g.kind === 'intelligence') {
       const cell = circuitCells(board(el), g.size).find((one) => inside(at, one.rect))
       if (cell) act(turnTile(g, cell.r, cell.c))
     } else if (at && el && g.kind === 'charisma') {
-      const card = handCards(board(el), g.hand.length).findIndex((rect) => inside(at, rect))
-      if (card >= 0) act(sayTopic(g, g.hand[card].id))
+      const tone = toneButtons(board(el)).findIndex((rect) => inside(at, rect))
+      if (tone >= 0) act(answerFace(g, TONES[tone]))
     } else if (at) move(at)
   }
   function release() {
     const g = game.current
     if (g.kind === 'strength') act(releasePower(g))
-    else if (g.kind === 'wisdom') act(releaseBreath(g))
   }
   function move(at: { x: number; y: number }) {
     pointer.current = at
@@ -208,14 +227,12 @@ export function MiniGameView({ content, state, drill, onFinish }: Props) {
 function usePictures(content: ContentPack, state: GameState) {
   const pictures = useRef<Pictures>(new Map())
   useEffect(() => {
-    const { pieces, topics, listeners } = content.minigames
+    const { pieces, listeners } = content.minigames
     const location = content.locations.find((l) => l.id === state.locationId)
     const backdrop = viewImage(location && backgroundFor(location), toDate(content.calendar, state.time).period.light)
-    // A topic and a stranger may share an id: each is kept under what it is.
     const wanted: [string, string | undefined][] = [
       ...pieces.map((one): [string, string | undefined] => [one.id, one.iconImage]),
-      ...topics.map((one): [string, string | undefined] => [`topic:${one.id}`, one.iconImage]),
-      ...listeners.map((one): [string, string | undefined] => [`listener:${one.id}`, one.iconImage])
+      ...listeners.flatMap((one) => MOODS.map((mood): [string, string | undefined] => [faceKey(one.id, mood), one.faces[mood]]))
     ]
     for (const [id, path] of [...wanted, ['backdrop', backdrop] as [string, string | undefined]]) {
       if (!path) continue
@@ -248,12 +265,24 @@ function circuitCells(rect: Rect, size: number): { r: number; c: number; rect: R
   return Array.from({ length: size * size }, (_, i) => ({ r: Math.floor(i / size), c: i % size, rect: { x: x0 + (i % size) * cell, y: y0 + Math.floor(i / size) * cell, w: cell, h: cell } }))
 }
 
-function handCards(rect: Rect, count: number): Rect[] {
-  const h = rect.h * 0.42
-  const w = h * 0.72
-  const gap = w * 0.18
-  const x0 = rect.x + (rect.w - (count * w + (count - 1) * gap)) / 2
-  return Array.from({ length: count }, (_, i) => ({ x: x0 + i * (w + gap), y: rect.y + rect.h - h, w, h }))
+/** The candles, in a row across the middle of the board. */
+function candleSpots(rect: Rect, count: number): Rect[] {
+  const h = rect.h * 0.5
+  const w = Math.min(h * 0.6, (rect.w * 0.9) / count)
+  const x0 = rect.x + (rect.w - count * w) / 2
+  return Array.from({ length: count }, (_, i) => ({ x: x0 + i * w, y: rect.y + (rect.h - h) / 2, w, h }))
+}
+
+/** A stranger's face in one mood, as the pictures are kept. */
+const faceKey = (id: string, mood: Mood) => `face:${id}:${mood}`
+
+/** The four tones he can answer in, in a row along the bottom of the board. */
+function toneButtons(rect: Rect): Rect[] {
+  const w = rect.w * 0.17
+  const h = rect.h * 0.3
+  const gap = rect.w * 0.035
+  const x0 = rect.x + (rect.w - (TONES.length * w + (TONES.length - 1) * gap)) / 2
+  return TONES.map((_, i) => ({ x: x0 + i * (w + gap), y: rect.y + rect.h - h, w, h }))
 }
 
 function draw(el: HTMLCanvasElement, game: MiniGame, pictures: Pictures, drill: PendingDrill, pointer: { x: number; y: number } | null) {
@@ -312,7 +341,8 @@ function draw(el: HTMLCanvasElement, game: MiniGame, pictures: Pictures, drill: 
       ctx.moveTo(track.x, track.top)
       ctx.lineTo(track.x, track.bottom)
       ctx.stroke()
-      picture('barbell', track.x, yOf(shownForce(game)), rect.h * 0.22)
+      // The bar spans the mark it is lifted into.
+      picture('barbell', track.x, yOf(shownForce(game)), rect.w * 0.34)
       text(t('screens.miniGame.rep', { n: Math.min(game.reps, game.results.length + 1), total: game.reps }), rect.x, rect.y + 20, 22, INK, 'left')
       const lastRep = game.results[game.results.length - 1]
       if (lastRep !== undefined) text(t('screens.miniGame.percent', { percent: Math.round(lastRep * 100) }), rect.x + rect.w, rect.y + 20, 22, lastRep > 0 ? GOOD : BAD, 'right')
@@ -396,38 +426,49 @@ function draw(el: HTMLCanvasElement, game: MiniGame, pictures: Pictures, drill: 
       break
     }
     case 'wisdom': {
-      const now = breathAt(game)
-      const cx = rect.x + rect.w / 2
-      const cy = rect.y + rect.h / 2
-      picture('lotus', cx, cy, rect.h * (0.3 + 0.6 * now.size))
-      const inStep = now.into < game.grace || game.holding === now.inhaling
-      text(now.inhaling ? t('screens.miniGame.breatheIn') : t('screens.miniGame.breatheOut'), cx, rect.y + rect.h + 30, 24, inStep ? GOOD : BAD)
+      // The candles in a row, unlit, the same candle each; one that flares has its own colour of flame set on its wick.
+      const lit = candleLit(game)
+      candleSpots(rect, game.candles).forEach((spot, i) => {
+        const flaring = lit?.candle === i
+        const [cx, cy] = [spot.x + spot.w / 2, spot.y + spot.h / 2]
+        picture('candle', cx, cy, spot.h)
+        if (flaring) {
+          const wick = { x: cx + (WICK.x - 0.5) * spot.h, y: cy + (WICK.y - 0.5) * spot.h }
+          const size = spot.h * 0.45
+          picture(`flame-${CANDLE_COLORS[i]}`, wick.x, wick.y - (FLAME_BASE - 0.5) * size, size)
+          if (!lit.right) text('✗', wick.x, wick.y - size * 0.3, 44, BAD)
+        }
+        text(String(i + 1), cx, spot.y + spot.h + 18, 18, flaring ? INK : 'rgba(244, 236, 216, 0.55)')
+      })
+      text(game.phase === 'showing' ? t('screens.miniGame.watch') : t('screens.miniGame.yourTurn', { n: game.entered + 1, total: game.length }), rect.x + rect.w / 2, rect.y + rect.h + 34, 24, game.phase === 'showing' ? GOLD : GOOD)
+      text(t('screens.miniGame.rounds', { n: game.rounds }), rect.x, rect.y + 20, 22, INK, 'left')
+      text(seconds(game.duration - game.time), rect.x + rect.w, rect.y + 20, 22, INK, 'right')
       break
     }
     case 'charisma': {
-      // The strangers across the top, each with how taken she is and how she took the last thing said; his hand below.
-      const across = rect.w / game.listeners.length
-      game.listeners.forEach((one, i) => {
-        const cx = rect.x + across * (i + 0.5)
-        const size = Math.min(across * 0.6, rect.h * 0.32)
-        picture(`listener:${one.id}`, cx, rect.y + size / 2, size)
-        text(one.name, cx, rect.y + size + 16, 18)
+      // Her face, with how long she will wait under it; the tones to answer in below.
+      const now = faceNow(game)
+      const size = rect.h * 0.56
+      const cx = rect.x + rect.w / 2
+      if (now) {
+        picture(faceKey(now.face.listenerId, now.mood), cx, rect.y + size / 2, size)
+        const left = 1 - now.waited / game.patience
         ctx.fillStyle = 'rgba(0,0,0,0.5)'
-        ctx.fillRect(cx - size / 2, rect.y + size + 32, size, 10)
-        ctx.fillStyle = GOLD
-        ctx.fillRect(cx - size / 2, rect.y + size + 32, size * game.attention[i], 10)
-        const took = game.last[i]
-        if (game.said.length > 0 && took !== 0) text(took > 0 ? '+' : '−', cx + size / 2, rect.y + 12, 30, took > 0 ? GOOD : BAD)
+        ctx.fillRect(cx - size / 2, rect.y + size + 10, size, 10)
+        ctx.fillStyle = left > 0.35 ? GOLD : BAD
+        ctx.fillRect(cx - size / 2, rect.y + size + 10, size * left, 10)
+      } else if (game.lastRight !== undefined) {
+        // Between faces, how the last answer went.
+        text(game.lastRight ? '✓' : '✗', cx, rect.y + size / 2, 64, game.lastRight ? GOOD : BAD)
+      }
+      toneButtons(rect).forEach((button, i) => {
+        const lifted = pointer && inside(pointer, button) ? 6 : 0
+        ctx.fillStyle = 'rgba(20, 16, 24, 0.6)'
+        ctx.fillRect(button.x, button.y - lifted, button.w, button.h)
+        picture(TONES[i], button.x + button.w / 2, button.y + button.h * 0.42 - lifted, button.h * 0.62)
+        text(`${i + 1}  ${t(TONE_LABELS[TONES[i]])}`, button.x + button.w / 2, button.y + button.h * 0.86 - lifted, 16)
       })
-      const cards = handCards(rect, game.hand.length)
-      game.hand.forEach((topic, i) => {
-        const card = cards[i]
-        const lifted = pointer && inside(pointer, card) ? 10 : 0
-        picture('card', card.x + card.w / 2, card.y + card.h / 2 - lifted, card.w, card.h)
-        picture(`topic:${topic.id}`, card.x + card.w / 2, card.y + card.h * 0.42 - lifted, card.w * 0.62)
-        text(topic.name, card.x + card.w / 2, card.y + card.h * 0.82 - lifted, 17, '#3a2a14')
-      })
-      text(t('screens.miniGame.turn', { n: Math.min(game.turns, game.said.length + 1), total: game.turns }), rect.x, rect.y + rect.h * 0.5, 22, INK, 'left')
+      text(seconds(game.duration - game.time), rect.x + rect.w, rect.y + 20, 22, INK, 'right')
       break
     }
   }

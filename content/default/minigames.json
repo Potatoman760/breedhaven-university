@@ -36,155 +36,141 @@
       "iconImage": "sprites/icons/pieces-lamp-cutout.webp"
     },
     {
-      "id": "lotus",
-      "name": "Lotus",
-      "iconImage": "sprites/icons/pieces-lotus-cutout.webp"
+      "id": "candle",
+      "name": "Candle",
+      "iconImage": "sprites/icons/pieces-candle-cutout.webp"
     },
     {
-      "id": "card",
-      "name": "Topic card",
-      "iconImage": "sprites/icons/pieces-card-cutout.webp"
-    }
-  ],
-  "topics": [
-    {
-      "id": "books",
-      "name": "Books",
-      "iconImage": "sprites/icons/topics-books-cutout.webp"
+      "id": "flame-red",
+      "name": "Red flame",
+      "iconImage": "sprites/icons/pieces-flame-red-cutout.webp"
     },
     {
-      "id": "sport",
-      "name": "Sport",
-      "iconImage": "sprites/icons/topics-sport-cutout.webp"
+      "id": "flame-orange",
+      "name": "Orange flame",
+      "iconImage": "sprites/icons/pieces-flame-orange-cutout.webp"
     },
     {
-      "id": "gossip",
-      "name": "Gossip",
-      "iconImage": "sprites/icons/topics-gossip-cutout.webp"
+      "id": "flame-gold",
+      "name": "Gold flame",
+      "iconImage": "sprites/icons/pieces-flame-gold-cutout.webp"
     },
     {
-      "id": "music",
-      "name": "Music",
-      "iconImage": "sprites/icons/topics-music-cutout.webp"
+      "id": "flame-green",
+      "name": "Green flame",
+      "iconImage": "sprites/icons/pieces-flame-green-cutout.webp"
     },
     {
-      "id": "food",
-      "name": "Food",
-      "iconImage": "sprites/icons/topics-food-cutout.webp"
+      "id": "flame-blue",
+      "name": "Blue flame",
+      "iconImage": "sprites/icons/pieces-flame-blue-cutout.webp"
     },
     {
-      "id": "magic",
-      "name": "Magic",
-      "iconImage": "sprites/icons/topics-magic-cutout.webp"
+      "id": "flame-violet",
+      "name": "Violet flame",
+      "iconImage": "sprites/icons/pieces-flame-violet-cutout.webp"
     },
     {
-      "id": "travel",
-      "name": "Travel",
-      "iconImage": "sprites/icons/topics-travel-cutout.webp"
+      "id": "compliment",
+      "name": "Compliment",
+      "iconImage": "sprites/icons/pieces-compliment-cutout.webp"
     },
     {
-      "id": "jokes",
-      "name": "Jokes",
-      "iconImage": "sprites/icons/topics-jokes-cutout.webp"
+      "id": "joke",
+      "name": "Joke",
+      "iconImage": "sprites/icons/pieces-joke-cutout.webp"
+    },
+    {
+      "id": "comfort",
+      "name": "Comfort",
+      "iconImage": "sprites/icons/pieces-comfort-cutout.webp"
+    },
+    {
+      "id": "space",
+      "name": "Give her space",
+      "iconImage": "sprites/icons/pieces-space-cutout.webp"
     }
   ],
   "listeners": [
     {
       "id": "bookworm",
       "name": "Bookworm",
-      "likes": [
-        "books",
-        "magic"
-      ],
-      "dislikes": [
-        "sport",
-        "gossip"
-      ],
-      "iconImage": "sprites/icons/listeners-bookworm-cutout.webp"
+      "faces": {
+        "happy": "sprites/icons/faces-bookworm-happy-cutout.webp",
+        "bored": "sprites/icons/faces-bookworm-bored-cutout.webp",
+        "sad": "sprites/icons/faces-bookworm-sad-cutout.webp",
+        "annoyed": "sprites/icons/faces-bookworm-annoyed-cutout.webp"
+      }
     },
     {
       "id": "athlete",
       "name": "Athlete",
-      "likes": [
-        "sport",
-        "food"
-      ],
-      "dislikes": [
-        "books"
-      ],
-      "iconImage": "sprites/icons/listeners-athlete-cutout.webp"
+      "faces": {
+        "happy": "sprites/icons/faces-athlete-happy-cutout.webp",
+        "bored": "sprites/icons/faces-athlete-bored-cutout.webp",
+        "sad": "sprites/icons/faces-athlete-sad-cutout.webp",
+        "annoyed": "sprites/icons/faces-athlete-annoyed-cutout.webp"
+      }
     },
     {
       "id": "gossip",
       "name": "Gossip",
-      "likes": [
-        "gossip",
-        "jokes"
-      ],
-      "dislikes": [
-        "magic"
-      ],
-      "iconImage": "sprites/icons/listeners-gossip-cutout.webp"
+      "faces": {
+        "happy": "sprites/icons/faces-gossip-happy-cutout.webp",
+        "bored": "sprites/icons/faces-gossip-bored-cutout.webp",
+        "sad": "sprites/icons/faces-gossip-sad-cutout.webp",
+        "annoyed": "sprites/icons/faces-gossip-annoyed-cutout.webp"
+      }
     },
     {
       "id": "musician",
       "name": "Musician",
-      "likes": [
-        "music",
-        "travel"
-      ],
-      "dislikes": [
-        "sport"
-      ],
-      "iconImage": "sprites/icons/listeners-musician-cutout.webp"
+      "faces": {
+        "happy": "sprites/icons/faces-musician-happy-cutout.webp",
+        "bored": "sprites/icons/faces-musician-bored-cutout.webp",
+        "sad": "sprites/icons/faces-musician-sad-cutout.webp",
+        "annoyed": "sprites/icons/faces-musician-annoyed-cutout.webp"
+      }
     },
     {
       "id": "cook",
       "name": "Cook",
-      "likes": [
-        "food",
-        "travel"
-      ],
-      "dislikes": [
-        "magic"
-      ],
-      "iconImage": "sprites/icons/listeners-cook-cutout.webp"
+      "faces": {
+        "happy": "sprites/icons/faces-cook-happy-cutout.webp",
+        "bored": "sprites/icons/faces-cook-bored-cutout.webp",
+        "sad": "sprites/icons/faces-cook-sad-cutout.webp",
+        "annoyed": "sprites/icons/faces-cook-annoyed-cutout.webp"
+      }
     },
     {
       "id": "witch",
       "name": "Witch",
-      "likes": [
-        "magic",
-        "music"
-      ],
-      "dislikes": [
-        "jokes"
-      ],
-      "iconImage": "sprites/icons/listeners-witch-cutout.webp"
+      "faces": {
+        "happy": "sprites/icons/faces-witch-happy-2-cutout.webp",
+        "bored": "sprites/icons/faces-witch-bored-2-cutout.webp",
+        "sad": "sprites/icons/faces-witch-sad-2-cutout.webp",
+        "annoyed": "sprites/icons/faces-witch-annoyed-2-cutout.webp"
+      }
     },
     {
       "id": "wanderer",
       "name": "Wanderer",
-      "likes": [
-        "travel",
-        "jokes"
-      ],
-      "dislikes": [
-        "gossip"
-      ],
-      "iconImage": "sprites/icons/listeners-wanderer-cutout.webp"
+      "faces": {
+        "happy": "sprites/icons/faces-wanderer-happy-cutout.webp",
+        "bored": "sprites/icons/faces-wanderer-bored-cutout.webp",
+        "sad": "sprites/icons/faces-wanderer-sad-cutout.webp",
+        "annoyed": "sprites/icons/faces-wanderer-annoyed-cutout.webp"
+      }
     },
     {
       "id": "wit",
       "name": "Wit",
-      "likes": [
-        "jokes",
-        "books"
-      ],
-      "dislikes": [
-        "food"
-      ],
-      "iconImage": "sprites/icons/listeners-wit-cutout.webp"
+      "faces": {
+        "happy": "sprites/icons/faces-wit-happy-cutout.webp",
+        "bored": "sprites/icons/faces-wit-bored-cutout.webp",
+        "sad": "sprites/icons/faces-wit-sad-cutout.webp",
+        "annoyed": "sprites/icons/faces-wit-annoyed-cutout.webp"
+      }
     }
   ]
 }

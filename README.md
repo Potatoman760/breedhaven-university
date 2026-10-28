@@ -724,8 +724,10 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
 - **The Undercroft** (`expedition.json`, `src/shared/model/expedition.ts`,
   `src/shared/game/expedition.ts`, `ExpeditionView.tsx`, `PartyDialog.tsx`): a turn-based
   adventure with no LLM in its fights. From `opensOnDay` the `guideId` character sets an hour
-  to show him the way down (`scheduleDescent` in `descent.ts`, put where his day is free and
-  put down again when he misses it, as the house viewing is). Keeping it reads `intro.cutscene`,
+  to show him the way down (`scheduleDescent` in `descent.ts`, at the first free hour from
+  06:00, which is before his classes on almost every day, and put down again when he misses it,
+  as the house viewing is). While it is due it holds the day, and the day view always offers it
+  to go to, even when a class is on at the same hour. Keeping it reads `intro.cutscene`,
   her telling him what is below, its dangers and why it must be him (`attendDescent`), and
   then `BelowTour.tsx`: she has him open the Go below window and points out its parts, then
   puts him in a practice fight (`practiceRun`, a run made in memory on its own state, never
@@ -765,23 +767,26 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
   (`src/main/content/expedition.test.ts`).
 - **Raising a stat**: each location lists what can be done there for a stat (`drills` in
   `locations.json`: a stat, a title and an opening line; edited under Locations). The day
-  view's **Stats** option opens into one suggestion for each of the six stats, picked from
-  every place that has one for it, preferring those open when he would arrive, and
-  changing from hour to hour. Taking one is an outing of two hours or more, for energy, done
+  view's **Stats** option opens into one drill for each of the six stats. Each stat has its
+  game at one place, the one that suits it: strength at Ironroot, dexterity and intelligence
+  at the Foundry, endurance by the river, wisdom in the chapel and charisma on the Great Court
+  steps. Those places are always open, so every drill can be had at any hour he is awake. Taking one is an outing of two hours or more, for energy, done
   alone whoever is there: it is never a scene. When he gets there the hours are spent and
   the drill waits in the save (`drill`) on its game (`src/shared/game/minigames.ts`,
   `MiniGameView.tsx`), one for each stat: a power meter for strength, tracing a wire for
   dexterity, pacing a heart rate for endurance, turning tiles of a ward circuit for
-  intelligence, breathing with a lotus for wisdom, and working a room of strangers with topic
-  cards for charisma. Each scores 0 to 1 and the drill trains `hours × (1 + 2 × score)`
+  intelligence, repeating the order a row of coloured candles flared in for wisdom (one
+  longer each round, over at a wrong candle), and reading strangers' faces for charisma
+  (each face is happy, bored, sad or annoyed, and is answered with a compliment, a joke,
+  comfort or space before her patience runs out). Each scores 0 to 1 and the drill trains `hours × (1 + 2 × score)`
   points (`DRILL_PER_HOUR`): skipping the game is a score of 0, the same as an hour of focus.
-  A game is harder the higher the stat. What the games are drawn with, and the strangers
-  and topics of the one for charisma, are in `minigames.json`; `npm run icons -- pieces
-  topics listeners` paints them. Nothing typed raises a stat: a typed outing only rests him
+  A game is harder the higher the stat, and a timed one runs from 20 seconds to 30 at the cap
+  (`roundSeconds`). What the games are drawn with, and the strangers' faces in each mood, are in
+  `minigames.json`; `npm run icons -- pieces faces` paints them, each stranger from her own seed
+  so that her four faces are the same woman. Nothing typed raises a stat: a typed outing only rests him
   or does nothing for him. Studying for a course is an outing as before. The confirmation says
   first what he would miss by going, a class he is taking or a shift at his job, as it now
-  does for anything the player sets out to do. The stats a place has drills for are also
-  what it counts as a good place to work on.
+  does for anything the player sets out to do.
 - **Jobs** (`jobs.json`, `src/shared/game/jobs.ts`): a job is a place, a boss (an NPC), an
   hourly rate, the stats it asks for and its weekly shifts, 8 to 16 hours of them, which are
   written in the content so that a job is the same in every game. The phone has a Jobs
@@ -1065,8 +1070,8 @@ directly: nothing in a scene ever calls it, and it talks only to the address you
 - **Using a picture**: "Use as the sprite" puts it on the outfit under that expression in
   the editor's draft; saving the character keeps it, like any other edit.
 - **Locations** (Edit game content, Locations): each of the game's places can be changed
-  there: its name, its two texts, opening hours, whether it is indoors or private, what it
-  is a good place to work on, and its pictures. `description` is what the LLM is told in a
+  there: its name, its two texts, opening hours, whether it is indoors or private, the drill
+  played there, and its pictures. `description` is what the LLM is told in a
   scene there (what the place is and what goes on in it); `appearance` is only what can be
   seen, and is sent to the image model and nothing else. A place has views, as a character has
   outfits (the first is shown unless the player picks another), and each view is drawn
@@ -1233,3 +1238,9 @@ outing. Classes, orientation and talks with NPCs are left alone.
   memory for everyone who was there.
 - The engine decides who, as what and when. It keeps no record of who has found out about
   whom and changes no meters itself; what comes of it is the LLM's to play.
+
+## License
+
+Copyright (C) 2026 Potatoman760.
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3. It is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See [LICENSE](LICENSE) for the full terms.

@@ -109,7 +109,7 @@ export function validateContentPack(raw: unknown): ContentPack {
 }
 
 // What a reference that leads nowhere was meant to be, as its message names it.
-type Thing = 'ambience' | 'booth' | 'calendarEvent' | 'character' | 'codexEntry' | 'enemy' | 'item' | 'location' | 'loveInterest' | 'month' | 'outfit' | 'period' | 'relationshipStage' | 'society' | 'pregnancyStage' | 'trait' | 'weekday' | 'weather' | 'course' | 'college' | 'topic'
+type Thing = 'ambience' | 'booth' | 'calendarEvent' | 'character' | 'codexEntry' | 'enemy' | 'item' | 'location' | 'loveInterest' | 'month' | 'outfit' | 'period' | 'relationshipStage' | 'society' | 'pregnancyStage' | 'trait' | 'weekday' | 'weather' | 'course' | 'college'
 
 function checkReferences(pack: ContentPack): string[] {
   const issues: string[] = []
@@ -412,11 +412,7 @@ function checkReferences(pack: ContentPack): string[] {
   })
 
   idSet(pack.minigames.pieces, 'minigames.pieces')
-  const topics = idSet(pack.minigames.topics, 'minigames.topics')
   idSet(pack.minigames.listeners, 'minigames.listeners')
-  for (const listener of pack.minigames.listeners) {
-    for (const id of [...listener.likes, ...listener.dislikes]) need(topics, id, `minigames.listeners.${listener.id}`, 'topic')
-  }
 
   const items = idSet(pack.items, 'items')
   idSet(pack.stalls, 'stalls')

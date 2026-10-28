@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { StatSchema, type Stat } from './stats'
+import { StatSchema } from './stats'
 import { t } from '../i18n'
 
 /** The two lights a place is drawn in. Each period of the day is one or the other. */
@@ -82,8 +82,3 @@ export const LocationSchema = z.object({
   drills: z.array(DrillSchema).default([])
 })
 export type Location = z.infer<typeof LocationSchema>
-
-/** The stats a place is good for working on: those it has something to do for. */
-export function trainsAt(location: Pick<Location, 'drills'>): Stat[] {
-  return [...new Set(location.drills.map((drill) => drill.stat))]
-}

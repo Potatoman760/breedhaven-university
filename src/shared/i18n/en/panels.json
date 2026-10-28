@@ -260,6 +260,8 @@
   "phone.noLongerPossible": "no longer possible",
   "phone.typing": "{name} is typing",
   "phone.cancelPlan": "Cancel plan",
+  "phone.shiftToday": "Shift today at {at}",
+  "phone.callOff": "Call off",
   "phone.messageTo": "A message to {name}",
   "phone.messagePlaceholder": "Message {name}...",
   "phone.send": "Send",

@@ -14,6 +14,7 @@ import {
   meet,
   sceneCast,
   parseDirectives,
+  lookLines,
   plainName,
   namesHer,
   sceneBaseline,
@@ -125,6 +126,10 @@ describe('look directives', () => {
     // A tag the model garbled is hidden all the same, but a bracket of ordinary words is not.
     expect(parseDirectives('[COMFassessing the table dynamics]\nHello.')).toMatchObject({ text: 'Hello.', comfort: [] })
     expect(parseDirectives('[COMF 4 fine]\nHi.')).toMatchObject({ text: 'Hi.', comfort: [{ name: '', level: 4, reason: 'fine' }] })
+    // A line left without its closing bracket ends with the line, and is read and hidden the same; the next line is untouched.
+    const open = parseDirectives("[EXPRESSION: happy\n[COMFORT: 4 fine, enjoying this more than she'd admit\nMm. [laughs] Go on.")
+    expect(open).toMatchObject({ text: 'Mm. [laughs] Go on.', expression: 'happy', comfort: [{ name: '', level: 4, reason: "fine, enjoying this more than she'd admit" }] })
+    expect(lookLines('[EXPRESSION: happy\n[COMFORT: 4 fine\nMm.')).toBe('[EXPRESSION: happy]\n[COMFORT: 4 fine]')
     expect(parseDirectives('[Comfortable silence]').text).toBe('[Comfortable silence]')
 
     const kept = applyComfort(scene, { ana: { level: 2, reason: 'he keeps asking about my mother' } })

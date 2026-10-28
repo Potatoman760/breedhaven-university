@@ -1,12 +1,12 @@
 /**
  * Paints the emblems that stand for things in the interface: each job, place on the map, society, market stall, kind
- * of weather and kind of stop on the way down, and the pieces, topics and strangers the drills' games are drawn with. Drawn as the item pictures are (big on a white card, cut out, made
+ * of weather and kind of stop on the way down, and the pieces the drills' games are drawn with and the faces of the strangers in the one for charisma. Drawn as the item pictures are (big on a white card, cut out, made
  * small) and in their style, so that the two sit together. Each is put in its content file as `iconImage` as it is
  * made (`stopImages` in expedition.json). Not part of the app: run it from the project folder with `npm run icons`:
  *
  *   npm run icons                        every emblem not yet made
  *   npm run icons -- jobs places         only these groups (jobs, places, societies, stalls, weather, stops, and the
- *                                        drills' games: pieces, topics, listeners)
+ *                                        drills' games: pieces, faces)
  *   npm run icons -- barista             only these, by id
  *   npm run icons -- --overwrite         make them again even where there is one already
  *   npm run icons -- --dry               print the prompts, and make nothing
@@ -17,12 +17,19 @@ import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { ComfyStore, generateArt } from '../src/main/comfy/studio'
 import { PACK, cutOut, minutes, settingsFile } from './lib/pictures'
+import { seedOf } from '../src/shared/game/seed'
 
 const SUBJECT = 'icons'
 const GIVE_UP_AFTER = 2
 const SIZE = { width: 1024, height: 1024 }
 const SHOWN = 256
 const FRAMING = 'a single object, shown whole, centered, filling the frame, game inventory icon, thick clean outline, simple shapes, no people, no hands, no text\n\nplain white background'
+
+// The game for wisdom draws one unlit candle for each in the row, and lays a flame over its wick when it flares, so that
+// the candle itself never changes. The flames are drawn from one seed, so that they are one flame in different colours,
+// each with the whole of its glow inside the picture.
+const CANDLE = 'One tall white pillar candle standing in a small round brass holder, unlit: no flame, no glow, only a short black wick, a little melted wax at the top. The whole candle from its holder to its wick, upright, centered, with white space all around.'
+const FLAME = (color: string) => `One bright ${color} magical candle flame on its own, with a soft round ${color} glow around it, and nothing else: no candle, no wick. The whole glow fits well inside the picture, with white space all around.`
 
 // What each emblem shows. One that is missing here is drawn from its name.
 const SUBJECTS: Record<string, Record<string, string>> = {
@@ -117,46 +124,54 @@ const SUBJECTS: Record<string, Record<string, string>> = {
     guardian: 'A menacing horned monster skull with glowing red eyes.'
   },
   pieces: {
-    barbell: 'A heavy iron barbell seen from the front, a thick black weight plate on each end of a steel bar.',
+    barbell: 'A whole Olympic barbell lying level, seen straight from the front: one long straight steel bar across the picture, with thick black weight plates on both the left end and the right end, the two ends the same.',
     iron: 'A soldering iron with a wooden handle and a glowing hot copper tip, pointing to the lower left.',
     heart: 'A plump glossy red heart.',
     dial: 'A round brass gauge face with a blank cream dial and no needle, no numbers.',
     tile: 'A square slab of dark carved slate seen from straight above, flat, plain, with a thin bronze rim.',
     spark: 'A crackling ball of blue magical lightning.',
     lamp: 'An unlit brass rune lamp with a round glass globe.',
-    lotus: 'A glowing pink lotus flower in full bloom, seen from above.',
-    card: 'A blank cream parchment card with a thin gold border, standing upright, nothing on it.'
-  },
-  topics: {
-    books: 'A stack of three old books with a ribbon bookmark.',
-    sport: 'A leather ball beside a referee whistle.',
-    gossip: 'A pink speech bubble with a small heart and a sparkle in it.',
-    music: 'A wooden lute with a golden music note above it.',
-    food: 'A steaming meat pie on a plate with a fork.',
-    magic: 'A crystal wand trailing golden sparkles.',
-    travel: 'A rolled old map with a brass compass on it.',
-    jokes: 'A laughing jester mask with bells.'
-  },
-  listeners: {
-    bookworm: 'A young woman with round glasses and a bun, hugging a book to her chest.',
-    athlete: 'A sporty young woman with a high ponytail and a sweatband.',
-    gossip: 'A young woman with a sly smile, a hand raised to her mouth as if telling a secret.',
-    musician: 'A young woman with wavy hair and a lute strap over her shoulder.',
-    cook: 'A cheerful young woman in a white apron with flour on her cheek.',
-    witch: 'A young woman in a pointed witch hat with a crescent moon earring.',
-    wanderer: 'A young woman with a sun-browned face, a scarf and a travel pack.',
-    wit: 'A young woman with a crooked grin and a raised eyebrow, a little bow tie.'
+    candle: CANDLE,
+    'flame-red': FLAME('red'),
+    'flame-orange': FLAME('orange'),
+    'flame-gold': FLAME('golden yellow'),
+    'flame-green': FLAME('emerald green'),
+    'flame-blue': FLAME('sapphire blue'),
+    'flame-violet': FLAME('violet'),
+    compliment: 'A single red rose with a little sparkle on one petal.',
+    joke: 'A laughing jester mask with bells.',
+    comfort: 'A warm mug of cocoa with a small heart drawn in its foam, steam rising.',
+    space: 'A small white flag on a short wooden pole.'
   }
+}
+
+// The strangers whose faces are read in the game for charisma: who each is, and how each mood looks on her. Each
+// stranger is drawn from her own seed, with only the mood changed, so that her four faces are the same woman.
+const STRANGERS: Record<string, string> = {
+  bookworm: 'A young woman with round glasses and her hair in a bun, a book held to her chest.',
+  athlete: 'A sporty young woman with a high ponytail and a sweatband.',
+  gossip: 'A young woman with a sleek black bob and big hoop earrings.',
+  musician: 'A young woman with long wavy hair and a lute strap over her shoulder.',
+  cook: 'A young woman in a white apron with her hair tied back, flour on her cheek.',
+  witch: 'A young woman in a small pointed witch hat, the whole hat in the picture with white space above it, and a crescent moon earring.',
+  wanderer: 'A young woman with a sun-browned face, a scarf and a travel pack.',
+  wit: 'A young woman with short dark hair, a white shirt and a little bow tie.'
+}
+const MOODS: Record<string, string> = {
+  happy: 'She is happy: a big warm smile, bright eyes.',
+  bored: 'She is bored: heavy-lidded eyes looking off to the side, a flat mouth, a small yawn.',
+  sad: 'She is sad: teary eyes, eyebrows raised in the middle, a downturned mouth.',
+  annoyed: 'She is annoyed: a deep frown, narrowed eyes, lips pressed tight, arms crossed.'
 }
 
 // Faces are drawn bigger and kept bigger, so that their eyes come out whole.
 const SIZES: Record<string, { size: { width: number; height: number }; shown: number }> = {
-  listeners: { size: { width: 1536, height: 1536 }, shown: 512 }
+  faces: { size: { width: 1536, height: 1536 }, shown: 512 }
 }
 
 // How a group is drawn, where it is not as an object on its own.
 const FRAMINGS: Record<string, string> = {
-  listeners: 'one young woman, head and shoulders, facing the viewer, cartoon game portrait icon, thick clean outline, simple shapes, no text\n\nplain white background'
+  faces: 'one young woman, head and shoulders, facing the viewer, the expression on her face plain to see, cartoon game portrait icon, thick clean outline, simple shapes, no text\n\nplain white background'
 }
 
 interface Target {
@@ -170,8 +185,14 @@ interface Target {
 interface Group {
   file: string
   list: (data: any) => { id: string; name?: string; title?: string; iconImage?: string }[]
-  /** Stops are kept as a map on the expedition, not on a list of their own. */
-  stops?: boolean
+  /** For a group not kept as a list of its own: puts the picture in its place, and says what it replaced. */
+  place?: (data: any, id: string, path: string) => string | undefined
+}
+
+// A stranger's face in one mood, as one picture to make: `<stranger>-<mood>`.
+const faceOf = (id: string): { stranger: string; mood: string } => {
+  const at = id.lastIndexOf('-')
+  return { stranger: id.slice(0, at), mood: id.slice(at + 1) }
 }
 const GROUPS: Record<string, Group> = {
   jobs: { file: 'jobs.json', list: (data) => data.jobs },
@@ -179,10 +200,28 @@ const GROUPS: Record<string, Group> = {
   societies: { file: 'societies.json', list: (data) => data.societies },
   stalls: { file: 'stalls.json', list: (data) => data },
   weather: { file: 'calendar.json', list: (data) => data.weather },
-  stops: { file: 'expedition.json', list: (data) => Object.keys(SUBJECTS.stops).map((id) => ({ id, name: id, iconImage: data.stopImages?.[id] })), stops: true },
+  stops: {
+    file: 'expedition.json',
+    list: (data) => Object.keys(SUBJECTS.stops).map((id) => ({ id, name: id, iconImage: data.stopImages?.[id] })),
+    place: (data, id, path) => {
+      const replaced = data.stopImages?.[id]
+      data.stopImages = { ...data.stopImages, [id]: path }
+      return replaced
+    }
+  },
   pieces: { file: 'minigames.json', list: (data) => data.pieces },
-  topics: { file: 'minigames.json', list: (data) => data.topics },
-  listeners: { file: 'minigames.json', list: (data) => data.listeners }
+  faces: {
+    file: 'minigames.json',
+    list: (data) => data.listeners.flatMap((one: any) => Object.keys(MOODS).map((mood) => ({ id: `${one.id}-${mood}`, name: `${one.name}, ${mood}`, iconImage: one.faces?.[mood] }))),
+    place: (data, id, path) => {
+      const { stranger, mood } = faceOf(id)
+      const one = data.listeners.find((l: any) => l.id === stranger)
+      if (!one) throw new Error('it is no longer in minigames.json')
+      const replaced = one.faces?.[mood]
+      one.faces = { ...one.faces, [mood]: path }
+      return replaced
+    }
+  }
 }
 
 function read(file: string): { data: any; eol: string } {
@@ -201,10 +240,8 @@ function put(target: Target, path: string): string | undefined {
   const group = GROUPS[target.group]
   const { data, eol } = read(group.file)
   let replaced: string | undefined
-  if (group.stops) {
-    replaced = data.stopImages?.[target.id]
-    data.stopImages = { ...data.stopImages, [target.id]: path }
-  } else {
+  if (group.place) replaced = group.place(data, target.id, path)
+  else {
     const entry = group.list(data).find((one) => one.id === target.id)
     if (!entry) throw new Error(`it is no longer in ${group.file}`)
     replaced = entry.iconImage
@@ -230,7 +267,15 @@ async function main(): Promise<void> {
   const settingsPath = settingsFile()
   if (!existsSync(settingsPath)) throw new Error(`No ComfyUI settings at ${settingsPath}. Set ComfyUI up in the app first.`)
   const readSettings = () => new ComfyStore(settingsPath, PACK).get()
-  const promptOf = (target: Target) => `${SUBJECTS[target.group]?.[target.id] ?? `An emblem of ${target.name}.`}\n\n${FRAMINGS[target.group] ?? FRAMING}`
+  const subjectOf = (target: Target) => {
+    if (target.group !== 'faces') return SUBJECTS[target.group]?.[target.id] ?? `An emblem of ${target.name}.`
+    const { stranger, mood } = faceOf(target.id)
+    return `${STRANGERS[stranger] ?? `A young woman, ${target.name}.`} ${MOODS[mood]}`
+  }
+  const promptOf = (target: Target) => `${subjectOf(target)}\n\n${FRAMINGS[target.group] ?? FRAMING}`
+  // A stranger is drawn from the same seed in every mood, so that she is the same woman in each.
+  // So are the candle flames, so that they are one flame in different colours.
+  const seedFor = (target: Target) => (target.group === 'faces' ? seedOf(faceOf(target.id).stranger) : target.id.startsWith('flame-') ? seedOf('flame') : undefined)
 
   console.log(`ComfyUI at ${readSettings().baseUrl}. ${todo.length} to make of ${all.length}${overwrite ? ', replacing those there are' : ''}.`)
   if (dry) {
@@ -253,7 +298,7 @@ async function main(): Promise<void> {
     const began = Date.now()
     process.stdout.write(`[${i + 1}/${todo.length}] ${target.group}: ${target.name}... `)
     // Filed by group, so that a stall and a place of the same id do not overwrite each other.
-    const result = await generateArt(readSettings(), PACK, PACK, { kind: 'sprite', subjectId: SUBJECT, name: `${target.group}-${target.id}`, workflow: '', positive: promptOf(target), negative: '', ...(SIZES[target.group]?.size ?? SIZE) }, cancel.signal, '')
+    const result = await generateArt(readSettings(), PACK, PACK, { kind: 'sprite', subjectId: SUBJECT, name: `${target.group}-${target.id}`, workflow: '', positive: promptOf(target), negative: '', seed: seedFor(target), ...(SIZES[target.group]?.size ?? SIZE) }, cancel.signal, '')
     if (cancel.signal.aborted) {
       console.log('cancelled.')
       break

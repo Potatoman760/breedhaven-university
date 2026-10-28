@@ -83,10 +83,11 @@ export interface NamedComfort extends Comfort {
 export const AGREED_TAG = '[AGREED]'
 /** The LLM writes this when those in the scene go to sleep for the night where they are: the clock goes on to morning. */
 export const SLEEP_TAG = '[SLEEP]'
+// A hidden line is one line: one the model forgot to close with a bracket is closed by the end of its line, and still hidden.
 // [LEAVES: Bea=hurt saw she was not wanted]: who goes, how she feels, and a few words why.
-const LEAVES_TAG = /\[\s*LEAVES?\s*:\s*([^\]]*?)\s*\]/gi
+const LEAVES_TAG = /\[\s*LEAVES?\s*:\s*([^\]\n]*?)\s*(?:\]|$)/gim
 // [ATTENDING: societies-fair] or, in a group, [ATTENDING: Bea=societies-fair].
-const ATTENDING_TAG = /\[\s*ATTENDING\s*:\s*([^\]]*?)\s*\]/gi
+const ATTENDING_TAG = /\[\s*ATTENDING\s*:\s*([^\]\n]*?)\s*(?:\]|$)/gim
 
 /** The LLM writes this when sex in the scene ends in a way that could leave her with child. */
 export const SEEDED_TAG = '[SEEDED]'
@@ -95,11 +96,11 @@ const SEEDED = /\[\s*SEEDED\s*(?::\s*([^\]]*?)\s*)?\]/gi
 const STOPS_CONTROL = /\[\s*STOPS?[\s_-]*BIRTH[\s_-]*CONTROL\s*(?::\s*([^\]]*?)\s*)?\]/gi
 
 // [SEX-ACT: id] is the tag for an NSFW sex-act; [POSE: id] and [ANIMATION: id] are its older names, still read.
-const LOOK_TAG = /\[\s*(OUTFIT|EXPRESSION|ANIMATION|POSE|SEX[\s_-]?ACT)\s*:\s*([^\]]*?)\s*\]/gi
+const LOOK_TAG = /\[\s*(OUTFIT|EXPRESSION|ANIMATION|POSE|SEX[\s_-]?ACT)\s*:\s*([^\]\n]*?)\s*(?:\]|$)/gim
 
 // [COMFORT: 3 he keeps asking] or, in a group, [COMFORT: Anwen=2 they are kissing in front of her]. A model sometimes
 // garbles the word and drops the colon ([COMFassessing the table]); in capitals it is still the tag, and still hidden.
-const COMFORT_TAG = /\[\s*(?:[Cc][Oo][Mm][Ff][Oo][Rr][Tt]\s*:|COMF[A-Z]*\s*:?)\s*([^\]]*?)\s*\]/g
+const COMFORT_TAG = /\[\s*(?:[Cc][Oo][Mm][Ff][Oo][Rr][Tt]\s*:|COMF[A-Z]*\s*:?)\s*([^\]\n]*?)\s*(?:\]|$)/gm
 
 /** Reads the tags the LLM may put in a reply: scene end, outfit, expression and animation. */
 /** A look asked for by name, in a scene with more than one love interest in it. */
@@ -119,9 +120,10 @@ export function lookLines(reply: string): string {
   for (const match of reply.matchAll(LOOK_TAG)) if (match[1].toUpperCase() === 'EXPRESSION') found.push({ at: match.index, tag: match[0] })
   // A garbled one is not shown back to be copied.
   for (const match of reply.matchAll(COMFORT_TAG)) if (/^\[\s*COMFORT\s*:/i.test(match[0])) found.push({ at: match.index, tag: match[0] })
+  // One left open is shown back closed, so that the slip is not copied.
   return found
     .sort((a, b) => a.at - b.at)
-    .map(({ tag }) => tag)
+    .map(({ tag }) => (tag.endsWith(']') ? tag : `${tag.trimEnd()}]`))
     .join('\n')
 }
 

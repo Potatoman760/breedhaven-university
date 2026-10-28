@@ -1,4 +1,4 @@
-import type { ContentPack, GameState, Listener, PendingDrill, Stat, TalkTopic } from '../model'
+import { MOODS, type ContentPack, type GameState, type Mood, type PendingDrill, type Stat } from '../model'
 import { draws } from './seed'
 import { STAT_CAP, statOf, trainStat } from './stats'
 
@@ -10,6 +10,9 @@ import { STAT_CAP, statOf, trainStat } from './stats'
 
 /** What an hour of a drill is worth in training points: played as badly as it can be, and played perfectly. */
 export const DRILL_PER_HOUR = { min: 1, max: 3 } as const
+
+/** How long a game played against the clock lasts, in seconds: twenty at first, and up to thirty, with more to it, the better he is. */
+export const roundSeconds = (difficulty: number): number => 20 + 10 * difficulty
 
 const within = (value: number, low = 0, high = 1) => Math.max(low, Math.min(high, value))
 
@@ -114,7 +117,7 @@ export interface WireGame {
 
 export function createWire(seed: number, difficulty: number): WireGame {
   const roll = draws(seed)
-  const turns = 6 + Math.round(4 * difficulty)
+  const turns = 4 + Math.round(3 * difficulty)
   const knots = Array.from({ length: turns + 1 }, (_, i) => ({ x: 1.2 + (i / turns) * (BOARD.width - 2.4), y: i === 0 || i === turns ? BOARD.height / 2 : 1.5 + roll() * (BOARD.height - 3) }))
   // Drawn through the knots as a smooth curve, a point every short step.
   const path: { x: number; y: number }[] = []
@@ -127,7 +130,7 @@ export function createWire(seed: number, difficulty: number): WireGame {
     }
   }
   path.push(knots[knots.length - 1])
-  return { kind: 'dexterity', path, tolerance: 0.5 - 0.22 * difficulty, progress: 0, onWire: false, slips: 0, time: 0, limit: 30 }
+  return { kind: 'dexterity', path, tolerance: 0.5 - 0.22 * difficulty, progress: 0, onWire: false, slips: 0, time: 0, limit: roundSeconds(difficulty) }
 }
 
 export function stepWire(game: WireGame, dt: number): WireGame {
@@ -166,7 +169,7 @@ export interface PaceGame {
 }
 
 export function createPace(difficulty: number): PaceGame {
-  return { kind: 'endurance', rate: 0.3, time: 0, duration: 45, held: 0, difficulty }
+  return { kind: 'endurance', rate: 0.3, time: 0, duration: roundSeconds(difficulty), held: 0, difficulty }
 }
 
 /** Where the pace should be just now: the band drifts, and narrows as the run goes on. */
@@ -245,7 +248,7 @@ export function createCircuit(seed: number, difficulty: number): CircuitGame {
   })
   // Every tile turned a random way, and once more if that left the circuit whole.
   for (const row of tiles) for (let c = 0; c < row.length; c++) for (let n = Math.floor(roll() * 4); n > 0; n--) row[c] = turned(row[c])
-  const game: CircuitGame = { kind: 'intelligence', size, tiles, from, to, route, time: 0, limit: 60 }
+  const game: CircuitGame = { kind: 'intelligence', size, tiles, from, to, route, time: 0, limit: roundSeconds(difficulty) }
   return circuitLit(game).solved ? turnTile(game, from, 0) : game
 }
 
@@ -282,106 +285,174 @@ export function circuitScore(game: CircuitGame): number {
   return 0.6 * (game.route.filter(({ r, c }) => lit.has(`${r},${c}`)).length / game.route.length)
 }
 
-// ---- Wisdom: hold as the ring grows, let go as it shrinks.
+// ---- Wisdom: the candles flare in an order, and he lights them again in the same order, one more each time.
 
-export interface BreathGame {
+/** The colours the candles burn, one to a candle, in the order they stand. */
+export const CANDLE_COLORS = ['red', 'orange', 'gold', 'green', 'blue', 'violet'] as const
+export type CandleColor = (typeof CANDLE_COLORS)[number]
+
+export interface CandleGame {
   kind: 'wisdom'
-  /** Each breath: how long it is drawn in, and how long let out. */
-  breaths: { inhale: number; exhale: number }[]
-  holding: boolean
+  /** How many candles stand in the row: the first so many colours. */
+  candles: number
+  /** The order they flare in, long enough for any round: each round is the first so many of it. */
+  order: number[]
+  /** How many flare this round, and how many of them he has lit again so far. */
+  length: number
+  entered: number
+  /** The candles flaring to be watched, or his turn; or over, for a wrong candle. */
+  phase: 'showing' | 'repeating' | 'over'
+  /** When the phase began: the showing waits a moment before the first flares. */
+  phaseAt: number
+  /** How long each candle of the showing has to itself. */
+  beat: number
+  /** The rounds he got through. */
+  rounds: number
+  /** A candle he lit, flaring until a moment after, and whether it was the right one. */
+  lit?: { candle: number; until: number; right: boolean }
   time: number
-  /** The time he has been in step with the ring, and the presses that broke the quiet. */
-  inStep: number
-  fumbles: number
-  /** How long a change of the ring is forgiven him while he follows it. */
-  grace: number
+  duration: number
 }
 
-export function createBreath(seed: number, difficulty: number): BreathGame {
+// The order a run starts at, the rounds that make a perfect score, and the pauses around the showing.
+const FIRST_LENGTH = 2
+const PERFECT_ROUNDS = 5
+const LEAD_IN = 0.6
+const FLARE = 0.3
+
+export function createCandles(seed: number, difficulty: number): CandleGame {
   const roll = draws(seed)
-  const breaths = Array.from({ length: 6 }, () => ({ inhale: 4 + (roll() - 0.5) * 2.4 * difficulty, exhale: 4 + (roll() - 0.5) * 2.4 * difficulty }))
-  return { kind: 'wisdom', breaths, holding: false, time: 0, inStep: 0, fumbles: 0, grace: 0.5 - 0.25 * difficulty }
-}
-
-const breathLength = (game: BreathGame) => game.breaths.reduce((sum, b) => sum + b.inhale + b.exhale, 0)
-
-/** Where the ring is now: drawing in or letting out, how far through it, and its size from 0 to 1. */
-export function breathAt(game: BreathGame): { inhaling: boolean; into: number; size: number } {
-  let left = game.time
-  for (const breath of game.breaths) {
-    if (left < breath.inhale) return { inhaling: true, into: left, size: left / breath.inhale }
-    left -= breath.inhale
-    if (left < breath.exhale) return { inhaling: false, into: left, size: 1 - left / breath.exhale }
-    left -= breath.exhale
+  const candles = 4 + Math.round(2 * difficulty)
+  // No candle twice running, so that each flare is plainly a new one.
+  const order: number[] = []
+  while (order.length < 40) {
+    const next = Math.floor(roll() * candles)
+    if (next !== order[order.length - 1]) order.push(next)
   }
-  return { inhaling: false, into: 0, size: 0 }
+  return { kind: 'wisdom', candles, order, length: FIRST_LENGTH, entered: 0, phase: 'showing', phaseAt: 0, beat: 0.7 - 0.25 * difficulty, rounds: 0, time: 0, duration: roundSeconds(difficulty) }
 }
 
-export function stepBreath(game: BreathGame, dt: number): BreathGame {
-  if (breathDone(game)) return game
-  const now = breathAt(game)
-  const inStep = now.into < game.grace || game.holding === now.inhaling
-  return { ...game, time: Math.min(breathLength(game), game.time + dt), inStep: game.inStep + (inStep ? dt : 0) }
+/** The candle flaring now, if any: in the showing, the one whose beat it is; in his turn, the one he last lit. */
+export function candleLit(game: CandleGame): { candle: number; right: boolean } | undefined {
+  if (game.lit && game.time < game.lit.until) return { candle: game.lit.candle, right: game.lit.right }
+  if (game.phase !== 'showing') return undefined
+  const into = game.time - game.phaseAt - LEAD_IN
+  const at = Math.floor(into / game.beat)
+  // Each flares for most of its beat, and goes dark before the next, so that the same candle twice would still show twice.
+  return into >= 0 && at < game.length && into - at * game.beat < game.beat * 0.75 ? { candle: game.order[at], right: true } : undefined
 }
 
-export function pressBreath(game: BreathGame): BreathGame {
-  if (breathDone(game) || game.holding) return game
-  const now = breathAt(game)
-  return { ...game, holding: true, fumbles: game.fumbles + (now.inhaling || now.into < game.grace ? 0 : 1) }
+export function stepCandles(game: CandleGame, dt: number): CandleGame {
+  if (candlesDone(game)) return game
+  const time = Math.min(game.duration, game.time + dt)
+  // The showing over, it is his turn.
+  if (game.phase === 'showing' && time - game.phaseAt >= LEAD_IN + game.length * game.beat) return { ...game, time, phase: 'repeating', phaseAt: time }
+  return { ...game, time }
 }
 
-export const releaseBreath = (game: BreathGame): BreathGame => ({ ...game, holding: false })
-export const breathDone = (game: BreathGame) => game.time >= breathLength(game)
-export const breathScore = (game: BreathGame) => within(game.inStep / breathLength(game) - 0.03 * game.fumbles)
+/** He lights a candle: the next in the order, or the run is over. The whole order lit, the next round is one longer. */
+export function lightCandle(game: CandleGame, candle: number): CandleGame {
+  if (game.phase !== 'repeating' || candlesDone(game) || candle < 0 || candle >= game.candles) return game
+  const right = game.order[game.entered] === candle
+  const lit = { candle, until: game.time + FLARE, right }
+  if (!right) return { ...game, lit, phase: 'over' }
+  if (game.entered + 1 < game.length) return { ...game, lit, entered: game.entered + 1 }
+  return { ...game, lit, rounds: game.rounds + 1, length: game.length + 1, entered: 0, phase: 'showing', phaseAt: game.time + FLARE }
+}
 
-// ---- Charisma: bring up what the room warms to, and learn what that is from how it takes what he says.
+export const candlesDone = (game: CandleGame) => game.phase === 'over' || game.time >= game.duration
+export const candlesScore = (game: CandleGame) => within(game.rounds / PERFECT_ROUNDS)
 
-export interface RoomGame {
+// ---- Charisma: read the mood on each face that comes up to him, and answer it in the tone it wants before she tires of waiting.
+
+/** The tones he answers in, and the mood each is right for. */
+export const TONES = ['compliment', 'joke', 'comfort', 'space'] as const
+export type Tone = (typeof TONES)[number]
+export const TONE_FOR: Record<Mood, Tone> = { happy: 'compliment', bored: 'joke', sad: 'comfort', annoyed: 'space' }
+
+/** One face that comes up: whose, in what mood, and, at his better, the mood it turns to part-way through. */
+export interface Face {
+  listenerId: string
+  mood: Mood
+  turn?: { after: number; to: Mood }
+}
+
+export interface FaceGame {
   kind: 'charisma'
-  listeners: Listener[]
-  /** How taken each of them is with him, from 0 to 1. */
-  attention: number[]
-  /** The topics in his hand to bring up next, and those he has already brought up. */
-  hand: TalkTopic[]
-  said: string[]
-  turns: number
-  /** How each took the last thing he said: up, down, or neither. */
-  last: number[]
-  seed: number
-  topics: TalkTopic[]
+  faces: Face[]
+  /** The face up now, and when it came up: before then, between faces, there is none. */
+  current: number
+  shownAt: number
+  /** How long each face waits for him to answer. */
+  patience: number
+  /** How each face he has had went, from 0 to 1: a right answer is worth more the sooner it came. */
+  results: number[]
+  /** Whether the last answer was right, for the screen to say so. */
+  lastRight?: boolean
+  time: number
+  duration: number
 }
 
-const ROOM_TURNS = 6
-const HAND = 4
+// The pause between one face and the next.
+const FACE_GAP = 0.35
 
-function dealHand(topics: TalkTopic[], seed: number, turn: number): TalkTopic[] {
-  const roll = draws(seed + turn * 104729)
-  return [...topics].sort(() => roll() - 0.5).slice(0, HAND)
-}
-
-export function createRoom(content: ContentPack, seed: number, difficulty: number): RoomGame {
+export function createFaces(content: ContentPack, seed: number, difficulty: number): FaceGame {
   const roll = draws(seed)
-  const count = Math.min(content.minigames.listeners.length, 3 + Math.round(difficulty))
-  const listeners = [...content.minigames.listeners].sort(() => roll() - 0.5).slice(0, count)
-  const topics = content.minigames.topics
-  return { kind: 'charisma', listeners, attention: listeners.map(() => 0.5), hand: dealHand(topics, seed, 0), said: [], turns: ROOM_TURNS, last: listeners.map(() => 0), seed, topics }
+  const patience = 3 - 1.6 * difficulty
+  const duration = roundSeconds(difficulty)
+  const ids = content.minigames.listeners.map((one) => one.id)
+  const other = <T>(list: readonly T[], not?: T): T => {
+    const left = list.filter((one) => one !== not)
+    return left[Math.floor(roll() * left.length)]
+  }
+  // More faces than can come up in the round, each a different stranger and mood from the one before.
+  const faces: Face[] = []
+  for (let i = 0; i < Math.ceil(duration / FACE_GAP); i++) {
+    const before = faces[i - 1]
+    const mood = other(MOODS, before?.mood)
+    faces.push({ listenerId: other(ids, before?.listenerId), mood, ...(roll() < 0.4 * difficulty && { turn: { after: patience * (0.35 + 0.2 * roll()), to: other(MOODS, mood) } }) })
+  }
+  return { kind: 'charisma', faces, current: 0, shownAt: 0, patience, results: [], time: 0, duration }
 }
 
-/** He brings up a topic in his hand: each of them warms to it, tires of it, or is bored by it; less the second time. */
-export function sayTopic(game: RoomGame, topicId: string): RoomGame {
-  if (roomDone(game) || !game.hand.some((topic) => topic.id === topicId)) return game
-  const again = game.said.includes(topicId) ? 0.5 : 1
-  const last = game.listeners.map((one) => (one.likes.includes(topicId) ? 0.25 : one.dislikes.includes(topicId) ? -0.2 : -0.05) * again)
-  const said = [...game.said, topicId]
-  return { ...game, said, last, attention: game.attention.map((a, i) => within(a + last[i])), hand: dealHand(game.topics, game.seed, said.length) }
+/** The face up now and its mood as it is just now, or nothing between faces and once the round is over. */
+export function faceNow(game: FaceGame): { face: Face; mood: Mood; waited: number } | undefined {
+  const face = game.faces[game.current]
+  if (!face || game.time < game.shownAt || facesDone(game)) return undefined
+  const waited = game.time - game.shownAt
+  return { face, mood: face.turn && waited >= face.turn.after ? face.turn.to : face.mood, waited }
 }
 
-export const roomDone = (game: RoomGame) => game.said.length >= game.turns
-export const roomScore = (game: RoomGame) => within((game.attention.reduce((sum, a) => sum + a, 0) / Math.max(1, game.attention.length) - 0.3) / 0.7)
+const nextFace = (game: FaceGame, result: number, lastRight: boolean): FaceGame => ({
+  ...game,
+  results: [...game.results, result],
+  lastRight,
+  current: game.current + 1,
+  shownAt: game.time + FACE_GAP
+})
+
+export function stepFaces(game: FaceGame, dt: number): FaceGame {
+  if (facesDone(game)) return game
+  const later = { ...game, time: Math.min(game.duration, game.time + dt) }
+  const now = faceNow(later)
+  // She would not wait any longer: nothing came of it.
+  return now && now.waited >= game.patience ? nextFace(later, 0, false) : later
+}
+
+/** He answers the face up now in a tone: right for her mood as it is, and the sooner the better; wrong is nothing. */
+export function answerFace(game: FaceGame, tone: Tone): FaceGame {
+  const now = faceNow(game)
+  if (!now) return game
+  const right = TONE_FOR[now.mood] === tone
+  return nextFace(game, right ? 1 - 0.5 * (now.waited / game.patience) : 0, right)
+}
+
+export const facesDone = (game: FaceGame) => game.time >= game.duration
+export const facesScore = (game: FaceGame) => (game.results.length === 0 ? 0 : game.results.reduce((sum, r) => sum + r, 0) / game.results.length)
 
 // ---- Any of them.
 
-export type MiniGame = PowerGame | WireGame | PaceGame | CircuitGame | BreathGame | RoomGame
+export type MiniGame = PowerGame | WireGame | PaceGame | CircuitGame | CandleGame | FaceGame
 
 /** The game a drill is played as, laid out for him as he is now. */
 export function createMiniGame(content: ContentPack, state: GameState, drill: PendingDrill): MiniGame {
@@ -391,8 +462,8 @@ export function createMiniGame(content: ContentPack, state: GameState, drill: Pe
     dexterity: () => createWire(drill.seed, difficulty),
     endurance: () => createPace(difficulty),
     intelligence: () => createCircuit(drill.seed, difficulty),
-    wisdom: () => createBreath(drill.seed, difficulty),
-    charisma: () => createRoom(content, drill.seed, difficulty)
+    wisdom: () => createCandles(drill.seed, difficulty),
+    charisma: () => createFaces(content, drill.seed, difficulty)
   }
   return games[drill.stat]()
 }
@@ -408,9 +479,9 @@ export function stepMiniGame(game: MiniGame, dt: number): MiniGame {
     case 'intelligence':
       return stepCircuit(game, dt)
     case 'wisdom':
-      return stepBreath(game, dt)
+      return stepCandles(game, dt)
     case 'charisma':
-      return game
+      return stepFaces(game, dt)
   }
 }
 
@@ -425,9 +496,9 @@ export function miniGameDone(game: MiniGame): boolean {
     case 'intelligence':
       return circuitDone(game)
     case 'wisdom':
-      return breathDone(game)
+      return candlesDone(game)
     case 'charisma':
-      return roomDone(game)
+      return facesDone(game)
   }
 }
 
@@ -442,8 +513,8 @@ export function miniGameScore(game: MiniGame): number {
     case 'intelligence':
       return circuitScore(game)
     case 'wisdom':
-      return breathScore(game)
+      return candlesScore(game)
     case 'charisma':
-      return roomScore(game)
+      return facesScore(game)
   }
 }

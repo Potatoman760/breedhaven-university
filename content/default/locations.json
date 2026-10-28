@@ -46,7 +46,7 @@
       {
         "stat": "charisma",
         "title": "Work the crowd on the steps",
-        "description": "You take a spot on the terrace steps and start talking to whoever sits down near you."
+        "description": "You take a spot on the terrace steps, and one stranger after another sits down beside you."
       }
     ],
     "iconImage": "sprites/icons/places-great-court-cutout.webp"
@@ -73,13 +73,7 @@
     },
     "indoors": true,
     "private": false,
-    "drills": [
-      {
-        "stat": "intelligence",
-        "title": "Sit in on an open lecture",
-        "description": "You slip into the back of a lecture that is not yours and take notes anyway."
-      }
-    ],
+    "drills": [],
     "iconImage": "sprites/icons/places-lecture-halls-cutout.webp"
   },
   {
@@ -105,18 +99,7 @@
     },
     "indoors": true,
     "private": false,
-    "drills": [
-      {
-        "stat": "intelligence",
-        "title": "Study in a reading cell",
-        "description": "You claim a stone cell, a lamp and a stack of books, and get down to it."
-      },
-      {
-        "stat": "wisdom",
-        "title": "Read the old philosophers",
-        "description": "You take down something chained and difficult and read it slowly."
-      }
-    ],
+    "drills": [],
     "iconImage": "sprites/icons/places-library-cutout.webp"
   },
   {
@@ -149,18 +132,7 @@
     },
     "indoors": true,
     "private": false,
-    "drills": [
-      {
-        "stat": "charisma",
-        "title": "Hold court at a long table",
-        "description": "You sit down in the middle of a full table and join the argument."
-      },
-      {
-        "stat": "endurance",
-        "title": "Eat like an athlete at the hot counter",
-        "description": "Two trays, three helpings, and a kitchen manager who approves."
-      }
-    ],
+    "drills": [],
     "iconImage": "sprites/icons/places-commons-cutout.webp"
   },
   {
@@ -178,17 +150,13 @@
         }
       }
     ],
-    "open": {
-      "fromHour": 5,
-      "toHour": 22
-    },
     "indoors": true,
     "private": false,
     "drills": [
       {
         "stat": "wisdom",
-        "title": "Sit in silence in the chapel",
-        "description": "You take a pew near the back and let the quiet do its work."
+        "title": "Light the chapel candles",
+        "description": "The sacristan lights the candles in an order and lets them burn down. Then it is your turn to light them the same way."
       }
     ],
     "iconImage": "sprites/icons/places-chapel-cutout.webp"
@@ -215,23 +183,7 @@
     },
     "indoors": false,
     "private": false,
-    "drills": [
-      {
-        "stat": "strength",
-        "title": "Spar in the ring",
-        "description": "You pull on the padding and step onto the sand."
-      },
-      {
-        "stat": "dexterity",
-        "title": "Blade drills at the targets",
-        "description": "A practice sword, a line of targets, and the same cut a hundred times."
-      },
-      {
-        "stat": "endurance",
-        "title": "Laps of the track",
-        "description": "You set off round the track at a pace you mean to keep."
-      }
-    ],
+    "drills": [],
     "iconImage": "sprites/icons/places-tiltyard-cutout.webp"
   },
   {
@@ -260,18 +212,7 @@
     ],
     "indoors": false,
     "private": false,
-    "drills": [
-      {
-        "stat": "wisdom",
-        "title": "Tend a bed in the garden",
-        "description": "You are handed a trowel and a bed of seedlings and told to pay attention."
-      },
-      {
-        "stat": "endurance",
-        "title": "Dig and haul compost",
-        "description": "A fork, a barrow and a heap that needs to be somewhere else."
-      }
-    ],
+    "drills": [],
     "iconImage": "sprites/icons/places-physic-garden-cutout.webp"
   },
   {
@@ -296,13 +237,7 @@
     },
     "indoors": true,
     "private": false,
-    "drills": [
-      {
-        "stat": "endurance",
-        "title": "Swim lengths",
-        "description": "You lower yourself into the warm pool and start counting lengths."
-      }
-    ],
+    "drills": [],
     "iconImage": "sprites/icons/places-bathhouse-cutout.webp"
   },
   {
@@ -321,22 +256,18 @@
         }
       }
     ],
-    "open": {
-      "fromHour": 8,
-      "toHour": 22
-    },
     "indoors": true,
     "private": false,
     "drills": [
       {
-        "stat": "intelligence",
-        "title": "Debug someone's project",
-        "description": "A bench, a device that should work and does not, and an afternoon to find out why."
-      },
-      {
         "stat": "dexterity",
         "title": "Fine soldering at the benches",
         "description": "A magnifier, a steady hand, and a board of joints the size of pinheads."
+      },
+      {
+        "stat": "intelligence",
+        "title": "Mend a ward circuit",
+        "description": "A bench, a ward board that should glow and does not, and its runes to turn until the spark reaches the lamp."
       }
     ],
     "iconImage": "sprites/icons/places-foundry-cutout.webp"
@@ -371,13 +302,7 @@
     },
     "indoors": true,
     "private": false,
-    "drills": [
-      {
-        "stat": "wisdom",
-        "title": "Sit in on a counseling talk",
-        "description": "An open session in a quiet room, on living with the Bloom and with each other."
-      }
-    ],
+    "drills": [],
     "iconImage": "sprites/icons/places-health-centre-cutout.webp"
   },
   {
@@ -429,13 +354,7 @@
     ],
     "indoors": false,
     "private": false,
-    "drills": [
-      {
-        "stat": "charisma",
-        "title": "Charm the shopkeepers of Lantern Row",
-        "description": "You work your way down the row, one counter and one conversation at a time."
-      }
-    ],
+    "drills": [],
     "iconImage": "sprites/icons/places-lantern-row-cutout.webp"
   },
   {
@@ -461,18 +380,7 @@
     },
     "indoors": false,
     "private": false,
-    "drills": [
-      {
-        "stat": "charisma",
-        "title": "Tell stories at the bar",
-        "description": "You take a stool at the bar and start a story loud enough for the next three to hear."
-      },
-      {
-        "stat": "dexterity",
-        "title": "Cards at the back table",
-        "description": "You are dealt in at the back table, where the stakes are small and the fingers are quick."
-      }
-    ],
+    "drills": [],
     "iconImage": "sprites/icons/places-honeyed-bee-inn-cutout.webp"
   },
   {
@@ -506,18 +414,7 @@
     },
     "indoors": false,
     "private": false,
-    "drills": [
-      {
-        "stat": "charisma",
-        "title": "Haggle for sport",
-        "description": "You pick a stall and set about talking the price down for the fun of it."
-      },
-      {
-        "stat": "strength",
-        "title": "Carry crates for the stalls",
-        "description": "The morning deliveries are stacked at the curb and somebody has to shift them."
-      }
-    ],
+    "drills": [],
     "iconImage": "sprites/icons/places-market-cutout.webp"
   },
   {
@@ -589,18 +486,7 @@
     },
     "indoors": true,
     "private": false,
-    "drills": [
-      {
-        "stat": "intelligence",
-        "title": "Study over coffee",
-        "description": "An armchair, a socket, and a coffee you intend to make last."
-      },
-      {
-        "stat": "charisma",
-        "title": "Join a study group's argument",
-        "description": "The table next to yours is arguing about the reading, and you have opinions."
-      }
-    ],
+    "drills": [],
     "iconImage": "sprites/icons/places-spell-and-sip-cutout.webp"
   },
   {
@@ -627,13 +513,7 @@
     "indoors": true,
     "private": false,
     "eventOnly": false,
-    "drills": [
-      {
-        "stat": "dexterity",
-        "title": "The rhythm game",
-        "description": "You feed the machine and step onto the pad as the first track starts."
-      }
-    ]
+    "drills": []
   },
   {
     "id": "boba-blossom",
@@ -657,13 +537,7 @@
     },
     "indoors": true,
     "private": false,
-    "drills": [
-      {
-        "stat": "charisma",
-        "title": "Chat up the line",
-        "description": "The line is long, slow and bored, which is an audience."
-      }
-    ],
+    "drills": [],
     "iconImage": "sprites/icons/places-boba-blossom-cutout.webp"
   },
   {
@@ -688,18 +562,7 @@
     },
     "indoors": true,
     "private": false,
-    "drills": [
-      {
-        "stat": "endurance",
-        "title": "Protein loading: the Ember Ramen challenge",
-        "description": "The biggest bowl on the menu arrives still on fire, with a second on the way."
-      },
-      {
-        "stat": "charisma",
-        "title": "Dine like you belong",
-        "description": "You take a table for one and behave as though you do this every week."
-      }
-    ],
+    "drills": [],
     "iconImage": "sprites/icons/places-cauldron-cutout.webp"
   },
   {
@@ -719,10 +582,6 @@
         }
       }
     ],
-    "open": {
-      "fromHour": 6,
-      "toHour": 23
-    },
     "indoors": true,
     "private": false,
     "eventOnly": false,
@@ -731,11 +590,6 @@
         "stat": "strength",
         "title": "A workout on the racks",
         "description": "You load a bar, chalk your hands and start on the first set."
-      },
-      {
-        "stat": "endurance",
-        "title": "The treadmill and the circuit",
-        "description": "An hour of running that goes nowhere, and then the circuit."
       }
     ]
   },
@@ -761,13 +615,7 @@
     },
     "indoors": true,
     "private": false,
-    "drills": [
-      {
-        "stat": "wisdom",
-        "title": "Watch an old film closely",
-        "description": "A matinee of something old and slow, in a nearly empty house."
-      }
-    ],
+    "drills": [],
     "iconImage": "sprites/icons/places-lumen-cutout.webp"
   },
   {
@@ -792,18 +640,7 @@
     },
     "indoors": true,
     "private": false,
-    "drills": [
-      {
-        "stat": "charisma",
-        "title": "Work the dance floor",
-        "description": "You go down the steps into the noise and make yourself known."
-      },
-      {
-        "stat": "endurance",
-        "title": "Dance until closing",
-        "description": "The floor is packed, the bass is in your ribs, and you are not stopping first."
-      }
-    ],
+    "drills": [],
     "iconImage": "sprites/icons/places-undergrowth-cutout.webp"
   },
   {
@@ -837,12 +674,7 @@
       {
         "stat": "endurance",
         "title": "A run along the river",
-        "description": "You set off down the river path at a steady pace."
-      },
-      {
-        "stat": "wisdom",
-        "title": "Sit by the water and think",
-        "description": "You take a bench facing the river and let your thoughts run out."
+        "description": "You set off down the river path at a pace you mean to keep."
       }
     ],
     "iconImage": "sprites/icons/places-riverside-park-cutout.webp"
@@ -1024,7 +856,8 @@
     ],
     "indoors": false,
     "private": false,
-    "eventOnly": true
+    "eventOnly": true,
+    "drills": []
   },
   {
     "id": "ballroom",

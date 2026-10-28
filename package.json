@@ -3,6 +3,7 @@
   "version": "0.8.0",
   "description": "An AI-driven dating sim built on Electron",
   "private": true,
+  "license": "GPL-3.0-only",
   "main": "./out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",

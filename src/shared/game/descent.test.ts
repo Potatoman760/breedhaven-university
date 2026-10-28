@@ -27,8 +27,8 @@ describe('being shown the way down', () => {
     const set = scheduleDescent(content, start)
     const plan = descentAppointment(set)!
     expect(plan).toMatchObject({ kind: 'below', loveInterestId: 'ana', locationId: 'shop', hours: 1 })
-    // From tomorrow on, and not before nine.
-    expect(plan.time).toBeGreaterThanOrEqual(20 + 3)
+    // Tomorrow, first thing as he wakes at 06:00, before anything else of his.
+    expect(plan.time).toBe(20)
     expect(courierThread(set, 'ana').at(-1)?.text).toMatch(/^Meet me at the Shop, .+\.$/)
     expect(set.expedition.invited).toBe(false)
     // Once set, it is not set again.

@@ -14,8 +14,8 @@ import { t } from '../i18n'
  */
 
 const DESCENT_ID = 'undercroft-descent'
-// She does not ask him there at dawn, or so late that the place is shutting.
-const EARLIEST_HOUR = 9
+// First thing, as he wakes and before any class, wherever the place is open then; not so late that it is shutting.
+const EARLIEST_HOUR = 6
 const LATEST_END = 21
 // How far ahead a free hour is looked for before a day he would have to give something up for is taken.
 const LOOK_AHEAD_DAYS = 10

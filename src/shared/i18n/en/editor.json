@@ -338,7 +338,7 @@
   "locations.from": "From",
   "locations.to": "to",
   "locations.drills": "Ways to raise a stat here",
-  "locations.drillsHint": "What the day view suggests when the player asks how to get better at something: one is picked for each stat from every place that has one. Each is two hours, a scene with whoever is there, and raises that stat. The stats named here are also what the place counts as good for.",
+  "locations.drillsHint": "What the day view suggests when the player asks how to get better at something. Each is two hours or more, played as that stat's game, and raises it. Give each stat one place, the one that suits its game.",
   "locations.raises": "Raises",
   "locations.drillPlaceholder": "A workout on the racks",
   "locations.opens": "How it opens",

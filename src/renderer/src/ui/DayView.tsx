@@ -154,6 +154,11 @@ export function DayView(props: Props) {
   const inductionPlace = content.locations.find((l) => l.id === induction?.locationId)
   // Something he has been summoned to and is next on his day: until it is done, it is all there is to do, as with orientation.
   const summoned = over || induction ? undefined : summons(content, state)
+  // What is put forward to go to next: what he has been summoned to whenever there is that, so that the one thing he
+  // is held to is always there to take, even with a class on at the same hour; otherwise the next thing of his.
+  const offered: Upcoming | undefined = summoned
+    ? { kind: 'plan', id: summoned.id, title: summoned.title, time: Math.max(summoned.time, state.time), locationId: summoned.locationId }
+    : upcoming
   // A part of an event he has to go to holds the day as orientation does, until he has been or it is over.
   const mustAttend = over || induction ? undefined : requiredEventPart(content, state)
   // The first day of the societies' fair holds the day as orientation does, until he has been.
@@ -352,23 +357,23 @@ export function DayView(props: Props) {
         )}
 
         {/* The next thing on his timetable today: taking it skips the hours until it starts and takes him there. */}
-        {!induction && !over && upcoming && (
-          canGoTo(content, state, upcoming).ok ? (
-            <button className="featured" disabled={props.busy} onClick={() => props.onGoTo(upcoming)}>
-              <span className="chip outline-light">{upcoming.kind === 'class' ? t('screens.dayView.nextClass') : upcoming.kind === 'exam' ? t('screens.dayView.exam') : upcoming.kind === 'work' ? t('screens.dayView.nextShift') : isBirth(upcoming.id) ? t('screens.dayView.birth') : t('screens.dayView.nextPlan')}</span>
-              <span className="featured-title">{upcoming.title}</span>
+        {!induction && !over && offered && (
+          canGoTo(content, state, offered).ok ? (
+            <button className="featured" disabled={props.busy} onClick={() => props.onGoTo(offered)}>
+              <span className="chip outline-light">{offered.kind === 'class' ? t('screens.dayView.nextClass') : offered.kind === 'exam' ? t('screens.dayView.exam') : offered.kind === 'work' ? t('screens.dayView.nextShift') : isBirth(offered.id) ? t('screens.dayView.birth') : t('screens.dayView.nextPlan')}</span>
+              <span className="featured-title">{offered.title}</span>
               <span>
-                {t('screens.dayView.skipTo', { time: formatTime(toDate(calendar, upcoming.time)), place: content.locations.find((l) => l.id === upcoming.locationId)?.name ?? '' })}
-                {focusName(state) && upcoming.time > state.time ? t('screens.dayView.skipFocus', { hours: upcoming.time - state.time, focus: focusName(state) }) : ''}
+                {t('screens.dayView.skipTo', { time: formatTime(toDate(calendar, offered.time)), place: content.locations.find((l) => l.id === offered.locationId)?.name ?? '' })}
+                {focusName(state) && offered.time > state.time ? t('screens.dayView.skipFocus', { hours: offered.time - state.time, focus: focusName(state) }) : ''}
               </span>
               <ChevronIcon size={18} />
             </button>
           ) : (
             <p className="glass note">
               <strong>
-                {t('screens.dayView.nextAt', { title: upcoming.title, time: formatTime(toDate(calendar, upcoming.time)) })}
+                {t('screens.dayView.nextAt', { title: offered.title, time: formatTime(toDate(calendar, offered.time)) })}
               </strong>{' '}
-              {canGoTo(content, state, upcoming).reasons.join(' · ')}
+              {canGoTo(content, state, offered).reasons.join(' · ')}
             </p>
           )
         )}

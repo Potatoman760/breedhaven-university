@@ -10,6 +10,8 @@ import {
   describeIntimacy,
   addEventGoers,
   cancelAppointment,
+  callOffShift,
+  shiftLaterToday,
   plansWith,
   applyForJob,
   attendees,
@@ -404,6 +406,9 @@ function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadPr
 
   // The plans with her still to come: each can be called off here, which is a message to her.
   const plans = plansWith(state, id)
+  // To his boss, a shift of his still to come today, which he can call off: the game takes note of it, not her reply.
+  const shift = shiftLaterToday(content, state)
+  const shiftToCall = shift?.job.bossId === id ? shift : undefined
 
   function send(event: FormEvent) {
     event.preventDefault()
@@ -438,8 +443,20 @@ function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadPr
   return (
     <>
       {/* What the two of them have planned, a line each at the head of the thread: there to be seen, and called off, without crowding what is said. */}
-      {plans.length > 0 && (
+      {(plans.length > 0 || shiftToCall) && (
         <ul className="chat-plans">
+          {shiftToCall && (
+            <li>
+              <CalendarIcon size={14} />
+              <span>
+                <strong>{t('panels.phone.shiftToday', { at: `${String(shiftToCall.shift.startHour).padStart(2, '0')}:00` })}</strong> · {shiftToCall.job.title}
+              </span>
+              {/* Calling it off is a message, and the shift is excused: it counts against him for less. */}
+              <Button variant="quiet" size="small" disabled={waiting} onClick={() => void say((current) => callOffShift(content, current))}>
+                {t('panels.phone.callOff')}
+              </Button>
+            </li>
+          )}
           {plans.map((plan) => (
             <li key={plan.id}>
               <CalendarIcon size={14} />

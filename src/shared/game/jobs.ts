@@ -236,6 +236,16 @@ export function excuseShift(state: GameState, key: string): GameState {
 }
 
 /**
+ * He messages his boss that he cannot make today's shift, which is still to come: it is excused, by the game and not by
+ * whatever her reply makes of it, and the message is in her thread for her to answer. Nothing without such a shift.
+ */
+export function callOffShift(content: ContentPack, state: GameState): GameState {
+  const due = shiftLaterToday(content, state)
+  if (!due) return state
+  return excuseShift(addNote(state, due.job.bossId, { from: 'player', text: t('game.jobs.callOff', { at: clock(due.shift.startHour) }), read: true }), due.key)
+}
+
+/**
  * Counts up the shifts that have ended since the last time: one he did not clock in for
  * is a strike against him, or part of one if he had told his boss that day. His boss
  * writes to say so, and at the last strike he is let go and will not be had back.
