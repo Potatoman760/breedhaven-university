@@ -576,11 +576,14 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
   exchange are put into the prompt of every scene with that love interest.
 - **Bloomr** (`src/shared/game/feed.ts`) is the photo feed: pictures with a caption. It needs
   both the Main LLM (captions) and ComfyUI (pictures) set up; without both there are no
-  posts. As each day begins the day is planned by rule (`feedRound`): one to three of the
-  love interests whose contact the player has, one or two posts each, at hours of their
-  own between 08:00 and 22:00, where each of them will be at that hour, and, four times in
-  ten when another love interest will be there too, that friend in the picture. One LLM
-  request then writes every caption, whether its picture is a selfie or a candid (`shot`),
+  posts. As each day begins the day is planned by rule (`feedRound`): some of the love
+  interests whose contact the player has post, each once at most (`postersToday`: at least
+  two, or the one there is, about a quarter of them once there are many, 5 of 20, and up
+  to a quarter of the rest more by luck), every post at an hour of its own between 08:00
+  and 22:00 so that no two go up together, with where each of them will be at that hour
+  and who could be in the picture with her: whoever will be there too, and her friends.
+  One LLM request then writes every caption, picks who if anyone is in the picture with
+  her from those (`with`), whether its picture is a selfie or a candid (`shot`),
   and a line of what it shows, and each picture is drawn in the background on ComfyUI, one
   at a time, with the Photo workflow, size and framing (`postPrompt` in
   `src/shared/comfy.ts`: one paragraph saying what kind of picture it is, her appearance,
@@ -774,7 +777,9 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
   alone whoever is there: it is never a scene. When he gets there the hours are spent and
   the drill waits in the save (`drill`) on its game (`src/shared/game/minigames.ts`,
   `MiniGameView.tsx`), one for each stat: a power meter for strength, tracing a wire for
-  dexterity, pacing a heart rate for endurance, turning tiles of a ward circuit for
+  dexterity, a run along a side-scrolling river path for endurance, seen through his eyes
+  (tapping holds his pace level with the trainer, `pacerId` in `minigames.json`, Grushka, who
+  runs at the pace to hold; slower and she pulls ahead, harder and she drops back), turning tiles of a ward circuit for
   intelligence, repeating the order a row of coloured candles flared in for wisdom (one
   longer each round, over at a wrong candle), and reading strangers' faces for charisma
   (each face is happy, bored, sad or annoyed, and is answered with a compliment, a joke,
@@ -782,8 +787,10 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
   points (`DRILL_PER_HOUR`): skipping the game is a score of 0, the same as an hour of focus.
   A game is harder the higher the stat, and a timed one runs from 20 seconds to 30 at the cap
   (`roundSeconds`). What the games are drawn with, and the strangers' faces in each mood, are in
-  `minigames.json`; `npm run icons -- pieces faces` paints them, each stranger from her own seed
-  so that her four faces are the same woman. Nothing typed raises a stat: a typed outing only rests him
+  `minigames.json`; `npm run icons -- pieces faces runners scenery` paints them, each stranger
+  from her own seed so that her four faces are the same woman, and the pacer from her own
+  character file (her appearance and usual clothes), in one running frame that the game bobs and
+  sways, gliding to where she should be rather than jumping. Nothing typed raises a stat: a typed outing only rests him
   or does nothing for him. Studying for a course is an outing as before. The confirmation says
   first what he would miss by going, a class he is taking or a shift at his job, as it now
   does for anything the player sets out to do.

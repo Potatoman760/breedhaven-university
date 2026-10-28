@@ -19,6 +19,7 @@ import {
   buildScenePhotoPrompt,
   parseScenePhoto,
   PLAYER_POSTER,
+  postersToday,
   scenePhotoDraft
 } from './feed'
 import type { ContentPack, Scene } from '../model'
@@ -95,31 +96,48 @@ describe('the feed', () => {
     expect(markFeedSeen(seen)).toBe(seen)
   })
 
-  it('plans the day as it begins: one to three of those whose contact he has, at hours still to come', () => {
-    const everyone = { ...start, feedDay: -1, contacts: content.loveInterests.map((li) => li.id) }
-    expect(feedRoundDue(content, everyone)).toBe(true)
-    const round = feedRound(content, everyone)
+  it('has at least two post a day, or the one there is, about a quarter of them once there are many, and some more by luck', () => {
+    expect(postersToday(0, 0.9)).toBe(0)
+    expect([0, 0.99].map((luck) => postersToday(1, luck))).toEqual([1, 1])
+    expect([0, 0.99].map((luck) => postersToday(2, luck))).toEqual([2, 2])
+    expect([0, 0.99].map((luck) => postersToday(8, luck))).toEqual([2, 3])
+    expect([0, 0.99].map((luck) => postersToday(20, luck))).toEqual([5, 8])
+  })
+
+  it('plans the day as it begins: each of those posting once, at an hour of her own still to come', () => {
+    // Twenty love interests, so that a day has many posters.
+    const crowd: ContentPack = { ...content, loveInterests: Array.from({ length: 20 }, (_, i) => ({ ...ana, id: `li${i}`, name: `Li ${i}` })) }
+    const everyone = { ...createInitialState(crowd), feedDay: -1, contacts: crowd.loveInterests.map((li) => li.id) }
+    expect(feedRoundDue(crowd, everyone)).toBe(true)
+    const round = feedRound(crowd, everyone)
     expect(round.state.feedDay).toBe(0)
     expect(round.state.feedPlans).toEqual(round.plans)
-    expect(feedRoundDue(content, round.state)).toBe(false)
-    expect(feedRound(content, everyone).plans).toEqual(round.plans)
+    expect(feedRoundDue(crowd, round.state)).toBe(false)
+    expect(feedRound(crowd, everyone).plans).toEqual(round.plans)
 
     for (let seed = 0; seed < 50; seed++) {
-      const { plans } = feedRound(content, { ...everyone, weatherSeed: seed })
-      const authors = new Set(plans.map((plan) => plan.authorId))
-      expect(authors.size).toBeGreaterThanOrEqual(1)
-      expect(authors.size).toBeLessThanOrEqual(3)
-      expect(plans.length).toBeLessThanOrEqual(6)
-      expect(new Set(plans.map((plan) => `${plan.authorId}@${plan.time}`)).size).toBe(plans.length)
+      const { plans } = feedRound(crowd, { ...everyone, weatherSeed: seed })
+      expect(plans.length).toBeGreaterThanOrEqual(5)
+      expect(plans.length).toBeLessThanOrEqual(8)
+      // Never two posts by one of them, and never two at one hour.
+      expect(new Set(plans.map((plan) => plan.authorId)).size).toBe(plans.length)
+      expect(new Set(plans.map((plan) => plan.time)).size).toBe(plans.length)
       expect(plans.map((plan) => plan.time)).toEqual([...plans.map((plan) => plan.time)].sort((a, b) => a - b))
       for (const plan of plans) {
         // Today, later than now, and not before breakfast.
         expect(plan.time).toBeGreaterThan(everyone.time)
         expect(toHour(plan.time)).toBeGreaterThanOrEqual(8)
         expect(Math.floor((content.calendar.start.hour + plan.time) / content.calendar.hoursPerDay)).toBe(0)
-        expect(plan.withId).not.toBe(plan.authorId)
+        expect(plan.company).not.toContain(plan.authorId)
       }
     }
+  })
+
+  it('lists who could be in the picture with her: whoever is there then, and her friends', () => {
+    const friendly = { ...start, feedDay: -1, contacts: [ana.id], rapport: { [ana.id]: { friends: [bea.id], enemies: [] } } }
+    const [plan] = feedRound(content, friendly).plans
+    expect(plan.company).toContain(bea.id)
+    expect(plan.company).not.toContain(ana.id)
   })
 
   it('keeps the plans with the game until each is made, and files only what is still planned', () => {
@@ -148,23 +166,24 @@ describe('the feed', () => {
 
   it('asks for a caption and a picture for each plan, and reads back only those asked for', () => {
     const plans = [
-      { authorId: ana.id, time: 3, locationId: 'shop' },
-      { authorId: ana.id, time: 6, locationId: 'home', withId: bea.id }
+      { authorId: ana.id, time: 3, locationId: 'shop', company: [] },
+      { authorId: ana.id, time: 6, locationId: 'home', company: [bea.id] }
     ]
     const { system, user } = buildFeedPrompt(content, start, plans)
     expect(system).toContain(`never name ${start.player.name}`)
     expect(user).toContain(`1. ${ana.name}`)
     expect(user).toContain('Where: the Shop')
-    expect(user).toContain('   Alone.')
-    expect(user).toContain(`With a friend: ${bea.name}`)
-    // Whether it is a selfie or a candid is hers to say.
+    expect(user).toContain('Nobody else is with her')
+    expect(user).toContain(`Who could be in it with her: ${bea.id} (${bea.name},`)
+    // Whether it is a selfie or a candid is hers to say, and whether anyone is in it with her, and who.
     expect(system).toContain('"shot": "selfie" or "candid"')
+    expect(system).toContain('"with": the id of the one other person')
 
-    const reply = `Here: [{"n":2,"text":"\\"Tea with B.\\"","shot":"Selfie","picture":"they hold up two cups"},{"n":9,"text":"x"},{"n":2,"text":"again"},{"text":"no number"},{"n":1,"text":"Open late."}]`
+    const reply = `Here: [{"n":2,"text":"\\"Tea with B.\\"","shot":"Selfie","picture":"they hold up two cups","with":" BEA "},{"n":9,"text":"x"},{"n":2,"text":"again"},{"text":"no number"},{"n":1,"text":"Open late.","with":"${bea.id}"}]`
     const written = parseFeedReply(reply, plans)
     expect(written).toEqual([
-      { index: 1, text: 'Tea with B.', shot: 'selfie', picture: 'they hold up two cups' },
-      // Without one said, or with one there is no such thing as, it is a candid.
+      { index: 1, text: 'Tea with B.', shot: 'selfie', picture: 'they hold up two cups', withId: bea.id },
+      // Without one said, or with one there is no such thing as, it is a candid; and someone she could not be with is nobody.
       { index: 0, text: 'Open late.', shot: 'candid', picture: '' }
     ])
     expect(parseFeedReply('no json here', plans)).toEqual([])
@@ -189,7 +208,7 @@ function toHour(time: number): number {
 }
 
 describe('a reply that ran out of room', () => {
-  const plans = [1, 2, 3, 4, 5].map((time) => ({ authorId: 'ana', time }))
+  const plans = [1, 2, 3, 4, 5].map((time) => ({ authorId: 'ana', time, company: [] }))
 
   it('says how many were written, whose are missing and what seems to have happened', () => {
     const cut = '[{"n":1,"text":"Rain again.","picture":"she holds up a cup"}, {"n":2,"text":"Half'

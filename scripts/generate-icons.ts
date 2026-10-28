@@ -6,14 +6,14 @@
  *
  *   npm run icons                        every emblem not yet made
  *   npm run icons -- jobs places         only these groups (jobs, places, societies, stalls, weather, stops, and the
- *                                        drills' games: pieces, faces)
+ *                                        drills' games: pieces, faces, runners, scenery)
  *   npm run icons -- barista             only these, by id
  *   npm run icons -- --overwrite         make them again even where there is one already
  *   npm run icons -- --dry               print the prompts, and make nothing
  *
  * It can be stopped and run again: whatever has its emblem is passed over.
  */
-import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { ComfyStore, generateArt } from '../src/main/comfy/studio'
 import { PACK, cutOut, minutes, settingsFile } from './lib/pictures'
@@ -30,6 +30,14 @@ const FRAMING = 'a single object, shown whole, centered, filling the frame, game
 // each with the whole of its glow inside the picture.
 const CANDLE = 'One tall white pillar candle standing in a small round brass holder, unlit: no flame, no glow, only a short black wick, a little melted wax at the top. The whole candle from its holder to its wick, upright, centered, with white space all around.'
 const FLAME = (color: string) => `One bright ${color} magical candle flame on its own, with a soft round ${color} glow around it, and nothing else: no candle, no wick. The whole glow fits well inside the picture, with white space all around.`
+
+// The stride the pacer of the game for endurance is drawn in: one frame, which the game sets bobbing. Who she is comes
+// from her own character file.
+const STRIDE = 'Seen exactly side on, facing right, mid-stride: one leg reaching forward and the other pushing off behind, both feet in sight, arms swinging.'
+
+// The runner icons of the game for endurance's progress bar and its banners: one figure, drawn from one seed, in the colour
+// and the stride of each.
+const RUN_ICON = (color: string, how: string) => `A ${color} silhouette of a runner seen side on, facing right, ${how}, with a soft glow, a few motion lines behind.`
 
 // What each emblem shows. One that is missing here is drawn from its name.
 const SUBJECTS: Record<string, Record<string, string>> = {
@@ -127,7 +135,6 @@ const SUBJECTS: Record<string, Record<string, string>> = {
     barbell: 'A whole Olympic barbell lying level, seen straight from the front: one long straight steel bar across the picture, with thick black weight plates on both the left end and the right end, the two ends the same.',
     iron: 'A soldering iron with a wooden handle and a glowing hot copper tip, pointing to the lower left.',
     heart: 'A plump glossy red heart.',
-    dial: 'A round brass gauge face with a blank cream dial and no needle, no numbers.',
     tile: 'A square slab of dark carved slate seen from straight above, flat, plain, with a thin bronze rim.',
     spark: 'A crackling ball of blue magical lightning.',
     lamp: 'An unlit brass rune lamp with a round glass globe.',
@@ -141,7 +148,19 @@ const SUBJECTS: Record<string, Record<string, string>> = {
     compliment: 'A single red rose with a little sparkle on one petal.',
     joke: 'A laughing jester mask with bells.',
     comfort: 'A warm mug of cocoa with a small heart drawn in its foam, steam rising.',
-    space: 'A small white flag on a short wooden pole.'
+    space: 'A small white flag on a short wooden pole.',
+    stopwatch: 'A silver stopwatch with a pale blue face and a button on top.',
+    'finish-flag': 'A black and white checkered racing flag waving on a short silver pole.',
+    'run-progress': RUN_ICON('glowing violet', 'sprinting'),
+    'run-pace': RUN_ICON('glowing emerald green', 'running at an easy steady stride'),
+    'run-behind': RUN_ICON('glowing amber orange', 'flagging, leaning forward and straining to keep up'),
+    'run-fast': RUN_ICON('glowing crimson red', 'sprinting flat out, with speed streaks behind')
+  },
+  // The game for endurance: the river path, seen side on. The pacer running along it is drawn from her character file
+  // (`pacerPrompt`), in two strides from one seed so that the two frames are the same woman.
+  scenery: {
+    'river-path':
+      'A wide side view of a riverside running path through a park on a sunny morning, seen from the side as in a side-scrolling game: a flat gravel path running straight across the bottom third of the picture from the left edge to the right edge, a calm river with reeds behind it, willow trees and a stone footbridge in the distance, and a far bank of green hills. Nobody on the path, no people. The left and right edges are open, with nothing cut off at either side.'
   }
 }
 
@@ -165,13 +184,20 @@ const MOODS: Record<string, string> = {
 }
 
 // Faces are drawn bigger and kept bigger, so that their eyes come out whole.
+// So are runners, drawn whole and big enough to be seen; the scenery is a picture of its own, kept as drawn.
 const SIZES: Record<string, { size: { width: number; height: number }; shown: number }> = {
-  faces: { size: { width: 1536, height: 1536 }, shown: 512 }
+  faces: { size: { width: 1536, height: 1536 }, shown: 512 },
+  runners: { size: { width: 1024, height: 1536 }, shown: 512 },
+  scenery: { size: { width: 1920, height: 1080 }, shown: 0 }
 }
+// Groups that are not emblems: drawn as backgrounds are, and not cut out.
+const SCENERY = new Set(['scenery'])
 
 // How a group is drawn, where it is not as an object on its own.
 const FRAMINGS: Record<string, string> = {
-  faces: 'one young woman, head and shoulders, facing the viewer, the expression on her face plain to see, cartoon game portrait icon, thick clean outline, simple shapes, no text\n\nplain white background'
+  faces: 'one young woman, head and shoulders, facing the viewer, the expression on her face plain to see, cartoon game portrait icon, thick clean outline, simple shapes, no text\n\nplain white background',
+  runners: 'one person, full body from the top of her head to the soles of both feet, both feet and both shoes whole and inside the picture with white space below them, the whole figure small enough to fit with room on every side, cartoon game sprite, thick clean outline, simple shapes, no text\n\nplain white background',
+  scenery: 'side-scrolling game background, cartoon, thick clean outlines, bright colours, no text'
 }
 
 interface Target {
@@ -210,6 +236,8 @@ const GROUPS: Record<string, Group> = {
     }
   },
   pieces: { file: 'minigames.json', list: (data) => data.pieces },
+  runners: { file: 'minigames.json', list: (data) => data.runners },
+  scenery: { file: 'minigames.json', list: (data) => data.scenery },
   faces: {
     file: 'minigames.json',
     list: (data) => data.listeners.flatMap((one: any) => Object.keys(MOODS).map((mood) => ({ id: `${one.id}-${mood}`, name: `${one.name}, ${mood}`, iconImage: one.faces?.[mood] }))),
@@ -222,6 +250,23 @@ const GROUPS: Record<string, Group> = {
       return replaced
     }
   }
+}
+
+/**
+ * The pacer of the game for endurance, as her character file has her: her looks, and the clothes she usually wears,
+ * running. Read afresh, so that a change to her file is a change to her picture when it is next drawn.
+ */
+function pacerPrompt(): string {
+  const id = read('minigames.json').data.pacerId
+  if (!id) throw new Error('minigames.json names no pacerId to draw')
+  const dir = join(PACK, 'love-interests')
+  const one = readdirSync(dir)
+    .filter((file) => file.endsWith('.json'))
+    .map((file) => JSON.parse(readFileSync(join(dir, file), 'utf8')))
+    .find((character) => character.id === id)
+  if (!one) throw new Error(`There is no character "${id}" to set the pace`)
+  const outfit = one.outfits?.find((o: any) => o.id === one.defaultOutfitId) ?? one.outfits?.[0]
+  return `${one.appearance} She is wearing ${outfit?.description?.trim() || 'running clothes'}, and trainers. She is running.`
 }
 
 function read(file: string): { data: any; eol: string } {
@@ -268,14 +313,24 @@ async function main(): Promise<void> {
   if (!existsSync(settingsPath)) throw new Error(`No ComfyUI settings at ${settingsPath}. Set ComfyUI up in the app first.`)
   const readSettings = () => new ComfyStore(settingsPath, PACK).get()
   const subjectOf = (target: Target) => {
+    if (target.group === 'runners') return `${pacerPrompt()} ${STRIDE}`
     if (target.group !== 'faces') return SUBJECTS[target.group]?.[target.id] ?? `An emblem of ${target.name}.`
     const { stranger, mood } = faceOf(target.id)
     return `${STRANGERS[stranger] ?? `A young woman, ${target.name}.`} ${MOODS[mood]}`
   }
   const promptOf = (target: Target) => `${subjectOf(target)}\n\n${FRAMINGS[target.group] ?? FRAMING}`
   // A stranger is drawn from the same seed in every mood, so that she is the same woman in each.
-  // So are the candle flames, so that they are one flame in different colours.
-  const seedFor = (target: Target) => (target.group === 'faces' ? seedOf(faceOf(target.id).stranger) : target.id.startsWith('flame-') ? seedOf('flame') : undefined)
+  // So are the candle flames, so that they are one flame in different colours, and each runner in both his strides.
+  const seedFor = (target: Target) =>
+    target.group === 'faces'
+      ? seedOf(faceOf(target.id).stranger)
+      : target.id.startsWith('flame-')
+        ? seedOf('flame')
+        : target.id.startsWith('run-')
+          ? seedOf('run-icon')
+        : target.group === 'runners'
+          ? seedOf(`${read('minigames.json').data.pacerId}-running`)
+          : undefined
 
   console.log(`ComfyUI at ${readSettings().baseUrl}. ${todo.length} to make of ${all.length}${overwrite ? ', replacing those there are' : ''}.`)
   if (dry) {
@@ -298,7 +353,7 @@ async function main(): Promise<void> {
     const began = Date.now()
     process.stdout.write(`[${i + 1}/${todo.length}] ${target.group}: ${target.name}... `)
     // Filed by group, so that a stall and a place of the same id do not overwrite each other.
-    const result = await generateArt(readSettings(), PACK, PACK, { kind: 'sprite', subjectId: SUBJECT, name: `${target.group}-${target.id}`, workflow: '', positive: promptOf(target), negative: '', seed: seedFor(target), ...(SIZES[target.group]?.size ?? SIZE) }, cancel.signal, '')
+    const result = await generateArt(readSettings(), PACK, PACK, { kind: SCENERY.has(target.group) ? 'background' : 'sprite', subjectId: SUBJECT, name: `${target.group}-${target.id}`, workflow: '', positive: promptOf(target), negative: '', seed: seedFor(target), ...(SIZES[target.group]?.size ?? SIZE) }, cancel.signal, '')
     if (cancel.signal.aborted) {
       console.log('cancelled.')
       break
@@ -315,10 +370,12 @@ async function main(): Promise<void> {
     failedInARow = 0
 
     let made = { path: result.path, note: '' }
-    try {
-      made = cutOut(result.path, SIZES[target.group]?.shown ?? SHOWN)
-    } catch (cause) {
-      made = { path: result.path, note: `left on its card: ${(cause as Error).message}` }
+    if (!SCENERY.has(target.group)) {
+      try {
+        made = cutOut(result.path, SIZES[target.group]?.shown ?? SHOWN)
+      } catch (cause) {
+        made = { path: result.path, note: `left on its card: ${(cause as Error).message}` }
+      }
     }
     try {
       const replaced = put(target, made.path)

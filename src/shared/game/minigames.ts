@@ -165,11 +165,25 @@ export interface PaceGame {
   duration: number
   /** The time spent in the band. */
   held: number
+  /** How far he has run, for the path to go by at the speed he runs it. */
+  distance: number
   difficulty: number
 }
 
 export function createPace(difficulty: number): PaceGame {
-  return { kind: 'endurance', rate: 0.3, time: 0, duration: roundSeconds(difficulty), held: 0, difficulty }
+  return { kind: 'endurance', rate: 0.3, time: 0, duration: roundSeconds(difficulty), held: 0, distance: 0, difficulty }
+}
+
+/** How far he is ahead of the pacer, who runs at the middle of the band: 0 beside her, up to 1 ahead or -1 behind. */
+export function paceLead(game: PaceGame): number {
+  const band = paceBand(game)
+  return Math.max(-1, Math.min(1, (game.rate - band.center) / 0.4))
+}
+
+/** Whether he is keeping pace just now: inside the band, which is running beside her. */
+export function onPace(game: PaceGame): boolean {
+  const band = paceBand(game)
+  return Math.abs(game.rate - band.center) <= band.width / 2
 }
 
 /** Where the pace should be just now: the band drifts, and narrows as the run goes on. */
@@ -182,9 +196,14 @@ export function paceBand(game: PaceGame): { center: number; width: number } {
 
 export function stepPace(game: PaceGame, dt: number): PaceGame {
   if (paceDone(game)) return game
-  const band = paceBand(game)
-  const inside = Math.abs(game.rate - band.center) <= band.width / 2
-  return { ...game, time: Math.min(game.duration, game.time + dt), rate: within(game.rate - dt * (0.18 + 0.12 * game.difficulty)), held: game.held + (inside ? dt : 0) }
+  // Even flagging he is still moving: the path never stops.
+  return {
+    ...game,
+    time: Math.min(game.duration, game.time + dt),
+    rate: within(game.rate - dt * (0.18 + 0.12 * game.difficulty)),
+    held: game.held + (onPace(game) ? dt : 0),
+    distance: game.distance + dt * (0.2 + game.rate)
+  }
 }
 
 export const tapPace = (game: PaceGame): PaceGame => (paceDone(game) ? game : { ...game, rate: within(game.rate + 0.07) })

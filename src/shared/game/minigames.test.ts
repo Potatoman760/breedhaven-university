@@ -30,6 +30,8 @@ import {
   finishDrill,
   moveWire,
   paceBand,
+  paceLead,
+  onPace,
   paceScore,
   powerDone,
   powerScore,
@@ -143,6 +145,19 @@ describe('the game for endurance', () => {
     let idle = createPace(0)
     while (idle.time < idle.duration) idle = stepPace(idle, DT)
     expect(paceScore(idle)).toBeLessThan(0.2)
+    // Kept, he ran further than when he flagged, though flagging he still moved.
+    expect(kept.distance).toBeGreaterThan(idle.distance)
+    expect(idle.distance).toBeGreaterThan(0)
+  })
+
+  it('has him beside the pacer while he keeps the pace, behind her slower and ahead of her faster', () => {
+    const at = (rate: number) => ({ ...createPace(0), rate: paceBand(createPace(0)).center + rate })
+    expect(onPace(at(0))).toBe(true)
+    expect(paceLead(at(0))).toBe(0)
+    expect(onPace(at(-0.3))).toBe(false)
+    expect(paceLead(at(-0.3))).toBeLessThan(0)
+    expect(paceLead(at(0.3))).toBeGreaterThan(0)
+    expect(paceLead(at(5))).toBe(1)
   })
 })
 
@@ -234,7 +249,7 @@ describe('the game for wisdom', () => {
 describe('the game for charisma', () => {
   const room: ContentPack = {
     ...content,
-    minigames: { pieces: [], listeners: ['a', 'b', 'c'].map((id) => ({ id, name: id.toUpperCase(), faces: {} })) }
+    minigames: { pieces: [], runners: [], scenery: [], listeners: ['a', 'b', 'c'].map((id) => ({ id, name: id.toUpperCase(), faces: {} })) }
   }
   /** Plays a round, answering each face after waiting so long, in the tone `choose` picks for her mood. */
   const play = (game: FaceGame, wait: number, choose: (mood: Mood) => Tone) => {

@@ -413,6 +413,8 @@ function checkReferences(pack: ContentPack): string[] {
 
   idSet(pack.minigames.pieces, 'minigames.pieces')
   idSet(pack.minigames.listeners, 'minigames.listeners')
+  const pacer = pack.minigames.pacerId
+  if (pacer && ![...pack.loveInterests, ...pack.npcs].some((one) => one.id === pacer)) unknown('minigames.pacerId', 'character', pacer)
 
   const items = idSet(pack.items, 'items')
   idSet(pack.stalls, 'stalls')

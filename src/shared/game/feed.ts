@@ -12,11 +12,11 @@ import { t } from '../i18n'
 
 // Nobody posts before breakfast, or once the evening is over.
 const POST_HOURS = { from: 8, until: 22 } as const
-// The most who post on a given day, and the most each of them does.
-const MAX_AUTHORS = 3
-const MAX_POSTS_EACH = 2
-// How often someone who is there with her is in the selfie too.
-const FRIEND_CHANCE = 0.4
+// How many post on a day, each once: at least two (one, with only one to post), more as he knows more of them at about
+// one in four, and on top of that, by luck, up to a quarter of the rest.
+const POSTERS = { least: 2, perContact: 0.25, extra: 0.25 } as const
+// The most people listed as who could be in a post's picture with her.
+const MAX_COMPANY = 6
 // How many posts the feed shows at a time: more are brought in as the reader scrolls down.
 export const FEED_PAGE = 5
 // Older posts fall off the end of the feed.
@@ -208,11 +208,22 @@ export function feedRoundDue(content: ContentPack, state: GameState): boolean {
 }
 
 /**
- * Today's round: marks it made, and plans the day's posts. One to three of the love
- * interests whose contact he has post, once or twice each, at hours of their own still to
- * come. Where each will be at that hour is worked out now, and now and then someone who
- * will be there with her is in the picture too. With nobody's contact there are none.
- * The plans are kept in the game until each is made; any left over from the day before are let go.
+ * How many post on a day, given how many there are who could, and a number in [0, 1) for luck: each posts once at most.
+ * At least two, or all of them when there are fewer; about a quarter of them once there are many; and a share more by luck.
+ */
+export function postersToday(contacts: number, luck: number): number {
+  if (contacts <= 0) return 0
+  const least = Math.min(contacts, Math.max(POSTERS.least, Math.round(contacts * POSTERS.perContact)))
+  const more = Math.floor((contacts - least) * POSTERS.extra)
+  return Math.min(contacts, least + Math.floor(luck * (more + 1)))
+}
+
+/**
+ * Today's round: marks it made, and plans the day's posts. Some of the love interests whose contact he has post, once
+ * each, every one at an hour of her own still to come, so that no two go up at once. Where each will be at that hour is
+ * worked out now, and who could be in the picture with her: whoever will be there too, and her friends. Whether anyone
+ * is, and who, is the LLM's to say when it writes the post. With nobody's contact there are none. The plans are kept in
+ * the game until each is made; any left over from the day before are let go.
  */
 export function feedRound(content: ContentPack, state: GameState): { state: GameState; plans: PostPlan[] } {
   const date = toDate(content.calendar, state.time)
@@ -222,26 +233,21 @@ export function feedRound(content: ContentPack, state: GameState): { state: Game
     .map((li) => ({ li, luck: draw(seedOf(li.id)) }))
     .filter(({ li }) => state.contacts.includes(li.id))
     .sort((a, b) => a.luck - b.luck)
-  const authors = known.slice(0, 1 + Math.floor(draw(1000) * MAX_AUTHORS)).map(({ li }) => li)
 
+  // The hours left today that a post can go up at, in an order of the day's own: each poster takes the next.
   const hours: number[] = []
   for (let hour = Math.max(POST_HOURS.from, date.hour + 1); hour < Math.min(POST_HOURS.until, content.calendar.hoursPerDay); hour++) hours.push(hour)
+  const order = hours.map((hour) => ({ hour, luck: draw(3000 + hour) })).sort((x, y) => x.luck - y.luck)
+  const authors = known.slice(0, Math.min(order.length, postersToday(known.length, draw(1000)))).map(({ li }) => li)
 
-  const plans: PostPlan[] = []
-  authors.forEach((li, a) => {
-    const count = 1 + Math.floor(draw(2000 + a) * MAX_POSTS_EACH)
-    const mine = hours
-      .map((hour) => ({ hour, luck: draw(3000 + a * 100 + hour) }))
-      .sort((x, y) => x.luck - y.luck)
-      .slice(0, count)
-    for (const { hour } of mine) {
-      const time = state.time - date.hour + hour
-      const then = { ...state, time }
-      const locationId = locationOf(content, then, li)
-      const there = locationId ? loveInterestsAt(content, then, locationId).filter((other) => other.id !== li.id) : []
-      const friend = draw(4000 + a * 100 + hour) < FRIEND_CHANCE ? there[Math.floor(draw(5000 + a * 100 + hour) * there.length)] : undefined
-      plans.push({ authorId: li.id, time, locationId, withId: friend?.id })
-    }
+  const plans: PostPlan[] = authors.map((li, a) => {
+    const time = state.time - date.hour + order[a].hour
+    const then = { ...state, time }
+    const locationId = locationOf(content, then, li)
+    const there = locationId ? loveInterestsAt(content, then, locationId).map((other) => other.id) : []
+    const friends = (state.rapport[li.id]?.friends ?? []).filter((id) => content.loveInterests.some((other) => other.id === id))
+    const company = [...new Set([...there, ...friends])].filter((id) => id !== li.id).slice(0, MAX_COMPANY)
+    return { authorId: li.id, time, locationId, company }
   })
   plans.sort((x, y) => x.time - y.time)
   return { state: { ...state, feedDay: date.dayIndex, feedPlans: plans }, plans }
@@ -257,6 +263,7 @@ export function buildFeedPrompt(content: ContentPack, state: GameState, plans: P
     t('llm.feed.fieldText', { field: '"text"' }),
     t('llm.feed.fieldShot', { field: '"shot"', selfie: '"selfie"', candid: '"candid"' }),
     t('llm.feed.fieldPicture', { field: '"picture"' }),
+    t('llm.feed.fieldWith', { field: '"with"', none: '""' }),
     t('llm.feed.captionRules'),
     t('llm.feed.captionShort'),
     t('llm.feed.captionMoment'),
@@ -287,14 +294,21 @@ export function buildFeedPrompt(content: ContentPack, state: GameState, plans: P
       const li = everyone.find((c) => c.id === plan.authorId)
       if (!li) return []
       const where = content.locations.find((l) => l.id === plan.locationId)
-      const friend = everyone.find((c) => c.id === plan.withId)
       const last = recentPostsBy(state, li.id, 1)[0]
+      // Who could be in it with her, by id, and why: there at the same hour, or a friend of hers who could have come along.
+      const then = { ...state, time: plan.time }
+      const people = plan.company.flatMap((id) => {
+        const other = everyone.find((c) => c.id === id)
+        if (!other) return []
+        const here = plan.locationId !== undefined && locationOf(content, then, other) === plan.locationId
+        return [t('llm.feed.companion', { id, name: other.name, why: here ? 'here' : 'friend' })]
+      })
       return [
         t('llm.feed.post', { n: i + 1, name: li.name, age: li.age, time: formatTime(toDate(content.calendar, plan.time)), bio: li.bio }),
         t('llm.feed.personality', { text: li.personality }),
         li.ai.speechPattern && t('llm.feed.voice', { text: li.ai.speechPattern }),
         t('llm.feed.where', { where: where ? `${where.name}. ${where.description}` : t('llm.feed.atHome') }),
-        friend ? t('llm.feed.withFriend', { name: friend.name, bio: friend.bio }) : t('llm.feed.alone'),
+        people.length > 0 ? t('llm.feed.company', { people: people.join('; ') }) : t('llm.feed.alone'),
         last && t('llm.feed.lastPost', { text: last.text })
       ]
     })
@@ -313,6 +327,8 @@ export interface WrittenPost {
   shot: Shot
   /** What the picture shows, in words for an image model. */
   picture: string
+  /** The one other person in the picture, when the reply put someone in it: one of those it could be. */
+  withId?: string
 }
 
 /**
@@ -340,13 +356,15 @@ export function parseFeedReply(reply: string, plans: PostPlan[]): WrittenPost[] 
   if (!Array.isArray(parsed)) return []
   const written: WrittenPost[] = []
   for (const entry of parsed) {
-    const { n, text, picture, shot } = (entry ?? {}) as { n?: unknown; text?: unknown; picture?: unknown; shot?: unknown }
+    const { n, text, picture, shot, with: other } = (entry ?? {}) as { n?: unknown; text?: unknown; picture?: unknown; shot?: unknown; with?: unknown }
     const index = Number(n) - 1
     if (!Number.isInteger(index) || index < 0 || index >= plans.length || typeof text !== 'string') continue
     const wording = text.trim().replace(/^["“]|["”]$/g, '').slice(0, MAX_POST_CHARS)
     if (wording && !written.some((post) => post.index === index)) {
       const taken = SHOTS.find((one) => one === (typeof shot === 'string' ? shot.trim().toLowerCase() : ''))
-      written.push({ index, text: wording, shot: taken ?? 'candid', picture: typeof picture === 'string' ? picture.trim().slice(0, MAX_POST_CHARS) : '' })
+      // Someone in it with her only from those she could be with; anyone else named, and nobody, are a picture of her alone.
+      const withId = typeof other === 'string' ? plans[index].company.find((id) => id.toLowerCase() === other.trim().toLowerCase()) : undefined
+      written.push({ index, text: wording, shot: taken ?? 'candid', picture: typeof picture === 'string' ? picture.trim().slice(0, MAX_POST_CHARS) : '', ...(withId && { withId }) })
     }
   }
   return written
@@ -370,9 +388,10 @@ export function feedShortfall(content: ContentPack, reply: string, plans: PostPl
   return t('llm.feed.shortfall', { written: written.length, planned: plans.length, missing: missing.join(', '), why })
 }
 
-/** A planned post with its caption written and the prompt its picture is drawn from: all but the picture. */
+/** A planned post with its caption written, who is in it with her, and the prompt its picture is drawn from: all but the picture. */
 export interface PostDraft extends PostPlan {
   text: string
+  withId?: string
   prompt: string
 }
 
@@ -388,14 +407,14 @@ export function draftPosts(content: ContentPack, state: GameState, plans: PostPl
     return who && { appearance: who.appearance, pronouns: who.pronouns, wears: outfitDescription(who.outfits, wornOutfit(content, then, who)) }
   }
   return written
-    .flatMap(({ index, text, shot, picture }) => {
+    .flatMap(({ index, text, shot, picture, withId }) => {
       const plan = plans[index]
       const then = { ...state, time: plan.time }
       const author = sitter(plan.authorId, then)
       if (!author) return []
       const place = content.locations.find((l) => l.id === plan.locationId)
       const light = periodAt(content.calendar, toDate(content.calendar, plan.time).hour).light
-      return [{ ...plan, text, prompt: postPrompt(author, sitter(plan.withId, then), shot, picture, place, light, framing) }]
+      return [{ ...plan, text, withId, prompt: postPrompt(author, sitter(withId, then), shot, picture, place, light, framing) }]
     })
     .sort((a, b) => a.time - b.time)
 }

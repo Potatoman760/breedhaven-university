@@ -18,6 +18,11 @@ describe('validateContentPack', () => {
     expect(() => validateContentPack(raw)).toThrow(/activities\.work: unknown location "nowhere"/)
   })
 
+  it('has the run paced by a character there is', () => {
+    expect(validateContentPack({ ...rawFixture(), minigames: { pacerId: 'ana' } }).minigames.pacerId).toBe('ana')
+    expect(() => validateContentPack({ ...rawFixture(), minigames: { pacerId: 'nobody' } })).toThrow(/minigames\.pacerId: unknown character "nobody"/)
+  })
+
   it('rejects dates that do not exist in the calendar', () => {
     const raw = rawFixture()
     raw.calendar.start.day = 4

@@ -1,13 +1,13 @@
 import { z } from 'zod'
 
-/** A post that is going to be made: who by, when, where she will be, and who is in the picture with her. */
+/** A post that is going to be made: who by, when, where she will be, and who could be in the picture with her. */
 export const PostPlanSchema = z.object({
   authorId: z.string(),
   /** Game time (hours since start) at which it goes up. */
   time: z.number().int().min(0),
   locationId: z.string().optional(),
-  /** The friend in the selfie with her, when it is not of her alone. */
-  withId: z.string().optional()
+  /** Those who could be in the picture with her: whoever is there at that hour, and her friends. The LLM writing the post picks one, or nobody. */
+  company: z.array(z.string()).default([])
 })
 export type PostPlan = z.infer<typeof PostPlanSchema>
 

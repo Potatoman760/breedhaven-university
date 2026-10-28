@@ -16,11 +16,6 @@
       "iconImage": "sprites/icons/pieces-heart-cutout.webp"
     },
     {
-      "id": "dial",
-      "name": "Pace dial",
-      "iconImage": "sprites/icons/pieces-dial-cutout.webp"
-    },
-    {
       "id": "tile",
       "name": "Circuit tile",
       "iconImage": "sprites/icons/pieces-tile-cutout.webp"
@@ -89,6 +84,51 @@
       "id": "space",
       "name": "Give her space",
       "iconImage": "sprites/icons/pieces-space-cutout.webp"
+    },
+    {
+      "id": "stopwatch",
+      "name": "Stopwatch",
+      "iconImage": "sprites/icons/pieces-stopwatch-cutout.webp"
+    },
+    {
+      "id": "finish-flag",
+      "name": "Finish flag",
+      "iconImage": "sprites/icons/pieces-finish-flag-cutout.webp"
+    },
+    {
+      "id": "run-progress",
+      "name": "Runner, the way to go",
+      "iconImage": "sprites/icons/pieces-run-progress-cutout.webp"
+    },
+    {
+      "id": "run-pace",
+      "name": "Runner, keeping pace",
+      "iconImage": "sprites/icons/pieces-run-pace-cutout.webp"
+    },
+    {
+      "id": "run-behind",
+      "name": "Runner, falling behind",
+      "iconImage": "sprites/icons/pieces-run-behind-cutout.webp"
+    },
+    {
+      "id": "run-fast",
+      "name": "Runner, too fast",
+      "iconImage": "sprites/icons/pieces-run-fast-cutout.webp"
+    }
+  ],
+  "runners": [
+    {
+      "id": "pacer",
+      "name": "The pacer, running",
+      "iconImage": "sprites/icons/runners-pacer-cutout.webp"
+    }
+  ],
+  "pacerId": "grushka",
+  "scenery": [
+    {
+      "id": "river-path",
+      "name": "The river path",
+      "iconImage": "generated/backgrounds/icons/scenery-river-path.webp"
     }
   ],
   "listeners": [
