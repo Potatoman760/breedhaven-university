@@ -140,19 +140,19 @@ describe('training a stat', () => {
 
   it('counts a day of one stat for less the more of it there is, and each stat on its own', () => {
     let state = withStats({ strength: 20, wisdom: 20 })
-    state = trainStat(content, state, 'strength', 2)
-    expect(state.training['strength']).toBe(2)
-    // The third and fourth hours of the day count for half, and anything after for nothing.
-    state = trainStat(content, state, 'strength', 2)
-    expect(state.training['strength']).toBe(3)
+    state = trainStat(content, state, 'strength', 6)
+    expect(state.training['strength']).toBe(6)
+    // The next six points of the day count for half, and anything after for nothing.
+    state = trainStat(content, state, 'strength', 6)
+    expect(state.training['strength']).toBe(9)
     state = trainStat(content, state, 'strength', 5)
-    expect(state.training['strength']).toBe(3)
+    expect(state.training['strength']).toBe(9)
     // Another stat has its own day.
     state = trainStat(content, state, 'wisdom', 1)
     expect(state.training['wisdom']).toBe(1)
     // And tomorrow is a new one.
     state = trainStat(content, onDay(state, 1), 'strength', 1)
-    expect(state.training['strength']).toBe(4)
+    expect(state.training['strength']).toBe(10)
   })
 
   it('never takes a score past the cap', () => {

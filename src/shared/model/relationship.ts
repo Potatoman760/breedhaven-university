@@ -20,6 +20,21 @@ export const GiftValuesSchema = z.object({
   disliked: z.number().default(-3)
 })
 
+/** The words a scene's summary judges each feeling's change in, from worst to best. The LLM writes them, and the parser reads them. */
+export const SCENE_CHANGES = ['much less', 'less', 'a little less', 'unchanged', 'a little more', 'more', 'much more'] as const
+export type SceneChange = (typeof SCENE_CHANGES)[number]
+
+/** What each of those words moves a feeling by, before what he has that bears on it. */
+export const SceneChangeValuesSchema = z.object({
+  'much less': z.number().default(-8),
+  less: z.number().default(-4),
+  'a little less': z.number().default(-1),
+  unchanged: z.number().default(0),
+  'a little more': z.number().default(1),
+  more: z.number().default(4),
+  'much more': z.number().default(8)
+})
+
 /**
  * An arrangement the player can be in with one or more love interests: a couple, an open
  * couple, three together. Stages measure how close two people are; a status is what they
@@ -82,6 +97,7 @@ export const RelationshipConfigSchema = z.object({
   gifts: GiftValuesSchema.prefault({}),
   /** Affection a like on one of her posts is worth, once a post. */
   postLike: z.number().default(1),
+  sceneChange: SceneChangeValuesSchema.prefault({}),
   stages: z.array(RelationshipStageSchema).min(1),
   statuses: z.array(RelationshipStatusSchema).default([]),
   tieLevels: z.array(TieLevelSchema).default([]),

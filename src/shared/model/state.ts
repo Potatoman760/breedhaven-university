@@ -11,7 +11,7 @@ import { ChildSchema, PregnancySchema } from './pregnancy'
 import { EmploymentSchema } from './job'
 import { BondSchema } from './relationship'
 import { PostPlanSchema, PostSchema } from './feed'
-import { CourierNoteSchema } from './stats'
+import { CourierNoteSchema, StatSchema } from './stats'
 
 export const PlayerSchema = z.object({
   name: z.string(),
@@ -67,6 +67,20 @@ export type Rapport = z.infer<typeof RapportSchema>
 export const FocusSchema = z.object({ kind: z.enum(['stat', 'course']), id: z.string() })
 export type Focus = z.infer<typeof FocusSchema>
 
+/**
+ * A drill he has gone to and whose game is still to be played or skipped: the hours are spent, and what it does for the
+ * stat waits on how the game goes. Kept in the save, so that the game is there again when a game is loaded.
+ */
+export const PendingDrillSchema = z.object({
+  stat: StatSchema,
+  hours: z.number().int().min(1),
+  title: z.string(),
+  description: z.string().default(''),
+  /** What its game is laid out from, so that it is the same game however often it is opened. */
+  seed: z.number().int()
+})
+export type PendingDrill = z.infer<typeof PendingDrillSchema>
+
 export const GameStateSchema = z.object({
   /** Hours elapsed since the calendar's start moment. */
   time: z.number().int().min(0),
@@ -97,6 +111,7 @@ export const GameStateSchema = z.object({
   trainedOn: z.object({ day: z.number().int(), points: z.record(z.string(), z.number()) }),
   /** What he gives his spare hours to: a stat, or a course he takes. Hours skipped on the way to the next thing are spent on it. */
   focus: FocusSchema.optional(),
+  drill: PendingDrillSchema.optional(),
   /** How far along he is in each course he takes: points earned in class and by study, by course id. */
   coursePoints: z.record(z.string(), z.number()),
   /** The grades he has been given, by course id: at the midterm, and at the final. */

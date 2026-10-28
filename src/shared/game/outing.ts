@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { MAX_SCENE_CAST, STATS, StatSchema, trainsAt, type CalendarEvent, type ContentPack, type Drill, type Location, type GameState, type Effect, type Scene, type Stat } from '../model'
+import { MAX_SCENE_CAST, STATS, StatSchema, type CalendarEvent, type ContentPack, type Drill, type Location, type GameState, type Effect, type Scene, type Stat } from '../model'
 import { formatTime, isGameOver, toDate } from './calendar'
 import { applyEffects } from './conditions'
 import { eventGoers, eventsOn } from './events'
@@ -26,20 +26,11 @@ const MAX_REST_HOURS = 8
 const MAX_SESSION_HOURS = 8
 // An event can be stayed at for as long as it runs, which may be most of a day.
 const MAX_EVENT_HOURS = 16
-// What an hour of working on yourself gives and costs, and what an hour of rest restores.
-const STAT_PER_HOUR = 1
+// What an hour of work on himself costs, and what an hour of rest restores.
 const ENERGY_PER_HOUR = 8
 const REST_PER_HOUR = 15
-// Words that give away what an activity works on, for when no LLM is there to judge.
-const STAT_WORDS: Record<Stat | 'rest', RegExp> = {
-  rest: /\b(sleep|rest|nap|bed|lie down|doze)\b/,
-  strength: /\b(lift|weights?|wrestl\w*|spar\w*|strength|chop\w*|haul\w*)\b/,
-  dexterity: /\b(archery|fenc\w*|juggl\w*|climb\w*|danc\w*|lockpick\w*|dexterity|cards)\b/,
-  endurance: /\b(run|running|jog\w*|swim\w*|laps|hike|hiking|endurance|train\w*|exercise)\b/,
-  intelligence: /\b(study|studying|read|reading|revis\w*|homework|research|intelligence)\b/,
-  charisma: /\b(mingl\w*|socialis\w*|socializ\w*|perform\w*|sing\w*|recit\w*|charm\w*|charisma|speech)\b/,
-  wisdom: /\b(pray\w*|meditat\w*|reflect\w*|contemplat\w*|garden\w*|wisdom)\b/
-}
+// Words that say he means to rest, for when no LLM is there to judge.
+const REST_WORDS = /\b(sleep|rest|nap|bed|lie down|doze)\b/
 // Words for going to see someone and no more than that: an hour of it.
 const TALK_WORDS = /\b(talk|chat|speak|see|visit|find|catch up|say hi|say hello|check on|drop in)\b/
 // Waiting for people to be free only looks this far ahead; beyond it, a plan is the thing.
@@ -58,7 +49,7 @@ export const OutingSchema = z.object({
   withIds: z.array(z.string()).max(MAX_SCENE_CAST).default([]),
   locationId: z.string(),
   hours: z.number().int().min(1).max(MAX_EVENT_HOURS).default(DEFAULT_HOURS),
-  /** What it does for the player: raises a stat, restores energy, or neither. */
+  /** What it does for the player: restores energy, or is a drill for a stat, whose game is played when he gets there. */
   trains: z.union([StatSchema, z.literal('rest')]).optional(),
   /**
    * Nobody is invited, but whoever is at the place when he gets there is part of it: love
@@ -126,11 +117,8 @@ function inRoom(outing: Outing, room: OutingRoom): Outing {
 export function fallbackOuting(content: ContentPack, state: GameState, text: string): Outing {
   const said = text.toLowerCase()
   const mentions = (name: string) => new RegExp(`\\b${name.toLowerCase().replace(/[^a-z0-9 ]/g, '.')}\\b`).test(said)
-  const named = content.locations.find((l) => mentions(l.name.replace(/^the /i, '')))
-  const trains = (['rest', ...STATS] as const).find((kind) => STAT_WORDS[kind].test(said))
-  // Somewhere suited to it, when the player didn't say where.
-  const suited = trains && trains !== 'rest' ? content.locations.find((l) => trainsAt(l).includes(trains)) : undefined
-  const place = named ?? suited
+  const place = content.locations.find((l) => mentions(l.name.replace(/^the /i, '')))
+  const trains = REST_WORDS.test(said) ? ('rest' as const) : undefined
   const withIds = content.loveInterests
     .filter((li) => mentions(li.name.split(' ')[0]))
     .map((li) => li.id)
@@ -167,7 +155,7 @@ export function buildOutingPrompt(content: ContentPack, state: GameState, text: 
     t('llm.outing.systemWith', { field: '"with"', player, max: MAX_SCENE_CAST }),
     t('llm.outing.systemPlace', { field: '"place"', player }),
     t('llm.outing.systemHours', { field: '"hours"', max: MAX_HOURS, maxRest: MAX_REST_HOURS }),
-    t('llm.outing.systemTrains', { field: '"trains"', player, stats: STATS.join(', '), rest: '"rest"', none: '"none"' }),
+    t('llm.outing.systemTrains', { field: '"trains"', player, rest: '"rest"', none: '"none"' }),
     t('llm.outing.systemIds')
   ].join('\n')
   const user = [
@@ -179,9 +167,7 @@ export function buildOutingPrompt(content: ContentPack, state: GameState, text: 
     ),
     '',
     t('llm.outing.places'),
-    ...content.locations.map(
-      (l) => `- ${l.id}: ${l.name}${trainsAt(l).length > 0 ? t('llm.outing.trainsAt', { stats: trainsAt(l).join(', ') }) : ''}`
-    ),
+    ...content.locations.map((l) => `- ${l.id}: ${l.name}`),
     ...(outingRooms(content, state).length > 0
       ? ['', t('llm.outing.rooms'), ...outingRooms(content, state).map((r) => t('llm.outing.room', { id: r.id, name: r.name, place: content.locations.find((l) => l.id === r.locationId)?.name ?? r.locationId }))]
       : []),
@@ -207,7 +193,7 @@ export function parseOuting(reply: string, content: ContentPack, state: GameStat
   const withIds = asked?.map((id) => idOf(content.loveInterests, id)).filter((id): id is string => id !== undefined)
   const hours = Math.round(Number(raw['hours']))
   const kind = typeof raw['trains'] === 'string' ? raw['trains'].trim().toLowerCase() : undefined
-  const trains = kind === 'none' ? undefined : (['rest', ...STATS] as const).find((k) => k === kind) ?? (kind ? undefined : guess.trains)
+  const trains = kind === 'rest' ? ('rest' as const) : kind ? undefined : guess.trains
   const title = typeof raw['title'] === 'string' ? raw['title'].trim() : ''
   // A room named as the place: the LLM's, or failing any place of its own, the one his words named.
   const room = idOf(outingRooms(content, state), raw['place'])
@@ -228,16 +214,15 @@ export function parseOuting(reply: string, content: ContentPack, state: GameStat
   return within ? inRoom(outing, within) : outing
 }
 
-/** What an outing does for the player himself: a stat worked on at the cost of energy, or energy restored. */
+/**
+ * What an outing does for the player himself: energy restored, or the energy a drill takes. What a drill does for its
+ * stat waits on its game.
+ */
 export function outingEffects(outing: Outing): Effect[] {
   if (outing.trains === 'rest') return [{ type: 'energy', amount: REST_PER_HOUR * outing.hours }]
   if (!outing.trains) return []
-  return [
-    { type: 'stat', stat: outing.trains, amount: STAT_PER_HOUR * outing.hours },
-    { type: 'energy', amount: -ENERGY_PER_HOUR * outing.hours }
-  ]
+  return [{ type: 'energy', amount: -ENERGY_PER_HOUR * outing.hours }]
 }
-
 /** Why a love interest can't come to something that runs over the given hours, if they can't. */
 function busyReason(content: ContentPack, state: GameState, id: string, from: number, hours: number): string | undefined {
   const li = content.loveInterests.find((c) => c.id === id)
@@ -345,6 +330,11 @@ export function startOuting(
     ? addCoursePoints(content, applyEffects(worked, [{ type: 'energy', amount: -ENERGY_PER_HOUR * outing.hours }], { content }), outing.studyCourseId, studyPoints(content, outing) * factor(content, worked, 'marks'))
     : worked
   const after = arrived
+  // A drill is done alone, and is its game: he meets nobody, and the hours are spent before it is played.
+  if (outing.trains && outing.trains !== 'rest') {
+    const drill = { stat: outing.trains, hours: outing.hours, title: outing.title, description: outing.description, seed: Math.floor(pick(state.weatherSeed, there.time, 77) * 0x7fffffff) }
+    return { state: { ...after, time: after.time + outing.hours, drill }, scene: null }
+  }
   const place = content.locations.find((l) => l.id === outing.locationId)
   // Whoever he asked along; or, for something he drops in on alone, whoever is there when he arrives:
   // Of the love interests there, he runs into one or two, whoever the day throws his way.
@@ -361,7 +351,7 @@ export function startOuting(
   const found = [...promised, ...chance].slice(0, MAX_SCENE_CAST)
   // With no love interest about he is alone, whoever works at the place: there is no scene, only what the work did.
   const [leadId, ...companionIds] = outing.withIds.length > 0 ? outing.withIds : found
-  const what = outing.studyCourseId ? t('llm.outing.whatStudy') : outing.trains && outing.trains !== 'rest' ? t('llm.outing.whatTrain', { stat: outing.trains }) : t('llm.outing.whatAlone')
+  const what = outing.studyCourseId ? t('llm.outing.whatStudy') : t('llm.outing.whatAlone')
   const direction = !outing.dropIn
     ? undefined
     : t('llm.outing.direction', {
@@ -454,7 +444,7 @@ export function asEventOuting(content: ContentPack, state: GameState, outing: Ou
   return { ...outing, eventId: going.event.id, window: going.outing.window, hours: Math.min(outing.hours, going.maxHours) }
 }
 
-/** How long working on a stat at a place takes: long enough to be worth a scene. */
+/** The fewest hours a drill takes. */
 export const DRILL_HOURS = 2
 
 /** A way of raising a stat that the day view can suggest: what, and where. */
@@ -491,7 +481,7 @@ export function suggestDrills(content: ContentPack, state: GameState): StatSugge
   })
 }
 
-/** The outing a suggestion is: two hours at the place, on his own, with whoever happens to be there. */
+/** The outing a suggestion is: two hours or more at the place, on his own. */
 export function drillOuting(suggestion: StatSuggestion): Outing {
   return {
     title: suggestion.drill.title,

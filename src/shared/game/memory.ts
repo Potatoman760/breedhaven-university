@@ -1,4 +1,4 @@
-import { MEMORY_LEVELS, type ContentPack, type DepartureFeeling, type GameState, type Memory, type MemoryLevel, type Scene, type SceneBeat } from '../model'
+import { MEMORY_LEVELS, SCENE_CHANGES, type ContentPack, type DepartureFeeling, type GameState, type Memory, type MemoryLevel, type Scene, type SceneBeat } from '../model'
 import { formatDate, toDate } from './calendar'
 import { describeBonds } from './bonds'
 import { stageFor } from './relationships'
@@ -13,7 +13,8 @@ import { t } from '../i18n'
 const MAX_TRANSCRIPT_CHARS = 12000
 
 // The answer the summary asks for: its keys and the levels it may give are read back by `parseSummary`, so they stay as they are.
-const SUMMARY_SHAPE = '{"memory": string, "level": string, "affection": number, "trust": number, "desire": number, "reason": string, "sex": boolean, "learned": string[]'
+// The reason comes before the feelings so that the verdict follows from it.
+const SUMMARY_SHAPE = '{"memory": string, "level": string, "reason": string, "affection": string, "trust": string, "desire": string, "sex": boolean, "learned": string[]'
 const RAPPORT_SHAPE = ', "rapport": {"with": string, "relation": string}[]'
 const SPENDING_SHAPE = '{"spent": number, "on": string}'
 
@@ -82,13 +83,13 @@ export function buildSummaryPrompt(input: SummaryInput): { system: string; user:
     ...(feels
       ? [
           t('scene.memory.feelsHeading', { name }),
-          t('scene.memory.change', { affection: 'affection', trust: 'trust', desire: 'desire', min: FEELING_RANGE.min, max: FEELING_RANGE.max, scale: max }),
-          t('scene.memory.judge', { name, player }),
-          t('scene.memory.amounts'),
-          t('scene.memory.negative'),
+          t('scene.memory.judge', { name, player, unchanged: 'unchanged' }),
+          t('scene.memory.reason', { key: 'reason' }),
+          t('scene.memory.change', { affection: 'affection', trust: 'trust', desire: 'desire', steps: SCENE_CHANGES.map((step) => `"${step}"`).join(', ') }),
+          t('scene.memory.amounts', { unchanged: 'unchanged', littleMore: 'a little more', more: 'more', muchMore: 'much more' }),
+          t('scene.memory.negative', { littleLess: 'a little less', less: 'less', muchLess: 'much less' }),
           t('scene.memory.three'),
           t('scene.memory.admires', { player }),
-          t('scene.memory.reason', { key: 'reason' }),
           t('scene.memory.sex', { key: 'sex', name, player }),
           unknown.length > 0 ? t('scene.memory.learned', { key: 'learned', player, name }) : t('scene.memory.learnedNone', { key: 'learned' }),
           ...unknown.map((fact) => `  - ${fact.id}: ${fact.telling}`),
@@ -152,9 +153,6 @@ export function buildSummaryPrompt(input: SummaryInput): { system: string; user:
   return { system, user }
 }
 
-/** How far one scene can move any one of what she feels for him, either way. */
-export const FEELING_RANGE = { min: -10, max: 10 } as const
-
 /** What a scene did to how a love interest feels about the player: the change in each, and why. */
 export interface Feelings {
   affection: number
@@ -182,11 +180,11 @@ export interface Summary {
 export const PLAIN_FEELINGS: Feelings = { affection: 1, trust: 0, desire: 0, reason: '' }
 
 /**
- * Reads the LLM's answer: the memory, and the changes in what she feels, each kept within
- * what one scene can do. An answer that is not the JSON asked for is taken as the memory
- * alone.
+ * Reads the LLM's answer: the memory, and the changes in what she feels, each a word of `SCENE_CHANGES` that the content
+ * puts a number on. A word it does not know changes nothing. An answer that is not the JSON asked for is taken as the
+ * memory alone.
  */
-export function parseSummary(reply: string): Summary {
+export function parseSummary(content: ContentPack, reply: string): Summary {
   const start = reply.indexOf('{')
   const end = reply.lastIndexOf('}')
   let read: unknown
@@ -199,8 +197,8 @@ export function parseSummary(reply: string): Summary {
   const given = read as Record<string, unknown>
   const memory = typeof given['memory'] === 'string' ? given['memory'].trim() : ''
   const change = (value: unknown) => {
-    const n = Math.round(Number(value))
-    return Number.isFinite(n) ? Math.max(FEELING_RANGE.min, Math.min(FEELING_RANGE.max, n)) : 0
+    const step = SCENE_CHANGES.find((one) => typeof value === 'string' && one === value.trim().toLowerCase().replace(/[-_]/g, ' ').replace(/\s+/g, ' '))
+    return step ? content.relationships.sceneChange[step] : 0
   }
   const level = typeof given['level'] === 'string' ? MEMORY_LEVELS.find((one) => one === (given['level'] as string).trim().toLowerCase()) : undefined
   return {

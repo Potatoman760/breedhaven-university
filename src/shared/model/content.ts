@@ -17,6 +17,7 @@ import { JobsConfigSchema } from './job'
 import { LocationSchema } from './location'
 import { LoveInterestSchema, kindOf } from './loveInterest'
 import { MapSchema } from './map'
+import { MiniGamesSchema } from './minigames'
 import { NpcSchema, type Npc } from './npc'
 import { OrientationSchema, type Intro } from './orientation'
 import { PokerConfigSchema } from './poker'
@@ -70,6 +71,8 @@ export const ContentPackSchema = z.object({
   stalls: z.array(StallSchema).default([]),
   /** Cards for money, at one place. Without it there is no game. */
   poker: PokerConfigSchema.optional(),
+  /** What the drills' games are drawn with, and who is in the room for the one for charisma. */
+  minigames: MiniGamesSchema.prefault({}),
   /** What the game sounds like: the files played for its cues, and the loops behind each place. */
   sounds: SoundsSchema.prefault({}),
   /** Without a map the player can't travel, so every activity must be at the starting location. */
@@ -106,7 +109,7 @@ export function validateContentPack(raw: unknown): ContentPack {
 }
 
 // What a reference that leads nowhere was meant to be, as its message names it.
-type Thing = 'ambience' | 'booth' | 'calendarEvent' | 'character' | 'codexEntry' | 'enemy' | 'item' | 'location' | 'loveInterest' | 'month' | 'outfit' | 'period' | 'relationshipStage' | 'society' | 'pregnancyStage' | 'trait' | 'weekday' | 'weather' | 'course' | 'college'
+type Thing = 'ambience' | 'booth' | 'calendarEvent' | 'character' | 'codexEntry' | 'enemy' | 'item' | 'location' | 'loveInterest' | 'month' | 'outfit' | 'period' | 'relationshipStage' | 'society' | 'pregnancyStage' | 'trait' | 'weekday' | 'weather' | 'course' | 'college' | 'topic'
 
 function checkReferences(pack: ContentPack): string[] {
   const issues: string[] = []
@@ -407,6 +410,13 @@ function checkReferences(pack: ContentPack): string[] {
       checkHour(shift.startHour + shift.hours - 1, `${at}.shifts[${n}]`)
     })
   })
+
+  idSet(pack.minigames.pieces, 'minigames.pieces')
+  const topics = idSet(pack.minigames.topics, 'minigames.topics')
+  idSet(pack.minigames.listeners, 'minigames.listeners')
+  for (const listener of pack.minigames.listeners) {
+    for (const id of [...listener.likes, ...listener.dislikes]) need(topics, id, `minigames.listeners.${listener.id}`, 'topic')
+  }
 
   const items = idSet(pack.items, 'items')
   idSet(pack.stalls, 'stalls')

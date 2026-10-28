@@ -24,12 +24,12 @@ describe('his focus', () => {
     expect(focusOf(setFocus(start, { kind: 'course', id: 'nothing-he-takes' }))).toBeUndefined()
   })
 
-  it('takes the hours he skips, at half what the same hours of work would be, for no energy', () => {
+  it('takes the hours he skips, a stat at what a drill not played gives, for no energy', () => {
     const strong = setFocus(start, { kind: 'stat', id: 'strength' })
-    // An hour of it is half a training point; two are a whole one, which at his 8 is a point of strength.
+    // An hour of it is a training point, which at his 8 is a point of strength.
     const after = spendOnFocus(content, strong, 1)
-    expect(trainingToward(after, 'strength').banked).toBe(trainingToward(strong, 'strength').banked + 0.5)
-    expect(spendOnFocus(content, strong, 2).player.stats['strength']).toBe((strong.player.stats['strength'] ?? 0) + 1)
+    expect(after.player.stats['strength']).toBe((strong.player.stats['strength'] ?? 0) + 1)
+    expect(trainingToward(after, 'strength').banked).toBe(0)
     expect(after.player.energy).toBe(strong.player.energy)
     expect(after.time).toBe(strong.time)
     // No focus, or no hours, and nothing changes.

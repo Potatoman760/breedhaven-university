@@ -35,7 +35,9 @@ export function meetingTool(
   movedTo?: () => string | undefined
 ): LlmTool {
   const player = state.player.name
-  const others = presentIds.filter((id) => id !== loveInterestId && content.loveInterests.some((li) => li.id === id))
+  // With two or more love interests here, whichever of them the plan is made with says so: it is not the scene's lead's by default.
+  const cast = presentIds.filter((id) => content.loveInterests.some((li) => li.id === id))
+  const others = cast.filter((id) => id !== loveInterestId)
   // Face to face there is also the going somewhere now, which is another tool's; by message this is the only way anything is arranged.
   const together = presentIds.length > 0
   return {
@@ -65,10 +67,15 @@ export function meetingTool(
         },
         ...(others.length > 0
           ? {
+              who: {
+                type: 'string',
+                enum: cast,
+                description: t('llm.tools.meetingWho', { player })
+              },
               with: {
                 type: 'array',
                 maxItems: MAX_SCENE_CAST - 1,
-                items: { type: 'string', enum: others },
+                items: { type: 'string', enum: cast },
                 description: t('llm.tools.meetingWith', { player })
               }
             }
@@ -79,23 +86,25 @@ export function meetingTool(
           description: t('llm.tools.meetingTimeOfDay')
         }
       },
-      required: ['activity', 'place']
+      required: others.length > 0 ? ['activity', 'place', 'who'] : ['activity', 'place']
     },
     run(args) {
       const text = (value: unknown): string | undefined => (typeof value === 'string' ? value : undefined)
+      const who = cast.find((id) => id === text(args['who'])) ?? loveInterestId
       // Going there now is the move itself: a plan for the place the scene has just gone to is the same thing asked for twice.
       const gone = movedTo?.()
       if (gone !== undefined && gone === text(args['place'])) {
         const where = content.locations.find((l) => l.id === gone)?.name ?? gone
         return t('llm.tools.meetingMoved', { place: where, move: 'move_scene' })
       }
-      const { proposal, message } = proposeMeeting(content, state, loveInterestId, {
+      const { proposal, message } = proposeMeeting(content, state, who, {
         activity: text(args['activity']) ?? '',
         place: text(args['place']) ?? '',
         earliest: text(args['earliest']),
         weekday: text(args['weekday']),
         timeOfDay: text(args['time_of_day']),
-        with: Array.isArray(args['with']) ? args['with'].filter((id): id is string => typeof id === 'string' && others.includes(id)) : undefined
+        with: Array.isArray(args['with']) ? args['with'].filter((id): id is string => typeof id === 'string' && id !== who && cast.includes(id)) : undefined,
+        named: others.length > 0
       })
       if (proposal) onProposal(proposal)
       return message

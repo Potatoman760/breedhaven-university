@@ -96,9 +96,10 @@ describe('memories', () => {
   })
 
   it('come with a level from the summary, and an answer that names none is taken as normal', () => {
-    expect(parseSummary('{"memory": "x", "level": " Core "}').level).toBe('core')
-    expect(parseSummary('{"memory": "x", "level": "unforgettable"}').level).toBeUndefined()
-    expect(parseSummary('{"memory": "x"}').level).toBeUndefined()
+    const content = fixture()
+    expect(parseSummary(content, '{"memory": "x", "level": " Core "}').level).toBe('core')
+    expect(parseSummary(content, '{"memory": "x", "level": "unforgettable"}').level).toBeUndefined()
+    expect(parseSummary(content, '{"memory": "x"}').level).toBeUndefined()
   })
 
   it('are described by how many days ago they happened', () => {
@@ -212,8 +213,8 @@ describe('what a scene does to how she feels', () => {
 
   it('is asked of the LLM along with the memory, as her own judgement of the scene', () => {
     const { system, user } = buildSummaryPrompt({ content, state, scene })
-    expect(system).toContain('{"memory": string, "level": string, "affection": number, "trust": number, "desire": number, "reason": string, "sex": boolean, "learned": string[]}')
-    expect(system).toContain('whole numbers from -10 to 10')
+    expect(system).toContain('{"memory": string, "level": string, "reason": string, "affection": string, "trust": string, "desire": string, "sex": boolean, "learned": string[]}')
+    expect(system).toContain('"much less", "less", "a little less", "unchanged", "a little more", "more", "much more"')
     expect(system).toContain('Nothing is owed for turning up')
     expect(user).toContain('About Ana:')
     expect(user).toContain('affection 28, trust 10, desire 5, each of 100')
@@ -225,12 +226,15 @@ describe('what a scene does to how she feels', () => {
     expect(plain.user).not.toContain('About Ana:')
   })
 
-  it('is read out of the answer, kept within what one scene can do', () => {
-    const read = parseSummary('Here:\n{"memory": "Pat asked Ana about the shop.", "affection": 3, "trust": 2.6, "desire": -40, "reason": "He was the first to ask."}')
-    expect(read).toEqual({ memory: 'Pat asked Ana about the shop.', feelings: { affection: 3, trust: 3, desire: -10, reason: 'He was the first to ask.' }, intimate: false, learned: [], rapport: [] })
-    expect(parseSummary('{"memory": "x", "affection": "lots"}').feelings).toEqual({ affection: 0, trust: 0, desire: 0, reason: '' })
+  it('is read out of the answer as words, each worth what the content says', () => {
+    const read = parseSummary(content, 'Here:\n{"memory": "Pat asked Ana about the shop.", "reason": "He was the first to ask.", "affection": "more", "trust": " A-Little More ", "desire": "much less"}')
+    expect(read).toEqual({ memory: 'Pat asked Ana about the shop.', feelings: { affection: 4, trust: 1, desire: -8, reason: 'He was the first to ask.' }, intimate: false, learned: [], rapport: [] })
+    // A word it does not know, or a number, changes nothing.
+    expect(parseSummary(content, '{"memory": "x", "affection": "lots", "trust": 5}').feelings).toEqual({ affection: 0, trust: 0, desire: 0, reason: '' })
+    const retuned = { ...content, relationships: { ...content.relationships, sceneChange: { ...content.relationships.sceneChange, more: 3 } } }
+    expect(parseSummary(retuned, '{"memory": "x", "affection": "more"}').feelings?.affection).toBe(3)
     // An answer that is not the JSON asked for is the memory alone.
-    expect(parseSummary('Pat and Ana had tea.')).toEqual({ memory: 'Pat and Ana had tea.' })
+    expect(parseSummary(content, 'Pat and Ana had tea.')).toEqual({ memory: 'Pat and Ana had tea.' })
   })
 
   it('moves what she feels, up or down, and never off the scale', () => {
@@ -282,9 +286,9 @@ describe('how many times they have had sex', () => {
     const { fixture } = await import('./testFixture')
     const content = fixture()
     const state = createInitialState(content)
-    expect(parseSummary('{"memory":"m","affection":1,"trust":0,"desire":2,"reason":"r","sex":true}').intimate).toBe(true)
-    expect(parseSummary('{"memory":"m","affection":1,"trust":0,"desire":2,"reason":"r","sex":false}').intimate).toBe(false)
-    expect(parseSummary('{"memory":"m","affection":1,"trust":0,"desire":2,"reason":"r"}').intimate).toBe(false)
+    expect(parseSummary(content, '{"memory":"m","reason":"r","sex":true}').intimate).toBe(true)
+    expect(parseSummary(content, '{"memory":"m","reason":"r","sex":false}').intimate).toBe(false)
+    expect(parseSummary(content, '{"memory":"m","reason":"r"}').intimate).toBe(false)
 
     expect(timesIntimate(state, 'ana')).toBe(0)
     expect(describeIntimacy(state, 'ana')).toBe('Times had sex: 0')
@@ -316,7 +320,7 @@ describe('what came out over a scene, and what changed between those in it', () 
     expect(system).toContain(`  - ${open[0].id}: ${open[0].telling}`)
     expect(system).toContain('"rapport": {"with": string, "relation": string}[]')
 
-    const read = parseSummary(`{"memory":"m","affection":1,"trust":0,"desire":0,"reason":"r","sex":false,"learned":["${open[0].id.toUpperCase()}","made-up"],"rapport":[{"with":"BEA","relation":"Friends"},{"with":"nobody","relation":"enemies"}]}`)
+    const read = parseSummary(content, `{"memory":"m","reason":"r","sex":false,"learned":["${open[0].id.toUpperCase()}","made-up"],"rapport":[{"with":"BEA","relation":"Friends"},{"with":"nobody","relation":"enemies"}]}`)
     expect(sceneRevelations(content, state, [{ id: 'ana', learned: read.learned ?? [] }])).toEqual([{ loveInterestId: 'ana', factId: open[0].id }])
     // Only where both say the same: one alone, or the two at odds, changes nothing; nothing for someone who was not there.
     expect(sceneRapport(state, ['ana', 'bea'], [{ id: 'ana', rapport: read.rapport ?? [] }])).toEqual([])

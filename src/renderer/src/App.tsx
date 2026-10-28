@@ -70,6 +70,7 @@ import {
   type Turn,
   applySpending,
   playerGains,
+  finishDrill,
   type Growth,
   personalise,
   answerInvite,
@@ -206,6 +207,7 @@ import { ExamDialog } from './ui/ExamDialog'
 import { ExpeditionView } from './ui/ExpeditionView'
 import { IntroView } from './ui/IntroView'
 import { PokerView } from './ui/PokerView'
+import { MiniGameView } from './ui/MiniGameView'
 import { PartyDialog } from './ui/PartyDialog'
 import type { Panel } from './ui/panels'
 import { SceneView } from './ui/SceneView'
@@ -882,11 +884,21 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     }
     setOuting(null)
     setNotice('')
-    // Done alone, there is no scene to tell him what it did: a toast does. With company, the scene's summary does.
-    if (!result.scene) {
+    // Done alone, there is no scene to tell him what it did: a toast does. With company, the scene's summary does. A drill tells it when its game is over.
+    if (!result.scene && !result.state.drill) {
       const gains = playerGains({ stats: state.player.stats, energy: state.player.energy, money: state.player.money, training: state.training, coursePoints: state.coursePoints }, result.state)
       setToast({ title: t('shell.app.outingToast', { plan: plan.title, hours: plan.hours }), gains })
     }
+  }
+
+  /** A drill's game is over, played or skipped: the stat is worked on by how it went, and a toast says what that did. */
+  function finishMiniGame(score: number) {
+    const drill = state.drill
+    if (!drill) return
+    const done = finishDrill(content, state, score)
+    setState(done)
+    const gains = playerGains({ stats: state.player.stats, energy: state.player.energy, money: state.player.money, training: state.training, coursePoints: state.coursePoints }, done)
+    setToast({ title: t('shell.app.outingToast', { plan: drill.title, hours: drill.hours }), gains })
   }
 
   /** Goes to the next part of orientation, which is a scene with whoever the player is put with, after its cutscene if it has one. */
@@ -1535,6 +1547,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           learned={learned}
           onOpen={setPanel}
         />
+      ) : state.drill ? (
+        <MiniGameView key={state.drill.seed} content={content} state={state} drill={state.drill} onFinish={finishMiniGame} />
       ) : isGameOver(content.calendar, state.time) ? (
         // The last day of the calendar is over: what became of him.
         <EpilogueView content={content} state={state} onExit={onExit} />

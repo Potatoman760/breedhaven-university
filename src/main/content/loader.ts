@@ -39,6 +39,7 @@ const OPTIONAL_FILES = {
   items: 'items.json',
   stalls: 'stalls.json',
   poker: 'poker.json',
+  minigames: 'minigames.json',
   sounds: 'sounds.json',
   // What is said under the logo while a scene loads.
   tips: 'tips.json',

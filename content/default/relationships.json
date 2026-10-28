@@ -1,5 +1,14 @@
 {
   "meterMax": 100,
+  "sceneChange": {
+    "much less": -8,
+    "less": -4,
+    "a little less": -1,
+    "unchanged": 0,
+    "a little more": 1,
+    "more": 4,
+    "much more": 8
+  },
   "stages": [
     {
       "id": "stranger",

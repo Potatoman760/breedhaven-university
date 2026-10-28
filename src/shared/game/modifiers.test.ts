@@ -259,8 +259,8 @@ describe('what he carries and uses', () => {
   it('gives his spare hours more, when he has learnt to read in them', () => {
     const his = learnt(passive('HIS', { kind: 'focus', amount: 1.5 }))
     const focused = (s: GameState) => trainingToward(spendOnFocus(his.content, setFocus({ ...s, player: { ...s.player, stats: { ...s.player.stats, wisdom: 12 } } }, { kind: 'stat', id: 'wisdom' }), 2), 'wisdom').banked
-    expect(focused(his.plain)).toBe(1)
-    expect(focused(his.state)).toBe(1.5)
+    expect(focused(his.plain)).toBe(2)
+    expect(focused(his.state)).toBe(3)
     expect(coursePoints(his.state, 'his')).toBe(30)
   })
 })

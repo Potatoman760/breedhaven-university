@@ -3,15 +3,16 @@ import { STAT_NAMES, STATS } from '../model'
 import { addCoursePoints } from './grades'
 import { trainStat } from './stats'
 import { factor } from './modifiers'
+import { DRILL_PER_HOUR } from './minigames'
 import { t } from '../i18n'
 
 /**
  * His focus: the one stat or course he gives his spare hours to. When he skips ahead to the next thing on his
- * timetable, the hours that go by are not lost: they are spent on it. It is worth half of what the same hours would
- * be if he set out to do the work, and costs him nothing, so that planning a day by hand is still the better use of it.
+ * timetable, the hours that go by are not lost: they are spent on it. It costs him nothing. A stat is worked on at what
+ * a drill gives when its game is not played; a course at half of what the same hours of study would earn.
  */
 
-// What an hour of his focus is worth beside an hour he set aside for the work.
+// What an hour of his focus on a course is worth beside an hour he set aside for study.
 export const FOCUS_SHARE = 0.5
 
 /** What he can give his spare hours to: each stat, and each course he is taking. */
@@ -47,7 +48,7 @@ export function setFocus(state: GameState, focus: Focus | undefined): GameState 
 export function spendOnFocus(content: ContentPack, state: GameState, hours: number): GameState {
   const focus = focusOf(state)
   if (!focus || hours <= 0) return state
-  const share = FOCUS_SHARE * factor(content, state, 'focus')
-  if (focus.kind === 'stat') return trainStat(content, state, focus.id, hours * share)
-  return addCoursePoints(content, state, focus.id, (content.coursework?.grading.studyPerHour ?? 0) * hours * share * factor(content, state, 'marks'))
+  const share = factor(content, state, 'focus')
+  if (focus.kind === 'stat') return trainStat(content, state, focus.id, hours * DRILL_PER_HOUR.min * share)
+  return addCoursePoints(content, state, focus.id, (content.coursework?.grading.studyPerHour ?? 0) * hours * FOCUS_SHARE * share * factor(content, state, 'marks'))
 }

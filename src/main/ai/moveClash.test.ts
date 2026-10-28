@@ -108,6 +108,24 @@ describe('going now and meeting later', () => {
     meet.run({ activity: 'tea', place: 'shop' })
     expect(plans).toEqual(['shop'])
   })
+
+  it('is made with whichever of those there the call names, and not the scene lead by default', () => {
+    const [ana] = content.loveInterests
+    const two: ContentPack = { ...content, loveInterests: [ana, { ...ana, id: 'bea', name: 'Bea Stone' }] }
+    const state = createInitialState(two)
+    const plans: { lead: string; with: string[] }[] = []
+    const meet = meetingTool(two, state, 'ana', (p) => plans.push({ lead: p.loveInterestId, with: p.companionIds }), ['ana', 'bea'])
+    expect(meet.parameters).toMatchObject({ properties: { who: { enum: ['ana', 'bea'] } }, required: ['activity', 'place', 'who'] })
+    // What the model is told says whose plan it is, so that it is she who suggests it and not whoever leads the scene.
+    expect(meet.run({ activity: 'tea', place: 'shop', who: 'bea' })).toContain("The plan is Bea's: she suggests exactly that day")
+    meet.run({ activity: 'tea', place: 'shop', who: 'bea', with: ['bea', 'ana'] })
+    expect(plans).toEqual([
+      { lead: 'bea', with: [] },
+      { lead: 'bea', with: ['ana'] }
+    ])
+    // Alone with one of them, there is nobody to name.
+    expect(meetingTool(two, state, 'ana', () => undefined, ['ana']).parameters).not.toHaveProperty('properties.who')
+  })
 })
 
 describe('setting off together for something of his that is hers too', () => {

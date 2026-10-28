@@ -1,11 +1,12 @@
 /**
  * Paints the emblems that stand for things in the interface: each job, place on the map, society, market stall, kind
- * of weather and kind of stop on the way down. Drawn as the item pictures are (big on a white card, cut out, made
+ * of weather and kind of stop on the way down, and the pieces, topics and strangers the drills' games are drawn with. Drawn as the item pictures are (big on a white card, cut out, made
  * small) and in their style, so that the two sit together. Each is put in its content file as `iconImage` as it is
  * made (`stopImages` in expedition.json). Not part of the app: run it from the project folder with `npm run icons`:
  *
  *   npm run icons                        every emblem not yet made
- *   npm run icons -- jobs places         only these groups (jobs, places, societies, stalls, weather, stops)
+ *   npm run icons -- jobs places         only these groups (jobs, places, societies, stalls, weather, stops, and the
+ *                                        drills' games: pieces, topics, listeners)
  *   npm run icons -- barista             only these, by id
  *   npm run icons -- --overwrite         make them again even where there is one already
  *   npm run icons -- --dry               print the prompts, and make nothing
@@ -114,7 +115,48 @@ const SUBJECTS: Record<string, Record<string, string>> = {
     find: 'A small wooden treasure chest, its lid ajar, golden light inside.',
     checkpoint: 'A small campfire with a bedroll beside it.',
     guardian: 'A menacing horned monster skull with glowing red eyes.'
+  },
+  pieces: {
+    barbell: 'A heavy iron barbell seen from the front, a thick black weight plate on each end of a steel bar.',
+    iron: 'A soldering iron with a wooden handle and a glowing hot copper tip, pointing to the lower left.',
+    heart: 'A plump glossy red heart.',
+    dial: 'A round brass gauge face with a blank cream dial and no needle, no numbers.',
+    tile: 'A square slab of dark carved slate seen from straight above, flat, plain, with a thin bronze rim.',
+    spark: 'A crackling ball of blue magical lightning.',
+    lamp: 'An unlit brass rune lamp with a round glass globe.',
+    lotus: 'A glowing pink lotus flower in full bloom, seen from above.',
+    card: 'A blank cream parchment card with a thin gold border, standing upright, nothing on it.'
+  },
+  topics: {
+    books: 'A stack of three old books with a ribbon bookmark.',
+    sport: 'A leather ball beside a referee whistle.',
+    gossip: 'A pink speech bubble with a small heart and a sparkle in it.',
+    music: 'A wooden lute with a golden music note above it.',
+    food: 'A steaming meat pie on a plate with a fork.',
+    magic: 'A crystal wand trailing golden sparkles.',
+    travel: 'A rolled old map with a brass compass on it.',
+    jokes: 'A laughing jester mask with bells.'
+  },
+  listeners: {
+    bookworm: 'A young woman with round glasses and a bun, hugging a book to her chest.',
+    athlete: 'A sporty young woman with a high ponytail and a sweatband.',
+    gossip: 'A young woman with a sly smile, a hand raised to her mouth as if telling a secret.',
+    musician: 'A young woman with wavy hair and a lute strap over her shoulder.',
+    cook: 'A cheerful young woman in a white apron with flour on her cheek.',
+    witch: 'A young woman in a pointed witch hat with a crescent moon earring.',
+    wanderer: 'A young woman with a sun-browned face, a scarf and a travel pack.',
+    wit: 'A young woman with a crooked grin and a raised eyebrow, a little bow tie.'
   }
+}
+
+// Faces are drawn bigger and kept bigger, so that their eyes come out whole.
+const SIZES: Record<string, { size: { width: number; height: number }; shown: number }> = {
+  listeners: { size: { width: 1536, height: 1536 }, shown: 512 }
+}
+
+// How a group is drawn, where it is not as an object on its own.
+const FRAMINGS: Record<string, string> = {
+  listeners: 'one young woman, head and shoulders, facing the viewer, cartoon game portrait icon, thick clean outline, simple shapes, no text\n\nplain white background'
 }
 
 interface Target {
@@ -137,7 +179,10 @@ const GROUPS: Record<string, Group> = {
   societies: { file: 'societies.json', list: (data) => data.societies },
   stalls: { file: 'stalls.json', list: (data) => data },
   weather: { file: 'calendar.json', list: (data) => data.weather },
-  stops: { file: 'expedition.json', list: (data) => Object.keys(SUBJECTS.stops).map((id) => ({ id, name: id, iconImage: data.stopImages?.[id] })), stops: true }
+  stops: { file: 'expedition.json', list: (data) => Object.keys(SUBJECTS.stops).map((id) => ({ id, name: id, iconImage: data.stopImages?.[id] })), stops: true },
+  pieces: { file: 'minigames.json', list: (data) => data.pieces },
+  topics: { file: 'minigames.json', list: (data) => data.topics },
+  listeners: { file: 'minigames.json', list: (data) => data.listeners }
 }
 
 function read(file: string): { data: any; eol: string } {
@@ -185,7 +230,7 @@ async function main(): Promise<void> {
   const settingsPath = settingsFile()
   if (!existsSync(settingsPath)) throw new Error(`No ComfyUI settings at ${settingsPath}. Set ComfyUI up in the app first.`)
   const readSettings = () => new ComfyStore(settingsPath, PACK).get()
-  const promptOf = (target: Target) => `${SUBJECTS[target.group]?.[target.id] ?? `An emblem of ${target.name}.`}\n\n${FRAMING}`
+  const promptOf = (target: Target) => `${SUBJECTS[target.group]?.[target.id] ?? `An emblem of ${target.name}.`}\n\n${FRAMINGS[target.group] ?? FRAMING}`
 
   console.log(`ComfyUI at ${readSettings().baseUrl}. ${todo.length} to make of ${all.length}${overwrite ? ', replacing those there are' : ''}.`)
   if (dry) {
@@ -208,7 +253,7 @@ async function main(): Promise<void> {
     const began = Date.now()
     process.stdout.write(`[${i + 1}/${todo.length}] ${target.group}: ${target.name}... `)
     // Filed by group, so that a stall and a place of the same id do not overwrite each other.
-    const result = await generateArt(readSettings(), PACK, PACK, { kind: 'sprite', subjectId: SUBJECT, name: `${target.group}-${target.id}`, workflow: '', positive: promptOf(target), negative: '', ...SIZE }, cancel.signal, '')
+    const result = await generateArt(readSettings(), PACK, PACK, { kind: 'sprite', subjectId: SUBJECT, name: `${target.group}-${target.id}`, workflow: '', positive: promptOf(target), negative: '', ...(SIZES[target.group]?.size ?? SIZE) }, cancel.signal, '')
     if (cancel.signal.aborted) {
       console.log('cancelled.')
       break
@@ -226,7 +271,7 @@ async function main(): Promise<void> {
 
     let made = { path: result.path, note: '' }
     try {
-      made = cutOut(result.path, SHOWN)
+      made = cutOut(result.path, SIZES[target.group]?.shown ?? SHOWN)
     } catch (cause) {
       made = { path: result.path, note: `left on its card: ${(cause as Error).message}` }
     }

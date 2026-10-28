@@ -980,7 +980,7 @@ function registerIpc(
             messages: [{ role: 'user', content: user }],
             temperature: SUMMARY_TEMPERATURE
           })
-          const read = parseSummary(reply)
+          const read = parseSummary(input.content, reply)
           const feels = !input.scene.npc && request.state.relationships[forId] !== undefined
           // A memory is always kept, and a love interest always comes away feeling something.
           // Sex is counted when she says it happened, or when she conceived in the scene.

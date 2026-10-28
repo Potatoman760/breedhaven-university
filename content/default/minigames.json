@@ -1,0 +1,190 @@
+{
+  "pieces": [
+    {
+      "id": "barbell",
+      "name": "Barbell",
+      "iconImage": "sprites/icons/pieces-barbell-cutout.webp"
+    },
+    {
+      "id": "iron",
+      "name": "Soldering iron",
+      "iconImage": "sprites/icons/pieces-iron-cutout.webp"
+    },
+    {
+      "id": "heart",
+      "name": "Heart",
+      "iconImage": "sprites/icons/pieces-heart-cutout.webp"
+    },
+    {
+      "id": "dial",
+      "name": "Pace dial",
+      "iconImage": "sprites/icons/pieces-dial-cutout.webp"
+    },
+    {
+      "id": "tile",
+      "name": "Circuit tile",
+      "iconImage": "sprites/icons/pieces-tile-cutout.webp"
+    },
+    {
+      "id": "spark",
+      "name": "Spark",
+      "iconImage": "sprites/icons/pieces-spark-cutout.webp"
+    },
+    {
+      "id": "lamp",
+      "name": "Ward lamp",
+      "iconImage": "sprites/icons/pieces-lamp-cutout.webp"
+    },
+    {
+      "id": "lotus",
+      "name": "Lotus",
+      "iconImage": "sprites/icons/pieces-lotus-cutout.webp"
+    },
+    {
+      "id": "card",
+      "name": "Topic card",
+      "iconImage": "sprites/icons/pieces-card-cutout.webp"
+    }
+  ],
+  "topics": [
+    {
+      "id": "books",
+      "name": "Books",
+      "iconImage": "sprites/icons/topics-books-cutout.webp"
+    },
+    {
+      "id": "sport",
+      "name": "Sport",
+      "iconImage": "sprites/icons/topics-sport-cutout.webp"
+    },
+    {
+      "id": "gossip",
+      "name": "Gossip",
+      "iconImage": "sprites/icons/topics-gossip-cutout.webp"
+    },
+    {
+      "id": "music",
+      "name": "Music",
+      "iconImage": "sprites/icons/topics-music-cutout.webp"
+    },
+    {
+      "id": "food",
+      "name": "Food",
+      "iconImage": "sprites/icons/topics-food-cutout.webp"
+    },
+    {
+      "id": "magic",
+      "name": "Magic",
+      "iconImage": "sprites/icons/topics-magic-cutout.webp"
+    },
+    {
+      "id": "travel",
+      "name": "Travel",
+      "iconImage": "sprites/icons/topics-travel-cutout.webp"
+    },
+    {
+      "id": "jokes",
+      "name": "Jokes",
+      "iconImage": "sprites/icons/topics-jokes-cutout.webp"
+    }
+  ],
+  "listeners": [
+    {
+      "id": "bookworm",
+      "name": "Bookworm",
+      "likes": [
+        "books",
+        "magic"
+      ],
+      "dislikes": [
+        "sport",
+        "gossip"
+      ],
+      "iconImage": "sprites/icons/listeners-bookworm-cutout.webp"
+    },
+    {
+      "id": "athlete",
+      "name": "Athlete",
+      "likes": [
+        "sport",
+        "food"
+      ],
+      "dislikes": [
+        "books"
+      ],
+      "iconImage": "sprites/icons/listeners-athlete-cutout.webp"
+    },
+    {
+      "id": "gossip",
+      "name": "Gossip",
+      "likes": [
+        "gossip",
+        "jokes"
+      ],
+      "dislikes": [
+        "magic"
+      ],
+      "iconImage": "sprites/icons/listeners-gossip-cutout.webp"
+    },
+    {
+      "id": "musician",
+      "name": "Musician",
+      "likes": [
+        "music",
+        "travel"
+      ],
+      "dislikes": [
+        "sport"
+      ],
+      "iconImage": "sprites/icons/listeners-musician-cutout.webp"
+    },
+    {
+      "id": "cook",
+      "name": "Cook",
+      "likes": [
+        "food",
+        "travel"
+      ],
+      "dislikes": [
+        "magic"
+      ],
+      "iconImage": "sprites/icons/listeners-cook-cutout.webp"
+    },
+    {
+      "id": "witch",
+      "name": "Witch",
+      "likes": [
+        "magic",
+        "music"
+      ],
+      "dislikes": [
+        "jokes"
+      ],
+      "iconImage": "sprites/icons/listeners-witch-cutout.webp"
+    },
+    {
+      "id": "wanderer",
+      "name": "Wanderer",
+      "likes": [
+        "travel",
+        "jokes"
+      ],
+      "dislikes": [
+        "gossip"
+      ],
+      "iconImage": "sprites/icons/listeners-wanderer-cutout.webp"
+    },
+    {
+      "id": "wit",
+      "name": "Wit",
+      "likes": [
+        "jokes",
+        "books"
+      ],
+      "dislikes": [
+        "food"
+      ],
+      "iconImage": "sprites/icons/listeners-wit-cutout.webp"
+    }
+  ]
+}

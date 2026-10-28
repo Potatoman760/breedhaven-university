@@ -48,6 +48,8 @@ export interface MeetingRequest {
   timeOfDay?: string
   /** Ids of other love interests to bring along, up to two. */
   with?: string[]
+  /** Others are there to hear it: who is to suggest it is said by name, and not as "you". */
+  named?: boolean
 }
 
 /** The others asked along who exist, without the proposer or repeats, up to the scene limit. */
@@ -162,7 +164,17 @@ export function proposeMeeting(
     proposal: { loveInterestId, companionIds, title, time, hours: MEETING_HOURS, locationId: location.id },
     message:
       note +
-      t('game.appointments.found', { group, player: state.player.name, names: firstNames(content, companionIds), when: describeWhen(content, time), off, place: location.name, earliest: 'earliest', weekday: 'weekday' })
+      t(request.named ? 'game.appointments.foundFor' : 'game.appointments.found', {
+        group,
+        who: firstNames(content, [loveInterestId]),
+        player: state.player.name,
+        names: firstNames(content, companionIds),
+        when: describeWhen(content, time),
+        off,
+        place: location.name,
+        earliest: 'earliest',
+        weekday: 'weekday'
+      })
   }
 }
 

@@ -22,8 +22,8 @@ export const STAT_TIERS = [
 /** As high as a stat goes. */
 export const STAT_CAP = 30
 // A day's training of one stat: this many points count in full, the next few for half, and the rest not at all.
-const FULL_A_DAY = 2
-const HALF_A_DAY = 2
+const FULL_A_DAY = 6
+const HALF_A_DAY = 6
 // How much more a pleased love interest's affection grows, per level of appeal.
 const APPEAL_BONUS = 0.25
 

@@ -385,11 +385,11 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
   (`src/shared/model/stats.ts`), on the usual scale of ability scores (10 is ordinary). A new game
   starts every stat at 8 and gives the player 27 points to raise them with as he likes, up
   to 15: a point buys a point up to 13, and the two above that cost two each. From there they are built by work, up to a cap of 30. Whatever works on a stat (a class,
-  a session from the Stats menu, a shift at a job that builds it, an activity) earns
-  **training points**, about one an hour, banked until there are enough for the next
+  a drill from the Stats menu, a shift at a job that builds it, focus) earns
+  **training points**, about one an hour (up to three in a drill played well), banked until there are enough for the next
   point: two at an ordinary score and two more for each step of its modifier, so 12 points
   from 10 to 14, 60 to 20 and 220 to 30. A day's work on one stat counts in full for the
-  first two points, for half for the next two and not at all after, so a stat is built
+  first six points, for half for the next six and not at all after, so a stat is built
   over weeks (`trainStat` in `src/shared/game/stats.ts`). Stats never fall. 14 is good, 18
   impressive, 22 exceptional and 26 legendary: what love interests notice and what jobs
   ask for. Each score has a
@@ -767,11 +767,18 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
   `locations.json`: a stat, a title and an opening line; edited under Locations). The day
   view's **Stats** option opens into one suggestion for each of the six stats, picked from
   every place that has one for it, preferring those open when he would arrive, and
-  changing from hour to hour. Taking one is a two-hour outing that is always two hours of work on that
-  stat, for energy. With love interests at the place when he arrives it is a scene: he
-  runs into one or two of them, picked at random, and the scene's summary lists what the
-  work did. With none there he is alone, whoever works at the place: no scene, and a toast
-  says what it did. Studying for a course works the same way. The confirmation says
+  changing from hour to hour. Taking one is an outing of two hours or more, for energy, done
+  alone whoever is there: it is never a scene. When he gets there the hours are spent and
+  the drill waits in the save (`drill`) on its game (`src/shared/game/minigames.ts`,
+  `MiniGameView.tsx`), one for each stat: a power meter for strength, tracing a wire for
+  dexterity, pacing a heart rate for endurance, turning tiles of a ward circuit for
+  intelligence, breathing with a lotus for wisdom, and working a room of strangers with topic
+  cards for charisma. Each scores 0 to 1 and the drill trains `hours × (1 + 2 × score)`
+  points (`DRILL_PER_HOUR`): skipping the game is a score of 0, the same as an hour of focus.
+  A game is harder the higher the stat. What the games are drawn with, and the strangers
+  and topics of the one for charisma, are in `minigames.json`; `npm run icons -- pieces
+  topics listeners` paints them. Nothing typed raises a stat: a typed outing only rests him
+  or does nothing for him. Studying for a course is an outing as before. The confirmation says
   first what he would miss by going, a class he is taking or a shift at his job, as it now
   does for anything the player sets out to do. The stats a place has drills for are also
   what it counts as a good place to work on.
@@ -834,8 +841,9 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
 - **Focus** (`src/shared/game/focus.ts`): under the Here bar on the day screen he picks one
   stat, or one course he is taking, as his focus (`focus` in the save). When he skips ahead
   to the next thing on his timetable, the hours that go by are spent on it
-  (`spendOnFocus`): `FOCUS_SHARE` (half) of what the same hours of a session would earn,
-  for no energy. A toast says what came of it as the next thing begins.
+  (`spendOnFocus`), for no energy: a stat at a training point an hour, what a drill whose
+  game is skipped gives; a course at `FOCUS_SHARE` (half) of what the same hours of study
+  would earn. A toast says what came of it as the next thing begins.
 - **What is next** (`src/shared/game/upcoming.ts`): the day screen puts the next thing on
   the player's timetable today at the head of what he can do: the soonest of the classes
   he takes, his shift, and the plans he has made (`nextUp`). Taking it skips the hours
@@ -868,11 +876,13 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
 - **How she feels afterwards** (`src/shared/game/memory.ts`): affection, trust and desire
   are not earned by the hour. When a scene ends, the same request that writes each love
   interest's memory of it asks how the scene changed what she feels for the player: a
-  change in each of the three from -10 to 10, and a sentence of why, as one JSON object.
-  She is asked to judge as herself, and is given her personality and traits, what she
-  admires and whether he has it, where the two of them stand, her last comfort reading,
-  whether she walked out, any gifts, and the whole conversation; nothing is owed for
-  turning up, and a scene that left no mark is 0. The changes are applied when the scene
+  a sentence of why, then a word for the change in each of the three (`much less` through
+  `unchanged` to `much more`), as one JSON object. The words are worth what
+  `relationships.json`'s `sceneChange` says (-8 to 8), so pacing is tuned there and not in
+  the prompt. She is asked to judge as herself, and is given her personality and traits,
+  what she admires and whether he has it, where the two of them stand, her last comfort
+  reading, whether she walked out, any gifts, and the whole conversation; nothing is owed
+  for turning up, and a scene that left no mark is `unchanged`. The changes are applied when the scene
   closes and the reason is shown on the summary. Nothing else moves the three but a gift,
   which keeps its own effect: sitting a class together, keeping a plan, an invitation,
   orientation and the activities that are scenes no longer hand out fixed amounts. An NPC
