@@ -8,6 +8,7 @@ import { feltChange, trustOf } from './modifiers'
 import { hiddenFacts } from './facts'
 import { RELATIONS, relationBetween, type Relation } from './rapport'
 import { t } from '../i18n'
+import { DEFAULT_MEMORY_RECALL } from '../settings'
 
 // Transcripts longer than this are trimmed from the start before summarising.
 const MAX_TRANSCRIPT_CHARS = 12000
@@ -339,14 +340,11 @@ export function amendMemory(state: GameState, loveInterestId: string, from: stri
   return { ...state, memories: { ...state.memories, [loveInterestId]: amended } }
 }
 
-/** How many of her memories a character is told in a scene. */
-export const MAX_PROMPT_MEMORIES = 8
-
 /**
  * The memories a character is told, most important first: by level, core before normal before fleeting, and within
- * a level the most recent first. No more than `limit` of them.
+ * a level the most recent first. No more than `limit` of them, which the player sets.
  */
-export function selectMemories(memories: Memory[], limit = MAX_PROMPT_MEMORIES): Memory[] {
+export function selectMemories(memories: Memory[], limit = DEFAULT_MEMORY_RECALL): Memory[] {
   const rank = (memory: Memory) => MEMORY_LEVELS.indexOf(memory.level)
   return memories
     .map((memory, order) => ({ memory, order }))

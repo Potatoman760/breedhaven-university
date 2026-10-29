@@ -7,6 +7,9 @@ export const LLM_DEFAULT_TIMEOUT_SECONDS = 120
 export const LLM_MIN_TIMEOUT_SECONDS = 10
 export const LLM_MAX_TIMEOUT_SECONDS = 1800
 
+/** How many of her memories a character is told in a scene, unless the player has set otherwise. */
+export const DEFAULT_MEMORY_RECALL = 8
+
 export const REASONING_LEVELS = ['default', 'off', 'minimal', 'low', 'medium', 'high'] as const
 export type ReasoningLevel = (typeof REASONING_LEVELS)[number]
 /**
@@ -50,7 +53,12 @@ export const LlmProfileSchema = z.object({
   /** OpenRouter: providers never to use, comma-separated. One that refuses what the game writes, say. */
   providerIgnore: z.string().default(''),
   /** OpenRouter: whether another provider may answer when those named cannot. */
-  allowFallbacks: z.boolean().default(true)
+  allowFallbacks: z.boolean().default(true),
+  /**
+   * The most requests sent to its address at once; the rest wait their turn. Left out, there is no limit. For a provider
+   * that takes one request at a time, 1.
+   */
+  maxConcurrent: z.number().int().min(1).optional()
 })
 export type LlmProfile = z.infer<typeof LlmProfileSchema>
 
@@ -58,7 +66,12 @@ export const SettingsSchema = z.object({
   main: LlmProfileSchema.prefault({}),
   nsfw: LlmProfileSchema.prefault({}),
   /** What the game is played in: its interface, its content and what the LLM is told and writes. */
-  language: z.string().default('en')
+  language: z.string().default('en'),
+  /**
+   * How many of her memories a character is told in a scene. More keeps her truer to the past and costs a longer prompt.
+   * One setting for both LLMs: the prompt is written before it is known which of them will answer.
+   */
+  memoryRecall: z.number().int().min(1).default(DEFAULT_MEMORY_RECALL)
 })
 export type Settings = z.infer<typeof SettingsSchema>
 
@@ -66,7 +79,7 @@ export type Settings = z.infer<typeof SettingsSchema>
 // and sends a key back only when the user types a new one.
 
 export type LlmProfileView = Omit<LlmProfile, 'apiKey'> & { hasApiKey: boolean }
-export type SettingsView = Record<LlmProfileId, LlmProfileView>
+export type SettingsView = Record<LlmProfileId, LlmProfileView> & Pick<Settings, 'memoryRecall'>
 
 export const LlmProfileUpdateSchema = LlmProfileSchema.omit({ apiKey: true }).extend({
   /** Omitted keeps the saved key; an empty string clears it. */
@@ -74,7 +87,9 @@ export const LlmProfileUpdateSchema = LlmProfileSchema.omit({ apiKey: true }).ex
 })
 export const SettingsUpdateSchema = z.object({
   main: LlmProfileUpdateSchema,
-  nsfw: LlmProfileUpdateSchema
+  nsfw: LlmProfileUpdateSchema,
+  /** Omitted keeps what is saved. */
+  memoryRecall: z.number().int().min(1).optional()
 })
 export type SettingsUpdate = z.infer<typeof SettingsUpdateSchema>
 
@@ -98,7 +113,7 @@ export function toView(settings: Settings): SettingsView {
     ...rest,
     hasApiKey: apiKey.length > 0
   })
-  return { main: view(settings.main), nsfw: view(settings.nsfw) }
+  return { main: view(settings.main), nsfw: view(settings.nsfw), memoryRecall: settings.memoryRecall }
 }
 
 /** A key is not required: local servers such as LM Studio and Ollama don't use one. */

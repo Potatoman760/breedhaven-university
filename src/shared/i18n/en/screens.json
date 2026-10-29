@@ -152,6 +152,7 @@
   "sceneView.nameChild": "Name {daughter, select, true {her} other {him}}",
   "sceneView.dismiss": "Dismiss",
   "sceneView.endSceneHere": "End the scene here",
+  "sceneView.retry": "Retry",
   "sceneView.thinking": "Thinking",
   "sceneView.moment": "You and {together} have a moment together.",
   "sceneView.dice": "Dice · {roll}",

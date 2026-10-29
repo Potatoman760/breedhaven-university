@@ -1,6 +1,7 @@
 import type { ChatMessage } from '../../shared/model'
 import type { LlmProfile, ReasoningStyle } from '../../shared/settings'
 import { t } from '../../shared/i18n'
+import { inTurn } from './queue'
 
 export interface CompletionInput {
   system: string
@@ -142,8 +143,12 @@ export async function chatCompletion(
   const messages: unknown[] = [{ role: 'system', content: system }, ...input.messages]
   let tools = input.tools && input.tools.length > 0 ? input.tools : undefined
 
-  /** One round trip. Returns the model's message, which may ask for tools instead of holding text. */
-  async function request(): Promise<AssistantMessage> {
+  /**
+   * One round trip. Returns the model's message, which may ask for tools instead of holding text. Where the profile
+   * allows only so many at once, it waits its turn first; its time to answer starts once it is sent.
+   */
+  const request = (): Promise<AssistantMessage> => inTurn(url, profile.maxConcurrent, input.signal, send)
+  async function send(): Promise<AssistantMessage> {
     let response: Response
     try {
       response = await fetchImpl(url, {
@@ -181,9 +186,10 @@ export async function chatCompletion(
         throw new RefusalError(`${response.status} ${response.statusText}: ${body}`.trim())
       }
       // Not every endpoint or model accepts tools. Carry on without them rather than fail.
+      // Sent again in the same turn: asking for another would wait on the one it already holds.
       if (tools && response.status < 500 && /tool|function/i.test(body)) {
         tools = undefined
-        return request()
+        return send()
       }
       throw new Error(t('llm.openai.failed', { status: response.status, statusText: response.statusText, body }))
     }

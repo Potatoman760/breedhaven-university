@@ -125,6 +125,8 @@ export interface PromptInput {
   strangers?: string[]
   /** A plan a character has suggested in this scene that the player has not yet put in his calendar. */
   pendingProposal?: Proposal
+  /** How many of her memories she is told, as set in the settings. */
+  memoryRecall?: number
   /** Recent conversation text, used to pick relevant codex entries. */
   recentText?: string
   codexBudgetChars?: number
@@ -242,7 +244,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
   const shareable = li.ai.secrets.filter((s) => evaluateAll(s.revealWhen, ctx))
   const guarded = li.ai.secrets.filter((s) => !shareable.includes(s))
   // An NPC keeps no memory of him: each time is the first, as far as she is told.
-  const memories = input.npc ? [] : selectMemories(state.memories[li.id] ?? [])
+  const memories = input.npc ? [] : selectMemories(state.memories[li.id] ?? [], input.memoryRecall)
   const plansWith = upcomingAppointments(state).filter((a) => attendees(a).includes(li.id))
   const lore = selectCodexEntries({
     content,

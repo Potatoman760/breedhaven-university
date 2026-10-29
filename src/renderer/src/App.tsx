@@ -395,6 +395,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   const endRelicMoment = useCallback(() => setRelicMoment(null), [])
   // Confirmation of the plan just accepted, shown until the next line is said.
   const [agreed, setAgreed] = useState('')
+  // The line that could not be answered, to send again as it was. Offered only beside the notice that said so.
+  const [failed, setFailed] = useState<{ notice: string; text?: string; said: Scene; when: GameState; ask?: string } | null>(null)
   // Something the player typed to do, worked out and waiting for a yes.
   const [outing, setOuting] = useState<Outing | null>(null)
   // The examination whose paper is in front of him, until he puts it down: to answer, and then marked.
@@ -783,7 +785,12 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       if (text !== undefined) setTurns((kept) => kept.slice(0, -1))
       setScene(from)
       // Stopped by the player, it is no failure: his line goes back in the box to say again or differently.
-      if (!errorMessage(error).includes(CHAT_CANCELLED)) setNotice(text === undefined ? errorMessage(error) : t('shell.app.lineWas', { error: errorMessage(error), text }))
+      if (!errorMessage(error).includes(CHAT_CANCELLED)) {
+        const told = text === undefined ? errorMessage(error) : t('shell.app.lineWas', { error: errorMessage(error), text })
+        setNotice(told)
+        // Sent again, it goes with whatever was told beside it, someone arriving included: she has arrived by now.
+        setFailed({ notice: told, text, said: from, when: at, ask: cue })
+      }
     } finally {
       setBusy(false)
       setMovingTo(null)
@@ -1508,6 +1515,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           busy={busy}
           movingTo={movingTo}
           notice={notice}
+          onRetry={failed && failed.notice === notice ? () => send(failed.text, failed.said, failed.when, failed.ask) : undefined}
           aside={aside}
           onDismissAside={() => setAside('')}
           ended={ended}

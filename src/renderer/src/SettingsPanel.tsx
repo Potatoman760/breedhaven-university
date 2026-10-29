@@ -9,7 +9,8 @@ import {
   type LlmProfileId,
   type LlmProfileView,
   type ReasoningLevel,
-  type ReasoningStyle
+  type ReasoningStyle,
+  type SettingsView
 } from '../../shared/settings'
 import { errorMessage } from './errors'
 import { Overlay } from './ui/Dialog'
@@ -38,12 +39,13 @@ interface ProfileForm extends LlmProfileView {
   clearKey: boolean
 }
 
-type Form = Record<LlmProfileId, ProfileForm>
+type Form = Record<LlmProfileId, ProfileForm> & { memoryRecall: number }
 
-function toForm(view: Record<LlmProfileId, LlmProfileView>): Form {
+function toForm(view: SettingsView): Form {
   return {
     main: { ...view.main, apiKeyInput: '', clearKey: false },
-    nsfw: { ...view.nsfw, apiKeyInput: '', clearKey: false }
+    nsfw: { ...view.nsfw, apiKeyInput: '', clearKey: false },
+    memoryRecall: view.memoryRecall
   }
 }
 
@@ -72,10 +74,10 @@ const STYLE_LABELS: Record<ReasoningStyle, MessageKey> = {
 }
 
 /** A number that may be left blank, meaning the model's own. Held as typed, so that "0." is not lost on the way to "0.5". */
-function OptionalNumber({ label, value, min, max, step, onChange }: { label: string; value: number | undefined; min: number; max?: number; step: number; onChange: (value: number | undefined) => void }) {
+function OptionalNumber({ label, value, min, max, step, placeholder, title, onChange }: { label: string; value: number | undefined; min: number; max?: number; step: number; placeholder?: string; title?: string; onChange: (value: number | undefined) => void }) {
   const [text, setText] = useState(value === undefined ? '' : String(value))
   return (
-    <label>
+    <label title={title}>
       {label}
       <input
         type="number"
@@ -83,7 +85,7 @@ function OptionalNumber({ label, value, min, max, step, onChange }: { label: str
         max={max}
         step={step}
         value={text}
-        placeholder={t('shell.settings.modelDefault')}
+        placeholder={placeholder ?? t('shell.settings.modelDefault')}
         onChange={(e) => {
           setText(e.target.value)
           const read = Number(e.target.value)
@@ -137,6 +139,15 @@ function AdvancedFields({ profile, onChange }: { profile: LlmProfileView; onChan
           />
         ))}
       </div>
+      <OptionalNumber
+        label={t('shell.settings.maxConcurrent')}
+        title={t('shell.settings.maxConcurrentTitle')}
+        placeholder={t('shell.settings.noLimit')}
+        value={profile.maxConcurrent}
+        min={1}
+        step={1}
+        onChange={(value) => onChange({ maxConcurrent: value })}
+      />
       <span className="field-label">{t('shell.settings.openRouter')}</span>
       <label>
         {t('shell.settings.providerOrder')}
@@ -178,7 +189,7 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
       // Leaving the field blank keeps the saved key.
       return { ...rest, apiKey: clearKey ? '' : apiKeyInput || undefined }
     }
-    const view = await window.api.saveSettings({ main: update(form.main), nsfw: update(form.nsfw) })
+    const view = await window.api.saveSettings({ main: update(form.main), nsfw: update(form.nsfw), memoryRecall: form.memoryRecall })
     setForm(toForm(view))
   }
 
@@ -358,6 +369,16 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
             )
           })}
         </div>
+        <label title={t('shell.settings.memoryRecallTitle')}>
+          {t('shell.settings.memoryRecall')}
+          <input
+            type="number"
+            min={1}
+            step={1}
+            value={form.memoryRecall}
+            onChange={(e) => setForm({ ...form, memoryRecall: Math.max(1, Math.round(e.target.valueAsNumber || 1)) })}
+          />
+        </label>
         <div className="actions">
           <button type="submit" disabled={busy}>
             {t('shell.settings.save')}

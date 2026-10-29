@@ -39,6 +39,15 @@ describe('SettingsStore', () => {
     expect(store.update({ main: { ...profile, apiKey: '' }, nsfw: profile }).main.apiKey).toBe('')
   })
 
+  it('keeps how many memories she recalls, and keeps it when an update leaves it out', () => {
+    const path = tempFile()
+    expect(new SettingsStore(path).get().memoryRecall).toBe(8)
+    new SettingsStore(path).update({ main: profile, nsfw: profile, memoryRecall: 20 })
+    const store = new SettingsStore(path)
+    expect(store.get().memoryRecall).toBe(20)
+    expect(store.update({ main: profile, nsfw: profile }).memoryRecall).toBe(20)
+  })
+
   it('stores the key in plain text when no cipher is available', () => {
     const path = tempFile()
     new SettingsStore(path).update({ main: { ...profile, apiKey: 'sk-1' }, nsfw: profile })

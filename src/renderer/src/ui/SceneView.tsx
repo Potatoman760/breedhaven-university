@@ -31,6 +31,8 @@ interface Props {
   /** Where the scene is going, while the reply that takes it there is being written. */
   movingTo: string | null
   notice: string
+  /** Sends again the line the notice says could not be answered. */
+  onRetry?: () => void
   /** Something from outside the scene, put away without leaving it. */
   aside?: string
   onDismissAside?: () => void
@@ -534,10 +536,17 @@ export function SceneView(props: Props) {
             {notice && (
               <div className="notice">
                 {notice}
-                {/* The way out when the AI can't be reached to end the scene itself. */}
-                <button className="quiet" disabled={busy} onClick={onContinue}>
-                  {t('screens.sceneView.endSceneHere')}
-                </button>
+                {/* A reply that failed is asked for again; Leave is still there for one that keeps failing. */}
+                {props.onRetry ? (
+                  <Button variant="quiet" size="small" disabled={busy} onClick={props.onRetry}>
+                    {t('screens.sceneView.retry')}
+                  </Button>
+                ) : (
+                  // The way out when the AI can't be reached to end the scene itself.
+                  <button className="quiet" disabled={busy} onClick={onContinue}>
+                    {t('screens.sceneView.endSceneHere')}
+                  </button>
+                )}
               </div>
             )}
             {playerLine && (

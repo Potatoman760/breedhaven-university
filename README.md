@@ -264,8 +264,10 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
   and under Advanced: how hard a thinking model thinks (sent as `reasoning_effort`, OpenRouter's
   `reasoning`, or a local chat template's `enable_thinking`, by default going by the address),
   the samplers (top P, min P, top K, repetition, frequency and presence penalties, each sent
-  only when set), and OpenRouter's provider order, providers to avoid and fallbacks
-  (`extraParameters` in `src/main/ai/openai.ts`)
+  only when set), the most requests to send at once (`maxConcurrent`: blank for no limit, 1
+  for a provider that takes one at a time; the rest wait their turn in `src/main/ai/queue.ts`,
+  first come first served, one line per address), and OpenRouter's provider order, providers
+  to avoid and fallbacks (`extraParameters` in `src/main/ai/openai.ts`)
   and extra instructions. They are saved to `settings.json` in Electron's user-data folder,
   with keys encrypted by the OS keychain where available. Keys never reach the renderer.
 - **Scenes** start with an activity shared with a love interest. The character ends the
@@ -963,7 +965,9 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
   transcript is discarded. The LLM also rates each memory **Core** (a moment that defines
   what they are to each other: a first kiss, a confession, a betrayal), **Normal** or
   **Fleeting**, and the player can change the rating, as well as the wording, on the summary
-  screen. A character is told at most eight of her memories in a scene, core first, then
+  screen. A character is told at most **Memories recalled in a scene** of her memories (a
+  setting on the LLM tab, `memoryRecall` in the settings, eight by default; one for both LLMs,
+  since the prompt is written before it is known which answers), core first, then
   normal, then fleeting, and the most recent first within each (`selectMemories` in
   `src/shared/game/memory.ts`). A memory saved before levels existed counts as normal.
   If the LLM is unavailable, a plain note built from the activity list is saved instead.

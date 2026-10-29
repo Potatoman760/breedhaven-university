@@ -606,6 +606,7 @@ function registerIpc(
       roomOf: scene.roomOf,
       departed: scene.departed,
       hoursSoFar: sceneHours(state, scene),
+      memoryRecall: settings.get().memoryRecall,
       windDown: windingDown(scene) ? exchanges(scene) : undefined,
       loveInterestId: scene.loveInterestId,
       companionIds: scene.companionIds,
@@ -810,6 +811,7 @@ function registerIpc(
         loveInterestId,
         mode: news !== undefined ? 'news' : invite ? 'invite' : note ? 'note' : 'courier',
         news,
+        memoryRecall: settings.get().memoryRecall,
         recentText: thread
           .slice(-CODEX_SCAN_MESSAGES)
           .map((note) => note.text)
