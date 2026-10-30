@@ -17,7 +17,7 @@ import {
   type DepartureFeeling,
   type Proposal
 } from './model'
-import type { EditorInfo, EditorResult, ImportAssetRequest, OptimizedPicture } from './editor'
+import type { EditorInfo, EditorResult, ImportAssetRequest, LookKind, OptimizedPicture } from './editor'
 import type { Language, Messages } from './i18n'
 import type { MemoryLevel } from './model'
 import type { PostDraft } from './game/feed'
@@ -282,6 +282,9 @@ export interface RendererApi {
     draftMajor(idea: MajorIdea): Promise<{ major?: Major; error?: string }>
     saveTrait(trait: unknown): Promise<EditorResult>
     deleteTrait(id: string): Promise<EditorResult>
+    /** Adds or changes a face (`expressions`) or a sex-act (`acts`) added to the standard ones. */
+    saveLook(change: { kind: LookKind; look: unknown }): Promise<EditorResult>
+    deleteLook(which: { kind: LookKind; id: string }): Promise<EditorResult>
     /** Saves a location as changed in the editor: what is said of it, and its pictures. */
     saveLocation(location: unknown): Promise<EditorResult>
     /** Puts a changed location back as it shipped. */

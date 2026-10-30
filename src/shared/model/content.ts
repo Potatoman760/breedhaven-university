@@ -15,7 +15,8 @@ import { CatalogueSchema, CourseworkConfigSchema } from './course'
 import { ItemSchema, StallSchema } from './item'
 import { JobsConfigSchema } from './job'
 import { LocationSchema } from './location'
-import { LoveInterestSchema, kindOf } from './loveInterest'
+import { EXPRESSIONS, LoveInterestSchema, STANDARD_POSES, isPregnantPose, kindOf } from './loveInterest'
+import { LooksSchema } from './looks'
 import { MapSchema } from './map'
 import { MiniGamesSchema } from './minigames'
 import { NpcSchema, type Npc } from './npc'
@@ -73,6 +74,8 @@ export const ContentPackSchema = z.object({
   poker: PokerConfigSchema.optional(),
   /** What the drills' games are drawn with, and who is in the room for the one for charisma. */
   minigames: MiniGamesSchema.prefault({}),
+  /** Faces and sex-acts added to the standard ones, each a slot for every character. */
+  looks: LooksSchema.prefault({}),
   /** What the game sounds like: the files played for its cues, and the loops behind each place. */
   sounds: SoundsSchema.prefault({}),
   /** Without a map the player can't travel, so every activity must be at the starting location. */
@@ -410,6 +413,17 @@ function checkReferences(pack: ContentPack): string[] {
       checkHour(shift.startHour + shift.hours - 1, `${at}.shifts[${n}]`)
     })
   })
+
+  // An added face or sex-act is a slot of its own: it cannot be one of the standard ones, or stand for one drawn pregnant.
+  const added = (items: { id: string }[], where: string, standard: readonly string[]) => {
+    idSet(items, where)
+    for (const { id } of items) {
+      if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(id)) issues.push(t('game.content.badLookId', { where, id }))
+      else if (standard.includes(id) || isPregnantPose(id)) issues.push(t('game.content.standardLookId', { where, id }))
+    }
+  }
+  added(pack.looks.expressions, 'looks.expressions', EXPRESSIONS)
+  added(pack.looks.acts, 'looks.acts', STANDARD_POSES.map((pose) => pose.id))
 
   idSet(pack.minigames.pieces, 'minigames.pieces')
   idSet(pack.minigames.listeners, 'minigames.listeners')

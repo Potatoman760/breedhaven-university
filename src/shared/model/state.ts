@@ -193,6 +193,11 @@ export const GameStateSchema = z.object({
   feedSeen: z.number().int().default(-1),
   /** The last day on which the drama engine had someone turn up in a scene. */
   dramaDay: z.number().int(),
+  /**
+   * What each character has on today, by id: an outfit that lasts the day, drawn as the day began or changed into in a
+   * scene since. `day` is the day it is for; another day's is gone.
+   */
+  dayOutfits: z.object({ day: z.number().int(), worn: z.record(z.string(), z.string()) }).prefault({ day: -1, worn: {} }),
   /** Calendar events generated during this playthrough, on top of the authored ones. */
   events: z.array(CalendarEventSchema),
   /** How things stand with the house the Sire Relations Office lets him, if it has come to that. */

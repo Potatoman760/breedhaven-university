@@ -38,6 +38,7 @@ import { ScheduleTab } from "./ScheduleTab";
 import { FamilyTab } from "./FamilyTab";
 import { SpritesTab } from "./SpritesTab";
 import { TraitsTab } from "./TraitsTab";
+import { LooksEditor } from "./LooksEditor";
 import { t, type MessageKey } from "../../../../shared/i18n";
 
 interface Props {
@@ -91,11 +92,12 @@ function firstSubject(content: ContentPack, teaching: boolean): Studies {
 const same = (a: unknown, b: unknown) =>
   JSON.stringify(a) === JSON.stringify(b);
 
-const SIDES = ["Instructions", "Characters", "Majors", "Player", "Locations", "Courses", "Societies", "Jobs", "ComfyUI"] as const;
+const SIDES = ["Instructions", "Characters", "Looks", "Majors", "Player", "Locations", "Courses", "Societies", "Jobs", "ComfyUI"] as const;
 type Side = (typeof SIDES)[number];
 const SIDE_LABELS: Record<Side, MessageKey> = {
   Instructions: "editor.instructions.title",
   Characters: "editor.sides.characters",
+  Looks: "editor.sides.looks",
   Majors: "editor.sides.majors",
   Player: "editor.sides.player",
   Locations: "editor.sides.locations",
@@ -180,7 +182,9 @@ export function ContentEditor(props: Props) {
   ) : side === "Player" ? (
     <PlayerEditor {...props} switcher={switcher} />
   ) : side === "ComfyUI" ? (
-    <ComfyEditor switcher={switcher} />
+    <ComfyEditor switcher={switcher} acts={props.content.looks.acts} />
+  ) : side === "Looks" ? (
+    <LooksEditor {...props} switcher={switcher} />
   ) : side === "Locations" ? (
     <LocationEditor {...props} switcher={switcher} />
   ) : (
@@ -855,7 +859,7 @@ function LoveInterestEditor({
 
           {tab === "Media" && (
             <>
-              <SpritesTab draft={draft} set={set} assetPrefix={info?.assetPrefix} eventOutfits={eventOutfits(content)} />
+              <SpritesTab draft={draft} set={set} assetPrefix={info?.assetPrefix} eventOutfits={eventOutfits(content)} looks={content.looks} />
 {!isNpc && (
                 <>
                                 <Group

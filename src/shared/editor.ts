@@ -6,6 +6,10 @@ export const ADDON_PREFIX = 'addons/'
 /** Where an entry comes from: the game, an add-on, or an add-on that replaces one of the game's. */
 export type ContentOrigin = 'base' | 'addon' | 'override'
 
+/** The two lists of `looks.json`: faces and sex-acts added to the standard ones. */
+export const LOOK_KINDS = ['expressions', 'acts'] as const
+export type LookKind = (typeof LOOK_KINDS)[number]
+
 /** Ids become file and folder names, so they are kept plain. */
 export function isSafeId(id: string): boolean {
   return /^[a-z0-9][a-z0-9-]{0,63}$/.test(id)
@@ -33,6 +37,8 @@ export interface EditorInfo {
   locations: Record<string, ContentOrigin>
   /** By subject code: the game's own subjects, and those made in the editor. */
   majors: Record<string, ContentOrigin>
+  /** By id, the faces and the sex-acts added to the standard ones: those that came with the game, and those added here. */
+  looks: Record<LookKind, Record<string, ContentOrigin>>
   /** The player a new game starts with has been changed from the game's own. */
   playerChanged: boolean
   /**

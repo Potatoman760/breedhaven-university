@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { resolveContentPath } from './assets'
-import { deleteLocation, deleteLoveInterest, deleteTrait, importAsset, loadWithAddons, rebuildCatalogue, saveMajor, deleteMajor, removeUnusedAssets, resetPlayer, saveLocation, saveLoveInterest, savePlayer, saveTrait } from './addons'
+import { deleteLocation, deleteLook, deleteLoveInterest, deleteTrait, saveLook, importAsset, loadWithAddons, rebuildCatalogue, saveMajor, deleteMajor, removeUnusedAssets, resetPlayer, saveLocation, saveLoveInterest, savePlayer, saveTrait } from './addons'
 
 // The game's own pack is the base; each test gets an empty add-on folder of its own.
 const packDir = join(process.cwd(), 'content', 'default')
@@ -69,6 +69,51 @@ describe('saveLoveInterest', () => {
     saveLoveInterest(dir, base.content, mira)
     const written = JSON.parse(readFileSync(join(dir, 'love-interests', 'mira.json'), 'utf8'))
     expect(written).toMatchObject({ id: 'mira', name: 'Mira Vale', age: faye.age })
+  })
+})
+
+describe('faces and sex-acts added in the editor', () => {
+  const smug = { id: 'smug', name: 'Smug', description: 'pleased with herself', draws: 'a smug expression' }
+  const press = { id: 'press', name: 'Press', description: 'legs pinned back', draws: 'she lies on her back, legs pinned back', seeding: true }
+
+  it('are saved, loaded for every character, and taken away once nobody has a picture for them', () => {
+    const dir = addons()
+    expect(saveLook(dir, base.content, { kind: 'expressions', look: smug })).toEqual([])
+    expect(saveLook(dir, base.content, { kind: 'acts', look: press })).toEqual([])
+    let loaded = loadWithAddons(packDir, dir)
+    expect(loaded.info.issues).toEqual([])
+    // Laid after those the game comes with.
+    expect(loaded.content.looks.expressions).toEqual([...base.content.looks.expressions, smug])
+    expect(loaded.content.looks.acts).toEqual([...base.content.looks.acts, { ...press, moment: false }])
+    expect(loaded.info.looks).toMatchObject({ expressions: { smug: 'addon' }, acts: { press: 'addon' } })
+
+    // Her picture for it keeps it: it would be left in no slot.
+    const pictured = { ...mira, outfits: mira.outfits.map((o) => (o.id === mira.defaultOutfitId ? { ...o, sprites: { ...o.sprites, smug: { image: 'x.png', description: '' } } } : o)), animations: [{ id: 'pregnant-press', name: 'Press, pregnant', description: '', image: 'p.png', loop: true }] }
+    expect(saveLoveInterest(dir, loaded.content, pictured)).toEqual([])
+    loaded = loadWithAddons(packDir, dir)
+    expect(deleteLook(dir, loaded.content, 'expressions', 'smug')).toEqual(['Mira has a picture for it. Remove the picture first.'])
+    expect(deleteLook(dir, loaded.content, 'acts', 'press')).toEqual(['Mira has a picture for it. Remove the picture first.'])
+
+    expect(saveLoveInterest(dir, loaded.content, mira)).toEqual([])
+    loaded = loadWithAddons(packDir, dir)
+    expect(deleteLook(dir, loaded.content, 'expressions', 'smug')).toEqual([])
+    expect(deleteLook(dir, loaded.content, 'acts', 'press')).toEqual([])
+    expect(loadWithAddons(packDir, dir).content.looks).toEqual(base.content.looks)
+    expect(deleteLook(dir, loaded.content, 'acts', 'press')).toEqual(['That one came with the game.'])
+  })
+
+  it('cannot take a standard one\'s id, and one in the file that does is left out', () => {
+    const dir = addons()
+    expect(saveLook(dir, base.content, { kind: 'expressions', look: { ...smug, id: 'happy' } }).join(' ')).toMatch(/standard/)
+    expect(saveLook(dir, base.content, { kind: 'acts', look: { ...press, id: 'pregnant-press' } }).join(' ')).toMatch(/standard/)
+    expect(saveLook(dir, base.content, { kind: 'acts', look: { ...press, name: ' ' } })).toEqual(['A name is needed.'])
+    expect(existsSync(join(dir, 'looks.json'))).toBe(false)
+
+    mkdirSync(dir, { recursive: true })
+    writeFileSync(join(dir, 'looks.json'), JSON.stringify({ expressions: [{ ...smug, id: 'sad' }, smug], acts: [] }))
+    const { content, info } = loadWithAddons(packDir, dir)
+    expect(content.looks.expressions.map((face) => face.id)).toEqual([...base.content.looks.expressions.map((face) => face.id), 'smug'])
+    expect(info.issues.join('\n')).toMatch(/"sad" was left out/)
   })
 })
 

@@ -420,7 +420,7 @@ export interface CutoutResult {
 // ---- what to ask for: prompts written from the content, for the user to edit before sending
 
 /** What is added to "she has a ... expression" for each standard face. Anything else is asked for by its own name. */
-const FACES: Record<string, string> = {
+export const FACES: Record<string, string> = {
   neutral: '',
   happy: 'a happy expression',
   sad: 'a sad expression',
@@ -444,19 +444,20 @@ const paragraphs = (parts: (string | false | undefined)[]): string => parts.filt
  * from: her body, what she wears, how the picture is framed, and last the look on her
  * face, each a paragraph of its own. A neutral face is asked for by saying nothing.
  * Written from `appearance` and the outfit's `description`, which is why those hold only
- * what can be drawn.
+ * what can be drawn. A face added in the editor is asked for in its own words (`draws`), where it has them.
  */
 export function spritePrompt(
   who: Pick<LoveInterest | Npc, 'appearance' | 'outfits'> & { pronouns?: string },
   outfitId: string,
   expression: string,
-  framing: string
+  framing: string,
+  draws = ''
 ): string {
   const outfit = who.outfits.find((o) => o.id === outfitId)
   // What she wears first, then whatever an outfit that builds on it adds, each a paragraph.
   const [worn = '', ...added] = outfitParts(who.outfits, outfit)
   const face = expression.trim().toLowerCase().replace(/[-_]?\d+$/, '').replace(/[-_]/g, ' ')
-  const look = face in FACES ? FACES[face] : face && `${/^[aeiou]/.test(face) ? 'an' : 'a'} ${face} expression`
+  const look = draws.trim() || (face in FACES ? FACES[face] : face && `${/^[aeiou]/.test(face) ? 'an' : 'a'} ${face} expression`)
   const { subject, has } = pronounWords(who.pronouns)
   const wears = subject === 'they' ? 'wear' : 'wears'
   return paragraphs([

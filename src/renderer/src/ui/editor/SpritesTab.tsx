@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { framingFor, nsfwPrompt, sizeFor, spritePrompt } from '../../../../shared/comfy'
 import { ADDON_PREFIX, isSafeId, slugify } from '../../../../shared/editor'
-import { EXPRESSIONS, isPregnantPose, NSFW_POSES, NSFW_PREGNANT_POSES, STANDARD_POSES, outfitDescription, STANDARD_OUTFITS, type Animation, type LoveInterest, type Outfit } from '../../../../shared/model'
+import { facesOf, isPregnantPose, posesOf, outfitDescription, STANDARD_OUTFITS, type Animation, type Looks, type LoveInterest, type Outfit } from '../../../../shared/model'
 import { errorMessage } from '../../errors'
 import { ArtTool } from '../art/ArtTool'
 import { BatchProgress, useBatch, type BatchOutcome } from '../art/batch'
@@ -27,7 +27,11 @@ interface Props {
   assetPrefix?: string
   /** The outfits the game's events put a woman in, each with where: an outfit of hers by that id is the one she wears there. */
   eventOutfits?: { id: string; worn: string[] }[]
+  /** The faces and sex-acts added in the editor: each a slot beside the standard ones. */
+  looks?: Looks
 }
+
+const NO_LOOKS: Looks = { expressions: [], acts: [] }
 
 // What the run that draws her missing NSFW poses is filed under, beside the runs of her outfits.
 const NSFW_BATCH = '(nsfw)'
@@ -69,8 +73,12 @@ function PercentBox({ value, min, max, onChange }: { value: number; min: number;
 }
 
 /** Outfits and their sprites, the portrait crop, and the NSFW pictures and clips. */
-export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, eventOutfits = [] }: Props) {
+export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, eventOutfits = [], looks = NO_LOOKS }: Props) {
   const [notice, setNotice] = useState('')
+  // Every face an outfit has a slot for, and every sex-act the NSFW section has: the standard ones and those added.
+  const faces = facesOf(looks)
+  const slots = posesOf(looks)
+  const drawsFace = (face: string) => looks.expressions.find((one) => one.id === face)?.draws
   // The art tool open on her walking profile, and that picture shown large.
   const [walking, setWalking] = useState(false)
   const [walkViewing, setWalkViewing] = useState(false)
@@ -109,7 +117,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
    * arrives. Nothing is asked first: a picture that is not liked can be removed and drawn again.
    */
   async function generateMissing(outfitId: string) {
-    const missing = EXPRESSIONS.filter((face) => !(face in (latest.current.outfits.find((o) => o.id === outfitId)?.sprites ?? {})))
+    const missing = faces.filter((face) => !(face in (latest.current.outfits.find((o) => o.id === outfitId)?.sprites ?? {})))
     // The seed typed for this run, for every picture in it; without one, her preferred seed.
     const typed = batchSeeds[outfitId] ?? ''
     const seed = typed === '' ? undefined : Number(typed)
@@ -126,7 +134,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
         kind: 'sprite',
         subjectId: who.id,
         name: `${outfitId}-${face}`,
-        positive: spritePrompt(who, outfitId, face, framingFor(settings, 'sprite')),
+        positive: spritePrompt(who, outfitId, face, framingFor(settings, 'sprite'), drawsFace(face)),
         width: size.width,
         height: size.height,
         seed: seed ?? who.imageSeed
@@ -261,11 +269,11 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
   }
 
   const isStandardOutfit = (id: string) => !plain && STANDARD_OUTFITS.some((s) => s.id === id)
-  const isFace = (name: string) => !plain && (EXPRESSIONS as readonly string[]).includes(name)
-  /** An outfit's pictures, the standard faces first and in their usual order. */
+  const isFace = (name: string) => !plain && faces.includes(name)
+  /** An outfit's pictures, the faces first and in their usual order. */
   const ordered = (outfit: Outfit) => [
-    ...EXPRESSIONS.filter((face) => face in outfit.sprites).map((face) => [face, outfit.sprites[face]] as const),
-    ...Object.entries(outfit.sprites).filter(([name]) => !(EXPRESSIONS as readonly string[]).includes(name))
+    ...faces.filter((face) => face in outfit.sprites).map((face) => [face, outfit.sprites[face]] as const),
+    ...Object.entries(outfit.sprites).filter(([name]) => !faces.includes(name))
   ]
 
   /** Has the user pick a picture for one of an outfit's faces. */
@@ -311,13 +319,13 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
   const poseOf = (id: string) => draft.animations.find((a) => a.id === id)
   // Every slot of the NSFW section: the standard poses in their usual order, with or without a picture, then any of her own.
   const poses = [
-    ...NSFW_POSES.map((pose) => poseOf(pose.id) ?? { id: pose.id, name: pose.name, description: '', image: undefined, clip: undefined, loop: true }),
-    ...draft.animations.filter((a) => !STANDARD_POSES.some((pose) => pose.id === a.id))
+    ...slots.poses.map((pose) => poseOf(pose.id) ?? { id: pose.id, name: pose.name, description: '', image: undefined, clip: undefined, loop: true }),
+    ...draft.animations.filter((a) => !slots.all.some((pose) => pose.id === a.id))
   ]
   // The row under it: each standard pose drawn pregnant, built on the one above.
-  const pregnantPoses = NSFW_PREGNANT_POSES.map((pose) => poseOf(pose.id) ?? { id: pose.id, name: pose.name, description: '', image: undefined, clip: undefined, loop: true })
+  const pregnantPoses = slots.pregnant.map((pose) => poseOf(pose.id) ?? { id: pose.id, name: pose.name, description: '', image: undefined, clip: undefined, loop: true })
   /** What a pose is drawn from: the standard wording, or for one of her own, what its description says. */
-  const drawsOf = (id: string) => STANDARD_POSES.find((pose) => pose.id === id)?.draws ?? poseOf(id)?.description ?? ''
+  const drawsOf = (id: string) => slots.all.find((pose) => pose.id === id)?.draws ?? poseOf(id)?.description ?? ''
 
   // The poses that have a picture, in the order they are shown, for stepping through them.
   const withPictures = [...poses, ...pregnantPoses].filter((pose) => pose.image !== undefined)
@@ -325,7 +333,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
   /** Changes a pose, making its entry if she has none for it yet. Written onto the draft as it is now, by `put` when a run does it. */
   function setPose(id: string, patch: Partial<Animation>, put: (patch: Partial<SpriteOwner>) => void = set) {
     const have = latest.current.animations
-    const standard = STANDARD_POSES.find((pose) => pose.id === id)
+    const standard = slots.all.find((pose) => pose.id === id)
     put({
       animations: have.some((a) => a.id === id)
         ? have.map((a) => (a.id === id ? { ...a, ...patch } : a))
@@ -348,12 +356,12 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
     const image = await pick('image')
     if (!image) return
     const stem = image.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'pose'
-    const id = unique(slugify(stem), [...STANDARD_POSES.map((pose) => pose.id), ...draft.animations.map((a) => a.id)])
+    const id = unique(slugify(stem), [...slots.all.map((pose) => pose.id), ...draft.animations.map((a) => a.id)])
     set({ animations: [...draft.animations, { id, name: id, description: '', image, loop: true }] })
   }
 
   /** Draws every standard pose that has no picture yet, one after another, and puts each in its slot as it arrives. */
-  async function generateMissingPoses(from: readonly { id: string; name: string; draws: string }[] = NSFW_POSES, at: string = NSFW_BATCH) {
+  async function generateMissingPoses(from: readonly { id: string; name: string; draws: string }[] = slots.poses, at: string = NSFW_BATCH) {
     const missing = from.filter((pose) => !latest.current.animations.find((a) => a.id === pose.id)?.image)
     setNotice('')
     const settings = await window.api.comfy.getSettings()
@@ -418,7 +426,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
   /** One slot of the NSFW section: a pose's picture with what can be done to it, or the empty place for one. */
   const poseSlot = (pose: Animation | (typeof poses)[number]) => {
     const image = pose.image
-    const standard = STANDARD_POSES.find((known) => known.id === pose.id)
+    const standard = slots.all.find((known) => known.id === pose.id)
     return image ? (
       <PictureSlot
         key={pose.id}
@@ -546,7 +554,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
       )}
       {drawing && (
         <ArtTool
-          target={{ kind: 'sprite', who: draft, outfitId: drawing.outfitId, expression: drawing.expression, onUse: useGenerated }}
+          target={{ kind: 'sprite', who: draft, outfitId: drawing.outfitId, expression: drawing.expression, faces: looks.expressions, onUse: useGenerated }}
           onClose={() => setDrawing(null)}
         />
       )}
@@ -618,7 +626,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
         hint={
           plain
             ? t('editor.sprites.outfitsHintPlain')
-            : t('editor.sprites.outfitsHint', { faces: EXPRESSIONS.join(', ') })
+            : t('editor.sprites.outfitsHint', { faces: faces.join(', ') })
         }
       >
         <label className="inline" title={t('editor.sprites.edgesTitle')}>
@@ -672,8 +680,20 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
             </div>
             {!isStandardOutfit(outfit.id) && (
               <label className="inline">
-                <input type="checkbox" checked={outfit.oneOff === true} onChange={(e) => setOutfit(index, { oneOff: e.target.checked || undefined })} />
+                <input type="checkbox" checked={outfit.oneOff === true} onChange={(e) => setOutfit(index, { oneOff: e.target.checked || undefined, ...(e.target.checked && { day: undefined }) })} />
                 {t('editor.sprites.oneOff')}
+              </label>
+            )}
+            {/* Her usual clothes always last the day, and a pregnant outfit goes by its parent. */}
+            {!outfit.pregnant && (
+              <label className="inline" title={t('editor.sprites.dayOutfitTitle')}>
+                <input
+                  type="checkbox"
+                  checked={outfit.id === draft.defaultOutfitId || outfit.day === true}
+                  disabled={outfit.id === draft.defaultOutfitId || outfit.oneOff === true}
+                  onChange={(e) => setOutfit(index, { day: e.target.checked || undefined })}
+                />
+                {t('editor.sprites.dayOutfit')}
               </label>
             )}
             <label>
@@ -742,16 +762,16 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
             {!outfit.fallback && (
             <>
             <div className="outfit-actions">
-              {!plain && EXPRESSIONS.some((face) => !(face in outfit.sprites)) && (
+              {!plain && faces.some((face) => !(face in outfit.sprites)) && (
                 <Button
                   disabled={!ready || batch !== null}
                   title={t('editor.sprites.generateMissingTitle')}
                   onClick={() => generateMissing(outfit.id)}
                 >
-                  {t('editor.sprites.generateMissing', { count: EXPRESSIONS.filter((face) => !(face in outfit.sprites)).length })}
+                  {t('editor.sprites.generateMissing', { count: faces.filter((face) => !(face in outfit.sprites)).length })}
                 </Button>
               )}
-              {!plain && EXPRESSIONS.some((face) => !(face in outfit.sprites)) && (
+              {!plain && faces.some((face) => !(face in outfit.sprites)) && (
                 <input
                   className="batch-seed"
                   inputMode="numeric"
@@ -766,7 +786,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
               <Button
                 disabled={!ready}
                 title={t('editor.sprites.drawSpriteTitle')}
-                onClick={() => setDrawing({ outfitId: outfit.id, expression: EXPRESSIONS.find((face) => !(face in outfit.sprites)) ?? '' })}
+                onClick={() => setDrawing({ outfitId: outfit.id, expression: faces.find((face) => !(face in outfit.sprites)) ?? '' })}
               >
                 {t('editor.player.generate')}
               </Button>
@@ -842,7 +862,7 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
                 </PictureSlot>
               ))}
               {!plain &&
-                EXPRESSIONS.filter((face) => !(face in outfit.sprites)).map((face) => (
+                faces.filter((face) => !(face in outfit.sprites)).map((face) => (
                   <EmptySlot key={face} name={face} disabled={!ready} onAdd={() => addFace(index, face)} onGenerate={() => setDrawing({ outfitId: outfit.id, expression: face })} />
                 ))}
             </SlotGrid>
@@ -872,17 +892,17 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
         hint={t('editor.sprites.nsfwHint')}
       >
         <div className="outfit-actions">
-          {NSFW_POSES.some((pose) => !poseOf(pose.id)?.image) && (
+          {slots.poses.some((pose) => !poseOf(pose.id)?.image) && (
             <Button
               variant="primary"
               disabled={!ready || batch !== null}
               title={t('editor.sprites.generatePosesTitle')}
               onClick={() => generateMissingPoses()}
             >
-              {t('editor.sprites.generatePoses', { count: NSFW_POSES.filter((pose) => !poseOf(pose.id)?.image).length })}
+              {t('editor.sprites.generatePoses', { count: slots.poses.filter((pose) => !poseOf(pose.id)?.image).length })}
             </Button>
           )}
-          <Button disabled={!ready} title={t('editor.sprites.drawPoseTitle')} onClick={() => setPosing(NSFW_POSES.find((pose) => !poseOf(pose.id)?.image)?.id ?? NSFW_POSES[0].id)}>
+          <Button disabled={!ready} title={t('editor.sprites.drawPoseTitle')} onClick={() => setPosing(slots.poses.find((pose) => !poseOf(pose.id)?.image)?.id ?? slots.poses[0].id)}>
             {t('editor.player.generate')}
           </Button>
           <Button disabled={!ready} onClick={addPose}>
@@ -909,14 +929,14 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
           hint={t('editor.sprites.nsfwPregnantHint')}
         >
           <div className="outfit-actions">
-            {NSFW_PREGNANT_POSES.some((pose) => !poseOf(pose.id)?.image) && (
+            {slots.pregnant.some((pose) => !poseOf(pose.id)?.image) && (
               <Button
                 variant="primary"
                 disabled={!ready || batch !== null}
                 title={t('editor.sprites.generatePregnantTitle')}
-                onClick={() => generateMissingPoses(NSFW_PREGNANT_POSES, NSFW_PREGNANT_BATCH)}
+                onClick={() => generateMissingPoses(slots.pregnant, NSFW_PREGNANT_BATCH)}
               >
-                {t('editor.sprites.generatePoses', { count: NSFW_PREGNANT_POSES.filter((pose) => !poseOf(pose.id)?.image).length })}
+                {t('editor.sprites.generatePoses', { count: slots.pregnant.filter((pose) => !poseOf(pose.id)?.image).length })}
               </Button>
             )}
           </div>

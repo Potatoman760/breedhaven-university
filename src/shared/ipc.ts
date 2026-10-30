@@ -42,6 +42,8 @@ export const IPC = {
   editorDraftMajor: 'editor:draftMajor',
   editorSaveTrait: 'editor:saveTrait',
   editorDeleteTrait: 'editor:deleteTrait',
+  editorSaveLook: 'editor:saveLook',
+  editorDeleteLook: 'editor:deleteLook',
   editorSaveCatalogue: 'editor:saveCatalogue',
   editorSaveLocation: 'editor:saveLocation',
   editorDeleteLocation: 'editor:deleteLocation',

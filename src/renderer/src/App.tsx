@@ -8,6 +8,8 @@ import {
   settlePokerHand,
   soundCues,
   acceptProposal,
+  schedulePlan,
+  type ScheduleRequest,
   applyFeelings,
   leaveScene,
   sceneWitnesses,
@@ -63,6 +65,8 @@ import {
   attendOrientation,
   courierRound,
   courierRoundDue,
+  dressForDay,
+  keepDayOutfits,
   MAX_TURNS_KEPT,
   packTurns,
   rewound,
@@ -175,7 +179,7 @@ import {
   joinSociety,
   societyPeople
 } from '../../shared/game'
-import { MAX_SCENE_CAST, type Activity, type ContentPack, type EventPart, type ExamKind, type GameState, type Intro, type PostPlan, type Relic, type RelicUse, type Scene } from '../../shared/model'
+import { MAX_SCENE_CAST, type Activity, type ContentPack, type EventPart, type ExamKind, type GameState, type Intro, type PostPlan, type Proposal, type Relic, type RelicUse, type Scene } from '../../shared/model'
 import { CHAT_CANCELLED } from '../../shared/ipc'
 import { AUTO_SLOT_ID, type SaveData } from '../../shared/saves'
 import { errorMessage } from './errors'
@@ -396,7 +400,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   // Confirmation of the plan just accepted, shown until the next line is said.
   const [agreed, setAgreed] = useState('')
   // The line that could not be answered, to send again as it was. Offered only beside the notice that said so.
-  const [failed, setFailed] = useState<{ notice: string; text?: string; said: Scene; when: GameState; ask?: string } | null>(null)
+  const [failed, setFailed] = useState<{ notice: string; text?: string; said: Scene; when: GameState; ask?: string; offered?: Proposal } | null>(null)
   // Something the player typed to do, worked out and waiting for a yes.
   const [outing, setOuting] = useState<Outing | null>(null)
   // The examination whose paper is in front of him, until he puts it down: to answer, and then marked.
@@ -486,6 +490,12 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   // Once the calendar has run out nothing more is set going: nobody writes, nothing is posted. Births still come, for the telling.
   const over = isGameOver(content.calendar, state.time)
   const idle = !scene && !summary && !state.expedition.run && (state.enrolment !== null || !content.coursework)
+  // As a day begins everyone is dressed for it, and keeps it on until the next.
+  useEffect(() => {
+    if (!idle) return
+    const dressed = dressForDay(content, state)
+    if (dressed !== state) setState(dressed)
+  }, [idle, content, state])
   const roundMade = useRef(-1)
   useEffect(() => {
     if (!idle || over || !courierRoundDue(content, state)) return
@@ -678,9 +688,10 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
 
   /**
    * Says a line in the scene, or with no line has the character open it. `from` and `at`
-   * let a caller pass a scene and state it has just changed.
+   * let a caller pass a scene and state it has just changed. A plan `offered` by the game is put to him with the reply,
+   * whatever the reply makes of it.
    */
-  async function send(text?: string, said: Scene | null = scene, when: GameState = state, ask?: string) {
+  async function send(text?: string, said: Scene | null = scene, when: GameState = state, ask?: string, offered?: Proposal) {
     if (!said) return
     // Kept so that the line, and whatever it leads to, can be taken back.
     if (text !== undefined) setTurns((kept) => [...kept, { state: when, scene: said, text }].slice(-MAX_TURNS_KEPT))
@@ -758,7 +769,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
             // Once the NSFW LLM has had to take over, it keeps the scene.
             nsfw: asked.nsfw || response.profileId === 'nsfw',
             // A suggestion stays on offer while the conversation moves on, until it is answered, replaced by another, or its time has gone by.
-            proposal: response.proposal ?? (response.proposalAccepted || (asked.proposal && asked.proposal.time <= at.time) ? undefined : asked.proposal),
+            // One the game found for what he asked is put to him whatever she made of it.
+            proposal: offered ?? response.proposal ?? (response.proposalAccepted || (asked.proposal && asked.proposal.time <= at.time) ? undefined : asked.proposal),
             bondProposal: response.bondProposal,
             conceived: [...new Set([...asked.conceived, ...conceived])]
           },
@@ -789,7 +801,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         const told = text === undefined ? errorMessage(error) : t('shell.app.lineWas', { error: errorMessage(error), text })
         setNotice(told)
         // Sent again, it goes with whatever was told beside it, someone arriving included: she has arrived by now.
-        setFailed({ notice: told, text, said: from, when: at, ask: cue })
+        setFailed({ notice: told, text, said: from, when: at, ask: cue, offered })
       }
     } finally {
       setBusy(false)
@@ -1302,6 +1314,32 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setPanel(scene.returnTo === 'fair' && fairNow(content, state) ? { kind: 'fair' } : null)
   }
 
+  /**
+   * He puts a plan to those with him. When everyone is free it is on offer at once, as if they had suggested it, with
+   * nothing asked of the LLM. When something is in the way the nearest time that fits is found, and his line goes to them
+   * with that time to agree to: whatever they say, it is on offer with their answer.
+   */
+  function schedule(request: ScheduleRequest) {
+    if (!scene || busy) return
+    const result = schedulePlan(content, state, request)
+    if ('error' in result) return setNotice(result.error)
+    const { proposal, clash } = result
+    if (!clash) return setScene({ ...scene, proposal })
+    const place = content.locations.find((l) => l.id === proposal.locationId)?.name ?? proposal.locationId
+    const line = t('shell.app.scheduleLine', { title: proposal.title, place, when: describeWhen(content, request.time) })
+    const cue = t('scene.prompt.meeting.moved', {
+      player: state.player.name,
+      title: proposal.title,
+      place,
+      asked: describeWhen(content, request.time),
+      why: clash.join('; '),
+      group: proposal.companionIds.length > 0,
+      when: describeWhen(content, proposal.time)
+    })
+    // What was on offer before is put aside: this takes its place.
+    void send(line, { ...scene, proposal: undefined }, state, cue, proposal)
+  }
+
   /** He says his goodbye: the line goes into the scene, and it is summed up at once, with no reply to it. */
   function sayGoodbye() {
     if (!scene || busy) return
@@ -1398,7 +1436,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       )
       // What she let out goes into what the player knows of her, and what changed between the love interests is kept.
       const known = revealed.reduce((next, r) => revealFacts(content, next, r.loveInterestId, [r.factId]), after)
-      const awake = result.rapport.reduce((next, c) => setRelation(next, c.a, c.b, c.relation), known)
+      // An outfit that lasts the day, changed into in the scene, she keeps on; one for the scene alone comes off.
+      const awake = keepDayOutfits(content, result.rapport.reduce((next, c) => setRelation(next, c.a, c.b, c.relation), known), scene)
       // They fell asleep where they were: the night goes by, and he wakes there in the morning, rested.
       const settled = sleepingOver ? sleepOver(content, awake) : awake
       if (sleepingOver) setDawn(true)
@@ -1515,7 +1554,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           busy={busy}
           movingTo={movingTo}
           notice={notice}
-          onRetry={failed && failed.notice === notice ? () => send(failed.text, failed.said, failed.when, failed.ask) : undefined}
+          onRetry={failed && failed.notice === notice ? () => send(failed.text, failed.said, failed.when, failed.ask, failed.offered) : undefined}
           aside={aside}
           onDismissAside={() => setAside('')}
           ended={ended}
@@ -1531,6 +1570,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           onRedo={redoFrom}
           onContinue={() => void finishScene()}
           onGoodbye={sayGoodbye}
+          onSchedule={schedule}
           onPhoto={() => void takePhoto()}
           photoBusy={photoBusy}
           onAcceptProposal={() => {

@@ -10,6 +10,7 @@ import {
   leaveScene,
   dialogueLines,
   firstNames,
+  firstToSpeak,
   hasMet,
   meet,
   sceneCast,
@@ -239,6 +240,60 @@ describe('look directives', () => {
     expect(later).toContain('"missionary" was up for your last reply')
 
     expect(prompt(undefined)).not.toContain('## How you appear')
+  })
+
+  it('offers a face added in the editor only to one who has its picture, in its own words', () => {
+    const looks = {
+      expressions: [{ id: 'smug', name: 'Smug', description: 'pleased with herself', draws: '' }],
+      acts: [{ id: 'press', name: 'Press', description: 'legs pinned back', draws: '', moment: false, seeding: false }]
+    }
+    const smug = { ...li, outfits: li.outfits.map((o) => (o.id === 'default' ? { ...o, sprites: { ...o.sprites, smug: { image: 's.png', description: '' } } } : o)), animations: [...li.animations, { id: 'press', name: 'Press', description: '', image: 'p.png', loop: true }] }
+    const others = [{ ...li, id: 'bea', name: 'Bea Moss' }]
+    const content = { ...fixture(), looks, loveInterests: [smug, ...others] }
+    const met = { time: 0, summary: 'They met.', level: 'normal' as const }
+    const state = { ...createInitialState(content), memories: { ana: [met], bea: [met] } }
+
+    const alone = buildCharacterPrompt({ content, state, loveInterestId: 'ana', look: {} })
+    expect(alone).toContain('in place of a face, [EXPRESSION: smug] shows: pleased with herself')
+    expect(alone).toContain('- press (Press): legs pinned back')
+    expect(buildCharacterPrompt({ content: { ...content, loveInterests: [li, ...others] }, state, loveInterestId: 'ana', look: {} })).not.toContain('smug')
+
+    const together = buildCharacterPrompt({ content, state, loveInterestId: 'ana', companionIds: ['bea'], look: {} })
+    expect(together).toContain('- Ana may also have, in place of a face: smug (pleased with herself)')
+    expect(together).not.toContain('- Bea may also have')
+  })
+})
+
+describe('who answers first in a group', () => {
+  const [ana] = fixture().loveInterests
+  const content = { ...fixture(), loveInterests: [ana, { ...ana, id: 'bea', name: 'Bea Moss' }, { ...ana, id: 'cy', name: 'Cy Ward' }] }
+  const group: Scene = { baseline: { stats: {}, energy: 0, money: 0, time: 0, relationship: { affection: 0, trust: 0, desire: 0 }, companions: {} }, loveInterestId: 'ana', companionIds: ['bea', 'cy'], nsfw: false, beats: [], messages: [], gifts: [], conceived: [], departed: [], npc: false }
+  const said = (...lines: string[]) => lines.map((content, i) => ({ role: i % 2 === 0 ? ('user' as const) : ('assistant' as const), content }))
+
+  it('is whoever he names, the first he names', () => {
+    expect(firstToSpeak(content, { ...group, messages: said('Cy, what do you think?') })).toBe('cy')
+    expect(firstToSpeak(content, { ...group, messages: said('I asked bea and then Cy.') })).toBe('bea')
+    // A name inside another word is not hers.
+    expect(firstToSpeak(content, { ...group, messages: said('Hello.', 'Ana: Hi.', 'Banana bread?') })).toBe('bea')
+  })
+
+  it('otherwise goes to whoever has gone longest without leading, and now and then to nobody', () => {
+    expect(firstToSpeak(content, { ...group, messages: said('Hello.', 'Ana: Hi.\nBea: Hey.', 'How are you?') })).toBe('bea')
+    expect(firstToSpeak(content, { ...group, messages: said('Hello.', 'Ana: Hi.', 'So.', 'Bea: Well.', 'And?') })).toBe('cy')
+    expect(firstToSpeak(content, { ...group, messages: said('a', 'Ana: b', 'c', 'Bea: d', 'e', 'Cy: f', 'g') })).toBeUndefined()
+  })
+
+  it('is nobody alone, or once the rest have gone', () => {
+    expect(firstToSpeak(content, { ...group, companionIds: [], messages: said('Hello.') })).toBeUndefined()
+    const left = { ...group, companionIds: ['bea'], departed: [{ id: 'bea', at: 0, feeling: 'content' as const, reason: '' }], messages: said('Hello.') }
+    expect(firstToSpeak(content, left)).toBeUndefined()
+  })
+
+  it('begins every list of them in the prompt', () => {
+    const state = createInitialState(content)
+    const prompt = buildCharacterPrompt({ content, state, loveInterestId: 'ana', companionIds: ['bea', 'cy'], look: {}, firstSpeakerId: 'cy' })
+    expect(prompt).toContain('[EXPRESSION: Cy=happy] [EXPRESSION: Ana=happy] [EXPRESSION: Bea=happy]')
+    expect(prompt).toContain('Cy: Sit down, then.')
   })
 })
 

@@ -1,4 +1,4 @@
-import type { Child, ContentPack, GameState, LoveInterest, Outfit, Pregnancy, PregnancyStage } from '../model'
+import type { Child, ContentPack, GameState, LoveInterest, Outfit, Pregnancy, PregnancyStage, Scene } from '../model'
 import { toDate } from './calendar'
 import { eventsOn } from './events'
 import { onBirthControl } from './intimacy'
@@ -154,17 +154,67 @@ export function deliverChild(content: ContentPack, state: GameState, motherId: s
   return { state: { ...state, pregnancies, children: [...state.children, child] }, child }
 }
 
+/** Whether an outfit lasts the day, and not only the scene: her usual clothes always do. A pregnant one goes by its parent. */
+export function lastsTheDay(li: Pick<LoveInterest, 'defaultOutfitId'>, outfit: Outfit): boolean {
+  return !outfit.pregnant && !outfit.oneOff && (outfit.day === true || outfit.id === li.defaultOutfitId)
+}
+
 /**
- * What she is wearing: the outfit chosen for her, or her usual clothes when none has been,
+ * What she has on today, as the day began or as a scene left her: today's as kept in the state, or before it has been
+ * kept, what it will be. On the day of an event she is dressed for it, if she has an outfit with its id; otherwise
+ * one of her outfits that last the day is drawn, the same one for the same day of the same game.
+ */
+function dayOutfit(content: ContentPack, state: GameState, li: LoveInterest): Outfit | undefined {
+  const has = (id: string) => li.outfits.find((o) => o.id === id)
+  const { dayIndex } = toDate(content.calendar, state.time)
+  const kept = state.dayOutfits.day === dayIndex ? state.dayOutfits.worn[li.id] : undefined
+  if (kept !== undefined) return has(kept)
+  const dressed = eventsOn(content, state).map((event) => has(event.id)).find((outfit) => outfit !== undefined)
+  if (dressed) return dressed
+  const choices = li.outfits.filter((o) => lastsTheDay(li, o))
+  return choices[Math.floor(roll(state.weatherSeed, dayIndex, seedOf(li.id), 7) * choices.length)]
+}
+
+/** Dresses everyone for the day, once it has begun: what each has on is kept until the next. Unchanged once done. */
+export function dressForDay(content: ContentPack, state: GameState): GameState {
+  const { dayIndex } = toDate(content.calendar, state.time)
+  if (state.dayOutfits.day === dayIndex) return state
+  const worn = Object.fromEntries(
+    [...content.loveInterests, ...content.npcs].flatMap((who) => {
+      const outfit = dayOutfit(content, state, who)
+      return outfit ? [[who.id, outfit.id]] : []
+    })
+  )
+  return { ...state, dayOutfits: { day: dayIndex, worn } }
+}
+
+/**
+ * What a scene leaves those in it wearing: an outfit that lasts the day, one of them changed into, she keeps on. One
+ * for the scene alone comes off with it, and she is back in what she had on.
+ */
+export function keepDayOutfits(content: ContentPack, state: GameState, scene: Pick<Scene, 'loveInterestId' | 'companionIds' | 'outfitId' | 'looks'>): GameState {
+  const dressed = dressForDay(content, state)
+  const worn = { ...dressed.dayOutfits.worn }
+  for (const id of [scene.loveInterestId, ...scene.companionIds]) {
+    const outfitId = id === scene.loveInterestId ? scene.outfitId : scene.looks?.[id]?.outfitId
+    const li = [...content.loveInterests, ...content.npcs].find((one) => one.id === id)
+    const outfit = li?.outfits.find((o) => o.id === outfitId)
+    // What she is shown in while pregnant is the pregnant form of what she chose.
+    const chosen = li && outfit && ordinaryOutfit(li, outfit)
+    if (li && chosen && lastsTheDay(li, chosen)) worn[id] = chosen.id
+  }
+  return { ...dressed, dayOutfits: { ...dressed.dayOutfits, worn } }
+}
+
+/**
+ * What she is wearing: the outfit chosen for her, or what she has on today when none has been,
  * in the form that fits her now. From her second trimester, when she shows, that is the
  * pregnant one (`pregnant` for her clothes, `nude-pregnant` undressed); before then, and
  * after the birth, the ordinary one.
  */
 export function wornOutfit(content: ContentPack, state: GameState, li: LoveInterest, chosenId?: string): Outfit | undefined {
   const has = (id: string) => li.outfits.find((o) => o.id === id)
-  // On the day of an event she is dressed for it, if she has an outfit with its id: from morning to night, until a scene puts her in something else.
-  const dressed = eventsOn(content, state).map((event) => has(event.id)).find((outfit) => outfit !== undefined)
-  const chosen = (chosenId !== undefined ? has(chosenId) : undefined) ?? dressed ?? has(li.defaultOutfitId)
+  const chosen = (chosenId !== undefined ? has(chosenId) : undefined) ?? dayOutfit(content, state, li) ?? has(li.defaultOutfitId)
   if (!chosen) return undefined
   const showing = pregnancyStage(content, state, li.id)?.showing === true
   if (chosen.pregnant === showing) return chosen

@@ -1,5 +1,5 @@
 import type { ContentPack, GameState } from '../model'
-import { dayAgenda } from './agenda'
+import { dayAgainst, dayAgenda, timeOn } from './agenda'
 import { toDate } from './calendar'
 import { courseMembers, meetingNow } from './courses'
 import { eventDay, eventsOn } from './events'
@@ -46,15 +46,34 @@ export function busyWith(content: ContentPack, state: GameState, loveInterestIds
   }
 
   // Theirs, asked of the timetable hour by hour, so that a holiday or a break leaves them clear.
-  const hoursOf = Array.from({ length: hours }, (_, i) => ({ ...state, time: time + i }))
-  for (const id of loveInterestIds) {
-    const name = firstNames(content, [id])
-    for (const course of state.courses.filter((c) => courseMembers(c).includes(id))) {
-      if (hoursOf.some((then) => meetingNow(content, then, course) !== undefined)) reasons.push(t('game.freeTime.herClass', { name, course: course.number }))
-    }
-    for (const society of (content.societies?.societies ?? []).filter((s) => societyPeople(s).includes(id))) {
-      if (hoursOf.some((then) => societyMeetingNow(content, then, society))) reasons.push(t('game.freeTime.herSociety', { name, society: society.name.replace(/^the /, '') }))
-    }
-  }
+  for (let i = 0; i < hours; i++) reasons.push(...theirsAt(content, state, loveInterestIds, time + i))
   return [...new Set(reasons)]
+}
+
+/** What any of the love interests named has on at one hour: her classes and her society meetings. */
+function theirsAt(content: ContentPack, state: GameState, loveInterestIds: string[], time: number): string[] {
+  const then = { ...state, time }
+  return loveInterestIds.flatMap((id) => {
+    const name = firstNames(content, [id])
+    return [
+      ...state.courses.filter((c) => courseMembers(c).includes(id) && meetingNow(content, then, c) !== undefined).map((course) => t('game.freeTime.herClass', { name, course: course.number })),
+      ...(content.societies?.societies ?? []).filter((s) => societyPeople(s).includes(id) && societyMeetingNow(content, then, s)).map((society) => t('game.freeTime.herSociety', { name, society: society.name.replace(/^the /, '') }))
+    ]
+  })
+}
+
+/**
+ * A plan laid over his day (`dayAgainst`), with what those it is with have on laid over it too: an hour one of them is
+ * held is held, and what holds her is said in it beside anything of his.
+ */
+export function dayAgainstWith(content: ContentPack, state: GameState, plan: { time: number; hours: number }, loveInterestIds: string[]): ReturnType<typeof dayAgainst> {
+  const day = dayAgainst(content, state, plan)
+  const { dayIndex } = toDate(content.calendar, plan.time)
+  const hours = day.hours.map((at) => {
+    const theirs = theirsAt(content, state, loveInterestIds, timeOn(content, dayIndex, at.hour))
+    if (theirs.length === 0) return at
+    return { ...at, mine: [at.mine, ...theirs].filter(Boolean).join(' · '), holds: true }
+  })
+  const theirClashes = day.hours.filter((at) => at.plan).flatMap((at) => theirsAt(content, state, loveInterestIds, timeOn(content, dayIndex, at.hour)))
+  return { ...day, hours, clashes: [...new Set([...day.clashes, ...theirClashes])] }
 }

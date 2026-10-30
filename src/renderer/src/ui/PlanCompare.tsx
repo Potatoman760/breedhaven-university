@@ -1,6 +1,7 @@
 import { useRef, useState, type CSSProperties } from 'react'
 import { createPortal } from 'react-dom'
 import { dayAgainst, describeWhen } from '../../../shared/game'
+import { dayAgainstWith } from '../../../shared/game/freeTime'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { t } from '../../../shared/i18n'
 
@@ -14,10 +15,11 @@ const ROOM = 360
  * red where it falls on something of his. The pop-up is drawn over the whole window, where no scrolling list it sits in
  * can cut it off: above the button, or below it when there is no room above.
  */
-export function PlanCompare({ content, state, plan, id }: { content: ContentPack; state: GameState; plan: { time: number; hours: number }; id: string }) {
+export function PlanCompare({ content, state, plan, id, withIds }: { content: ContentPack; state: GameState; plan: { time: number; hours: number }; id: string; withIds?: string[] }) {
   const button = useRef<HTMLButtonElement>(null)
   const [at, setAt] = useState<CSSProperties | null>(null)
-  const day = dayAgainst(content, state, plan)
+  // With those it would be with named, what they have on is laid over his day too.
+  const day = withIds ? dayAgainstWith(content, state, plan, withIds) : dayAgainst(content, state, plan)
   const clashes = day.clashes.length
   const open = () => {
     const box = button.current?.getBoundingClientRect()
@@ -29,7 +31,7 @@ export function PlanCompare({ content, state, plan, id }: { content: ContentPack
   return (
     <span className="compare" onMouseEnter={open} onMouseLeave={close} onFocus={open} onBlur={close}>
       <button ref={button} type="button" className={clashes > 0 ? 'compare-button clash' : 'compare-button'} aria-describedby={`plan-compare-${id}`}>
-        {t('screens.planCompare.button')}
+        {withIds ? t('screens.planCompare.buttonAll') : t('screens.planCompare.button')}
         <span>{clashes === 0 ? t('screens.planCompare.clear') : t('screens.planCompare.conflicts', { n: clashes })}</span>
       </button>
       {at &&

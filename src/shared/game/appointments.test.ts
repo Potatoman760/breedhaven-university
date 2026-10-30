@@ -7,8 +7,13 @@ import {
   findMeetingTime,
   keepAppointment,
   proposeMeeting,
+  scheduleDays,
+  scheduleHours,
+  schedulePlan,
   upcomingAppointments
 } from './appointments'
+import { dayAgainst } from './agenda'
+import { dayAgainstWith } from './freeTime'
 import { locationOf } from './map'
 import { buildCharacterPrompt } from './prompt'
 import { createInitialState } from './state'
@@ -36,6 +41,50 @@ function withClass(): { content: ContentPack; state: typeof state } {
   })
   return { content: { ...content, coursework }, state: { ...state, courses: [course], enrolment: [] } }
 }
+
+describe('a plan he puts to them himself', () => {
+  const tea = { loveInterestIds: ['ana'], title: 'Tea', locationId: 'home', time: 2, hours: 2 }
+
+  it('is offered as asked when everyone is free and the place is open', () => {
+    expect(schedulePlan(content, state, tea)).toEqual({ proposal: { loveInterestId: 'ana', companionIds: [], title: 'Tea', time: 2, hours: 2, locationId: 'home' } })
+    expect(schedulePlan(content, state, { ...tea, title: ' ' })).toMatchObject({ proposal: { title: 'Meet up' } })
+  })
+
+  it('moves to the nearest time after it that fits, and says what was in the way', () => {
+    const term = withClass()
+    const moved = schedulePlan(term.content, term.state, tea)
+    expect(moved).toMatchObject({ proposal: { time: 4 } })
+    expect('clash' in moved && moved.clash?.length).toBeGreaterThan(0)
+    // The shop shuts at 15: asked for 16:00 there, it is the next morning.
+    const shut = schedulePlan(content, state, { ...tea, locationId: 'shop', time: 10 })
+    expect(shut).toMatchObject({ proposal: { time: 22 } })
+    expect('clash' in shut && shut.clash?.join(' ')).toMatch(/closed then/)
+    expect(schedulePlan(content, state, { ...tea, time: 0 })).toMatchObject({ proposal: { time: 2 } })
+  })
+
+  it('needs someone to make it with and somewhere to go', () => {
+    expect(schedulePlan(content, state, { ...tea, loveInterestIds: [] })).toEqual({ error: 'Choose who it is with and where.' })
+    expect(schedulePlan(content, state, { ...tea, locationId: 'the-moon' })).toEqual({ error: 'Choose who it is with and where.' })
+  })
+
+  it('is shown against her calendar as well as his, a clash in her hours as much as in his', () => {
+    const term = withClass()
+    const plan = { time: 2, hours: 2 }
+    expect(dayAgainst(term.content, term.state, plan).clashes).toEqual([])
+    const both = dayAgainstWith(term.content, term.state, plan, ['ana'])
+    expect(both.clashes).toHaveLength(1)
+    expect(both.clashes[0]).toContain('Ana')
+    expect(both.hours.find((at) => at.hour === 8)).toMatchObject({ plan: true, holds: true, mine: both.clashes[0] })
+    expect(both.hours.find((at) => at.hour === 11)).toMatchObject({ holds: false })
+  })
+
+  it('is offered for the civil hours of today and the fortnight after', () => {
+    expect(scheduleHours(content, 2)).toEqual([8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18])
+    const days = scheduleDays(content, state)
+    expect(days[0]).toBe(-6)
+    expect(days[1]).toBe(14)
+  })
+})
 
 describe('findMeetingTime', () => {
   it('picks the first civil hour from now on', () => {

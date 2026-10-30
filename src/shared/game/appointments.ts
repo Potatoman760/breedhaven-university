@@ -178,6 +178,59 @@ export function proposeMeeting(
   }
 }
 
+/** A plan the player puts to those in a scene himself, with no LLM asked to make it. */
+export interface ScheduleRequest {
+  /** Who it is with: the first is the one who answers for it. */
+  loveInterestIds: string[]
+  title: string
+  locationId: string
+  time: number
+  hours: number
+}
+
+/** The hours of the day a plan can start at, for one that lasts so long: the same civil hours the LLM's plans keep. */
+export function scheduleHours(content: ContentPack, hours: number): number[] {
+  const latestEnd = Math.min(LATEST_END_HOUR, content.calendar.hoursPerDay)
+  return Array.from({ length: Math.max(0, latestEnd - hours - EARLIEST_HOUR + 1) }, (_, i) => EARLIEST_HOUR + i)
+}
+
+/** The days a plan can be made for: today and the fortnight after, as game time at their midnight, while the year lasts. */
+export function scheduleDays(content: ContentPack, state: GameState): number[] {
+  const { calendar } = content
+  const today = toDate(calendar, state.time).dayIndex
+  return Array.from({ length: SEARCH_DAYS + 1 }, (_, i) => (today + i) * calendar.hoursPerDay - calendar.start.hour).filter((midnight) => !isGameOver(calendar, Math.max(0, midnight)))
+}
+
+/**
+ * What comes of a plan he puts to them himself. When he and all of them are free then, and the place is open throughout,
+ * it is theirs as he asked it (no `clash`). Otherwise it is moved to the nearest time after it that does fit, and `clash`
+ * says what was in the way. With nothing in the next two weeks, `error` says so.
+ */
+export function schedulePlan(content: ContentPack, state: GameState, request: ScheduleRequest): { proposal: Proposal; clash?: string[] } | { error: string } {
+  const { calendar } = content
+  const location = content.locations.find((l) => l.id === request.locationId)
+  const [loveInterestId, ...companionIds] = request.loveInterestIds
+  if (!location || !loveInterestId) return { error: t('game.appointments.scheduleIncomplete') }
+  const latestEnd = Math.min(LATEST_END_HOUR, calendar.hoursPerDay)
+  const why = (time: number): string[] => {
+    const { hour } = toDate(calendar, time)
+    return [
+      ...(time <= state.time ? [t('game.appointments.past')] : []),
+      ...(hour < EARLIEST_HOUR || hour + request.hours > latestEnd ? [t('game.appointments.lateHour')] : []),
+      ...(isOpen(location, hour) && isOpen(location, hour + request.hours - 1) ? [] : [t('game.appointments.closed', { place: location.name })]),
+      ...busyWith(content, state, request.loveInterestIds, time, request.hours)
+    ]
+  }
+  const plan = (time: number): Proposal => ({ loveInterestId, companionIds: companionIds.slice(0, MAX_SCENE_CAST - 1), title: request.title.trim() || t('game.appointments.meetUp'), time, hours: request.hours, locationId: location.id })
+  const clash = why(request.time)
+  if (clash.length === 0) return { proposal: plan(request.time) }
+  for (let time = Math.max(request.time, state.time) + 1; time <= state.time + SEARCH_DAYS * calendar.hoursPerDay; time++) {
+    if (isGameOver(calendar, time)) break
+    if (why(time).length === 0) return { proposal: plan(time), clash }
+  }
+  return { error: t('game.appointments.scheduleNoTime', { place: location.name }) }
+}
+
 /** Puts an accepted proposal on the calendar. */
 export function acceptProposal(state: GameState, proposal: Proposal): GameState {
   let n = 1

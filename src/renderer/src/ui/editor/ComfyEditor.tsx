@@ -8,6 +8,8 @@ import { EditorFoot } from './fields'
 interface Props {
   /** The rail of the editor's sides, which asks this one whether it may be left. */
   switcher: (mayLeave: () => boolean) => ReactNode
+  /** Sex-acts added in the editor, which have clip prompts beside the standard ones. */
+  acts: readonly { id: string; name: string }[]
 }
 
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
@@ -16,7 +18,7 @@ const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
  * The editor's ComfyUI side: how the art tool draws. Like every other side it keeps a draft, and nothing is kept
  * until it is saved. With the game's own files being edited, what is said of the workflows is saved into the game.
  */
-export function ComfyEditor({ switcher }: Props) {
+export function ComfyEditor({ switcher, acts }: Props) {
   const [original, setOriginal] = useState<ComfySettings | null>(null)
   const [draft, setDraft] = useState<ComfySettings | null>(null)
   const [list, setList] = useState<WorkflowListResult | null>(null)
@@ -80,7 +82,7 @@ export function ComfyEditor({ switcher }: Props) {
           </div>
         </div>
         {draft ? (
-          <ComfySetup key={round} settings={draft} list={list} onSave={async (next) => (setDraft(next), setStatus(''))} />
+          <ComfySetup key={round} settings={draft} list={list} acts={acts} onSave={async (next) => (setDraft(next), setStatus(''))} />
         ) : (
           <p className="hint">{t('comfy.setup.loading')}</p>
         )}

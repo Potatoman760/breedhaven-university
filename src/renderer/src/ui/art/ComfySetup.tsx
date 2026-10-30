@@ -40,6 +40,8 @@ interface Props {
    * is the editor's, and is left out.
    */
   connectionOnly?: boolean
+  /** Sex-acts added in the editor: each has a clip prompt of its own beside the standard ones'. */
+  acts?: readonly { id: string; name: string }[]
 }
 
 const AUTO = '__auto__'
@@ -53,7 +55,7 @@ const kindsOf = (workflow: WorkflowSummary): readonly WorkflowKind[] => (workflo
  * has to be running and have what they call for, and each workflow has to have somewhere to
  * put a prompt. Each has its own answer here.
  */
-export function ComfySetup({ settings, list, onSave, connectionOnly }: Props) {
+export function ComfySetup({ settings, list, onSave, connectionOnly, acts = [] }: Props) {
   // Typed fields are held here and saved when left, so a half-typed address is not refused on every key.
   const [url, setUrl] = useState(settings.baseUrl)
   const [timeout, setTimeoutSeconds] = useState(String(settings.timeoutSeconds))
@@ -175,7 +177,7 @@ export function ComfySetup({ settings, list, onSave, connectionOnly }: Props) {
         <div className="editor-group">
           <h2>{t('comfy.setup.videoClips')}</h2>
           <p className="hint">{t('comfy.setup.videoClipsHint')}</p>
-          {NSFW_POSES.map((pose) => (
+          {[...NSFW_POSES, ...acts].map((pose) => (
             <VideoPromptRow key={pose.id} pose={pose} settings={settings} onChange={(prompt) => patch({ videoPrompts: { ...settings.videoPrompts, [pose.id]: prompt } })} />
           ))}
         </div>

@@ -1,6 +1,6 @@
 {
   "name": "breedhaven-dating-sim",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "An AI-driven dating sim built on Electron",
   "private": true,
   "license": "GPL-3.0-only",

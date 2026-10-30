@@ -12,7 +12,7 @@ import {
   type GenerateArtResult,
   type WorkflowListResult
 } from '../../../../shared/comfy'
-import { isPregnantPose, EXPRESSIONS, type Location, type LoveInterest, type Npc } from '../../../../shared/model'
+import { isPregnantPose, EXPRESSIONS, type CustomExpression, type Location, type LoveInterest, type Npc } from '../../../../shared/model'
 import { t, type MessageKey } from '../../../../shared/i18n'
 import { errorMessage } from '../../errors'
 import { Overlay } from '../Dialog'
@@ -31,6 +31,8 @@ export type ArtTarget =
       /** The outfit and expression it is opened on. Both can be changed in the tool. */
       outfitId: string
       expression: string
+      /** Faces added in the editor, offered beside the standard ones and drawn in their own words. */
+      faces?: readonly CustomExpression[]
       onUse: (outfitId: string, expression: string, path: string) => void | Promise<void>
     }
   | {
@@ -202,7 +204,7 @@ function Generate({ target, settings, list }: GenerateProps) {
   /** The prompt as the content would have it, for what is picked. */
   const written = (): string => {
     const framing = framingFor(settings, kind)
-    if (target.kind === 'sprite') return spritePrompt(target.who, outfitId, expression, framing)
+    if (target.kind === 'sprite') return spritePrompt(target.who, outfitId, expression, framing, target.faces?.find((face) => face.id === expression)?.draws)
     if (target.kind === 'background') return backgroundPrompt(target.location, view, period, framing)
     // A pose drawn pregnant is the same pose, with her pregnant nude in place of her nude.
     if (target.kind === 'birth') return birthPrompt(target.who, framing)
@@ -307,7 +309,7 @@ function Generate({ target, settings, list }: GenerateProps) {
               {t('comfy.art.expression')}
               <input list="art-expressions" value={expression} placeholder="neutral" onChange={(e) => (setExpression(e.target.value), setEdited(false))} />
               <datalist id="art-expressions">
-                {EXPRESSIONS.map((e) => (
+                {[...EXPRESSIONS, ...(target.kind === 'sprite' ? (target.faces ?? []).map((face) => face.id) : [])].map((e) => (
                   <option key={e} value={e} />
                 ))}
               </datalist>

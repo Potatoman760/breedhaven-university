@@ -4,18 +4,19 @@ import { dirname, extname, join, resolve, sep } from 'node:path'
 import { z } from 'zod'
 import { chatCompletion, listModels } from './ai/openai'
 import { completeWithFallback, notConfigured } from './ai/router'
-import { leavers, lookLines, namesHer, parseDirectives, sceneCast, sceneWitnesses, validLook, whoSpoke } from '../shared/game/scene'
+import { firstNames, firstToSpeak, leavers, lookLines, namesHer, parseDirectives, sceneCast, sceneWitnesses, validLook, whoSpoke } from '../shared/game/scene'
 import { canSleepOver } from '../shared/game/sleep'
 import { sexGate } from '../shared/game/intimacy'
 import { sceneRelicUses } from '../shared/game/relics'
 import { CONTENT_SCHEME, resolveContentPath, serveContent } from './content/assets'
 import { deleteLoveInterest,
   removeUnusedAssets,
+  deleteLook, saveLook,
   deleteTrait, deleteJob, saveJob, deleteSociety, saveSociety, importAsset, loadBase, loadWithAddons, rebuildCatalogue, saveCatalogue, saveMajor, deleteMajor, saveLocation, deleteLocation, saveLoveInterest, saveTrait,
   resetPlayer,
   savePlayer
 } from './content/addons'
-import { isSafeId, type EditorInfo, type EditorResult } from '../shared/editor'
+import { LOOK_KINDS, isSafeId, type EditorInfo, type EditorResult } from '../shared/editor'
 import { SaveStore } from './saves/store'
 import { SettingsStore, type KeyCipher } from './settings/store'
 import { RenameSaveRequestSchema, SaveRequestSchema, SlotIdSchema } from '../shared/saves'
@@ -380,6 +381,11 @@ function registerIpc(
   ipcMain.handle(IPC.editorDeleteTrait, (_event, raw: unknown) =>
     change(() => deleteTrait(info.addonDir, content, baseTraitIds(), z.string().parse(raw)))
   )
+  ipcMain.handle(IPC.editorSaveLook, (_event, raw: unknown) => change(() => saveLook(info.addonDir, content, raw)))
+  ipcMain.handle(IPC.editorDeleteLook, (_event, raw: unknown) => {
+    const { kind, id } = z.object({ kind: z.enum(LOOK_KINDS), id: z.string() }).parse(raw)
+    return change(() => deleteLook(info.addonDir, content, kind, id))
+  })
   ipcMain.handle(IPC.editorSaveLocation, (_event, raw: unknown) => change(() => saveLocation(info.addonDir, content, raw, info.base)))
   ipcMain.handle(IPC.editorDeleteLocation, (_event, raw: unknown) => change(() => deleteLocation(info.addonDir, z.string().parse(raw))))
   // Jobs and societies are the game's own: there to be changed only when it is run from source.
@@ -597,9 +603,12 @@ function registerIpc(
     const npc = scene.npc ? npcOf(content, scene.loveInterestId) : undefined
     // At a masked ball she is herself in her mask's gown, with its sex-acts for her own.
     const cast = npc ? withNpc(content, npc.id) : inMasks(content, scene, false)
+    // In a group, who answers first this time: told beside his line, and first in every list of them. In a class the teacher leads.
+    const firstSpeakerId = npc || scene.lesson ? undefined : firstToSpeak(cast, scene)
     const systemPrompt = buildCharacterPrompt({
       content: cast,
       state,
+      firstSpeakerId,
       npc: npc && { role: npc.role, knowledge: npc.ai.knowledge },
       extras: sceneExtras(content, state, scene),
       backgroundId: scene.backgroundId,
@@ -657,7 +666,12 @@ function registerIpc(
       system: systemPrompt,
       signal: stop.signal,
       // With nothing said yet, the character opens the scene.
-      messages: sceneTurns(scene.messages, state.player.name, scene.lesson, clockNote(content, state)),
+      messages: sceneTurns(
+        scene.messages,
+        state.player.name,
+        scene.lesson,
+        [clockNote(content, state), firstSpeakerId && t('scene.prompt.firstSpeaker', { name: firstNames(cast, [firstSpeakerId]) })].filter(Boolean).join(' ')
+      ),
       // The lecture a class opens with is several times the length of an ordinary reply.
       ...(scene.lesson && scene.messages.length === 0 ? { maxTokens: Math.max(settings.get().main.maxTokens, LESSON_MIN_TOKENS) } : {}),
       // An NPC makes no plans and no promises with the player.
@@ -744,7 +758,7 @@ function registerIpc(
     const showing = poser !== undefined && !npc && pregnancyStage(content, state, poser.id)?.showing === true
     const shown = (showing && pose && poser?.animations.find((a) => a.id === pregnantPoseId(pose.id) && drawn(a))) || pose
     // A moment is shown once: asked for again in the very next reply, it is not put up a second time.
-    const again = pose !== undefined && shown !== undefined && isMoment(basePoseId(pose.id)) && scene.animationId === shown.id && (scene.animationOf ?? scene.loveInterestId) === poser?.id
+    const again = pose !== undefined && shown !== undefined && isMoment(basePoseId(pose.id), content.looks.acts) && scene.animationId === shown.id && (scene.animationOf ?? scene.loveInterestId) === poser?.id
     const posed = look.animationId === null ? { animationId: null } : pose && shown && poser && !npc && !again && willing(poser.id) ? { animationId: shown.id, animationOf: poser.id } : {}
     return {
       message: { role: 'assistant', content: text || '...', tags: lookLines(reply) || undefined },
@@ -757,7 +771,7 @@ function registerIpc(
       bondProposal,
       // A pose that shows him finishing inside her says what the tag says, whether or not the tag was written. The game still decides what comes of it.
       offControlIds: npc ? [] : [...new Set(stopsControl.map(idOf).filter((id): id is string => id !== undefined))],
-      seededIds: npc ? [] : [...new Set([...seededIds, ...(pose && poser && isSeeding(basePoseId(pose.id)) && willing(poser.id) ? [poser.id] : [])])],
+      seededIds: npc ? [] : [...new Set([...seededIds, ...(pose && poser && isSeeding(basePoseId(pose.id), content.looks.acts) && willing(poser.id) ? [poser.id] : [])])],
       rolls,
       // Setting off for his class or plan is the going: the scene is not also taken somewhere.
       moveTo: walkTo || sleptOver ? undefined : movedTo,

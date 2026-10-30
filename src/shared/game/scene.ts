@@ -322,6 +322,34 @@ export function whoSpoke(reply: string, cast: Pick<LoveInterest, 'id' | 'name'>[
   return [...new Set(dialogueLines(reply, cast).flatMap((line) => line.speakerId ?? []))]
 }
 
+// One line in so many of his is left with nobody named to answer first, for the LLM to give to whoever would.
+const UNLED_EVERY = 4
+
+/**
+ * Who of a group answers his line first, so that they do not fall into one order and keep to it: one he names in it,
+ * and otherwise whoever has gone longest without leading a reply. Now and then, unless he named someone, nobody: the
+ * LLM chooses. Nobody either outside a group, or once only one is left in it.
+ */
+export function firstToSpeak(content: Pick<ContentPack, 'loveInterests'>, scene: Pick<Scene, 'loveInterestId' | 'companionIds' | 'departed' | 'messages'>): string | undefined {
+  const gone = new Set(scene.departed.map((d) => d.id))
+  const cast = sceneCast(scene)
+    .filter((id) => !gone.has(id))
+    .flatMap((id) => content.loveInterests.filter((li) => li.id === id))
+  if (cast.length < 2) return undefined
+  const said = scene.messages.at(-1)?.role === 'user' ? plainName(scene.messages.at(-1)!.content) : ''
+  // Named anywhere in his line, as a word of its own: the one named first.
+  const at = (li: LoveInterest) => {
+    const name = plainName(li.name.split(' ')[0]).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    return new RegExp(`(^|[^\\p{L}])${name}($|[^\\p{L}])`, 'u').exec(said)?.index ?? -1
+  }
+  const named = cast.filter((li) => at(li) >= 0).sort((a, b) => at(a) - at(b))[0]
+  if (named) return named.id
+  if (scene.messages.filter((m) => m.role === 'user').length % UNLED_EVERY === 0) return undefined
+  // Whoever led each of her replies so far; one who never has comes first, and the cast's own order breaks a tie.
+  const led = scene.messages.filter((m) => m.role === 'assistant').map((m) => whoSpoke(m.content, cast)[0])
+  return [...cast].sort((a, b) => led.lastIndexOf(a.id) - led.lastIndexOf(b.id))[0].id
+}
+
 const NO_RELATIONSHIP = { affection: 0, trust: 0, desire: 0 }
 
 /** Recorded when a scene starts, before the activity that opens it takes effect. */

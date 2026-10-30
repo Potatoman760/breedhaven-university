@@ -491,6 +491,7 @@
   "app.stoppedControl": "{who} {count, plural, one {has} other {have}} stopped taking birth control.",
   "app.planAdded": "{plan} with {who}: {when}. Added to your calendar.",
   "app.goodbyeLine": "Gotta go, goodbye!",
+  "app.scheduleLine": "How about {title} at {place}, {when}?",
   "app.photoTaking": "Taking a picture…",
   "app.photoPosted": "Posted to Bloomr: {text}",
   "app.photoFailed": "The picture could not be taken. {error}",

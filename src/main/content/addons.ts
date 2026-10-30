@@ -6,7 +6,11 @@ import {
   CurriculumSchema,
   DEFAULT_VIEW,
   LocationSchema,
+  LooksSchema,
+  CustomActSchema,
+  CustomExpressionSchema,
   LoveInterestSchema,
+  pregnantPoseId,
   MAJOR_COURSES,
   MajorSchema,
   NewGameSchema,
@@ -24,10 +28,11 @@ import {
   type Curriculum,
   type Location,
   type LoveInterest,
+  type Looks,
   type Major,
   type Trait
 } from '../../shared/model'
-import { ADDON_PREFIX, isSafeId, type ContentOrigin, type EditorInfo } from '../../shared/editor'
+import { ADDON_PREFIX, LOOK_KINDS, isSafeId, type ContentOrigin, type EditorInfo, type LookKind } from '../../shared/editor'
 import { readPack } from './loader'
 import { t } from '../../shared/i18n'
 import { catalogueBasis, catalogueIsStale, catalogueOf, writtenCatalogue } from '../../shared/game/catalogue'
@@ -36,6 +41,7 @@ const LOVE_INTERESTS = 'love-interests'
 const LOCATIONS = 'locations'
 const LOCATIONS_FILE = 'locations.json'
 const TRAITS_FILE = 'traits.json'
+const LOOKS_FILE = 'looks.json'
 const CATALOGUE_FILE = 'catalogue.json'
 const CURRICULUM_FILE = 'curriculum.json'
 const NEW_GAME_FILE = 'new-game.json'
@@ -78,6 +84,21 @@ function readAddonTraits(addonDir: string, issues: string[]): unknown[] {
     return []
   }
 }
+
+/** The faces and sex-acts of the add-on folder's `looks.json`, as raw JSON. One that can't be read is reported, not thrown. */
+function readAddonLooks(addonDir: string, issues: string[]): Record<LookKind, unknown[]> {
+  const path = join(addonDir, LOOKS_FILE)
+  if (!existsSync(path)) return { expressions: [], acts: [] }
+  try {
+    const raw = readJsonFile(path) as Partial<Record<LookKind, unknown>>
+    return { expressions: Array.isArray(raw.expressions) ? raw.expressions : [], acts: Array.isArray(raw.acts) ? raw.acts : [] }
+  } catch (error) {
+    issues.push(t('editor.addons.issue', { path: LOOKS_FILE, message: (error as Error).message }))
+    return { expressions: [], acts: [] }
+  }
+}
+
+const LOOK_SCHEMAS = { expressions: CustomExpressionSchema, acts: CustomActSchema }
 
 /** Lays add-on entries over the base ones: same id replaces, new id is added at the end. */
 function overlay<T extends WithId>(base: T[], added: T[]): T[] {
@@ -234,11 +255,34 @@ export function loadWithAddons(packDir: string, addonDir: string, languageDir?: 
     }
   }
 
+  // Faces and sex-acts added in the editor come before the characters, whose pictures are filed under them. Each is
+  // tried on its own: one that takes a standard one's id, say, is left out.
+  const parsedLooks = LooksSchema.safeParse((base as { looks?: unknown }).looks ?? {})
+  const baseLooks: Looks = parsedLooks.success ? parsedLooks.data : { expressions: [], acts: [] }
+  const addonLooks = readAddonLooks(addonDir, issues)
+  const acceptedLooks: Looks = { expressions: [], acts: [] }
+  const looksOf = (added: Looks): Looks => ({ expressions: overlay(baseLooks.expressions, added.expressions), acts: overlay(baseLooks.acts, added.acts) })
+  for (const kind of LOOK_KINDS) {
+    for (const raw of addonLooks[kind]) {
+      const parsed = LOOK_SCHEMAS[kind].safeParse(raw)
+      try {
+        if (!parsed.success) throw new Error(parsed.error.issues[0]?.message)
+        const tried = { ...acceptedLooks, [kind]: [...acceptedLooks[kind], parsed.data] } as Looks
+        validateContentPack({ ...base, looks: looksOf(tried) })
+        ;(acceptedLooks[kind] as unknown[]).push(parsed.data)
+      } catch (error) {
+        const id = (raw as Partial<WithId> | null)?.id
+        issues.push(t('editor.addons.lookLeftOut', { file: LOOKS_FILE, id: typeof id === 'string' ? id : '?', message: (error as Error).message }))
+      }
+    }
+  }
+
   // Each character, love interest or NPC, is tried on its own against everything accepted so far.
   const accepted: LoveInterest[] = []
   const pack = (loveInterests: unknown[]) => ({
     ...base,
     ...curriculumOf(acceptedMajors),
+    looks: looksOf(acceptedLooks),
     locations: overlay(baseLocations, acceptedLocations),
     traits: overlay(baseTraits, traits),
     loveInterests: overlay(baseLoveInterests, loveInterests as LoveInterest[])
@@ -286,7 +330,7 @@ export function loadWithAddons(packDir: string, addonDir: string, languageDir?: 
   } catch (error) {
     // The add-on traits broke something in the base pack (a trait a character uses, say). Go without add-ons.
     issues.push(t('editor.addons.allLeftOut', { message: (error as Error).message }))
-    return { content: validateContentPack(base), info: { addonDir, issues, loveInterests: origins(baseLoveInterests, []), traits: origins(baseTraits, []), locations: origins(baseLocations, []), majors: origins(baseMajors, []), playerChanged: false, base: false, assetPrefix: ADDON_PREFIX } }
+    return { content: validateContentPack(base), info: { addonDir, issues, loveInterests: origins(baseLoveInterests, []), traits: origins(baseTraits, []), locations: origins(baseLocations, []), majors: origins(baseMajors, []), looks: { expressions: origins(baseLooks.expressions, []), acts: origins(baseLooks.acts, []) }, playerChanged: false, base: false, assetPrefix: ADDON_PREFIX } }
   }
   return {
     content,
@@ -297,6 +341,7 @@ export function loadWithAddons(packDir: string, addonDir: string, languageDir?: 
       traits: origins(baseTraits, traits),
       locations: origins(baseLocations, acceptedLocations),
       majors: origins(baseMajors, acceptedMajors.map((major) => ({ id: major.code }))),
+      looks: { expressions: origins(baseLooks.expressions, acceptedLooks.expressions), acts: origins(baseLooks.acts, acceptedLooks.acts) },
       playerChanged,
       base: false,
       assetPrefix: ADDON_PREFIX
@@ -325,6 +370,7 @@ export function loadBase(packDir: string, languageDir?: string): LoadedContent {
       locations: all(raw.locations, 'base'),
       // Every subject is the game's own to change here, as every character is.
       majors: all((content.curriculum?.majors ?? []).map((major) => ({ id: major.code })), 'addon'),
+      looks: { expressions: all(content.looks.expressions, 'addon'), acts: all(content.looks.acts, 'addon') },
       playerChanged: false,
       base: true,
       assetPrefix: ''
@@ -613,6 +659,50 @@ export function deleteTrait(addonDir: string, content: ContentPack, baseTraitIds
     if (users.length > 0) return [t('editor.addons.traitInUse', { names: users.join(', '), count: users.length })]
   }
   writeTraits(addonDir, mine.filter((trait) => trait.id !== id))
+  return []
+}
+
+function writeLooks(addonDir: string, looks: Record<LookKind, unknown[]>): void {
+  mkdirSync(addonDir, { recursive: true })
+  writeFileSync(join(addonDir, LOOKS_FILE), `${JSON.stringify(looks, null, 2)}\n`)
+}
+
+/**
+ * Adds a face or a sex-act to those added in the editor, or changes one, after checking the game would still load with
+ * it. Every character has a slot for it from then on.
+ */
+export function saveLook(addonDir: string, content: ContentPack, raw: unknown): string[] {
+  const parsed = z.discriminatedUnion('kind', [
+    z.object({ kind: z.literal('expressions'), look: CustomExpressionSchema }),
+    z.object({ kind: z.literal('acts'), look: CustomActSchema })
+  ]).safeParse(raw)
+  if (!parsed.success) return parsed.error.issues.map((issue) => t('editor.addons.issue', { path: issue.path.join('.') || t('editor.addons.whatLook'), message: issue.message }))
+  const { kind, look } = parsed.data
+  if (!isSafeId(look.id)) return [t('editor.addons.badId')]
+  if (look.name.trim() === '') return [t('editor.addons.nameNeeded')]
+  try {
+    validateContentPack({ ...content, looks: { ...content.looks, [kind]: overlay<WithId>(content.looks[kind], [look]) } })
+  } catch (error) {
+    return (error as { issues?: string[] }).issues ?? [(error as Error).message]
+  }
+  const mine = readAddonLooks(addonDir, [])
+  writeLooks(addonDir, { ...mine, [kind]: overlay(mine[kind] as WithId[], [look]) })
+  return []
+}
+
+/**
+ * Takes away a face or a sex-act added in the editor. Not while any character has a picture filed under it: that
+ * picture would be left in no slot.
+ */
+export function deleteLook(addonDir: string, content: ContentPack, kind: LookKind, id: string): string[] {
+  const mine = readAddonLooks(addonDir, [])
+  if (!(mine[kind] as Partial<WithId>[]).some((look) => look?.id === id)) return [t('editor.addons.lookNotAddon')]
+  const everyone = [...content.loveInterests, ...content.npcs]
+  const users = everyone.filter((who) =>
+    kind === 'expressions' ? who.outfits.some((outfit) => id in outfit.sprites) : who.animations.some((pose) => (pose.id === id || pose.id === pregnantPoseId(id)) && poseMedia(pose).length > 0)
+  )
+  if (users.length > 0) return [t('editor.addons.lookInUse', { names: users.map((who) => who.name.split(' ')[0]).join(', '), count: users.length })]
+  writeLooks(addonDir, { ...mine, [kind]: (mine[kind] as Partial<WithId>[]).filter((look) => look?.id !== id) })
   return []
 }
 

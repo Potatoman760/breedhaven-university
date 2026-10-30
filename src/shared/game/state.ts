@@ -66,6 +66,7 @@ export function createInitialState(
     feedPlans: [],
     feedSeen: -1,
     dramaDay: -1,
+    dayOutfits: { day: -1, worn: {} },
     events: [],
     housing: HousingStateSchema.parse({}),
     expedition: ExpeditionStateSchema.parse({})

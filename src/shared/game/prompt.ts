@@ -1,4 +1,4 @@
-import { MEMORY_LEVEL_LABELS, picturedOutfit, EXPRESSIONS, isPregnantPose, poseDescription, poseMedia, kindOf, classYear, outfitDescription, type ChatMessage, type ContentPack, type LoveInterest, type Departure, type GameState, type Lesson, type Npc, type Proposal, type Scene, type SceneBeat, type SceneGift, type ScenePresent, type RelicUse } from '../model'
+import { MEMORY_LEVEL_LABELS, picturedOutfit, EXPRESSIONS, isPregnantPose, poseDescription, poseMedia, kindOf, classYear, outfitDescription, type ChatMessage, type ContentPack, type LoveInterest, type Outfit, type Departure, type GameState, type Lesson, type Npc, type Proposal, type Scene, type SceneBeat, type SceneGift, type ScenePresent, type RelicUse } from '../model'
 import { describeGift } from './market'
 import { examNotes } from './exams'
 import { attendees, describeWhen, upcomingAppointments } from './appointments'
@@ -125,6 +125,8 @@ export interface PromptInput {
   strangers?: string[]
   /** A plan a character has suggested in this scene that the player has not yet put in his calendar. */
   pendingProposal?: Proposal
+  /** In a group, who answers first this time (`firstToSpeak`): the lists of them begin with her. */
+  firstSpeakerId?: string
   /** How many of her memories she is told, as set in the settings. */
   memoryRecall?: number
   /** Recent conversation text, used to pick relevant codex entries. */
@@ -228,6 +230,10 @@ export function buildCharacterPrompt(input: PromptInput): string {
   const outfits = wearableOutfits(li)
   const wearing = (c: LoveInterest, worn: ReturnType<typeof wornOutfit>): string => (worn ? ordinaryOutfit(c, worn).id : c.defaultOutfitId)
   const cast = [li, ...companions]
+  // The same, from whoever answers first this time: what they are listed in is the order they answer in, and a list that
+  // always runs the same way keeps them to one.
+  const lead = cast.find((c) => c.id === input.firstSpeakerId)
+  const voices = lead ? [lead, ...cast.filter((c) => c !== lead)] : cast
   const fertile = cast.filter((c) => canConceive(content, state, c.id) && sexGate(content, state, c, input.uninhibited?.includes(c.id)).open)
   // Only a pose with something to show can be asked for.
   // The poses that can be asked for are the ordinary ones. One drawn pregnant is put up in its place by the game, once she shows.
@@ -235,6 +241,13 @@ export function buildCharacterPrompt(input: PromptInput): string {
   // A woman who will not go to bed with him in this scene is told nothing of sex-acts: there is none for her to choose.
   const actsOf = (c: LoveInterest) => (isNpc || sexGate(content, state, c, input.uninhibited?.includes(c.id)).open ? posesOf(c) : [])
   const animations = actsOf(li)
+  // An outfit's pictures beyond the standard faces, each with what it shows: a face added in the editor says so itself
+  // unless the picture does. One that says nothing is not offered.
+  const ownFaces = (outfit: Outfit): [string, string][] =>
+    Object.entries(outfit.sprites).flatMap(([name, sprite]): [string, string][] => {
+      const description = sprite.description || content.looks.expressions.find((face) => face.id === name)?.description || ''
+      return (EXPRESSIONS as readonly string[]).includes(name) || description === '' ? [] : [[name, description]]
+    })
   // Her own traits, and any every woman has from a relic he has on.
   const fromRelics = isNpc ? [] : relicTraitIds(content, state)
   const traitsOf = (ids: string[]) => content.traits.filter((t) => ids.includes(t.id) || fromRelics.includes(t.id))
@@ -297,7 +310,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
         : t('scene.prompt.reply.words', { lineWords: LINE_WORDS, words: REPLY_WORDS }),
       input.lesson && t('scene.prompt.reply.speaker', { speaker: input.lesson.speaker }),
       input.lesson && t('scene.prompt.reply.noCalling', { speaker: input.lesson.speaker, player: player.name }),
-      named ? t('scene.prompt.reply.named', { firstName }) : t('scene.prompt.reply.plain'),
+      named ? t('scene.prompt.reply.named', { firstName: voices[0].name.split(' ')[0] }) : t('scene.prompt.reply.plain'),
       group && t('scene.prompt.reply.group', { others }),
       lecture
         ? t('scene.prompt.reply.lectureNarration')
@@ -531,18 +544,24 @@ export function buildCharacterPrompt(input: PromptInput): string {
       !isNpc &&
       section(t('scene.prompt.appear.title'), [
         group
-          ? t('scene.prompt.appear.beginGroup', { tags: cast.map((c) => `[EXPRESSION: ${c.name.split(' ')[0]}=happy]`).join(' ') })
+          ? t('scene.prompt.appear.beginGroup', { tags: voices.map((c) => `[EXPRESSION: ${c.name.split(' ')[0]}=happy]`).join(' ') })
           : t('scene.prompt.appear.begin', { tag: '[EXPRESSION: happy]' }),
         t('scene.prompt.appear.faces', { faces: EXPRESSIONS.join(', '), group }),
         ...(group
           ? [
               t('scene.prompt.appear.outfitGroup', { tag: '[OUTFIT: Name=id]' }),
-              ...cast.map((c) => {
+              ...voices.map((c) => {
                 const worn = wornOutfit(content, state, c, c.id === li.id ? look.outfitId : input.looks?.[c.id]?.outfitId)
                 const has = wearableOutfits(c).map((o) => `${o.id} (${o.name})`).join(', ')
                 const first = c.name.split(' ')[0]
                 const note = pregnantNote(c, first)
                 return t('scene.prompt.appear.wearingGroup', { first, outfit: wearing(c, worn), has, showing: note !== false, note: note || undefined })
+              }),
+              // Faces of their own, beyond the standard ones, as the outfit each has on has pictures for.
+              ...voices.flatMap((c) => {
+                const worn = wornOutfit(content, state, c, c.id === li.id ? look.outfitId : input.looks?.[c.id]?.outfitId)
+                const faces = worn ? ownFaces(picturedOutfit(c.outfits, worn)).map(([name, description]) => `${name} (${description})`) : []
+                return faces.length > 0 ? [t('scene.prompt.appear.facesGroup', { first: c.name.split(' ')[0], faces: faces.join('; ') })] : []
               }),
               // Poses belong to one of them each, and one is shown at a time, over everyone.
               ...(cast.some((c) => actsOf(c).length > 0)
@@ -552,7 +571,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
                       pose: look.animationId,
                       first: cast.find((c) => c.id === (look.animationOf ?? li.id))?.name.split(' ')[0] ?? firstName
                     }),
-                    ...cast.filter((c) => actsOf(c).length > 0).map((c) => `- ${c.name.split(' ')[0]}: ${actsOf(c).map((a) => `${a.id} (${poseDescription(a) || a.name})`).join('; ')}`),
+                    ...cast.filter((c) => actsOf(c).length > 0).map((c) => `- ${c.name.split(' ')[0]}: ${actsOf(c).map((a) => `${a.id} (${poseDescription(a, content.looks.acts) || a.name})`).join('; ')}`),
                     t('scene.prompt.appear.actsGroupRules', { tag: '[SEX-ACT: Name=id]', bare: SEX_ACT_TAG, ...ONE_MOMENT })
                   ]
                 : [])
@@ -562,20 +581,20 @@ export function buildCharacterPrompt(input: PromptInput): string {
               t('scene.prompt.appear.wearing', { outfit: wearing(li, outfit), tag: '[OUTFIT: id]' }),
               ...outfits.flatMap((o) => {
                 // Pictures that are not one of the faces: something particular, to be asked for by name.
-                const others = Object.entries(picturedOutfit(li.outfits, o).sprites).filter(([name, sprite]) => !(EXPRESSIONS as readonly string[]).includes(name) && sprite.description)
+                const others = ownFaces(picturedOutfit(li.outfits, o))
                 return [
                   t('scene.prompt.appear.option', {
                     id: o.id,
                     name: o.name,
                     about: o.id === wearing(li, outfit) ? t('scene.prompt.appear.onNow') : outfitDescription(li.outfits, o) || t('scene.prompt.noDescription')
                   }),
-                  ...others.map(([name, sprite]) => t('scene.prompt.appear.picture', { tag: `[EXPRESSION: ${name}]`, description: sprite.description }))
+                  ...others.map(([name, description]) => t('scene.prompt.appear.picture', { tag: `[EXPRESSION: ${name}]`, description }))
                 ]
               }),
               ...(animations.length > 0
                 ? [
                     look.animationId ? t('scene.prompt.appear.actsUp', { pose: look.animationId }) : t('scene.prompt.appear.acts'),
-                    ...animations.map((a) => t('scene.prompt.appear.option', { id: a.id, name: a.name, about: poseDescription(a) || t('scene.prompt.noDescription') })),
+                    ...animations.map((a) => t('scene.prompt.appear.option', { id: a.id, name: a.name, about: poseDescription(a, content.looks.acts) || t('scene.prompt.noDescription') })),
                     t('scene.prompt.appear.actsRules', {
                       expression: EXPRESSION_TAG,
                       outfit: OUTFIT_TAG,
@@ -595,10 +614,10 @@ export function buildCharacterPrompt(input: PromptInput): string {
       !byCourier &&
       section(group ? t('scene.prompt.comfort.titleGroup') : t('scene.prompt.comfort.title'), [
         group
-          ? t('scene.prompt.comfort.lineGroup', { tags: cast.map((c) => `[COMFORT: ${c.name.split(' ')[0]}=4 ${t('scene.prompt.comfort.why')}]`).join(' ') })
+          ? t('scene.prompt.comfort.lineGroup', { tags: voices.map((c) => `[COMFORT: ${c.name.split(' ')[0]}=4 ${t('scene.prompt.comfort.why')}]`).join(' ') })
           : t('scene.prompt.comfort.line', { tag: `[COMFORT: 4 ${t('scene.prompt.comfort.why')}]` }),
         t('scene.prompt.comfort.scale', { group, player: player.name, floor: skillLevel(content, state, 'comfort') === 2 }),
-        ...cast.map((c) => {
+        ...voices.map((c) => {
           const said = input.comfort?.[c.id]
           const who = group ? c.name.split(' ')[0] : undefined
           const soon = classSoon(content, state, c.id, CLASS_SOON_HOURS)

@@ -223,6 +223,18 @@ courses, the player's start, locations, jobs, societies and ComfyUI.
   with `addons/` are served from there.
 - **Traits**: toggle a character's traits, and add, change or remove traits in the shared
   library. A trait someone still has can't be deleted.
+- **Expressions & acts** (`LooksEditor.tsx`, in both builds): faces and sex-acts added to the
+  standard ones, kept in `looks.json` (`content.looks`, `src/shared/model/looks.ts`): in
+  `content/default` from source, in the add-on folder otherwise, laid over the game's by id.
+  Each has a name, what it shows (told to the LLM) and an image prompt; a sex-act also has
+  ticks for a one-reply moment (`isMoment`) and counting as insemination (`isSeeding`), a
+  slot in the pregnant row as every standard one has, and a clip prompt beside the standard
+  ones in the ComfyUI side. Every character gets a slot for each in her Media tab (`facesOf`,
+  `posesOf`). The LLM is offered an added face only for a girl whose outfit has its picture,
+  in its own words unless the picture has some (`ownFaces` in `prompt.ts`; in a group, a line
+  per girl for the outfit she has on), and an added act only where she has its picture, as
+  any act. The standard ones are listed but locked, and an added one can't take a standard
+  id or start with `pregnant-`. One a character has a picture for can't be deleted.
 
 ## Languages
 
@@ -323,12 +335,29 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
     and what she makes of it is settled when the scene is over. Characters are told about plans already made.
     The tool's `with` argument brings up to two other love interests along; the slot then
     has to suit everyone, and all of them are at the meeting place when the time comes.
+  - **Schedule something**, in a scene's tool menu (`ScheduleDialog.tsx`), is the player's
+    own plan, made without the LLM calling anything: what, where, the day, the hour, how long,
+    and which of the love interests in the scene. `schedulePlan` in `appointments.ts` checks
+    it: when he and all of them are free, the place is open throughout and the hour is civil,
+    it is on offer at once, as if they had suggested it, and no LLM is asked. Otherwise the
+    nearest time after it that fits is found, his line ("How about...?") goes to them with
+    what was in the way and that time to agree to (`prompt.meeting.moved`), and that plan is
+    on offer with their answer whatever they say. Either way he accepts it as any other.
 - **Group scenes**: a scene has one lead love interest and up to two companions
   (`companionIds`, three in all, `MAX_SCENE_CAST`). The prompt is the lead's, with a short
   profile of each companion, and the LLM writes everyone's lines, starting each with the
   speaker's first name (`Tink: ...`). The text box puts that name on the nameplate, all
   sprites stand side by side and whoever isn't speaking is dimmed. In a group, everyone
   appears in their default outfit (no outfit, expression or animation tags).
+  - **Who answers first**: left to itself the LLM keeps them in one order. For each of his
+    lines the game picks who answers first (`firstToSpeak` in `src/shared/game/scene.ts`):
+    whoever he names in it, the first he names, and otherwise whoever has gone longest
+    without leading a reply (read off the first speaker of each, `whoSpoke`); one line in
+    four (`UNLED_EVERY`) names nobody, unless he named someone. She is told beside his line
+    ("Bea answers first this time.", with the clock note, not kept in the history), and
+    every list of them in the prompt begins with her (`firstSpeakerId`): the face and
+    comfort tags, the outfit lines and the example line. Not in a class, where the teacher
+    leads, nor with an NPC.
   - **Where they come from**: a shared activity is done with everyone picked in the day
     view's "Here" row. By default that is everyone at the location, up to three; click a
     name to leave them out or bring them along. The first picked leads. Attending a class
@@ -1013,7 +1042,15 @@ each secret is told (`revealWhen`, the same conditions an activity's requirement
 the Media tab an outfit can be her usual one, worn only where an event puts her in it
 (`oneOff`), or named for an event's outfit ("Worn for", from `eventOutfits` in
 `src/shared/game/events.ts`), and "Add a bathrobe for the trip" adds the bathrobe and its
-pregnant form the springs trip starts her in. Her room has a picture by day and one by
+pregnant form the springs trip starts her in. An outfit ticked **Day outfit** (`day`) lasts
+the day; any other (nude, the bathrobe) lasts only the scene, and her usual clothes always
+last the day. As each day begins everyone is dressed (`dressForDay` in
+`src/shared/game/pregnancy.ts`, an idle effect in `App.tsx`): in the outfit named for an
+event that day if she has one, otherwise one of her day outfits drawn at random (the same for
+the same day of the same game), kept in the save as `dayOutfits` until the next day. A day
+outfit she changes into in a scene she keeps on after it (`keepDayOutfits`, as the scene is
+summed up); one for the scene alone comes off with it. Everything that shows her outside a
+scene goes through `wornOutfit`, which reads this. Her room has a picture by day and one by
 night (`room.images`; either shows when the other is missing), or uses a view of the
 place it is in (`room.viewId`). Everyone is saved to the add-on folder as
 `love-interests/<id>.json`; one with a built-in character's id takes that character's
@@ -1116,7 +1153,7 @@ gone to as an outing. Two things make one more than that:
   there while the event is on, by day and by night (`backgroundFor`). Its `description` tells the characters what the
   place looks like dressed. The Commons has one for the Feast of First Frost (`first-frost`).
 - **Dressed people.** A character with an outfit whose `id` is the event's id wears it from morning to night while it
-  is on (`wornOutfit`), unless a scene has put her in something else. Dorrit has one for First Frost. A cutscene can
+  is on (`dressForDay`), unless a scene has put her in a day outfit since. Dorrit has one for First Frost. A cutscene can
   also name its speaker's outfit (`outfitId`), and change anyone's as it goes: a line `[OUTFIT: Tamsin=nude]` or
   `[EXPRESSION: Maren=aroused]` (no name: the speaker's) is not read, and changes her from the next line on
   (`cutsceneBeats` in `src/shared/game/cutscene.ts`). A society's night hands the scene after it the looks it left

@@ -153,11 +153,22 @@ describe('the hidden lines as the LLM really writes them', () => {
 
   it('knows which pose is him finishing inside her, and counts as the tag for it', () => {
     expect(isSeeding('creampie')).toBe(true)
-    expect(['facial', 'blowjob', 'missionary', 'doggy', 'cowgirl', 'her-own'].some(isSeeding)).toBe(false)
+    expect(['facial', 'blowjob', 'missionary', 'doggy', 'cowgirl', 'her-own'].some((id) => isSeeding(id))).toBe(false)
   })
 
   it('knows which poses are a single moment', () => {
-    expect(['creampie', 'facial'].every(isMoment)).toBe(true)
-    expect(['blowjob', 'missionary', 'doggy', 'cowgirl', 'her-own'].some(isMoment)).toBe(false)
+    expect(['creampie', 'facial'].every((id) => isMoment(id))).toBe(true)
+    expect(['blowjob', 'missionary', 'doggy', 'cowgirl', 'her-own'].some((id) => isMoment(id))).toBe(false)
+  })
+
+  it('takes a sex-act added in the editor at its word for being a moment and for leaving her with child', () => {
+    const added = [
+      { id: 'breeding-press', description: '', moment: false, seeding: true },
+      { id: 'afterglow', description: '', moment: true, seeding: false }
+    ]
+    expect(isSeeding('breeding-press', added)).toBe(true)
+    expect(isMoment('breeding-press', added)).toBe(false)
+    expect(isMoment('afterglow', added)).toBe(true)
+    expect(isSeeding('afterglow', added)).toBe(false)
   })
 })

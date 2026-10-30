@@ -1,7 +1,9 @@
 import { Button } from './Button'
 import { useConfirm } from './Confirm'
 import { useEffect, useMemo, useRef, useState, type FormEvent, type CSSProperties, type KeyboardEvent } from 'react'
-import { MAX_CHILD_NAME, COMFORT_WORDS, hasSkill, attendees, bondLifts, describeBond, describeWhen, statusOf, dialogueLines, firstNames, sceneCast, sceneClock, toDate, weatherOn, wornOutfit, lookOf, spriteFor, npcAsCharacter, UNNAMED, playerRoom, roomBackdrop, roomOwner, sceneExtras, sceneSuggestions, plain, type Suggestion } from '../../../shared/game'
+import { createPortal } from 'react-dom'
+import { MAX_CHILD_NAME, COMFORT_WORDS, hasSkill, attendees, bondLifts, describeBond, describeWhen, statusOf, dialogueLines, firstNames, sceneCast, sceneClock, toDate, weatherOn, wornOutfit, lookOf, spriteFor, npcAsCharacter, UNNAMED, playerRoom, roomBackdrop, roomOwner, sceneExtras, sceneSuggestions, plain, type ScheduleRequest, type Suggestion } from '../../../shared/game'
+import { ScheduleDialog } from './ScheduleDialog'
 import { Portrait } from './Portrait'
 import { PlanCompare } from './PlanCompare'
 import { basePoseId, poseMedia, type ContentPack, type GameState, type LoveInterest, type Scene } from '../../../shared/model'
@@ -70,6 +72,8 @@ interface Props {
   onPhoto: () => void
   /** A picture is being taken: another waits until it is done. */
   photoBusy: boolean
+  /** He puts a plan to those with him, worked out by the game and not left to the LLM. */
+  onSchedule: (request: ScheduleRequest) => void
 }
 
 interface ExitMenuProps {
@@ -80,35 +84,48 @@ interface ExitMenuProps {
   onExit: () => void
   onGoodbye: () => void
   onPhoto: () => void
+  /** Opens the plan he can put to them. Left out where there is nobody to make one with. */
+  onSchedule?: () => void
 }
 
 /** The way out of a scene, and the other things done on the way: a menu that opens upward from beside the text box. */
-function ExitMenu({ label, busy, photoBusy, onExit, onGoodbye, onPhoto }: ExitMenuProps) {
-  const [open, setOpen] = useState(false)
+function ExitMenu({ label, busy, photoBusy, onExit, onGoodbye, onPhoto, onSchedule }: ExitMenuProps) {
+  // Where it opens: its foot just above the button, its right edge on the button's. Nothing while it is shut.
+  const [at, setAt] = useState<{ right: number; bottom: number } | null>(null)
+  const open = at !== null
   const menu = useRef<HTMLSpanElement>(null)
-  // A press anywhere else, or Escape, shuts it.
+  const flyout = useRef<HTMLSpanElement>(null)
+  // A press anywhere else, Escape, or the window changing size shuts it.
   useEffect(() => {
     if (!open) return
-    const away = (event: MouseEvent) => !menu.current?.contains(event.target as Node) && setOpen(false)
-    const escape = (event: globalThis.KeyboardEvent) => event.key === 'Escape' && setOpen(false)
+    const away = (event: MouseEvent) => !menu.current?.contains(event.target as Node) && !flyout.current?.contains(event.target as Node) && setAt(null)
+    const escape = (event: globalThis.KeyboardEvent) => event.key === 'Escape' && setAt(null)
+    const shut = () => setAt(null)
     document.addEventListener('mousedown', away)
     document.addEventListener('keydown', escape)
+    window.addEventListener('resize', shut)
     return () => {
       document.removeEventListener('mousedown', away)
       document.removeEventListener('keydown', escape)
+      window.removeEventListener('resize', shut)
     }
   }, [open])
+  const toggle = () => {
+    const box = menu.current?.getBoundingClientRect()
+    setAt(open || !box ? null : { right: window.innerWidth - box.right, bottom: window.innerHeight - box.top + 8 })
+  }
   const pick = (action: () => void) => () => {
-    setOpen(false)
+    setAt(null)
     action()
   }
   return (
     <span className="exit-menu" ref={menu}>
-      <Button className="icon" disabled={busy} aria-haspopup="menu" aria-expanded={open} aria-label={t('screens.sceneView.more')} title={t('screens.sceneView.more')} onClick={() => setOpen(!open)}>
+      <Button className="icon" disabled={busy} aria-haspopup="menu" aria-expanded={open} aria-label={t('screens.sceneView.more')} title={t('screens.sceneView.more')} onClick={toggle}>
         <ToolIcon size={18} />
       </Button>
-      {open && (
-        <span className="exit-flyout glass" role="menu">
+      {/* Put on the page itself, over everything: inside the text box, which scrolls, it was cut off at the box's top. */}
+      {at && createPortal(
+        <span className="exit-flyout glass" role="menu" ref={flyout} style={{ right: at.right, bottom: at.bottom }}>
           <Button role="menuitem" variant="quiet" size="small" onClick={pick(onExit)}>
             {label}
           </Button>
@@ -118,7 +135,13 @@ function ExitMenu({ label, busy, photoBusy, onExit, onGoodbye, onPhoto }: ExitMe
           <Button role="menuitem" variant="quiet" size="small" disabled={photoBusy} onClick={pick(onPhoto)}>
             {photoBusy ? t('screens.sceneView.takingPicture') : t('screens.sceneView.takePicture')}
           </Button>
-        </span>
+          {onSchedule && (
+            <Button role="menuitem" variant="quiet" size="small" onClick={pick(onSchedule)}>
+              {t('screens.sceneView.schedule')}
+            </Button>
+          )}
+        </span>,
+        document.body
       )}
     </span>
   )
@@ -151,6 +174,10 @@ export function SceneView(props: Props) {
   // The child this scene is the birth of, which he may name while it lasts.
   const newborn = scene.newborn === undefined ? undefined : state.children.find((child) => child.motherId === scene.loveInterestId && child.bornAt === scene.newborn)
   const [childName, setChildName] = useState('')
+  // Whom a plan can be made with: the love interests in the scene, the lead first. Nobody, in a scene with an NPC.
+  const plannable = scene.npc ? [] : [scene.loveInterestId, ...scene.companionIds].filter((id) => content.loveInterests.some((li) => li.id === id))
+  // The plan he is putting to them, while it is open.
+  const [scheduling, setScheduling] = useState(false)
   // How comfortable each woman last said she was, for one who has learnt to read it.
   const reading = hasSkill(content, state, 'comfort')
     ? Object.entries(scene.comfort ?? {}).flatMap(([id, said]) => {
@@ -360,6 +387,18 @@ export function SceneView(props: Props) {
       }}
     >
       {confirming}
+      {scheduling && (
+        <ScheduleDialog
+          content={content}
+          state={state}
+          withIds={plannable}
+          onClose={() => setScheduling(false)}
+          onSchedule={(request) => {
+            setScheduling(false)
+            props.onSchedule(request)
+          }}
+        />
+      )}
       <Backdrop
         screen="scene"
         room={staged.room}
@@ -692,6 +731,7 @@ export function SceneView(props: Props) {
                     }
                     onGoodbye={props.onGoodbye}
                     onPhoto={props.onPhoto}
+                    onSchedule={plannable.length > 0 ? () => setScheduling(true) : undefined}
                   />
                 ) : (
                   // Any other conversation can be walked out of: the time is gone, and nothing between them changes. Not a
@@ -707,6 +747,7 @@ export function SceneView(props: Props) {
                       }
                       onGoodbye={props.onGoodbye}
                       onPhoto={props.onPhoto}
+                      onSchedule={plannable.length > 0 ? () => setScheduling(true) : undefined}
                     />
                   )
                 )}

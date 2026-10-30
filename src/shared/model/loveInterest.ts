@@ -90,6 +90,11 @@ export const OutfitSchema = z.object({
   pregnant: z.boolean().default(false),
   /** Worn only where the content puts her in it, as a cutscene of a society's night does: never offered to the LLM to choose. */
   oneOff: z.boolean().optional(),
+  /**
+   * Lasts the day: she may be dressed in it as a day begins, and one she changes into in a scene she keeps on after it.
+   * Any other is worn for the scene alone. Her usual clothes always last the day; a pregnant outfit goes by its parent.
+   */
+  day: z.boolean().optional(),
 });
 export type Outfit = z.infer<typeof OutfitSchema>;
 
@@ -219,12 +224,15 @@ export const NSFW_POSES = [
 // The poses that are what follows the act and not the act: each is a single moment.
 const MOMENTS: readonly string[] = ["creampie", "facial"];
 
+/** What the game needs to know of a sex-act added in the editor: see `CustomActSchema`. */
+type AddedAct = { id: string; description: string; moment: boolean; seeding: boolean };
+
 /**
  * Whether a pose is a moment: shown for the one reply it happens in, and never for the
- * next as well, however the LLM asks.
+ * next as well, however the LLM asks. One added in the editor is when it says so.
  */
-export function isMoment(poseId: string): boolean {
-  return MOMENTS.includes(poseId);
+export function isMoment(poseId: string, added: readonly AddedAct[] = []): boolean {
+  return MOMENTS.includes(poseId) || added.some((act) => act.id === poseId && act.moment);
 }
 
 // The poses that show him finishing inside her: choosing one says what the [SEEDED] tag says.
@@ -234,8 +242,8 @@ const SEEDING: readonly string[] = ["creampie"];
  * Whether a pose shows the moment that can leave her with child. Asking for one counts as
  * the [SEEDED] tag does, so that conception does not hang on the LLM remembering both.
  */
-export function isSeeding(poseId: string): boolean {
-  return SEEDING.includes(poseId);
+export function isSeeding(poseId: string, added: readonly AddedAct[] = []): boolean {
+  return SEEDING.includes(poseId) || added.some((act) => act.id === poseId && act.seeding);
 }
 
 // What a pose drawn pregnant is filed under: the pose it is built on, with this before it.
@@ -278,15 +286,16 @@ export function pregnantPoseId(poseId: string): string {
   return `${PREGNANT_POSE}${poseId}`;
 }
 
-/** What a pose shows, as the LLM is told it: her own words for it, or the standard ones. */
+/** What a pose shows, as the LLM is told it: her own words for it, or the standard ones, or those of one added in the editor. */
 export function poseDescription(
   pose: Pick<Animation, "id" | "description">,
+  added: readonly Pick<AddedAct, "id" | "description">[] = [],
 ): string {
   return (
     pose.description.trim() ||
     (NSFW_POSES.some((known) => known.id === pose.id)
       ? t(`game.pose.${pose.id as (typeof NSFW_POSES)[number]["id"]}`)
-      : "")
+      : (added.find((act) => act.id === pose.id)?.description.trim() ?? ""))
   );
 }
 

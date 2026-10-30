@@ -40,6 +40,8 @@ const OPTIONAL_FILES = {
   stalls: 'stalls.json',
   poker: 'poker.json',
   minigames: 'minigames.json',
+  // Faces and sex-acts added in the editor.
+  looks: 'looks.json',
   sounds: 'sounds.json',
   // What is said under the logo while a scene loads.
   tips: 'tips.json',
