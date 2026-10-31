@@ -6,6 +6,7 @@ import { MAX_CHILD_NAME, COMFORT_WORDS, hasSkill, attendees, bondLifts, describe
 import { ScheduleDialog } from './ScheduleDialog'
 import { Portrait } from './Portrait'
 import { PlanCompare } from './PlanCompare'
+import { RetryNotice } from './RetryNotice'
 import { basePoseId, poseMedia, type ContentPack, type GameState, type LoveInterest, type Scene } from '../../../shared/model'
 import { playSong, setPoseLoop, stopSong, useVolumes } from '../sound'
 import { LoadingScreen } from './LoadingScreen'
@@ -70,6 +71,8 @@ interface Props {
   onGoodbye: () => void
   /** He takes a picture of whoever is with him, for his own post on Bloomr. The scene goes on meanwhile. */
   onPhoto: () => void
+  /** Takes the picture again that the line under the scene says could not be taken. */
+  onRetryPhoto?: () => void
   /** A picture is being taken: another waits until it is done. */
   photoBusy: boolean
   /** He puts a plan to those with him, worked out by the game and not left to the LLM. */
@@ -618,7 +621,14 @@ export function SceneView(props: Props) {
                 {t('screens.sceneView.learned', { line })}
               </p>
             ))}
-            {props.agreed && <p className="agreed">{props.agreed}</p>}
+            {props.agreed &&
+              (props.onRetryPhoto ? (
+                <RetryNotice className="agreed" disabled={props.photoBusy} onRetry={props.onRetryPhoto}>
+                  {props.agreed}
+                </RetryNotice>
+              ) : (
+                <p className="agreed">{props.agreed}</p>
+              ))}
             {!more && !waiting && back === 0 && scene.bondProposal && (
               <div className="proposal">
                 <div>

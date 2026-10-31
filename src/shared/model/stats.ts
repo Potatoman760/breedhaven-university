@@ -32,6 +32,8 @@ export const CourierNoteSchema = z.object({
   /** In a group chat, which of them said it. */
   speakerId: z.string().optional(),
   text: z.string(),
+  /** A picture sent with it: a selfie he asked her for. Its path in the content. */
+  image: z.string().optional(),
   /** Game time (hours since start) at which it was sent. */
   time: z.number().int().min(0),
   /** A plan the love interest suggests in this note. */

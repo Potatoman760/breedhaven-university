@@ -223,6 +223,7 @@ import { LanternRelease, type LanternDate } from './ui/LanternRelease'
 import { TripMoment, type TripCompanion, type TripMomentKind } from './ui/TripMoment'
 import { MasqueradeGuess } from './ui/MasqueradeGuess'
 import { TripBooking } from './ui/TripBooking'
+import { Button } from './ui/Button'
 import { SummaryView, type SceneSummary } from './ui/SummaryView'
 
 // The content editor, where a player makes characters and subjects of his own: loaded only when it is opened.
@@ -339,6 +340,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   const [ended, setEnded] = useState(false)
   // A picture he is taking in a scene, being written and drawn.
   const [photoBusy, setPhotoBusy] = useState(false)
+  // What was said when the last picture failed: it can be taken again for as long as that is what is on screen.
+  const [photoFailure, setPhotoFailure] = useState('')
   // Where the scene is on its way to, while the reply that takes it there is still being written.
   const [movingTo, setMovingTo] = useState<string | null>(null)
   useEffect(() => window.api.onSceneMoving(setMovingTo), [])
@@ -388,11 +391,14 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   }, [arrival])
   useEffect(() => () => setAmbience(undefined), [])
   // Outside a scene, a notice is a toast too, since nothing else on the screen would be read: up for a while, and gone at a click.
+  // One that offers a retry stays until it is answered.
+  const [noticeRetry, setNoticeRetry] = useState<{ notice: string; run: () => void } | null>(null)
+  const canRetryNotice = noticeRetry !== null && noticeRetry.notice === notice
   useEffect(() => {
-    if (!notice || scene) return
+    if (!notice || scene || canRetryNotice) return
     const timer = window.setTimeout(() => setNotice(''), NOTICE_MS)
     return () => window.clearTimeout(timer)
-  }, [notice, scene])
+  }, [notice, scene, canRetryNotice])
   const [lastPrompt, setLastPrompt] = useState('')
   const [panel, setPanel] = useState<Panel | null>(null)
   // A relic just used in the scene, shown rising over it before the scene goes on.
@@ -559,6 +565,12 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         setDrawn((count) => count + 1)
       })
   }, [state.feedPlans, state.weatherSeed, over, drawn])
+  // Asked for from the feed: whatever is still planned is tried again now, without waiting for the next run of the game.
+  const retryFeed = useCallback(() => {
+    triedPlans.current.clear()
+    setFeedError(null)
+    setDrawn((count) => count + 1)
+  }, [])
   // In a scene with an NPC, the NPC stands among the characters for every screen that shows the scene.
   // At a masked ball the lead is in her mask, and goes by its name until he has named her. Whoever he is meeting for the
   // first time is "???" on screen until her name is said: `cast` keeps her name, for telling who speaks a line.
@@ -888,7 +900,9 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       const response = await window.api.planOuting({ state, text })
       setOuting(response.outing)
     } catch (error) {
-      setNotice(errorMessage(error))
+      const told = errorMessage(error)
+      setNotice(told)
+      setNoticeRetry({ notice: told, run: () => void propose(text) })
     } finally {
       setBusy(false)
     }
@@ -1349,6 +1363,12 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     void finishScene(said)
   }
 
+  function photoFailed(error: string) {
+    const told = t('shell.app.photoFailed', { error })
+    setAgreed(told)
+    setPhotoFailure(told)
+  }
+
   /**
    * He takes a picture of whoever is with him and posts it on Bloomr. It is written and drawn in the background while the
    * scene goes on, and goes on the feed when it is done: at the hour he took it, unless the game has been left since.
@@ -1364,9 +1384,9 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         const { text, image, comments } = taken
         setState((current) => (current.weatherSeed === weatherSeed ? addPlayerPost(current, { time, text, image, comments }) : current))
         setAgreed(t('shell.app.photoPosted', { text }))
-      } else setAgreed(t('shell.app.photoFailed', { error: taken.error ?? '' }))
+      } else photoFailed(taken.error ?? '')
     } catch (error) {
-      setAgreed(t('shell.app.photoFailed', { error: errorMessage(error) }))
+      photoFailed(errorMessage(error))
     } finally {
       setPhotoBusy(false)
     }
@@ -1426,7 +1446,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           ...revealed.map((r) => describeLearned(content, r.loveInterestId, r.factId)).filter((line): line is string => line !== undefined)
         ],
         reasons: Object.fromEntries(Object.entries(result.feelings).map(([id, feelings]) => [id, feelings.reason])),
-        memoryError: result.error
+        memoryError: result.error,
+        plainIds: result.plainIds
       })
       // Everyone who was there keeps their own memory of it.
       // Sharing a scene also brings the love interests in it closer to each other.
@@ -1473,6 +1494,30 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     } finally {
       setBusy(false)
     }
+  }
+
+  /**
+   * Asks again for the memories that came back as plain notes, and puts each one written this time in place of its note.
+   * Only the wording and level: what the scene did to how she feels was settled as it ended. Returns what changed.
+   */
+  async function retryMemories(): Promise<Pick<SceneSummary, 'memories' | 'levels'>> {
+    if (!summary) return { memories: {}, levels: {} }
+    const before = summary
+    let result
+    try {
+      result = await window.api.summarize({ state, scene: before.scene })
+    } catch (error) {
+      setSummary((current) => current && { ...current, memoryError: errorMessage(error) })
+      return { memories: {}, levels: {} }
+    }
+    const { memories: rewritten, levels: rated, plainIds, error } = result
+    const fixed = before.plainIds.filter((id) => !plainIds.includes(id))
+    const memories = Object.fromEntries(fixed.map((id) => [id, rewritten[id]]))
+    const levels = Object.fromEntries(fixed.map((id) => [id, rated[id]]))
+    setState((current) => fixed.reduce((next, id) => amendMemory(next, id, before.memories[id] ?? '', memories[id], levels[id]), current))
+    const still = before.plainIds.filter((id) => plainIds.includes(id))
+    setSummary((current) => current && { ...current, memories: { ...current.memories, ...memories }, levels: { ...current.levels, ...levels }, plainIds: still, memoryError: still.length > 0 ? error : undefined })
+    return { memories, levels }
   }
 
   const close = () => setPanel(null)
@@ -1527,6 +1572,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           state={state}
           summary={summary}
           backgroundId={summary.scene.viewId ?? backgroundId}
+          onRetryMemories={retryMemories}
           onContinue={(edited, levels, global) => {
             // The memories were kept as written when the scene ended, so that nothing is lost
             // if the game is closed here. What the player has reworded, or made more or less important, takes their place now.
@@ -1574,6 +1620,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           onGoodbye={sayGoodbye}
           onSchedule={schedule}
           onPhoto={() => void takePhoto()}
+          onRetryPhoto={agreed !== '' && agreed === photoFailure ? () => void takePhoto() : undefined}
           photoBusy={photoBusy}
           onAcceptProposal={() => {
             if (!scene.proposal) return
@@ -1753,12 +1800,17 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       )}
 
       {panel?.kind === 'courier' && (
-        <PhonePanel content={withStrangers(content, scene)} state={state} feedError={feedError && feedError.seed === state.weatherSeed && feedError.day === toDate(content.calendar, state.time).dayIndex ? feedError.message : undefined} onChange={applyUpdate} onClose={close} initialId={panel.id} initialChat={panel.chat} app={panel.app} onGoToInvite={scene || summary ? undefined : goToInvite} canAct={!scene && !summary} />
+        <PhonePanel content={withStrangers(content, scene)} state={state} feedError={feedError && feedError.seed === state.weatherSeed && feedError.day === toDate(content.calendar, state.time).dayIndex ? feedError.message : undefined} onRetryFeed={retryFeed} onChange={applyUpdate} onClose={close} initialId={panel.id} initialChat={panel.chat} app={panel.app} onGoToInvite={scene || summary ? undefined : goToInvite} canAct={!scene && !summary} />
       )}
       <div className="toasts">
       {!scene && notice && (
         <div className="toast plain" role="status" onClick={() => setNotice('')}>
           <span>{notice}</span>
+          {canRetryNotice && (
+            <Button variant="quiet" size="small" onClick={noticeRetry.run}>
+              {t('screens.sceneView.retry')}
+            </Button>
+          )}
         </div>
       )}
       {!scene && aside && (

@@ -27,6 +27,7 @@ const api: RendererApi = {
   feed: (request) => ipcRenderer.invoke(IPC.feed, request),
   feedPicture: (request) => ipcRenderer.invoke(IPC.feedPicture, request),
   scenePhoto: (request) => ipcRenderer.invoke(IPC.scenePhoto, request),
+  selfie: (request) => ipcRenderer.invoke(IPC.selfie, request),
   getSettings: () => ipcRenderer.invoke(IPC.getSettings),
   saveSettings: (update) => ipcRenderer.invoke(IPC.saveSettings, update),
   testConnection: (profileId) => ipcRenderer.invoke(IPC.testConnection, profileId),

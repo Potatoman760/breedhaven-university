@@ -85,13 +85,15 @@ import { Button } from './Button'
 import { PlanCompare } from './PlanCompare'
 import { useModelName } from '../modelName'
 import type { PhoneApp } from './panels'
+import { Lightbox } from './Lightbox'
 import { MemoryField } from './MemoryField'
 import { Portrait } from './Portrait'
+import { RetryNotice } from './RetryNotice'
 import { MEMORY_LEVEL_LABELS, METERS, STATS, type ContentPack, type GameState, type Job, type LoveInterest, type Memory, type SkillGrant, type Stat } from '../../../shared/model'
 import { errorMessage } from '../errors'
 import { Overlay } from './Dialog'
 import { useConfirm } from './Confirm'
-import { BackIcon, BatteryIcon, CalendarIcon, ChatIcon, ChevronIcon, ClockIcon, CoinIcon, HeartIcon, PregnantIcon, SignalIcon, TagIcon, WeatherIcon, WifiIcon } from './icons'
+import { BackIcon, BatteryIcon, CalendarIcon, CameraIcon, ChatIcon, ChevronIcon, ClockIcon, CoinIcon, HeartIcon, PregnantIcon, SignalIcon, TagIcon, WeatherIcon, WifiIcon } from './icons'
 import star from '../../../assets/phone/star.webp'
 import chatsArt from '../../../assets/phone/apps/chats.webp'
 import friendsArt from '../../../assets/phone/apps/friends.webp'
@@ -124,6 +126,8 @@ interface Props {
   canAct?: boolean
   /** Why today's posts could not be made, when they could not: said at the top of the feed. */
   feedError?: string
+  /** Tries today's posts again. */
+  onRetryFeed?: () => void
 }
 
 /**
@@ -173,7 +177,7 @@ function PlayerFace({ content, state, size }: { content: ContentPack; state: Gam
  * The player's phone: his Bloomr DMs for messages, Friends to keep track of everyone he is
  * getting to know, the Bloomr feed for what they post, and Jobs for work.
  */
-export function PhonePanel({ content, state, onChange, onClose, initialId, initialChat, app: shown, onGoToInvite, canAct = true, feedError }: Props) {
+export function PhonePanel({ content, state, onChange, onClose, initialId, initialChat, app: shown, onGoToInvite, canAct = true, feedError, onRetryFeed }: Props) {
   // Everyone who can be in his DMs: the love interests, and any NPC he has worked for.
   const people = messageable(content)
   const [app, setApp] = useState<App>(shown ?? (initialId === undefined ? 'chats' : 'friends'))
@@ -254,7 +258,7 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, initi
         <div className={`phone-screen ${app}`}>
           {app === 'chats' && <Chats content={content} state={state} onChange={onChange} selectedId={chatId} onSelect={setChatId} onGoToInvite={onGoToInvite} canAct={canAct} />}
           {app === 'friends' && <Friends content={content} state={state} selectedId={friendId} onSelect={setFriendId} onMessage={message} canMessage={canMessage} />}
-          {app === 'updates' && <Updates content={content} state={state} onChange={onChange} onMessage={message} canMessage={canMessage} error={feedError} />}
+          {app === 'updates' && <Updates content={content} state={state} onChange={onChange} onMessage={message} canMessage={canMessage} error={feedError} onRetry={onRetryFeed} />}
           {app === 'jobs' && <Jobs content={content} state={state} onChange={onChange} onMessage={message} />}
           {app === 'societies' && <Societies content={content} state={state} onChange={onChange} />}
           {app === 'shop' && <Market content={content} state={state} onChange={onChange} />}
@@ -450,8 +454,41 @@ function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadPr
     }
   }
 
+  // An NPC in his DMs is his boss: only a love interest sends him selfies.
+  const canAskSelfie = content.loveInterests.some((one) => one.id === id)
+  const [selfieFailed, setSelfieFailed] = useState(false)
+  const [viewing, setViewing] = useState<string>()
+
+  function askSelfie() {
+    if (waiting) return
+    const ask = (current: GameState) => addNote(current, id, { from: 'player', text: t('panels.phone.selfieLine'), read: true })
+    onChange(ask)
+    void getSelfie(ask(state))
+  }
+
+  /** Waits for the selfie he has asked for. It takes a while to draw: it can come after the phone is put away, but not into another game. */
+  async function getSelfie(sent: GameState) {
+    const failed = (error: string) => {
+      setNotice(t('panels.phone.noAnswer', { error }))
+      setSelfieFailed(true)
+    }
+    setNotice('')
+    setSelfieFailed(false)
+    setWaiting(true)
+    try {
+      const { text, image, error } = await window.api.selfie({ state: sent, loveInterestId: id })
+      if (text && image) onChange((current) => (current.weatherSeed === sent.weatherSeed ? addNote(current, id, { from: 'them', text, image, read: false }) : current))
+      else failed(error ?? '')
+    } catch (error) {
+      failed(errorMessage(error))
+    } finally {
+      setWaiting(false)
+    }
+  }
+
   return (
     <>
+      {viewing && <Lightbox image={viewing} name={t('panels.phone.selfieFrom', { name: firstName })} onClose={() => setViewing(undefined)} />}
       {/* What the two of them have planned, a line each at the head of the thread: there to be seen, and called off, without crowding what is said. */}
       {(plans.length > 0 || shiftToCall) && (
         <ul className="chat-plans">
@@ -497,6 +534,11 @@ function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadPr
                 <span className="caps stamp">
                   {t('panels.phone.messageStamp', { weekday: sentOn.weekday, day: sentOn.day, month: sentOn.month.name.slice(0, 3), time: `${String(sentOn.hour).padStart(2, '0')}:00` })}
                 </span>
+              )}
+              {note.image && (
+                <Button variant="quiet" className="chat-photo" aria-label={t('panels.phone.selfieFrom', { name: firstName })} onClick={() => setViewing(note.image)}>
+                  <img src={`content://pack/${note.image}`} alt="" loading="lazy" draggable={false} />
+                </Button>
               )}
               <p className="bubble">{note.text}</p>
               {/* A house offered to him: taken or left here, and one that was left can still be taken. */}
@@ -567,7 +609,12 @@ function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadPr
         <div ref={end} />
       </div>
 
-      {notice && <p className="notice">{notice}</p>}
+      {/* What he said has been kept: asking again only waits for her answer to it. */}
+      {notice && (
+        <RetryNotice disabled={waiting} onRetry={() => void (selfieFailed ? getSelfie(state) : say((current) => current))}>
+          {notice}
+        </RetryNotice>
+      )}
       <form className="chat-compose" onSubmit={send}>
         <EmojiPicker onPick={addEmoji} />
         <input
@@ -579,6 +626,11 @@ function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadPr
           placeholder={t('panels.phone.messagePlaceholder', { name: firstName })}
           autoFocus
         />
+        {canAskSelfie && (
+          <Button className="icon chat-selfie" disabled={waiting} aria-label={t('panels.phone.askSelfie', { name: firstName })} title={t('panels.phone.askSelfie', { name: firstName })} onClick={askSelfie}>
+            <CameraIcon size={18} />
+          </Button>
+        )}
         <button type="submit" disabled={!draft.trim() || waiting} aria-label={t('panels.phone.send')} className="icon" title={model || undefined} onMouseEnter={look}>
           <ChevronIcon size={18} />
         </button>
@@ -607,13 +659,18 @@ function GroupThread({ content, state, chatId, onChange }: { content: ContentPac
     end.current?.scrollIntoView({ block: 'end' })
   }, [chatId, notes.length, waiting, state, onChange])
 
-  async function send(event: FormEvent) {
+  function send(event: FormEvent) {
     event.preventDefault()
     const text = draft.trim()
     if (!text || waiting || !chat) return
     setDraft('')
-    const sent = addGroupNote(state, chatId, { from: 'player', text, read: true })
     onChange((current) => addGroupNote(current, chatId, { from: 'player', text, read: true }))
+    void ask(addGroupNote(state, chatId, { from: 'player', text, read: true }))
+  }
+
+  /** Waits for what they say to the chat as it stands. */
+  async function ask(sent: GameState) {
+    if (!chat) return
     setNotice('')
     setWaiting(true)
     try {
@@ -655,7 +712,11 @@ function GroupThread({ content, state, chatId, onChange }: { content: ContentPac
         )}
         <div ref={end} />
       </div>
-      {notice && <p className="notice">{notice}</p>}
+      {notice && (
+        <RetryNotice disabled={waiting} onRetry={() => void ask(state)}>
+          {notice}
+        </RetryNotice>
+      )}
       <form className="chat-compose" onSubmit={send}>
         <input value={draft} onChange={(e) => setDraft(e.target.value)} maxLength={400} aria-label={t('panels.phone.messageTo', { name: chat?.name ?? t('panels.phone.theGroup') })} placeholder={t('panels.phone.messagePlaceholder', { name: chat?.name ?? t('panels.phone.theGroup') })} autoFocus />
         <button type="submit" disabled={!draft.trim() || waiting} aria-label={t('panels.phone.send')} className="icon" title={model || undefined} onMouseEnter={look}>
@@ -760,10 +821,11 @@ interface UpdatesProps {
   onMessage: (id: string) => void
   canMessage: (id: string) => boolean
   error?: string
+  onRetry?: () => void
 }
 
 /** The feed: Bloomr, the selfies everyone has been posting, newest first, a few at a time. */
-function Updates({ content, state, onChange, onMessage, canMessage, error }: UpdatesProps) {
+function Updates({ content, state, onChange, onMessage, canMessage, error, onRetry }: UpdatesProps) {
   const posts = feedOf(state)
   // Only a page of posts is drawn; reaching the bottom brings in the next.
   const [shown, setShown] = useState(FEED_PAGE)
@@ -782,7 +844,14 @@ function Updates({ content, state, onChange, onMessage, canMessage, error }: Upd
   const everyone = [...content.loveInterests, ...content.npcs]
   return (
     <div className="feed" ref={list}>
-      {error && <p className="notice feed-error">{error}</p>}
+      {error &&
+        (onRetry ? (
+          <RetryNotice className="notice feed-error" onRetry={onRetry}>
+            {error}
+          </RetryNotice>
+        ) : (
+          <p className="notice feed-error">{error}</p>
+        ))}
       {posts.length === 0 && (
         <p className="hint phone-empty">{t('panels.phone.noPosts')}</p>
       )}

@@ -19,6 +19,7 @@ export const IPC = {
   feedPicture: 'ai:feedPicture',
   /** A picture the player takes in a scene, written and drawn, for his own post. */
   scenePhoto: 'ai:scenePhoto',
+  selfie: 'ai:selfie',
   getContent: 'content:get',
   getLanguage: 'language:get',
   setLanguage: 'language:set',

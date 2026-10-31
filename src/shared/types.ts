@@ -98,6 +98,8 @@ export interface SummarizeResponse {
   spending?: { amount: number; on: string }
   /** Set when the LLM could not be used for at least one of them, which then got the plain fallback note. */
   error?: string
+  /** Those who got the plain fallback note, by id. */
+  plainIds: string[]
 }
 
 export const GenerateEventsRequestSchema = z.object({ state: GameStateSchema })
@@ -192,6 +194,16 @@ export interface ScenePhotoResponse {
   error?: string
 }
 
+export const SelfieRequestSchema = z.object({ state: GameStateSchema, loveInterestId: z.string() })
+export type SelfieRequest = z.input<typeof SelfieRequestSchema>
+
+/** A selfie he asked for in his DMs: what she sent with it and its path in the content, or why there is none. */
+export interface SelfieResponse {
+  text?: string
+  image?: string
+  error?: string
+}
+
 export interface FeedPictureResponse {
   /** The selfie's path in the content, or null when it could not be drawn. */
   image: string | null
@@ -247,6 +259,8 @@ export interface RendererApi {
   /** Draws the selfie for one Bloomr post on ComfyUI. Never rejects. */
   feedPicture(request: FeedPictureRequest): Promise<FeedPictureResponse>
   scenePhoto(request: SceneRequest): Promise<ScenePhotoResponse>
+  /** Writes and draws the selfie he asked a love interest for. Never rejects. */
+  selfie(request: SelfieRequest): Promise<SelfieResponse>
   getSettings(): Promise<SettingsView>
   saveSettings(update: SettingsUpdate): Promise<SettingsView>
   /** Sends a tiny request through the saved settings of the given profile. */

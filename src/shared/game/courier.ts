@@ -237,7 +237,8 @@ export function courierExcerpt(
       ? t('scene.courier.invitation', { title: note.proposal.title, when: describeWhen(content, note.proposal.time), answer: note.answer, player: state.player.name })
       : ''
     const offer = note.offer === 'housing' ? t('scene.courier.housingOffer', { answer: note.answer, player: state.player.name }) : ''
-    const line = `${note.from === 'player' ? state.player.name : them}: ${note.text}${plan}${offer}`
+    const selfie = note.image ? t('scene.courier.selfie') : ''
+    const line = `${note.from === 'player' ? state.player.name : them}: ${note.text}${plan}${offer}${selfie}`
     used += line.length
     if (lines.length > 0 && used > budgetChars) break
     lines.unshift(line)

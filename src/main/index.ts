@@ -24,6 +24,7 @@ import { contactsSaid, DM_CLOSE, DM_OPEN, fallbackInvite, messageText } from '..
 import { buildFeedPrompt, buildScenePhotoPrompt, draftPosts, feedReplyTokens, feedShortfall, parseFeedReply, parseScenePhoto, PLAYER_POSTER, scenePhotoDraft } from '../shared/game/feed'
 import { toDate } from '../shared/game/calendar'
 import { attendableEvents, buildEventPrompt, parseGeneratedEvents } from '../shared/game/events'
+import { buildSelfiePrompt, parseSelfie, selfieDraft } from '../shared/game/selfie'
 import { buildSpendingPrompt, buildSummaryPrompt, fallbackSummary, parseSpending, parseSummary, PLAIN_FEELINGS, sceneRapport, sceneRevelations, type Spending, type Summary } from '../shared/game/memory'
 import { npcOf, sceneExtras, withNpc } from '../shared/game/npcs'
 import { inMasks } from '../shared/game/masquerade'
@@ -77,12 +78,14 @@ import {
 } from '../shared/settings'
 import {
   CourierRequestSchema,
+  SelfieRequestSchema,
   type CourierResponse,
   FeedPictureRequestSchema,
   type FeedPictureResponse,
   FeedRequestSchema,
   type FeedResponse,
   type ScenePhotoResponse,
+  type SelfieResponse,
   PlanOutingRequestSchema,
   PickCoursesRequestSchema,
   BanterRequestSchema, MomentLinesRequestSchema,
@@ -911,6 +914,30 @@ function registerIpc(
     }
   })
 
+  // Never fails: a selfie he asked her for in his DMs, of her as she is and where she is right now.
+  ipcMain.handle(IPC.selfie, async (_event, raw: unknown): Promise<SelfieResponse> => {
+    const { state, loveInterestId } = SelfieRequestSchema.parse(raw)
+    const content = readBy(state)
+    const li = content.loveInterests.find((c) => c.id === loveInterestId)
+    if (!li) return { error: t('llm.selfie.unread') }
+    if (!isConfigured(settings.get().main)) return { error: notConfigured() }
+    if (!comfyReady()) return { error: t('llm.scenePhoto.noComfy') }
+    try {
+      const { system, user } = buildSelfiePrompt(content, state, li)
+      // The Main LLM first, and the NSFW one if it will not write it.
+      const { reply } = await completeWithFallback(settings.get(), false, { system, messages: [{ role: 'user', content: user }] })
+      const written = parseSelfie(reply)
+      if (!written) return { error: t('llm.selfie.unread') }
+      const date = toDate(content.calendar, state.time)
+      const prompt = selfieDraft(content, state, li, written.picture, framingFor(comfy.get(), 'photo'))
+      // Made as the game is played: filed with the player's own pictures whatever is being edited.
+      const made = await generateArt(comfy.get(), packDir, userDir, { kind: 'photo', subjectId: li.id, name: `dm-day-${date.dayIndex + 1}-${date.hour}`, workflow: '', positive: prompt, negative: '', ...sizeFor(comfy.get(), 'photo') })
+      return made.ok && made.path ? { text: written.text, image: made.path } : { error: made.message }
+    } catch (error) {
+      return { error: (error as Error).message }
+    }
+  })
+
   // Never fails: without an LLM the plan is read off the names and places in the player's words.
   ipcMain.handle(IPC.planOuting, async (_event, raw: unknown): Promise<PlanOutingResponse> => {
     const { state, text } = PlanOutingRequestSchema.parse(raw)
@@ -972,6 +999,7 @@ function registerIpc(
     // The content as this game reads it, with the player's name where the content wrote the token.
     const content = readBy(request.state)
     let failure: string | undefined
+    const plainIds: string[] = []
     // What he paid for is worked out alongside, from what was said. No answer is no spending: he is never charged on a guess.
     const spending = (async (): Promise<Spending | undefined> => {
       if (!request.scene.messages.some((m) => m.role === 'user')) return undefined
@@ -1004,6 +1032,7 @@ function registerIpc(
           return [forId, { memory: read.memory || fallbackSummary(input), level: read.memory ? read.level : undefined, feelings: feels ? (read.feelings ?? PLAIN_FEELINGS) : undefined, intimate, learned: feels ? read.learned : undefined, rapport: feels ? read.rapport : undefined }]
         } catch (error) {
           failure = (error as Error).message
+          plainIds.push(forId)
           const feels = !input.scene.npc && request.state.relationships[forId] !== undefined
           return [forId, { memory: fallbackSummary(input), feelings: feels ? PLAIN_FEELINGS : undefined }]
         }
@@ -1017,7 +1046,8 @@ function registerIpc(
       revealed: sceneRevelations(content, request.state, written.map(([id, summary]) => ({ id, learned: summary.learned ?? [] }))),
       rapport: sceneRapport(request.state, sceneWitnesses(request.scene), written.map(([id, summary]) => ({ id, rapport: summary.rapport ?? [] }))),
       spending: await spending,
-      error: failure
+      error: failure,
+      plainIds
     }
   })
 }

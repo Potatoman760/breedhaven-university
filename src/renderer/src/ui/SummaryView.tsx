@@ -5,6 +5,7 @@ import { Backdrop } from './Backdrop'
 import { Button } from './Button'
 import { ChevronIcon, Sprig } from './icons'
 import { MemoryField } from './MemoryField'
+import { RetryNotice } from './RetryNotice'
 import { t } from '../../../shared/i18n'
 
 /** Everything the summary screen shows about a scene that has just ended. */
@@ -25,6 +26,8 @@ export interface SceneSummary {
   learned: string[]
   /** Why a memory is a plain note instead of one written by the LLM, if any is. */
   memoryError?: string
+  /** Those whose memory is a plain note, by id. */
+  plainIds: string[]
 }
 
 /** A memory for everyone, as the player is writing it. */
@@ -40,6 +43,8 @@ interface Props {
   backgroundId: string | undefined
   /** Called with the memories as the player leaves them, how much each matters, by love interest id, and any he added for everyone. */
   onContinue: (memories: Record<string, string>, levels: Record<string, MemoryLevel>, global?: GlobalMemoryDraft) => void
+  /** Asks again for the plain notes, and resolves to whichever memories were written this time. */
+  onRetryMemories: () => Promise<Pick<SceneSummary, 'memories' | 'levels'>>
 }
 
 function change({ from, to }: Growth): string {
@@ -49,7 +54,7 @@ function change({ from, to }: Growth): string {
 }
 
 /** Shown when a scene ends: what the player gained, how the relationship moved, and the memory kept. */
-export function SummaryView({ content, state, summary, backgroundId, onContinue }: Props) {
+export function SummaryView({ content, state, summary, backgroundId, onContinue, onRetryMemories }: Props) {
   const { scene, outcome, memories, levels, memoryError } = summary
   const partner = content.loveInterests.find((li) => li.id === scene.loveInterestId)
   const group = scene.companionIds.length > 0
@@ -67,6 +72,15 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
   const [levelDrafts, setLevelDrafts] = useState<Record<string, MemoryLevel>>(levels)
   // Something for everyone to know, once the player has asked to add it.
   const [global, setGlobal] = useState<GlobalMemoryDraft>()
+  const [retrying, setRetrying] = useState(false)
+
+  async function retryMemories() {
+    setRetrying(true)
+    const written = await onRetryMemories()
+    setDrafts((current) => ({ ...current, ...written.memories }))
+    setLevelDrafts((current) => ({ ...current, ...written.levels }))
+    setRetrying(false)
+  }
 
   return (
     <main className="stage">
@@ -208,7 +222,14 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
             {t('screens.summaryView.memoryHint')}
           </p>
         )}
-        {memoryError && <p className="hint">{t('screens.summaryView.plainNote', { error: memoryError })}</p>}
+        {memoryError &&
+          (summary.plainIds.length > 0 ? (
+            <RetryNotice className="hint" disabled={retrying} onRetry={() => void retryMemories()}>
+              {t('screens.summaryView.plainNote', { error: memoryError })}
+            </RetryNotice>
+          ) : (
+            <p className="hint">{t('screens.summaryView.plainNote', { error: memoryError })}</p>
+          ))}
         {summary.learned.length > 0 && (
           <section className="learned">
             <span className="caps">{t('screens.summaryView.youLearned')}</span>
@@ -240,7 +261,7 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
           </Button>
         )}
 
-        <button onClick={() => onContinue(drafts, levelDrafts, global)} autoFocus>
+        <button disabled={retrying} onClick={() => onContinue(drafts, levelDrafts, global)} autoFocus>
           {t('screens.sceneView.continue')}
           <ChevronIcon size={16} />
         </button>

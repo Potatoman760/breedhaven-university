@@ -329,6 +329,7 @@
   "courier.stoodUp": "{player} never turned up for \"{title}\" at {where}, {when}, and sent no word. You waited for him.",
   "courier.cancel": "I'm sorry, I can't make {title} on {when}. Something has come up.",
   "courier.invitation": " [invitation: {title}, {when}; {answer, select, cancelled {accepted, then called off by {player}} accepted {accepted} declined {declined} lapsed {lapsed} other {not yet answered}}]",
+  "courier.selfie": " [sent with a selfie]",
   "courier.housingOffer": " [offer of Sire housing: {answer, select, accepted {accepted} declined {declined} lapsed {lapsed} cancelled {cancelled} other {not yet answered}}]",
   "courier.meetUp": "Meet up",
   "courier.invite": "{player}, come and find me at {where}: {when}. Let me know?",

@@ -1797,6 +1797,11 @@ textarea.memory {
   line-height: 1.35;
 }
 
+.toast.plain button.btn.quiet {
+  align-self: flex-start;
+  color: #fff;
+}
+
 .toast strong {
   font: 700 1.5rem/1.15 var(--display);
 }
@@ -3869,6 +3874,32 @@ button.btn.back-button.phone-back {
 .chat-compose button:disabled {
   border-color: var(--rule);
   background: #e6dcc3;
+}
+
+/* Asking for a selfie: smaller than sending, beside it. */
+.chat-compose button.btn.chat-selfie {
+  flex: none;
+  align-self: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+}
+
+/* A selfie in a thread, opened by a click. */
+button.btn.chat-photo {
+  width: min(70%, 280px);
+  height: auto;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.chat-photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  background: var(--rule-soft);
 }
 
 /* Friends: a wall of cards, and behind each a page. */

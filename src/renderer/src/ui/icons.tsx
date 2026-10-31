@@ -498,6 +498,13 @@ export const GearIcon = (p: IconProps) => (
   </Icon>
 )
 
+export const CameraIcon = (p: IconProps) => (
+  <Icon viewBox="0 0 24 24" {...p}>
+    <path d="M4 8h3.500L9 5.500h6L16.500 8H20a1.500 1.500 0 011.500 1.500V18a1.500 1.500 0 01-1.500 1.500H4A1.500 1.500 0 012.500 18V9.500A1.500 1.500 0 014 8z" />
+    <circle cx="12" cy="13.500" r="3.500" />
+  </Icon>
+)
+
 export const PowerIcon = (p: IconProps) => (
   <Icon viewBox="0 0 24 24" {...p}>
     <path d="M12 3v9 M6.300 6.300a8 8 0 1011.400 0" />
