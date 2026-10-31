@@ -372,6 +372,7 @@ export function HelpPanel({ content, state, tab: opening = 'Basics', onClose }: 
             <ul>
               <li>{t('shell.help.memoriesOne', { levels: Object.values(MEMORY_LEVEL_LABELS).join(', ') })}</li>
               <li>{t('shell.help.memoriesRecall')}</li>
+              <li>{t('shell.help.memoriesGlobal')}</li>
             </ul>
           </div>
         )}

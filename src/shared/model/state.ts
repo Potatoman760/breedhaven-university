@@ -92,6 +92,8 @@ export const GameStateSchema = z.object({
   unlockedCodexIds: z.array(z.string()),
   /** Keyed by love interest id, oldest first. */
   memories: z.record(z.string(), z.array(MemorySchema)),
+  /** What the player has said everyone knows, about him or about what has happened, oldest first: his to write, and told to all of them. */
+  globalMemories: z.array(MemorySchema).default([]),
   /** Plans made with love interests that are still to come. */
   appointments: z.array(AppointmentSchema),
   /** Makes each game's run of weather different. */

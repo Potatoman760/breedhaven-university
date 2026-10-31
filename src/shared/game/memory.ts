@@ -340,6 +340,35 @@ export function amendMemory(state: GameState, loveInterestId: string, from: stri
   return { ...state, memories: { ...state.memories, [loveInterestId]: amended } }
 }
 
+/** Returns a new state with something everyone knows recorded at the current game time. With nothing written, nothing is kept. */
+export function addGlobalMemory(state: GameState, summary: string, level: MemoryLevel = 'normal'): GameState {
+  const wording = summary.trim()
+  return wording === '' ? state : { ...state, globalMemories: [...state.globalMemories, { time: state.time, summary: wording, level }] }
+}
+
+/** What the player can change of himself on his profile. */
+export interface ProfileEdit {
+  bio: string
+  about: string
+  /** Everything everyone knows, as it is to stand. */
+  memories: Memory[]
+}
+
+/**
+ * Applies the player's profile as he left it. A memory edited down to nothing is forgotten. Nothing changed leaves
+ * the state as it is, so that looking at the page does not count as an edit.
+ */
+export function editProfile(state: GameState, edit: ProfileEdit): GameState {
+  const player = { ...state.player, bio: edit.bio.trim(), about: edit.about.trim() }
+  const globalMemories = edit.memories.map((memory) => ({ ...memory, summary: memory.summary.trim() })).filter((memory) => memory.summary !== '')
+  const same =
+    player.bio === state.player.bio &&
+    player.about === state.player.about &&
+    globalMemories.length === state.globalMemories.length &&
+    globalMemories.every((memory, i) => memory.summary === state.globalMemories[i].summary && memory.level === state.globalMemories[i].level)
+  return same ? state : { ...state, player, globalMemories }
+}
+
 /**
  * The memories a character is told, most important first: by level, core before normal before fleeting, and within
  * a level the most recent first. No more than `limit` of them, which the player sets.

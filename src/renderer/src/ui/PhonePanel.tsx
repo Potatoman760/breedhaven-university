@@ -39,6 +39,7 @@ import {
   describeChildren,
   describeStudies,
   describeWhen,
+  editProfile,
   FACT_GROUP_NAMES,
   FACT_GROUPS,
   factsOf,
@@ -69,6 +70,7 @@ import {
   toggleLike,
   PLAYER_HANDLE,
   PLAYER_POSTER,
+  PLAYER_TOKEN,
   unreadNotes,
   unreadPosts,
   markFeedSeen,
@@ -83,13 +85,13 @@ import { Button } from './Button'
 import { PlanCompare } from './PlanCompare'
 import { useModelName } from '../modelName'
 import type { PhoneApp } from './panels'
+import { MemoryField } from './MemoryField'
 import { Portrait } from './Portrait'
-import { MEMORY_LEVEL_LABELS, METERS, STATS, type ContentPack, type GameState, type Job, type LoveInterest, type SkillGrant, type Stat } from '../../../shared/model'
+import { MEMORY_LEVEL_LABELS, METERS, STATS, type ContentPack, type GameState, type Job, type LoveInterest, type Memory, type SkillGrant, type Stat } from '../../../shared/model'
 import { errorMessage } from '../errors'
 import { Overlay } from './Dialog'
 import { useConfirm } from './Confirm'
 import { BackIcon, BatteryIcon, CalendarIcon, ChatIcon, ChevronIcon, ClockIcon, CoinIcon, HeartIcon, PregnantIcon, SignalIcon, TagIcon, WeatherIcon, WifiIcon } from './icons'
-import crest from '../../../assets/phone/crest.webp'
 import star from '../../../assets/phone/star.webp'
 import chatsArt from '../../../assets/phone/apps/chats.webp'
 import friendsArt from '../../../assets/phone/apps/friends.webp'
@@ -97,6 +99,7 @@ import updatesArt from '../../../assets/phone/apps/updates.webp'
 import jobsArt from '../../../assets/phone/apps/jobs.webp'
 import societiesArt from '../../../assets/phone/apps/societies.webp'
 import shopArt from '../../../assets/phone/apps/shop.webp'
+import profileArt from '../../../assets/phone/apps/profile.webp'
 import { Stalls } from './MarketView'
 import { BackButton } from './BackButton'
 import { useBack } from '../mouseBack'
@@ -128,6 +131,7 @@ interface Props {
  * apps are drawn.
  */
 const APPS = [
+  { id: 'profile', label: 'panels.phone.profile', title: 'panels.phone.profile', art: profileArt },
   { id: 'chats', label: 'panels.phone.app.chats', title: 'panels.phone.app.chatsTitle', art: chatsArt },
   { id: 'friends', label: 'panels.phone.app.friends', title: 'panels.phone.app.friendsTitle', art: friendsArt },
   { id: 'updates', label: 'panels.phone.app.updates', title: 'panels.phone.app.updatesTitle', art: updatesArt },
@@ -157,6 +161,12 @@ function Presence({ content, state, li }: { content: ContentPack; state: GameSta
       {where ? t(inClass(content, state, li) ? 'panels.phone.inClassAt' : 'panels.phone.at', { place: where.name }) : t('panels.phone.whereaboutsUnknown')}
     </span>
   )
+}
+
+/** His Bloomr picture where he has one, whole and centred; his face cut from his sprite where he has not. */
+function PlayerFace({ content, state, size }: { content: ContentPack; state: GameState; size: number }) {
+  const { look } = content.newGame
+  return <Portrait who={{ name: state.player.name, faceY: look.bloomrPicture ? 50 : look.faceY }} image={look.bloomrPicture ?? look.sprite} size={size} className={look.bloomrPicture ? 'avatar whole' : 'avatar'} />
 }
 
 /**
@@ -201,7 +211,6 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, initi
           </span>
         </div>
         <nav className="phone-rail" role="tablist" aria-orientation="vertical">
-          <img className="phone-crest" src={crest} alt="" draggable={false} />
           {APPS.map(({ id, label, art }) => (
             <button
               key={id}
@@ -249,6 +258,7 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, initi
           {app === 'jobs' && <Jobs content={content} state={state} onChange={onChange} onMessage={message} />}
           {app === 'societies' && <Societies content={content} state={state} onChange={onChange} />}
           {app === 'shop' && <Market content={content} state={state} onChange={onChange} />}
+          {app === 'profile' && <Profile content={content} state={state} onChange={onChange} />}
         </div>
         </div>
         </div>
@@ -779,12 +789,10 @@ function Updates({ content, state, onChange, onMessage, canMessage, error }: Upd
       {posts.slice(0, shown).map((post) => {
         // His own pictures, taken in scenes: his face and handle, and nothing to like or answer.
         if (post.authorId === PLAYER_POSTER) {
-          const { look } = content.newGame
           return (
             <article key={post.id} className="post mine">
               <header>
-                {/* His Bloomr picture where he has one, whole and centred; his face cut from his sprite where he has not. */}
-                <Portrait who={{ name: state.player.name, faceY: look.bloomrPicture ? 50 : look.faceY }} image={look.bloomrPicture ?? look.sprite} size={44} className={look.bloomrPicture ? 'avatar whole' : 'avatar'} />
+                <PlayerFace content={content} state={state} size={44} />
                 <div>
                   <strong>{state.player.name}</strong>
                   <span className="handle">
@@ -1127,6 +1135,69 @@ function Societies({ content, state, onChange }: { content: ContentPack; state: 
           </article>
         )
       })}
+    </div>
+  )
+}
+
+/** Who he is, and what everyone knows: all of it his to change. */
+function Profile({ content, state, onChange }: { content: ContentPack; state: GameState; onChange: (update: (state: GameState) => GameState) => void }) {
+  const { name, bio, about } = state.player
+  const [draft, setDraft] = useState({ bio, about, memories: state.globalMemories })
+  const memories = draft.memories
+  const setMemories = (next: Memory[]) => setDraft({ ...draft, memories: next })
+  const change = (i: number, memory: Partial<Memory>) => setMemories(memories.map((m, at) => (at === i ? { ...m, ...memory } : m)))
+  // It is all kept as it stands on leaving, for another app or by putting the phone away.
+  const latest = useRef(draft)
+  useEffect(() => {
+    latest.current = draft
+  }, [draft])
+  useEffect(() => () => onChange((current) => editProfile(current, latest.current)), [onChange])
+
+  return (
+    <div className="friend-page">
+      <div className="friend-banner">
+        <PlayerFace content={content} state={state} size={88} />
+        <div>
+          <h1>{name}</h1>
+          <span className="handle">{PLAYER_HANDLE}</span>
+        </div>
+      </div>
+      <label title={t('panels.phone.profileTip', { token: PLAYER_TOKEN })}>
+        {t('panels.phone.bio')}
+        <textarea rows={3} value={draft.bio} onChange={(e) => setDraft({ ...draft, bio: e.target.value })} />
+      </label>
+      <label title={t('panels.phone.profileTip', { token: PLAYER_TOKEN })}>
+        {t('panels.phone.about')}
+        <textarea rows={3} value={draft.about} onChange={(e) => setDraft({ ...draft, about: e.target.value })} />
+      </label>
+
+      <div className="friend-page-head">
+        <h2>{t('panels.phone.everyoneKnows')}</h2>
+        <Button size="small" onClick={() => setMemories([...memories, { time: state.time, summary: '', level: 'normal' }])}>
+          {t('panels.phone.addGlobalMemory')}
+        </Button>
+      </div>
+      {memories.length === 0 && <p className="hint">{t('panels.phone.noGlobalMemories')}</p>}
+      {/* Newest first, as her memories are shown. */}
+      {memories.map((memory, i) => ({ memory, i })).reverse().map(({ memory, i }) => (
+        <div key={i} className="card">
+          <span className="hint">{describeAge(content, memory, state.time)}</span>
+          <MemoryField
+            label={t('panels.phone.everyoneKnows')}
+            levelLabel={t('panels.phone.holdOn')}
+            value={memory.summary}
+            level={memory.level}
+            placeholder={t('panels.phone.globalPlaceholder')}
+            autoFocus={i >= state.globalMemories.length}
+            onChange={(summary) => change(i, { summary })}
+            onLevel={(level) => change(i, { level })}
+          >
+            <Button variant="quiet" size="small" onClick={() => setMemories(memories.filter((_, at) => at !== i))}>
+              {t('panels.phone.forget')}
+            </Button>
+          </MemoryField>
+        </div>
+      ))}
     </div>
   )
 }

@@ -1490,6 +1490,10 @@ textarea.memory {
   align-self: flex-end;
 }
 
+.summary > button.add-memory {
+  align-self: flex-start;
+}
+
 .summary-head {
   display: flex;
   flex-direction: column;
@@ -3389,13 +3393,6 @@ button.stat-grid:hover {
     url('../../assets/phone/vine.webp') left -30px bottom -40px / 70px auto no-repeat,
     linear-gradient(180deg, #2c4127, var(--wood-deep));
   box-shadow: inset -1px 0 0 rgba(212, 175, 90, 0.5);
-}
-
-.phone-crest {
-  width: 76px;
-  height: 76px;
-  margin-bottom: 10px;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.45));
 }
 
 .phone-tab {

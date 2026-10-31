@@ -1,8 +1,10 @@
 import { describeBeat, firstNames, sceneCast, sceneHours, sceneWitnesses, toDate, type Growth, type SceneOutcome } from '../../../shared/game'
 import { useState } from 'react'
-import { MEMORY_LEVEL_LABELS, MEMORY_LEVELS, type ContentPack, type GameState, type MemoryLevel, type Scene } from '../../../shared/model'
+import type { ContentPack, GameState, MemoryLevel, Scene } from '../../../shared/model'
 import { Backdrop } from './Backdrop'
+import { Button } from './Button'
 import { ChevronIcon, Sprig } from './icons'
+import { MemoryField } from './MemoryField'
 import { t } from '../../../shared/i18n'
 
 /** Everything the summary screen shows about a scene that has just ended. */
@@ -25,13 +27,19 @@ export interface SceneSummary {
   memoryError?: string
 }
 
+/** A memory for everyone, as the player is writing it. */
+interface GlobalMemoryDraft {
+  summary: string
+  level: MemoryLevel
+}
+
 interface Props {
   content: ContentPack
   state: GameState
   summary: SceneSummary
   backgroundId: string | undefined
-  /** Called with the memories as the player leaves them, and how much each matters, by love interest id. */
-  onContinue: (memories: Record<string, string>, levels: Record<string, MemoryLevel>) => void
+  /** Called with the memories as the player leaves them, how much each matters, by love interest id, and any he added for everyone. */
+  onContinue: (memories: Record<string, string>, levels: Record<string, MemoryLevel>, global?: GlobalMemoryDraft) => void
 }
 
 function change({ from, to }: Growth): string {
@@ -57,6 +65,8 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
   const [drafts, setDrafts] = useState<Record<string, string>>(memories)
   // And how much each matters, as the player has set it.
   const [levelDrafts, setLevelDrafts] = useState<Record<string, MemoryLevel>>(levels)
+  // Something for everyone to know, once the player has asked to add it.
+  const [global, setGlobal] = useState<GlobalMemoryDraft>()
 
   return (
     <main className="stage">
@@ -172,30 +182,15 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
         {(scene.npc ? [] : sceneWitnesses(scene)).map((id) => (
           <section key={id}>
             <h2>{t('screens.summaryView.willRemember', { name: firstNames(content, [id]) })}</h2>
-            <textarea
-              className="memory"
-              rows={3}
-              maxLength={600}
-              aria-label={t('screens.summaryView.willRemember', { name: firstNames(content, [id]) })}
+            <MemoryField
+              label={t('screens.summaryView.willRemember', { name: firstNames(content, [id]) })}
+              levelLabel={t('screens.summaryView.holdOn', { name: firstNames(content, [id]) })}
               value={drafts[id] ?? ''}
+              level={levelDrafts[id] ?? 'normal'}
               placeholder={t('screens.summaryView.forget')}
-              onChange={(e) => setDrafts({ ...drafts, [id]: e.target.value })}
-            />
-            <div className="memory-level">
-              <label className="inline">
-                {t('screens.summaryView.memory')}
-                <select
-                  aria-label={t('screens.summaryView.holdOn', { name: firstNames(content, [id]) })}
-                  value={levelDrafts[id] ?? 'normal'}
-                  onChange={(e) => setLevelDrafts({ ...levelDrafts, [id]: e.target.value as MemoryLevel })}
-                >
-                  {MEMORY_LEVELS.map((level) => (
-                    <option key={level} value={level}>
-                      {MEMORY_LEVEL_LABELS[level]}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              onChange={(value) => setDrafts({ ...drafts, [id]: value })}
+              onLevel={(level) => setLevelDrafts({ ...levelDrafts, [id]: level })}
+            >
               {((drafts[id] ?? '') !== (memories[id] ?? '') || (levelDrafts[id] ?? 'normal') !== (levels[id] ?? 'normal')) && (
                 <button
                   type="button"
@@ -205,7 +200,7 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
                   {t('screens.summaryView.putBack')}
                 </button>
               )}
-            </div>
+            </MemoryField>
           </section>
         ))}
         {!scene.npc && (
@@ -225,7 +220,27 @@ export function SummaryView({ content, state, summary, backgroundId, onContinue 
           </section>
         )}
 
-        <button onClick={() => onContinue(drafts, levelDrafts)} autoFocus>
+        {global ? (
+          <section>
+            <h2>{t('screens.summaryView.everyoneWillKnow')}</h2>
+            <MemoryField
+              label={t('screens.summaryView.everyoneWillKnow')}
+              levelLabel={t('screens.summaryView.everyoneHoldOn')}
+              value={global.summary}
+              level={global.level}
+              placeholder={t('screens.summaryView.globalPlaceholder')}
+              autoFocus
+              onChange={(value) => setGlobal({ ...global, summary: value })}
+              onLevel={(level) => setGlobal({ ...global, level })}
+            />
+          </section>
+        ) : (
+          <Button variant="quiet" className="add-memory" onClick={() => setGlobal({ summary: '', level: 'normal' })}>
+            {t('screens.summaryView.addGlobal')}
+          </Button>
+        )}
+
+        <button onClick={() => onContinue(drafts, levelDrafts, global)} autoFocus>
           {t('screens.sceneView.continue')}
           <ChevronIcon size={16} />
         </button>

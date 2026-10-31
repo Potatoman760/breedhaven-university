@@ -581,6 +581,10 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
   pregnancy, memories, and what has been found out about her) and Feed (the Bloomr feed).
   A further app is one entry in `APPS` in `PhonePanel.tsx`. A love interest's `handle`
   is her name on both; left out, one is made from her name.
+  - **His profile** is the first app on the rail: his bio, what he added
+    about himself and his global memories. It is applied on leaving the page (`editProfile`
+    in `src/shared/game/memory.ts`), for another app or by putting the phone away. His name
+    is shown there and cannot be changed.
   - **What there is to know** is drawn from her file (`src/shared/game/facts.ts`): each
     like and dislike, each trait, each stat she is drawn to, what she studies or teaches,
     her age, birthday and room, and each secret. All of it starts unknown.
@@ -1000,6 +1004,12 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
   normal, then fleeting, and the most recent first within each (`selectMemories` in
   `src/shared/game/memory.ts`). A memory saved before levels existed counts as normal.
   If the LLM is unavailable, a plain note built from the activity list is saved instead.
+- **Global memories** (`globalMemories` in the save): what the player says everyone knows,
+  about himself or about a big event. Nothing writes one but him: **Add global memory** at the
+  bottom of the summary screen, or his profile on the phone. They have the same levels and go
+  through `selectMemories` under the same **Memories recalled in a scene** limit, counted
+  separately from a character's own. `buildCharacterPrompt` tells them to every character, NPCs
+  included, in scenes and DMs.
 
 ## Outfits and faces
 

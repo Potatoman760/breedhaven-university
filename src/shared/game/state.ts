@@ -25,6 +25,7 @@ export function createInitialState(
     flags: {},
     unlockedCodexIds: [],
     memories: {},
+    globalMemories: [],
     appointments: [],
     courses: startingCourses(content),
     enrolment: null,

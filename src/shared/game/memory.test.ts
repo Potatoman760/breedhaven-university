@@ -4,11 +4,13 @@ import {
   applySpending,
   buildSpendingPrompt,
   parseSpending,
+  addGlobalMemory,
   addMemory,
   amendMemory,
   applyFeelings,
   buildSummaryPrompt,
   describeAge,
+  editProfile,
   fallbackSummary,
   parseSummary,
   PLAIN_FEELINGS,
@@ -188,6 +190,32 @@ describe('amendMemory', () => {
     expect(amendMemory(kept, 'ana', 'They walked.', 'They walked.')).toBe(kept)
     expect(amendMemory(kept, 'ana', 'Never happened.', 'Something else.')).toBe(kept)
     expect(amendMemory(kept, 'nobody', 'They walked.', 'x')).toBe(kept)
+  })
+})
+
+describe('global memories', () => {
+  const profile = (state: GameState) => ({ ...state.player, memories: state.globalMemories })
+
+  it('keeps what the player wrote at the current time, and nothing when he wrote nothing', () => {
+    const state = { ...start(), time: 7 }
+    expect(addGlobalMemory(state, '  Pat won the regatta.  ', 'core').globalMemories).toEqual([{ time: 7, summary: 'Pat won the regatta.', level: 'core' }])
+    expect(addGlobalMemory(state, '   ')).toBe(state)
+  })
+
+  it('applies the profile as he left it, forgetting a memory emptied', () => {
+    const kept = addGlobalMemory(addGlobalMemory(start(), 'One.'), 'Two.')
+    const after = editProfile(kept, {
+      bio: ' Tall. ',
+      about: ' Sings. ',
+      memories: [{ time: 0, summary: ' ', level: 'normal' }, { time: 0, summary: 'Two, reworded.', level: 'core' }]
+    })
+    expect(after.player).toMatchObject({ name: kept.player.name, bio: 'Tall.', about: 'Sings.' })
+    expect(after.globalMemories).toEqual([{ time: 0, summary: 'Two, reworded.', level: 'core' }])
+  })
+
+  it('leaves the state alone when nothing was changed', () => {
+    const kept = addGlobalMemory(start(), 'One.')
+    expect(editProfile(kept, profile(kept))).toBe(kept)
   })
 })
 

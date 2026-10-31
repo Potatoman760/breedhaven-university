@@ -1,4 +1,4 @@
-import { MEMORY_LEVEL_LABELS, picturedOutfit, EXPRESSIONS, isPregnantPose, poseDescription, poseMedia, kindOf, classYear, outfitDescription, type ChatMessage, type ContentPack, type LoveInterest, type Outfit, type Departure, type GameState, type Lesson, type Npc, type Proposal, type Scene, type SceneBeat, type SceneGift, type ScenePresent, type RelicUse } from '../model'
+import { MEMORY_LEVEL_LABELS, picturedOutfit, EXPRESSIONS, isPregnantPose, poseDescription, poseMedia, kindOf, classYear, outfitDescription, type ChatMessage, type ContentPack, type LoveInterest, type Memory, type Outfit, type Departure, type GameState, type Lesson, type Npc, type Proposal, type Scene, type SceneBeat, type SceneGift, type ScenePresent, type RelicUse } from '../model'
 import { describeGift } from './market'
 import { examNotes } from './exams'
 import { attendees, describeWhen, upcomingAppointments } from './appointments'
@@ -258,6 +258,12 @@ export function buildCharacterPrompt(input: PromptInput): string {
   const guarded = li.ai.secrets.filter((s) => !shareable.includes(s))
   // An NPC keeps no memory of him: each time is the first, as far as she is told.
   const memories = input.npc ? [] : selectMemories(state.memories[li.id] ?? [], input.memoryRecall)
+  // What everyone knows, she included, and so an NPC too.
+  const known = selectMemories(state.globalMemories, input.memoryRecall)
+  const memoryLine = (m: Memory) => {
+    const then = toDate(content.calendar, m.time)
+    return t('scene.prompt.memories.line', { level: MEMORY_LEVEL_LABELS[m.level], age: describeAge(content, m, state.time), day: then.day, month: then.month.name, summary: m.summary })
+  }
   const plansWith = upcomingAppointments(state).filter((a) => attendees(a).includes(li.id))
   const lore = selectCodexEntries({
     content,
@@ -412,13 +418,12 @@ export function buildCharacterPrompt(input: PromptInput): string {
       t('scene.prompt.memories.title', { player: player.name }),
       memories.length === 0
         ? []
-        : [
-            t('scene.prompt.memories.intro'),
-            ...memories.map((m) => {
-              const then = toDate(content.calendar, m.time)
-              return t('scene.prompt.memories.line', { level: MEMORY_LEVEL_LABELS[m.level], age: describeAge(content, m, state.time), day: then.day, month: then.month.name, summary: m.summary })
-            })
-          ]
+        : [t('scene.prompt.memories.intro'), ...memories.map(memoryLine)]
+    ),
+
+    section(
+      t('scene.prompt.globalMemories.title', { player: player.name }),
+      known.length === 0 ? [] : [t('scene.prompt.globalMemories.intro', { player: player.name }), ...known.map(memoryLine)]
     ),
 
     section(t('scene.prompt.scene.title'), [

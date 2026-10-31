@@ -336,5 +336,15 @@
   "phone.friends": "Friends",
   "phone.enemies": "Enemies",
   "phone.remembers": "What {name} remembers",
-  "phone.noMemories": "Nothing yet. Each scene you share becomes one short memory."
+  "phone.noMemories": "Nothing yet. Each scene you share becomes one short memory.",
+  "phone.profile": "Profile",
+  "phone.bio": "Bio",
+  "phone.about": "About you",
+  "phone.profileTip": "Told to everyone you meet. Write {token} for your name.",
+  "phone.everyoneKnows": "What everyone knows",
+  "phone.noGlobalMemories": "Nothing yet.",
+  "phone.addGlobalMemory": "Add global memory",
+  "phone.globalPlaceholder": "Something about you, or a big event",
+  "phone.holdOn": "How much everyone will hold on to it",
+  "phone.forget": "Forget"
 }

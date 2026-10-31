@@ -45,6 +45,25 @@ describe('buildCharacterPrompt', () => {
     expect(prompt(start(), 'any dragon stories?')).toContain('- Dragons: Dragons are extinct.')
   })
 
+  it('tells everyone what everyone knows, most important first and within the recall limit', () => {
+    expect(prompt(start())).not.toContain('What everyone knows')
+    const state: GameState = {
+      ...start(),
+      globalMemories: [
+        { time: 0, summary: 'Pat won the regatta.', level: 'normal' },
+        { time: 0, summary: 'Pat is left-handed.', level: 'fleeting' },
+        { time: 0, summary: 'The bridge fell.', level: 'core' }
+      ]
+    }
+    const text = prompt(state)
+    expect(text).toContain('## What everyone knows of Pat')
+    expect(text.indexOf('The bridge fell.')).toBeLessThan(text.indexOf('Pat won the regatta.'))
+
+    const told = buildCharacterPrompt({ content, state, loveInterestId: 'ana', memoryRecall: 2, mode: 'courier', npc: { role: 'Baker', knowledge: [] } })
+    expect(told).toContain('The bridge fell.')
+    expect(told).not.toContain('Pat is left-handed.')
+  })
+
   it('rejects unknown characters', () => {
     expect(() =>
       buildCharacterPrompt({ content, state: start(), loveInterestId: 'nobody' })

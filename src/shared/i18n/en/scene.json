@@ -90,6 +90,8 @@
   "prompt.memories.title": "What you remember of your time with {player}",
   "prompt.memories.intro": "Most important first. A core memory is one that defines what you are to each other: it stays with you and colors everything. A fleeting one has mostly faded.",
   "prompt.memories.line": "- {level}, {age} ({day} {month}): {summary}",
+  "prompt.globalMemories.title": "What everyone knows of {player}",
+  "prompt.globalMemories.intro": "Common knowledge, most important first, in the words of {player}.",
   "prompt.scene.title": "The scene",
   "prompt.scene.time": "It is {time} ({period}) on {date}.",
   "prompt.scene.today": "Today is {name}. {description}{going, select, true { You told {player} you would be there.} other {}}",

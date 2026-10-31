@@ -14,6 +14,7 @@ import {
   leaveScene,
   sceneWitnesses,
   attendees,
+  addGlobalMemory,
   addMemory,
   amendMemory,
   addNote,
@@ -1526,15 +1527,16 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           state={state}
           summary={summary}
           backgroundId={summary.scene.viewId ?? backgroundId}
-          onContinue={(edited, levels) => {
+          onContinue={(edited, levels, global) => {
             // The memories were kept as written when the scene ended, so that nothing is lost
             // if the game is closed here. What the player has reworded, or made more or less important, takes their place now.
-            setState((current) =>
-              sceneWitnesses(summary.scene).reduce(
+            setState((current) => {
+              const amended = sceneWitnesses(summary.scene).reduce(
                 (next, id) => amendMemory(next, id, summary.memories[id] ?? '', edited[id] ?? '', levels[id]),
                 current
               )
-            )
+              return global ? addGlobalMemory(amended, global.summary, global.level) : amended
+            })
             setSummary(null)
             // They left together for his class or his plan: with the scene settled, that is what comes next.
             const shared = walkingWith ? sharedUpcoming(content, state, walkingWith) : undefined
