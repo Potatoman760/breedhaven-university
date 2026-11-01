@@ -2857,6 +2857,41 @@ button.stat-grid:hover {
   font-weight: 700;
 }
 
+/* Packs: what can go in one, in columns, each with how many files come with it. */
+.pack-choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 4px 16px;
+}
+
+.pack-choices label {
+  min-height: 32px;
+}
+
+button.btn.pack-all {
+  align-self: flex-start;
+}
+
+.editor-foot > input {
+  flex: 0 1 240px;
+  min-width: 0;
+}
+
+/* What a pack would do, character by character, before it is imported. */
+.pack-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.pack-preview section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .editor-foot {
   display: flex;
   align-items: center;

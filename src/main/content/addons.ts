@@ -710,12 +710,12 @@ export function deleteLook(addonDir: string, content: ContentPack, kind: LookKin
  * Copies a picture or video into a love interest's add-on folder and returns the path to
  * write in the content, which the game serves from there.
  */
-export function importAsset(addonDir: string, loveInterestId: string, sourcePath: string, prefix: string = ADDON_PREFIX): string {
+export function importAsset(addonDir: string, loveInterestId: string, sourcePath: string, prefix: string = ADDON_PREFIX, named: string = sourcePath): string {
   if (!isSafeId(loveInterestId)) throw new Error(t('editor.addons.assetNeedsId'))
   const dir = join(addonDir, SPRITES, loveInterestId)
   mkdirSync(dir, { recursive: true })
-  const ext = extname(sourcePath).toLowerCase()
-  const stem = basename(sourcePath, extname(sourcePath)).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'image'
+  const ext = extname(named).toLowerCase()
+  const stem = basename(named, extname(named)).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'image'
   // Never overwrite: another sprite may still be using the file of that name.
   let name = `${stem}${ext}`
   for (let n = 2; existsSync(join(dir, name)); n++) name = `${stem}-${n}${ext}`

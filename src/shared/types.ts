@@ -5,6 +5,7 @@ import { z } from 'zod'
 import type { LoveInterest, Major } from './model'
 import type { MajorIdea } from './game/draftMajor'
 import type { Card } from './game/sillyCard'
+import type { PackPreview, PackSelection } from './packs'
 import type { ComfyBundle, ComfyBundleCheck, ComfyDownloadList, ComfySettings, ModelDownloadProgress, ModelDownloadResult, ComfyTestResult, CutoutRequest, CutoutResult, GenerateArtRequest, GenerateArtResult, GenerateVideoRequest, WorkflowListResult } from './comfy'
 import {
   GameStateSchema,
@@ -323,6 +324,12 @@ export interface RendererApi {
      */
     /** Has the user pick a file, copies it into the add-on folder, and returns its content path. Null if they cancelled. */
     importAsset(request: ImportAssetRequest): Promise<string | null>
+    /** Asks where to save a pack of what was chosen, and writes it. Null if the player cancels. */
+    exportPack(selection: PackSelection): Promise<{ path: string; files: number; missing: number } | null>
+    /** Asks for a pack and says what importing it would do. Null if the player cancels. */
+    openPack(): Promise<{ preview?: PackPreview; error?: string } | null>
+    /** Imports the pack last opened. */
+    installPack(): Promise<EditorResult & { installed: string[]; majors: string[]; notes: string[] }>
     /** The bytes of one of the content's pictures, by its path. Rejects for a path outside the content. */
     readPicture(path: string): Promise<Uint8Array>
     /**

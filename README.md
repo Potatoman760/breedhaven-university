@@ -223,6 +223,20 @@ courses, the player's start, locations, jobs, societies and ComfyUI.
   with `addons/` are served from there.
 - **Traits**: toggle a character's traits, and add, change or remove traits in the shared
   library. A trait someone still has can't be deleted.
+- **Packs** (`PacksEditor.tsx`, in both builds): a zip of outfits, custom expressions,
+  sex-acts, whole characters and majors, chosen character by character, to pass to another
+  player, and the way to import one. It holds `pack.json` and the files it names under `files/`
+  (`src/shared/packs.ts`, `src/main/content/packs.ts`); the added faces and acts its contents
+  are filed under go with it, and a whole character brings all her files, her traits, and any
+  major of a player's own she studies or teaches, with its college. A player can pack only
+  their own files (those under `addons/`), and as whole characters and majors only those they
+  made; from source, everything. Importing shows what it would do first, and then saves each
+  thing as the editor would: what a character has that the pack does not name stays, one not in
+  the game is passed over, a whole character takes the place of anyone of her id, and a face,
+  act, trait or major whose id or code is already there is left as it is. A whole character's
+  friends and enemies are kept only where the game has them.
+  Nothing in a zip is trusted: only files `pack.json` names are read, they have to be
+  pictures or clips, and the game names where they go.
 - **Expressions & acts** (`LooksEditor.tsx`, in both builds): faces and sex-acts added to the
   standard ones, kept in `looks.json` (`content.looks`, `src/shared/model/looks.ts`): in
   `content/default` from source, in the add-on folder otherwise, laid over the game's by id.

@@ -33,6 +33,7 @@ import { JobsEditor } from "./JobsEditor";
 import { MajorsEditor } from "./MajorsEditor";
 import { SocietiesEditor } from "./SocietiesEditor";
 import { LocationEditor } from "./LocationEditor";
+import { PacksEditor } from "./PacksEditor";
 import { PlayerEditor } from "./PlayerEditor";
 import { ScheduleTab } from "./ScheduleTab";
 import { FamilyTab } from "./FamilyTab";
@@ -92,7 +93,7 @@ function firstSubject(content: ContentPack, teaching: boolean): Studies {
 const same = (a: unknown, b: unknown) =>
   JSON.stringify(a) === JSON.stringify(b);
 
-const SIDES = ["Instructions", "Characters", "Looks", "Majors", "Player", "Locations", "Courses", "Societies", "Jobs", "ComfyUI"] as const;
+const SIDES = ["Instructions", "Characters", "Looks", "Majors", "Player", "Locations", "Courses", "Societies", "Jobs", "Packs", "ComfyUI"] as const;
 type Side = (typeof SIDES)[number];
 const SIDE_LABELS: Record<Side, MessageKey> = {
   Instructions: "editor.instructions.title",
@@ -104,6 +105,7 @@ const SIDE_LABELS: Record<Side, MessageKey> = {
   Courses: "editor.sides.courses",
   Societies: "editor.sides.societies",
   Jobs: "editor.sides.jobs",
+  Packs: "editor.sides.packs",
   ComfyUI: "editor.sides.comfy",
 };
 // The sides that change the game itself and not what a player adds to it: there only when the game's own files are being edited.
@@ -187,6 +189,8 @@ export function ContentEditor(props: Props) {
     <LooksEditor {...props} switcher={switcher} />
   ) : side === "Locations" ? (
     <LocationEditor {...props} switcher={switcher} />
+  ) : side === "Packs" ? (
+    <PacksEditor {...props} switcher={switcher} />
   ) : (
     <LoveInterestEditor {...props} switcher={switcher} />
   );

@@ -16,7 +16,9 @@ import { deleteLoveInterest,
   resetPlayer,
   savePlayer
 } from './content/addons'
-import { LOOK_KINDS, isSafeId, type EditorInfo, type EditorResult } from '../shared/editor'
+import { installPack, readPackManifest, unpackFiles, writePack, type PackInstall } from './content/packs'
+import { LOOK_KINDS, isSafeId, slugify, type EditorInfo, type EditorResult } from '../shared/editor'
+import { PackSelectionSchema, packManifest, packPreview, type PackManifest, type PackPreview } from '../shared/packs'
 import { SaveStore } from './saves/store'
 import { SettingsStore, type KeyCipher } from './settings/store'
 import { RenameSaveRequestSchema, SaveRequestSchema, SlotIdSchema } from '../shared/saves'
@@ -420,6 +422,56 @@ function registerIpc(
     const picked = forced ? { canceled: false, filePaths: [forced] } : await (window ? dialog.showOpenDialog(window, options) : dialog.showOpenDialog(options))
     if (picked.canceled || !picked.filePaths[0]) return null
     return importAsset(info.addonDir, loveInterestId, picked.filePaths[0], info.assetPrefix)
+  })
+  ipcMain.handle(IPC.editorExportPack, async (event, raw: unknown): Promise<{ path: string; files: number; missing: number } | null> => {
+    const selection = PackSelectionSchema.parse(raw)
+    const window = BrowserWindow.fromWebContents(event.sender)
+    const options = { defaultPath: `${slugify(selection.name) || 'pack'}.zip`, filters: [{ name: t('editor.packs.zipFiles'), extensions: ['zip'] }] }
+    const picked = await (window ? dialog.showSaveDialog(window, options) : dialog.showSaveDialog(options))
+    if (picked.canceled || !picked.filePath) return null
+    const onDisk = (path: string): string | undefined => {
+      try {
+        return pictureFile(path)
+      } catch {
+        return undefined
+      }
+    }
+    const written = await writePack(picked.filePath, packManifest(content, selection, info), onDisk)
+    return { path: picked.filePath, files: written.files, missing: written.missing.length }
+  })
+  // The pack last opened: it is looked over before it is imported, and the renderer never names a file itself.
+  let pickedPack: { file: string; manifest: PackManifest } | null = null
+  ipcMain.handle(IPC.editorOpenPack, async (event): Promise<{ preview?: PackPreview; error?: string } | null> => {
+    const window = BrowserWindow.fromWebContents(event.sender)
+    const options = { properties: ['openFile' as const], filters: [{ name: t('editor.packs.zipFiles'), extensions: ['zip'] }] }
+    const picked = await (window ? dialog.showOpenDialog(window, options) : dialog.showOpenDialog(options))
+    const file = picked.filePaths[0]
+    if (picked.canceled || !file) return null
+    try {
+      const manifest = await readPackManifest(file)
+      pickedPack = { file, manifest }
+      return { preview: packPreview(content, manifest) }
+    } catch (error) {
+      return { error: (error as Error).message }
+    }
+  })
+  ipcMain.handle(IPC.editorInstallPack, async (): Promise<EditorResult & PackInstall> => {
+    if (!pickedPack) throw new Error(t('editor.packs.notAPack'))
+    const { file, manifest } = pickedPack
+    pickedPack = null
+    const { dir, files } = await unpackFiles(file, manifest)
+    try {
+      let done: PackInstall = { installed: [], majors: [], notes: [] }
+      const result = change(() => {
+        done = installPack(info.addonDir, content, manifest, files, info.assetPrefix)
+        return []
+      })
+      // What a pack's pictures took the place of is not hers any more.
+      for (const who of [...content.loveInterests, ...content.npcs]) if (done.installed.includes(who.id)) removeUnusedAssets(info.addonDir, who, info.assetPrefix)
+      return { ...result, ...done }
+    } finally {
+      rmSync(dir, { recursive: true, force: true })
+    }
   })
   /** Where one of the content's pictures is on disk, by its path; never outside the content. */
   const pictureFile = (path: string): string => {
