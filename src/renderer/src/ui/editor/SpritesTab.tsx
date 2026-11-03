@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { framingFor, nsfwPrompt, sizeFor, spritePrompt } from '../../../../shared/comfy'
 import { isSafeId, slugify } from '../../../../shared/editor'
-import { facesOf, isPregnantPose, posesOf, outfitDescription, STANDARD_OUTFITS, type Animation, type Looks, type LoveInterest, type Outfit } from '../../../../shared/model'
+import { facesOf, isPregnantPose, posesOf, outfitDescription, SKIN_TONES, STANDARD_OUTFITS, type Animation, type SkinTone, type Looks, type LoveInterest, type Outfit } from '../../../../shared/model'
 import { errorMessage } from '../../errors'
 import { ArtTool } from '../art/ArtTool'
 import { BatchProgress, useBatch, type BatchOutcome } from '../art/batch'
@@ -16,7 +16,7 @@ import { EmptySlot, PictureSlot, SlotGrid } from './slots'
 import { t } from '../../../../shared/i18n'
 
 /** What the sprite editor needs of a character: a love interest and an NPC both have it. */
-type SpriteOwner = Pick<LoveInterest, 'id' | 'name' | 'pronouns' | 'appearance' | 'outfits' | 'defaultOutfitId' | 'faceY' | 'stageHeight' | 'animations' | 'imageSeed' | 'birthPictures' | 'walkSprite' | 'room'>
+type SpriteOwner = Pick<LoveInterest, 'id' | 'name' | 'pronouns' | 'appearance' | 'outfits' | 'defaultOutfitId' | 'faceY' | 'stageHeight' | 'animations' | 'tonedAnimations' | 'imageSeed' | 'birthPictures' | 'walkSprite' | 'room'>
 
 interface Props {
   draft: SpriteOwner
@@ -150,21 +150,21 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
   }
 
   // Her pictures that are still PNGs, her room's among them: everything the optimize button would turn into WebP.
-  const pngs = pngsIn({ outfits: draft.outfits, animations: draft.animations, birthPictures: draft.birthPictures, walkSprite: draft.walkSprite, room: draft.room?.images })
+  const pngs = pngsIn({ outfits: draft.outfits, animations: draft.animations, tonedAnimations: draft.tonedAnimations, birthPictures: draft.birthPictures, walkSprite: draft.walkSprite, room: draft.room?.images })
 
   /**
    * Turns every PNG of hers into a WebP of the same picture, one after another, and puts each in every slot the PNG
    * was in as it is done. Nothing is kept until she is saved; the PNGs go once a save no longer names them.
    */
   async function optimize() {
-    const paths = pngsIn({ outfits: latest.current.outfits, animations: latest.current.animations, birthPictures: latest.current.birthPictures, walkSprite: latest.current.walkSprite, room: latest.current.room?.images })
+    const paths = pngsIn({ outfits: latest.current.outfits, animations: latest.current.animations, tonedAnimations: latest.current.tonedAnimations, birthPictures: latest.current.birthPictures, walkSprite: latest.current.walkSprite, room: latest.current.room?.images })
     if (paths.length === 0 || batch) return
     setNotice('')
     const put = forOwner(latest.current.id)
     const { failed } = await run(OPTIMIZE_BATCH, t('editor.common.optimizing'), paths, fileName, async (path) => {
       try {
         const to = await toWebp(path)
-        put({ outfits: renamed(latest.current.outfits, path, to), animations: renamed(latest.current.animations, path, to), birthPictures: renamed(latest.current.birthPictures, path, to), walkSprite: renamed(latest.current.walkSprite, path, to), room: latest.current.room && { ...latest.current.room, images: renamed(latest.current.room.images, path, to) } })
+        put({ outfits: renamed(latest.current.outfits, path, to), animations: renamed(latest.current.animations, path, to), tonedAnimations: renamed(latest.current.tonedAnimations, path, to), birthPictures: renamed(latest.current.birthPictures, path, to), walkSprite: renamed(latest.current.walkSprite, path, to), room: latest.current.room && { ...latest.current.room, images: renamed(latest.current.room.images, path, to) } })
         return { ok: true }
       } catch (error) {
         return { ok: false, message: errorMessage(error) }
@@ -255,12 +255,20 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
     set({ outfits: freed, defaultOutfitId: draft.defaultOutfitId === gone ? (freed[0]?.id ?? '') : draft.defaultOutfitId })
   }
 
-  /** The pose of that id as she has it, if she has anything for it yet. */
-  const poseOf = (id: string) => draft.animations.find((a) => a.id === id)
+  // Which tone's sex-acts are shown: those drawn with a man of that skin. Light ones are her own `animations`.
+  const [tone, setTone] = useState<SkinTone>('light')
+  /** Her poses of a tone. */
+  const posesIn = (who: Pick<SpriteOwner, 'animations' | 'tonedAnimations'>, of: SkinTone = tone): Animation[] =>
+    of === 'light' ? who.animations : (who.tonedAnimations[of] ?? [])
+  /** What changes her to have these as her poses of a tone. */
+  const withPoses = (who: Pick<SpriteOwner, 'tonedAnimations'>, list: Animation[], of: SkinTone = tone): Partial<SpriteOwner> =>
+    of === 'light' ? { animations: list } : { tonedAnimations: { ...who.tonedAnimations, [of]: list } }
+  /** The pose of that id as she has it in the tone shown, if she has anything for it yet. */
+  const poseOf = (id: string) => posesIn(draft).find((a) => a.id === id)
   // Every slot of the NSFW section: the standard poses in their usual order, with or without a picture, then any of her own.
   const poses = [
     ...slots.poses.map((pose) => poseOf(pose.id) ?? { id: pose.id, name: pose.name, description: '', image: undefined, clip: undefined, loop: true }),
-    ...draft.animations.filter((a) => !slots.all.some((pose) => pose.id === a.id))
+    ...posesIn(draft).filter((a) => !slots.all.some((pose) => pose.id === a.id))
   ]
   // The row under it: each standard pose drawn pregnant, built on the one above.
   const pregnantPoses = slots.pregnant.map((pose) => poseOf(pose.id) ?? { id: pose.id, name: pose.name, description: '', image: undefined, clip: undefined, loop: true })
@@ -271,24 +279,26 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
   const withPictures = [...poses, ...pregnantPoses].filter((pose) => pose.image !== undefined)
 
   /** Changes a pose, making its entry if she has none for it yet. Written onto the draft as it is now, by `put` when a run does it. */
-  function setPose(id: string, patch: Partial<Animation>, put: (patch: Partial<SpriteOwner>) => void = set) {
-    const have = latest.current.animations
+  function setPose(id: string, patch: Partial<Animation>, put: (patch: Partial<SpriteOwner>) => void = set, of: SkinTone = tone) {
+    const have = posesIn(latest.current, of)
     const standard = slots.all.find((pose) => pose.id === id)
-    put({
-      animations: have.some((a) => a.id === id)
-        ? have.map((a) => (a.id === id ? { ...a, ...patch } : a))
-        : [...have, { id, name: standard?.name ?? id, description: '', loop: true, ...patch }]
-    })
+    put(
+      withPoses(
+        latest.current,
+        have.some((a) => a.id === id) ? have.map((a) => (a.id === id ? { ...a, ...patch } : a)) : [...have, { id, name: standard?.name ?? id, description: '', loop: true, ...patch }],
+        of
+      )
+    )
   }
 
   function removePose(id: string) {
-    set({ animations: draft.animations.filter((a) => a.id !== id) })
+    set(withPoses(draft, posesIn(draft).filter((a) => a.id !== id)))
   }
 
   /** Renames a pose of her own. A standard one keeps its name, which is how the game knows it. */
   function renamePose(from: string, to: string) {
-    if (to === from || draft.animations.some((a) => a.id === to)) return
-    set({ animations: draft.animations.map((a) => (a.id === from ? { ...a, id: to, name: to } : a)) })
+    if (to === from || posesIn(draft).some((a) => a.id === to)) return
+    set(withPoses(draft, posesIn(draft).map((a) => (a.id === from ? { ...a, id: to, name: to } : a))))
   }
 
   /** Has the user pick a picture for a pose of her own, beyond the standard ones. */
@@ -296,13 +306,14 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
     const image = await pick('image')
     if (!image) return
     const stem = image.split('/').pop()?.replace(/\.[^.]+$/, '') ?? 'pose'
-    const id = unique(slugify(stem), [...slots.all.map((pose) => pose.id), ...draft.animations.map((a) => a.id)])
-    set({ animations: [...draft.animations, { id, name: id, description: '', image, loop: true }] })
+    const id = unique(slugify(stem), [...slots.all.map((pose) => pose.id), ...posesIn(draft).map((a) => a.id)])
+    set(withPoses(draft, [...posesIn(draft), { id, name: id, description: '', image, loop: true }]))
   }
 
   /** Draws every standard pose that has no picture yet, one after another, and puts each in its slot as it arrives. */
   async function generateMissingPoses(from: readonly { id: string; name: string; draws: string }[] = slots.poses, at: string = NSFW_BATCH) {
-    const missing = from.filter((pose) => !latest.current.animations.find((a) => a.id === pose.id)?.image)
+    const of = tone
+    const missing = from.filter((pose) => !posesIn(latest.current, of).find((a) => a.id === pose.id)?.image)
     setNotice('')
     const settings = await window.api.comfy.getSettings()
     const size = sizeFor(settings, 'nsfw')
@@ -315,16 +326,16 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
       const result = await window.api.comfy.generate({
         kind: 'nsfw',
         subjectId: who.id,
-        name: `nsfw-${pose.id}`,
-        // One drawn pregnant is the same pose, with her pregnant nude in place of her nude.
-        positive: nsfwPrompt(who, pose.draws, framingFor(settings, 'nsfw'), isPregnantPose(pose.id)),
+        name: of === 'light' ? `nsfw-${pose.id}` : `nsfw-${of}-${pose.id}`,
+        // One drawn pregnant is the same pose, with her pregnant nude in place of her nude; the man is drawn in the tone's skin.
+        positive: nsfwPrompt(who, pose.draws, framingFor(settings, 'nsfw'), isPregnantPose(pose.id), of),
         width: size.width,
         height: size.height,
         seed: who.imageSeed
       })
       // Without a working ComfyUI the rest would fail the same way.
       if (!result.ok || !result.path) return { ok: false, message: result.message, fatal: true }
-      setPose(pose.id, { image: result.path }, put)
+      setPose(pose.id, { image: result.path }, put, of)
       return { ok: true }
     })
     if (failed.length > 0) setNotice(t('editor.common.stoppedAt', { name: failed[0] }))
@@ -335,7 +346,8 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
 
   /** Makes a clip of every sex-act that has a picture and no clip, one after another, as the clip tool would with nothing changed. */
   async function generateMissingClips() {
-    const missing = [...latest.current.animations].filter((pose) => pose.image !== undefined && pose.clip === undefined)
+    const of = tone
+    const missing = [...posesIn(latest.current, of)].filter((pose) => pose.image !== undefined && pose.clip === undefined)
     setNotice('')
     const [settings, list] = await Promise.all([window.api.comfy.getSettings(), window.api.comfy.workflows()])
     const owner = latest.current.id
@@ -347,7 +359,7 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
       if (!asked) return { ok: false, message: t('editor.sprites.noClipWorkflow'), fatal: true }
       const result = await window.api.comfy.generateVideo(asked.request)
       if (!result.ok || !result.path) return { ok: false, message: result.message, fatal: true }
-      setPose(pose.id, asked.loop === undefined ? { clip: result.path } : { clip: result.path, loop: asked.loop }, put)
+      setPose(pose.id, asked.loop === undefined ? { clip: result.path } : { clip: result.path, loop: asked.loop }, put, of)
       return { ok: true }
     })
     if (failed.length > 0) setNotice(t('editor.common.stoppedAt', { name: failed[0] }))
@@ -449,6 +461,7 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
             who: draft,
             poses: [...poses, ...pregnantPoses].map((pose) => ({ id: pose.id, name: pose.name, draws: drawsOf(pose.id) })),
             pose: posing,
+            man: tone,
             onUse: (poseId, image) => setPose(poseId, { image })
           }}
           onClose={() => setPosing(null)}
@@ -810,6 +823,14 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
         </div>
       </Group>
 
+      {/* The sex-acts are drawn once for each tone of the man in them: the player's is shown, or the light one where his has none. */}
+      <div className="tabs" role="tablist" aria-label={t('editor.sprites.manTone')}>
+        {SKIN_TONES.map((one) => (
+          <button key={one} type="button" role="tab" aria-selected={tone === one} className={tone === one ? 'tab selected' : 'tab'} title={t('editor.sprites.manToneTip')} onClick={() => setTone(one)}>
+            {t(`editor.family.tone.${one}`)}
+          </button>
+        ))}
+      </div>
       <Group
         title={t('editor.sprites.nsfw')}
         hint={t('editor.sprites.nsfwHint')}

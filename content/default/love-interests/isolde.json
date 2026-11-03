@@ -546,5 +546,123 @@
     "knowledge": [],
     "secrets": [],
     "extraInstructions": ""
+  },
+  "tonedAnimations": {
+    "medium": [
+      {
+        "id": "blowjob",
+        "name": "Blowjob",
+        "description": "",
+        "image": "sprites/isolde/nsfw-medium-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "missionary",
+        "name": "Missionary",
+        "description": "",
+        "image": "sprites/isolde/nsfw-medium-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "doggy",
+        "name": "Doggy",
+        "description": "",
+        "image": "sprites/isolde/nsfw-medium-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "cowgirl",
+        "name": "Cowgirl",
+        "description": "",
+        "image": "sprites/isolde/nsfw-medium-cowgirl.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-blowjob",
+        "name": "Blowjob, pregnant",
+        "description": "",
+        "image": "sprites/isolde/nsfw-medium-pregnant-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-missionary",
+        "name": "Missionary, pregnant",
+        "description": "",
+        "image": "sprites/isolde/nsfw-medium-pregnant-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-doggy",
+        "name": "Doggy, pregnant",
+        "description": "",
+        "image": "sprites/isolde/nsfw-medium-pregnant-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-cowgirl",
+        "name": "Cowgirl, pregnant",
+        "description": "",
+        "image": "sprites/isolde/nsfw-medium-pregnant-cowgirl.webp",
+        "loop": true
+      }
+    ],
+    "dark": [
+      {
+        "id": "blowjob",
+        "name": "Blowjob",
+        "description": "",
+        "image": "sprites/isolde/nsfw-dark-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "missionary",
+        "name": "Missionary",
+        "description": "",
+        "image": "sprites/isolde/nsfw-dark-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "doggy",
+        "name": "Doggy",
+        "description": "",
+        "image": "sprites/isolde/nsfw-dark-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "cowgirl",
+        "name": "Cowgirl",
+        "description": "",
+        "image": "sprites/isolde/nsfw-dark-cowgirl.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-blowjob",
+        "name": "Blowjob, pregnant",
+        "description": "",
+        "image": "sprites/isolde/nsfw-dark-pregnant-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-missionary",
+        "name": "Missionary, pregnant",
+        "description": "",
+        "image": "sprites/isolde/nsfw-dark-pregnant-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-doggy",
+        "name": "Doggy, pregnant",
+        "description": "",
+        "image": "sprites/isolde/nsfw-dark-pregnant-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-cowgirl",
+        "name": "Cowgirl, pregnant",
+        "description": "",
+        "image": "sprites/isolde/nsfw-dark-pregnant-cowgirl.webp",
+        "loop": true
+      }
+    ]
   }
 }

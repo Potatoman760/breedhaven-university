@@ -566,5 +566,123 @@
     "knowledge": [],
     "secrets": [],
     "extraInstructions": "Her voice stays warm and unhurried when she is weighing an offer. She holds a look, chooses when to move closer, and enjoys seeing someone react. She flirts on purpose and usually knows what she wants from the exchange. Affection can become sincere without making her suddenly timid or stripping away her confidence. Give her real questions and desires; do not make every line a contract metaphor."
+  },
+  "tonedAnimations": {
+    "medium": [
+      {
+        "id": "blowjob",
+        "name": "Blowjob",
+        "description": "",
+        "image": "sprites/faye/nsfw-medium-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "missionary",
+        "name": "Missionary",
+        "description": "",
+        "image": "sprites/faye/nsfw-medium-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "doggy",
+        "name": "Doggy",
+        "description": "",
+        "image": "sprites/faye/nsfw-medium-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "cowgirl",
+        "name": "Cowgirl",
+        "description": "",
+        "image": "sprites/faye/nsfw-medium-cowgirl.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-blowjob",
+        "name": "Blowjob, pregnant",
+        "description": "",
+        "image": "sprites/faye/nsfw-medium-pregnant-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-missionary",
+        "name": "Missionary, pregnant",
+        "description": "",
+        "image": "sprites/faye/nsfw-medium-pregnant-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-doggy",
+        "name": "Doggy, pregnant",
+        "description": "",
+        "image": "sprites/faye/nsfw-medium-pregnant-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-cowgirl",
+        "name": "Cowgirl, pregnant",
+        "description": "",
+        "image": "sprites/faye/nsfw-medium-pregnant-cowgirl.webp",
+        "loop": true
+      }
+    ],
+    "dark": [
+      {
+        "id": "blowjob",
+        "name": "Blowjob",
+        "description": "",
+        "image": "sprites/faye/nsfw-dark-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "missionary",
+        "name": "Missionary",
+        "description": "",
+        "image": "sprites/faye/nsfw-dark-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "doggy",
+        "name": "Doggy",
+        "description": "",
+        "image": "sprites/faye/nsfw-dark-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "cowgirl",
+        "name": "Cowgirl",
+        "description": "",
+        "image": "sprites/faye/nsfw-dark-cowgirl.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-blowjob",
+        "name": "Blowjob, pregnant",
+        "description": "",
+        "image": "sprites/faye/nsfw-dark-pregnant-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-missionary",
+        "name": "Missionary, pregnant",
+        "description": "",
+        "image": "sprites/faye/nsfw-dark-pregnant-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-doggy",
+        "name": "Doggy, pregnant",
+        "description": "",
+        "image": "sprites/faye/nsfw-dark-pregnant-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-cowgirl",
+        "name": "Cowgirl, pregnant",
+        "description": "",
+        "image": "sprites/faye/nsfw-dark-pregnant-cowgirl.webp",
+        "loop": true
+      }
+    ]
   }
 }

@@ -461,6 +461,8 @@
   "sprites.addOutfit": "Add an outfit",
   "sprites.addBathrobe": "Add a bathrobe for the trip",
   "sprites.nsfw": "NSFW",
+  "sprites.manTone": "Skin tone of the man",
+  "sprites.manToneTip": "The sex-acts drawn with a man of this skin. A player of this tone sees these, act by act, and the light ones for any act that has none here.",
   "sprites.nsfwHint": "Explicit pictures that take the sprite's place, one to a sex-act, as an outfit has one to a face. The LLM shows one when the scene reaches what its description says, and takes it down when it no longer fits. A sex-act can have a video clip as a layer over its picture: where it has one the clip is played, and the picture is what it falls back on. The picture is always what is shown here, marked in its corner when it has a clip. A clip is uploaded, or made from the picture with a video workflow on your own ComfyUI, and either can be replaced without touching the other.",
   "sprites.generatePosesTitle": "Draw every sex-act that has no picture yet with your own ComfyUI, one after another",
   "sprites.generatePoses": "Generate missing sex-acts ({count})",

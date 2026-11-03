@@ -23,6 +23,7 @@ import {
   kindOf,
   poseMedia,
   validateContentPack,
+  type Animation,
   type Job,
   type Society,
   type SocietiesFair,
@@ -776,7 +777,7 @@ export function deleteGroup(addonDir: string, id: string): string[] {
 
 /** What of a group the clean-up after a save looks at: its files are a folder of their own, kept as a character's are. */
 export function groupAssets(group: Group): Parameters<typeof removeUnusedAssets>[1] {
-  return { id: groupFiles(group.id), outfits: [], animations: group.animations }
+  return { id: groupFiles(group.id), outfits: [], animations: group.animations, tonedAnimations: group.tonedAnimations }
 }
 
 /**
@@ -804,7 +805,7 @@ export function importAsset(addonDir: string, loveInterestId: string, sourcePath
  */
 export function removeUnusedAssets(
   addonDir: string,
-  who: Pick<LoveInterest, 'id' | 'outfits' | 'animations'> & { room?: { images?: Partial<Record<string, string>> }; birthPictures?: Partial<Record<string, string>>; walkSprite?: string },
+  who: Pick<LoveInterest, 'id' | 'outfits' | 'animations'> & { tonedAnimations?: Partial<Record<string, Animation[]>>; room?: { images?: Partial<Record<string, string>> }; birthPictures?: Partial<Record<string, string>>; walkSprite?: string },
   prefix: string = ADDON_PREFIX
 ): string[] {
   if (!isSafeId(who.id)) return []
@@ -812,6 +813,7 @@ export function removeUnusedAssets(
     [
       ...who.outfits.flatMap((outfit) => Object.values(outfit.sprites).map((sprite) => sprite.image)),
       ...who.animations.flatMap(poseMedia),
+      ...Object.values(who.tonedAnimations ?? {}).flatMap((poses) => (poses ?? []).flatMap((pose) => poseMedia(pose))),
       ...Object.values(who.room?.images ?? {}),
       ...Object.values(who.birthPictures ?? {}),
       who.walkSprite

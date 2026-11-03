@@ -55,7 +55,69 @@
         "clip": "sprites/group-anwen-elowen/nsfw-facial.mp4",
         "loop": true
       }
-    ]
+    ],
+    "tonedAnimations": {
+      "medium": [
+        {
+          "id": "blowjob",
+          "name": "Blowjob",
+          "description": "",
+          "image": "sprites/group-anwen-elowen/nsfw-medium-blowjob.webp",
+          "loop": true
+        },
+        {
+          "id": "missionary",
+          "name": "Missionary",
+          "description": "",
+          "image": "sprites/group-anwen-elowen/nsfw-medium-missionary.webp",
+          "loop": true
+        },
+        {
+          "id": "doggy",
+          "name": "Doggy",
+          "description": "",
+          "image": "sprites/group-anwen-elowen/nsfw-medium-doggy.webp",
+          "loop": true
+        },
+        {
+          "id": "cowgirl",
+          "name": "Cowgirl",
+          "description": "",
+          "image": "sprites/group-anwen-elowen/nsfw-medium-cowgirl.webp",
+          "loop": true
+        }
+      ],
+      "dark": [
+        {
+          "id": "blowjob",
+          "name": "Blowjob",
+          "description": "",
+          "image": "sprites/group-anwen-elowen/nsfw-dark-blowjob.webp",
+          "loop": true
+        },
+        {
+          "id": "missionary",
+          "name": "Missionary",
+          "description": "",
+          "image": "sprites/group-anwen-elowen/nsfw-dark-missionary.webp",
+          "loop": true
+        },
+        {
+          "id": "doggy",
+          "name": "Doggy",
+          "description": "",
+          "image": "sprites/group-anwen-elowen/nsfw-dark-doggy.webp",
+          "loop": true
+        },
+        {
+          "id": "cowgirl",
+          "name": "Cowgirl",
+          "description": "",
+          "image": "sprites/group-anwen-elowen/nsfw-dark-cowgirl.webp",
+          "loop": true
+        }
+      ]
+    }
   },
   {
     "id": "dinah-morwenna",
@@ -107,7 +169,69 @@
         "image": "sprites/group-dinah-morwenna/nsfw-facial.webp",
         "loop": true
       }
-    ]
+    ],
+    "tonedAnimations": {
+      "medium": [
+        {
+          "id": "blowjob",
+          "name": "Blowjob",
+          "description": "",
+          "image": "sprites/group-dinah-morwenna/nsfw-medium-blowjob.webp",
+          "loop": true
+        },
+        {
+          "id": "missionary",
+          "name": "Missionary",
+          "description": "",
+          "image": "sprites/group-dinah-morwenna/nsfw-medium-missionary.webp",
+          "loop": true
+        },
+        {
+          "id": "doggy",
+          "name": "Doggy",
+          "description": "",
+          "image": "sprites/group-dinah-morwenna/nsfw-medium-doggy.webp",
+          "loop": true
+        },
+        {
+          "id": "cowgirl",
+          "name": "Cowgirl",
+          "description": "",
+          "image": "sprites/group-dinah-morwenna/nsfw-medium-cowgirl.webp",
+          "loop": true
+        }
+      ],
+      "dark": [
+        {
+          "id": "blowjob",
+          "name": "Blowjob",
+          "description": "",
+          "image": "sprites/group-dinah-morwenna/nsfw-dark-blowjob.webp",
+          "loop": true
+        },
+        {
+          "id": "missionary",
+          "name": "Missionary",
+          "description": "",
+          "image": "sprites/group-dinah-morwenna/nsfw-dark-missionary.webp",
+          "loop": true
+        },
+        {
+          "id": "doggy",
+          "name": "Doggy",
+          "description": "",
+          "image": "sprites/group-dinah-morwenna/nsfw-dark-doggy.webp",
+          "loop": true
+        },
+        {
+          "id": "cowgirl",
+          "name": "Cowgirl",
+          "description": "",
+          "image": "sprites/group-dinah-morwenna/nsfw-dark-cowgirl.webp",
+          "loop": true
+        }
+      ]
+    }
   },
   {
     "id": "seraphine-yelena",
@@ -159,6 +283,68 @@
         "image": "sprites/group-seraphine-yelena/nsfw-facial.webp",
         "loop": true
       }
-    ]
+    ],
+    "tonedAnimations": {
+      "medium": [
+        {
+          "id": "blowjob",
+          "name": "Blowjob",
+          "description": "",
+          "image": "sprites/group-seraphine-yelena/nsfw-medium-blowjob.webp",
+          "loop": true
+        },
+        {
+          "id": "missionary",
+          "name": "Missionary",
+          "description": "",
+          "image": "sprites/group-seraphine-yelena/nsfw-medium-missionary.webp",
+          "loop": true
+        },
+        {
+          "id": "doggy",
+          "name": "Doggy",
+          "description": "",
+          "image": "sprites/group-seraphine-yelena/nsfw-medium-doggy.webp",
+          "loop": true
+        },
+        {
+          "id": "cowgirl",
+          "name": "Cowgirl",
+          "description": "",
+          "image": "sprites/group-seraphine-yelena/nsfw-medium-cowgirl.webp",
+          "loop": true
+        }
+      ],
+      "dark": [
+        {
+          "id": "blowjob",
+          "name": "Blowjob",
+          "description": "",
+          "image": "sprites/group-seraphine-yelena/nsfw-dark-blowjob.webp",
+          "loop": true
+        },
+        {
+          "id": "missionary",
+          "name": "Missionary",
+          "description": "",
+          "image": "sprites/group-seraphine-yelena/nsfw-dark-missionary.webp",
+          "loop": true
+        },
+        {
+          "id": "doggy",
+          "name": "Doggy",
+          "description": "",
+          "image": "sprites/group-seraphine-yelena/nsfw-dark-doggy.webp",
+          "loop": true
+        },
+        {
+          "id": "cowgirl",
+          "name": "Cowgirl",
+          "description": "",
+          "image": "sprites/group-seraphine-yelena/nsfw-dark-cowgirl.webp",
+          "loop": true
+        }
+      ]
+    }
   }
 ]

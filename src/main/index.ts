@@ -42,6 +42,7 @@ import { banterDue, buildBanterPrompt, parseBanter } from '../shared/game/banter
 import { buildMomentPrompt, parseMomentLines } from '../shared/game/momentLines'
 import { personalise } from '../shared/game/personalise'
 import { withHousing } from '../shared/game/housing'
+import { withSkinTone } from '../shared/game/skin'
 import { buildCharacterPrompt, clockNote, sceneTurns } from '../shared/game/prompt'
 import { CHAT_CANCELLED, IPC } from '../shared/ipc'
 import { DEFAULT_LANGUAGE, setLanguage, t, type Messages } from '../shared/i18n'
@@ -260,7 +261,7 @@ function registerIpc(
   })
   /** The content as the game with this state reads it: the player's name filled in wherever the content wrote the token. */
   // And with the house he has been let in it or out of it, as his game has it.
-  const readBy = (state: Pick<GameState, 'player' | 'housing'>): ContentPack => withHousing(personalise(content, state.player.name), state)
+  const readBy = (state: Pick<GameState, 'player' | 'housing'>): ContentPack => withHousing(withSkinTone(personalise(content, state.player.name), state.player.skinTone), state)
   const baseTraitIds = () => Object.keys(info.traits).filter((id) => info.traits[id] !== 'addon')
 
   ipcMain.handle(IPC.getContent, () => content)

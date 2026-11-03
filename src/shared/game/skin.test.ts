@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { babyTone, babyToneFor, babyTonesOf, birthPictureFor } from './skin'
+import { babyTone, babyToneFor, babyTonesOf, birthPictureFor, posesForTone, withSkinTone } from './skin'
 import { createInitialState } from './state'
 import { fixture } from './testFixture'
 
@@ -20,6 +20,27 @@ describe('a child of theirs', () => {
     expect(babyTonesOf({ skinTone: 'medium' })).toEqual(['medium', 'dark'])
     expect(babyTonesOf({ skinTone: 'dark' })).toEqual(['medium', 'dark'])
     expect(babyTonesOf({ skinTone: 'medium', ownBabyTone: 'light' })).toEqual(['light'])
+  })
+
+  it("shows a player her sex-acts for his tone, act by act, and the light ones for any act it has none of", () => {
+    const pose = (id: string, image?: string) => ({ id, name: id, description: '', loop: true, ...(image && { image }) })
+    const ana = {
+      animations: [pose('blowjob', 'l-bj.png'), pose('pregnant-blowjob', 'l-pbj.png'), pose('doggy', 'l-dog.png'), pose('pregnant-doggy', 'l-pdog.png')],
+      tonedAnimations: { dark: [pose('blowjob', 'd-bj.png'), pose('doggy'), pose('pregnant-doggy', 'd-pdog.png')] }
+    }
+    const dark = posesForTone(ana, 'dark')
+    // Blowjob is drawn dark, so the dark one is shown, and with no pregnant one of its own the pregnant form is not borrowed.
+    expect(dark.filter((one) => one.id.endsWith('blowjob')).map((one) => one.image)).toEqual(['d-bj.png'])
+    // Doggy has no dark picture of itself, so the act is the light one, pregnant form and all.
+    expect(dark.filter((one) => one.id.endsWith('doggy')).map((one) => one.image)).toEqual(['l-dog.png', 'l-pdog.png'])
+    expect(posesForTone(ana, 'medium')).toBe(ana.animations)
+    expect(posesForTone(ana, 'light')).toBe(ana.animations)
+    // The pack a game of a tone reads has her so, and is the same object while nothing changes.
+    const base = fixture()
+    const content = { ...base, loveInterests: base.loveInterests.map((li) => ({ ...li, ...ana })) }
+    expect(withSkinTone(content, 'dark').loveInterests[0].animations).toEqual(dark)
+    expect(withSkinTone(content, 'dark')).toBe(withSkinTone(content, 'dark'))
+    expect(withSkinTone(content, 'light')).toBe(content)
   })
 
   it("is drawn in her picture of that tone, from the player's tone and hers", () => {

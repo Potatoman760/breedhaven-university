@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { framingFor, groupNsfwPrompt, sizeFor } from '../../../../shared/comfy'
 import { isSafeId, slugify, type EditorInfo, type EditorResult } from '../../../../shared/editor'
-import { GROUP_SIZE, groupFiles, posesOf, type Animation, type ContentPack, type Group as GroupData } from '../../../../shared/model'
+import { GROUP_SIZE, SKIN_TONES, groupFiles, posesOf, type Animation, type ContentPack, type Group as GroupData, type SkinTone } from '../../../../shared/model'
 import { errorMessage } from '../../errors'
 import { ArtTool } from '../art/ArtTool'
 import { BatchProgress, useBatch, type BatchOutcome } from '../art/batch'
@@ -22,7 +22,7 @@ interface Props {
   switcher: (mayLeave: () => boolean) => ReactNode
 }
 
-const blank = (): GroupData => ({ id: '', name: '', memberIds: ['', ''], animations: [] })
+const blank = (): GroupData => ({ id: '', name: '', memberIds: ['', ''], animations: [], tonedAnimations: {} })
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
 // The runs that draw the group's missing sex-acts, and make their missing clips.
 const POSES_BATCH = '(group-poses)'
@@ -43,6 +43,8 @@ export function GroupsEditor({ content, onContent, switcher }: Props) {
   const [posing, setPosing] = useState<string | null>(null)
   const [clipping, setClipping] = useState<string | null>(null)
   const [viewing, setViewing] = useState<string | null>(null)
+  // Which tone's sex-acts are shown: those drawn with a man of that skin. Light ones are the group's own `animations`.
+  const [tone, setTone] = useState<SkinTone>('light')
   const { batch, run, stop } = useBatch()
   const { ask, dialog } = useConfirm()
   useEffect(() => {
@@ -66,7 +68,13 @@ export function GroupsEditor({ content, onContent, switcher }: Props) {
   // A group's picture of an act is asked for in the act's group wording, all of them in it; one with none, in its own.
   const drawsOf = (slot: (typeof slots)[number]) => slot.groupDraws?.trim() || slot.draws
   const manIn = (id: string) => slots.find((slot) => slot.id === id)?.manShown !== false
-  const poseOf = (id: string) => draft.animations.find((a) => a.id === id)
+  /** The group's sex-acts of a tone. */
+  const posesIn = (group: Pick<GroupData, 'animations' | 'tonedAnimations'>, of: SkinTone = tone): Animation[] =>
+    of === 'light' ? group.animations : (group.tonedAnimations[of] ?? [])
+  /** The group with these as its sex-acts of a tone. */
+  const withPoses = (group: GroupData, list: Animation[], of: SkinTone = tone): GroupData =>
+    of === 'light' ? { ...group, animations: list } : { ...group, tonedAnimations: { ...group.tonedAnimations, [of]: list } }
+  const poseOf = (id: string) => posesIn(draft).find((a) => a.id === id)
   const removable = !isNew && info?.groups[draft.id] !== 'base'
   const canSave = ready && draft.name.trim() !== '' && members.length >= GROUP_SIZE.least && new Set(members).size === members.length
 
@@ -75,13 +83,11 @@ export function GroupsEditor({ content, onContent, switcher }: Props) {
     setDraft((current) => ({ ...current, ...patch }))
   }
   /** Changes a sex-act, making its entry if the group has none for it yet. Onto the draft as it is now. */
-  function setPose(id: string, patch: Partial<Animation>) {
+  function setPose(id: string, patch: Partial<Animation>, of: SkinTone = tone) {
     setDraft((current) => {
       const name = slots.find((slot) => slot.id === id)?.name ?? id
-      const animations = current.animations.some((a) => a.id === id)
-        ? current.animations.map((a) => (a.id === id ? { ...a, ...patch } : a))
-        : [...current.animations, { id, name, description: '', loop: true, ...patch }]
-      return { ...current, animations }
+      const have = posesIn(current, of)
+      return withPoses(current, have.some((a) => a.id === id) ? have.map((a) => (a.id === id ? { ...a, ...patch } : a)) : [...have, { id, name, description: '', loop: true, ...patch }], of)
     })
   }
   const setMember = (at: number, id: string) => set({ memberIds: Array.from({ length: Math.max(GROUP_SIZE.least, at + 1, draft.memberIds.length) }, (_, i) => (i === at ? id : (draft.memberIds[i] ?? ''))) })
@@ -126,26 +132,29 @@ export function GroupsEditor({ content, onContent, switcher }: Props) {
   /** Draws every sex-act the group has no picture for, one after another, each put in its slot as it arrives. */
   async function generateMissing() {
     const id = latest.current.id
-    const missing = slots.filter((slot) => !latest.current.animations.find((a) => a.id === slot.id)?.image)
+    // A run keeps to the tone it was started on, whatever is shown meanwhile.
+    const of = tone
+    const missing = slots.filter((slot) => !posesIn(latest.current, of).find((a) => a.id === slot.id)?.image)
     const settings = await window.api.comfy.getSettings()
     const size = sizeFor(settings, 'nsfw')
     const { failed } = await run(POSES_BATCH, t('editor.common.drawing'), missing, (slot) => slot.name, async (slot) => {
       const stopped = owner(id)
       if (stopped) return stopped
-      const result = await window.api.comfy.generate({ kind: 'nsfw', subjectId: groupFiles(id), name: `nsfw-${slot.id}`, positive: groupNsfwPrompt(women, drawsOf(slot), framingFor(settings, 'nsfw'), manIn(slot.id)), width: size.width, height: size.height, seed: lead?.imageSeed })
+      const result = await window.api.comfy.generate({ kind: 'nsfw', subjectId: groupFiles(id), name: of === 'light' ? `nsfw-${slot.id}` : `nsfw-${of}-${slot.id}`, positive: groupNsfwPrompt(women, drawsOf(slot), framingFor(settings, 'nsfw'), manIn(slot.id), of), width: size.width, height: size.height, seed: lead?.imageSeed })
       if (!result.ok || !result.path) return { ok: false, message: result.message, fatal: true }
-      if (latest.current.id === id) setPose(slot.id, { image: result.path })
+      if (latest.current.id === id) setPose(slot.id, { image: result.path }, of)
       return { ok: true }
     })
     if (failed.length > 0) setStatus(t('editor.common.stoppedAt', { name: failed[0] }))
   }
 
   // The sex-acts that have a picture and no clip yet.
-  const unclipped = draft.animations.filter((pose) => pose.image !== undefined && pose.clip === undefined)
+  const unclipped = posesIn(draft).filter((pose) => pose.image !== undefined && pose.clip === undefined)
 
   async function generateMissingClips() {
     const id = latest.current.id
-    const missing = latest.current.animations.filter((pose) => pose.image !== undefined && pose.clip === undefined)
+    const of = tone
+    const missing = posesIn(latest.current, of).filter((pose) => pose.image !== undefined && pose.clip === undefined)
     const [settings, list] = await Promise.all([window.api.comfy.getSettings(), window.api.comfy.workflows()])
     const { failed } = await run(CLIPS_BATCH, t('editor.sprites.animating'), missing, (pose) => pose.name, async (pose) => {
       const stopped = owner(id)
@@ -154,7 +163,7 @@ export function GroupsEditor({ content, onContent, switcher }: Props) {
       if (!asked) return { ok: false, message: t('editor.sprites.noClipWorkflow'), fatal: true }
       const result = await window.api.comfy.generateVideo(asked.request)
       if (!result.ok || !result.path) return { ok: false, message: result.message, fatal: true }
-      if (latest.current.id === id) setPose(pose.id, asked.loop === undefined ? { clip: result.path } : { clip: result.path, loop: asked.loop })
+      if (latest.current.id === id) setPose(pose.id, asked.loop === undefined ? { clip: result.path } : { clip: result.path, loop: asked.loop }, of)
       return { ok: true }
     })
     if (failed.length > 0) setStatus(t('editor.common.stoppedAt', { name: failed[0] }))
@@ -175,7 +184,7 @@ export function GroupsEditor({ content, onContent, switcher }: Props) {
             who: { id: files, name: nameOf(draft), pronouns: 'she/her', appearance: '', outfits: [], imageSeed: lead?.imageSeed },
             poses: slots.map((slot) => ({ id: slot.id, name: slot.name, draws: drawsOf(slot) })),
             pose: posing,
-            prompt: (draws, framing, poseId) => groupNsfwPrompt(women, draws, framing, manIn(poseId)),
+            prompt: (draws, framing, poseId) => groupNsfwPrompt(women, draws, framing, manIn(poseId), tone),
             onUse: (poseId, image) => setPose(poseId, { image })
           }}
           onClose={() => setPosing(null)}
@@ -257,6 +266,14 @@ export function GroupsEditor({ content, onContent, switcher }: Props) {
             </div>
           </Group>
 
+          {/* The sex-acts are drawn once for each tone of the man in them, and shown as a character's are. */}
+          <div className="tabs" role="tablist" aria-label={t('editor.sprites.manTone')}>
+            {SKIN_TONES.map((one) => (
+              <button key={one} type="button" role="tab" aria-selected={tone === one} className={tone === one ? 'tab selected' : 'tab'} title={t('editor.sprites.manToneTip')} onClick={() => setTone(one)}>
+                {t(`editor.family.tone.${one}`)}
+              </button>
+            ))}
+          </div>
           <Group title={t('editor.sprites.nsfw')}>
             <div className="outfit-actions">
               {slots.some((slot) => !poseOf(slot.id)?.image) && (
@@ -302,7 +319,7 @@ export function GroupsEditor({ content, onContent, switcher }: Props) {
                         <Button disabled={!ready} title={t('editor.sprites.videoTitle')} onClick={() => setClipping(slot.id)}>
                           {t('editor.sprites.video')}
                         </Button>
-                        <Button onClick={() => set({ animations: draft.animations.filter((a) => a.id !== slot.id) })}>{t('editor.common.remove')}</Button>
+                        <Button onClick={() => set(withPoses(draft, posesIn(draft).filter((a) => a.id !== slot.id)))}>{t('editor.common.remove')}</Button>
                       </>
                     }
                   />

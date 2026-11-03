@@ -407,7 +407,7 @@
       "id": "pregnant-doggy",
       "name": "Doggy, pregnant",
       "description": "",
-      "image": "sprites/dinah/nsfw-pregnant-doggy.webp",
+      "image": "sprites/dinah/nsfw-pregnant-doggy-2.png",
       "loop": true
     },
     {
@@ -444,8 +444,8 @@
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/dinah/nsfw-doggy.webp",
-      "clip": "sprites/dinah/nsfw-doggy.mp4",
+      "image": "sprites/dinah/nsfw-doggy-2.png",
+      "clip": "sprites/dinah/nsfw-doggy-2.mp4",
       "loop": true
     },
     {
@@ -473,6 +473,124 @@
       "loop": true
     }
   ],
+  "tonedAnimations": {
+    "medium": [
+      {
+        "id": "pregnant-blowjob",
+        "name": "Blowjob, pregnant",
+        "description": "",
+        "image": "sprites/dinah/nsfw-medium-pregnant-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-missionary",
+        "name": "Missionary, pregnant",
+        "description": "",
+        "image": "sprites/dinah/nsfw-medium-pregnant-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-doggy",
+        "name": "Doggy, pregnant",
+        "description": "",
+        "image": "sprites/dinah/nsfw-medium-pregnant-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-cowgirl",
+        "name": "Cowgirl, pregnant",
+        "description": "",
+        "image": "sprites/dinah/nsfw-medium-pregnant-cowgirl.webp",
+        "loop": true
+      },
+      {
+        "id": "blowjob",
+        "name": "Blowjob",
+        "description": "",
+        "image": "sprites/dinah/nsfw-medium-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "missionary",
+        "name": "Missionary",
+        "description": "",
+        "image": "sprites/dinah/nsfw-medium-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "doggy",
+        "name": "Doggy",
+        "description": "",
+        "image": "sprites/dinah/nsfw-medium-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "cowgirl",
+        "name": "Cowgirl",
+        "description": "",
+        "image": "sprites/dinah/nsfw-medium-cowgirl.webp",
+        "loop": true
+      }
+    ],
+    "dark": [
+      {
+        "id": "pregnant-blowjob",
+        "name": "Blowjob, pregnant",
+        "description": "",
+        "image": "sprites/dinah/nsfw-dark-pregnant-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-missionary",
+        "name": "Missionary, pregnant",
+        "description": "",
+        "image": "sprites/dinah/nsfw-dark-pregnant-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-doggy",
+        "name": "Doggy, pregnant",
+        "description": "",
+        "image": "sprites/dinah/nsfw-dark-pregnant-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-cowgirl",
+        "name": "Cowgirl, pregnant",
+        "description": "",
+        "image": "sprites/dinah/nsfw-dark-pregnant-cowgirl.webp",
+        "loop": true
+      },
+      {
+        "id": "blowjob",
+        "name": "Blowjob",
+        "description": "",
+        "image": "sprites/dinah/nsfw-dark-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "missionary",
+        "name": "Missionary",
+        "description": "",
+        "image": "sprites/dinah/nsfw-dark-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "doggy",
+        "name": "Doggy",
+        "description": "",
+        "image": "sprites/dinah/nsfw-dark-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "cowgirl",
+        "name": "Cowgirl",
+        "description": "",
+        "image": "sprites/dinah/nsfw-dark-cowgirl.webp",
+        "loop": true
+      }
+    ]
+  },
   "schedule": [
     {
       "weekdays": [

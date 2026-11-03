@@ -567,5 +567,123 @@
     "knowledge": [],
     "secrets": [],
     "extraInstructions": "Play her as genuinely fun, not as a joke. She is careless, not stupid, and she notices more than she lets on. Let her Starklandish pride surface when someone assumes she is just a pretty face. She should flirt as easily as breathing but go still and quiet if someone is actually kind to her without wanting something."
+  },
+  "tonedAnimations": {
+    "medium": [
+      {
+        "id": "blowjob",
+        "name": "Blowjob",
+        "description": "",
+        "image": "sprites/yulia/nsfw-medium-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "missionary",
+        "name": "Missionary",
+        "description": "",
+        "image": "sprites/yulia/nsfw-medium-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "doggy",
+        "name": "Doggy",
+        "description": "",
+        "image": "sprites/yulia/nsfw-medium-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "cowgirl",
+        "name": "Cowgirl",
+        "description": "",
+        "image": "sprites/yulia/nsfw-medium-cowgirl.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-blowjob",
+        "name": "Blowjob, pregnant",
+        "description": "",
+        "image": "sprites/yulia/nsfw-medium-pregnant-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-missionary",
+        "name": "Missionary, pregnant",
+        "description": "",
+        "image": "sprites/yulia/nsfw-medium-pregnant-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-doggy",
+        "name": "Doggy, pregnant",
+        "description": "",
+        "image": "sprites/yulia/nsfw-medium-pregnant-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-cowgirl",
+        "name": "Cowgirl, pregnant",
+        "description": "",
+        "image": "sprites/yulia/nsfw-medium-pregnant-cowgirl.webp",
+        "loop": true
+      }
+    ],
+    "dark": [
+      {
+        "id": "blowjob",
+        "name": "Blowjob",
+        "description": "",
+        "image": "sprites/yulia/nsfw-dark-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "missionary",
+        "name": "Missionary",
+        "description": "",
+        "image": "sprites/yulia/nsfw-dark-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "doggy",
+        "name": "Doggy",
+        "description": "",
+        "image": "sprites/yulia/nsfw-dark-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "cowgirl",
+        "name": "Cowgirl",
+        "description": "",
+        "image": "sprites/yulia/nsfw-dark-cowgirl.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-blowjob",
+        "name": "Blowjob, pregnant",
+        "description": "",
+        "image": "sprites/yulia/nsfw-dark-pregnant-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-missionary",
+        "name": "Missionary, pregnant",
+        "description": "",
+        "image": "sprites/yulia/nsfw-dark-pregnant-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-doggy",
+        "name": "Doggy, pregnant",
+        "description": "",
+        "image": "sprites/yulia/nsfw-dark-pregnant-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-cowgirl",
+        "name": "Cowgirl, pregnant",
+        "description": "",
+        "image": "sprites/yulia/nsfw-dark-pregnant-cowgirl.webp",
+        "loop": true
+      }
+    ]
   }
 }

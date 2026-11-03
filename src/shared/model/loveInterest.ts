@@ -479,7 +479,10 @@ export const LoveInterestSchema = z.object({
   studies: StudiesSchema.optional(),
   /** What a teacher teaches. Omitted for anyone who isn't one. */
   teaching: TeachingSchema.optional(),
+  /** Her sex-acts, drawn with a man of light skin: the ones a game falls back on for any tone that has none. */
   animations: z.array(AnimationSchema).default([]),
+  /** The same, drawn with a man of medium or dark skin, by tone: shown for a player of it, act by act (`withSkinTone`). */
+  tonedAnimations: z.partialRecord(z.enum(["medium", "dark"]), z.array(AnimationSchema)).default({}),
   schedule: z.array(ScheduleEntrySchema).default([]),
   /** Where she lives. A scene can move there. */
   room: RoomSchema.optional(),

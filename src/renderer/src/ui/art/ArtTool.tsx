@@ -57,6 +57,8 @@ export type ArtTarget =
       pose: string
       /** What the prompt is written from, in place of one woman's: a group's is all of them at once. */
       prompt?: (draws: string, framing: string, poseId: string) => string
+      /** The skin of the man in it: the tone the pictures are drawn for. */
+      man?: SkinTone
       onUse: (poseId: string, path: string) => void | Promise<void>
     }
   | { kind: 'photo' }
@@ -211,7 +213,7 @@ function Generate({ target, settings, list }: GenerateProps) {
     if (target.kind === 'walk') return walkPrompt(target.who, framing)
     if (target.kind === 'nsfw') {
       const draws = target.poses.find((pose) => pose.id === expression)?.draws ?? ''
-      return target.prompt ? target.prompt(draws, framing, expression) : nsfwPrompt(target.who, draws, framing, isPregnantPose(expression))
+      return target.prompt ? target.prompt(draws, framing, expression) : nsfwPrompt(target.who, draws, framing, isPregnantPose(expression), target.man)
     }
     return [subject.trim(), framing].filter(Boolean).join('\n\n')
   }
@@ -226,7 +228,7 @@ function Generate({ target, settings, list }: GenerateProps) {
     setBusy(true)
     setNotice('')
     const subjectId = target.kind === 'sprite' || target.kind === 'nsfw' || target.kind === 'birth' || target.kind === 'walk' ? target.who.id : target.kind === 'background' ? target.location.id : ''
-    const name = target.kind === 'birth' ? `birth-${target.tone}` : kind === 'walk' ? 'walk' : kind === 'nsfw' ? `nsfw-${expression}` : kind === 'sprite' ? `${outfitId}-${expression || 'neutral'}` : kind === 'background' ? [view, period].filter(Boolean).join('-') || 'view' : subject.slice(0, 40) || 'photo'
+    const name = target.kind === 'birth' ? `birth-${target.tone}` : kind === 'walk' ? 'walk' : target.kind === 'nsfw' ? (target.man && target.man !== 'light' ? `nsfw-${target.man}-${expression}` : `nsfw-${expression}`) : kind === 'sprite' ? `${outfitId}-${expression || 'neutral'}` : kind === 'background' ? [view, period].filter(Boolean).join('-') || 'view' : subject.slice(0, 40) || 'photo'
     try {
       const result = await window.api.comfy.generate({
         kind,

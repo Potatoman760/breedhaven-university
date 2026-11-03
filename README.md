@@ -581,6 +581,13 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
     shown on the Family tab, not with her outfits. She is shown in it about the house while the household is up,
     with a child of theirs living there and herself not showing with another (`outfitAtHome` in
     `src/shared/game/homeOutfit.ts`): in the house's views, and as a scene there opens (`dressForHome`).
+  - **Her sex-acts by his tone**: the sex-acts show the player, so each is drawn once for each tone of the man
+    (`animations` for light, `tonedAnimations.medium` and `.dark` beside it; the tabs over the NSFW section of the
+    Sprites tab, whose pictures are drawn with a line for the man's skin, `nsfwPrompt`). The pack a game reads has
+    each woman's sex-acts for the player's tone (`withSkinTone`, `posesForTone`): act by act, the ones drawn for his
+    tone where that act has a picture of its own there, the light ones otherwise, and an act comes whole from one
+    or the other, so that what then stands in for it pregnant is the same man. A group's sex-acts are kept and shown
+    the same way (`tonedAnimations` on the group, the tabs on the Groups editor).
 - **Sire housing** (`housing.json`, optional; `src/shared/game/housing.ts`): once a love
   interest he is in any agreed relationship with is carrying his child, the housing
   officer of the Sire Relations Office (an NPC, `officerId`) DMs him the offer of a house,

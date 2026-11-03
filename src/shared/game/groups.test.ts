@@ -7,13 +7,14 @@ import { buildCharacterPrompt } from './prompt'
 import { applyLook, leaveScene } from './scene'
 import { createInitialState } from './state'
 import { fixture } from './testFixture'
+import { withSkinTone } from './skin'
 
 const base = fixture()
 const ana = base.loveInterests[0]
 const bea = { ...ana, id: 'bea', name: 'Bea Moss' }
 const cy = { ...ana, id: 'cy', name: 'Cy Fenn' }
 const act = (id: string, media = true) => ({ id, name: id, description: '', loop: true, ...(media && { image: `sprites/group-pair/${id}.webp` }) })
-const pair: Group = { id: 'pair', name: 'Ana & Bea', memberIds: ['ana', 'bea'], animations: [act('missionary'), act('doggy', false)] }
+const pair: Group = { id: 'pair', name: 'Ana & Bea', memberIds: ['ana', 'bea'], animations: [act('missionary'), act('doggy', false)], tonedAnimations: {} }
 const content: ContentPack = {
   ...base,
   loveInterests: [ana, bea, cy],
@@ -56,6 +57,18 @@ describe('a group sex-act', () => {
     expect(groupPose(content, state, scene(['bea']), 'MISSIONARY', everyone)?.pose.id).toBe('missionary')
     expect(groupPose(content, state, scene(['bea']), 'doggy', everyone)).toBeUndefined()
     expect(groupPose(content, state, scene(['bea']), undefined, everyone)).toBeUndefined()
+  })
+
+  it("is the group's for the player's tone where it has that act drawn so, and the light one otherwise", () => {
+    const dark = (id: string) => ({ ...act(id), image: `sprites/group-pair/nsfw-dark-${id}.webp` })
+    const toned: ContentPack = { ...content, groups: [{ ...pair, animations: [act('missionary'), act('cowgirl')], tonedAnimations: { dark: [dark('missionary')] } }] }
+    const seen = withSkinTone(toned, 'dark')
+    expect(groupPose(seen, state, scene(['bea']), 'missionary', everyone)?.pose.image).toBe('sprites/group-pair/nsfw-dark-missionary.webp')
+    expect(groupPose(seen, state, scene(['bea']), 'cowgirl', everyone)?.pose.image).toBe('sprites/group-pair/cowgirl.webp')
+    expect(groupPose(withSkinTone(toned, 'medium'), state, scene(['bea']), 'missionary', everyone)?.pose.image).toBe('sprites/group-pair/missionary.webp')
+    // Drawn for his tone, the man's skin is said.
+    expect(groupNsfwPrompt([ana, bea], 'together', '', true, 'dark')).toContain('The man has dark brown skin.')
+    expect(groupNsfwPrompt([ana, bea], 'together', '', false, 'dark')).not.toContain('The man')
   })
 
   it('is not shown while one of them will not, or once a pregnancy shows', () => {

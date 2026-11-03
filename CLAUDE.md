@@ -50,7 +50,7 @@ scripts/                One-off and maintenance scripts
 
 - Game rules go in `src/shared/game` as pure functions of `(content, state)` returning a new state. The renderer and main only call them.
 - Periodic work (settling rent, scheduling births, announcing skills) is an idle `useEffect` in `App.tsx` guarded by a marker in the state, so it runs once however far the clock jumped.
-- The content one game sees is derived: `withHousing(personalise(content, name), state)`. Use it wherever content is prepared for a state.
+- The content one game sees is derived: `withHousing(withSkinTone(personalise(content, name), state.player.skinTone), state)`. Use it wherever content is prepared for a state.
 - Anything that changes a number of the game for a while or for good goes through `src/shared/game/modifiers.ts` (`factor`, `bonus`), not a one-off `if`.
 - Text the code writes, for the player or for the LLM, is never a literal: it is `t('<namespace>.<module>.<name>', params)` from `src/shared/i18n`, with the English in `src/shared/i18n/en/<namespace>.json`. Tags the parser reads, ids and image prompts stay in code and go in as params. See "Languages" in `README.md`.
 

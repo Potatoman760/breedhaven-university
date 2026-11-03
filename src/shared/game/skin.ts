@@ -1,4 +1,4 @@
-import { SKIN_TONES, type ContentPack, type GameState, type LoveInterest, type SkinTone } from '../model'
+import { SKIN_TONES, basePoseId, poseMedia, type Animation, type ContentPack, type GameState, type LoveInterest, type SkinTone } from '../model'
 
 /**
  * The tone a child of two tones is drawn in: halfway between them, and where halfway falls between two, the darker, as
@@ -24,6 +24,39 @@ export function babyTonesOf(mother: Pick<LoveInterest, 'skinTone' | 'ownBabyTone
  */
 export function takesHerTint(mother: Pick<LoveInterest, 'skinTone' | 'ownBabyTone' | 'babyTint'>, tone: SkinTone): boolean {
   return mother.babyTint !== undefined && (mother.ownBabyTone !== undefined || tone === mother.skinTone)
+}
+
+/**
+ * Her sex-acts as a player of a tone sees them: act by act, those drawn for his tone where she has that act drawn for
+ * it at all, and the light ones otherwise. An act comes whole from one tone or the other, pregnant form and all, so that
+ * what is shown pregnant is the same man as what is shown before.
+ */
+export function posesForTone(li: Pick<LoveInterest, 'animations' | 'tonedAnimations'>, tone: SkinTone): Animation[] {
+  const own = tone === 'light' ? [] : (li.tonedAnimations[tone] ?? [])
+  const drawn = new Set(own.filter((pose) => poseMedia(pose).length > 0 && basePoseId(pose.id) === pose.id).map((pose) => pose.id))
+  if (drawn.size === 0) return li.animations
+  return [...li.animations.filter((pose) => !drawn.has(basePoseId(pose.id))), ...own.filter((pose) => drawn.has(basePoseId(pose.id)))]
+}
+
+// One pack for each pack and tone, so that a pack is the same object for as long as nothing changes.
+const tonedPacks = new WeakMap<ContentPack, Map<SkinTone, ContentPack>>()
+
+/** The pack as a player of a tone sees it: each love interest's sex-acts, and each group's, are those for his tone (`posesForTone`). */
+export function withSkinTone(content: ContentPack, tone: SkinTone): ContentPack {
+  if (tone === 'light' || ![...content.loveInterests, ...content.groups].some((one) => (one.tonedAnimations[tone] ?? []).length > 0)) return content
+  let byTone = tonedPacks.get(content)
+  if (!byTone) tonedPacks.set(content, (byTone = new Map()))
+  let pack = byTone.get(tone)
+  if (!pack)
+    byTone.set(
+      tone,
+      (pack = {
+        ...content,
+        loveInterests: content.loveInterests.map((li) => ({ ...li, animations: posesForTone(li, tone) })),
+        groups: content.groups.map((group) => ({ ...group, animations: posesForTone(group, tone) }))
+      })
+    )
+  return pack
 }
 
 /** The tone a child of hers by the player is drawn in, in this game. */

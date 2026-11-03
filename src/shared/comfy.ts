@@ -463,7 +463,14 @@ const LIGHT_WORDS: Record<string, string> = {
  * (in the words of her own nude outfit, when she has one), what the pose shows, and how
  * the picture is framed, each a paragraph, as a sprite's is written.
  */
-export function nsfwPrompt(who: Pick<LoveInterest | Npc, 'appearance' | 'outfits'> & { pronouns?: string }, pose: string, framing: string, pregnant = false): string {
+// How the man in a sex-act is drawn, by the player's tone.
+const MAN_SKIN: Record<SkinTone, string> = {
+  light: 'The man has fair, light skin.',
+  medium: 'The man has medium brown, olive to tan skin.',
+  dark: 'The man has dark brown skin.'
+}
+
+export function nsfwPrompt(who: Pick<LoveInterest | Npc, 'appearance' | 'outfits'> & { pronouns?: string }, pose: string, framing: string, pregnant = false, man?: SkinTone): string {
   // Drawn pregnant, she is in her pregnant nude: her nude, with what that outfit adds to it.
   const [bare = 'nothing at all, completely nude', ...added] = outfitParts(who.outfits, who.outfits.find((o) => o.id === (pregnant ? 'nude-pregnant' : 'nude')) ?? who.outfits.find((o) => o.id === 'nude'))
   const { subject } = pronounWords(who.pronouns)
@@ -472,6 +479,7 @@ export function nsfwPrompt(who: Pick<LoveInterest | Npc, 'appearance' | 'outfits
     paragraph(`${subject[0].toUpperCase()}${subject.slice(1)} ${subject === 'they' ? 'wear' : 'wears'} ${bare}`),
     ...(pregnant ? (added.length > 0 ? added : ['She has a round, pregnant belly.']).map(paragraph) : []),
     paragraph(pose),
+    man && MAN_SKIN[man],
     framing.trim()
   ])
 }
@@ -648,7 +656,7 @@ const COUNT_WORDS = ['one', 'two', 'three', 'four']
  * model draws as many as there are and no more, each undressed in the words of her own nude outfit, and the man with
  * them unless the act leaves him out; then what the act shows, done by all of them together, and how it is framed.
  */
-export function groupNsfwPrompt(women: (Pick<LoveInterest | Npc, 'appearance' | 'outfits'> & { pronouns?: string })[], pose: string, framing: string, manShown = true): string {
+export function groupNsfwPrompt(women: (Pick<LoveInterest | Npc, 'appearance' | 'outfits'> & { pronouns?: string })[], pose: string, framing: string, manShown = true, man?: SkinTone): string {
   const count = COUNT_WORDS[women.length - 1] ?? String(women.length)
   const person = (who: (typeof women)[number], i: number): string => {
     const [bare = 'nothing at all, completely nude'] = outfitParts(who.outfits, who.outfits.find((o) => o.id === 'nude'))
@@ -656,6 +664,7 @@ export function groupNsfwPrompt(women: (Pick<LoveInterest | Npc, 'appearance' | 
   }
   return paragraphs([
     [paragraph(`An explicit picture of ${count} women together${manShown ? ' with one man' : ''}`), ...women.map(person), paragraph(`All of them together: ${pose}`)].join(' '),
+    manShown && man ? MAN_SKIN[man] : '',
     framing.trim()
   ])
 }

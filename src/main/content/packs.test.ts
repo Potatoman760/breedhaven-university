@@ -155,6 +155,8 @@ describe('a whole character and her major', () => {
       studies: { subject: 'Dreaming', code: 'DRM', level: 2, stats: major.stats, practical: major.practical },
       outfits: faye.outfits.map((outfit) => (outfit.id === 'default' ? { ...outfit, sprites: { neutral: { image: file('neutral.png'), description: '' } } } : { ...outfit, sprites: {} })),
       animations: [{ id: 'blowjob', name: 'Blowjob', description: '', clip: file('act.mp4'), loop: true }],
+      // Hers alone: nothing of the sex-acts Faye has for other tones.
+      tonedAnimations: {},
       room: { name: 'a garret', description: '', locationId: content.locations[0].id, images: { day: file('room.webp') } },
       birthPictures: { dark: file('birth.png') },
       walkSprite: file('walk.png')

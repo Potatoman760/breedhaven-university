@@ -12,8 +12,10 @@ export const GroupSchema = z.object({
   id: z.string(),
   name: z.string(),
   memberIds: z.array(z.string()).min(GROUP_SIZE.least).max(GROUP_SIZE.most),
-  /** Its sex-acts, as a character's are written: by the act's id, each a picture and, if it has one, a clip. */
-  animations: z.array(AnimationSchema).default([])
+  /** Its sex-acts, as a character's are written: by the act's id, each a picture and, if it has one, a clip. Drawn with a man of light skin. */
+  animations: z.array(AnimationSchema).default([]),
+  /** The same, drawn with a man of medium or dark skin, by tone, as a character's are (`withSkinTone`). */
+  tonedAnimations: z.partialRecord(z.enum(['medium', 'dark']), z.array(AnimationSchema)).default({})
 })
 export type Group = z.infer<typeof GroupSchema>
 

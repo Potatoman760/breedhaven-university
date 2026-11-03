@@ -54,6 +54,7 @@ import {
   scheduleBirths,
   settleBirths,
   withHousing,
+  withSkinTone,
   homeViewId,
   housingOfferDue,
   scheduleDescent,
@@ -347,7 +348,7 @@ const NOTICE_MS = 9000
 function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   const [state, setState] = useState<GameState>(initial.state)
   // The content as this game reads it: the player's name wherever the content wrote the token, and the house he has been let in it or out of it.
-  const content = useMemo(() => withHousing(personalise(written, state.player.name), state), [written, state.player.name, state.housing])
+  const content = useMemo(() => withHousing(withSkinTone(personalise(written, state.player.name), state.player.skinTone), state), [written, state.player.name, state.player.skinTone, state.housing])
   const [scene, setScene] = useState<Scene | null>(initial.scene)
   // The character has closed the scene and the player hasn't moved on yet.
   const [ended, setEnded] = useState(false)
