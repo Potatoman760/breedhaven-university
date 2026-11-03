@@ -350,6 +350,36 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "baby-medium",
+      "name": "With the baby (medium)",
+      "description": "She cradles a sleeping newborn baby in her arms, held against her chest, swaddled snugly in a soft cream blanket with only its small face showing. The baby has light olive to tan skin.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/vespera/baby-medium-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true,
+      "babyTone": "medium"
+    },
+    {
+      "id": "baby-dark",
+      "name": "With the baby (dark)",
+      "description": "She cradles a sleeping newborn baby in her arms, held against her chest, swaddled snugly in a soft cream blanket with only its small face showing. The baby has dark brown skin.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/vespera/baby-dark-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true,
+      "babyTone": "dark"
     }
   ],
   "defaultOutfitId": "default",
@@ -520,7 +550,11 @@
       "day": "generated/backgrounds/vespera/view.webp"
     }
   },
-  "birthPicture": "sprites/vespera/birth.webp",
+  "skinTone": "dark",
+  "birthPictures": {
+    "medium": "sprites/vespera/birth-medium.webp",
+    "dark": "sprites/vespera/birth-dark.webp"
+  },
   "walkSprite": "sprites/vespera/walk-cutout.webp",
   "childNames": {
     "daughters": [

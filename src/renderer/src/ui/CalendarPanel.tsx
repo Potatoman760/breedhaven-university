@@ -4,7 +4,7 @@ import type { ContentPack, GameState } from '../../../shared/model'
 import { Button } from './Button'
 import { Dialog } from './Dialog'
 import { BackButton } from './BackButton'
-import { ChevronIcon } from './icons'
+import { ChevronIcon, PlanMarkIcon } from './icons'
 import { Portrait } from './Portrait'
 import { t } from '../../../shared/i18n'
 
@@ -199,7 +199,7 @@ export function CalendarPanel({ content, state, onChange, onClose, onChangeClass
                           tabIndex={0}
                           onClick={() => setPicked({ item, dayIndex: d.dayIndex })}
                           onKeyDown={(e) => e.key === 'Enter' && setPicked({ item, dayIndex: d.dayIndex })}
-                          className={`entry timed ${item.kind}`}
+                          className={`entry timed ${item.kind}${item.mark ? ` special ${item.mark}` : ''}`}
                           title={[t('screens.calendar.fromTo', { from: clock(item.startHour ?? 0), to: clock((item.startHour ?? 0) + (item.hours ?? 1)) }), item.title, item.detail].filter(Boolean).join(' · ')}
                           style={{
                             top: `${((start - FIRST_HOUR) / hours.length) * 100}%`,
@@ -208,7 +208,10 @@ export function CalendarPanel({ content, state, onChange, onClose, onChangeClass
                             width: `${100 / of}%`
                           }}
                         >
-                          <strong>{item.title}</strong>
+                          <strong>
+                            {item.mark && <PlanMarkIcon mark={item.mark} size={12} />}
+                            {item.title}
+                          </strong>
                           {item.detail && <span>{item.detail}</span>}
                         </div>
                       )
@@ -244,7 +247,8 @@ export function CalendarPanel({ content, state, onChange, onClose, onChangeClass
                     >
                       <span className="day-number">{i + 1}</span>
                       {items.slice(0, MONTH_LINES).map((item) => (
-                        <span key={item.id} className={`entry ${item.kind}`}>
+                        <span key={item.id} className={`entry ${item.kind}${item.mark ? ` special ${item.mark}` : ''}`}>
+                          {item.mark && <PlanMarkIcon mark={item.mark} size={11} />}
                           {item.startHour !== undefined && `${clock(item.startHour)} `}
                           {item.title}
                         </span>

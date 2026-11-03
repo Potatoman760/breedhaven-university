@@ -44,6 +44,8 @@ export const OrientationStepSchema = z.object({
    * across the steps, those he shares no class with first, so he meets everyone.
    */
   castIds: z.array(z.string()).optional(),
+  /** What everyone in its scene starts in, where she has it, as a cutscene before it may have drawn them. Left out, as they are dressed. */
+  outfitId: z.string().optional(),
   /** Lines read before its scene, with nothing to answer. */
   cutscene: IntroSchema.optional()
 })

@@ -440,7 +440,8 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
   interests the player shares no class with, and so would not otherwise run into: only
   they are dealt out, one to a step, so that the player meets people one at a time (a
   step that names its own `castIds` keeps the first of them). Whoever is left over is met
-  some other way. A step with nobody to meet just passes the time. The game's has three steps on day 1:
+  some other way. A step's `outfitId` is what everyone in its scene starts in; the Assembly and the
+  Campus Tour put Tamsin and Seraphine in their usual clothes, as their cutscenes draw them. A step with nobody to meet just passes the time. The game's has three steps on day 1:
   the Assembly, the Campus Tour and the Hall Supper.
 - **Guided tours** (`ui/Tour.tsx`): a character pops up beside one part of the screen after another and says what it
   is for; Skip or Escape ends it. Tamsin shows the course planner the first time it opens (`CoursesView.tsx`), and
@@ -551,7 +552,7 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
     a class, then another plan (`birthSlot`). It cannot be called off.
     - **Kept**, it is a scene of its own (`attendBirth`): the child is born as it opens, the
       scene is set in the place's `birthViewId` view (the maternity room) with her
-      `birthPicture` for its whole stage if she has one, and its opening beat tells the LLM
+      birth picture in their child's tone for its whole stage if she has one, and its opening beat tells the LLM
       what the moment is. What it does to her feelings is the scene's own summary.
     - **Missed**, the child is born all the same at the end of the hour (`settleBirths`):
       she takes `MISSED_BIRTH` (affection -25, trust -30, desire -15), keeps a **core**
@@ -564,10 +565,22 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
     The child is recorded in `children` in the save, and her prompt and the others' mention
     it from then on. The `pregnant` condition lets activities, secrets and codex entries
     depend on it. A birth still to come when the calendar ends is told in the epilogue.
-  - **Her birth picture**: each love interest has one optional `birthPicture` (the Birth
-    slot on the editor's Family tab), drawn at 1920×1080 by the `birth` kind of picture from
-    her appearance (`birthPrompt` in `src/shared/comfy.ts`): sitting up in a hospital bed in
-    a gown with the child in her arms.
+  - **Skin tone**: the player chooses his as a game begins, light, medium or dark (`skinTone` on the player,
+    editable in the phone's Profile; every character is told it), and each love interest has hers (`skinTone`,
+    the editor's Family tab). A child of theirs is halfway between the two, and where halfway falls between two
+    tones, the darker, as dark carries over light (`babyTone` in `src/shared/game/skin.ts`): a light mother's is
+    light or medium, a medium or dark mother's medium or dark. A `babyTint` is what a child of her own tone takes
+    from her besides (Dinah's pallor, with a light father only); a mother whose trait outweighs any father's has
+    every child drawn in one tone (`ownBabyTone`: Grushka's green, Lira's blue), with her tint always.
+  - **Her birth pictures**: one for each tone a child of hers can have (`birthPictures`, `babyTonesOf`; the Birth slots on the
+    editor's Family tab), drawn at 1920×1080 by the `birth` kind of picture from her appearance and the child's
+    tone and tint (`birthPrompt` in `src/shared/comfy.ts`): sitting up in a hospital bed in a gown with the child
+    in her arms. `npm run births` draws them (`--tone` for only some).
+  - **With the baby**: for each of the same tones, an outfit of her holding a swaddled newborn of it (`babyTone` on
+    the outfit, `baby-<tone>`, built on her day clothes by `babyOutfit` in `src/shared/comfy.ts`), drawn neutral and
+    shown on the Family tab, not with her outfits. She is shown in it about the house while the household is up,
+    with a child of theirs living there and herself not showing with another (`outfitAtHome` in
+    `src/shared/game/homeOutfit.ts`): in the house's views, and as a scene there opens (`dressForHome`).
 - **Sire housing** (`housing.json`, optional; `src/shared/game/housing.ts`): once a love
   interest he is in any agreed relationship with is carrying his child, the housing
   officer of the Sire Relations Office (an NPC, `officerId`) DMs him the offer of a house,
@@ -1121,8 +1134,10 @@ the Media tab an outfit can be her usual one, worn only where an event puts her 
 pregnant form the springs trip starts her in. An outfit ticked **Day outfit** (`day`) lasts
 the day; any other (nude, the bathrobe) lasts only the scene, and her usual clothes always
 last the day. As each day begins everyone is dressed (`dressForDay` in
-`src/shared/game/pregnancy.ts`, an idle effect in `App.tsx`): in the outfit named for an
-event that day if she has one, otherwise one of her day outfits drawn at random (the same for
+`src/shared/game/pregnancy.ts`, an idle effect in `App.tsx`): in the `outfitId` of an orientation
+step or event part of that day she is cast in, when it is a day outfit she has (`dayOutfitsPlanned` in
+`dayDress.ts`, so that she is already in what its cutscene draws her in); else in the outfit named for an
+event that day if she has one; otherwise one of her day outfits drawn at random (the same for
 the same day of the same game), kept in the save as `dayOutfits` until the next day. A day
 outfit she changes into in a scene she keeps on after it (`keepDayOutfits`, as the scene is
 summed up); one for the scene alone comes off with it. Everything that shows her outside a
@@ -1295,6 +1310,45 @@ gone to as an outing. Two things make one more than that:
   any other the speaker's, and one in asterisks is narration.
 - The load check refuses a part on a day the event does not have, a place or cast that does not exist, and a cutscene
   by nobody or at a view a place does not have.
+
+## Story beats
+
+`story.json` (`src/shared/model/story.ts`, `content.story`) holds scenes written for one love interest, by her id,
+one for each stage of what she and the player are that has one (`stage`): a cutscene she speaks, and the
+`direction` the scene after it runs on, so that each woman has an arc of her own and not only the common prompt. A
+beat says where it is (`locationId`, a `viewId`, or `inHerRoom`), when (`startHour`, `hours`, and a `weekday`
+when it has to be one), what she wears (`outfitId`), what she writes to ask him to come (`invitation`), what going
+does (`effects` on her meters, `stopsBirthControl`), and for Lover two more tellings: one for when he has already
+been to bed with her (`ifIntimate`, as a society's night has), and one for when she has already stopped taking
+anything against the Bloom in this game (`offBirthControl` in the save), or is already carrying his child
+(`ifUnprotected`: the same moment as a confession only, with nothing said of either; it comes first). One who never
+took it, as Dinah, Lira and Lola never did, is not "already off" it: for her only a pregnancy brings that telling. Each beat is one ask, had once: reaching the stage sends her invitation
+and puts a card on his calendar, marked as hers and not an ordinary plan; going reads the cutscene and opens the
+scene with her alone; missed, it is gone. The default pack has a beat at Friend, Dating and Lover for every love
+interest (Tamsin starts a friend, so has no Friend beat), fifty-nine in all, each at a place of hers: Seraphine's
+warding lesson is at Aether and Anwen's night ride at the Ridge Road, two places off the map that exist for these
+(`eventOnly`). At Lover most stop taking anything against the Bloom; Daphne, Elowen, Tink and Yulia do not, and
+Dinah, Lira and Lola never took it. The load check holds a beat to a stage, place, view, outfit and weekday there
+are, and to cutscenes spoken by her; `src/main/content/story.test.ts` pins the pack's, and that the unprotected
+telling says nothing of birth control or a child. The lines are written with nano-gpt (see `CLAUDE.md`), not by
+hand.
+
+Delivery (`src/shared/game/story.ts`): from 09:00, an idle effect in `App.tsx` sends the next invitation there is
+(`sendStoryInvitation`): from the first love interest whose Bloomr he has and whose next beat's stage she has reached,
+in her order, so that one skipped by a leap of affection still comes first. It is her `invitation` as a note from her,
+with the beat as its plan (`story` on the proposal, the stage), for the beat's hour on the first day from now they are
+both free (its weekday where it has one, two weeks ahead at most); the beat is flagged as asked (`story:<id>:<stage>`)
+as it is sent, so declined, lapsed, cancelled or stood up, it never comes again. Only one is out at a time. It is
+marked as hers wherever it shows: the accept panel in the DM has a beating heart in a gold ring and a rose-and-gold
+frame, the day's card for it a gold edge and a heart in its chip, the calendar entry gold with a heart
+(`story` on the agenda item). Keeping it (`attendStory`) reads the telling it is for (unprotected, intimate, or its
+own), applies its `effects` and, in a telling where she says so, `stopsBirthControl`, and opens the scene with her
+alone on that telling's direction, in her room where it is held, in its outfit and view.
+
+The same marking is given to the other offers that are more than a plan (`planMark` in `appointments.ts`): the
+Office's offer of the house and the viewing it sets, with a house in moss, and the guide's note setting the way down
+below (`offer: 'below'` on the note, which shows the plan with it while it is on the calendar), with a sword in
+dark stone. Only the heart beats.
 
 ## Cards
 

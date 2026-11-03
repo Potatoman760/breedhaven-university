@@ -51,7 +51,7 @@ export function scheduleDescent(content: ContentPack, state: GameState): GameSta
   const place = content.locations.find((l) => l.id === config.entryLocationId)?.name ?? config.entryLocationId
   const plan: Appointment = { id: DESCENT_ID, kind: 'below', loveInterestId: config.guideId, companionIds: [], title: t('game.descent.title', { place }), time: best.time, hours, locationId: config.entryLocationId }
   const text = (missed ? config.intro.missedText : config.intro.text).replaceAll('{date}', describeWhen(content, best.time)).replaceAll('{place}', place)
-  return addNote(giveContact({ ...cleared, appointments: [...cleared.appointments, plan].sort((a, b) => a.time - b.time) }, config.guideId), config.guideId, { from: 'them', text, read: false })
+  return addNote(giveContact({ ...cleared, appointments: [...cleared.appointments, plan].sort((a, b) => a.time - b.time) }, config.guideId), config.guideId, { from: 'them', text, offer: 'below', read: false })
 }
 
 /**

@@ -72,6 +72,7 @@
   "upcoming.midterm": "Midterm: {number}",
   "upcoming.final": "Final: {number}",
   "orientation.activity": "Orientation: {step}",
+  "story.title": "Something special",
   "courses.and": " and ",
   "courses.lab": "lab {weekday} {from}-{to}",
   "courses.noSuchCourse": "No such course",

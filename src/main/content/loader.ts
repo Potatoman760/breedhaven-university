@@ -30,6 +30,8 @@ const OPTIONAL_FILES = {
   map: 'map.json',
   coursework: 'coursework.json',
   orientation: 'orientation.json',
+  // Scenes written for a love interest, earned stage by stage.
+  story: 'story.json',
   jobs: 'jobs.json',
   societies: 'societies.json',
   housing: 'housing.json',

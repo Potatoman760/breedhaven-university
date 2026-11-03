@@ -156,7 +156,7 @@ describe('a whole character and her major', () => {
       outfits: faye.outfits.map((outfit) => (outfit.id === 'default' ? { ...outfit, sprites: { neutral: { image: file('neutral.png'), description: '' } } } : { ...outfit, sprites: {} })),
       animations: [{ id: 'blowjob', name: 'Blowjob', description: '', clip: file('act.mp4'), loop: true }],
       room: { name: 'a garret', description: '', locationId: content.locations[0].id, images: { day: file('room.webp') } },
-      birthPicture: file('birth.png'),
+      birthPictures: { dark: file('birth.png') },
       walkSprite: file('walk.png')
     }
     expect(saveLoveInterest(addonDir, content, her)).toEqual([])
@@ -197,7 +197,7 @@ describe('a whole character and her major', () => {
     expect(her.traitIds).toEqual(['dreamy'])
     expect(content.curriculum?.colleges.map((one) => one.id)).toContain('night-school')
     expect(her.room?.images?.day).toBe('addons/sprites/mira/room.webp')
-    expect([her.walkSprite, her.birthPicture]).toEqual(['addons/sprites/mira/walk.png', 'addons/sprites/mira/birth.png'])
+    expect([her.walkSprite, her.birthPictures.dark]).toEqual(['addons/sprites/mira/walk.png', 'addons/sprites/mira/birth.png'])
     expect(her.animations[0].clip).toBe('addons/sprites/mira/act.mp4')
     expect(readdirSync(join(addonDir, 'sprites', 'mira'))).toHaveLength(5)
   })

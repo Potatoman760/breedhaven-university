@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { ContentPack, Outfit } from '../model'
+import { CalendarEventSchema, type ContentPack, type Outfit } from '../model'
+import { dayOutfitsPlanned } from './dayDress'
 import { dressForDay, keepDayOutfits, wornOutfit } from './pregnancy'
 import { createInitialState } from './state'
 import { fixture } from './testFixture'
@@ -52,5 +53,26 @@ describe('day outfits', () => {
     const tomorrow = dressForDay(content, { ...kept, time: kept.time + content.calendar.hoursPerDay })
     expect(tomorrow.dayOutfits.day).toBe(1)
     expect(tomorrow.dayOutfits.worn.ana).toBe(wornOutfit(content, { ...dressed, time: dressed.time + content.calendar.hoursPerDay }, ana)?.id)
+  })
+
+  it("begin in what a part of today puts its cast in, where it can last the day, and leave everyone else as drawn", () => {
+    const base = wardrobe()
+    const [ana] = base.loveInterests
+    const bea = { ...ana, id: 'bea', name: 'Bea' }
+    // A day-long event starting on the game's first day, with a part for Ana alone.
+    const event = (outfitId: string) =>
+      CalendarEventSchema.parse({ id: 'fete', name: 'the Fete', month: 'a', day: 2, program: [{ id: 'garden', name: 'Garden', day: 1, startHour: 10, castIds: ['ana'], outfitId }] })
+    const withPart = (outfitId: string): ContentPack => ({ ...base, loveInterests: [ana, bea], calendar: { ...base.calendar, events: [event(outfitId)] } })
+    for (const day of ['jeans', 'sundress']) {
+      const content = withPart(day)
+      const start = createInitialState(content)
+      expect(dayOutfitsPlanned(content, start)).toEqual({ ana: day })
+      expect(dressForDay(content, start, dayOutfitsPlanned(content, start)).dayOutfits.worn.ana).toBe(day)
+    }
+    // Bea is not in it, and a bathrobe is for a scene alone: both are drawn as any other day.
+    const robed = withPart('bathrobe')
+    const start = createInitialState(robed)
+    const drawn = dressForDay(robed, start).dayOutfits.worn
+    expect(dressForDay(robed, start, dayOutfitsPlanned(robed, start)).dayOutfits.worn).toEqual(drawn)
   })
 })

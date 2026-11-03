@@ -14,7 +14,9 @@ export const ProposalSchema = z.object({
   /** Game time (hours since start) at which it begins. */
   time: z.number().int().min(0),
   hours: z.number().int().min(1),
-  locationId: z.string()
+  locationId: z.string(),
+  /** Her story beat this asks him to, by the stage that earned it: a scene written for her, not an ordinary plan. */
+  story: z.string().optional()
 })
 export type Proposal = z.infer<typeof ProposalSchema>
 

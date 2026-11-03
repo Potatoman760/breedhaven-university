@@ -46,19 +46,20 @@ describe('the player in the content', () => {
 })
 
 describe('who the player is', () => {
-  it('is his bio and what the player added to it, told to every character under his own name, and nothing when there is none', () => {
+  it('is his skin tone, his bio and what the player added to it, told to every character under his own name', () => {
     const base = fixture()
     const written = { ...base, newGame: { ...base.newGame, player: { ...base.newGame.player, bio: `${PLAYER_TOKEN} is nineteen and new in town.` } } }
     // The content's own, under the name he chose when the game began.
     const read = written
     const state = createInitialState(written, 'Wren')
     const prompt = buildCharacterPrompt({ content: read, state, loveInterestId: 'ana' })
-    expect(prompt).toContain('## About Wren\nWren is nineteen and new in town.')
-    expect(buildCharacterPrompt({ content: base, state: createInitialState(base), loveInterestId: 'ana' })).not.toContain('## About')
+    expect(prompt).toContain('## About Wren\nWren has medium-brown skin.\nWren is nineteen and new in town.')
+    // With no bio, his skin is all there is to say.
+    expect(buildCharacterPrompt({ content: base, state: createInitialState(base, 'Wren', 0, undefined, '', 'dark'), loveInterestId: 'ana' })).toContain('## About Wren\nWren has dark skin.\n\n')
     // What the player wrote of himself when the game began is told after the content's own, which stays.
     const own = createInitialState(written, 'Wren', 0, undefined, ` ${PLAYER_TOKEN} grew up on a barge. `)
     expect(own.player).toMatchObject({ bio: `${PLAYER_TOKEN} is nineteen and new in town.`, about: `${PLAYER_TOKEN} grew up on a barge.` })
-    expect(buildCharacterPrompt({ content: read, state: own, loveInterestId: 'ana' })).toContain('## About Wren\nWren is nineteen and new in town.\nWren grew up on a barge.')
+    expect(buildCharacterPrompt({ content: read, state: own, loveInterestId: 'ana' })).toContain('## About Wren\nWren has medium-brown skin.\nWren is nineteen and new in town.\nWren grew up on a barge.')
   })
 
   it('is said in his bio and not in the codex, which every character is given whole', () => {

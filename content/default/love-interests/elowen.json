@@ -350,6 +350,36 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "baby-medium",
+      "name": "With the baby (medium)",
+      "description": "She cradles a sleeping newborn baby in her arms, held against her chest, swaddled snugly in a soft cream blanket with only its small face showing. The baby has light olive to tan skin.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/baby-medium-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true,
+      "babyTone": "medium"
+    },
+    {
+      "id": "baby-dark",
+      "name": "With the baby (dark)",
+      "description": "She cradles a sleeping newborn baby in her arms, held against her chest, swaddled snugly in a soft cream blanket with only its small face showing. The baby has dark brown skin.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/baby-dark-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true,
+      "babyTone": "dark"
     }
   ],
   "defaultOutfitId": "default",
@@ -503,7 +533,11 @@
       "day": "generated/backgrounds/elowen/view.webp"
     }
   },
-  "birthPicture": "sprites/elowen/birth-2.webp",
+  "skinTone": "medium",
+  "birthPictures": {
+    "medium": "sprites/elowen/birth-medium.webp",
+    "dark": "sprites/elowen/birth-dark.webp"
+  },
   "walkSprite": "sprites/elowen/walk-cutout.webp",
   "childNames": {
     "daughters": [

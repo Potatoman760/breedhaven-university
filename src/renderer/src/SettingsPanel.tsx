@@ -21,10 +21,16 @@ import { chooseLanguage, useLanguageView } from './language'
 import { t, type MessageKey } from '../../shared/i18n'
 
 // What the settings are for, a tab each.
-const TABS = ['llms', 'comfy', 'sound'] as const
+const TABS = ['llms', 'comfy', 'sound', 'credits'] as const
 type Tab = (typeof TABS)[number]
 
-const TAB_LABELS: Record<Tab, MessageKey> = { llms: 'shell.settings.tabLlms', comfy: 'shell.settings.tabComfy', sound: 'shell.settings.tabSound' }
+const TAB_LABELS: Record<Tab, MessageKey> = { llms: 'shell.settings.tabLlms', comfy: 'shell.settings.tabComfy', sound: 'shell.settings.tabSound', credits: 'shell.settings.tabCredits' }
+
+// Who made the game, and who backs it, each under its heading: names, said as they are.
+const CREDITS: { heading: MessageKey; names: string[] }[] = [
+  { heading: 'shell.credits.creator', names: ['Potatoman760'] },
+  { heading: 'shell.credits.patreonDirectors', names: ['elby', 'syphen'] }
+]
 
 const VOLUME_LABELS: Record<VolumeKind, MessageKey> = { effects: 'shell.settings.effects', ambience: 'shell.settings.ambience', music: 'shell.settings.music' }
 
@@ -264,6 +270,27 @@ export function SettingsPanel({ onClose }: { onClose: () => void }) {
                   {t('shell.settings.volume', { kind: t(VOLUME_LABELS[kind]), percent: Math.round(volumes[kind] * 100) })}
                   <input type="range" min={0} max={100} value={Math.round(volumes[kind] * 100)} onChange={(e) => setVolume(kind, Number(e.target.value) / 100)} />
                 </label>
+              ))}
+            </div>
+            <div className="actions">
+              <button type="button" className="secondary" onClick={onClose}>
+                {t('shell.common.close')}
+              </button>
+            </div>
+          </>
+        )}
+        {tab === 'credits' && (
+          <>
+            <div className="credits">
+              {CREDITS.map(({ heading, names }) => (
+                <section key={heading}>
+                  <h2>{t(heading)}</h2>
+                  <ul>
+                    {names.map((name) => (
+                      <li key={name}>{name}</li>
+                    ))}
+                  </ul>
+                </section>
               ))}
             </div>
             <div className="actions">

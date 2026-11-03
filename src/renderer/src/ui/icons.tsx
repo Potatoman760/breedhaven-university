@@ -399,6 +399,16 @@ export const JOB_ICON_PATHS: Record<string, string> = {
   pin: 'M12 21s7-6.500 7-12a7 7 0 10-14 0c0 5.500 7 12 7 12z M12 11.500a2.500 2.500 0 100-5 2.500 2.500 0 000 5z'
 }
 
+/** The badge of a plan that is more than an ordinary one: a heart for her story beat, the house, a sword for the way down. */
+export function PlanMarkIcon({ mark, ...p }: IconProps & { mark: 'story' | 'house' | 'below' }) {
+  if (mark === 'story') return <HeartIcon {...p} />
+  return (
+    <Icon viewBox="0 0 24 24" {...p}>
+      <path d={JOB_ICON_PATHS[mark === 'house' ? 'house' : 'sword']} />
+    </Icon>
+  )
+}
+
 /** The names a job's data may give its picture. */
 export const JOB_ICONS = Object.keys(JOB_ICON_PATHS)
 

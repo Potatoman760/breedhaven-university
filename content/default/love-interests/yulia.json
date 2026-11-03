@@ -351,6 +351,36 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "baby-light",
+      "name": "With the baby (light)",
+      "description": "She cradles a sleeping newborn baby in her arms, held against her chest, swaddled snugly in a soft cream blanket with only its small face showing. The baby has fair, light skin.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/baby-light-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true,
+      "babyTone": "light"
+    },
+    {
+      "id": "baby-medium",
+      "name": "With the baby (medium)",
+      "description": "She cradles a sleeping newborn baby in her arms, held against her chest, swaddled snugly in a soft cream blanket with only its small face showing. The baby has light olive to tan skin.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/baby-medium-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true,
+      "babyTone": "medium"
     }
   ],
   "defaultOutfitId": "default",
@@ -504,7 +534,11 @@
       "day": "generated/backgrounds/yulia/view.webp"
     }
   },
-  "birthPicture": "sprites/yulia/birth.webp",
+  "skinTone": "light",
+  "birthPictures": {
+    "light": "sprites/yulia/birth-light.webp",
+    "medium": "sprites/yulia/birth-medium.webp"
+  },
   "walkSprite": "sprites/yulia/walk-cutout.webp",
   "childNames": {
     "daughters": [

@@ -893,5 +893,47 @@
     "eventOnly": true,
     "private": false,
     "drills": []
+  },
+  {
+    "id": "aether",
+    "name": "Aether",
+    "icon": "lantern",
+    "description": "A small private training hall off Lantern Row, where anyone with magic and the fee can practice it away from the University's eyes: one bare room with a chalk circle on the mats, and a bench outside the door for whoever is waiting.",
+    "appearance": "A small bare practice hall: pale wooden floor with a worn chalk circle, padded mats, high windows letting in morning light, a rack of practice wands on one wall, a single bench, a faint haze of chalk dust in the sunbeams.",
+    "backgrounds": [
+      {
+        "id": "default",
+        "name": "Default",
+        "images": {
+          "day": "generated/backgrounds/aether/default.webp",
+          "night": "generated/backgrounds/aether/default.webp"
+        }
+      }
+    ],
+    "indoors": true,
+    "eventOnly": true,
+    "private": false,
+    "drills": []
+  },
+  {
+    "id": "ridge-road",
+    "name": "the Ridge Road",
+    "icon": "tree",
+    "description": "The road that climbs out of town over the ridge, with a gravel lay-by at the top where the whole of Seedblossom lies spread out below in lights.",
+    "appearance": "A gravel lay-by on a dark ridge road at night, a low stone wall, pines on the slope, and the lights of a town spread out far below in the valley under a sky full of stars; a motorbike parked by the wall.",
+    "backgrounds": [
+      {
+        "id": "default",
+        "name": "Default",
+        "images": {
+          "day": "generated/backgrounds/ridge-road/default.webp",
+          "night": "generated/backgrounds/ridge-road/default.webp"
+        }
+      }
+    ],
+    "indoors": false,
+    "eventOnly": true,
+    "private": false,
+    "drills": []
   }
 ]

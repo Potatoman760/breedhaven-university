@@ -328,26 +328,56 @@
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",
-      "pregnant": false,
       "sprites": {
         "neutral": {
           "image": "sprites/zelie/bathrobe-neutral-cutout.webp",
           "description": ""
         }
-      }
+      },
+      "pregnant": false
     },
     {
       "id": "bathrobe-pregnant",
       "name": "Bathrobe, pregnant",
-      "inherits": "bathrobe",
       "description": "She has a round, pregnant belly.",
-      "pregnant": true,
+      "inherits": "bathrobe",
       "sprites": {
         "neutral": {
           "image": "sprites/zelie/bathrobe-pregnant-neutral-cutout.webp",
           "description": ""
         }
-      }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "baby-light",
+      "name": "With the baby (light)",
+      "description": "She cradles a sleeping newborn baby in her arms, held against her chest, swaddled snugly in a soft cream blanket with only its small face showing. The baby has fair, light skin.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/zelie/baby-light-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true,
+      "babyTone": "light"
+    },
+    {
+      "id": "baby-medium",
+      "name": "With the baby (medium)",
+      "description": "She cradles a sleeping newborn baby in her arms, held against her chest, swaddled snugly in a soft cream blanket with only its small face showing. The baby has light olive to tan skin.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/zelie/baby-medium-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true,
+      "babyTone": "medium"
     }
   ],
   "defaultOutfitId": "default",
@@ -486,7 +516,11 @@
     "locationId": "sire-house",
     "viewId": "nanny"
   },
-  "birthPicture": "sprites/zelie/birth.webp",
+  "skinTone": "light",
+  "birthPictures": {
+    "light": "sprites/zelie/birth-light.webp",
+    "medium": "sprites/zelie/birth-medium.webp"
+  },
   "walkSprite": "sprites/zelie/walk-2-cutout.webp",
   "childNames": {
     "daughters": [

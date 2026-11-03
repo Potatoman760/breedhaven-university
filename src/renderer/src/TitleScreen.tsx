@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import music from '../../assets/Magical College Days.mp3'
 import titleArt from '../../assets/BreedhavenTitle.webp'
 import { adjustStat, catalogueIsStale, createInitialState, describeModifier, describeStat, PLAYER_TOKEN, POINT_BUY, pointCost, pointsLeft, randomStats, startingStats } from '../../shared/game'
-import { STAT_LABELS, STATS, type ContentPack, type Stat } from '../../shared/model'
+import { STAT_LABELS, STATS, type ContentPack, type SkinTone, type Stat } from '../../shared/model'
 import { AUTO_SLOT_ID, latestSave, type SaveData, type SaveSummary } from '../../shared/saves'
 import { errorMessage } from './errors'
 import { useVolumes } from './sound'
@@ -10,6 +10,7 @@ import { Overlay } from './ui/Dialog'
 import { describeSave, SavesPanel } from './SavesPanel'
 import { SettingsPanel } from './SettingsPanel'
 import { AchievementsPanel } from './ui/AchievementsPanel'
+import { SkinTonePicker } from './ui/SkinTonePicker'
 import { t } from '../../shared/i18n'
 
 // Where it is remembered that the player turned the menu's music off.
@@ -28,6 +29,7 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
   const [name, setName] = useState(content.newGame.player.name)
   // Who he is, as the characters are told it: the content's own, which is fixed, and whatever the player adds to it.
   const [about, setAbout] = useState('')
+  const [skinTone, setSkinTone] = useState<SkinTone>(content.newGame.player.skinTone)
   const [notice, setNotice] = useState('')
   // His stats as he has set them so far: all at the lowest when the dialog opens, with the whole pool to spend.
   const [stats, setStats] = useState<Record<Stat, number>>(startingStats)
@@ -37,6 +39,7 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
   const openNew = () => {
     setStats(startingStats())
     setAbout('')
+    setSkinTone(content.newGame.player.skinTone)
     setPanel('new')
   }
 
@@ -64,7 +67,7 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
     event.preventDefault()
     // A fresh seed gives each game its own run of weather.
     const seed = Math.floor(Math.random() * 0x7fffffff)
-    onStart({ state: createInitialState(content, name, seed, stats, about), scene: null })
+    onStart({ state: createInitialState(content, name, seed, stats, about, skinTone), scene: null })
   }
 
   // The menu's music: it plays round and round while the menu is up, and stops with it. Whether it is wanted is remembered.
@@ -126,6 +129,10 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
               {t('shell.title.yourName')}
               <input value={name} onChange={(e) => setName(e.target.value)} autoFocus />
             </label>
+            <div className="field">
+              <span className="field-label">{t('shell.skinTone.label')}</span>
+              <SkinTonePicker value={skinTone} onChange={setSkinTone} />
+            </div>
             <label>
               {t('shell.title.aboutYou')}
               <span className="new-game-bio">{content.newGame.player.bio.split(PLAYER_TOKEN).join(name.trim() || content.newGame.player.name)}</span>

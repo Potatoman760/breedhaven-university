@@ -327,26 +327,56 @@
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",
-      "pregnant": false,
       "sprites": {
         "neutral": {
           "image": "sprites/maren/bathrobe-neutral-cutout.webp",
           "description": ""
         }
-      }
+      },
+      "pregnant": false
     },
     {
       "id": "bathrobe-pregnant",
       "name": "Bathrobe, pregnant",
-      "inherits": "bathrobe",
       "description": "She has a round, pregnant belly.",
-      "pregnant": true,
+      "inherits": "bathrobe",
       "sprites": {
         "neutral": {
           "image": "sprites/maren/bathrobe-pregnant-neutral-cutout.webp",
           "description": ""
         }
-      }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "baby-medium",
+      "name": "With the baby (medium)",
+      "description": "She cradles a sleeping newborn baby in her arms, held against her chest, swaddled snugly in a soft cream blanket with only its small face showing. The baby has light olive to tan skin.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/maren/baby-medium-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true,
+      "babyTone": "medium"
+    },
+    {
+      "id": "baby-dark",
+      "name": "With the baby (dark)",
+      "description": "She cradles a sleeping newborn baby in her arms, held against her chest, swaddled snugly in a soft cream blanket with only its small face showing. The baby has dark brown skin.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/maren/baby-dark-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true,
+      "babyTone": "dark"
     }
   ],
   "defaultOutfitId": "default",
@@ -524,7 +554,11 @@
       "day": "generated/backgrounds/maren/view.webp"
     }
   },
-  "birthPicture": "sprites/maren/birth.webp",
+  "skinTone": "medium",
+  "birthPictures": {
+    "medium": "sprites/maren/birth-medium.webp",
+    "dark": "sprites/maren/birth-dark.webp"
+  },
   "walkSprite": "sprites/maren/walk-cutout.webp",
   "childNames": {
     "daughters": [

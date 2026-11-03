@@ -92,6 +92,17 @@ describe('orientation day', () => {
     expect(() => attendOrientation(content, second.state)).toThrow(/no orientation/)
   })
 
+  it('dresses everyone in its scene in the outfit a step names, and leaves them as they are otherwise', () => {
+    const dressed: ContentPack = {
+      ...content,
+      orientation: { ...content.orientation!, steps: content.orientation!.steps.map((s, i) => (i === 0 ? { ...s, outfitId: 'default' } : s)) }
+    }
+    const scene = attendOrientation(dressed, state).scene!
+    expect(scene.outfitId).toBe('default')
+    expect(Object.values(scene.looks ?? {}).every((look) => look.outfitId === 'default')).toBe(true)
+    expect(attendOrientation(content, state).scene!.outfitId).toBeUndefined()
+  })
+
   it('is over once its day has passed, attended or not, and classes meet again', () => {
     const nextWeek = { ...state, time: 60 } // three days on: a "Two" again, at 06:00
     expect(isOrientationDay(content, nextWeek)).toBe(false)

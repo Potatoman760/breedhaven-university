@@ -349,6 +349,36 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "baby-light",
+      "name": "With the baby (light)",
+      "description": "She cradles a sleeping newborn baby in her arms, held against her chest, swaddled snugly in a soft cream blanket with only its small face showing. The baby has fair, light skin.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/morwenna/baby-light-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true,
+      "babyTone": "light"
+    },
+    {
+      "id": "baby-medium",
+      "name": "With the baby (medium)",
+      "description": "She cradles a sleeping newborn baby in her arms, held against her chest, swaddled snugly in a soft cream blanket with only its small face showing. The baby has light olive to tan skin.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/morwenna/baby-medium-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true,
+      "babyTone": "medium"
     }
   ],
   "defaultOutfitId": "default",
@@ -497,7 +527,11 @@
       "day": "generated/backgrounds/morwenna/view-2.webp"
     }
   },
-  "birthPicture": "sprites/morwenna/birth.webp",
+  "skinTone": "light",
+  "birthPictures": {
+    "light": "sprites/morwenna/birth-light.webp",
+    "medium": "sprites/morwenna/birth-medium.webp"
+  },
   "walkSprite": "sprites/morwenna/walk-cutout.webp",
   "childNames": {
     "daughters": [

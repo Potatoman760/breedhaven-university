@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
-import { builtTier, canBuild, factor, houseLayout, inRoom, nextWork, roomHeIsIn, spriteFor, viewImage, wornOutfit } from '../../../../shared/game'
+import { builtTier, canBuild, factor, houseLayout, inRoom, nextWork, roomHeIsIn, shownOutfit, spriteFor, viewImage } from '../../../../shared/game'
 import { Portrait } from '../Portrait'
 import type { ContentPack, GameState, HousingConfig, Light, LoveInterest } from '../../../../shared/model'
 import { t } from '../../../../shared/i18n'
@@ -33,7 +33,8 @@ interface Props {
 }
 
 /** The picture her portrait is cut from in the house: what she is wearing today. */
-export const wornSprite = (content: ContentPack, state: GameState, li: LoveInterest) => spriteFor(li, wornOutfit(content, state, li), undefined)
+// Holding their child where she is so, otherwise in what she has on.
+export const wornSprite = (content: ContentPack, state: GameState, li: LoveInterest) => spriteFor(li, shownOutfit(content, state, li), undefined)
 
 /**
  * The house seen from the front with its wall cut away: every room a window onto its own picture, floors stacked on

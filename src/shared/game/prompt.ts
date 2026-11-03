@@ -367,7 +367,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
     ]),
 
     // Who he is, as anyone who has heard of him knows it.
-    section(t('scene.prompt.about.title', { player: player.name }), [player.bio, player.about].map((text) => text.split(PLAYER_TOKEN).join(player.name))),
+    section(t('scene.prompt.about.title', { player: player.name }), [t('scene.prompt.about.skin', { player: player.name, tone: player.skinTone }), player.bio, player.about].map((text) => text.split(PLAYER_TOKEN).join(player.name))),
 
     !isNpc && section(t('scene.prompt.relationship.title', { player: player.name }), [
       t('scene.prompt.relationship.stage', { stage: stage.name, description: stage.description }).trim(),

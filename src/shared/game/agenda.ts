@@ -1,5 +1,5 @@
 import type { ContentPack, GameState } from '../model'
-import { attendees } from './appointments'
+import { attendees, planMark, type PlanMark } from './appointments'
 import { toDate } from './calendar'
 import { meetingNow } from './courses'
 import { eventGoers, eventsOn } from './events'
@@ -23,6 +23,8 @@ export interface AgendaItem {
   hours?: number
   /** What it is, at length, for when it is looked at: an event's description. */
   description?: string
+  /** A plan that is more than an ordinary one, marked as what it is: her story beat, the house, the way down. */
+  mark?: PlanMark
 }
 
 /** One hour of the day a plan is suggested for: what of his is then, and whether the plan is. */
@@ -158,7 +160,8 @@ export function dayAgenda(content: ContentPack, state: GameState, dayIndex: numb
       title: plan.kind === 'birth' ? t('game.agenda.givesBirth', { name: firstNames(content, [plan.loveInterestId]) }) : plan.kind === 'viewing' || plan.kind === 'below' ? plan.title : t('game.agenda.planWith', { plan: plan.title, names: firstNames(content, attendees(plan)) }),
       detail: place,
       startHour: date.hour,
-      hours: plan.hours
+      hours: plan.hours,
+      ...(planMark(plan) && { mark: planMark(plan) })
     })
   }
   return [...whole.filter((item) => item.startHour === undefined), ...timed.sort((a, b) => (a.startHour ?? 0) - (b.startHour ?? 0))]

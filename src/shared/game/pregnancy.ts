@@ -161,27 +161,33 @@ export function lastsTheDay(li: Pick<LoveInterest, 'defaultOutfitId'>, outfit: O
 
 /**
  * What she has on today, as the day began or as a scene left her: today's as kept in the state, or before it has been
- * kept, what it will be. On the day of an event she is dressed for it, if she has an outfit with its id; otherwise
- * one of her outfits that last the day is drawn, the same one for the same day of the same game.
+ * kept, what it will be. One a part of today puts her in, where it is given, comes first; then on the day of an event
+ * she is dressed for it, if she has an outfit with its id; otherwise one of her outfits that last the day is drawn,
+ * the same one for the same day of the same game.
  */
-function dayOutfit(content: ContentPack, state: GameState, li: LoveInterest): Outfit | undefined {
+function dayOutfit(content: ContentPack, state: GameState, li: LoveInterest, planned: Record<string, string> = {}): Outfit | undefined {
   const has = (id: string) => li.outfits.find((o) => o.id === id)
   const { dayIndex } = toDate(content.calendar, state.time)
   const kept = state.dayOutfits.day === dayIndex ? state.dayOutfits.worn[li.id] : undefined
   if (kept !== undefined) return has(kept)
+  const asked = planned[li.id] !== undefined ? has(planned[li.id]) : undefined
+  if (asked && lastsTheDay(li, asked)) return asked
   const dressed = eventsOn(content, state).map((event) => has(event.id)).find((outfit) => outfit !== undefined)
   if (dressed) return dressed
   const choices = li.outfits.filter((o) => lastsTheDay(li, o))
   return choices[Math.floor(roll(state.weatherSeed, dayIndex, seedOf(li.id), 7) * choices.length)]
 }
 
-/** Dresses everyone for the day, once it has begun: what each has on is kept until the next. Unchanged once done. */
-export function dressForDay(content: ContentPack, state: GameState): GameState {
+/**
+ * Dresses everyone for the day, once it has begun: what each has on is kept until the next. Unchanged once done.
+ * `planned` is what today's parts put their casts in (`dayOutfitsPlanned`), by id.
+ */
+export function dressForDay(content: ContentPack, state: GameState, planned: Record<string, string> = {}): GameState {
   const { dayIndex } = toDate(content.calendar, state.time)
   if (state.dayOutfits.day === dayIndex) return state
   const worn = Object.fromEntries(
     [...content.loveInterests, ...content.npcs].flatMap((who) => {
-      const outfit = dayOutfit(content, state, who)
+      const outfit = dayOutfit(content, state, who, planned)
       return outfit ? [[who.id, outfit.id]] : []
     })
   )
@@ -192,8 +198,8 @@ export function dressForDay(content: ContentPack, state: GameState): GameState {
  * What a scene leaves those in it wearing: an outfit that lasts the day, one of them changed into, she keeps on. One
  * for the scene alone comes off with it, and she is back in what she had on.
  */
-export function keepDayOutfits(content: ContentPack, state: GameState, scene: Pick<Scene, 'loveInterestId' | 'companionIds' | 'outfitId' | 'looks'>): GameState {
-  const dressed = dressForDay(content, state)
+export function keepDayOutfits(content: ContentPack, state: GameState, scene: Pick<Scene, 'loveInterestId' | 'companionIds' | 'outfitId' | 'looks'>, planned: Record<string, string> = {}): GameState {
+  const dressed = dressForDay(content, state, planned)
   const worn = { ...dressed.dayOutfits.worn }
   for (const id of [scene.loveInterestId, ...scene.companionIds]) {
     const outfitId = id === scene.loveInterestId ? scene.outfitId : scene.looks?.[id]?.outfitId

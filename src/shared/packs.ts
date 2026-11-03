@@ -209,15 +209,16 @@ export function withPackPaths(who: PackedCharacter, to: (path: string) => string
 /** A whole character with every file's path changed by `to`. A file it has no answer for is left out. */
 export function withPersonPaths(who: LoveInterest, to: (path: string) => string | undefined): LoveInterest {
   const { outfits, animations } = withPackPaths({ ...who, outfits: who.outfits.map((outfit) => ({ ...outfit, whole: true })) }, to)
-  const { birthPicture, walkSprite, room, ...rest } = who
+  const { birthPictures, walkSprite, room, ...rest } = who
   const moved = (path: string | undefined) => (path ? to(path) : undefined)
-  const [birth, walk] = [moved(birthPicture), moved(walkSprite)]
+  const walk = moved(walkSprite)
+  const births = Object.fromEntries(Object.entries(birthPictures).flatMap(([tone, image]) => (moved(image) ? [[tone, moved(image)]] : [])))
   const images = room?.images && Object.fromEntries(Object.entries(room.images).flatMap(([when, image]) => (moved(image) ? [[when, moved(image)]] : [])))
   return {
     ...rest,
     outfits: outfits.map(({ whole: _whole, ...outfit }) => outfit),
     animations,
-    ...(birth && { birthPicture: birth }),
+    birthPictures: births,
     ...(walk && { walkSprite: walk }),
     ...(room && { room: { ...room, ...(images && { images }) } })
   }
@@ -230,7 +231,7 @@ export function packedFiles(who: PackedCharacter): string[] {
 
 /** Every file a whole character names. */
 export function personFiles(who: LoveInterest): string[] {
-  const own = [...Object.values(who.room?.images ?? {}), who.birthPicture, who.walkSprite].filter((path): path is string => typeof path === 'string')
+  const own = [...Object.values(who.room?.images ?? {}), ...Object.values(who.birthPictures), who.walkSprite].filter((path): path is string => typeof path === 'string')
   return [...new Set([...packedFiles({ ...who, outfits: who.outfits.map((outfit) => ({ ...outfit, whole: true })) }), ...own])]
 }
 

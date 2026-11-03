@@ -93,7 +93,7 @@ import { MEMORY_LEVEL_LABELS, METERS, STATS, type ContentPack, type GameState, t
 import { errorMessage } from '../errors'
 import { Overlay } from './Dialog'
 import { useConfirm } from './Confirm'
-import { BackIcon, BatteryIcon, CalendarIcon, CameraIcon, ChatIcon, ChevronIcon, ClockIcon, CoinIcon, HeartIcon, PregnantIcon, SignalIcon, TagIcon, WeatherIcon, WifiIcon } from './icons'
+import { BackIcon, BatteryIcon, CalendarIcon, CameraIcon, ChatIcon, ChevronIcon, ClockIcon, CoinIcon, HeartIcon, PlanMarkIcon, PregnantIcon, SignalIcon, TagIcon, WeatherIcon, WifiIcon } from './icons'
 import star from '../../../assets/phone/star.webp'
 import chatsArt from '../../../assets/phone/apps/chats.webp'
 import friendsArt from '../../../assets/phone/apps/friends.webp'
@@ -104,6 +104,7 @@ import shopArt from '../../../assets/phone/apps/shop.webp'
 import profileArt from '../../../assets/phone/apps/profile.webp'
 import { Stalls } from './MarketView'
 import { BackButton } from './BackButton'
+import { SkinTonePicker } from './SkinTonePicker'
 import { useBack } from '../mouseBack'
 import { EmojiPicker } from './EmojiPicker'
 import { t, type MessageKey } from '../../../shared/i18n'
@@ -543,7 +544,10 @@ function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadPr
               <p className="bubble">{note.text}</p>
               {/* A house offered to him: taken or left here, and one that was left can still be taken. */}
               {note.offer === 'housing' && content.housing && (
-                <div className="proposal">
+                <div className="proposal special house">
+                  <span className="proposal-badge" aria-hidden="true">
+                    <PlanMarkIcon mark="house" size={20} />
+                  </span>
                   <div>
                     <strong>{t('panels.phone.housingOffer', { name: content.housing.name })}</strong>
                     <span>
@@ -566,9 +570,35 @@ function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadPr
                   )}
                 </div>
               )}
+              {/* The way down below: set for him already, and shown here with when and where while it is on his calendar. */}
+              {note.offer === 'below' &&
+                (() => {
+                  const below = state.appointments.find((one) => one.kind === 'below')
+                  return below ? (
+                    <div className="proposal special below">
+                      <span className="proposal-badge" aria-hidden="true">
+                        <PlanMarkIcon mark="below" size={20} />
+                      </span>
+                      <div>
+                        <strong>{below.title}</strong>
+                        <span>
+                          {describeWhen(content, below.time)} · {content.locations.find((l) => l.id === below.locationId)?.name}
+                        </span>
+                      </div>
+                      <span className="chip">{t('panels.phone.onCalendar')}</span>
+                    </div>
+                  ) : null
+                })()}
               {plan && (
-                <div className="proposal">
+                // Her story beat is not an ordinary plan, and is marked as hers: a heart, and the frame of something that matters.
+                <div className={plan.story ? 'proposal special story' : 'proposal'}>
+                  {plan.story && (
+                    <span className="proposal-badge" aria-hidden="true">
+                      <PlanMarkIcon mark="story" size={22} />
+                    </span>
+                  )}
                   <div>
+                    {plan.story && <span className="caps">{t('panels.phone.storyInvite', { name: firstName })}</span>}
                     <strong>{t('panels.phone.planWith', { title: plan.title, names: firstNames(content, attendees(plan)) })}</strong>
                     <span>
                       {describeWhen(content, plan.time)} · {content.locations.find((l) => l.id === plan.locationId)?.name}
@@ -1210,8 +1240,8 @@ function Societies({ content, state, onChange }: { content: ContentPack; state: 
 
 /** Who he is, and what everyone knows: all of it his to change. */
 function Profile({ content, state, onChange }: { content: ContentPack; state: GameState; onChange: (update: (state: GameState) => GameState) => void }) {
-  const { name, bio, about } = state.player
-  const [draft, setDraft] = useState({ bio, about, memories: state.globalMemories })
+  const { name, bio, about, skinTone } = state.player
+  const [draft, setDraft] = useState({ bio, about, skinTone, memories: state.globalMemories })
   const memories = draft.memories
   const setMemories = (next: Memory[]) => setDraft({ ...draft, memories: next })
   const change = (i: number, memory: Partial<Memory>) => setMemories(memories.map((m, at) => (at === i ? { ...m, ...memory } : m)))
@@ -1230,6 +1260,10 @@ function Profile({ content, state, onChange }: { content: ContentPack; state: Ga
           <h1>{name}</h1>
           <span className="handle">{PLAYER_HANDLE}</span>
         </div>
+      </div>
+      <div className="field">
+        <span className="field-label">{t('shell.skinTone.label')}</span>
+        <SkinTonePicker value={draft.skinTone} onChange={(tone) => setDraft({ ...draft, skinTone: tone })} />
       </div>
       <label title={t('panels.phone.profileTip', { token: PLAYER_TOKEN })}>
         {t('panels.phone.bio')}

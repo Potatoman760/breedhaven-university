@@ -119,6 +119,21 @@
       "fallback": "pregnant",
       "sprites": {},
       "pregnant": true
+    },
+    {
+      "id": "baby-medium",
+      "name": "With the baby (medium)",
+      "description": "She cradles a sleeping newborn baby in her arms, held against her chest, swaddled snugly in a soft cream blanket with only its small face showing. The baby's skin is tinted a soft pale blue, like its mother's.",
+      "inherits": "default",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/lira/baby-medium-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true,
+      "babyTone": "medium"
     }
   ],
   "defaultOutfitId": "default",
@@ -271,7 +286,12 @@
       "day": "generated/backgrounds/lira/view.webp"
     }
   },
-  "birthPicture": "sprites/lira/birth.webp",
+  "skinTone": "medium",
+  "babyTint": "The baby's skin is tinted a soft pale blue, like its mother's",
+  "ownBabyTone": "medium",
+  "birthPictures": {
+    "medium": "sprites/lira/birth-medium.webp"
+  },
   "walkSprite": "sprites/lira/walk-cutout.webp",
   "childNames": {
     "daughters": [

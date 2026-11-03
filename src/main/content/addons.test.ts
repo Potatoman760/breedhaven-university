@@ -228,7 +228,7 @@ describe('tidying up on save', () => {
       outfits: [{ id: 'default', name: 'Usual', description: '', pregnant: false, sprites: { neutral: { image: 'addons/sprites/mira/neutral.png', description: '' } } }],
       animations: [{ id: 'dance', name: 'Dance', description: '', clip: 'addons/sprites/mira/dance.mp4', loop: true }],
       room: { images: { night: 'addons/generated/backgrounds/mira/kept.png' } },
-      birthPicture: 'addons/sprites/mira/birth.png',
+      birthPictures: { light: 'addons/sprites/mira/birth.png' },
       walkSprite: 'addons/sprites/mira/walk.png'
     }
     expect(removeUnusedAssets(dir, saved).sort()).toEqual(['neutral-old.png', 'room.png', 'try-1.png'])

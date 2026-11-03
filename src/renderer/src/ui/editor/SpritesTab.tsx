@@ -16,7 +16,7 @@ import { EmptySlot, PictureSlot, SlotGrid } from './slots'
 import { t } from '../../../../shared/i18n'
 
 /** What the sprite editor needs of a character: a love interest and an NPC both have it. */
-type SpriteOwner = Pick<LoveInterest, 'id' | 'name' | 'pronouns' | 'appearance' | 'outfits' | 'defaultOutfitId' | 'faceY' | 'stageHeight' | 'animations' | 'imageSeed' | 'birthPicture' | 'walkSprite' | 'room'>
+type SpriteOwner = Pick<LoveInterest, 'id' | 'name' | 'pronouns' | 'appearance' | 'outfits' | 'defaultOutfitId' | 'faceY' | 'stageHeight' | 'animations' | 'imageSeed' | 'birthPictures' | 'walkSprite' | 'room'>
 
 interface Props {
   draft: SpriteOwner
@@ -150,21 +150,21 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
   }
 
   // Her pictures that are still PNGs, her room's among them: everything the optimize button would turn into WebP.
-  const pngs = pngsIn({ outfits: draft.outfits, animations: draft.animations, birthPicture: draft.birthPicture, walkSprite: draft.walkSprite, room: draft.room?.images })
+  const pngs = pngsIn({ outfits: draft.outfits, animations: draft.animations, birthPictures: draft.birthPictures, walkSprite: draft.walkSprite, room: draft.room?.images })
 
   /**
    * Turns every PNG of hers into a WebP of the same picture, one after another, and puts each in every slot the PNG
    * was in as it is done. Nothing is kept until she is saved; the PNGs go once a save no longer names them.
    */
   async function optimize() {
-    const paths = pngsIn({ outfits: latest.current.outfits, animations: latest.current.animations, birthPicture: latest.current.birthPicture, walkSprite: latest.current.walkSprite, room: latest.current.room?.images })
+    const paths = pngsIn({ outfits: latest.current.outfits, animations: latest.current.animations, birthPictures: latest.current.birthPictures, walkSprite: latest.current.walkSprite, room: latest.current.room?.images })
     if (paths.length === 0 || batch) return
     setNotice('')
     const put = forOwner(latest.current.id)
     const { failed } = await run(OPTIMIZE_BATCH, t('editor.common.optimizing'), paths, fileName, async (path) => {
       try {
         const to = await toWebp(path)
-        put({ outfits: renamed(latest.current.outfits, path, to), animations: renamed(latest.current.animations, path, to), birthPicture: renamed(latest.current.birthPicture, path, to), walkSprite: renamed(latest.current.walkSprite, path, to), room: latest.current.room && { ...latest.current.room, images: renamed(latest.current.room.images, path, to) } })
+        put({ outfits: renamed(latest.current.outfits, path, to), animations: renamed(latest.current.animations, path, to), birthPictures: renamed(latest.current.birthPictures, path, to), walkSprite: renamed(latest.current.walkSprite, path, to), room: latest.current.room && { ...latest.current.room, images: renamed(latest.current.room.images, path, to) } })
         return { ok: true }
       } catch (error) {
         return { ok: false, message: errorMessage(error) }
@@ -573,7 +573,7 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
           {t('editor.sprites.usualOutfit')}
           <select value={draft.defaultOutfitId} onChange={(e) => set({ defaultOutfitId: e.target.value })}>
             {draft.outfits
-              .filter((outfit) => !outfit.pregnant)
+              .filter((outfit) => !outfit.pregnant && !outfit.babyTone)
               .map((outfit) => (
                 <option key={outfit.id} value={outfit.id}>
                   {outfit.name} ({outfit.id})
@@ -581,7 +581,8 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
               ))}
           </select>
         </label>
-        {draft.outfits.map((outfit, index) => (
+        {/* Holding a child is on the Family tab, one for each tone a child of hers can have. */}
+        {draft.outfits.map((outfit, index) => outfit.babyTone ? null : (
           <div key={index} className="outfit card">
             <div className="row">
               <Text label={t('editor.common.id')} value={outfit.id} disabled={isStandardOutfit(outfit.id)} onChange={(id) => {

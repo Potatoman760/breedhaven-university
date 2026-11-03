@@ -14,7 +14,7 @@ import { nextUp } from './upcoming'
 const base = fixture()
 const content: ContentPack = {
   ...base,
-  loveInterests: [{ ...base.loveInterests[0], birthPicture: 'sprites/ana/birth.png', childNames: { daughters: ['Mab', 'Nell'], sons: ['Tam'] } }],
+  loveInterests: [{ ...base.loveInterests[0], birthPictures: { medium: 'sprites/ana/birth.png' }, childNames: { daughters: ['Mab', 'Nell'], sons: ['Tam'] } }],
   locations: base.locations.map((l) => (l.id === 'shop' ? { ...l, backgrounds: [{ id: 'default', name: 'Default', images: {} }, { id: 'ward', name: 'The ward', images: {} }] } : l)),
   pregnancy: PregnancyConfigSchema.parse({ chance: 1, birthControlChance: 1, lengthDays: 3, recoveryDays: 1, birthLocationId: 'shop', birthViewId: 'ward', birthHours: 2, birthNoticeDays: 1, stages: [{ id: 'early', name: 'with child', from: 0 }] })
 }

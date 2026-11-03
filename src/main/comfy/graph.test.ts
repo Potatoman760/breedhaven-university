@@ -258,10 +258,18 @@ describe('the NSFW section', () => {
 describe('the picture of a birth', () => {
   it('is drawn wide, from her body, in a hospital bed with the child in her arms', () => {
     expect(DEFAULT_SIZES.birth).toEqual({ width: 1920, height: 1080 })
-    expect(birthPrompt({ pronouns: 'she/her', appearance: 'A woman with brown skin and long black hair' }, 'wide shot, a maternity room')).toBe(
+    expect(birthPrompt({ pronouns: 'she/her', appearance: 'A woman with brown skin and long black hair', skinTone: 'medium' }, 'wide shot, a maternity room', 'medium')).toBe(
       'A woman with brown skin and long black hair.\n\nShe wears a pale hospital gown.\n\n' +
-        'She sits propped up on pillows in a hospital bed, cradling a newborn baby wrapped in a soft blanket in her arms, smiling down at it, tired and radiant.\n\nwide shot, a maternity room'
+        'She sits propped up on pillows in a hospital bed, cradling a newborn baby wrapped in a soft blanket in her arms, smiling down at it, tired and radiant.\n\n' +
+        'The baby has light olive to tan skin.\n\nwide shot, a maternity room'
     )
+    // A pale mother's pallor goes only to a child of her own tone, with its tone under it.
+    const pale = { appearance: 'A pale elf', skinTone: 'light' as const, babyTint: 'The baby is very pale' }
+    expect(birthPrompt(pale, '', 'light')).toContain('The baby is very pale, with a fair undertone.')
+    expect(birthPrompt(pale, '', 'medium')).toContain('The baby has light olive to tan skin.')
+    expect(birthPrompt(pale, '', 'medium')).not.toContain('very pale')
+    // One whose children are all alike gives each her tint alone.
+    expect(birthPrompt({ appearance: 'An orc', skinTone: 'medium', ownBabyTone: 'light', babyTint: 'The baby has green skin' }, '', 'light')).toMatch(/The baby has green skin\.$/)
   })
 })
 

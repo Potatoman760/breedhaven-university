@@ -81,6 +81,7 @@ export function attendOrientation(content: ContentPack, state: GameState): { sta
               direction: step.direction || undefined
             }
           ],
+          ...(step.outfitId && { outfitId: step.outfitId, looks: Object.fromEntries(companionIds.map((id) => [id, { outfitId: step.outfitId }])) }),
           messages: [],
           gifts: [], conceived: [], departed: [], npc: false,
           baseline: sceneBaseline(state, leadId, companionIds)

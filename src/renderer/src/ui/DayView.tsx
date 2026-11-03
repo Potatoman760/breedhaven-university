@@ -15,6 +15,7 @@ import {
   type Outing,
   shiftNow,
   appointmentsNow,
+  planMark,
   attendees,
   coursesInSession,
   eventsOn,
@@ -32,7 +33,7 @@ import {
   roomHeIsIn,
   inRoom,
   spriteFor,
-  wornOutfit,
+  shownOutfit,
   skillFor,
   skillProgress,
   focusOf,
@@ -59,7 +60,7 @@ import { ActivityList } from './ActivityList'
 import { Backdrop } from './Backdrop'
 import { DateBanner } from './DateBanner'
 import { NavTiles } from './NavTiles'
-import { ChevronIcon } from './icons'
+import { ChevronIcon, PlanMarkIcon } from './icons'
 import type { Panel } from './panels'
 import { useBack } from '../mouseBack'
 import { Portrait } from './Portrait'
@@ -229,7 +230,7 @@ export function DayView(props: Props) {
       {inTheRoom.length > 0 && (
         <div className="cast home-cast">
           {inTheRoom.map((li) => {
-            const image = spriteFor(li, wornOutfit(content, state, li), undefined)
+            const image = spriteFor(li, shownOutfit(content, state, li), undefined)
             return (
               image && (
                 <img
@@ -402,8 +403,8 @@ export function DayView(props: Props) {
           const check = canGoTo(content, state, item)
           const who = firstNames(content, attendees(plan))
           return check.ok ? (
-            <button key={plan.id} className="featured" onClick={() => props.onGoTo(item)}>
-              <span className="chip outline-light">{plan.kind === 'birth' ? t('screens.dayView.birth') : plan.kind === 'viewing' ? t('screens.dayView.house') : plan.kind === 'below' ? t('screens.dayView.below') : t('screens.dayView.plan')}</span>
+            <button key={plan.id} className={planMark(plan) ? `featured special ${planMark(plan)}` : 'featured'} onClick={() => props.onGoTo(item)}>
+              <span className="chip outline-light">{planMark(plan) && <PlanMarkIcon mark={planMark(plan)!} size={14} />}{plan.kind === 'birth' ? t('screens.dayView.birth') : plan.kind === 'viewing' ? t('screens.dayView.house') : plan.kind === 'below' ? t('screens.dayView.below') : t('screens.dayView.plan')}</span>
               <span className="featured-title">{plan.kind === 'birth' ? t('screens.dayView.planBirth', { who }) : plan.kind === 'viewing' ? plan.title : plan.kind === 'below' ? t('screens.dayView.planBelow', { who }) : t('screens.dayView.planWith', { title: plan.title, who })}</span>
               <ChevronIcon size={18} />
             </button>

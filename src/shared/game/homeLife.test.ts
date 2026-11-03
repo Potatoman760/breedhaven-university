@@ -4,6 +4,7 @@ import { loadContentPack } from '../../main/content/loader'
 import type { GameState } from '../model'
 import { timeOn } from './agenda'
 import { inRoom, movingInScene, roomHeIsIn, whereAtHome } from './homeLife'
+import { dressForHome, outfitAtHome } from './homeOutfit'
 import { buildRoom, goToRoom, invite, moveIn, withHousing } from './housing'
 import { createInitialState } from './state'
 
@@ -83,5 +84,21 @@ describe('who is where in the house', () => {
     // A room he builds is one they may then be found in.
     const nursery = housing.rooms.find((room) => room.cots > 0 && room.role === 'common')!.key
     expect(buildRoom(seen(noon), noon, nursery).housing.rooms[nursery]).toBe(1)
+  })
+  it('shows a mother with their child in her arms about the house while it is up, in its tone, and dresses a scene there so', () => {
+    // Their daughter born and living in the house; Tamsin no longer carrying.
+    const { [`tamsin`]: _done, ...pregnancies } = home.pregnancies
+    const born: GameState = { ...home, pregnancies, children: [{ motherId: 'tamsin', bornAt: 0, daughter: true, name: 'Ada', health: 5 }] }
+    const tamsin = written.loveInterests.find((li) => li.id === 'tamsin')!
+    const day = at(born, 14)
+    expect(outfitAtHome(seen(day), day, tamsin)?.id).toBe('baby-medium')
+    // His tone and hers make a dark one with a dark father.
+    const darker = { ...day, player: { ...day.player, skinTone: 'dark' as const } }
+    expect(outfitAtHome(seen(darker), darker, tamsin)?.id).toBe('baby-dark')
+    expect(outfitAtHome(seen(at(born, 23)), at(born, 23), tamsin)).toBeUndefined()
+    expect(outfitAtHome(seen(day), { ...day, locationId: 'great-court' }, tamsin)).toBeUndefined()
+    expect(outfitAtHome(seen(at(home, 14)), at(home, 14), tamsin)).toBeUndefined()
+    const scene = dressForHome(seen(day), day, movingInScene(seen(home), home, 'tamsin', master)!.scene)
+    expect(scene.outfitId).toBe('baby-medium')
   })
 })

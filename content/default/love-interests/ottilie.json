@@ -346,6 +346,36 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "baby-light",
+      "name": "With the baby (light)",
+      "description": "She cradles a sleeping newborn baby in her arms, held against her chest, swaddled snugly in a soft cream blanket with only its small face showing. The baby has fair, light skin.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/baby-light-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true,
+      "babyTone": "light"
+    },
+    {
+      "id": "baby-medium",
+      "name": "With the baby (medium)",
+      "description": "She cradles a sleeping newborn baby in her arms, held against her chest, swaddled snugly in a soft cream blanket with only its small face showing. The baby has light olive to tan skin.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/baby-medium-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true,
+      "babyTone": "medium"
     }
   ],
   "defaultOutfitId": "default",
@@ -518,7 +548,11 @@
       "day": "generated/backgrounds/ottilie/view-5.webp"
     }
   },
-  "birthPicture": "sprites/ottilie/birth.webp",
+  "skinTone": "light",
+  "birthPictures": {
+    "light": "sprites/ottilie/birth-light.webp",
+    "medium": "sprites/ottilie/birth-medium.webp"
+  },
   "walkSprite": "sprites/ottilie/walk-cutout.webp",
   "childNames": {
     "daughters": [

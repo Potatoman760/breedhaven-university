@@ -12,6 +12,7 @@ import { EmploymentSchema } from './job'
 import { BondSchema } from './relationship'
 import { PostPlanSchema, PostSchema } from './feed'
 import { CourierNoteSchema, StatSchema } from './stats'
+import { SkinToneSchema } from './skin'
 
 export const PlayerSchema = z.object({
   name: z.string(),
@@ -26,7 +27,9 @@ export const PlayerSchema = z.object({
    */
   bio: z.string().default(''),
   /** What the player added to it when the game began, told along with it. `{player}` stands for his name here too. */
-  about: z.string().default('')
+  about: z.string().default(''),
+  /** His skin tone, chosen as a game begins: told to everyone, and what a child of his takes from him. */
+  skinTone: SkinToneSchema.default('medium')
 })
 export type Player = z.infer<typeof PlayerSchema>
 

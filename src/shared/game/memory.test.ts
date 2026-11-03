@@ -207,9 +207,10 @@ describe('global memories', () => {
     const after = editProfile(kept, {
       bio: ' Tall. ',
       about: ' Sings. ',
+      skinTone: 'dark',
       memories: [{ time: 0, summary: ' ', level: 'normal' }, { time: 0, summary: 'Two, reworded.', level: 'core' }]
     })
-    expect(after.player).toMatchObject({ name: kept.player.name, bio: 'Tall.', about: 'Sings.' })
+    expect(after.player).toMatchObject({ name: kept.player.name, bio: 'Tall.', about: 'Sings.', skinTone: 'dark' })
     expect(after.globalMemories).toEqual([{ time: 0, summary: 'Two, reworded.', level: 'core' }])
   })
 

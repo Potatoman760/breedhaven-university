@@ -1,4 +1,4 @@
-import { MEMORY_LEVELS, SCENE_CHANGES, type ContentPack, type DepartureFeeling, type GameState, type Memory, type MemoryLevel, type Scene, type SceneBeat } from '../model'
+import { MEMORY_LEVELS, SCENE_CHANGES, type ContentPack, type DepartureFeeling, type GameState, type Memory, type MemoryLevel, type Scene, type SceneBeat, type SkinTone } from '../model'
 import { formatDate, toDate } from './calendar'
 import { describeBonds } from './bonds'
 import { stageFor } from './relationships'
@@ -350,6 +350,7 @@ export function addGlobalMemory(state: GameState, summary: string, level: Memory
 export interface ProfileEdit {
   bio: string
   about: string
+  skinTone: SkinTone
   /** Everything everyone knows, as it is to stand. */
   memories: Memory[]
 }
@@ -359,11 +360,12 @@ export interface ProfileEdit {
  * the state as it is, so that looking at the page does not count as an edit.
  */
 export function editProfile(state: GameState, edit: ProfileEdit): GameState {
-  const player = { ...state.player, bio: edit.bio.trim(), about: edit.about.trim() }
+  const player = { ...state.player, bio: edit.bio.trim(), about: edit.about.trim(), skinTone: edit.skinTone }
   const globalMemories = edit.memories.map((memory) => ({ ...memory, summary: memory.summary.trim() })).filter((memory) => memory.summary !== '')
   const same =
     player.bio === state.player.bio &&
     player.about === state.player.about &&
+    player.skinTone === state.player.skinTone &&
     globalMemories.length === state.globalMemories.length &&
     globalMemories.every((memory, i) => memory.summary === state.globalMemories[i].summary && memory.level === state.globalMemories[i].level)
   return same ? state : { ...state, player, globalMemories }

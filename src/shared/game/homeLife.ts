@@ -15,6 +15,8 @@ import { t } from '../i18n'
 // From this hour of the evening, and until this hour of the morning, everyone is in her own room.
 const TO_BED_HOUR = 22
 const UP_HOUR = 7
+/** The hours the household is up and about the house. */
+export const AWAKE_HOURS = { from: UP_HOUR, to: TO_BED_HOUR } as const
 
 /** A number from 0 up to 1 that is the same for the same woman in the same part of the same day. */
 function chance(seed: number, index: number, dayIndex: number, part: number): number {

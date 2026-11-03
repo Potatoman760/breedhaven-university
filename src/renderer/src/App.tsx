@@ -47,6 +47,7 @@ import {
   spendOnFocus,
   focusName,
   setFocus,
+  attendStory,
   attendViewing,
   scheduleViewing,
   renameNewborn,
@@ -73,7 +74,9 @@ import {
   attendOrientation,
   courierRound,
   courierRoundDue,
+  dayOutfitsPlanned,
   dressForDay,
+  dressForHome,
   keepDayOutfits,
   MAX_TURNS_KEPT,
   packTurns,
@@ -129,6 +132,7 @@ import {
   settleAppointments,
   sharedUpcoming,
   sceneEndWriter,
+  sendStoryInvitation,
   planKey,
   postMade,
   addPlayerPost,
@@ -527,7 +531,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   // As a day begins everyone is dressed for it, and keeps it on until the next.
   useEffect(() => {
     if (!idle) return
-    const dressed = dressForDay(content, state)
+    const dressed = dressForDay(content, state, dayOutfitsPlanned(content, state))
     if (dressed !== state) setState(dressed)
   }, [idle, content, state])
   const roundMade = useRef(-1)
@@ -548,6 +552,13 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       })
       .catch(() => undefined)
   }, [idle, state, content])
+  // Once what she and he are reaches a stage she has a beat for, she writes to ask him to it. It is written content, not
+  // the LLM's: the beat is marked asked as it is sent, so the same one is never sent twice.
+  useEffect(() => {
+    if (!idle || over) return
+    const asked = sendStoryInvitation(content, state)
+    if (asked) setState(asked)
+  }, [idle, over, state, content])
   // At the start of each day, the day's Bloomr posts are planned. The plans are kept in the game until each is made.
   useEffect(() => {
     if (!idle || over || !feedRoundDue(content, state)) return
@@ -705,7 +716,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
    * may be on her way, and a friend who was brought along is there from the first moment.
    */
   function begin(opening: Scene, at: GameState, tags: string[] = []) {
-    const planned = planDrama(content, at, opening, { tags })
+    // In the house, whoever is holding their child opens the scene so.
+    const planned = planDrama(content, at, dressForHome(content, at, opening), { tags })
     const along = fireDrama(content, at, planned)
     setState(along.state)
     setScene(along.scene)
@@ -910,6 +922,14 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       setCutscene({ intro: shown.cutscene, then: () => setBelowTour(true) })
       return
     }
+    // Her story beat: what she has written for it is read, and then the scene she asked him to.
+    if (at.appointments.find((plan) => plan.id === appointmentId)?.story !== undefined) {
+      const told = attendStory(content, at, appointmentId)
+      setNotice('')
+      setState(told.state)
+      introThenScene(told.cutscene, told.scene)
+      return
+    }
     const { state: after, appointment } = keepAppointment(content, at, appointmentId)
     setNotice('')
     begin({
@@ -1002,7 +1022,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setPanel(null)
     setNotice('')
     setState(shown.state)
-    setScene(shown.scene)
+    setScene(dressForHome(content, shown.state, shown.scene))
   }, [welcome])
   const [practice, setPractice] = useState<GameState | null>(null)
   // The lanterns let go as the festival date begins, and what comes after them.
@@ -1494,7 +1514,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       // What she let out goes into what the player knows of her, and what changed between the love interests is kept.
       const known = revealed.reduce((next, r) => revealFacts(content, next, r.loveInterestId, [r.factId]), after)
       // An outfit that lasts the day, changed into in the scene, she keeps on; one for the scene alone comes off.
-      const awake = keepDayOutfits(content, result.rapport.reduce((next, c) => setRelation(next, c.a, c.b, c.relation), known), scene)
+      const related = result.rapport.reduce((next, c) => setRelation(next, c.a, c.b, c.relation), known)
+      const awake = keepDayOutfits(content, related, scene, dayOutfitsPlanned(content, related))
       // They fell asleep where they were: the night goes by, and he wakes there in the morning, rested.
       const settled = sleepingOver ? sleepOver(content, awake) : awake
       if (sleepingOver) setDawn(true)

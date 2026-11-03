@@ -24,6 +24,7 @@ import { NpcSchema, type Npc } from './npc'
 import { OrientationSchema, type Intro } from './orientation'
 import { PokerConfigSchema } from './poker'
 import { PregnancyConfigSchema } from './pregnancy'
+import { StorySchema } from './story'
 import { RelationshipConfigSchema } from './relationship'
 import { SoundsSchema } from './sound'
 import { NewGameSchema } from './state'
@@ -79,6 +80,8 @@ export const ContentPackSchema = z.object({
   looks: LooksSchema.prefault({}),
   /** Love interests together, with sex-acts of all of them at once. */
   groups: z.array(GroupSchema).default([]),
+  /** Scenes written for a love interest, earned as what they are reaches a stage. */
+  story: StorySchema.default({}),
   /** What the game sounds like: the files played for its cues, and the loops behind each place. */
   sounds: SoundsSchema.prefault({}),
   /** Without a map the player can't travel, so every activity must be at the starting location. */
@@ -294,6 +297,30 @@ function checkReferences(pack: ContentPack): string[] {
     need(locations, step.locationId, `orientation.steps[${i}]`, 'location')
     checkHour(step.startHour, `orientation.steps[${i}].startHour`)
   })
+  // A story beat is hers: she speaks its cutscene, at a place and in clothes there are, for a stage there is.
+  for (const [id, beats] of Object.entries(pack.story)) {
+    const her = pack.loveInterests.find((li) => li.id === id)
+    if (!her) {
+      unknown('story', 'loveInterest', id)
+      continue
+    }
+    beats.forEach((beat, i) => {
+      const where = `story.${id}[${i}]`
+      need(stages, beat.stage, `${where}.stage`, 'relationshipStage')
+      need(locations, beat.locationId, where, 'location')
+      const place = pack.locations.find((l) => l.id === beat.locationId)
+      if (place && beat.viewId !== undefined && !place.backgrounds.some((view) => view.id === beat.viewId)) issues.push(t('game.content.noView', { where, owner: place.id, id: beat.viewId }))
+      if (beat.outfitId !== undefined && !her.outfits.some((outfit) => outfit.id === beat.outfitId)) issues.push(t('game.content.noOutfit', { where: `${where}.outfitId`, owner: id, id: beat.outfitId }))
+      if (beat.weekday !== undefined) need(weekdays, beat.weekday, `${where}.weekday`, 'weekday')
+      checkHour(beat.startHour, `${where}.startHour`)
+      for (const [name, telling] of [['cutscene', beat], ['ifIntimate', beat.ifIntimate], ['ifUnprotected', beat.ifUnprotected]] as const) {
+        if (!telling) continue
+        checkCutscene(telling.cutscene, `${where}.${name}`)
+        if (telling.cutscene.speakerId !== id) unknown(`${where}.${name}.speakerId`, 'loveInterest', telling.cutscene.speakerId)
+      }
+    })
+  }
+
   if (pack.societies) {
     const { societies } = pack
     need(events, societies.fairId, 'societies.fairId', 'calendarEvent')

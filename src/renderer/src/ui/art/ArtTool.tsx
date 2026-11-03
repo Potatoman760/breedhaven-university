@@ -12,7 +12,7 @@ import {
   type GenerateArtResult,
   type WorkflowListResult
 } from '../../../../shared/comfy'
-import { isPregnantPose, EXPRESSIONS, type CustomExpression, type Location, type LoveInterest, type Npc } from '../../../../shared/model'
+import { isPregnantPose, EXPRESSIONS, type CustomExpression, type Location, type LoveInterest, type Npc, type SkinTone } from '../../../../shared/model'
 import { t, type MessageKey } from '../../../../shared/i18n'
 import { errorMessage } from '../../errors'
 import { Overlay } from '../Dialog'
@@ -62,7 +62,9 @@ export type ArtTarget =
   | { kind: 'photo' }
   | {
       kind: 'birth'
-      who: Pick<LoveInterest | Npc, 'id' | 'name' | 'pronouns' | 'appearance' | 'imageSeed'>
+      who: Pick<LoveInterest, 'id' | 'name' | 'pronouns' | 'appearance' | 'imageSeed' | 'babyTint' | 'skinTone' | 'ownBabyTone'>
+      /** The tone the child is drawn in: one picture is made for each. */
+      tone: SkinTone
       onUse: (path: string) => void | Promise<void>
     }
   | {
@@ -205,7 +207,7 @@ function Generate({ target, settings, list }: GenerateProps) {
     if (target.kind === 'sprite') return spritePrompt(target.who, outfitId, expression, framing, target.faces?.find((face) => face.id === expression)?.draws)
     if (target.kind === 'background') return backgroundPrompt(target.location, view, period, framing)
     // A pose drawn pregnant is the same pose, with her pregnant nude in place of her nude.
-    if (target.kind === 'birth') return birthPrompt(target.who, framing)
+    if (target.kind === 'birth') return birthPrompt(target.who, framing, target.tone)
     if (target.kind === 'walk') return walkPrompt(target.who, framing)
     if (target.kind === 'nsfw') {
       const draws = target.poses.find((pose) => pose.id === expression)?.draws ?? ''
@@ -224,7 +226,7 @@ function Generate({ target, settings, list }: GenerateProps) {
     setBusy(true)
     setNotice('')
     const subjectId = target.kind === 'sprite' || target.kind === 'nsfw' || target.kind === 'birth' || target.kind === 'walk' ? target.who.id : target.kind === 'background' ? target.location.id : ''
-    const name = kind === 'birth' ? 'birth' : kind === 'walk' ? 'walk' : kind === 'nsfw' ? `nsfw-${expression}` : kind === 'sprite' ? `${outfitId}-${expression || 'neutral'}` : kind === 'background' ? [view, period].filter(Boolean).join('-') || 'view' : subject.slice(0, 40) || 'photo'
+    const name = target.kind === 'birth' ? `birth-${target.tone}` : kind === 'walk' ? 'walk' : kind === 'nsfw' ? `nsfw-${expression}` : kind === 'sprite' ? `${outfitId}-${expression || 'neutral'}` : kind === 'background' ? [view, period].filter(Boolean).join('-') || 'view' : subject.slice(0, 40) || 'photo'
     try {
       const result = await window.api.comfy.generate({
         kind,

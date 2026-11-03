@@ -8,6 +8,7 @@ import { addMemory, applyFeelings } from './memory'
 import { deliverChild, nameChild } from './pregnancy'
 import { sceneBaseline } from './scene'
 import { isOpen } from './schedule'
+import { birthPictureFor } from './skin'
 import { t } from '../i18n'
 
 /**
@@ -130,7 +131,7 @@ export function attendBirth(content: ContentPack, state: GameState, appointmentI
       conceived: [],
       departed: [],
       viewId: content.pregnancy?.birthViewId,
-      picture: mother?.birthPicture,
+      picture: birthPictureFor(content, state, motherId),
       newborn: child?.bornAt,
       // From before the child came, so that what the hour did to her feelings is the scene's to say.
       baseline: sceneBaseline(state, motherId, [])

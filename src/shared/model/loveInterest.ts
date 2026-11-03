@@ -4,6 +4,7 @@ import { StudiesSchema, TeachingSchema } from "./course";
 import { StatSchema } from "./stats";
 import { ChildNamesSchema } from "./pregnancy";
 import { RoleSchema } from "./expedition";
+import { SkinToneSchema } from "./skin";
 import { t } from "../i18n";
 
 /**
@@ -95,6 +96,11 @@ export const OutfitSchema = z.object({
    * Any other is worn for the scene alone. Her usual clothes always last the day; a pregnant outfit goes by its parent.
    */
   day: z.boolean().optional(),
+  /**
+   * She holds their child in her arms, a newborn of this tone: worn only in the house, where a child of theirs of it
+   * lives. One for each tone a child of hers can have, shown on the editor's Family tab and not with her outfits.
+   */
+  babyTone: SkinToneSchema.optional(),
 });
 export type Outfit = z.infer<typeof OutfitSchema>;
 
@@ -477,8 +483,20 @@ export const LoveInterestSchema = z.object({
   schedule: z.array(ScheduleEntrySchema).default([]),
   /** Where she lives. A scene can move there. */
   room: RoomSchema.optional(),
-  /** A picture of her just after giving birth: sitting up in a hospital bed with the child in her arms. It is the whole stage of the scene of a birth he is there for. */
-  birthPicture: z.string().optional(),
+  /** Her skin tone: with his, what a child of theirs looks like. */
+  skinTone: SkinToneSchema.default("medium"),
+  /**
+   * What a child of hers takes from her besides its tone, a sentence for its picture: "The baby has green skin like its
+   * mother's". Said for a child of her own tone, or for every child where they all look alike (`ownBabyTone`).
+   */
+  babyTint: z.string().optional(),
+  /** The one tone every child of hers is drawn in, whoever the father, where what she gives it outweighs his. */
+  ownBabyTone: SkinToneSchema.optional(),
+  /**
+   * Pictures of her just after giving birth, sitting up in a hospital bed with the child in her arms, one for each
+   * tone a child of hers may have (`babyTone`). It is the whole stage of the scene of a birth he is there for.
+   */
+  birthPictures: z.partialRecord(SkinToneSchema, z.string()).default({}),
   /** Her walking in profile, facing right, in her usual clothes, cut out: she walks across the loading screen of a scene with her. */
   walkSprite: z.string().optional(),
   /** The names she would give a child of hers: she suggests the next one not yet used when it is born. */

@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { basePoseId, DEFAULT_VIEW, outfitParts, type Location, type LoveInterest, type Npc, pronounWords } from './model'
+import { basePoseId, DEFAULT_VIEW, outfitParts, type Location, type LoveInterest, type Npc, type Outfit, type SkinTone, babyOutfitId, pronounWords } from './model'
 import { t } from './i18n'
 
 /**
@@ -481,15 +481,58 @@ export function nsfwPrompt(who: Pick<LoveInterest | Npc, 'appearance' | 'outfits
  * a birth he is there for: her body, that she is in a hospital bed in a gown with the child in her arms, and how the
  * picture is framed, each a paragraph. She is no longer drawn pregnant: the child is born.
  */
-export function birthPrompt(who: Pick<LoveInterest | Npc, 'appearance'> & { pronouns?: string }, framing: string): string {
+export function birthPrompt(who: Pick<LoveInterest, 'appearance' | 'babyTint' | 'skinTone' | 'ownBabyTone'> & { pronouns?: string }, framing: string, tone: SkinTone): string {
   const { subject } = pronounWords(who.pronouns)
   const She = `${subject[0].toUpperCase()}${subject.slice(1)}`
   return paragraphs([
     paragraph(who.appearance),
     paragraph(`${She} ${subject === 'they' ? 'wear' : 'wears'} a pale hospital gown`),
     paragraph(`${She} ${subject === 'they' ? 'sit' : 'sits'} propped up on pillows in a hospital bed, cradling a newborn baby wrapped in a soft blanket in ${subject === 'they' ? 'their' : subject === 'he' ? 'his' : 'her'} arms, smiling down at it, tired and radiant`),
+    babySkin(who, tone),
     framing.trim()
   ])
+}
+
+// How a newborn of each tone is drawn.
+const BABY_SKIN: Record<SkinTone, string> = {
+  light: 'The baby has fair, light skin.',
+  medium: 'The baby has light olive to tan skin.',
+  dark: 'The baby has dark brown skin.'
+}
+
+/**
+ * Her outfit holding a newborn of theirs of a tone: her day clothes, or what she always wears when she has none, with
+ * the child swaddled in her arms and its skin said as her birth picture says it. Worn only where the game puts her in it.
+ */
+export function babyOutfit(who: Pick<LoveInterest, 'outfits' | 'defaultOutfitId' | 'skinTone' | 'ownBabyTone' | 'babyTint'>, tone: SkinTone): Outfit {
+  const parent = who.outfits.some((outfit) => outfit.id === 'casual') ? 'casual' : who.defaultOutfitId
+  return {
+    id: babyOutfitId(tone),
+    name: `With the baby (${tone})`,
+    description: `She cradles a sleeping newborn baby in her arms, held against her chest, swaddled snugly in a soft cream blanket with only its small face showing. ${babySkin(who, tone)}`,
+    inherits: parent,
+    sprites: {},
+    pregnant: false,
+    oneOff: true,
+    babyTone: tone
+  }
+}
+
+// Under what a mother of another color gives a child, its tone is only an undertone: said first, the tone wins.
+const BABY_UNDERTONE: Record<SkinTone, string> = {
+  light: 'a fair undertone',
+  medium: 'a warm olive undertone',
+  dark: 'a deep brown undertone'
+}
+
+/**
+ * What a picture says of the skin of a child of hers in a tone: the tone; or where the child takes her tint
+ * (`takesHerTint`), that first and plainly, and the tone under it only for one who is not always drawn alike.
+ */
+export function babySkin(who: Pick<LoveInterest, 'skinTone' | 'ownBabyTone' | 'babyTint'>, tone: SkinTone): string {
+  const tint = who.babyTint?.trim().replace(/\.$/, '')
+  if (!tint || !(who.ownBabyTone !== undefined || tone === who.skinTone)) return BABY_SKIN[tone]
+  return who.ownBabyTone !== undefined ? `${tint}.` : `${tint}, with ${BABY_UNDERTONE[tone]}.`
 }
 
 // What a description says of a face up close: drawn from the side at a distance it barely shows, and asked for, it turns her to face the viewer.

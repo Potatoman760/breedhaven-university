@@ -1,4 +1,4 @@
-import { ExpeditionStateSchema, HousingStateSchema, type ContentPack, type GameState } from '../model'
+import { ExpeditionStateSchema, HousingStateSchema, type ContentPack, type GameState, type SkinTone } from '../model'
 import { startingCourses } from './catalogue'
 import { assignRapport } from './rapport'
 
@@ -9,7 +9,9 @@ export function createInitialState(
   /** The stats he rolled for himself. Left out, he has the content's own. */
   stats?: Record<string, number>,
   /** What the player added to who he is when the game began. */
-  about = ''
+  about = '',
+  /** His skin tone. Left out, the content's own. */
+  skinTone?: SkinTone
 ): GameState {
   const { player, locationId } = content.newGame
   // Those he knows already: met, and able to be messaged, from the first day.
@@ -18,7 +20,7 @@ export function createInitialState(
     time: 0,
     weatherSeed,
     locationId,
-    player: { ...player, name: playerName?.trim() || player.name, stats: stats ? { ...player.stats, ...stats } : player.stats, about: about.trim() },
+    player: { ...player, name: playerName?.trim() || player.name, stats: stats ? { ...player.stats, ...stats } : player.stats, about: about.trim(), ...(skinTone !== undefined && { skinTone }) },
     relationships: Object.fromEntries(
       content.loveInterests.map((li) => [li.id, li.startsAt ? { ...li.startsAt } : { affection: 0, trust: 0, desire: 0 }])
     ),

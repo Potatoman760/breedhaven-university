@@ -1387,6 +1387,103 @@ pre {
   font-size: 0.9rem;
 }
 
+/*
+ * An offer that is more than an ordinary plan, framed in gold with its badge in a gold ring: her story beat in rose with
+ * a heart that beats once in a while, the house in moss, the way down in dark stone. Each mark sets its own colors.
+ */
+.proposal.special {
+  --special-tint: var(--madder-tint);
+  --special-light: #f7e7d6;
+  --special-ink: var(--madder-ink);
+  --special-badge: var(--madder-deep);
+  --special-badge-light: #c45a62;
+  border-color: var(--gold-deep);
+  background: linear-gradient(135deg, var(--special-tint), var(--special-light));
+  box-shadow:
+    inset 0 0 0 1px rgba(242, 226, 160, 0.7),
+    0 2px 10px rgba(42, 40, 31, 0.18);
+}
+
+.proposal.special.house {
+  --special-tint: var(--moss-tint);
+  --special-light: #f2edd8;
+  --special-ink: var(--moss-deep);
+  --special-badge: var(--moss-deep);
+  --special-badge-light: var(--leaf);
+}
+
+.proposal.special.below {
+  --special-tint: #d9d4cb;
+  --special-light: #ece6da;
+  --special-ink: var(--wood);
+  --special-badge: var(--wood-deep);
+  --special-badge-light: #4a5a45;
+}
+
+.proposal.special .caps {
+  color: var(--special-ink);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+}
+
+.proposal.special strong {
+  color: var(--special-ink);
+  font-family: var(--display);
+  font-size: 1.1rem;
+}
+
+.proposal-badge {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, var(--special-badge-light), var(--special-badge));
+  box-shadow:
+    0 0 0 2px var(--gold),
+    0 0 12px rgba(212, 175, 90, 0.55);
+  color: #fff4e8;
+}
+
+.proposal.special.story .proposal-badge {
+  animation: proposal-heartbeat 2.4s ease-in-out infinite;
+}
+
+@keyframes proposal-heartbeat {
+  0%,
+  60%,
+  100% {
+    transform: scale(1);
+  }
+  68% {
+    transform: scale(1.14);
+  }
+  76% {
+    transform: scale(1);
+  }
+  84% {
+    transform: scale(1.08);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .proposal.special.story .proposal-badge {
+    animation: none;
+  }
+}
+
+/* The same on the day's card for any of them: a gold edge, and the badge in its chip. */
+button.featured.special {
+  box-shadow: inset 0 0 0 2px var(--gold);
+}
+
+button.featured.special .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .agreed {
   padding: 6px 12px;
   border-radius: 4px;
@@ -3286,6 +3383,58 @@ button.btn.pack-all {
 .entry.plan {
   border-left-color: var(--madder, #8a3a3f);
   background: rgba(138, 58, 63, 0.16);
+}
+
+/* The credits: each heading in the display face, its names under it. */
+.credits {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 8px 0 4px;
+  text-align: center;
+}
+
+.credits h2 {
+  margin: 0 0 6px;
+  color: var(--gold-deep);
+  font: 700 1.25rem/1.2 var(--display);
+  letter-spacing: 0.04em;
+}
+
+.credits ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+/* A marked plan on the calendar: gold where a plan is red, and its badge before its title, colored as its offer is. */
+.entry.plan.special {
+  border-left-color: var(--gold);
+  background: linear-gradient(90deg, rgba(212, 175, 90, 0.3), rgba(138, 58, 63, 0.18));
+}
+
+.entry.plan.special.house {
+  background: linear-gradient(90deg, rgba(212, 175, 90, 0.3), rgba(76, 106, 58, 0.18));
+}
+
+.entry.plan.special.below {
+  background: linear-gradient(90deg, rgba(212, 175, 90, 0.3), rgba(37, 48, 31, 0.22));
+}
+
+.entry.special svg {
+  margin-right: 3px;
+  vertical-align: -1px;
+  color: var(--madder);
+}
+
+.entry.special.house svg {
+  color: var(--moss-deep);
+}
+
+.entry.special.below svg {
+  color: var(--wood);
 }
 
 /* Orientation happens once, at the start: it is shown as the event it is. */

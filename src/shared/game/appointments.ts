@@ -19,6 +19,13 @@ export function describeWhen(content: ContentPack, time: number): string {
   return t('game.appointments.when', { date: formatDate(date), time: formatTime(date) })
 }
 
+/** How a plan is marked as more than an ordinary one, where it is shown: her story beat, the house, the way down. */
+export type PlanMark = 'story' | 'house' | 'below'
+
+export function planMark(plan: Pick<Proposal, 'story'> & { kind?: string }): PlanMark | undefined {
+  return plan.story !== undefined ? 'story' : plan.kind === 'viewing' ? 'house' : plan.kind === 'below' ? 'below' : undefined
+}
+
 /** Everyone a plan is with: whoever suggested it, then the others. */
 export function attendees(plan: Pick<Proposal, 'loveInterestId' | 'companionIds'>): string[] {
   return [plan.loveInterestId, ...plan.companionIds]

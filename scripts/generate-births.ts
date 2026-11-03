@@ -1,5 +1,5 @@
 /**
- * Makes the birth picture of every love interest, one at a time, on the ComfyUI in the app's settings, and puts each
+ * Makes the birth pictures of every love interest, one for each tone a child of hers can have (`babyTonesOf`), one at a time, on the ComfyUI in the app's settings, and puts each
  * on her as it is made: the same picture the Birth slot of the editor's Family tab draws, from the same prompt, size
  * and workflow. Not part of the app: run it from the project folder with `npm run births`, and anything after `--`
  * narrows it:
@@ -7,6 +7,7 @@
  *   npm run births                               everyone who has none yet
  *   npm run births -- tamsin wren                only these
  *   npm run births -- --except vespera,yelena    everyone but these
+ *   npm run births -- --tone dark                only those of this tone (or several: --tone light,dark)
  *   npm run births -- --overwrite                draw them again even where there is one already
  *   npm run births -- --dry                      say what it would make, and make nothing
  *
@@ -20,6 +21,8 @@ import { existsSync, rmSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { birthPrompt, framingFor, sizeFor } from '../src/shared/comfy'
+import { SKIN_TONES, type SkinTone } from '../src/shared/model'
+import { babyTonesOf } from '../src/shared/game/skin'
 import { loadBase, saveLoveInterest } from '../src/main/content/addons'
 import { ComfyStore, generateArt } from '../src/main/comfy/studio'
 
@@ -41,9 +44,10 @@ function settingsFile(): string {
 
 const minutes = (ms: number) => `${Math.floor(ms / 60000)}m ${Math.round((ms % 60000) / 1000)}s`
 
-function readArgs(argv: string[]): { dry: boolean; overwrite: boolean; only: string[]; except: string[] } {
+function readArgs(argv: string[]): { dry: boolean; overwrite: boolean; only: string[]; except: string[]; tones: SkinTone[] } {
   const only: string[] = []
   const except: string[] = []
+  let tones: SkinTone[] = [...SKIN_TONES]
   let dry = false
   let overwrite = false
   for (let i = 0; i < argv.length; i++) {
@@ -55,10 +59,16 @@ function readArgs(argv: string[]): { dry: boolean; overwrite: boolean; only: str
       const value = inline ?? argv[++i]
       if (value === undefined || value.startsWith('--')) throw new Error('--except needs a value: --except a,b')
       except.push(...value.split(',').map((one) => one.trim().toLowerCase()).filter(Boolean))
-    } else if (arg.startsWith('--')) throw new Error(`There is no ${arg}. Use --dry, --overwrite or --except.`)
+    } else if (flag === '--tone') {
+      const value = inline ?? argv[++i]
+      const asked = (value ?? '').split(',').map((one) => one.trim().toLowerCase())
+      const bad = asked.filter((one) => !(SKIN_TONES as readonly string[]).includes(one))
+      if (value === undefined || bad.length > 0) throw new Error(`--tone takes ${SKIN_TONES.join(', ')}`)
+      tones = asked as SkinTone[]
+    } else if (arg.startsWith('--')) throw new Error(`There is no ${arg}. Use --dry, --overwrite, --except or --tone.`)
     else only.push(arg.toLowerCase())
   }
-  return { dry, overwrite, only, except }
+  return { dry, overwrite, only, except, tones }
 }
 
 async function main(): Promise<void> {
@@ -68,20 +78,21 @@ async function main(): Promise<void> {
   const readSettings = () => new ComfyStore(settingsPath, PACK).get()
   const settings = readSettings()
 
-  const { dry, overwrite, only, except } = readArgs(process.argv.slice(2))
+  const { dry, overwrite, only, except, tones } = readArgs(process.argv.slice(2))
   const all = loadBase(PACK).content.loveInterests.filter((li) => li.kind !== 'npc')
   const unknown = [...only, ...except].filter((id) => !all.some((li) => li.id === id))
   if (unknown.length > 0) throw new Error(`No love interest called: ${unknown.join(', ')}`)
   const everyone = all.filter((li) => (only.length === 0 || only.includes(li.id)) && !except.includes(li.id))
   // With --overwrite, the ones this run has drawn are not known to a later one, so a stopped overwrite starts over.
-  const todo = everyone.filter((li) => overwrite || !li.birthPicture)
+  // Only the tones a child of hers can have: the rest would never be shown.
+  const todo = everyone.flatMap((li) => tones.filter((tone) => babyTonesOf(li).includes(tone) && (overwrite || !li.birthPictures[tone])).map((tone) => ({ li, tone })))
 
   const size = sizeFor(settings, 'birth')
   console.log(`ComfyUI at ${settings.baseUrl}, birth pictures of ${size.width}×${size.height}${overwrite ? ', replacing those there are' : ''}.`)
   console.log(`${todo.length} to make for ${everyone.length} love interests.`)
   if (todo.length === 0) return
   if (dry) {
-    for (const li of todo) console.log(`  ${li.name}${li.birthPicture ? `, in place of ${li.birthPicture}` : ''}`)
+    for (const { li, tone } of todo) console.log(`  ${li.name}, ${tone}${li.birthPictures[tone] ? `, in place of ${li.birthPictures[tone]}` : ''}`)
     return
   }
 
@@ -95,10 +106,10 @@ async function main(): Promise<void> {
 
   const started = Date.now()
   let failedInARow = 0
-  for (const [i, { id, name }] of todo.entries()) {
+  for (const [i, { li: { id, name }, tone }] of todo.entries()) {
     if (cancel.signal.aborted) break
     const began = Date.now()
-    process.stdout.write(`[${i + 1}/${todo.length}] ${name}... `)
+    process.stdout.write(`[${i + 1}/${todo.length}] ${name}, ${tone}... `)
     const now = readSettings()
     // Her, as the game's files have her now: read afresh, so that nothing saved meanwhile is undone.
     const before = loadBase(PACK).content.loveInterests.find((one) => one.id === id)
@@ -111,7 +122,7 @@ async function main(): Promise<void> {
       now,
       PACK,
       PACK,
-      { kind: 'birth', subjectId: id, name: 'birth', workflow: '', positive: birthPrompt(before, framingFor(now, 'birth')), negative: '', width, height, seed: before.imageSeed },
+      { kind: 'birth', subjectId: id, name: `birth-${tone}`, workflow: '', positive: birthPrompt(before, framingFor(now, 'birth'), tone), negative: '', width, height, seed: before.imageSeed },
       cancel.signal,
       ''
     )
@@ -137,8 +148,8 @@ async function main(): Promise<void> {
       console.log('made, but she is no longer in the game.')
       continue
     }
-    const replaced = she.birthPicture
-    const issues = saveLoveInterest(PACK, content, { ...she, birthPicture: result.path })
+    const replaced = she.birthPictures[tone]
+    const issues = saveLoveInterest(PACK, content, { ...she, birthPictures: { ...she.birthPictures, [tone]: result.path } })
     if (issues.length > 0) {
       console.log(`made, but she could not be saved: ${issues.join('; ')}`)
       continue

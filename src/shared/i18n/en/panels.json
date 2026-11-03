@@ -255,6 +255,8 @@
   "phone.answer.lapsed": "lapsed",
   "phone.answer.cancelled": "cancelled",
   "phone.planWith": "{title} with {names}",
+  "phone.storyInvite": "{name} has something on her mind",
+  "phone.onCalendar": "On your calendar",
   "phone.goNow": "Go now",
   "phone.later": "Later",
   "phone.noLongerPossible": "no longer possible",

@@ -74,6 +74,7 @@
   "prompt.speech.title": "How you speak",
   "prompt.speech.example": "Example - them: \"{user}\" you: \"{reply}\"",
   "prompt.about.title": "About {player}",
+  "prompt.about.skin": "{player} has {tone, select, light {light} medium {medium-brown} other {dark}} skin.",
   "prompt.relationship.title": "Your relationship with {player}",
   "prompt.relationship.stage": "Stage: {stage}. {description}",
   "prompt.relationship.meters": "Affection {affection}, trust {trust}, desire {desire} (each out of {max}).",

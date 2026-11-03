@@ -349,6 +349,36 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "baby-medium",
+      "name": "With the baby (medium)",
+      "description": "She cradles a sleeping newborn baby in her arms, held against her chest, swaddled snugly in a soft cream blanket with only its small face showing. The baby has light olive to tan skin.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/anwen/baby-medium-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true,
+      "babyTone": "medium"
+    },
+    {
+      "id": "baby-dark",
+      "name": "With the baby (dark)",
+      "description": "She cradles a sleeping newborn baby in her arms, held against her chest, swaddled snugly in a soft cream blanket with only its small face showing. The baby has dark brown skin.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/anwen/baby-dark-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true,
+      "babyTone": "dark"
     }
   ],
   "defaultOutfitId": "default",
@@ -498,7 +528,11 @@
       "day": "generated/backgrounds/anwen/view-5.webp"
     }
   },
-  "birthPicture": "sprites/anwen/birth.webp",
+  "skinTone": "medium",
+  "birthPictures": {
+    "medium": "sprites/anwen/birth-medium.webp",
+    "dark": "sprites/anwen/birth-dark.webp"
+  },
   "walkSprite": "sprites/anwen/walk-cutout.webp",
   "childNames": {
     "daughters": [

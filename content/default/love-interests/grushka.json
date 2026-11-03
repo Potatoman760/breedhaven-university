@@ -327,26 +327,41 @@
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",
-      "pregnant": false,
       "sprites": {
         "neutral": {
           "image": "sprites/grushka/bathrobe-neutral-cutout.webp",
           "description": ""
         }
-      }
+      },
+      "pregnant": false
     },
     {
       "id": "bathrobe-pregnant",
       "name": "Bathrobe, pregnant",
-      "inherits": "bathrobe",
       "description": "She has a round, pregnant belly.",
-      "pregnant": true,
+      "inherits": "bathrobe",
       "sprites": {
         "neutral": {
           "image": "sprites/grushka/bathrobe-pregnant-neutral-cutout.webp",
           "description": ""
         }
-      }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "baby-light",
+      "name": "With the baby (light)",
+      "description": "She cradles a sleeping newborn baby in her arms, held against her chest, swaddled snugly in a soft cream blanket with only its small face showing. The baby has green skin like its mother's, a soft light green.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/grushka/baby-light-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "oneOff": true,
+      "babyTone": "light"
     }
   ],
   "defaultOutfitId": "default",
@@ -523,7 +538,12 @@
       "day": "generated/backgrounds/grushka/view.webp"
     }
   },
-  "birthPicture": "sprites/grushka/birth.webp",
+  "skinTone": "medium",
+  "babyTint": "The baby has green skin like its mother's, a soft light green",
+  "ownBabyTone": "light",
+  "birthPictures": {
+    "light": "sprites/grushka/birth-light.webp"
+  },
   "walkSprite": "sprites/grushka/walk-cutout.webp",
   "childNames": {
     "daughters": [
