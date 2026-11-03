@@ -5,7 +5,7 @@
   "age": 34,
   "pronouns": "she/her",
   "bio": "Professor of Witchcraft at Breedhaven University, teaching applied hexes, sympathetic magic and circle-work. Rumor says she once out-hexed a senior member of the Arcane Board over a parking dispute.",
-  "appearance": "A striking Black woman in her mid-thirties with rich dark skin and a sharp, elegant face with high cheekbones. Her eyes are deep brown, large and heavy-lidded, and her full lips are painted a dark plum. Her black hair falls in long, loose waves past her shoulders, thick and glossy. She is tall, with a full bust, a narrow waist and long legs.",
+  "appearance": "A striking Black woman in her mid-thirties with rich dark skin and a sharp, elegant face with high cheekbones. Her eyes are deep brown, large and heavy-lidded, and her full lips are painted a dark plum. Her black hair falls in long, loose waves past her shoulders, thick and glossy. She is tall and fat, with a MILFy curvaceous build, large breasts, fat arms, large stomach, and thick thighs. She wears a pair of small, plain silver hoop earrings, one in each ear.",
   "personality": "Sassy, teasing and entirely comfortable in her own skin, she meets the world with a raised eyebrow and a ready quip. She is confident to the point of arrogance and enjoys keeping people off-balance. Underneath the performance she is generous with her time and fiercely protective of her students.",
   "traitIds": [
     "flirtatious",
@@ -39,31 +39,31 @@
       "description": "a deep-plunging violet blouse with a pentagram chain necklace resting in her cleavage, a fitted black skirt slit to the thigh",
       "sprites": {
         "neutral": {
-          "image": "sprites/vespera/default-neutral-cutout.webp",
+          "image": "sprites/vespera/default-neutral.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/vespera/default-happy-cutout.webp",
+          "image": "sprites/vespera/default-happy-2.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/vespera/default-sad-cutout.webp",
+          "image": "sprites/vespera/default-sad-2.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/vespera/default-angry-cutout.webp",
+          "image": "sprites/vespera/default-angry-2.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/vespera/default-surprised-cutout.webp",
+          "image": "sprites/vespera/default-surprised-2.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/vespera/default-embarrassed-cutout.webp",
+          "image": "sprites/vespera/default-embarrassed-2.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/vespera/default-aroused-cutout.webp",
+          "image": "sprites/vespera/default-aroused-2.webp",
           "description": ""
         }
       },
@@ -76,31 +76,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/vespera/pregnant-neutral-2-cutout.webp",
+          "image": "sprites/vespera/pregnant-neutral.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/vespera/pregnant-happy-2-cutout.webp",
+          "image": "sprites/vespera/pregnant-happy.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/vespera/pregnant-sad-2-cutout.webp",
+          "image": "sprites/vespera/pregnant-sad.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/vespera/pregnant-angry-2-cutout.webp",
+          "image": "sprites/vespera/pregnant-angry.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/vespera/pregnant-surprised-2-cutout.webp",
+          "image": "sprites/vespera/pregnant-surprised.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/vespera/pregnant-embarrassed-2-cutout.webp",
+          "image": "sprites/vespera/pregnant-embarrassed.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/vespera/pregnant-aroused-2-cutout.webp",
+          "image": "sprites/vespera/pregnant-aroused.webp",
           "description": ""
         }
       },
@@ -112,31 +112,31 @@
       "description": "nothing at all, completely nude, a pentagram chain necklace resting in her cleavage",
       "sprites": {
         "neutral": {
-          "image": "sprites/vespera/nude-neutral-cutout-2.webp",
+          "image": "sprites/vespera/nude-neutral.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/vespera/nude-happy-cutout-2.webp",
+          "image": "sprites/vespera/nude-happy.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/vespera/nude-sad-cutout-2.webp",
+          "image": "sprites/vespera/nude-sad.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/vespera/nude-angry-cutout-2.webp",
+          "image": "sprites/vespera/nude-angry.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/vespera/nude-surprised-cutout-2.webp",
+          "image": "sprites/vespera/nude-surprised.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/vespera/nude-embarrassed-cutout-2.webp",
+          "image": "sprites/vespera/nude-embarrassed.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/vespera/nude-aroused-cutout-2.webp",
+          "image": "sprites/vespera/nude-aroused.webp",
           "description": ""
         }
       },
@@ -149,31 +149,31 @@
       "inherits": "nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/vespera/nude-pregnant-neutral-cutout-2.webp",
+          "image": "sprites/vespera/nude-pregnant-neutral.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/vespera/nude-pregnant-happy-cutout-2.webp",
+          "image": "sprites/vespera/nude-pregnant-happy.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/vespera/nude-pregnant-sad-cutout-2.webp",
+          "image": "sprites/vespera/nude-pregnant-sad.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/vespera/nude-pregnant-angry-cutout-2.webp",
+          "image": "sprites/vespera/nude-pregnant-angry.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/vespera/nude-pregnant-surprised-cutout-2.webp",
+          "image": "sprites/vespera/nude-pregnant-surprised.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/vespera/nude-pregnant-embarrassed-cutout-2.webp",
+          "image": "sprites/vespera/nude-pregnant-embarrassed.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/vespera/nude-pregnant-aroused-cutout-2.webp",
+          "image": "sprites/vespera/nude-pregnant-aroused.webp",
           "description": ""
         }
       },
@@ -256,7 +256,7 @@
     {
       "id": "lingerie",
       "name": "Violet witch",
-      "description": "a deep violet lace bra and matching panties with thin black straps crossing above the hips, a black garter belt holding up sheer black stockings, and a pentagram chain necklace resting in her cleavage; her ears bare, with no earrings",
+      "description": "a deep violet lace bra and matching panties with thin black straps crossing above the hips, a black garter belt holding up sheer black stockings, and a pentagram chain necklace resting in her cleavage",
       "sprites": {
         "neutral": {
           "image": "sprites/vespera/lingerie-neutral.webp",
@@ -330,26 +330,26 @@
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",
-      "pregnant": false,
       "sprites": {
         "neutral": {
-          "image": "sprites/vespera/bathrobe-neutral-cutout.webp",
+          "image": "sprites/vespera/bathrobe-neutral.webp",
           "description": ""
         }
-      }
+      },
+      "pregnant": false
     },
     {
       "id": "bathrobe-pregnant",
       "name": "Bathrobe, pregnant",
-      "inherits": "bathrobe",
       "description": "She has a round, pregnant belly.",
-      "pregnant": true,
+      "inherits": "bathrobe",
       "sprites": {
         "neutral": {
-          "image": "sprites/vespera/bathrobe-pregnant-neutral-cutout.webp",
+          "image": "sprites/vespera/bathrobe-pregnant-neutral.webp",
           "description": ""
         }
-      }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -378,7 +378,7 @@
       "name": "Blowjob",
       "description": "",
       "image": "sprites/vespera/nsfw-blowjob.webp",
-      "clip": "sprites/vespera/nsfw-blowjob.mp4",
+      "clip": "sprites/vespera/nsfw-blowjob-2.mp4",
       "loop": true
     },
     {
@@ -393,8 +393,8 @@
       "id": "doggy",
       "name": "Doggy",
       "description": "",
-      "image": "sprites/vespera/nsfw-doggy.webp",
-      "clip": "sprites/vespera/nsfw-doggy.mp4",
+      "image": "sprites/vespera/nsfw-doggy-9.webp",
+      "clip": "sprites/vespera/nsfw-doggy-2.mp4",
       "loop": true
     },
     {
@@ -402,7 +402,7 @@
       "name": "Cowgirl",
       "description": "",
       "image": "sprites/vespera/nsfw-cowgirl.webp",
-      "clip": "sprites/vespera/nsfw-cowgirl.mp4",
+      "clip": "sprites/vespera/nsfw-cowgirl-2.mp4",
       "loop": true
     },
     {
@@ -410,7 +410,7 @@
       "name": "Creampie",
       "description": "",
       "image": "sprites/vespera/nsfw-creampie.webp",
-      "clip": "sprites/vespera/nsfw-creampie.mp4",
+      "clip": "sprites/vespera/nsfw-creampie-2.mp4",
       "loop": true
     },
     {
@@ -418,14 +418,14 @@
       "name": "Facial",
       "description": "",
       "image": "sprites/vespera/nsfw-facial.webp",
-      "clip": "sprites/vespera/nsfw-facial.mp4",
+      "clip": "sprites/vespera/nsfw-facial-2.mp4",
       "loop": true
     },
     {
       "id": "pregnant-blowjob",
       "name": "Blowjob, pregnant",
       "description": "",
-      "image": "sprites/vespera/nsfw-pregnant-blowjob.webp",
+      "image": "sprites/vespera/nsfw-pregnant-blowjob-2.webp",
       "loop": true
     },
     {
