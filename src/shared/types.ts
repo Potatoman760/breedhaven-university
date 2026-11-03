@@ -6,6 +6,7 @@ import type { LoveInterest, Major } from './model'
 import type { MajorIdea } from './game/draftMajor'
 import type { Card } from './game/sillyCard'
 import type { PackPreview, PackSelection } from './packs'
+import type { AchievementId } from './game/achievements'
 import type { ComfyBundle, ComfyBundleCheck, ComfyDownloadList, ComfySettings, ModelDownloadProgress, ModelDownloadResult, ComfyTestResult, GenerateArtRequest, GenerateArtResult, GenerateVideoRequest, WorkflowListResult } from './comfy'
 import {
   GameStateSchema,
@@ -275,6 +276,11 @@ export interface RendererApi {
   /** Gives a save a name, or with an empty one takes its name away. Rejects for a slot with nothing in it. */
   renameSave(request: RenameSaveRequest): Promise<SaveSummary>
   /** The content editor. Changes are written to the user's add-on folder, never to the game's own files. */
+  /** The achievements earned on this install, by id, with when; and earning more, which answers with those that were new. */
+  achievements: {
+    list(): Promise<Partial<Record<AchievementId, string>>>
+    unlock(ids: AchievementId[]): Promise<AchievementId[]>
+  }
   editor: {
     info(): Promise<EditorInfo>
     saveLoveInterest(loveInterest: unknown): Promise<EditorResult>
@@ -300,6 +306,9 @@ export interface RendererApi {
     /** Adds or changes a face (`expressions`) or a sex-act (`acts`) added to the standard ones. */
     saveLook(change: { kind: LookKind; look: unknown }): Promise<EditorResult>
     deleteLook(which: { kind: LookKind; id: string }): Promise<EditorResult>
+    /** Adds a group or changes one, then clears out whatever of its pictures and clips the saved group no longer uses. */
+    saveGroup(group: unknown): Promise<EditorResult>
+    deleteGroup(id: string): Promise<EditorResult>
     /** Saves a location as changed in the editor: what is said of it, and its pictures. */
     saveLocation(location: unknown): Promise<EditorResult>
     /** Puts a changed location back as it shipped. */

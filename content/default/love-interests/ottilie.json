@@ -250,6 +250,42 @@
       "pregnant": true
     },
     {
+      "id": "lingerie",
+      "name": "Charcoal silk",
+      "description": "rimless rectangular glasses; a plain charcoal-gray silk camisole with thin straps and matching high-waisted silk shorts, both edged with thin black lace",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/lingerie-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/ottilie/lingerie-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/ottilie/lingerie-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/ottilie/lingerie-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/ottilie/lingerie-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/ottilie/lingerie-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/ottilie/lingerie-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

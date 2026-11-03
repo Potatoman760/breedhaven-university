@@ -254,6 +254,42 @@
       "pregnant": true
     },
     {
+      "id": "lingerie",
+      "name": "Violet witch",
+      "description": "a deep violet lace bra and matching panties with thin black straps crossing above the hips, a black garter belt holding up sheer black stockings, and a pentagram chain necklace resting in her cleavage; her ears bare, with no earrings",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/vespera/lingerie-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/vespera/lingerie-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/vespera/lingerie-sad.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/vespera/lingerie-surprised.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/vespera/lingerie-aroused.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/vespera/lingerie-angry.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/vespera/lingerie-embarrassed.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

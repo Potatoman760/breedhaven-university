@@ -250,6 +250,42 @@
       "pregnant": true
     },
     {
+      "id": "lingerie",
+      "name": "Garden lace",
+      "description": "a sage-green lace bralette and matching high-waisted lace panties embroidered with tiny white flowers, under a long sheer dusky-rose chiffon robe worn open and slipping off her shoulders",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/caelwen/lingerie-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/caelwen/lingerie-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/caelwen/lingerie-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/caelwen/lingerie-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/caelwen/lingerie-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/caelwen/lingerie-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/caelwen/lingerie-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

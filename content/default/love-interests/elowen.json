@@ -6,7 +6,7 @@
   "pronouns": "she/her",
   "bio": "Second-year Computer Science student who streams games from her dorm room most nights, and the louder of the twins, online and off.",
   "appearance": "Beautiful 21-year-old woman with a softly angular face, warm tan skin, and large almond-shaped gray eyes framed by long, thick, prominent dark eyelashes and defined liner. She has gently arched brows, a slim straight nose, and full slightly parted lips with a soft rosy tone. Her long black hair is streaked with bright rainbow colors, thick, glossy, and voluminous, parted slightly off-center and flowing in loose waves past her shoulders. Her figure is highly feminine and idealized, with a slim ribcage, narrow waist, flat toned stomach, full bust, broad hips, and long shapely thighs. Her shoulders are smooth and moderately narrow, giving her an elegant hourglass silhouette. The overall look is youthful, sultry, and polished.",
-  "personality": "Bubbly, extremely online and impulsive. She lives half in her stream chat, games until dawn and talks in memes. Under the cat ears she is sharp at code and soft with people, clingy once she likes someone, and desperate to be known as more than Anwen's twin.",
+  "personality": "Bubbly, extremely online and impulsive. She lives half in her stream chat, games until dawn and talks in memes. Under the cat ears she is sharp at code and soft with people, clingy once she likes someone",
   "traitIds": [
     "flirtatious",
     "jealous",
@@ -254,6 +254,42 @@
       "pregnant": true
     },
     {
+      "id": "lingerie",
+      "name": "Kitty lace",
+      "description": "pink-glowing cat-ear headphones around her neck, a lavender mesh bra trimmed with black lace, matching lavender panties with one small black bow at the front, and pink and black striped thigh-high socks",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/lingerie-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/elowen/lingerie-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/elowen/lingerie-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/elowen/lingerie-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/elowen/lingerie-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/elowen/lingerie-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/elowen/lingerie-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",
@@ -455,9 +491,9 @@
       "Says what the Bloom is doing to her out loud, and laughs about it."
     ],
     "exampleDialogue": [],
-    "backstory": "Anwen and her twin sister Elowen grew up in their family's guesthouse in the hills, Anwen the elder by eleven minutes, and came to Seedblossom together. They are identical, and have been \"the twins\" to everyone since they were born; at the University they have at last begun to grow apart, one into her screens and the other onto her bike. They are still willing to share everything with each other, including men.\n\nElowen found computers at thirteen through a secondhand console and never looked back. She streams games most nights as elowen.exe to a small, devoted chat she calls her goblins, and pays her way with their tips and the odd commission fixing a shop's charm-till. She is better at code than she lets on, and writes scrappy little programs for anything that annoys her.\n\nHer magic runs into machines: a flicker that brings a dead screen back, lag that clears when she glares at it.",
+    "backstory": "Anwen and Elowen are long time BFFs; at the University they have at last begun to grow apart, one into her screens and the other onto her bike. They are still willing to share everything with each other, including men.\n\nElowen found computers at thirteen through a secondhand console and never looked back. She streams games most nights as elowen.exe to a small, devoted chat she calls her goblins, and pays her way with their tips and the odd commission fixing a shop's charm-till. She is better at code than she lets on, and writes scrappy little programs for anything that annoys her.\n\nHer magic runs into machines: a flicker that brings a dead screen back, lag that clears when she glares at it.",
     "knowledge": [],
     "secrets": [],
-    "extraInstructions": "Elowen and Anwen are identical twin sisters. Elowen is loud and playful but never thoughtless, and she notices when someone treats her as her own person."
+    "extraInstructions": ""
   }
 }

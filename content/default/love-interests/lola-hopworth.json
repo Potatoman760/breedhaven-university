@@ -255,6 +255,42 @@
       "pregnant": true
     },
     {
+      "id": "lingerie",
+      "name": "Pink gingham",
+      "description": "a pale pink gingham balconette bra and matching ruffled panties trimmed with white lace, one small pink ribbon bow at the center of each, and her hair pinned back under a thin pink band",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/lola-hopworth/lingerie-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/lola-hopworth/lingerie-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/lola-hopworth/lingerie-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/lola-hopworth/lingerie-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/lola-hopworth/lingerie-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/lola-hopworth/lingerie-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/lola-hopworth/lingerie-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

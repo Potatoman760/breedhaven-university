@@ -17,6 +17,7 @@ import { JobsConfigSchema } from './job'
 import { LocationSchema } from './location'
 import { EXPRESSIONS, LoveInterestSchema, STANDARD_POSES, isPregnantPose, kindOf } from './loveInterest'
 import { LooksSchema } from './looks'
+import { GroupSchema } from './groups'
 import { MapSchema } from './map'
 import { MiniGamesSchema } from './minigames'
 import { NpcSchema, type Npc } from './npc'
@@ -76,6 +77,8 @@ export const ContentPackSchema = z.object({
   minigames: MiniGamesSchema.prefault({}),
   /** Faces and sex-acts added to the standard ones, each a slot for every character. */
   looks: LooksSchema.prefault({}),
+  /** Love interests together, with sex-acts of all of them at once. */
+  groups: z.array(GroupSchema).default([]),
   /** What the game sounds like: the files played for its cues, and the loops behind each place. */
   sounds: SoundsSchema.prefault({}),
   /** Without a map the player can't travel, so every activity must be at the starting location. */
@@ -424,6 +427,20 @@ function checkReferences(pack: ContentPack): string[] {
   }
   added(pack.looks.expressions, 'looks.expressions', EXPRESSIONS)
   added(pack.looks.acts, 'looks.acts', STANDARD_POSES.map((pose) => pose.id))
+
+  // A group is two or three love interests, each once, and no two groups are of the same ones.
+  idSet(pack.groups, 'groups')
+  const loveInterestIds = new Set(pack.loveInterests.map((li) => li.id))
+  const groupKeys = new Set<string>()
+  for (const group of pack.groups) {
+    const where = `groups.${group.id}`
+    for (const id of group.memberIds) need(loveInterestIds, id, where, 'loveInterest')
+    if (new Set(group.memberIds).size !== group.memberIds.length) issues.push(t('game.content.groupTwice', { where }))
+    const key = [...group.memberIds].sort().join('|')
+    if (groupKeys.has(key)) issues.push(t('game.content.groupSame', { where }))
+    groupKeys.add(key)
+    idSet(group.animations, `${where}.animations`)
+  }
 
   idSet(pack.minigames.pieces, 'minigames.pieces')
   idSet(pack.minigames.listeners, 'minigames.listeners')

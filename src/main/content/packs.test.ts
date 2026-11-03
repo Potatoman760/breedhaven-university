@@ -12,7 +12,7 @@ import { installPack, readPackManifest, unpackFiles, writePack } from './packs'
 const packDir = join(process.cwd(), 'content', 'default')
 const folder = () => mkdtempSync(join(tmpdir(), 'bh-packs-'))
 const face = { id: 'smug', name: 'Smug', description: 'pleased with herself', draws: '' }
-const act = { id: 'spoons', name: 'Spoons', description: 'lying side by side', draws: 'side by side', moment: false, seeding: false }
+const act = { id: 'spoons', name: 'Spoons', description: 'lying side by side', draws: 'side by side', groupDraws: '', moment: false, seeding: false, manShown: true }
 
 /** A player's game with an outfit, a face and a sex-act of their own for Faye, and their files on disk. */
 function madeByPlayer() {

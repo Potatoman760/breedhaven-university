@@ -37,6 +37,10 @@ const api: RendererApi = {
   loadGame: (slotId) => ipcRenderer.invoke(IPC.loadGame, slotId),
   deleteSave: (slotId) => ipcRenderer.invoke(IPC.deleteSave, slotId),
   renameSave: (request) => ipcRenderer.invoke(IPC.renameSave, request),
+  achievements: {
+    list: () => ipcRenderer.invoke(IPC.achievementsList),
+    unlock: (ids) => ipcRenderer.invoke(IPC.achievementsUnlock, ids)
+  },
   editor: {
     info: () => ipcRenderer.invoke(IPC.editorInfo),
     saveLoveInterest: (loveInterest) => ipcRenderer.invoke(IPC.editorSaveLoveInterest, loveInterest),
@@ -51,6 +55,8 @@ const api: RendererApi = {
     deleteTrait: (id) => ipcRenderer.invoke(IPC.editorDeleteTrait, id),
     saveLook: (change) => ipcRenderer.invoke(IPC.editorSaveLook, change),
     deleteLook: (which) => ipcRenderer.invoke(IPC.editorDeleteLook, which),
+    saveGroup: (group) => ipcRenderer.invoke(IPC.editorSaveGroup, group),
+    deleteGroup: (id) => ipcRenderer.invoke(IPC.editorDeleteGroup, id),
     saveCatalogue: (catalogue) => ipcRenderer.invoke(IPC.editorSaveCatalogue, catalogue),
     saveLocation: (location) => ipcRenderer.invoke(IPC.editorSaveLocation, location),
     deleteLocation: (id) => ipcRenderer.invoke(IPC.editorDeleteLocation, id),

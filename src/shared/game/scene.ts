@@ -33,6 +33,8 @@ export interface SceneLook {
   animationId?: string | null
   /** Whose pose it is, where the scene has more than one love interest: her name as the LLM wrote it, and once checked, her id. Left out, the scene's lead. */
   animationOf?: string
+  /** The group whose picture of it is shown, all of them at once, when the scene is of exactly one. */
+  animationGroup?: string
 }
 
 export interface Directives extends SceneLook {
@@ -232,7 +234,8 @@ export function applyLook(scene: Scene, look: SceneLook): Scene {
     expression: look.expression ?? (look.outfitId !== undefined ? undefined : scene.expression),
     animationId,
     // Whose it is: the one named with it, or the lead when nobody was.
-    animationOf: animationId === undefined ? undefined : (look.animationOf ?? scene.loveInterestId)
+    animationOf: animationId === undefined ? undefined : (look.animationOf ?? scene.loveInterestId),
+    animationGroup: animationId === undefined ? undefined : look.animationGroup
   }
 }
 
@@ -472,7 +475,9 @@ export function leaveScene<S extends Scene>(scene: S, askedIds: string[], feelin
     // The look on the scene itself was the old lead's; the new lead brings her own.
     ...(leadChanged && { outfitId: scene.looks?.[leadId]?.outfitId, expression: scene.looks?.[leadId]?.expression }),
     // A pose goes with whoever's it was.
-    ...(scene.animationId !== undefined && going.includes(scene.animationOf ?? scene.loveInterestId) && { animationId: undefined, animationOf: undefined }),
+    // A group's goes with any of them: the scene is no longer of the group.
+    ...(scene.animationId !== undefined &&
+      (going.includes(scene.animationOf ?? scene.loveInterestId) || scene.animationGroup !== undefined) && { animationId: undefined, animationOf: undefined, animationGroup: undefined }),
     looks: Object.fromEntries(Object.entries(scene.looks ?? {}).filter(([id]) => id !== leadId && !going.includes(id))),
     comfort: scene.comfort && Object.fromEntries(Object.entries(scene.comfort).filter(([id]) => !going.includes(id))),
     // If it was her room, the others are not left sitting in it without her.

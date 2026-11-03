@@ -55,6 +55,8 @@ export type ArtTarget =
       poses: { id: string; name: string; draws: string }[]
       /** The pose it is opened on. It can be changed in the tool. */
       pose: string
+      /** What the prompt is written from, in place of one woman's: a group's is all of them at once. */
+      prompt?: (draws: string, framing: string, poseId: string) => string
       onUse: (poseId: string, path: string) => void | Promise<void>
     }
   | { kind: 'photo' }
@@ -205,7 +207,10 @@ function Generate({ target, settings, list }: GenerateProps) {
     // A pose drawn pregnant is the same pose, with her pregnant nude in place of her nude.
     if (target.kind === 'birth') return birthPrompt(target.who, framing)
     if (target.kind === 'walk') return walkPrompt(target.who, framing)
-    if (target.kind === 'nsfw') return nsfwPrompt(target.who, target.poses.find((pose) => pose.id === expression)?.draws ?? '', framing, isPregnantPose(expression))
+    if (target.kind === 'nsfw') {
+      const draws = target.poses.find((pose) => pose.id === expression)?.draws ?? ''
+      return target.prompt ? target.prompt(draws, framing, expression) : nsfwPrompt(target.who, draws, framing, isPregnantPose(expression))
+    }
     return [subject.trim(), framing].filter(Boolean).join('\n\n')
   }
   // The prompt follows the choices until it is edited by hand; "Rewrite" puts it back.

@@ -4,9 +4,9 @@
   "role": "",
   "age": 21,
   "pronouns": "she/her",
-  "bio": "Second-year Magical Engineering student who rebuilt her own motorbike and rides it everywhere: the twin everyone is a little afraid of.",
+  "bio": "Second-year Magical Engineering student who rebuilt her own motorbike and rides it everywhere: the girl everyone is a little afraid of.",
   "appearance": "Beautiful 21-year-old woman with a softly angular face, warm tan skin, and large almond-shaped gray eyes framed by dark lashes and defined liner. She has gently arched brows, a slim straight nose, and full slightly parted lips with a soft rosy tone. Her long black hair is thick, glossy, and voluminous, parted slightly off-center and flowing in loose waves past her shoulders. Her figure is highly feminine and idealized, with a slim ribcage, narrow waist, flat toned stomach, full bust, broad hips, and long shapely thighs. Her shoulders are smooth and moderately narrow, giving her an elegant hourglass silhouette. The overall look is youthful, sultry, and polished.",
-  "personality": "Cool, confident and cutting. She runs a room without trying, decides at a glance who is worth her time, and says the cruel thing first. Under the leather she is fiercely loyal to the few she lets in, and wants to be someone other than Elowen's sister.",
+  "personality": "Cool, confident and cutting. She runs a room without trying, decides at a glance who is worth her time, and says the cruel thing first. Under the leather she is fiercely loyal to the few she lets in",
   "traitIds": [
     "dominant",
     "competitive",
@@ -253,6 +253,42 @@
       "pregnant": true
     },
     {
+      "id": "lingerie",
+      "name": "Black leather",
+      "description": "a black leather bra with a single silver O-ring at the center of the bust, matching black leather high-cut panties, and sheer black thigh-high stockings",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/anwen/lingerie-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/anwen/lingerie-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/anwen/lingerie-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/anwen/lingerie-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/anwen/lingerie-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/anwen/lingerie-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/anwen/lingerie-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",
@@ -450,9 +486,9 @@
       "Talks about her bike as if it were the only one who gets her."
     ],
     "exampleDialogue": [],
-    "backstory": "Anwen and her twin sister Elowen grew up in their family's guesthouse in the hills, Anwen the elder by eleven minutes, and came to Seedblossom together. They are identical, and have been \"the twins\" to everyone since they were born; at the University they have at last begun to grow apart, one into her screens and the other onto her bike. They are still willing to share everything with each other, including men.\n\nAnwen spent her teens in the guesthouse's back shed, rebuilding a dead motorbike piece by piece until it ran, then rebuilding it again to run on a charm-core. She rides it to class, parks it where she likes, and has never let anyone else drive it. At the University she found she could make people do what she wanted with a look, and stopped being the quiet twin. She runs with a small, sharp crowd, decides who is in and who is out, and is meanest to the ones she likes.\n\nHer magic is hot and exact: a weld that seals at a touch, an engine that turns over when she tells it to.",
+    "backstory": "Anwen and Elowen are long time BFFs; at the University they have at last begun to grow apart, one into her screens and the other onto her bike. They are still willing to share everything with each other, including men.\n\nAnwen spent her teens in the guesthouse's back shed, rebuilding a dead motorbike piece by piece until it ran, then rebuilding it again to run on a charm-core. She rides it to class, parks it where she likes, and has never let anyone else drive it. At the University she found she could make people do what she wanted with a look, and stopped being the quiet twin. She runs with a small, sharp crowd, decides who is in and who is out, and is meanest to the ones she likes.\n\nHer magic is hot and exact: a weld that seals at a touch, an engine that turns over when she tells it to.",
     "knowledge": [],
     "secrets": [],
-    "extraInstructions": "Anwen and Elowen are identical twin sisters. Anwen warms, grudgingly, to anyone who can tell them apart and stands up to her, and cools at once when the two are treated as interchangeable."
+    "extraInstructions": ""
   }
 }

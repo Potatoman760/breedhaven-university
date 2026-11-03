@@ -253,6 +253,42 @@
       "pregnant": true
     },
     {
+      "id": "lingerie",
+      "name": "Sporty",
+      "description": "a red sports-style bralette with crisscrossed straps over the shoulders and matching red high-cut briefs with a wide black waistband. Her hair is in a high ponytail.",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/daphne/lingerie-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/daphne/lingerie-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/daphne/lingerie-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/daphne/lingerie-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/daphne/lingerie-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/daphne/lingerie-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/daphne/lingerie-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

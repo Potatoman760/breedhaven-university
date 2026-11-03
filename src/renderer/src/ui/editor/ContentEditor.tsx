@@ -33,6 +33,7 @@ import { JobsEditor } from "./JobsEditor";
 import { MajorsEditor } from "./MajorsEditor";
 import { SocietiesEditor } from "./SocietiesEditor";
 import { LocationEditor } from "./LocationEditor";
+import { GroupsEditor } from "./GroupsEditor";
 import { PacksEditor } from "./PacksEditor";
 import { PlayerEditor } from "./PlayerEditor";
 import { ScheduleTab } from "./ScheduleTab";
@@ -93,12 +94,13 @@ function firstSubject(content: ContentPack, teaching: boolean): Studies {
 const same = (a: unknown, b: unknown) =>
   JSON.stringify(a) === JSON.stringify(b);
 
-const SIDES = ["Instructions", "Characters", "Looks", "Majors", "Player", "Locations", "Courses", "Societies", "Jobs", "Packs", "ComfyUI"] as const;
+const SIDES = ["Instructions", "Characters", "Looks", "Groups", "Majors", "Player", "Locations", "Courses", "Societies", "Jobs", "Packs", "ComfyUI"] as const;
 type Side = (typeof SIDES)[number];
 const SIDE_LABELS: Record<Side, MessageKey> = {
   Instructions: "editor.instructions.title",
   Characters: "editor.sides.characters",
   Looks: "editor.sides.looks",
+  Groups: "editor.sides.groups",
   Majors: "editor.sides.majors",
   Player: "editor.sides.player",
   Locations: "editor.sides.locations",
@@ -189,6 +191,8 @@ export function ContentEditor(props: Props) {
     <LooksEditor {...props} switcher={switcher} />
   ) : side === "Locations" ? (
     <LocationEditor {...props} switcher={switcher} />
+  ) : side === "Groups" ? (
+    <GroupsEditor {...props} switcher={switcher} />
   ) : side === "Packs" ? (
     <PacksEditor {...props} switcher={switcher} />
   ) : (

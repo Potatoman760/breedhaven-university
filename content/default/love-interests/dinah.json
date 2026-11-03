@@ -251,6 +251,42 @@
       "pregnant": true
     },
     {
+      "id": "lingerie",
+      "name": "Ivory chemise",
+      "description": "an ivory lace bra and matching ivory panties under a sheer ivory chiffon chemise with thin straps that falls to mid-thigh, with one small satin bow at the center of its neckline",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/dinah/lingerie-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/dinah/lingerie-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/dinah/lingerie-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/dinah/lingerie-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/dinah/lingerie-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/dinah/lingerie-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/dinah/lingerie-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

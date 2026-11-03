@@ -8,7 +8,7 @@ import { t } from '../i18n'
 const GOOD = 14
 const IMPRESSIVE = 18
 const EXCEPTIONAL = 22
-const LEGENDARY = 26
+export const LEGENDARY = 26
 
 /** What a score is called, lowest first, and the score each name begins at. */
 export const STAT_TIERS = [

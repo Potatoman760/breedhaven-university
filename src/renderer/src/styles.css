@@ -10798,3 +10798,44 @@ fieldset.plain {
   padding: 0;
   border: 0;
 }
+
+/* Achievements: one a row, those not yet earned faded. */
+.achievements {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 60vh;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.achievement {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  opacity: 0.55;
+}
+
+.achievement-icon {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 6px;
+}
+
+.achievement-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.achievement.earned {
+  border-color: var(--gold);
+  background: var(--paper-raised);
+  opacity: 1;
+}

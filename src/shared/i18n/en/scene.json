@@ -144,6 +144,7 @@
   "prompt.appear.outfitGroup": "When what one of you is wearing changes in the story, write {tag} on a line after the faces:",
   "prompt.appear.wearingGroup": "- {first} is wearing \"{outfit}\". She has: {has}.{showing, select, true { {note}} other {}}",
   "prompt.appear.actsGroup": "During sex, an explicit picture of a sex-act by ONE of you at a time can be shown behind the rest of you, in place of her own picture.{up, select, true { \"{pose}\" of {first} was up for the last reply.} other {}}",
+  "prompt.appear.actsTogether": "- All of you together, named for whichever of you it is most about: {acts}",
   "prompt.appear.actsGroupRules": "A sex-act is chosen in addition to the faces and outfits, never in their place. When the scene reaches one of these sex-acts, add a line saying whose and which: {tag}. Choose the one of you the moment is most about, and change whose it is as the moment passes from one of you to another; the rest of you stay in view in front of it. Most replies have no {bare} line at all: write one only in a reply whose own lines show that act happening at that moment, and never for talk, kissing or anything afterwards. A sex-act is up for the one reply that asks for it and comes down with the next, so do not carry it on out of habit. {creampie} and {facial} are a single moment and are never shown twice running.",
   "prompt.appear.wearing": "You are wearing \"{outfit}\". When what you are wearing changes in the story, write {tag} on a line after your face:",
   "prompt.appear.option": "- {id} ({name}): {about}",

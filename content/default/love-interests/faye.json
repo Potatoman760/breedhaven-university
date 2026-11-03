@@ -251,6 +251,42 @@
       "pregnant": true
     },
     {
+      "id": "lingerie",
+      "name": "Midnight satin",
+      "description": "a midnight-blue satin plunge bra, matching high-cut satin panties and garter belt holding up sheer black stockings, and a sheer midnight-blue lace robe hanging open off her shoulders",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/faye/lingerie-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/faye/lingerie-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/faye/lingerie-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/faye/lingerie-angry.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/faye/lingerie-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/faye/lingerie-aroused.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/faye/lingerie-surprised.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

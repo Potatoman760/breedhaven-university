@@ -256,12 +256,35 @@
       "description": "a pink lace bra, matching lace panties and a garter belt with little satin ribbon bows, and pale pink stockings",
       "sprites": {
         "neutral": {
-          "image": "sprites/maren/lingerie-neutral-cutout.webp",
+          "image": "sprites/maren/lingerie-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/maren/lingerie-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/maren/lingerie-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/maren/lingerie-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/maren/lingerie-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/maren/lingerie-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/maren/lingerie-aroused.webp",
           "description": ""
         }
       },
-      "pregnant": false,
-      "oneOff": true
+      "pregnant": false
     },
     {
       "id": "lingerie-pregnant",

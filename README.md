@@ -186,6 +186,32 @@ left unsigned.
 - Saves from a different format version, or damaged files, are shown as unreadable rather
   than hidden. Loading tolerates content changes such as a newly added love interest.
 
+## Achievements
+
+Kept for the install, not for a game: `achievements.json` in the app's user data folder
+(`src/main/achievements/store.ts`), each by id with when it was earned. They are listed under
+Achievements in the Esc menu and on the title screen (`ui/AchievementsPanel.tsx`), and earning one
+is said as it happens. Which there are, and what earns each, is `src/shared/game/achievements.ts`;
+their names and descriptions are `game.achievements.<id>` in the strings. An id never changes, since
+it is how one is known on disk, and will be how it is known to Steam: the store's `onUnlock` is where
+that goes. Most are read off a game as it stands (`earnedInState`, checked whenever the game
+changes), so a save that already meets one earns it when it is loaded: Perfection (every meter full
+with one love interest), Aced! (an A on every midterm), Legendary (every stat at 26 or more), Conqueror (the Undercroft cleared to its
+eighth depth), We live in a society (in any society), Obligatory onsen scene (a part of the Mistmoon
+Break attended) and Where's the landlady? (moved into Haven House, which is not bought but offered).
+The rest are of something a save does not keep, and are earned as it happens: Light of my life when
+a part of the Lantern Festival is attended with someone (`earnedAtEvent`), Heartbreaker when a
+breakup is agreed (`earnedByBond`), and, as a scene in which he had sex ends (`earnedInScene`), Oil
+and Water (Dinah and Morwenna), Forbidden (Anwen and Elowen), Teach me! (any three professors), Diplomacy (Yelena and Seraphine),
+Maid my Day (Zélie) and XXXmas (anyone, during First Frost). BFFs is read off the game: Tamsin pregnant
+and in any arrangement with him.
+Those six and BFFs are hidden, as Steam has it (`HIDDEN_ACHIEVEMENTS`): until earned, the panel names
+none of them and only counts them.
+Each has two icons in `src/assets/achievements/`, at Steam's size (256 square, JPG): `<id>.jpg`, shown
+once it is earned, and `<id>-locked.jpg`, the same in grey, before. Both are uploaded to Steam as
+they are; a test fails for an achievement missing either. They were drawn with the comic-book
+background workflow on a dark plum ground with a gold border, at 1024 and made smaller.
+
 ## Content editor and add-ons
 
 **Where the editor writes.** Run from source (`npm run dev`), the game is being written: the
@@ -241,6 +267,22 @@ courses, the player's start, locations, jobs, societies and ComfyUI.
   friends and enemies are kept only where the game has them.
   Nothing in a zip is trusted: only files `pack.json` names are read, they have to be
   pictures or clips, and the game names where they go.
+- **Groups** (`GroupsEditor.tsx`, in both builds): two or three love interests together
+  (`groups.json`, `src/shared/model/groups.ts`, laid over by the add-on folder's as `looks.json` is),
+  each with a slot for every sex-act, standard and added, and a picture and a clip for it made as
+  a character's are, the picture asked for with every one of them in it (`groupNsfwPrompt` in
+  `src/shared/comfy.ts`), and in the act's group wording in place of its own: `groupDraws`, written
+  for each standard act in `NSFW_POSES` and a field of its own for an act added under Expressions
+  & acts (left empty, the act's own wording is used). `manShown` (Man on screen, on unless
+  unticked; off for `creampie` and `facial`) says whether a group picture has the man in it.
+  A group's clip is asked for with the act's group clip prompt (`groupVideoPrompts` in the ComfyUI
+  settings, edited under ComfyUI setup → Group clips, `groupVideoPromptFor`), and with the act's own
+  clip prompt until one is written. Its files are under `sprites/group-<id>/`. In a scene of exactly a group's
+  members, the group's sex-acts are offered to the LLM beside each woman's, and a sex-act asked for
+  is shown from the group when it has one (`groupPose` in `src/shared/game/groups.ts`, the scene's
+  `animationGroup`), in place of the one woman's; otherwise it is hers, as before. Not while any of
+  them is showing a pregnancy (the group is drawn without one) or any will not have sex in the
+  scene. It comes down when anyone leaves. Groups have no pregnant row, and do not go in packs.
 - **Expressions & acts** (`LooksEditor.tsx`, in both builds): faces and sex-acts added to the
   standard ones, kept in `looks.json` (`content.looks`, `src/shared/model/looks.ts`): in
   `content/default` from source, in the add-on folder otherwise, laid over the game's by id.

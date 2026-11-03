@@ -255,6 +255,42 @@
       "pregnant": true
     },
     {
+      "id": "lingerie",
+      "name": "Bubblegum mesh",
+      "description": "a bubblegum-pink mesh bra and matching high-cut panties, under a sheer white babydoll that hangs open from the bust to the top of her thighs",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/lingerie-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/yulia/lingerie-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/yulia/lingerie-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/yulia/lingerie-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/yulia/lingerie-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/yulia/lingerie-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/yulia/lingerie-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

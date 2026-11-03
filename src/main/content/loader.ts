@@ -42,6 +42,8 @@ const OPTIONAL_FILES = {
   minigames: 'minigames.json',
   // Faces and sex-acts added in the editor.
   looks: 'looks.json',
+  // Love interests together, with sex-acts of all of them at once.
+  groups: 'groups.json',
   sounds: 'sounds.json',
   // What is said under the logo while a scene loads.
   tips: 'tips.json',

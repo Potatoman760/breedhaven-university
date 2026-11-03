@@ -280,6 +280,42 @@
       "oneOff": true
     },
     {
+      "id": "lingerie",
+      "name": "Green satin",
+      "description": "a dark green satin bra and matching panties trimmed with black lace, and black thigh-high stockings with one small green bow at the top of each",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tink/lingerie-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/tink/lingerie-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/tink/lingerie-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/tink/lingerie-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/tink/lingerie-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/tink/lingerie-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/tink/lingerie-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

@@ -148,6 +148,8 @@ export const ComfySettingsSchema = z.object({
   sizes: z.partialRecord(z.enum(ART_KINDS), SizeSchema).default({}),
   /** What a clip of each pose is asked for with, by pose id, in place of the built-in ones. */
   videoPrompts: z.record(z.string(), z.string()).default({}),
+  /** What a clip of a group's sex-act is asked for with, all of them in it, by the act's id. Left out, the act's own. */
+  groupVideoPrompts: z.record(z.string(), z.string()).default({}),
   /** Whether a clip is made to loop: asked to end on the picture it starts from, so that it goes round without a jump. One that is not is played once. */
   videoLastFrame: z.boolean().default(false),
   /** How long a clip runs, in seconds. */
@@ -169,7 +171,7 @@ export const defaultsFor = (settings: Pick<ComfySettings, 'defaults' | 'videoWor
  * picture, and nothing of the player's own machine. Kept in the content beside the workflows, and read under
  * whatever a player has changed for themselves.
  */
-export const ComfyBundleSettingsSchema = ComfySettingsSchema.pick({ promptPrefixes: true, negativePrefixes: true, overrides: true, defaults: true, framing: true, sizes: true, videoPrompts: true })
+export const ComfyBundleSettingsSchema = ComfySettingsSchema.pick({ promptPrefixes: true, negativePrefixes: true, overrides: true, defaults: true, framing: true, sizes: true, videoPrompts: true, groupVideoPrompts: true })
 export type ComfyBundleSettings = z.infer<typeof ComfyBundleSettingsSchema>
 
 /** The game's workflows, and what each calls for that the player has to fetch themselves. */
@@ -264,6 +266,11 @@ export function sizeFor(settings: Pick<ComfySettings, 'sizes'>, kind: ArtKind): 
 export function videoPromptFor(settings: Pick<ComfySettings, 'videoPrompts'>, poseId: string): string {
   const pose = basePoseId(poseId)
   return settings.videoPrompts[pose] ?? DEFAULT_VIDEO_PROMPTS[pose] ?? DEFAULT_VIDEO_PROMPT
+}
+
+/** What a clip of a group's sex-act is asked for with: its group prompt, or until one is written, the act's own. */
+export function groupVideoPromptFor(settings: Pick<ComfySettings, 'videoPrompts' | 'groupVideoPrompts'>, poseId: string): string {
+  return settings.groupVideoPrompts[basePoseId(poseId)] ?? videoPromptFor(settings, poseId)
 }
 
 /** A prompt with a workflow's prefix in front of it, as a paragraph of its own, when it has one. */
@@ -592,6 +599,23 @@ export const SCENE_SHOTS = ['posed', 'candid'] as const
 export type SceneShot = (typeof SCENE_SHOTS)[number]
 
 const COUNT_WORDS = ['one', 'two', 'three', 'four']
+
+/**
+ * The prompt for a picture in a group's NSFW section: every woman of it said in a paragraph of her own, so that an image
+ * model draws as many as there are and no more, each undressed in the words of her own nude outfit, and the man with
+ * them unless the act leaves him out; then what the act shows, done by all of them together, and how it is framed.
+ */
+export function groupNsfwPrompt(women: (Pick<LoveInterest | Npc, 'appearance' | 'outfits'> & { pronouns?: string })[], pose: string, framing: string, manShown = true): string {
+  const count = COUNT_WORDS[women.length - 1] ?? String(women.length)
+  const person = (who: (typeof women)[number], i: number): string => {
+    const [bare = 'nothing at all, completely nude'] = outfitParts(who.outfits, who.outfits.find((o) => o.id === 'nude'))
+    return paragraph(`The ${['first', 'second', 'third'][i] ?? 'next'}: ${who.appearance.trim().replace(/[.!?]+$/, '')}. She wears ${bare}`)
+  }
+  return paragraphs([
+    [paragraph(`An explicit picture of ${count} women together${manShown ? ' with one man' : ''}`), ...women.map(person), paragraph(`All of them together: ${pose}`)].join(' '),
+    framing.trim()
+  ])
+}
 
 /**
  * The prompt for a picture the player takes in a scene and posts: of whoever is there with him, never of himself. Each

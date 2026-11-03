@@ -21,7 +21,7 @@ type Draft = { kind: LookKind } & CustomAct
 
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
 
-const blank = (kind: LookKind): Draft => ({ kind, id: '', name: '', description: '', draws: '', moment: false, seeding: false })
+const blank = (kind: LookKind): Draft => ({ kind, id: '', name: '', description: '', draws: '', groupDraws: '', moment: false, seeding: false, manShown: true })
 
 const HEADINGS: Record<LookKind, { title: MessageKey; add: MessageKey }> = {
   expressions: { title: 'editor.looks.expressions', add: 'editor.looks.newExpression' },
@@ -32,7 +32,7 @@ const HEADINGS: Record<LookKind, { title: MessageKey; add: MessageKey }> = {
 function saved(draft: Draft): CustomExpression | CustomAct {
   const { kind, ...look } = draft
   if (kind === 'acts') return look
-  const { moment: _moment, seeding: _seeding, ...face } = look
+  const { moment: _moment, seeding: _seeding, groupDraws: _groupDraws, manShown: _manShown, ...face } = look
   return face
 }
 
@@ -51,6 +51,8 @@ const standardOf = (): Record<LookKind, Draft[]> => ({
     name: pose.name,
     description: poseDescription({ id: pose.id, description: '' }),
     draws: pose.draws,
+    groupDraws: pose.groupDraws,
+    manShown: pose.manShown,
     moment: isMoment(pose.id),
     seeding: isSeeding(pose.id)
   }))
@@ -184,10 +186,24 @@ export function LooksEditor({ content, onContent, switcher }: Props) {
               onChange={(draws) => set({ draws })}
             />
             {draft.kind === 'acts' && (
+              <Text
+                label={t('editor.looks.groupDraws')}
+                value={draft.groupDraws}
+                rows={3}
+                disabled={locked}
+                placeholder={NSFW_POSES[0].groupDraws}
+                onChange={(groupDraws) => set({ groupDraws })}
+              />
+            )}
+            {draft.kind === 'acts' && (
               <div className="row checks">
                 <label className="inline" title={t('editor.looks.momentTitle')}>
                   <input type="checkbox" checked={draft.moment} disabled={locked} onChange={(e) => set({ moment: e.target.checked })} />
                   {t('editor.looks.moment')}
+                </label>
+                <label className="inline" title={t('editor.looks.manShownTitle')}>
+                  <input type="checkbox" checked={draft.manShown} disabled={locked} onChange={(e) => set({ manShown: e.target.checked })} />
+                  {t('editor.looks.manShown')}
                 </label>
                 <label className="inline" title={t('editor.looks.seedingTitle')}>
                   <input type="checkbox" checked={draft.seeding} disabled={locked} onChange={(e) => set({ seeding: e.target.checked })} />

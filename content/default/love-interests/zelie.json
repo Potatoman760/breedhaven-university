@@ -252,6 +252,42 @@
       "pregnant": true
     },
     {
+      "id": "lingerie",
+      "name": "Parisian",
+      "description": "a black silk balconette bra and matching high-waisted panties trimmed with white lace, a black garter belt holding up sheer dark stockings, and a thin blue ribbon tied at her throat",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/zelie/lingerie-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/zelie/lingerie-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/zelie/lingerie-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/zelie/lingerie-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/zelie/lingerie-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/zelie/lingerie-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/zelie/lingerie-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

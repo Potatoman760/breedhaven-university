@@ -251,6 +251,42 @@
       "pregnant": true
     },
     {
+      "id": "lingerie",
+      "name": "Plain black",
+      "description": "a plain black cotton sports bra and matching black boy-short briefs, with a wide red cloth sash knotted at one hip, its ends hanging to the knee",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/grushka/lingerie-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/grushka/lingerie-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/grushka/lingerie-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/grushka/lingerie-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/grushka/lingerie-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/grushka/lingerie-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/grushka/lingerie-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

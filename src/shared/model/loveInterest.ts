@@ -174,7 +174,9 @@ export type Animation = z.infer<typeof AnimationSchema>;
 /**
  * The poses every character has a slot for in the NSFW section, as she has a slot for every
  * face in an outfit. `description` is what the LLM is told of one whose own is left empty,
- * and `draws` is what the picture is asked for with.
+ * and `draws` is what the picture is asked for with. `groupDraws` is what a group's picture of it is asked for with
+ * in its place: the same act, with all of them in it. `manShown` says whether he is in the picture: not in what
+ * follows the act, which shows only them.
  */
 export const NSFW_POSES = [
   {
@@ -183,6 +185,9 @@ export const NSFW_POSES = [
     description: "she takes him in her mouth",
     draws:
       "POV from above: she kneels in front of a man and performs oral sex on him, penis in her mouth, looking up at the camera",
+    groupDraws:
+      "POV from above: the women kneel side by side in front of a man, sharing his penis between them, one with it in her mouth while the other licks its shaft, both looking up at the camera",
+    manShown: true,
   },
   {
     id: "missionary",
@@ -190,6 +195,9 @@ export const NSFW_POSES = [
     description: "on her back, him above her",
     draws:
       "POV: she lies on her back on a bed, head on a pillow, having sex in the missionary position, legs apart, looking up at the camera. a mans penis is penetrating her pussy",
+    groupDraws:
+      "POV: the women lie side by side on their backs on a bed, legs spread apart, looking up at the camera; a mans penis is penetrating the pussy of the left woman while the woman on the right has her fingers inside her own pussy and kisses the woman on the left.",
+    manShown: true,
   },
   {
     id: "doggy",
@@ -197,6 +205,9 @@ export const NSFW_POSES = [
     description: "on her hands and knees, him behind her",
     draws:
       "she is on her hands and knees on a bed having sex from behind, seen from the side, looking back over her shoulder. a mans penis is penetrating her pussy from behind",
+    groupDraws:
+      "side view, the first woman is laying on the bed face down. The second woman is laying on top of her body; a mans penis is penetrating  the top woman's ass from behind",
+    manShown: true,
   },
   {
     id: "cowgirl",
@@ -204,6 +215,9 @@ export const NSFW_POSES = [
     description: "astride him, on top",
     draws:
       "POV from below: she sits astride a man having sex in the cowgirl position, her hands on his chest, looking down at the camera",
+    groupDraws:
+      "POV from below: one of the women sits astride a man having sex in the cowgirl position while the other kneels beside them with her hands on his chest, both looking down at the camera",
+    manShown: true,
   },
   {
     id: "creampie",
@@ -211,6 +225,9 @@ export const NSFW_POSES = [
     description: "the moment he finishes inside her",
     draws:
       "she lies back on a bed after sex, legs apart, lots of white semen leaking from her vagina, flushed and out of breath",
+    groupDraws:
+      "the women lie back side by side on a bed after sex, legs apart, white semen leaking from the vagina of one of them, both flushed and out of breath",
+    manShown: false,
   },
   {
     id: "facial",
@@ -218,6 +235,9 @@ export const NSFW_POSES = [
     description: "the moment he finishes on her face",
     draws:
       "close on her face and shoulders after sex, semen on her face, eyes half closed, lips parted",
+    groupDraws:
+      "close on the women's faces and shoulders side by side after sex, semen on both their faces, eyes half closed, lips parted",
+    manShown: false,
   },
 ] as const;
 
@@ -225,14 +245,25 @@ export const NSFW_POSES = [
 const MOMENTS: readonly string[] = ["creampie", "facial"];
 
 /** What the game needs to know of a sex-act added in the editor: see `CustomActSchema`. */
-type AddedAct = { id: string; description: string; moment: boolean; seeding: boolean };
+type AddedAct = {
+  id: string;
+  description: string;
+  moment: boolean;
+  seeding: boolean;
+};
 
 /**
  * Whether a pose is a moment: shown for the one reply it happens in, and never for the
  * next as well, however the LLM asks. One added in the editor is when it says so.
  */
-export function isMoment(poseId: string, added: readonly AddedAct[] = []): boolean {
-  return MOMENTS.includes(poseId) || added.some((act) => act.id === poseId && act.moment);
+export function isMoment(
+  poseId: string,
+  added: readonly AddedAct[] = [],
+): boolean {
+  return (
+    MOMENTS.includes(poseId) ||
+    added.some((act) => act.id === poseId && act.moment)
+  );
 }
 
 // The poses that show him finishing inside her: choosing one says what the [SEEDED] tag says.
@@ -242,8 +273,14 @@ const SEEDING: readonly string[] = ["creampie"];
  * Whether a pose shows the moment that can leave her with child. Asking for one counts as
  * the [SEEDED] tag does, so that conception does not hang on the LLM remembering both.
  */
-export function isSeeding(poseId: string, added: readonly AddedAct[] = []): boolean {
-  return SEEDING.includes(poseId) || added.some((act) => act.id === poseId && act.seeding);
+export function isSeeding(
+  poseId: string,
+  added: readonly AddedAct[] = [],
+): boolean {
+  return (
+    SEEDING.includes(poseId) ||
+    added.some((act) => act.id === poseId && act.seeding)
+  );
 }
 
 // What a pose drawn pregnant is filed under: the pose it is built on, with this before it.
@@ -265,7 +302,9 @@ export const NSFW_PREGNANT_POSES = NSFW_POSES.map((pose) => ({
 
 /** What of a pose is shown, best first: its clip, then its picture. */
 export function poseMedia(pose: Pick<Animation, "clip" | "image">): string[] {
-  return [pose.clip, pose.image].filter((file): file is string => file !== undefined);
+  return [pose.clip, pose.image].filter(
+    (file): file is string => file !== undefined,
+  );
 }
 
 /** Every pose with a slot of its own: the standard ones, and each of them drawn pregnant. */

@@ -177,6 +177,8 @@ export const SceneSchema = z.object({
   animationId: z.string().optional(),
   /** Whose pose that is, by love interest id: one of those in the scene. Only one is shown at a time. */
   animationOf: z.string().optional(),
+  /** When the pose is a group's, all of them at once: the group's id. Whose it is stays `animationOf`. */
+  animationGroup: z.string().optional(),
   /** A plan to meet that the love interest has suggested and the player hasn't answered yet. */
   proposal: ProposalSchema.optional(),
   /** Love interests who were in the scene and have left it, in the order they went. */

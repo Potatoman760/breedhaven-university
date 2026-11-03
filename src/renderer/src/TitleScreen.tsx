@@ -9,6 +9,7 @@ import { useVolumes } from './sound'
 import { Overlay } from './ui/Dialog'
 import { describeSave, SavesPanel } from './SavesPanel'
 import { SettingsPanel } from './SettingsPanel'
+import { AchievementsPanel } from './ui/AchievementsPanel'
 import { t } from '../../shared/i18n'
 
 // Where it is remembered that the player turned the menu's music off.
@@ -23,7 +24,7 @@ interface Props {
 
 export function TitleScreen({ content, onStart, onEdit }: Props) {
   const [saves, setSaves] = useState<SaveSummary[]>([])
-  const [panel, setPanel] = useState<'new' | 'load' | 'settings' | null>(null)
+  const [panel, setPanel] = useState<'new' | 'load' | 'settings' | 'achievements' | null>(null)
   const [name, setName] = useState(content.newGame.player.name)
   // Who he is, as the characters are told it: the content's own, which is fixed, and whatever the player adds to it.
   const [about, setAbout] = useState('')
@@ -101,6 +102,9 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
           </button>
           <button className="secondary" onClick={() => setPanel('settings')}>
             {t('shell.title.settings')}
+          </button>
+          <button className="secondary" onClick={() => setPanel('achievements')}>
+            {t('shell.achievements.title')}
           </button>
           {onEdit && (
             <button className="quiet" onClick={onEdit}>
@@ -202,6 +206,7 @@ export function TitleScreen({ content, onStart, onEdit }: Props) {
         />
       )}
       {panel === 'settings' && <SettingsPanel onClose={() => setPanel(null)} />}
+      {panel === 'achievements' && <AchievementsPanel onClose={() => setPanel(null)} />}
     </main>
   )
 }

@@ -17,6 +17,7 @@ import {
   sizeFor,
   SLOT_LABELS,
   videoPromptFor,
+  groupVideoPromptFor,
   WORKFLOW_KINDS,
   type ArtKind,
   type BindingSlot,
@@ -181,6 +182,14 @@ export function ComfySetup({ settings, list, onSave, connectionOnly, acts = [] }
             <VideoPromptRow key={pose.id} pose={pose} settings={settings} onChange={(prompt) => patch({ videoPrompts: { ...settings.videoPrompts, [pose.id]: prompt } })} />
           ))}
         </div>
+
+        <div className="editor-group">
+          <h2>{t('comfy.setup.groupClips')}</h2>
+          <p className="hint">{t('comfy.setup.groupClipsHint')}</p>
+          {[...NSFW_POSES, ...acts].map((pose) => (
+            <VideoPromptRow key={pose.id} pose={pose} settings={settings} group onChange={(prompt) => patch({ groupVideoPrompts: { ...settings.groupVideoPrompts, [pose.id]: prompt } })} />
+          ))}
+        </div>
         </>
         )}
       </div>
@@ -268,16 +277,19 @@ function SizeRow({ kind, settings, onChange }: { kind: ArtKind; settings: ComfyS
 interface VideoPromptRowProps {
   pose: { id: string; name: string }
   settings: ComfySettings
+  /** The prompt for a group's clip of the act, in place of one woman's. */
+  group?: boolean
   onChange: (prompt: string) => void
 }
 
 /** What a clip of one pose is asked for with. Held as it is typed, and saved when it is left. */
-function VideoPromptRow({ pose, settings, onChange }: VideoPromptRowProps) {
-  const [prompt, setPrompt] = useState(videoPromptFor(settings, pose.id))
+function VideoPromptRow({ pose, settings, group, onChange }: VideoPromptRowProps) {
+  const saved = group ? groupVideoPromptFor(settings, pose.id) : videoPromptFor(settings, pose.id)
+  const [prompt, setPrompt] = useState(saved)
   return (
     <label>
       {pose.name}
-      <textarea rows={4} value={prompt} onChange={(e) => setPrompt(e.target.value)} onBlur={() => prompt !== videoPromptFor(settings, pose.id) && onChange(prompt)} />
+      <textarea rows={4} value={prompt} onChange={(e) => setPrompt(e.target.value)} onBlur={() => prompt !== saved && onChange(prompt)} />
     </label>
   )
 }

@@ -26,10 +26,14 @@ export const CustomActSchema = z.object({
   description: z.string().default(''),
   /** What its picture is asked for with. */
   draws: z.string().default(''),
+  /** What a group's picture of it is asked for with, all of them in it. Left empty, its own, for one woman. */
+  groupDraws: z.string().default(''),
   /** A single moment, as a creampie is: shown for the one reply and never twice running. */
   moment: z.boolean().default(false),
   /** It shows him finishing inside her: choosing it counts as the [SEEDED] tag does. */
-  seeding: z.boolean().default(false)
+  seeding: z.boolean().default(false),
+  /** He is in the picture. Off for one that shows only her, or them, as what follows the act does. */
+  manShown: z.boolean().default(true)
 })
 export type CustomAct = z.infer<typeof CustomActSchema>
 
@@ -51,6 +55,10 @@ export interface StandardPose {
   name: string
   description: string
   draws: string
+  /** What a group's picture of it is asked for with, in place of `draws`. */
+  groupDraws?: string
+  /** He is in the picture. Left out, he is. */
+  manShown?: boolean
 }
 
 /**

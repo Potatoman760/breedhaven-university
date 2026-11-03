@@ -19,6 +19,7 @@ import { describeAppeal } from './stats'
 import { evaluateAll } from './conditions'
 import { attendableEvents, describeEvent, eventGoers, eventsOn, upcomingEvents } from './events'
 import { describeAge, describeBeat, describeIntimacy, feelingWord, selectMemories } from './memory'
+import { groupActs } from './groups'
 import { stageFor } from './relationships'
 import { describeSexGate, sexGate } from './intimacy'
 import { describeOwnChildren, describePregnancy, canConceive, ordinaryOutfit, pregnancyStage, wearableOutfits, wornOutfit } from './pregnancy'
@@ -241,6 +242,11 @@ export function buildCharacterPrompt(input: PromptInput): string {
   // A woman who will not go to bed with him in this scene is told nothing of sex-acts: there is none for her to choose.
   const actsOf = (c: LoveInterest) => (isNpc || sexGate(content, state, c, input.uninhibited?.includes(c.id)).open ? posesOf(c) : [])
   const animations = actsOf(li)
+  // A scene of exactly a group has the group's sex-acts too, all of them at once, where each of them will.
+  const together = isNpc ? undefined : groupActs(content, state, { loveInterestId: li.id, companionIds: companions.map((c) => c.id), npc: false }, (id) => {
+    const who = cast.find((c) => c.id === id)
+    return who !== undefined && sexGate(content, state, who, input.uninhibited?.includes(id)).open
+  })
   // An outfit's pictures beyond the standard faces, each with what it shows: a face added in the editor says so itself
   // unless the picture does. One that says nothing is not offered.
   const ownFaces = (outfit: Outfit): [string, string][] =>
@@ -569,7 +575,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
                 return faces.length > 0 ? [t('scene.prompt.appear.facesGroup', { first: c.name.split(' ')[0], faces: faces.join('; ') })] : []
               }),
               // Poses belong to one of them each, and one is shown at a time, over everyone.
-              ...(cast.some((c) => actsOf(c).length > 0)
+              ...(cast.some((c) => actsOf(c).length > 0) || together
                 ? [
                     t('scene.prompt.appear.actsGroup', {
                       up: Boolean(look.animationId),
@@ -577,6 +583,8 @@ export function buildCharacterPrompt(input: PromptInput): string {
                       first: cast.find((c) => c.id === (look.animationOf ?? li.id))?.name.split(' ')[0] ?? firstName
                     }),
                     ...cast.filter((c) => actsOf(c).length > 0).map((c) => `- ${c.name.split(' ')[0]}: ${actsOf(c).map((a) => `${a.id} (${poseDescription(a, content.looks.acts) || a.name})`).join('; ')}`),
+                    together &&
+                      t('scene.prompt.appear.actsTogether', { acts: together.acts.map((a) => `${a.id} (${poseDescription(a, content.looks.acts) || a.name})`).join('; ') }),
                     t('scene.prompt.appear.actsGroupRules', { tag: '[SEX-ACT: Name=id]', bare: SEX_ACT_TAG, ...ONE_MOMENT })
                   ]
                 : [])

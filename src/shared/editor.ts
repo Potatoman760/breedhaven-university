@@ -39,6 +39,8 @@ export interface EditorInfo {
   majors: Record<string, ContentOrigin>
   /** By id, the faces and the sex-acts added to the standard ones: those that came with the game, and those added here. */
   looks: Record<LookKind, Record<string, ContentOrigin>>
+  /** By group id. */
+  groups: Record<string, ContentOrigin>
   /** The player a new game starts with has been changed from the game's own. */
   playerChanged: boolean
   /**

@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { backgroundPrompt, birthPrompt, ComfySettingsSchema, DEFAULT_SIZES, DEFAULT_VIDEO_PROMPT, normaliseComfyUrl, nsfwPrompt, prependPrompt, spritePrompt, videoPromptFor } from '../../shared/comfy'
+import { backgroundPrompt, birthPrompt, ComfySettingsSchema, DEFAULT_SIZES, DEFAULT_VIDEO_PROMPT, normaliseComfyUrl, nsfwPrompt, prependPrompt, spritePrompt, videoPromptFor, groupVideoPromptFor } from '../../shared/comfy'
 import { NSFW_POSES, outfitDescription, poseDescription } from '../../shared/model'
 import { analyse, applyBindings, effectiveBindings, parseGraph, unplugLastFrame } from './graph'
 import { ComfyStore, fileArt } from './studio'
@@ -378,5 +378,26 @@ describe('a video workflow', () => {
     expect(videoPromptFor(settings, 'pregnant-doggy')).toBe('she rocks back and forth')
     expect(videoPromptFor(settings, 'cowgirl')).toBe(DEFAULT_VIDEO_PROMPT)
     expect(videoPromptFor(settings, 'her-own')).toBe(DEFAULT_VIDEO_PROMPT)
+  })
+})
+
+describe('a group clip', () => {
+  it("is asked for with the act's group prompt, and the act's own until one is written", () => {
+    const settings = ComfySettingsSchema.parse({ videoPrompts: { doggy: 'she rocks' }, groupVideoPrompts: { missionary: 'they rock together' } })
+    expect(groupVideoPromptFor(settings, 'missionary')).toBe('they rock together')
+    expect(groupVideoPromptFor(settings, 'doggy')).toBe('she rocks')
+    expect(groupVideoPromptFor(settings, 'doggy')).toBe(videoPromptFor(settings, 'doggy'))
+  })
+
+  it("is the game's to ship, and a player's change is kept on their own computer", () => {
+    const root = mkdtempSync(join(tmpdir(), 'bh-group-clips-'))
+    const pack = join(root, 'pack')
+    mkdirSync(join(pack, 'comfy'), { recursive: true })
+    writeFileSync(join(pack, 'comfy', 'bundle.json'), JSON.stringify({ groupVideoPrompts: { missionary: 'shipped' } }))
+    const store = new ComfyStore(join(root, 'comfy.json'), pack)
+    expect(store.get().groupVideoPrompts).toEqual({ missionary: 'shipped' })
+    store.update({ ...store.get(), groupVideoPrompts: { ...store.get().groupVideoPrompts, doggy: 'mine' } })
+    expect(new ComfyStore(join(root, 'comfy.json'), pack).get().groupVideoPrompts).toEqual({ missionary: 'shipped', doggy: 'mine' })
+    expect(JSON.parse(readFileSync(join(pack, 'comfy', 'bundle.json'), 'utf8')).groupVideoPrompts).toEqual({ missionary: 'shipped' })
   })
 })

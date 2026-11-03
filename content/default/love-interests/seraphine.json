@@ -280,6 +280,42 @@
       "oneOff": true
     },
     {
+      "id": "lingerie",
+      "name": "Royal lace",
+      "description": "a pale green silk bra and matching panties edged with small embroidered gold leaves, under a sheer white chiffon babydoll that falls open from the bust to mid-thigh",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/seraphine/lingerie-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/seraphine/lingerie-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/seraphine/lingerie-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/seraphine/lingerie-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/seraphine/lingerie-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/seraphine/lingerie-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/seraphine/lingerie-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

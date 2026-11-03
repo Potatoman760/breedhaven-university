@@ -251,6 +251,42 @@
       "pregnant": true
     },
     {
+      "id": "lingerie",
+      "name": "Slate silk",
+      "description": "a slate-green silk bra and matching high-waisted silk panties trimmed with ivory lace, and a matching garter belt holding up sheer black stockings",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/isolde/lingerie-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/isolde/lingerie-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/isolde/lingerie-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/isolde/lingerie-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/isolde/lingerie-surprised.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/isolde/lingerie-aroused.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/isolde/lingerie-embarrassed.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs. Delicate thin silver oval spectacles worn on her face",

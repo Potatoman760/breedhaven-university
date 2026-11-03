@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { defaultsFor, MAX_CLIP_SECONDS, videoPromptFor, type ComfySettings, type GenerateArtResult, type GenerateVideoRequest, type WorkflowListResult } from '../../../../shared/comfy'
+import { defaultsFor, groupVideoPromptFor, MAX_CLIP_SECONDS, videoPromptFor, type ComfySettings, type GenerateArtResult, type GenerateVideoRequest, type WorkflowListResult } from '../../../../shared/comfy'
 import type { LoveInterest, Npc } from '../../../../shared/model'
 import { errorMessage } from '../../errors'
 import { t } from '../../../../shared/i18n'
@@ -22,6 +22,8 @@ export interface ClipTarget {
   onLoop: (loop: boolean) => void
   /** Keeps a prompt on the pose for its clips from now on, or with none, goes back to the settings' own. */
   onKeepPrompt: (prompt: string | undefined) => void
+  /** The pose is a group's: its clip is asked for with the settings' group prompt for the act. */
+  group?: boolean
 }
 
 /** The workflows that make clips: those with somewhere to put a first frame. */
@@ -37,7 +39,9 @@ export function clipRequest(
   list: WorkflowListResult | null,
   subjectId: string,
   pose: { id: string; image: string; clipPrompt?: string },
-  choice: { workflow?: string; prompt?: string; seed?: number; seconds?: number } = {}
+  choice: { workflow?: string; prompt?: string; seed?: number; seconds?: number } = {},
+  /** A group's pose, whose clip is asked for with the group prompt for the act. */
+  group = false
 ): { request: GenerateVideoRequest; loop?: boolean; workflow: string } | null {
   const usable = clipWorkflows(list)
   const chosen = usable.find((w) => w.file === choice.workflow) ?? usable.find((w) => w.file === defaultsFor(settings).video) ?? usable[0]
@@ -52,7 +56,7 @@ export function clipRequest(
       name: `nsfw-${pose.id}`,
       workflow: chosen.file,
       image: pose.image,
-      prompt: choice.prompt ?? pose.clipPrompt ?? videoPromptFor(settings, pose.id),
+      prompt: choice.prompt ?? pose.clipPrompt ?? (group ? groupVideoPromptFor(settings, pose.id) : videoPromptFor(settings, pose.id)),
       lastImage: looping ? pose.image : undefined,
       seed: choice.seed,
       seconds: chosen.bindings.length !== null ? (choice.seconds ?? settings.videoSeconds) : undefined
@@ -76,7 +80,7 @@ interface Props {
 export function GenerateClip({ target, settings, list, onSave }: Props) {
   const { pose } = target
   // Her own for the pose, when one was kept, or else the settings' for the sex-act.
-  const own = pose.clipPrompt ?? videoPromptFor(settings, pose.id)
+  const own = pose.clipPrompt ?? (target.group ? groupVideoPromptFor(settings, pose.id) : videoPromptFor(settings, pose.id))
   const [prompt, setPrompt] = useState(own)
   // The prompt is the one kept for the pose until it is edited by hand; putting it back follows it again.
   const [edited, setEdited] = useState(false)
@@ -115,7 +119,7 @@ export function GenerateClip({ target, settings, list, onSave }: Props) {
         prompt,
         seed: seed.trim() === '' ? undefined : Math.max(0, Math.floor(Number(seed)) || 0),
         seconds: lengthOf(seconds)
-      })
+      }, target.group)
       if (!asked) return
       const result = await window.api.comfy.generateVideo(asked.request)
       if (!result.ok) setNotice(result.message)

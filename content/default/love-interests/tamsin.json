@@ -250,6 +250,42 @@
       "pregnant": true
     },
     {
+      "id": "lingerie",
+      "name": "First lace",
+      "description": "a simple black lace bralette and matching black lace boy-short panties",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tamsin/lingerie-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/tamsin/lingerie-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/tamsin/lingerie-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/tamsin/lingerie-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/tamsin/lingerie-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/tamsin/lingerie-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/tamsin/lingerie-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

@@ -7,6 +7,8 @@ import {
   DEFAULT_VIEW,
   LocationSchema,
   LooksSchema,
+  GroupSchema,
+  groupFiles,
   CustomActSchema,
   CustomExpressionSchema,
   LoveInterestSchema,
@@ -29,6 +31,7 @@ import {
   type Location,
   type LoveInterest,
   type Looks,
+  type Group,
   type Major,
   type Trait
 } from '../../shared/model'
@@ -42,6 +45,7 @@ const LOCATIONS = 'locations'
 const LOCATIONS_FILE = 'locations.json'
 const TRAITS_FILE = 'traits.json'
 const LOOKS_FILE = 'looks.json'
+const GROUPS_FILE = 'groups.json'
 const CATALOGUE_FILE = 'catalogue.json'
 const CURRICULUM_FILE = 'curriculum.json'
 const NEW_GAME_FILE = 'new-game.json'
@@ -95,6 +99,20 @@ function readAddonLooks(addonDir: string, issues: string[]): Record<LookKind, un
   } catch (error) {
     issues.push(t('editor.addons.issue', { path: LOOKS_FILE, message: (error as Error).message }))
     return { expressions: [], acts: [] }
+  }
+}
+
+/** The groups of the add-on folder's `groups.json`, as raw JSON. One that can't be read is reported, not thrown. */
+function readAddonGroups(addonDir: string, issues: string[]): unknown[] {
+  const path = join(addonDir, GROUPS_FILE)
+  if (!existsSync(path)) return []
+  try {
+    const raw = readJsonFile(path)
+    if (!Array.isArray(raw)) throw new Error(t('editor.addons.notGroupList'))
+    return raw
+  } catch (error) {
+    issues.push(t('editor.addons.issue', { path: GROUPS_FILE, message: (error as Error).message }))
+    return []
   }
 }
 
@@ -298,13 +316,30 @@ export function loadWithAddons(packDir: string, addonDir: string, languageDir?: 
     }
   }
 
+  // Groups come after the characters they are of. Each is tried on its own, as a character is.
+  const baseGroups = ((base as { groups?: unknown }).groups ?? []) as Group[]
+  const acceptedGroups: Group[] = []
+  for (const raw of readAddonGroups(addonDir, issues)) {
+    const parsed = GroupSchema.safeParse(raw)
+    try {
+      if (!parsed.success) throw new Error(parsed.error.issues[0]?.message)
+      if (!isSafeId(parsed.data.id)) throw new Error(t('editor.addons.idMissing'))
+      validateContentPack({ ...pack(accepted), groups: overlay(baseGroups, [...acceptedGroups, parsed.data]) })
+      acceptedGroups.push(parsed.data)
+    } catch (error) {
+      const id = (raw as Partial<WithId> | null)?.id
+      issues.push(t('editor.addons.groupLeftOut', { file: GROUPS_FILE, id: typeof id === 'string' ? id : '?', message: (error as Error).message }))
+    }
+  }
+  const groups = overlay(baseGroups, acceptedGroups)
+
   // The course catalogue built in the editor. One that can't be read is as good as none: it is built again there.
   let catalogue: unknown
   if (existsSync(join(addonDir, CATALOGUE_FILE))) {
     try {
       // It is checked with the pack it belongs to: on its own it says only who is in what and when.
       const read = readJsonFile(join(addonDir, CATALOGUE_FILE))
-      validateContentPack({ ...pack(accepted), catalogue: read })
+      validateContentPack({ ...pack(accepted), groups, catalogue: read })
       catalogue = read
     } catch (error) {
       issues.push(t('editor.addons.fileLeftOut', { file: CATALOGUE_FILE, message: (error as Error).message }))
@@ -316,7 +351,7 @@ export function loadWithAddons(packDir: string, addonDir: string, languageDir?: 
   if (existsSync(join(addonDir, NEW_GAME_FILE))) {
     try {
       const read = readJsonFile(join(addonDir, NEW_GAME_FILE))
-      validateContentPack({ ...pack(accepted), newGame: read })
+      validateContentPack({ ...pack(accepted), groups, newGame: read })
       newGame = read
     } catch (error) {
       issues.push(t('editor.addons.fileLeftOut', { file: NEW_GAME_FILE, message: (error as Error).message }))
@@ -326,11 +361,11 @@ export function loadWithAddons(packDir: string, addonDir: string, languageDir?: 
 
   let content: ContentPack
   try {
-    content = validateContentPack({ ...pack(accepted), ...(catalogue !== undefined && { catalogue }), ...(newGame !== undefined && { newGame }) })
+    content = validateContentPack({ ...pack(accepted), groups, ...(catalogue !== undefined && { catalogue }), ...(newGame !== undefined && { newGame }) })
   } catch (error) {
     // The add-on traits broke something in the base pack (a trait a character uses, say). Go without add-ons.
     issues.push(t('editor.addons.allLeftOut', { message: (error as Error).message }))
-    return { content: validateContentPack(base), info: { addonDir, issues, loveInterests: origins(baseLoveInterests, []), traits: origins(baseTraits, []), locations: origins(baseLocations, []), majors: origins(baseMajors, []), looks: { expressions: origins(baseLooks.expressions, []), acts: origins(baseLooks.acts, []) }, playerChanged: false, base: false, assetPrefix: ADDON_PREFIX } }
+    return { content: validateContentPack(base), info: { addonDir, issues, loveInterests: origins(baseLoveInterests, []), traits: origins(baseTraits, []), locations: origins(baseLocations, []), majors: origins(baseMajors, []), looks: { expressions: origins(baseLooks.expressions, []), acts: origins(baseLooks.acts, []) }, groups: origins(baseGroups, []), playerChanged: false, base: false, assetPrefix: ADDON_PREFIX } }
   }
   return {
     content,
@@ -342,6 +377,7 @@ export function loadWithAddons(packDir: string, addonDir: string, languageDir?: 
       locations: origins(baseLocations, acceptedLocations),
       majors: origins(baseMajors, acceptedMajors.map((major) => ({ id: major.code }))),
       looks: { expressions: origins(baseLooks.expressions, acceptedLooks.expressions), acts: origins(baseLooks.acts, acceptedLooks.acts) },
+      groups: origins(baseGroups, acceptedGroups),
       playerChanged,
       base: false,
       assetPrefix: ADDON_PREFIX
@@ -371,6 +407,7 @@ export function loadBase(packDir: string, languageDir?: string): LoadedContent {
       // Every subject is the game's own to change here, as every character is.
       majors: all((content.curriculum?.majors ?? []).map((major) => ({ id: major.code })), 'addon'),
       looks: { expressions: all(content.looks.expressions, 'addon'), acts: all(content.looks.acts, 'addon') },
+      groups: all(content.groups, 'addon'),
       playerChanged: false,
       base: true,
       assetPrefix: ''
@@ -704,6 +741,42 @@ export function deleteLook(addonDir: string, content: ContentPack, kind: LookKin
   if (users.length > 0) return [t('editor.addons.lookInUse', { names: users.map((who) => who.name.split(' ')[0]).join(', '), count: users.length })]
   writeLooks(addonDir, { ...mine, [kind]: (mine[kind] as Partial<WithId>[]).filter((look) => look?.id !== id) })
   return []
+}
+
+/**
+ * Adds a group, or changes one, after checking the game would still load with it: two or three love interests there
+ * are, each once, and no other group of the same ones. One with a group of the game's id takes its place.
+ */
+export function saveGroup(addonDir: string, content: ContentPack, raw: unknown): string[] {
+  const parsed = GroupSchema.safeParse(raw)
+  if (!parsed.success) return parsed.error.issues.map((issue) => t('editor.addons.issue', { path: issue.path.join('.') || t('editor.addons.whatGroup'), message: issue.message }))
+  const group = parsed.data
+  if (!isSafeId(group.id)) return [t('editor.addons.badId')]
+  if (group.name.trim() === '') return [t('editor.addons.nameNeeded')]
+  try {
+    validateContentPack({ ...content, groups: overlay(content.groups, [group]) })
+  } catch (error) {
+    return (error as { issues?: string[] }).issues ?? [(error as Error).message]
+  }
+  const mine = readAddonGroups(addonDir, []) as Group[]
+  mkdirSync(addonDir, { recursive: true })
+  writeFileSync(join(addonDir, GROUPS_FILE), `${JSON.stringify(overlay(mine, [group]), null, 2)}
+`)
+  return []
+}
+
+/** Takes away a group made in the editor, which puts back the game's own of that id if there is one. */
+export function deleteGroup(addonDir: string, id: string): string[] {
+  const mine = readAddonGroups(addonDir, []) as Partial<WithId>[]
+  if (!mine.some((group) => group?.id === id)) return [t('editor.addons.groupNotAddon')]
+  writeFileSync(join(addonDir, GROUPS_FILE), `${JSON.stringify(mine.filter((group) => group?.id !== id), null, 2)}
+`)
+  return []
+}
+
+/** What of a group the clean-up after a save looks at: its files are a folder of their own, kept as a character's are. */
+export function groupAssets(group: Group): Parameters<typeof removeUnusedAssets>[1] {
+  return { id: groupFiles(group.id), outfits: [], animations: group.animations }
 }
 
 /**

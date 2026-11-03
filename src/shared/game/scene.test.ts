@@ -245,7 +245,7 @@ describe('look directives', () => {
   it('offers a face added in the editor only to one who has its picture, in its own words', () => {
     const looks = {
       expressions: [{ id: 'smug', name: 'Smug', description: 'pleased with herself', draws: '' }],
-      acts: [{ id: 'press', name: 'Press', description: 'legs pinned back', draws: '', moment: false, seeding: false }]
+      acts: [{ id: 'press', name: 'Press', description: 'legs pinned back', draws: '', groupDraws: '', moment: false, seeding: false, manShown: true }]
     }
     const smug = { ...li, outfits: li.outfits.map((o) => (o.id === 'default' ? { ...o, sprites: { ...o.sprites, smug: { image: 's.png', description: '' } } } : o)), animations: [...li.animations, { id: 'press', name: 'Press', description: '', image: 'p.png', loop: true }] }
     const others = [{ ...li, id: 'bea', name: 'Bea Moss' }]

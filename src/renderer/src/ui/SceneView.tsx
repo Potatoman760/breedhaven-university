@@ -256,7 +256,9 @@ export function SceneView(props: Props) {
   // An NSFW pose is shown over the background while it is up, in place of the sprite of whoever's it is:
   // the lead's, or in a group whoever it was named for.
   const poser = cast.find((li) => li.id === scene.animationOf) ?? partner
-  const animation = poser.animations.find((a) => a.id === scene.animationId)
+  // Or a group's, all of them at once, in place of hers.
+  const posedGroup = content.groups.find((group) => group.id === scene.animationGroup)
+  const animation = (posedGroup ?? poser).animations.find((a) => a.id === scene.animationId)
   // What of it is shown: the first of its clip, its picture and its first frame that will load.
   const media = animation && poseMedia(animation).find((file) => !lost.includes(file))
   const playing = animation !== undefined && media !== undefined

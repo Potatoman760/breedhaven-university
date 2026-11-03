@@ -15,6 +15,12 @@ import {
   sceneWitnesses,
   attendees,
   addGlobalMemory,
+  describeAchievement,
+  earnedAtEvent,
+  earnedByBond,
+  earnedInScene,
+  earnedInState,
+  type AchievementId,
   addMemory,
   amendMemory,
   canChangeClasses,
@@ -204,7 +210,7 @@ import { CoursesView } from './ui/CoursesView'
 import { DayView } from './ui/DayView'
 import { GrandButton } from './ui/GrandButton'
 import { isMouseBack } from './mouseBack'
-import { GearIcon, JobIcon, LoadIcon, PowerIcon, SaveIcon } from './ui/icons'
+import { GearIcon, HeartIcon, JobIcon, LoadIcon, PowerIcon, SaveIcon } from './ui/icons'
 import { Dialog } from './ui/Dialog'
 import { FairView } from './ui/FairView'
 import { InterfaceTour } from './ui/InterfaceTour'
@@ -226,6 +232,7 @@ import { TripMoment, type TripCompanion, type TripMomentKind } from './ui/TripMo
 import { MasqueradeGuess } from './ui/MasqueradeGuess'
 import { TripBooking } from './ui/TripBooking'
 import { Button } from './ui/Button'
+import { AchievementsPanel } from './ui/AchievementsPanel'
 import { SummaryView, type SceneSummary } from './ui/SummaryView'
 
 // The content editor, where a player makes characters and subjects of his own: loaded only when it is opened.
@@ -360,6 +367,15 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   const [notice, setNotice] = useState('')
   // Something to tell him that happened in the background, the feed's posts: never a reason to end a scene, so it is only ever put away.
   const [aside, setAside] = useState('')
+  // Earns achievements, and says so for those that are new. They are the install's, so loading a save that already
+  // meets one earns it then.
+  const earn = useCallback((ids: AchievementId[]) => {
+    if (ids.length === 0) return
+    window.api.achievements.unlock(ids).then(
+      (fresh) => fresh.length > 0 && setAside(t('shell.achievements.unlocked', { names: fresh.map((id) => describeAchievement(id).name).join(', '), n: fresh.length })),
+      () => undefined
+    )
+  }, [])
   // The game and the scene as they stood before each line he has said in this scene, newest last, so that a turn can be taken back.
   const [turns, setTurns] = useState<Turn[]>(() => (initial.scene ? unpackTurns(initial.turns ?? [], initial.state, initial.scene) : []))
   useEffect(() => {
@@ -601,6 +617,12 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       setTripMoment({ kind: 'drive-home', companions: gladOf(ids, state), lines: () => window.api.momentLines({ state, ids, moment: 'drive-home' }).then((got) => got.lines), then: () => undefined })
     }
   }, [idle, state, content])
+
+  // What the game as it stands has earned, whenever it changes.
+  const standing = earnedInState(content, state).join(',')
+  useEffect(() => {
+    if (standing !== '') earn(standing.split(',') as AchievementId[])
+  }, [standing, earn])
 
   // A date he let go by: once its hour is past, every woman with a claim on him minds that he took nobody.
   useEffect(() => {
@@ -1022,6 +1044,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setDating(null)
     const result = attendEventPart(content, state, eventId, partId, dateIds)
     setState(result.state)
+    earn(earnedAtEvent(eventId, result.scene ? sceneCast(result.scene) : []))
     setNotice(result.hurt.length > 0 ? t('shell.app.notAsked', { who: firstNames(content, result.hurt), count: result.hurt.length }) : '')
     // A booking part ends on the booking screen, not a scene.
     const begin = () => (result.booking ? setBooking(result.booking) : setScene(result.scene))
@@ -1415,6 +1438,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       }
       // How each of them feels about him now is what she made of the scene, and nothing else moves it.
       // A scene in which they had sex is counted for each of them, once.
+      earn(earnedInScene(content, state, result.intimate))
       const moved = addIntimacy(Object.entries(result.feelings).reduce((current, [id, feelings]) => applyFeelings(content, current, id, feelings, false, scene.outing === true), state), result.intimate)
       // What he paid for along the way comes out of his pocket now.
       const felt = applySpending(moved, result.spending)
@@ -1651,13 +1675,14 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
             setAgreed(t('shell.app.planAdded', { plan: scene.proposal.title, who: firstNames(content, attendees(scene.proposal)), when: describeWhen(content, scene.proposal.time) }))
           }}
           onDeclineProposal={() => setScene({ ...scene, proposal: undefined })}
-          onAnimationEnd={() => setScene((current) => current && { ...current, animationId: undefined, animationOf: undefined })}
+          onAnimationEnd={() => setScene((current) => current && { ...current, animationId: undefined, animationOf: undefined, animationGroup: undefined })}
           onAnswerBond={(accept) => {
             const asked = scene.bondProposal
             if (!asked) return
             setScene({ ...scene, bondProposal: undefined })
             if (!accept) return
             setState(acceptBond(content, state, asked))
+            earn(earnedByBond(asked))
             setAgreed(t('shell.app.bondAgreed', { bond: describeBond(content, asked) }))
           }}
           agreed={agreed}
@@ -1902,12 +1927,14 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
             <GrandButton label={t('shell.app.save')} icon={<SaveIcon size={22} />} onClick={() => setPanel({ kind: 'save' })} />
             <GrandButton label={t('shell.app.load')} icon={<LoadIcon size={22} />} onClick={() => setPanel({ kind: 'load' })} />
             <GrandButton label={t('shell.app.settings')} icon={<GearIcon size={22} />} onClick={() => setPanel({ kind: 'settings' })} />
+            <GrandButton label={t('shell.achievements.title')} icon={<HeartIcon size={22} />} onClick={() => setPanel({ kind: 'achievements' })} />
             <GrandButton label={t('shell.app.exitToTitle')} icon={<JobIcon name="door" size={22} />} onClick={onExit} />
             <GrandButton label={t('shell.app.quit')} icon={<PowerIcon size={22} />} onClick={() => window.close()} />
           </div>
         </Dialog>
       )}
       {panel?.kind === 'settings' && <SettingsPanel onClose={close} />}
+      {panel?.kind === 'achievements' && <AchievementsPanel onClose={close} />}
       {(panel?.kind === 'save' || panel?.kind === 'load') && (
         <SavesPanel
           content={content}

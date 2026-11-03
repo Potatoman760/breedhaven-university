@@ -1,0 +1,164 @@
+[
+  {
+    "id": "anwen-elowen",
+    "name": "anwen-elowen",
+    "memberIds": [
+      "anwen",
+      "elowen"
+    ],
+    "animations": [
+      {
+        "id": "blowjob",
+        "name": "Blowjob",
+        "description": "",
+        "image": "sprites/group-anwen-elowen/nsfw-blowjob.png",
+        "clip": "sprites/group-anwen-elowen/nsfw-blowjob-2.mp4",
+        "loop": true
+      },
+      {
+        "id": "missionary",
+        "name": "Missionary",
+        "description": "",
+        "image": "sprites/group-anwen-elowen/nsfw-missionary-6.png",
+        "clip": "sprites/group-anwen-elowen/minimax-h3-00117-audio.mp4",
+        "loop": true
+      },
+      {
+        "id": "doggy",
+        "name": "Doggy",
+        "description": "",
+        "image": "sprites/group-anwen-elowen/nsfw-doggy-5.png",
+        "clip": "sprites/group-anwen-elowen/nsfw-doggy.mp4",
+        "loop": true
+      },
+      {
+        "id": "cowgirl",
+        "name": "Cowgirl",
+        "description": "",
+        "image": "sprites/group-anwen-elowen/nsfw-cowgirl.png",
+        "clip": "sprites/group-anwen-elowen/minimax-h3-00118-audio.mp4",
+        "loop": true
+      },
+      {
+        "id": "creampie",
+        "name": "Creampie",
+        "description": "",
+        "image": "sprites/group-anwen-elowen/nsfw-creampie-4.png",
+        "clip": "sprites/group-anwen-elowen/nsfw-creampie.mp4",
+        "loop": true
+      },
+      {
+        "id": "facial",
+        "name": "Facial",
+        "description": "",
+        "image": "sprites/group-anwen-elowen/nsfw-facial.png",
+        "clip": "sprites/group-anwen-elowen/nsfw-facial.mp4",
+        "loop": true
+      }
+    ]
+  },
+  {
+    "id": "dinah-morwenna",
+    "name": "dinah-morwenna",
+    "memberIds": [
+      "dinah",
+      "morwenna"
+    ],
+    "animations": [
+      {
+        "id": "blowjob",
+        "name": "Blowjob",
+        "description": "",
+        "image": "sprites/group-dinah-morwenna/nsfw-blowjob.png",
+        "loop": true
+      },
+      {
+        "id": "missionary",
+        "name": "Missionary",
+        "description": "",
+        "image": "sprites/group-dinah-morwenna/nsfw-missionary.png",
+        "loop": true
+      },
+      {
+        "id": "doggy",
+        "name": "Doggy",
+        "description": "",
+        "image": "sprites/group-dinah-morwenna/nsfw-doggy-2.png",
+        "loop": true
+      },
+      {
+        "id": "cowgirl",
+        "name": "Cowgirl",
+        "description": "",
+        "image": "sprites/group-dinah-morwenna/nsfw-cowgirl.png",
+        "loop": true
+      },
+      {
+        "id": "creampie",
+        "name": "Creampie",
+        "description": "",
+        "image": "sprites/group-dinah-morwenna/nsfw-creampie.png",
+        "loop": true
+      },
+      {
+        "id": "facial",
+        "name": "Facial",
+        "description": "",
+        "image": "sprites/group-dinah-morwenna/nsfw-facial.png",
+        "loop": true
+      }
+    ]
+  },
+  {
+    "id": "seraphine-yelena",
+    "name": "seraphine-yelena",
+    "memberIds": [
+      "seraphine",
+      "yelena"
+    ],
+    "animations": [
+      {
+        "id": "blowjob",
+        "name": "Blowjob",
+        "description": "",
+        "image": "sprites/group-seraphine-yelena/nsfw-blowjob-3.png",
+        "loop": true
+      },
+      {
+        "id": "missionary",
+        "name": "Missionary",
+        "description": "",
+        "image": "sprites/group-seraphine-yelena/nsfw-missionary-6.png",
+        "loop": true
+      },
+      {
+        "id": "doggy",
+        "name": "Doggy",
+        "description": "",
+        "image": "sprites/group-seraphine-yelena/nsfw-doggy.png",
+        "loop": true
+      },
+      {
+        "id": "cowgirl",
+        "name": "Cowgirl",
+        "description": "",
+        "image": "sprites/group-seraphine-yelena/nsfw-cowgirl.png",
+        "loop": true
+      },
+      {
+        "id": "creampie",
+        "name": "Creampie",
+        "description": "",
+        "image": "sprites/group-seraphine-yelena/nsfw-creampie.png",
+        "loop": true
+      },
+      {
+        "id": "facial",
+        "name": "Facial",
+        "description": "",
+        "image": "sprites/group-seraphine-yelena/nsfw-facial.png",
+        "loop": true
+      }
+    ]
+  }
+]

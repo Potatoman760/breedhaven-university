@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { resolveContentPath } from './assets'
-import { deleteLocation, deleteLook, deleteLoveInterest, deleteTrait, saveLook, importAsset, loadWithAddons, rebuildCatalogue, saveMajor, deleteMajor, removeUnusedAssets, resetPlayer, saveLocation, saveLoveInterest, savePlayer, saveTrait } from './addons'
+import { deleteGroup, saveGroup, deleteLocation, deleteLook, deleteLoveInterest, deleteTrait, saveLook, importAsset, loadWithAddons, rebuildCatalogue, saveMajor, deleteMajor, removeUnusedAssets, resetPlayer, saveLocation, saveLoveInterest, savePlayer, saveTrait } from './addons'
 
 // The game's own pack is the base; each test gets an empty add-on folder of its own.
 const packDir = join(process.cwd(), 'content', 'default')
@@ -84,7 +84,7 @@ describe('faces and sex-acts added in the editor', () => {
     expect(loaded.info.issues).toEqual([])
     // Laid after those the game comes with.
     expect(loaded.content.looks.expressions).toEqual([...base.content.looks.expressions, smug])
-    expect(loaded.content.looks.acts).toEqual([...base.content.looks.acts, { ...press, moment: false }])
+    expect(loaded.content.looks.acts).toEqual([...base.content.looks.acts, { ...press, groupDraws: '', moment: false, manShown: true }])
     expect(loaded.info.looks).toMatchObject({ expressions: { smug: 'addon' }, acts: { press: 'addon' } })
 
     // Her picture for it keeps it: it would be left in no slot.
@@ -415,5 +415,34 @@ describe('a subject made in the editor', () => {
     const loaded = loadWithAddons(packDir, dir)
     expect(loaded.info.issues[0]).toMatch(/AST was left out/)
     expect(loaded.content.curriculum!.majors.some((major) => major.code === 'AST')).toBe(false)
+  })
+})
+
+describe('groups', () => {
+  const pair = { id: 'faye-tink', name: 'Faye & Tink', memberIds: ['faye', 'tink'], animations: [{ id: 'missionary', name: 'Missionary', description: '', image: 'addons/sprites/group-faye-tink/nsfw-missionary.webp', loop: true }] }
+
+  it('is saved to the add-on folder, laid over the game, and taken away again', () => {
+    const dir = addons()
+    expect(saveGroup(dir, base.content, pair)).toEqual([])
+    const { content, info } = loadWithAddons(packDir, dir)
+    expect(info.issues).toEqual([])
+    expect(content.groups.find((group) => group.id === 'faye-tink')?.memberIds).toEqual(['faye', 'tink'])
+    expect(info.groups['faye-tink']).toBe('addon')
+    expect(deleteGroup(dir, 'faye-tink')).toEqual([])
+    expect(loadWithAddons(packDir, dir).content.groups.some((group) => group.id === 'faye-tink')).toBe(false)
+    expect(deleteGroup(dir, 'faye-tink')).toEqual(['That group came with the game.'])
+  })
+
+  it('refuses one the game could not load, and leaves out a broken one without stopping the game', () => {
+    const dir = addons()
+    expect(saveGroup(dir, base.content, { ...pair, memberIds: ['faye', 'nobody'] }).join(' ')).toMatch(/nobody/)
+    expect(saveGroup(dir, base.content, { ...pair, memberIds: ['faye'] }).length).toBeGreaterThan(0)
+    expect(existsSync(join(dir, 'groups.json'))).toBe(false)
+    mkdirSync(dir, { recursive: true })
+    writeFileSync(join(dir, 'groups.json'), JSON.stringify([pair, { ...pair, id: 'lost', memberIds: ['faye', 'the-moon'] }]))
+    const { content, info } = loadWithAddons(packDir, dir)
+    expect(content.groups.map((group) => group.id)).toContain('faye-tink')
+    expect(content.groups.map((group) => group.id)).not.toContain('lost')
+    expect(info.issues.join('\n')).toMatch(/group "lost" was left out/)
   })
 })

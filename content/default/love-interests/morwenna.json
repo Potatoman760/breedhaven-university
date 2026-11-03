@@ -253,6 +253,42 @@
       "pregnant": true
     },
     {
+      "id": "lingerie",
+      "name": "Black lace corset",
+      "description": "a black lace corset with silver hook fastenings down the front, matching black lace panties, black fishnet thigh-high stockings, and a black spiked leather choker",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/morwenna/lingerie-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/morwenna/lingerie-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/morwenna/lingerie-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/morwenna/lingerie-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/morwenna/lingerie-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/morwenna/lingerie-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/morwenna/lingerie-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

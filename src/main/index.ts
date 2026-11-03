@@ -12,6 +12,7 @@ import { CONTENT_SCHEME, resolveContentPath, serveContent } from './content/asse
 import { deleteLoveInterest,
   removeUnusedAssets,
   deleteLook, saveLook,
+  deleteGroup, groupAssets, saveGroup,
   deleteTrait, deleteJob, saveJob, deleteSociety, saveSociety, importAsset, loadBase, loadWithAddons, rebuildCatalogue, saveCatalogue, saveMajor, deleteMajor, saveLocation, deleteLocation, saveLoveInterest, saveTrait,
   resetPlayer,
   savePlayer
@@ -20,6 +21,7 @@ import { installPack, readPackManifest, unpackFiles, writePack, type PackInstall
 import { LOOK_KINDS, isSafeId, slugify, type EditorInfo, type EditorResult } from '../shared/editor'
 import { PackSelectionSchema, packManifest, packPreview, type PackManifest, type PackPreview } from '../shared/packs'
 import { SaveStore } from './saves/store'
+import { AchievementStore } from './achievements/store'
 import { SettingsStore, type KeyCipher } from './settings/store'
 import { RenameSaveRequestSchema, SaveRequestSchema, SlotIdSchema } from '../shared/saves'
 import { contactsSaid, DM_CLOSE, DM_OPEN, fallbackInvite, messageText } from '../shared/game/courier'
@@ -29,6 +31,7 @@ import { attendableEvents, buildEventPrompt, parseGeneratedEvents } from '../sha
 import { buildSelfiePrompt, parseSelfie, selfieDraft } from '../shared/game/selfie'
 import { buildSpendingPrompt, buildSummaryPrompt, fallbackSummary, parseSpending, parseSummary, PLAIN_FEELINGS, sceneRapport, sceneRevelations, type Spending, type Summary } from '../shared/game/memory'
 import { npcOf, sceneExtras, withNpc } from '../shared/game/npcs'
+import { groupPose } from '../shared/game/groups'
 import { inMasks } from '../shared/game/masquerade'
 import { unnamedIn } from '../shared/game/strangers'
 import { sceneHours } from '../shared/game/sceneMoves'
@@ -237,8 +240,11 @@ function registerIpc(
   /** The user's own add-on folder, where what the game makes as it is played (the selfies on the feed) is always filed. */
   userDir: string,
   /** The language the content was loaded in. */
-  inLanguage: InLanguage
+  inLanguage: InLanguage,
+  achievements: AchievementStore
 ): void {
+  ipcMain.handle(IPC.achievementsList, () => achievements.list())
+  ipcMain.handle(IPC.achievementsUnlock, (_event, raw: unknown) => achievements.unlock(z.array(z.string()).parse(raw)))
   // Replaced whenever the editor changes an add-on; every handler below reads the current one.
   let { content, info } = loaded
   let lang = inLanguage
@@ -388,6 +394,13 @@ function registerIpc(
     const { kind, id } = z.object({ kind: z.enum(LOOK_KINDS), id: z.string() }).parse(raw)
     return change(() => deleteLook(info.addonDir, content, kind, id))
   })
+  ipcMain.handle(IPC.editorSaveGroup, (_event, raw: unknown) =>
+    saveAndTidy(raw, () => saveGroup(info.addonDir, content, raw), (id) => {
+      const group = content.groups.find((one) => one.id === id)
+      return group && groupAssets(group)
+    })
+  )
+  ipcMain.handle(IPC.editorDeleteGroup, (_event, raw: unknown) => change(() => deleteGroup(info.addonDir, z.string().parse(raw))))
   ipcMain.handle(IPC.editorSaveLocation, (_event, raw: unknown) => change(() => saveLocation(info.addonDir, content, raw, info.base)))
   ipcMain.handle(IPC.editorDeleteLocation, (_event, raw: unknown) => change(() => deleteLocation(info.addonDir, z.string().parse(raw))))
   // Jobs and societies are the game's own: there to be changed only when it is run from source.
@@ -803,8 +816,18 @@ function registerIpc(
     const showing = poser !== undefined && !npc && pregnancyStage(content, state, poser.id)?.showing === true
     const shown = (showing && pose && poser?.animations.find((a) => a.id === pregnantPoseId(pose.id) && drawn(a))) || pose
     // A moment is shown once: asked for again in the very next reply, it is not put up a second time.
-    const again = pose !== undefined && shown !== undefined && isMoment(basePoseId(pose.id), content.looks.acts) && scene.animationId === shown.id && (scene.animationOf ?? scene.loveInterestId) === poser?.id
-    const posed = look.animationId === null ? { animationId: null } : pose && shown && poser && !npc && !again && willing(poser.id) ? { animationId: shown.id, animationOf: poser.id } : {}
+    const again = pose !== undefined && shown !== undefined && isMoment(basePoseId(pose.id), content.looks.acts) && scene.animationId === shown.id && (scene.animationOf ?? scene.loveInterestId) === poser?.id && scene.animationGroup === undefined
+    // In a scene of exactly a group, the group's own picture of the act is shown in place of the one woman's, where it has one.
+    const together = npc ? undefined : groupPose(content, state, scene, look.animationId, willing)
+    const againTogether = together !== undefined && isMoment(together.pose.id, content.looks.acts) && scene.animationGroup === together.group.id && scene.animationId === together.pose.id
+    const posed =
+      look.animationId === null
+        ? { animationId: null }
+        : together && !againTogether
+          ? { animationId: together.pose.id, animationOf: poser?.id ?? scene.loveInterestId, animationGroup: together.group.id }
+          : pose && shown && poser && !npc && !again && willing(poser.id)
+            ? { animationId: shown.id, animationOf: poser.id }
+            : {}
     return {
       message: { role: 'assistant', content: text || '...', tags: lookLines(reply) || undefined },
       systemPrompt,
@@ -816,7 +839,16 @@ function registerIpc(
       bondProposal,
       // A pose that shows him finishing inside her says what the tag says, whether or not the tag was written. The game still decides what comes of it.
       offControlIds: npc ? [] : [...new Set(stopsControl.map(idOf).filter((id): id is string => id !== undefined))],
-      seededIds: npc ? [] : [...new Set([...seededIds, ...(pose && poser && isSeeding(basePoseId(pose.id), content.looks.acts) && willing(poser.id) ? [poser.id] : [])])],
+      seededIds: npc
+        ? []
+        : [
+            ...new Set([
+              ...seededIds,
+              ...(pose && poser && isSeeding(basePoseId(pose.id), content.looks.acts) && willing(poser.id) ? [poser.id] : []),
+              // The group's act shows him finishing inside the one it was named for, as hers would.
+              ...(together && isSeeding(together.pose.id, content.looks.acts) ? [poser?.id ?? scene.loveInterestId] : [])
+            ])
+          ],
       rolls,
       // Setting off for his class or plan is the going: the scene is not also taken somewhere.
       moveTo: walkTo || sleptOver ? undefined : movedTo,
@@ -1118,9 +1150,11 @@ app.whenReady().then(() => {
 
   serveContentAssets(contentDir(), addonDir)
   const saves = new SaveStore(join(app.getPath('userData'), 'saves'))
+  // Steam's achievements are set here too, once the game is on it.
+  const achievements = new AchievementStore(join(app.getPath('userData'), 'achievements.json'))
   const comfy = new ComfyStore(join(app.getPath('userData'), 'comfy.json'), contentDir())
   const civitaiKey = new CivitaiKeyStore(join(app.getPath('userData'), 'civitai.json'), keyCipher())
-  registerIpc(loaded, contentDir(), settings, saves, comfy, civitaiKey, addonDir, inLanguage)
+  registerIpc(loaded, contentDir(), settings, saves, comfy, civitaiKey, addonDir, inLanguage, achievements)
   createWindow()
 
   app.on('activate', () => {
