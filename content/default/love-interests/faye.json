@@ -287,6 +287,43 @@
       "pregnant": false
     },
     {
+      "id": "lingerie-pregnant",
+      "name": "Midnight satin, pregnant",
+      "description": "She has a large, round, heavily pregnant belly, bare between her bra and her garter belt, which sits low beneath it with her panties; her open robe falls to either side of it.",
+      "inherits": "lingerie",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/faye/lingerie-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/faye/lingerie-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/faye/lingerie-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/faye/lingerie-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/faye/lingerie-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/faye/lingerie-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/faye/lingerie-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

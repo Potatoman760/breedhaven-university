@@ -191,7 +191,7 @@ left unsigned.
 Kept for the install, not for a game: `achievements.json` in the app's user data folder
 (`src/main/achievements/store.ts`), each by id with when it was earned. They are listed under
 Achievements in the Esc menu and on the title screen (`ui/AchievementsPanel.tsx`), and earning one
-is said as it happens. Which there are, and what earns each, is `src/shared/game/achievements.ts`;
+puts a gilt card with its icon in the lower right for a few seconds (`ui/AchievementToasts.tsx`). Which there are, and what earns each, is `src/shared/game/achievements.ts`;
 their names and descriptions are `game.achievements.<id>` in the strings. An id never changes, since
 it is how one is known on disk, and will be how it is known to Steam: the store's `onUnlock` is where
 that goes. Most are read off a game as it stands (`earnedInState`, checked whenever the game

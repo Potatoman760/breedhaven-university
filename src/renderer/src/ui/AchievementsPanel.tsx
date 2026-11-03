@@ -1,11 +1,8 @@
 import { useEffect, useState } from 'react'
 import { ACHIEVEMENTS, describeAchievement, isHidden, type AchievementId } from '../../../shared/game'
 import { Dialog } from './Dialog'
+import { iconOf } from './achievementIcon'
 import { t } from '../../../shared/i18n'
-
-// Each icon, as Steam has them: 256 square, and the same in grey for one not yet earned. Filed by the achievement's id.
-const ICONS = import.meta.glob<string>('../../../assets/achievements/*.jpg', { eager: true, import: 'default' })
-const iconOf = (id: AchievementId, earned: boolean): string | undefined => ICONS[`../../../assets/achievements/${id}${earned ? '' : '-locked'}.jpg`]
 
 /** Every achievement, those earned on this install first, each with when. A hidden one is only counted until it is earned. */
 export function AchievementsPanel({ onClose }: { onClose: () => void }) {

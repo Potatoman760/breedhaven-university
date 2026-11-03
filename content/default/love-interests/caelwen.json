@@ -286,6 +286,43 @@
       "pregnant": false
     },
     {
+      "id": "lingerie-pregnant",
+      "name": "Garden lace, pregnant",
+      "description": "She has a large, round, heavily pregnant belly, bare between her bralette and her panties, which sit low beneath it; her open robe falls to either side of it.",
+      "inherits": "lingerie",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/caelwen/lingerie-pregnant-neutral.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/caelwen/lingerie-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/caelwen/lingerie-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/caelwen/lingerie-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/caelwen/lingerie-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/caelwen/lingerie-pregnant-aroused.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/caelwen/lingerie-pregnant-happy.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

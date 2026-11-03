@@ -286,6 +286,43 @@
       "pregnant": false
     },
     {
+      "id": "lingerie-pregnant",
+      "name": "Charcoal silk, pregnant",
+      "description": "She has a large, round, heavily pregnant belly; her camisole stretches over it and rides up at the front, and her shorts sit low beneath it.",
+      "inherits": "lingerie",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/lingerie-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/ottilie/lingerie-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/ottilie/lingerie-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/ottilie/lingerie-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/ottilie/lingerie-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/ottilie/lingerie-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/ottilie/lingerie-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

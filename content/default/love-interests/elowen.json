@@ -290,6 +290,43 @@
       "pregnant": false
     },
     {
+      "id": "lingerie-pregnant",
+      "name": "Kitty lace, pregnant",
+      "description": "She has a large, round, heavily pregnant belly, bare between her bra and her panties, which sit low beneath it.",
+      "inherits": "lingerie",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/lingerie-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/elowen/lingerie-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/elowen/lingerie-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/elowen/lingerie-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/elowen/lingerie-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/elowen/lingerie-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/elowen/lingerie-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

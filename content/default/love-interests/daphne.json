@@ -289,6 +289,43 @@
       "pregnant": false
     },
     {
+      "id": "lingerie-pregnant",
+      "name": "Sporty, pregnant",
+      "description": "She has a large, round, heavily pregnant belly, bare between her bralette and her briefs, which sit low beneath it.",
+      "inherits": "lingerie",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/daphne/lingerie-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/daphne/lingerie-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/daphne/lingerie-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/daphne/lingerie-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/daphne/lingerie-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/daphne/lingerie-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/daphne/lingerie-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

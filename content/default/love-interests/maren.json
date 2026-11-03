@@ -289,16 +289,39 @@
     {
       "id": "lingerie-pregnant",
       "name": "Pink lace lingerie, pregnant",
-      "description": "She has a round, pregnant belly.",
+      "description": "She has a large, round, heavily pregnant belly, bare between her bra and her garter belt, which sits low beneath it with her panties.",
       "inherits": "lingerie",
       "sprites": {
         "neutral": {
-          "image": "sprites/maren/lingerie-pregnant-neutral-cutout.webp",
+          "image": "sprites/maren/lingerie-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/maren/lingerie-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/maren/lingerie-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/maren/lingerie-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/maren/lingerie-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/maren/lingerie-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/maren/lingerie-pregnant-aroused.webp",
           "description": ""
         }
       },
-      "pregnant": true,
-      "oneOff": true
+      "pregnant": true
     },
     {
       "id": "bathrobe",

@@ -537,7 +537,7 @@
   "achievements.earned": "Earned {date}",
   "achievements.hidden": "{n, plural, one {# hidden achievement} other {# hidden achievements}}",
   "achievements.hiddenHint": "Revealed once earned.",
-  "achievements.unlocked": "{n, plural, one {Achievement} other {Achievements}} unlocked: {names}",
+  "achievements.toast": "Achievement unlocked",
   "app.save": "Save",
   "app.load": "Load",
   "app.settings": "Settings",

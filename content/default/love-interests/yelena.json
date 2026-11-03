@@ -297,10 +297,33 @@
         "neutral": {
           "image": "sprites/yelena/lingerie-pregnant-neutral-cutout.webp",
           "description": ""
+        },
+        "happy": {
+          "image": "sprites/yelena/lingerie-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/yelena/lingerie-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/yelena/lingerie-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/yelena/lingerie-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/yelena/lingerie-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/yelena/lingerie-pregnant-aroused.webp",
+          "description": ""
         }
       },
-      "pregnant": true,
-      "oneOff": true
+      "pregnant": true
     },
     {
       "id": "bathrobe",

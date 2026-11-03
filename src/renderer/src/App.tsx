@@ -15,7 +15,6 @@ import {
   sceneWitnesses,
   attendees,
   addGlobalMemory,
-  describeAchievement,
   earnedAtEvent,
   earnedByBond,
   earnedInScene,
@@ -233,6 +232,7 @@ import { MasqueradeGuess } from './ui/MasqueradeGuess'
 import { TripBooking } from './ui/TripBooking'
 import { Button } from './ui/Button'
 import { AchievementsPanel } from './ui/AchievementsPanel'
+import { AchievementToasts } from './ui/AchievementToasts'
 import { SummaryView, type SceneSummary } from './ui/SummaryView'
 
 // The content editor, where a player makes characters and subjects of his own: loaded only when it is opened.
@@ -369,10 +369,11 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   const [aside, setAside] = useState('')
   // Earns achievements, and says so for those that are new. They are the install's, so loading a save that already
   // meets one earns it then.
+  const [unlocked, setUnlocked] = useState<AchievementId[]>([])
   const earn = useCallback((ids: AchievementId[]) => {
     if (ids.length === 0) return
     window.api.achievements.unlock(ids).then(
-      (fresh) => fresh.length > 0 && setAside(t('shell.achievements.unlocked', { names: fresh.map((id) => describeAchievement(id).name).join(', '), n: fresh.length })),
+      (fresh) => fresh.length > 0 && setUnlocked((shown) => [...shown, ...fresh.filter((id) => !shown.includes(id))]),
       () => undefined
     )
   }, [])
@@ -398,6 +399,12 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   useEffect(() => {
     if (notice || aside || toast) play('notice')
   }, [notice, aside, toast])
+  // An achievement is heard as it comes, not as it goes.
+  const unlocksHeard = useRef(0)
+  useEffect(() => {
+    if (unlocked.length > unlocksHeard.current) play('skill')
+    unlocksHeard.current = unlocked.length
+  }, [unlocked.length])
   // The loop behind where he is, which changes with the place and the dark, and stops when the game is left.
   const ambience = ambienceAt(content, state)
   useEffect(() => setAmbience(ambience), [ambience])
@@ -1859,6 +1866,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           )}
         </div>
       )}
+      <AchievementToasts ids={unlocked} onDone={(id) => setUnlocked((shown) => shown.filter((one) => one !== id))} />
       {!scene && aside && (
         <div className="toast plain" role="status" onClick={() => setAside('')}>
           <span>{aside}</span>
