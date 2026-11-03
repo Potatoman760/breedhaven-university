@@ -16,7 +16,7 @@
 import { existsSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { ComfyStore, generateArt } from '../src/main/comfy/studio'
-import { PACK, cutOut, minutes, settingsFile } from './lib/pictures'
+import { PACK, cutOut, minutes, onCard, settingsFile } from './lib/pictures'
 import { seedOf } from '../src/shared/game/seed'
 
 const SUBJECT = 'icons'
@@ -353,7 +353,7 @@ async function main(): Promise<void> {
     const began = Date.now()
     process.stdout.write(`[${i + 1}/${todo.length}] ${target.group}: ${target.name}... `)
     // Filed by group, so that a stall and a place of the same id do not overwrite each other.
-    const result = await generateArt(readSettings(), PACK, PACK, { kind: SCENERY.has(target.group) ? 'background' : 'sprite', subjectId: SUBJECT, name: `${target.group}-${target.id}`, workflow: '', positive: promptOf(target), negative: '', seed: seedFor(target), ...(SIZES[target.group]?.size ?? SIZE) }, cancel.signal, '')
+    const result = await generateArt(readSettings(), PACK, PACK, { kind: SCENERY.has(target.group) ? 'background' : 'sprite', subjectId: SUBJECT, name: `${target.group}-${target.id}`, workflow: onCard(readSettings()), positive: promptOf(target), negative: '', seed: seedFor(target), ...(SIZES[target.group]?.size ?? SIZE) }, cancel.signal, '')
     if (cancel.signal.aborted) {
       console.log('cancelled.')
       break

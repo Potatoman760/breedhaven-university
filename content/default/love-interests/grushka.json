@@ -177,6 +177,80 @@
       "pregnant": true
     },
     {
+      "id": "casual",
+      "name": "Off the mat",
+      "description": "a fitted olive-green sleeveless tunic tucked into her trousers, with a short laced V neckline tied with black cord, a broad brown leather belt with a plain iron buckle, loose dark brown cargo trousers, brown leather bracers on both forearms, and a red cord wound through her long braid, which hangs over her right shoulder",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/grushka/casual-neutral-2.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/grushka/casual-happy-2.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/grushka/casual-sad-2.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/grushka/casual-angry-2.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/grushka/casual-surprised-2.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/grushka/casual-embarrassed-2.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/grushka/casual-aroused-2.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Off the mat, pregnant",
+      "description": "She has a large, round, heavily pregnant belly, with her tunic untucked and stretched over it.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/grushka/casual-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/grushka/casual-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/grushka/casual-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/grushka/casual-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/grushka/casual-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/grushka/casual-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/grushka/casual-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

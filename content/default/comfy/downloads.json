@@ -42,6 +42,11 @@
       "name": "rgthree-comfy",
       "provides": ["Power Lora Loader (rgthree)"],
       "page": "https://github.com/rgthree/rgthree-comfy"
+    },
+    {
+      "name": "comfyui-rmbg",
+      "provides": ["BiRefNetRMBG"],
+      "page": "https://github.com/1038lab/ComfyUI-RMBG"
     }
   ]
 }

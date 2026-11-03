@@ -177,6 +177,80 @@
       "pregnant": true
     },
     {
+      "id": "casual",
+      "name": "Sailor frills",
+      "description": "a pastel mint sailor-collar blouse with a big pink satin bow at the chest, a high-waisted cream skirt layered with lace frills, white knee socks trimmed with pink ribbon, and a small pink bow clipped beside one ear",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/maren/casual-neutral-s101.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/maren/casual-happy-s101.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/maren/casual-sad-s101.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/maren/casual-angry-s101.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/maren/casual-surprised-s101.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/maren/casual-embarrassed-s101.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/maren/casual-aroused-s101.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Sailor frills, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/maren/casual-pregnant-neutral-s101.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/maren/casual-pregnant-happy-s101.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/maren/casual-pregnant-sad-s101.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/maren/casual-pregnant-angry-s505.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/maren/casual-pregnant-surprised-s101.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/maren/casual-pregnant-embarrassed-s101.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/maren/casual-pregnant-aroused-s202.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "lingerie",
       "name": "Pink lace lingerie",
       "description": "a pink lace bra, matching lace panties and a garter belt with little satin ribbon bows, and pale pink stockings",

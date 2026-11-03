@@ -177,6 +177,80 @@
       "pregnant": true
     },
     {
+      "id": "casual",
+      "name": "Business",
+      "description": "a fitted black satin blouse with long sleeves and a plunging neckline, her neck and collarbones bare, a high-waisted wine-red pencil skirt with a high slit up one thigh, a thin gold belt with a plain gold buckle, and gold drop earrings set with red stones",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/faye/casual-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/faye/casual-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/faye/casual-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/faye/casual-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/faye/casual-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/faye/casual-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/faye/casual-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Business, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/faye/casual-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/faye/casual-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/faye/casual-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/faye/casual-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/faye/casual-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/faye/casual-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/faye/casual-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

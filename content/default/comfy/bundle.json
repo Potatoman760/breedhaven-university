@@ -3,11 +3,18 @@
     "krea2 comic book.json": "AstroWitchV01K2T, comic book style",
     "minimax h3 eros RTX.json": "comic book style animation",
     "minimax h3 eros AMD.json": "comic book style animation",
-    "krea2.json": "AstroWitchV01K2T, comic book style"
+    "krea2.json": "AstroWitchV01K2T, comic book style",
+    "krea2 comic book sprite.json": "AstroWitchV01K2T, comic book style"
   },
   "negativePrefixes": {},
   "overrides": {},
   "defaults": {
+    "sprite": "krea2 comic book sprite.json",
+    "background": "krea2 comic book.json",
+    "photo": "krea2 comic book.json",
+    "nsfw": "krea2 comic book.json",
+    "birth": "krea2 comic book.json",
+    "walk": "krea2 comic book sprite.json",
     "video": "minimax h3 eros RTX.json"
   },
   "framing": {},

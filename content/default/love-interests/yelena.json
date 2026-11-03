@@ -179,6 +179,80 @@
       "pregnant": true
     },
     {
+      "id": "casual",
+      "name": "Her own choice",
+      "description": "a fitted cream silk blouse with the top buttons undone, a high-waisted emerald-green velvet skirt ending above the knee, and a single green gemstone pendant; her ears bare, with no earrings",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yelena/casual-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/yelena/casual-happy-2.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/yelena/casual-sad-2.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/yelena/casual-angry-2.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/yelena/casual-surprised-2.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/yelena/casual-embarrassed-2.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/yelena/casual-aroused-2.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Her own choice, pregnant",
+      "description": "She has a large, round, heavily pregnant belly; her blouse stretches over it and her skirt sits low beneath it.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yelena/casual-pregnant-neutral-2.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/yelena/casual-pregnant-happy-2.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/yelena/casual-pregnant-sad-2.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/yelena/casual-pregnant-angry-2.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/yelena/casual-pregnant-surprised-2.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/yelena/casual-pregnant-embarrassed-2.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/yelena/casual-pregnant-aroused-2.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "lingerie",
       "name": "Black silk lingerie",
       "description": "a black silk balconette bra with a front clasp, matching silk panties and sheer black stockings",

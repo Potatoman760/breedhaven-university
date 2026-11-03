@@ -176,6 +176,80 @@
       "pregnant": true
     },
     {
+      "id": "casual",
+      "name": "Garden day",
+      "description": "a soft cream wrap blouse with loose bell sleeves and a deep V neckline, a long flowing skirt of dusky rose linen embroidered with tiny white flowers at the hem, a woven belt of green cord, and a silver leaf pendant necklace; her reading glasses pushed up into her hair, her pointed ears bare, with no earrings",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/caelwen/casual-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/caelwen/casual-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/caelwen/casual-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/caelwen/casual-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/caelwen/casual-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/caelwen/casual-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/caelwen/casual-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Garden day, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/caelwen/casual-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/caelwen/casual-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/caelwen/casual-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/caelwen/casual-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/caelwen/casual-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/caelwen/casual-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/caelwen/casual-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

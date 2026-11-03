@@ -393,30 +393,6 @@ export const GenerateVideoRequestSchema = z.object({
 })
 export type GenerateVideoRequest = z.input<typeof GenerateVideoRequestSchema>
 
-export const CutoutRequestSchema = z.object({
-  /** The picture's content path, in the add-on folder. */
-  path: z.string(),
-  /** How far from the border's own colour still counts as card. Left out, the usual. */
-  tolerance: z.number().int().min(1).max(64).optional(),
-  /** The card reachable from the border only, or the gaps the art has closed around as well: a gap can be meant, as between a hand and a cup. */
-  mode: z.enum(['edge', 'gaps']).default('gaps')
-})
-export type CutoutRequest = z.input<typeof CutoutRequestSchema>
-
-export interface CutoutResult {
-  ok: boolean
-  /** Why not, or anything worth saying when it worked. */
-  message: string
-  /** The cut-out's content path. The picture it was made from is gone. */
-  path: string | null
-  /** The card colour that was found, as hex. */
-  colour: string | null
-  /** Pixels taken out entirely, given a partial alpha at the figure's edge, and taken from enclosed gaps. */
-  cleared: number
-  feathered: number
-  enclosed: number
-}
-
 // ---- what to ask for: prompts written from the content, for the user to edit before sending
 
 /** What is added to "she has a ... expression" for each standard face. Anything else is asked for by its own name. */

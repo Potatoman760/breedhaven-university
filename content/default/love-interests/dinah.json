@@ -177,6 +177,80 @@
       "pregnant": true
     },
     {
+      "id": "casual",
+      "name": "Chapel day",
+      "description": "a long-sleeved forest-green wool dress with a high round neckline and a fitted waist, a cream crocheted shawl over her shoulders, a thin brown leather belt with a small brass seed-shaped buckle, and a green ribbon loosely tying back her long hair",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/dinah/casual-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/dinah/casual-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/dinah/casual-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/dinah/casual-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/dinah/casual-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/dinah/casual-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/dinah/casual-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Chapel day, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/dinah/casual-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/dinah/casual-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/dinah/casual-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/dinah/casual-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/dinah/casual-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/dinah/casual-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/dinah/casual-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

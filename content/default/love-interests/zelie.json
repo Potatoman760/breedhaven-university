@@ -178,6 +178,80 @@
       "pregnant": true
     },
     {
+      "id": "casual",
+      "name": "Day off",
+      "description": "a navy-and-white striped boat-neck top tucked into a high-waisted red A-line skirt ending just above the knee, a thin red silk scarf knotted at her throat, and small pearl earrings",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/zelie/casual-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/zelie/casual-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/zelie/casual-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/zelie/casual-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/zelie/casual-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/zelie/casual-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/zelie/casual-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Day off, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/zelie/casual-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/zelie/casual-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/zelie/casual-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/zelie/casual-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/zelie/casual-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/zelie/casual-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/zelie/casual-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

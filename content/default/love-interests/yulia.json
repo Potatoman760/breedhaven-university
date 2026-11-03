@@ -181,6 +181,80 @@
       "pregnant": true
     },
     {
+      "id": "casual",
+      "name": "Daytime",
+      "description": "a white off-the-shoulder ribbed crop top with short sleeves, low-rise pale blue jeans ripped at the knees, a pink butterfly clip in her hair, and gold hoop earrings",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/casual-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/yulia/casual-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/yulia/casual-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/yulia/casual-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/yulia/casual-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/yulia/casual-embarrassed-2.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/yulia/casual-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Daytime, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/casual-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/yulia/casual-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/yulia/casual-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/yulia/casual-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/yulia/casual-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/yulia/casual-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/yulia/casual-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

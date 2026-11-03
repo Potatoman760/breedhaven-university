@@ -5,7 +5,7 @@
   "age": 36,
   "pronouns": "she/her",
   "bio": "Reader in Sire Genetics and head of the fertility lab at the Health Center: the woman who knows more about why a True Sire is what he is than anyone alive.",
-  "appearance": "A beautiful 36-year-old woman with fair skin, a refined face with sharp cheekbones, a straight nose, cool green eyes under fine arched brows, long lashes, and full lips painted a muted rose. Dark blonde hair, sleek and straight, cut to the jaw with a center parting. Tall and long-legged, with a slim, elegant figure: a full, high bust, a very narrow waist, and curved hips.",
+  "appearance": "A beautiful 36-year-old woman with fair skin, a refined face with sharp cheekbones, a straight nose, cool green eyes under fine arched brows, long lashes, and full lips painted a muted rose. Dark blonde hair, sleek and straight, cut to the shoulder with a center parting. Tall and long-legged, with a slim, elegant figure: a full, high bust, a very narrow waist, and curved hips.",
   "personality": "Brilliant, exact and dry, with no small talk and very little patience for sentiment dressed up as science. Curious to the point of rudeness. Kinder than she sounds, and bad at showing it. She is not used to being surprised and rather likes it.",
   "traitIds": [
     "bookish",
@@ -32,34 +32,34 @@
     {
       "id": "default",
       "name": "Usual clothes",
-      "description": "rimless rectangular glasses; a white knee-length lab coat worn open over a close-fitting charcoal high-collared dress that ends above the knee, with a narrow keyhole opening at the chest; sheer black stockings; and a blue lanyard with an ID card around her neck",
+      "description": "rimless rectangular glasses; a white knee-length lab coat worn open over a close-fitting charcoal high-collared dress that ends above the knee, with a narrow keyhole opening at the chest; sheer black stockings; and a blue lanyard with an ID card around her neck. The ID card has her picture and the name Ottilie Marrow",
       "sprites": {
         "neutral": {
-          "image": "sprites/ottilie/default-neutral-2-cutout.webp",
+          "image": "sprites/ottilie/default-neutral.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/ottilie/default-happy-cutout.webp",
+          "image": "sprites/ottilie/default-happy.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/ottilie/default-sad-cutout.webp",
+          "image": "sprites/ottilie/default-sad.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/ottilie/default-angry-cutout.webp",
+          "image": "sprites/ottilie/default-angry.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/ottilie/default-surprised-cutout.webp",
+          "image": "sprites/ottilie/default-surprised.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/ottilie/default-embarrassed-cutout.webp",
+          "image": "sprites/ottilie/default-embarrassed.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/ottilie/default-aroused-cutout.webp",
+          "image": "sprites/ottilie/default-aroused.webp",
           "description": ""
         }
       },
@@ -72,31 +72,31 @@
       "inherits": "default",
       "sprites": {
         "neutral": {
-          "image": "sprites/ottilie/pregnant-neutral-2-cutout.webp",
+          "image": "sprites/ottilie/pregnant-neutral.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/ottilie/pregnant-happy-cutout.webp",
+          "image": "sprites/ottilie/pregnant-happy.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/ottilie/pregnant-sad-cutout.webp",
+          "image": "sprites/ottilie/pregnant-sad.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/ottilie/pregnant-angry-cutout.webp",
+          "image": "sprites/ottilie/pregnant-angry.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/ottilie/pregnant-surprised-cutout.webp",
+          "image": "sprites/ottilie/pregnant-surprised.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/ottilie/pregnant-embarrassed-cutout.webp",
+          "image": "sprites/ottilie/pregnant-embarrassed.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/ottilie/pregnant-aroused-cutout.webp",
+          "image": "sprites/ottilie/pregnant-aroused.webp",
           "description": ""
         }
       },
@@ -124,15 +124,15 @@
           "description": ""
         },
         "surprised": {
-          "image": "sprites/ottilie/nude-surprised-cutout.webp",
+          "image": "sprites/ottilie/nude-surprised.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/ottilie/nude-embarrassed-cutout.webp",
+          "image": "sprites/ottilie/nude-embarrassed.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/ottilie/nude-aroused-cutout.webp",
+          "image": "sprites/ottilie/nude-aroused.webp",
           "description": ""
         }
       },
@@ -145,31 +145,105 @@
       "inherits": "nude",
       "sprites": {
         "neutral": {
-          "image": "sprites/ottilie/nude-pregnant-neutral-cutout.webp",
+          "image": "sprites/ottilie/nude-pregnant-neutral.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/ottilie/nude-pregnant-happy-cutout.webp",
+          "image": "sprites/ottilie/nude-pregnant-happy.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/ottilie/nude-pregnant-sad-cutout.webp",
+          "image": "sprites/ottilie/nude-pregnant-sad.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/ottilie/nude-pregnant-angry-cutout.webp",
+          "image": "sprites/ottilie/nude-pregnant-angry.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/ottilie/nude-pregnant-surprised-cutout.webp",
+          "image": "sprites/ottilie/nude-pregnant-surprised.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/ottilie/nude-pregnant-embarrassed-cutout.webp",
+          "image": "sprites/ottilie/nude-pregnant-embarrassed.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/ottilie/nude-pregnant-aroused-cutout.webp",
+          "image": "sprites/ottilie/nude-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "casual",
+      "name": "Weekend",
+      "description": "rimless rectangular glasses; a fitted camel turtleneck sweater, high-waisted charcoal wide-leg trousers with a sharp crease, a slim black leather belt, and a thin silver wristwatch on a black leather strap",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/casual-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/ottilie/casual-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/ottilie/casual-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/ottilie/casual-angry-2.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/ottilie/casual-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/ottilie/casual-embarrassed-2.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/ottilie/casual-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Weekend, pregnant",
+      "description": "She has a large, round, heavily pregnant belly; her sweater stretches over it and her trousers sit low beneath it.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/casual-pregnant-neutral-2.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/ottilie/casual-pregnant-happy-2.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/ottilie/casual-pregnant-sad-2.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/ottilie/casual-pregnant-angry-2.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/ottilie/casual-pregnant-surprised-2.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/ottilie/casual-pregnant-embarrassed-2.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/ottilie/casual-pregnant-aroused-2.webp",
           "description": ""
         }
       },
@@ -179,26 +253,26 @@
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",
-      "pregnant": false,
       "sprites": {
         "neutral": {
           "image": "sprites/ottilie/bathrobe-neutral-cutout.webp",
           "description": ""
         }
-      }
+      },
+      "pregnant": false
     },
     {
       "id": "bathrobe-pregnant",
       "name": "Bathrobe, pregnant",
-      "inherits": "bathrobe",
       "description": "She has a round, pregnant belly.",
-      "pregnant": true,
+      "inherits": "bathrobe",
       "sprites": {
         "neutral": {
           "image": "sprites/ottilie/bathrobe-pregnant-neutral-cutout.webp",
           "description": ""
         }
-      }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",

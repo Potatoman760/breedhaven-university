@@ -179,6 +179,80 @@
       "pregnant": true
     },
     {
+      "id": "casual",
+      "name": "Big sweater",
+      "description": "a loose, oversized dark green knit sweater worn off one shoulder as a short dress, a brown leather belt with two small leather pouches on her right hip, and black thigh-high stockings",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tink/casual-neutral-2.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/tink/casual-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/tink/casual-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/tink/casual-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/tink/casual-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/tink/casual-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/tink/casual-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Big sweater, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tink/casual-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/tink/casual-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/tink/casual-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/tink/casual-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/tink/casual-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/tink/casual-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/tink/casual-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "underwear",
       "name": "Underwear",
       "description": "a plain black cotton bra and matching black panties",

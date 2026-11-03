@@ -176,6 +176,80 @@
       "pregnant": true
     },
     {
+      "id": "casual",
+      "name": "Overalls",
+      "description": "a loose white tank top under faded denim overalls with one strap unbuttoned and hanging, the legs rolled up, and a green bandana tied in her hair",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tamsin/casual-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/tamsin/casual-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/tamsin/casual-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/tamsin/casual-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/tamsin/casual-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/tamsin/casual-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/tamsin/casual-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Overalls, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tamsin/casual-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/tamsin/casual-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/tamsin/casual-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/tamsin/casual-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/tamsin/casual-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/tamsin/casual-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/tamsin/casual-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

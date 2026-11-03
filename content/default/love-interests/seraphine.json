@@ -179,6 +179,80 @@
       "pregnant": true
     },
     {
+      "id": "casual",
+      "name": "Day dress",
+      "description": "a soft white blouse with puffed sleeves and a ribbon tie at the neck, a high-waisted sage-green skirt falling to mid-calf, embroidered with small gold flowers along the hem, and a thin gold band of leaves in her hair",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/seraphine/casual-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/seraphine/casual-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/seraphine/casual-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/seraphine/casual-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/seraphine/casual-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/seraphine/casual-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/seraphine/casual-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Day dress, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/seraphine/casual-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/seraphine/casual-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/seraphine/casual-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/seraphine/casual-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/seraphine/casual-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/seraphine/casual-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/seraphine/casual-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "slip",
       "name": "Silk slip",
       "description": "a short champagne-gold silk slip with thin straps and a lace hem",

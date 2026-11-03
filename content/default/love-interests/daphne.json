@@ -179,6 +179,80 @@
       "pregnant": true
     },
     {
+      "id": "casual",
+      "name": "Casual",
+      "description": "a white tank top tucked into high-waisted denim cutoff shorts, an unbuttoned red flannel shirt tied around her waist, and a black leather cuff on one wrist. Her hair is in a high ponytail.",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/daphne/casual-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/daphne/casual-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/daphne/casual-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/daphne/casual-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/daphne/casual-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/daphne/casual-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/daphne/casual-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Casual, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/daphne/casual-pregnant-neutral-2.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/daphne/casual-pregnant-happy-2.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/daphne/casual-pregnant-sad-2.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/daphne/casual-pregnant-angry-2.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/daphne/casual-pregnant-surprised-2.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/daphne/casual-pregnant-embarrassed-2.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/daphne/casual-pregnant-aroused-2.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

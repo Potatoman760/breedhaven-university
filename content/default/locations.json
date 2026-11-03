@@ -104,23 +104,24 @@
   },
   {
     "id": "commons",
-    "name": "the Student Commons",
     "icon": "cloche",
+    "iconImage": "sprites/icons/places-commons-cutout.webp",
+    "name": "the Student Commons",
     "description": "The Student Commons: the dining hall and common room of the University. Long tables, a great hearth lit in winter, cheap hot food on trays three times a day, vending machines, and sofas where people sit with a laptop long after lectures. It is loud, warm and public; everyone eats here at some point, so it is where news travels and where people are seen together. Societies meet in the corners in the evening. Sitting down at someone's table is ordinary and nobody needs an invitation.",
-    "appearance": "A large university dining hall and common room with a high timber roof and whitewashed stone walls. Long wooden tables and benches run the length of the room, set with trays, mugs and open laptops. A great stone fireplace burns at one end beneath a wall screen showing the day's menu. Along one wall a stainless-steel serving counter with heat lamps and steaming dishes, a row of brightly lit vending machines, and a drinks machine with glowing blue runes. Worn sofas and low tables fill a corner by tall windows, with strings of small ward-lights hung across the beams.",
+    "appearance": "A large university dining hall and common room with a high timber roof and whitewashed stone walls. Long wooden tables and benches run the length of the room, set with trays, mugs and open laptops. A great stone fireplace burns at one end beneath a wall screen showing the day's menu (labeled MENU), with visible words that say Entree, Dessert, Sides. Along one wall a stainless-steel serving counter with heat lamps and steaming dishes, a row of brightly lit vending machines that are labeled SNACKS, and a drinks machine with glowing blue runes labeled DRINKS. Worn sofas and low tables fill a corner by tall windows, with strings of small ward-lights hung across the beams.",
     "backgrounds": [
       {
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/commons/view.webp"
+          "day": "generated/backgrounds/commons/default-day-3.webp"
         }
       },
       {
         "id": "first-frost",
         "name": "the Feast of First Frost",
         "images": {
-          "day": "generated/backgrounds/commons/first-frost-day.webp",
+          "day": "generated/backgrounds/commons/the-feast-of-first-frost-day-2.webp",
           "night": "generated/backgrounds/commons/first-frost-night.webp"
         },
         "description": "The Commons is dressed for the Feast of First Frost: evergreen garlands and holly along the beams, the long tables joined under white cloths and laden with food, candles and frost-blue ward-lights strung overhead, a tall tree hung with glass ornaments in the corner, and the great hearth roaring."
@@ -132,8 +133,8 @@
     },
     "indoors": true,
     "private": false,
-    "drills": [],
-    "iconImage": "sprites/icons/places-commons-cutout.webp"
+    "eventOnly": false,
+    "drills": []
   },
   {
     "id": "chapel",
@@ -329,8 +330,9 @@
   },
   {
     "id": "lantern-row",
-    "name": "Lantern Row",
     "icon": "lantern",
+    "iconImage": "sprites/icons/places-lantern-row-cutout.webp",
+    "name": "Lantern Row",
     "description": "The street outside the University gate, and the main street of the student district: apartments above the shops, a tram stop, and strings of lanterns the council keeps lit by charm. The shops come in pairs that say what kind of country this is. Byte & Bloom sells phones beside Arcana, which sells wands. The Book Nook has the textbooks and the Forbidden Shelf next door has the grimoires. Petal & Thorn the florist shares a wall and most of its customers with the Cradle, which sells maternity wear. Velvet cuts hair and Glamour enchants it. Petal & Pill is the pharmacy. Seven Petals, the convenience store on the corner, never closes. Older students and staff rent the apartments upstairs. Busy from morning until the pubs shut.",
     "appearance": "A lively main street of narrow old townhouses with shops at street level and apartments above, just outside a stone university gate. Strings of paper lanterns glowing by magic are hung back and forth across the street. Shopfronts stand in pairs with painted signs and bright window displays: a phone shop beside a wand shop, a bookshop beside a shop of chained grimoires, a florist beside a maternity boutique, a hair salon beside a glamour parlour with shimmering mirrors, and a convenience store on the corner with a glowing seven-petalled flower sign. A sleek tram waits at a stop on tracks set into the cobbles. Bicycles, cafe tables, hanging flower baskets.",
     "backgrounds": [
@@ -354,8 +356,8 @@
     ],
     "indoors": false,
     "private": false,
-    "drills": [],
-    "iconImage": "sprites/icons/places-lantern-row-cutout.webp"
+    "eventOnly": false,
+    "drills": []
   },
   {
     "id": "honeyed-bee-inn",
@@ -517,17 +519,18 @@
   },
   {
     "id": "boba-blossom",
-    "name": "Boba Blossom",
     "icon": "boba",
+    "iconImage": "sprites/icons/places-boba-blossom-cutout.webp",
+    "name": "Boba Blossom",
     "description": "Boba Blossom, a bubble tea shop in pink and pale green on Lantern Row. It is next door to Bloomwell Women's Health, so half the line is waiting on a result and the other half just wants taro milk tea, and nobody asks which. It has window seats, a loyalty card, and a seasonal special that changes color as it is drunk. Sweet, bright and girlish; friends come in pairs and stay to talk.",
-    "appearance": "The interior of a small bubble tea shop decorated in pastel pink and pale green. A white counter with a row of metal tea containers, jars of colored tapioca pearls and a sealing machine, under a pink neon sign shaped like a blossom. A wall menu with pictures of drinks, shelves of plush toys and potted succulents, and a window bench with high stools looking onto the street. Round white tables, pastel chairs, a flower wall for photographs, and tall plastic cups of tea that glow softly in shifting colors.",
+    "appearance": "The interior of a small bubble tea shop decorated in pastel pink and pale green. A white counter with a row of metal tea containers, jars of colored tapioca pearls and a sealing machine, under a pink neon sign shaped like a blossom. A wall menu labeled BOBA with pictures of drinks, shelves of plush toys and potted succulents, and a window bench with high stools looking onto the street. Round white tables, pastel chairs, a flower wall for photographs, and tall plastic cups of tea that glow softly in shifting colors.",
     "backgrounds": [
       {
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/boba-blossom/default-day-3.webp",
-          "night": "generated/backgrounds/boba-blossom/default-night-3.webp"
+          "day": "generated/backgrounds/boba-blossom/default-day.webp",
+          "night": "generated/backgrounds/boba-blossom/default-night-2.webp"
         }
       }
     ],
@@ -537,8 +540,8 @@
     },
     "indoors": true,
     "private": false,
-    "drills": [],
-    "iconImage": "sprites/icons/places-boba-blossom-cutout.webp"
+    "eventOnly": false,
+    "drills": []
   },
   {
     "id": "cauldron",
@@ -620,8 +623,9 @@
   },
   {
     "id": "undergrowth",
-    "name": "the Undergrowth",
     "icon": "music",
+    "iconImage": "sprites/icons/places-undergrowth-cutout.webp",
+    "name": "the Undergrowth",
     "description": "The Undergrowth, a basement club under the railway arches where the University goes dancing. Low ceilings are hung with charm-grown vines that pulse with the bass, there is a sprung floor, and a quiet room at the back for anyone the Bloom is getting too loud for. It opens late and is hot, crowded and dark. Talk is shouted in the ear or not at all; dancing close is expected and suppressants wear thin by the end of the night.",
     "appearance": "The interior of a basement nightclub under brick railway arches. Low vaulted brick ceilings are hung with thick living vines and leaves that glow in pulsing green, violet and blue. A wooden dance floor lit by moving colored beams and haze, a DJ booth with decks and screens, and tall speaker stacks. A bar along one arch with glowing bottles and luminous drinks. Booths with dark velvet seats, neon signs in the shape of leaves and flowers, and an archway at the back leading to a dimmer, quieter room with soft amber light and cushions.",
     "backgrounds": [
@@ -629,7 +633,7 @@
         "id": "default",
         "name": "Default",
         "images": {
-          "day": "generated/backgrounds/undergrowth/default-day.webp",
+          "day": "generated/backgrounds/undergrowth/default-day-2.webp",
           "night": "generated/backgrounds/undergrowth/default-night.webp"
         }
       }
@@ -640,8 +644,8 @@
     },
     "indoors": true,
     "private": false,
-    "drills": [],
-    "iconImage": "sprites/icons/places-undergrowth-cutout.webp"
+    "eventOnly": false,
+    "drills": []
   },
   {
     "id": "riverside-park",

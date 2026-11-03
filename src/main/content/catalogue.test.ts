@@ -1,6 +1,6 @@
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { catalogueIsStale, coursesClash } from '../../shared/game'
+import { catalogueIsStale, classChangeDeadline, coursesClash } from '../../shared/game'
 import { courseOf, kindOf } from '../../shared/model'
 import { loadContentPack } from './loader'
 
@@ -35,6 +35,10 @@ describe('the catalogue of the default pack', () => {
       }
       for (const a of hers) for (const b of hers) if (a !== b) expect(coursesClash(a, b), `${li.id}: ${a.number} and ${b.number}`).toBe(false)
     }
+  })
+
+  it('lets classes be changed until the end of the Saturday of week two', () => {
+    expect(classChangeDeadline(content)).toMatchObject({ weekday: 'Saturday', week: 2 })
   })
 
   it('still teaches every general subject, since the skills are learnt in them', () => {

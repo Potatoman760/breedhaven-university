@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { CourseworkConfigSchema, type ContentPack, type Course, type CourseMeeting, type GameState } from '../model'
 import { canPerform } from './activities'
-import { attend, canAttend, canBeginTerm, canEnrol, classmates, classSoon, courseMatches, coursesClash, coursesInSession, describeMeetings, enrolledCourses } from './courses'
+import { attend, canAttend, canBeginTerm, canChangeClasses, canEnrol, changeClasses, classChangeDeadline, classmates, classSoon, courseMatches, coursesClash, coursesInSession, describeMeetings, enrolledCourses } from './courses'
 import { buildCharacterPrompt } from './prompt'
 import { approachableAt, inClass, locationOf, loveInterestsAt } from './map'
 import { createInitialState } from './state'
@@ -89,6 +89,36 @@ describe('enrolment', () => {
   it('lists what the player is taking', () => {
     expect(enrolledCourses(start()).map((c) => c.id)).toEqual(['pol'])
     expect(enrolledCourses(start(null))).toEqual([])
+  })
+})
+
+describe('changing classes', () => {
+  // The fixture's week is three days long, and the deadline is the coursework's: day 13 unless it says otherwise.
+  const day = (dayIndex: number) => dayIndex * content.calendar.hoursPerDay + 8
+  const taking = (enrolment: string[], dayIndex = 0) => ({ ...start(enrolment), time: day(dayIndex) })
+
+  it('is open from the start of term until the deadline day is over', () => {
+    expect(classChangeDeadline(content)).toMatchObject({ dayIndex: 12, week: 5 })
+    expect(canChangeClasses(content, taking(['pol', 'phy']))).toBe(true)
+    expect(canChangeClasses(content, taking(['pol', 'phy'], 12))).toBe(true)
+    expect(canChangeClasses(content, taking(['pol', 'phy'], 13))).toBe(false)
+    // Before he has chosen any, it is the start of term and not a change.
+    expect(canChangeClasses(content, start(null))).toBe(false)
+  })
+
+  it('takes a new full load with no clash, and keeps what he earned in what he drops', () => {
+    const earned = { ...taking(['pol', 'phy']), coursePoints: { pol: 12 } }
+    const changed = changeClasses(content, earned, ['his', 'phy'])
+    expect(changed.enrolment).toEqual(['his', 'phy'])
+    expect(changed.coursePoints).toEqual({ pol: 12 })
+  })
+
+  it('changes nothing for a clash, a short load, or once it is too late', () => {
+    const state = taking(['pol', 'phy'])
+    expect(changeClasses(content, state, ['pol', 'his'])).toBe(state)
+    expect(changeClasses(content, state, ['phy'])).toBe(state)
+    const late = taking(['pol', 'phy'], 13)
+    expect(changeClasses(content, late, ['his', 'phy'])).toBe(late)
   })
 })
 

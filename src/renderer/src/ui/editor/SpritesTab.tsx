@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { framingFor, nsfwPrompt, sizeFor, spritePrompt } from '../../../../shared/comfy'
-import { ADDON_PREFIX, isSafeId, slugify } from '../../../../shared/editor'
+import { isSafeId, slugify } from '../../../../shared/editor'
 import { facesOf, isPregnantPose, posesOf, outfitDescription, STANDARD_OUTFITS, type Animation, type Looks, type LoveInterest, type Outfit } from '../../../../shared/model'
 import { errorMessage } from '../../errors'
 import { ArtTool } from '../art/ArtTool'
@@ -23,8 +23,6 @@ interface Props {
   set: (patch: Partial<SpriteOwner>) => void
   /** Leaves out what only a love interest has: an outfit drawn pregnant. */
   plain?: boolean
-  /** What the path of a picture the editor can change starts with: `addons/` for an add-on, nothing when the game's own files are being edited. */
-  assetPrefix?: string
   /** The outfits the game's events put a woman in, each with where: an outfit of hers by that id is the one she wears there. */
   eventOutfits?: { id: string; worn: string[] }[]
   /** The faces and sex-acts added in the editor: each a slot beside the standard ones. */
@@ -73,7 +71,7 @@ function PercentBox({ value, min, max, onChange }: { value: number; min: number;
 }
 
 /** Outfits and their sprites, the portrait crop, and the NSFW pictures and clips. */
-export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, eventOutfits = [], looks = NO_LOOKS }: Props) {
+export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LOOKS }: Props) {
   const [notice, setNotice] = useState('')
   // Every face an outfit has a slot for, and every sex-act the NSFW section has: the standard ones and those added.
   const faces = facesOf(looks)
@@ -82,12 +80,10 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
   // The art tool open on her walking profile, and that picture shown large.
   const [walking, setWalking] = useState(false)
   const [walkViewing, setWalkViewing] = useState(false)
-  // Cutting out leaves the gaps the art closes around.
-  const [edgesOnly, setEdgesOnly] = useState(false)
   // The outfit and expression the art tool is open on, while it is.
   const [drawing, setDrawing] = useState<{ outfitId: string; expression: string } | null>(null)
   const ready = isSafeId(draft.id)
-  // The run that is drawing or cutting out the pictures of one outfit, while there is one.
+  // The run that is drawing the pictures of one outfit, while there is one.
   const { batch, run, stop } = useBatch()
   // The picture opened to be looked at whole, while one is.
   const [viewing, setViewing] = useState<{ outfitId: string; name: string } | null>(null)
@@ -177,39 +173,6 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
     setNotice(failed.length > 0 ? t('editor.common.optimizeFailed', { failed: failed.join('; ') }) : t('editor.sprites.optimized'))
   }
 
-  /** Whether a sprite still has its flat background: a PNG of hers in the add-on folder that is not already a cut-out. */
-  const uncut = (image: string) => image.startsWith(assetPrefix) && /\.png$/i.test(image) && !/-cutout(-\d+)?\.png$/i.test(image)
-
-  /** Takes the background out from behind every sprite of an outfit that still has one, one after another. */
-  async function cutOutAll(outfitId: string) {
-    const names = Object.entries(latest.current.outfits.find((o) => o.id === outfitId)?.sprites ?? {})
-      .filter(([, sprite]) => uncut(sprite.image))
-      .map(([name]) => name)
-    if (names.length === 0 || batch) return
-    setNotice('')
-    const owner = latest.current.id
-    const put = forOwner(owner)
-    const { failed } = await run(outfitId, t('editor.sprites.cuttingOut'), names, (name) => name, async (name) => {
-      const stopped = gone(owner)
-      if (stopped) return stopped
-      const from = latest.current.outfits.find((o) => o.id === outfitId)?.sprites[name]?.image
-      if (!from) return { ok: true }
-      const cut = await window.api.comfy.cutout({ path: from, mode: edgesOnly ? 'edge' : 'gaps' })
-      // One that can't be keyed is left as it is, and the rest go on.
-      if (!cut.ok || !cut.path) return { ok: false, message: cut.message }
-      const to = cut.path
-      // Every sprite on the old file moves, since that file is gone.
-      put({
-        outfits: latest.current.outfits.map((o) => ({
-          ...o,
-          sprites: Object.fromEntries(Object.entries(o.sprites).map(([key, sprite]) => [key, sprite.image === from ? { ...sprite, image: to } : sprite]))
-        }))
-      })
-      return { ok: true }
-    })
-    setNotice(failed.length > 0 ? t('editor.sprites.cutFailed', { failed: failed.join('; ') }) : t('editor.sprites.cutAll'))
-  }
-
   const setOutfit = (index: number, patch: Partial<Outfit>) =>
     set({ outfits: draft.outfits.map((outfit, i) => (i === index ? { ...outfit, ...patch } : outfit)) })
 
@@ -243,29 +206,6 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
           : outfit
       )
     })
-  }
-
-  /** Takes the flat background out from behind a sprite in the add-on folder, and points the sprite at the cut-out. */
-  async function cutOut(index: number, name: string) {
-    const outfit = draft.outfits[index]
-    const sprite = outfit.sprites[name]
-    setNotice('')
-    try {
-      const cut = await window.api.comfy.cutout({ path: sprite.image, mode: edgesOnly ? 'edge' : 'gaps' })
-      if (!cut.ok || !cut.path) return setNotice(cut.colour ? t('editor.sprites.cutColour', { message: cut.message, colour: cut.colour }) : cut.message)
-      // Every sprite on the old file moves, since that file is gone.
-      const from = sprite.image
-      const to = cut.path
-      set({
-        outfits: draft.outfits.map((o) => ({
-          ...o,
-          sprites: Object.fromEntries(Object.entries(o.sprites).map(([key, s]) => [key, s.image === from ? { ...s, image: to } : s]))
-        }))
-      })
-      setNotice(cut.message || t('editor.sprites.cutOne'))
-    } catch (error) {
-      setNotice(errorMessage(error))
-    }
   }
 
   const isStandardOutfit = (id: string) => !plain && STANDARD_OUTFITS.some((s) => s.id === id)
@@ -629,10 +569,6 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
             : t('editor.sprites.outfitsHint', { faces: faces.join(', ') })
         }
       >
-        <label className="inline" title={t('editor.sprites.edgesTitle')}>
-          <input type="checkbox" checked={edgesOnly} onChange={(e) => setEdgesOnly(e.target.checked)} />
-          {t('editor.sprites.edges')}
-        </label>
         <label>
           {t('editor.sprites.usualOutfit')}
           <select value={draft.defaultOutfitId} onChange={(e) => set({ defaultOutfitId: e.target.value })}>
@@ -793,15 +729,6 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
               <Button disabled={!ready} onClick={() => addSprite(index)}>
                 {plain ? t('editor.player.addPicture') : t('editor.sprites.addAnother')}
               </Button>
-              {Object.values(outfit.sprites).some((sprite) => uncut(sprite.image)) && (
-                <Button
-                  disabled={batch !== null}
-                  title={t('editor.sprites.cutAllTitle')}
-                  onClick={() => cutOutAll(outfit.id)}
-                >
-                  {t('editor.sprites.cutAllButton', { count: Object.values(outfit.sprites).filter((sprite) => uncut(sprite.image)).length })}
-                </Button>
-              )}
               <Button variant="quiet" className="outfit-remove" disabled={draft.outfits.length <= 1 || isStandardOutfit(outfit.id) || outfit.id === draft.defaultOutfitId} onClick={() => removeOutfit(index)}>
                 {t('editor.sprites.removeOutfit')}
               </Button>
@@ -829,11 +756,6 @@ export function SpritesTab({ draft, set, plain, assetPrefix = ADDON_PREFIX, even
                       <Button disabled={!ready} title={t('editor.sprites.drawSpriteAgain')} onClick={() => setDrawing({ outfitId: outfit.id, expression: name })}>
                         {t('editor.common.generate')}
                       </Button>
-                      {sprite.image.startsWith(assetPrefix) && sprite.image.toLowerCase().endsWith('.png') && (
-                        <Button title={t('editor.sprites.cutOutTitle')} onClick={() => cutOut(index, name)}>
-                          {t('editor.sprites.cutOut')}
-                        </Button>
-                      )}
                       <Button
                         onClick={() => {
                           const { [name]: _removed, ...rest } = outfit.sprites

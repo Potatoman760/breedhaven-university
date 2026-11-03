@@ -87,8 +87,7 @@ const api: RendererApi = {
     },
     generate: (request) => ipcRenderer.invoke(IPC.comfyGenerate, request),
     generateVideo: (request) => ipcRenderer.invoke(IPC.comfyGenerateVideo, request),
-    cancel: () => ipcRenderer.invoke(IPC.comfyCancel),
-    cutout: (request) => ipcRenderer.invoke(IPC.comfyCutout, request)
+    cancel: () => ipcRenderer.invoke(IPC.comfyCancel)
   }
 }
 

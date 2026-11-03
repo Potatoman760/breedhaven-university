@@ -93,8 +93,6 @@ interface Made {
   period: string
   /** What became of it, once it has been put to use. */
   used?: string
-  /** Its background has been taken out. */
-  cut?: boolean
 }
 
 /**
@@ -192,8 +190,6 @@ function Generate({ target, settings, list }: GenerateProps) {
   const [busy, setBusy] = useState(false)
   const [notice, setNotice] = useState('')
   const [made, setMade] = useState<Made[]>([])
-  // Cutting out leaves the gaps the art closes around.
-  const [edgesOnly, setEdgesOnly] = useState(false)
   // The picture opened to be looked at whole, while one is.
   const [viewing, setViewing] = useState<string | null>(null)
 
@@ -265,28 +261,6 @@ function Generate({ target, settings, list }: GenerateProps) {
       setMade((before) => before.map((one) => (one.result.path === m.result.path ? { ...one, used } : one)))
     } catch (error) {
       setNotice(errorMessage(error))
-    }
-  }
-
-  /**
-   * Takes the flat background out from behind a picture. The cut-out replaces it, so one
-   * already put to use is handed over again under its new name.
-   */
-  async function cutout(m: Made) {
-    if (!m.result.path) return
-    setBusy(true)
-    setNotice('')
-    try {
-      const cut = await window.api.comfy.cutout({ path: m.result.path, mode: edgesOnly ? 'edge' : 'gaps' })
-      if (!cut.ok || !cut.path) return setNotice(cut.colour ? t('comfy.art.cutFailedColour', { message: cut.message, colour: cut.colour }) : cut.message)
-      const next: Made = { ...m, result: { ...m.result, path: cut.path }, cut: true }
-      setMade((before) => before.map((one) => (one.result.path === m.result.path ? next : one)))
-      setNotice(cut.message)
-      if (m.used) await use(next)
-    } catch (error) {
-      setNotice(errorMessage(error))
-    } finally {
-      setBusy(false)
     }
   }
 
@@ -429,21 +403,6 @@ function Generate({ target, settings, list }: GenerateProps) {
                 {t('comfy.art.madeWith', { workflow: m.result.workflow?.replace(/\.json$/i, '') ?? '', seed: m.result.seed ?? '' })}
               </span>
               <code>{m.result.path}</code>
-              {kind !== 'background' && kind !== 'nsfw' && kind !== 'birth' && (
-                <div className="row">
-                  <Button
-                    disabled={busy}
-                    title={edgesOnly ? t('comfy.art.cutEdgesTitle') : t('comfy.art.cutGapsTitle')}
-                    onClick={() => cutout(m)}
-                  >
-                    {m.cut ? t('comfy.art.cutAgain') : edgesOnly ? t('comfy.art.cutEdges') : t('comfy.art.cutGaps')}
-                  </Button>
-                  <label className="inline">
-                    <input type="checkbox" checked={edgesOnly} onChange={(e) => setEdgesOnly(e.target.checked)} />
-                    {t('comfy.art.edgesOnly')}
-                  </label>
-                </div>
-              )}
               {m.used ? (
                 <span className="chip">{m.used}</span>
               ) : (

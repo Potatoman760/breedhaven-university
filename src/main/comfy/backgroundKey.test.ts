@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  clearLeftCard,
   coverage,
   describeColour,
   keyBackground,
@@ -531,5 +532,72 @@ describe('refusing rather than wrecking it', () => {
     // Diagnostic rather than a shrug: the reading is there to be looked at.
     expect(outcome.reading?.colour).toEqual([128, 128, 128])
     expect(refuseKey(image, outcome.reading!)).toBe(outcome.message)
+  })
+})
+
+describe('the card a cut-out left behind', () => {
+  const CLEAR: Swatch = [0, 0, 0, 0]
+  const SKIN: Swatch = [200, 150, 120, 255]
+
+  /**
+   * The case it is for: two legs running off the bottom of the frame, and the white between them that the cut-out kept
+   * because the frame walls it in. Above it, where the gap opens onto what was taken away, it was cleared already. Her
+   * outline is ink, as the art's is: what the soft edge reaches is only what stands against the card.
+   */
+  it('takes out the white the frame walls in, and nothing of her', () => {
+    const image = grid(
+      [
+        '____________',
+        '_##k____k##_',
+        '_##k____k##_',
+        '_##k....k##_',
+        '_##k....k##_'
+      ],
+      { _: CLEAR, '#': SKIN, k: BLACK, '.': WHITE }
+    )
+    const { image: out, cleared } = clearLeftCard(image)
+    expect(cleared).toBe(8)
+    expect(alphaAt(out, 5, 4)).toBe(0)
+    expect(alphaAt(out, 5, 3)).toBe(0)
+    expect(at(out, 3, 4)).toEqual(BLACK)
+    expect(at(out, 2, 4)).toEqual(SKIN)
+    expect(at(out, 9, 3)).toEqual(SKIN)
+  })
+
+  it('leaves white of hers that the frame does not reach', () => {
+    const image = grid(
+      [
+        '______',
+        '_####_',
+        '_#..#_',
+        '_####_',
+        '______'
+      ],
+      { _: CLEAR, '#': SKIN, '.': WHITE }
+    )
+    expect(clearLeftCard(image)).toEqual({ image, cleared: 0 })
+  })
+
+  it('takes the card at the edge of what was cut away, kept nearly whole, along with the rest of it', () => {
+    const NEARLY: Swatch = [254, 254, 254, 230]
+    const image = grid(['_#,.#_', '_#,.#_'], { _: CLEAR, '#': SKIN, ',': NEARLY, '.': WHITE })
+    const { image: out } = clearLeftCard(image)
+    expect(alphaAt(out, 2, 1)).toBe(0)
+    expect(alphaAt(out, 3, 1)).toBe(0)
+  })
+
+  it('never makes anything more there than the cut-out left it', () => {
+    const SOFT: Swatch = [120, 90, 70, 60]
+    const image = grid(['_ks...', '_ks...'], { _: CLEAR, k: BLACK, s: SOFT, '.': WHITE })
+    const { image: out } = clearLeftCard(image)
+    expect(alphaAt(out, 2, 0)).toBeLessThanOrEqual(60)
+    expect(at(out, 1, 0)).toEqual(BLACK)
+  })
+
+  it('is no change to a picture with no card left on its frame', () => {
+    const image = grid(['____', '_#._', '____'], { _: CLEAR, '#': SKIN, '.': WHITE })
+    const result = clearLeftCard(image)
+    expect(result.cleared).toBe(0)
+    expect(result.image).toBe(image)
   })
 })

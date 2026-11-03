@@ -181,6 +181,80 @@
       "pregnant": true
     },
     {
+      "id": "casual",
+      "name": "Day off",
+      "description": "a cropped pale pink knitted sweater with a wide neckline slipping off her left shoulder, high-waisted white denim shorts, and a pink ribbon tied in a bow at the base of one long ear",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/lola-hopworth/casual-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/lola-hopworth/casual-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/lola-hopworth/casual-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/lola-hopworth/casual-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/lola-hopworth/casual-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/lola-hopworth/casual-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/lola-hopworth/casual-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Day off, pregnant",
+      "description": "She has a large, round, heavily pregnant belly, bare below her cropped sweater, with her shorts worn low beneath it.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/lola-hopworth/casual-pregnant-neutral-2.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/lola-hopworth/casual-pregnant-happy-2.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/lola-hopworth/casual-pregnant-sad-2.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/lola-hopworth/casual-pregnant-angry-2.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/lola-hopworth/casual-pregnant-surprised-2.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/lola-hopworth/casual-pregnant-embarrassed-2.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/lola-hopworth/casual-pregnant-aroused-2.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

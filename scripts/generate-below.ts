@@ -18,7 +18,7 @@ import { join } from 'node:path'
 import { framingFor, sizeFor } from '../src/shared/comfy'
 import { ComfyStore, generateArt } from '../src/main/comfy/studio'
 import { ExpeditionConfigSchema } from '../src/shared/model'
-import { PACK, cutOut, minutes, settingsFile } from './lib/pictures'
+import { PACK, cutOut, minutes, onCard, settingsFile } from './lib/pictures'
 
 const FILE = join(PACK, 'expedition.json')
 // The folder its pictures are filed under, beside those of the places above.
@@ -101,7 +101,7 @@ async function main(): Promise<void> {
       now,
       PACK,
       PACK,
-      { kind: job.kind === 'depth' ? 'background' : 'sprite', subjectId: SUBJECT, name: job.kind === 'relic' ? `relic-${job.key}` : job.key, workflow: '', positive: promptOf(job), negative: '', ...size },
+      { kind: job.kind === 'depth' ? 'background' : 'sprite', subjectId: SUBJECT, name: job.kind === 'relic' ? `relic-${job.key}` : job.key, workflow: onCard(now), positive: promptOf(job), negative: '', ...size },
       cancel.signal,
       ''
     )

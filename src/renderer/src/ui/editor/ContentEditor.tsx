@@ -863,7 +863,7 @@ function LoveInterestEditor({
 
           {tab === "Media" && (
             <>
-              <SpritesTab draft={draft} set={set} assetPrefix={info?.assetPrefix} eventOutfits={eventOutfits(content)} looks={content.looks} />
+              <SpritesTab draft={draft} set={set} eventOutfits={eventOutfits(content)} looks={content.looks} />
 {!isNpc && (
                 <>
                                 <Group

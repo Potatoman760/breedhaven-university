@@ -17,6 +17,7 @@ import { t, type MessageKey } from '../../shared/i18n'
 import { bundleDir, readBundleSettings, writeBundleSettings } from './bundle'
 import { generateImage, uploadImage } from './client'
 import { applyBindings, unplugLastFrame } from './graph'
+import { withoutLeftCard } from './png'
 import { loadWorkflows, resolveWorkflow } from './workflows'
 
 // The settings the game itself has a say in: each is a list by workflow, by kind of picture or by pose.
@@ -101,6 +102,9 @@ export function fileArt(addonDir: string, kind: ArtKind, subjectId: string, name
   return `${prefix}${folder}/${file}`
 }
 
+/** The kinds of picture whose workflow cuts them out. */
+const CUT_OUT = new Set<ArtKind>(['sprite', 'walk'])
+
 export interface StudioRequest {
   kind: ArtKind
   subjectId: string
@@ -148,9 +152,11 @@ export async function generateArt(settings: ComfySettings, packDir: string, addo
     cancel
   })
   if (!made.ok || !made.bytes) return failed(made.message)
+  // A sprite and her walking picture are cut out in ComfyUI, which can leave some of the card behind where the frame walls it in.
+  const bytes = CUT_OUT.has(request.kind) ? withoutLeftCard(made.bytes) : made.bytes
 
   try {
-    const path = fileArt(addonDir, request.kind, request.subjectId, request.name, made.bytes, prefix)
+    const path = fileArt(addonDir, request.kind, request.subjectId, request.name, bytes, prefix)
     return { ok: true, message: '', path, seed, workflow: workflow.file, positive, skipped }
   } catch (cause) {
     return failed(t('comfy.studio.pictureNotSaved', { reason: (cause as Error).message }))

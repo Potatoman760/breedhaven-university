@@ -3,7 +3,7 @@
   "intimacy.onControl": "You are on birth control, so you are unlikely to conceive. If you want his child, whether {player} asks you to stop or you decide it yourself, say so in your own words and write {tag}{group, select, true { (in a group, {groupTag})} other {}} on a line of its own at the end of that reply. If he asks and you do not, refuse or say not yet.",
   "intimacy.offControl": "You take nothing against the Bloom: if {player} finishes inside you, you will very likely conceive.",
   "intimacy.justMet": "You have only just met {player}, and you do not have sex with a man the day you meet him.",
-  "intimacy.notYet": "You do not want {player} enough yet to have sex with him.",
+  "intimacy.notYet": "You will refuse {player} if he tries to have sex with you.",
   "intimacy.shut": "{why} Nothing he says or does in this scene changes that. Flirt or kiss as you feel; if he presses for more, turn him down in your own way.",
   "list.and": " and ",
   "list.commaAnd": ", and ",

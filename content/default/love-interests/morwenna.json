@@ -37,32 +37,32 @@
       "name": "Usual clothes",
       "description": "a long black velvet coat over a low-cut black lace blouse with no accessories, a layered black skirt with fishnet stockings, and a choker of woven black leather with a silver crescent moon pendant",
       "sprites": {
-        "neutral": {
-          "image": "sprites/morwenna/default-neutral-cutout.webp",
-          "description": ""
-        },
-        "sad": {
-          "image": "sprites/morwenna/default-sad-cutout.webp",
-          "description": ""
-        },
-        "angry": {
-          "image": "sprites/morwenna/default-angry-cutout.webp",
-          "description": ""
-        },
         "surprised": {
           "image": "sprites/morwenna/default-surprised-cutout.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/morwenna/default-embarrassed-cutout.webp",
+          "image": "sprites/morwenna/default-embarrassed.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/morwenna/default-aroused-cutout.webp",
+          "image": "sprites/morwenna/default-aroused.webp",
           "description": ""
         },
         "happy": {
           "image": "sprites/morwenna/default-happy-11-cutout.webp",
+          "description": ""
+        },
+        "neutral": {
+          "image": "sprites/morwenna/default-neutral.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/morwenna/default-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/morwenna/default-angry.webp",
           "description": ""
         }
       },
@@ -74,32 +74,32 @@
       "description": "She has a round, pregnant belly under the skirt",
       "inherits": "default",
       "sprites": {
-        "neutral": {
-          "image": "sprites/morwenna/pregnant-neutral-6-cutout.webp",
-          "description": ""
-        },
-        "happy": {
-          "image": "sprites/morwenna/pregnant-happy-cutout.webp",
-          "description": ""
-        },
         "sad": {
-          "image": "sprites/morwenna/pregnant-sad-cutout.webp",
+          "image": "sprites/morwenna/pregnant-sad.webp",
           "description": ""
         },
         "angry": {
           "image": "sprites/morwenna/pregnant-angry-cutout.webp",
           "description": ""
         },
+        "neutral": {
+          "image": "sprites/morwenna/pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/morwenna/pregnant-happy-2.webp",
+          "description": ""
+        },
         "surprised": {
-          "image": "sprites/morwenna/pregnant-surprised-cutout.webp",
+          "image": "sprites/morwenna/pregnant-surprised-2.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/morwenna/pregnant-embarrassed-cutout.webp",
+          "image": "sprites/morwenna/pregnant-embarrassed.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/morwenna/pregnant-aroused-cutout.webp",
+          "image": "sprites/morwenna/pregnant-aroused.webp",
           "description": ""
         }
       },
@@ -111,31 +111,31 @@
       "description": "nothing at all, completely nude, and a choker of woven black leather with a silver crescent moon pendant",
       "sprites": {
         "neutral": {
-          "image": "sprites/morwenna/nude-neutral-4-cutout.webp",
+          "image": "sprites/morwenna/nude-neutral.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/morwenna/nude-happy-3-cutout.webp",
+          "image": "sprites/morwenna/nude-happy.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/morwenna/nude-sad-cutout.webp",
+          "image": "sprites/morwenna/nude-sad.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/morwenna/nude-angry-cutout.webp",
+          "image": "sprites/morwenna/nude-angry.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/morwenna/nude-surprised-cutout.webp",
+          "image": "sprites/morwenna/nude-surprised.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/morwenna/nude-embarrassed-cutout.webp",
+          "image": "sprites/morwenna/nude-embarrassed.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/morwenna/nude-aroused-cutout.webp",
+          "image": "sprites/morwenna/nude-aroused.webp",
           "description": ""
         }
       },
@@ -147,32 +147,106 @@
       "description": "She has a round, pregnant belly.",
       "inherits": "nude",
       "sprites": {
-        "neutral": {
-          "image": "sprites/morwenna/nude-pregnant-neutral-cutout.webp",
-          "description": ""
-        },
-        "happy": {
-          "image": "sprites/morwenna/nude-pregnant-happy-cutout.webp",
-          "description": ""
-        },
-        "sad": {
-          "image": "sprites/morwenna/nude-pregnant-sad-cutout-2.webp",
-          "description": ""
-        },
         "angry": {
           "image": "sprites/morwenna/nude-pregnant-angry-2-cutout-2.webp",
           "description": ""
         },
+        "neutral": {
+          "image": "sprites/morwenna/nude-pregnant-neutral-2.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/morwenna/nude-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/morwenna/nude-pregnant-sad-2.webp",
+          "description": ""
+        },
         "surprised": {
-          "image": "sprites/morwenna/nude-pregnant-surprised-cutout.webp",
+          "image": "sprites/morwenna/nude-pregnant-surprised-2.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/morwenna/nude-pregnant-embarrassed-cutout.webp",
+          "image": "sprites/morwenna/nude-pregnant-embarrassed.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/morwenna/nude-pregnant-aroused-cutout.webp",
+          "image": "sprites/morwenna/nude-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "casual",
+      "name": "Corset",
+      "description": "a black corset with silver hook fastenings over a sheer black mesh long-sleeved top, a long black tiered skirt falling closed to the floor, black lace gloves, and a black leather choker studded with short silver spikes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/morwenna/casual-neutral-2.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/morwenna/casual-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/morwenna/casual-sad-2.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/morwenna/casual-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/morwenna/casual-surprised-2.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/morwenna/casual-embarrassed-2.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/morwenna/casual-aroused-2.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Corset, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/morwenna/casual-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/morwenna/casual-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/morwenna/casual-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/morwenna/casual-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/morwenna/casual-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/morwenna/casual-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/morwenna/casual-pregnant-aroused.webp",
           "description": ""
         }
       },
@@ -182,26 +256,26 @@
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",
-      "pregnant": false,
       "sprites": {
         "neutral": {
           "image": "sprites/morwenna/bathrobe-neutral-cutout.webp",
           "description": ""
         }
-      }
+      },
+      "pregnant": false
     },
     {
       "id": "bathrobe-pregnant",
       "name": "Bathrobe, pregnant",
-      "inherits": "bathrobe",
       "description": "She has a round, pregnant belly.",
-      "pregnant": true,
+      "inherits": "bathrobe",
       "sprites": {
         "neutral": {
           "image": "sprites/morwenna/bathrobe-pregnant-neutral-cutout.webp",
           "description": ""
         }
-      }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",

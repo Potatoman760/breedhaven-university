@@ -35,10 +35,6 @@
       "name": "Usual clothes",
       "description": "a beautifully tailored slate-green estate-manager's long coat, shaped closely at the waist with narrow lapels and small antique-brass buttons, over an ivory silk blouse with a neat modest V neckline. A long flowing charcoal skirt. Delicate thin silver oval spectacles worn on her face, flattering and professional",
       "sprites": {
-        "neutral": {
-          "image": "sprites/isolde/default-neutral-cutout.webp",
-          "description": ""
-        },
         "happy": {
           "image": "sprites/isolde/default-happy-cutout.webp",
           "description": ""
@@ -47,20 +43,24 @@
           "image": "sprites/isolde/default-sad-cutout.webp",
           "description": ""
         },
+        "aroused": {
+          "image": "sprites/isolde/default-aroused-cutout.webp",
+          "description": ""
+        },
+        "neutral": {
+          "image": "sprites/isolde/default-neutral.webp",
+          "description": ""
+        },
         "angry": {
-          "image": "sprites/isolde/default-angry-cutout.webp",
+          "image": "sprites/isolde/default-angry.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/isolde/default-surprised-cutout.webp",
+          "image": "sprites/isolde/default-surprised.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/isolde/default-embarrassed-cutout.webp",
-          "description": ""
-        },
-        "aroused": {
-          "image": "sprites/isolde/default-aroused-cutout.webp",
+          "image": "sprites/isolde/default-embarrassed.webp",
           "description": ""
         }
       },
@@ -177,29 +177,103 @@
       "pregnant": true
     },
     {
-      "id": "bathrobe",
-      "name": "Bathrobe",
-      "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",
-      "pregnant": false,
+      "id": "casual",
+      "name": "Shirtsleeves",
+      "description": "a tailored charcoal waistcoat buttoned over a crisp white shirt with the top buttons open and the sleeves rolled to the elbow, slim high-waisted black trousers, a thin silver watch chain looped from the waistcoat pocket, and delicate thin silver oval spectacles worn on her face",
       "sprites": {
         "neutral": {
-          "image": "sprites/isolde/bathrobe-neutral-cutout.webp",
+          "image": "sprites/isolde/casual-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/isolde/casual-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/isolde/casual-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/isolde/casual-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/isolde/casual-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/isolde/casual-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/isolde/casual-aroused.webp",
           "description": ""
         }
-      }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Shirtsleeves, pregnant",
+      "description": "She has a large, round, heavily pregnant belly; her waistcoat hangs open over it and her shirt stretches across it.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/isolde/casual-pregnant-neutral-2.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/isolde/casual-pregnant-happy-2.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/isolde/casual-pregnant-sad-2.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/isolde/casual-pregnant-angry-2.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/isolde/casual-pregnant-surprised-2.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/isolde/casual-pregnant-embarrassed-2.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/isolde/casual-pregnant-aroused-2.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "bathrobe",
+      "name": "Bathrobe",
+      "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs. Delicate thin silver oval spectacles worn on her face",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/isolde/bathrobe-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
     },
     {
       "id": "bathrobe-pregnant",
       "name": "Bathrobe, pregnant",
-      "inherits": "bathrobe",
       "description": "She has a round, pregnant belly.",
-      "pregnant": true,
+      "inherits": "bathrobe",
       "sprites": {
         "neutral": {
-          "image": "sprites/isolde/bathrobe-pregnant-neutral-cutout.webp",
+          "image": "sprites/isolde/bathrobe-pregnant-neutral.webp",
           "description": ""
         }
-      }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",

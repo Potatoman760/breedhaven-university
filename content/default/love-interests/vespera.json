@@ -180,6 +180,80 @@
       "pregnant": true
     },
     {
+      "id": "casual",
+      "name": "Wrap dress",
+      "description": "a fitted black wrap dress ending at mid-thigh, with a deep V neckline and long sheer sleeves, a wide purple satin sash at the waist, and a single silver pendant with a small purple crystal",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/vespera/casual-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/vespera/casual-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/vespera/casual-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/vespera/casual-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/vespera/casual-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/vespera/casual-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/vespera/casual-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Wrap dress, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/vespera/casual-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/vespera/casual-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/vespera/casual-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/vespera/casual-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/vespera/casual-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/vespera/casual-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/vespera/casual-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

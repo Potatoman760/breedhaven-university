@@ -21,7 +21,7 @@ import { join, resolve } from 'node:path'
 import { framingFor, sizeFor, walkPrompt } from '../src/shared/comfy'
 import { loadBase, saveLoveInterest } from '../src/main/content/addons'
 import { ComfyStore, generateArt } from '../src/main/comfy/studio'
-import { cutOut } from './lib/pictures'
+import { cutOut, onCard } from './lib/pictures'
 
 const PACK = resolve('content', 'default')
 // Two in a row is not bad luck: ComfyUI is down, or refusing the workflow, and the rest would go the same way.
@@ -113,7 +113,7 @@ async function main(): Promise<void> {
       now,
       PACK,
       PACK,
-      { kind: 'walk', subjectId: id, name: 'walk', workflow: '', positive: walkPrompt(before, framingFor(now, 'walk')), negative: '', width, height },
+      { kind: 'walk', subjectId: id, name: 'walk', workflow: onCard(now), positive: walkPrompt(before, framingFor(now, 'walk')), negative: '', width, height },
       cancel.signal,
       ''
     )

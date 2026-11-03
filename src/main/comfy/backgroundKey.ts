@@ -659,6 +659,110 @@ export function keyBackground(image: Raster, options: KeyOptions = {}): KeyOutco
   }
 }
 
+/**
+ * How much of a pixel a cut-out has to have kept for it to be card it left behind. The card it keeps by the frame comes
+ * at 85-97%; less than half is what it took away, or the soft edge it gave her.
+ */
+const KEPT = 128
+
+/**
+ * The card a cut-out left behind, taken out after it: white that the frame walls in.
+ *
+ * A model that cuts the figure out judges by region, not by colour, and it keeps the gap between two legs that run off
+ * the bottom of the frame: bounded by her on two sides and by the frame on the third, it never touches the background
+ * it took away, and so it reads as part of her. What is left is the card itself, flat and white, and the border reaches
+ * it. So this is the border fill again, over what is still there: it starts from the card on the frame's own edge, goes
+ * only through card, and stops at her. The colour is the card's that is left, so a picture with none left is untouched.
+ *
+ * Only what it clears gets an edge: the cut-out's own, already soft, and its colour already worked out, is left as it is.
+ */
+export function clearLeftCard(image: Raster, options: { tolerance?: number } = {}): { image: Raster; cleared: number } {
+  const { width, height, data } = image
+  const pixels = width * height
+  const unchanged = { image, cleared: 0 }
+  if (width < 1 || height < 1 || data.length !== pixels * 4 || pixels > MAX_PIXELS) return unchanged
+  const tolerance = clampTolerance(options.tolerance)
+  const kept = (pixel: number): boolean => data[pixel * 4 + 3]! >= KEPT
+
+  const border: number[] = []
+  for (let x = 0; x < width; x++) border.push(x, (height - 1) * width + x)
+  for (let y = 1; y < height - 1; y++) border.push(y * width, y * width + width - 1)
+
+  // The card's colour, from what of it is left on the frame: opaque, light and grey. None left, nothing to do.
+  const left = border.filter((pixel) => {
+    if (!kept(pixel)) return false
+    const at = pixel * 4
+    const [r, g, b] = [data[at]!, data[at + 1]!, data[at + 2]!]
+    return Math.min(r, g, b) >= LIGHT_ENOUGH && Math.max(r, g, b) - Math.min(r, g, b) <= NEUTRAL_ENOUGH
+  })
+  if (left.length === 0) return unchanged
+  const key: [number, number, number] = [0, 1, 2].map((channel) => median(left.map((pixel) => data[pixel * 4 + channel]!))) as [number, number, number]
+
+  const distanceAt = (pixel: number): number => {
+    const at = pixel * 4
+    return distance(data[at]!, data[at + 1]!, data[at + 2]!, key)
+  }
+  const isCard = (pixel: number): boolean => kept(pixel) && distanceAt(pixel) <= tolerance
+
+  const state = new Uint8Array(pixels)
+  const queue = new Int32Array(pixels)
+  let tail = 0
+  for (const pixel of border) {
+    if (state[pixel] !== UNTOUCHED || !isCard(pixel)) continue
+    state[pixel] = CLEAR
+    queue[tail++] = pixel
+  }
+  // Four-connected, as the border fill is, so that it never slips between two outline pixels meeting at a corner.
+  for (let head = 0; head < tail; head++) {
+    const pixel = queue[head]!
+    const x = pixel % width
+    const y = (pixel / width) | 0
+    for (const [nx, ny] of [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]] as const) {
+      if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue
+      const next = ny * width + nx
+      if (state[next] !== UNTOUCHED || !isCard(next)) continue
+      state[next] = CLEAR
+      queue[tail++] = next
+    }
+  }
+  if (tail === 0) return unchanged
+
+  // A soft edge where the card was taken from against her, as the border fill gives one: never more there than the cut-out left it.
+  let frontier = Array.from(queue.subarray(0, tail))
+  for (let pass = 0; pass < SKIRT; pass++) {
+    const next: number[] = []
+    for (const pixel of frontier) {
+      const x = pixel % width
+      const y = (pixel / width) | 0
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          const nx = x + dx
+          const ny = y + dy
+          if ((dx === 0 && dy === 0) || nx < 0 || ny < 0 || nx >= width || ny >= height) continue
+          const neighbour = ny * width + nx
+          if (state[neighbour] !== UNTOUCHED || data[neighbour * 4 + 3] === 0 || distanceAt(neighbour) >= SOLID) continue
+          state[neighbour] = SKIN
+          next.push(neighbour)
+        }
+      }
+    }
+    frontier = next
+  }
+
+  const out = new Uint8ClampedArray(data)
+  for (let pixel = 0; pixel < pixels; pixel++) {
+    const at = pixel * 4
+    if (state[pixel] === CLEAR) {
+      out.set([key[0], key[1], key[2], 0], at)
+    } else if (state[pixel] === SKIN) {
+      const alpha = coverage(data[at]!, data[at + 1]!, data[at + 2]!, key, tolerance)
+      for (let channel = 0; channel < 3; channel++) out[at + channel] = Math.round(key[channel]! + (data[at + channel]! - key[channel]!) / alpha)
+      out[at + 3] = Math.min(data[at + 3]!, Math.round(alpha * 255))
+    }
+  }
+  return { image: { width, height, data: out }, cleared: tail }
+}
+
 /** `#fbfaf7`, for saying which colour was taken out. */
 export function describeColour(colour: readonly [number, number, number]): string {
   return hex(colour)

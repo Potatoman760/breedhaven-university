@@ -137,7 +137,11 @@ left unsigned.
   The title screen warns when the saved catalogue is out of date (a character's subject or year
   has changed since) and it was not built again. At the start of term the player picks up to `maxCourses` on a week
   planner, a column per day and a row per hour; two courses whose hours overlap cannot
-  both be taken. While a course meets, everyone taking it is at the Lecture Halls, and
+  both be taken. Until the end of day `changeUntilDay` of term (13, the Saturday of week 2,
+  pinned in `catalogue.test.ts`) Change classes on the calendar opens the same planner on the
+  classes he has (`changeClasses` in `src/shared/game/courses.ts`): only a full load with no
+  two classes at once is checked, nothing else he has on, and his calendar shows the new week
+  as soon as it is saved. What he earned in a course he drops is kept, should he take it back. While a course meets, everyone taking it is at the Lecture Halls, and
   in class (`inClass` in `src/shared/game/map.ts`): not in the day view's "Here" row, not
   to be done anything with or asked out, and not run into by someone dropping in or working
   a shift there. The only way to her then is to attend the same class, which is a scene.
@@ -1159,11 +1163,20 @@ directly: nothing in a scene ever calls it, and it talks only to the address you
   from the appearance, and one button draws whichever a view is missing. A changed place is saved to `locations/<id>.json` in the add-on folder and
   laid over the game's own; "Put back the original" removes it. Places cannot be added
   there, since a place has to be on the map to be reached.
-- **Cutting out** (`src/main/comfy/backgroundKey.ts`): takes the flat background out from
-  behind a sprite, working inward from the edges so white inside the figure is left alone;
-  a second mode also clears gaps the art has closed around. The cut-out is a new
-  `-cutout.png` and the picture it was made from is deleted. Available on a generated
-  picture in the tool, and as "Cut out" on any PNG sprite in the add-on folder.
+- **Transparent sprites**: a character's sprites and her walking picture come back from ComfyUI
+  with no background. Their default, `krea2 comic book sprite.json`, is the comic-book workflow
+  with BiRefNet (comfyui-rmbg, in `downloads.json`) taking the background away before it is
+  saved. Every other kind of picture names `krea2 comic book.json` in `bundle.json`. BiRefNet
+  judges by region, and keeps white the frame walls in, such as the gap between two legs that run
+  off the bottom edge; so as each sprite or walking picture is filed, the card it left is taken out
+  (`clearLeftCard` in `src/main/comfy/backgroundKey.ts`, run by `withoutLeftCard` in
+  `src/main/comfy/png.ts`): a fill from the card still on the frame's edge, through card only,
+  that gives a soft edge to what it clears and leaves BiRefNet's own edges alone. A picture with no
+  card left is filed as it came, and the workflow ComfyUI writes into the PNG is kept. The editor
+  has no cutting out of its own. The item, icon, below and walk scripts still draw on a white
+  card with that one (`onCard` in `scripts/lib/pictures.ts`) and key it out themselves
+  (`cutOut`, with `src/main/comfy/backgroundKey.ts`), working inward from the edges so white
+  inside the figure is left alone.
 - Settings about this computer (the address, where the models are, how long to wait) are
   kept in `comfy.json` in the app's user data folder. Settings about a workflow, a kind of
   picture or a clip are the game's, in `content/default/comfy/bundle.json`: with the

@@ -76,6 +76,5 @@ export const IPC = {
   comfyDownloadProgress: 'comfy:downloadProgress',
   comfyGenerate: 'comfy:generate',
   comfyGenerateVideo: 'comfy:generateVideo',
-  comfyCancel: 'comfy:cancel',
-  comfyCutout: 'comfy:cutout'
+  comfyCancel: 'comfy:cancel'
 } as const

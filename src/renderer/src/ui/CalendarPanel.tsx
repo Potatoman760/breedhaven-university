@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { dayAgenda, dayIndexOf, eventHours, eventsOn, removeEvent, toDate, upcomingEvents, type AgendaItem } from '../../../shared/game'
+import { classChangeDeadline, dayAgenda, dayIndexOf, eventHours, eventsOn, removeEvent, toDate, upcomingEvents, type AgendaItem } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { Button } from './Button'
 import { Dialog } from './Dialog'
@@ -21,6 +21,8 @@ interface Props {
   state: GameState
   onChange: (state: GameState) => void
   onClose: () => void
+  /** Opens the course planner to change his classes. Left out once he no longer may, or in the middle of a scene. */
+  onChangeClasses?: () => void
 }
 
 const clock = (hour: number) => `${String(hour).padStart(2, '0')}:00`
@@ -48,7 +50,7 @@ function lanes(items: AgendaItem[]): { item: AgendaItem; lane: number; of: numbe
  * events where they fall; the month is a step back from that. What is coming up further
  * off is listed beside it.
  */
-export function CalendarPanel({ content, state, onChange, onClose }: Props) {
+export function CalendarPanel({ content, state, onChange, onClose, onChangeClasses }: Props) {
   const { calendar } = content
   const today = toDate(calendar, state.time)
   const [mode, setMode] = useState<'week' | 'month'>('week')
@@ -123,6 +125,11 @@ export function CalendarPanel({ content, state, onChange, onClose }: Props) {
             <Button variant="quiet" disabled={offset === 0} onClick={() => setOffset(0)}>
               {t('screens.calendar.today')}
             </Button>
+            {onChangeClasses && (
+              <Button variant="secondary" size="small" title={classChangeDeadline(content) && t('screens.calendar.changeUntil', classChangeDeadline(content)!)} onClick={onChangeClasses}>
+                {t('screens.calendar.changeClasses')}
+              </Button>
+            )}
             <div className="tabs" role="tablist">
               <button role="tab" aria-selected={mode === 'week'} className={mode === 'week' ? 'tab selected' : 'tab'} onClick={() => switchTo('week')}>
                 {t('screens.calendar.week')}

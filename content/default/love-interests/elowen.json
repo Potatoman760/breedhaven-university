@@ -180,6 +180,80 @@
       "pregnant": true
     },
     {
+      "id": "casual",
+      "name": "Stream night",
+      "description": "black cat-ear headphones with pink-glowing rims, worn around her neck, an oversized lavender hoodie with a white pixel-art cat face outlined in black on the front, slipping off her left shoulder, black bike shorts peeking out below its hem, and pink and black striped thigh-high socks",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/casual-neutral-2.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/elowen/casual-happy-2.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/elowen/casual-sad-2.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/elowen/casual-angry-2.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/elowen/casual-surprised-2.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/elowen/casual-embarrassed-2.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/elowen/casual-aroused-2.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Stream night, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/casual-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/elowen/casual-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/elowen/casual-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/elowen/casual-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/elowen/casual-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/elowen/casual-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/elowen/casual-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
       "id": "bathrobe",
       "name": "Bathrobe",
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",

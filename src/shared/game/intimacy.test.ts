@@ -42,7 +42,7 @@ describe('whether she will', () => {
     // An old friend he has not yet had a scene with is no stranger: only what she feels holds her back.
     const friend = (desire: number) => ({ ...start, relationships: { ...start.relationships, ana: { affection: 35, trust: 45, desire } } })
     expect(sexGate(content, friend(10), a)).toEqual({ open: false, why: 'desire' })
-    expect(describeSexGate(content, friend(10), a)[0]).toContain('You do not want Pat enough yet')
+    expect(describeSexGate(content, friend(10), a)[0]).toContain('You will refuse Pat if he tries to have sex with you')
     expect(sexGate(content, friend(30), a)).toEqual({ open: true })
     expect(sexGate(content, known(start, 'ana', 25), a)).toEqual({ open: true })
     // In a scene where nothing holds anyone back, as a society's night, it is open to her whoever he is to her.
@@ -65,7 +65,7 @@ describe('whether she will', () => {
 
   it('is told to her as a rule of the scene, and to an easy woman not at all', () => {
     expect(describeSexGate(content, start, a)[0]).toContain('You have only just met Pat')
-    expect(describeSexGate(content, known(start, 'ana', 5), a)[0]).toContain('You do not want Pat enough yet')
+    expect(describeSexGate(content, known(start, 'ana', 5), a)[0]).toContain('You will refuse Pat if he tries to have sex with you')
     expect(describeSexGate(content, known(start, 'ana', 5), a)[0]).toContain('turn him down in your own way')
     expect(describeSexGate(content, start, b)).toHaveLength(1)
     const prompt = buildCharacterPrompt({ content, state: start, loveInterestId: 'ana', sceneBeats: [{ activityName: 'Tea' }] })

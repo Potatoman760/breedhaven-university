@@ -78,6 +78,31 @@ export function canBeginTerm(content: ContentPack, selected: string[]): PerformC
   return selected.length === load ? { ok: true, reasons: [] } : { ok: false, reasons: [t('game.courses.choose', { load })] }
 }
 
+/** The last day he may change his classes on, as he is told it: its weekday and which week of term it is in. */
+export function classChangeDeadline(content: ContentPack): { dayIndex: number; weekday: string; week: number } | undefined {
+  const day = content.coursework?.changeUntilDay
+  if (day === undefined) return undefined
+  const date = toDate(content.calendar, (day - 1) * content.calendar.hoursPerDay)
+  return { dayIndex: date.dayIndex, weekday: date.weekday, week: Math.floor(date.dayIndex / content.calendar.weekdays.length) + 1 }
+}
+
+/** Whether he may still change his classes: once he has chosen them, and until the deadline's day is over. */
+export function canChangeClasses(content: ContentPack, state: GameState): boolean {
+  const deadline = classChangeDeadline(content)
+  return state.enrolment !== null && deadline !== undefined && toDate(content.calendar, state.time).dayIndex <= deadline.dayIndex
+}
+
+/**
+ * Takes these courses in place of those he had, while he still may. As at the start of term it has to be a full load
+ * with no two meeting at once: what else he has on is his own to sort out. What he had earned in a course he drops is
+ * kept, should he take it back. Anything that can't be is no change.
+ */
+export function changeClasses(content: ContentPack, state: GameState, courseIds: string[]): GameState {
+  if (!canChangeClasses(content, state) || !canBeginTerm(content, courseIds).ok) return state
+  const fits = courseIds.every((id, i) => canEnrol(content, state, courseIds.slice(0, i), id).ok)
+  return fits ? { ...state, enrolment: [...courseIds] } : state
+}
+
 /** The courses the player is taking. */
 export function enrolledCourses(state: GameState): Course[] {
   return state.courses.filter((c) => state.enrolment?.includes(c.id))

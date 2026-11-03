@@ -6,7 +6,7 @@ import type { LoveInterest, Major } from './model'
 import type { MajorIdea } from './game/draftMajor'
 import type { Card } from './game/sillyCard'
 import type { PackPreview, PackSelection } from './packs'
-import type { ComfyBundle, ComfyBundleCheck, ComfyDownloadList, ComfySettings, ModelDownloadProgress, ModelDownloadResult, ComfyTestResult, CutoutRequest, CutoutResult, GenerateArtRequest, GenerateArtResult, GenerateVideoRequest, WorkflowListResult } from './comfy'
+import type { ComfyBundle, ComfyBundleCheck, ComfyDownloadList, ComfySettings, ModelDownloadProgress, ModelDownloadResult, ComfyTestResult, GenerateArtRequest, GenerateArtResult, GenerateVideoRequest, WorkflowListResult } from './comfy'
 import {
   GameStateSchema,
   PostPlanSchema,
@@ -370,7 +370,5 @@ export interface RendererApi {
     generateVideo(request: GenerateVideoRequest): Promise<GenerateArtResult>
     /** Gives up on the picture or clip being made, if one is. */
     cancel(): Promise<void>
-    /** Takes the flat background out from behind a generated picture, into a new file that replaces it. Never rejects. */
-    cutout(request: CutoutRequest): Promise<CutoutResult>
   }
 }

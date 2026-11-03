@@ -44,7 +44,6 @@ import { CHAT_CANCELLED, IPC } from '../shared/ipc'
 import { DEFAULT_LANGUAGE, setLanguage, t, type Messages } from '../shared/i18n'
 import { languagesIn, readStrings } from './content/language'
 import {
-  CutoutRequestSchema,
   GenerateArtRequestSchema,
   GenerateVideoRequestSchema,
   framingFor,
@@ -55,11 +54,9 @@ import {
   type ComfyDownloadList,
   type ModelDownloadResult,
   type ComfyTestResult,
-  type CutoutResult,
   type GenerateArtResult
 } from '../shared/comfy'
 import { testComfy } from './comfy/client'
-import { cutoutArt } from './comfy/cutout'
 import { ComfyStore, generateArt, generateClip } from './comfy/studio'
 import { listWorkflows, unusedVideoWorkflows } from './comfy/workflows'
 import { bundleDir, checkBundle, readBundle } from './comfy/bundle'
@@ -581,13 +578,6 @@ function registerIpc(
     }
   })
   ipcMain.handle(IPC.comfyCancel, () => drawing?.abort())
-  ipcMain.handle(IPC.comfyCutout, (_event, raw: unknown): CutoutResult => {
-    try {
-      return cutoutArt(info.addonDir, CutoutRequestSchema.parse(raw), info.assetPrefix)
-    } catch (error) {
-      return { ok: false, message: (error as Error).message, path: null, colour: null, cleared: 0, feathered: 0, enclosed: 0 }
-    }
-  })
   ipcMain.handle(IPC.editorOpenFolder, async () => {
     mkdirSync(info.addonDir, { recursive: true })
     await shell.openPath(info.addonDir)

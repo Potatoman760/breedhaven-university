@@ -17,6 +17,8 @@ import {
   addGlobalMemory,
   addMemory,
   amendMemory,
+  canChangeClasses,
+  changeClasses,
   addNote,
   attendBirth,
   useItem,
@@ -496,7 +498,9 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   // Once a day, when nothing else is going on, someone may write to the player unprompted.
   // Once the calendar has run out nothing more is set going: nobody writes, nothing is posted. Births still come, for the telling.
   const over = isGameOver(content.calendar, state.time)
-  const idle = !scene && !summary && !state.expedition.run && (state.enrolment !== null || !content.coursework)
+  // Changing his classes from his calendar: the course planner is up in place of the day.
+  const [changingClasses, setChangingClasses] = useState(false)
+  const idle = !scene && !summary && !state.expedition.run && !changingClasses && (state.enrolment !== null || !content.coursework)
   // As a day begins everyone is dressed for it, and keeps it on until the next.
   useEffect(() => {
     if (!idle) return
@@ -1544,6 +1548,23 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           toured={state.flags[COURSES_TOURED] === true}
           onToured={() => setState((current) => ({ ...current, flags: { ...current.flags, [COURSES_TOURED]: true } }))}
         />
+      ) : content.coursework && changingClasses ? (
+        // Back to the calendar either way, which shows his week as it now is.
+        <CoursesView
+          content={content}
+          state={state}
+          onEnrol={(enrolment) => {
+            setState((current) => changeClasses(content, current, enrolment))
+            setChangingClasses(false)
+            setPanel({ kind: 'calendar' })
+          }}
+          onCancel={() => {
+            setChangingClasses(false)
+            setPanel({ kind: 'calendar' })
+          }}
+          toured
+          onToured={() => undefined}
+        />
       ) : content.orientation?.intro && state.orientationStep === 0 && !state.flags[WELCOMED] ? (
         <IntroView
           content={content}
@@ -1897,7 +1918,20 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
         />
       )}
       {panel?.kind === 'calendar' && (
-        <CalendarPanel content={content} state={state} onChange={setState} onClose={close} />
+        <CalendarPanel
+          content={content}
+          state={state}
+          onChange={setState}
+          onClose={close}
+          onChangeClasses={
+            !scene && !summary && canChangeClasses(content, state)
+              ? () => {
+                  setPanel(null)
+                  setChangingClasses(true)
+                }
+              : undefined
+          }
+        />
       )}
       {panel?.kind === 'below' && (
         <PartyDialog

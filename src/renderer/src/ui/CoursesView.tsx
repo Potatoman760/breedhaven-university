@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { canBeginTerm, canEnrol, courseLabel, courseMatches, describeMeetings, toDate, skillFor } from '../../../shared/game'
+import { canBeginTerm, canEnrol, classChangeDeadline, courseLabel, courseMatches, describeMeetings, toDate, skillFor } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { Backdrop } from './Backdrop'
 import { Button } from './Button'
@@ -17,6 +17,8 @@ interface Props {
   /** Whether he has been shown round the screen already. */
   toured: boolean
   onToured: () => void
+  /** Given when he is changing the classes he has, from his calendar: the way back without changing them. */
+  onCancel?: () => void
 }
 
 // Who shows him round the screen at the start of his first term.
@@ -26,9 +28,11 @@ const GUIDE_ID = 'tamsin'
  * The start of term: the catalogue this game began with, laid out as a week planner, a
  * column per day and a row per hour, for the player to pick from.
  */
-export function CoursesView({ content, state, onEnrol, toured, onToured }: Props) {
+export function CoursesView({ content, state, onEnrol, toured, onToured, onCancel }: Props) {
   const config = content.coursework
-  const [selected, setSelected] = useState<string[]>([])
+  // Changing them, he starts from the classes he has.
+  const changing = onCancel !== undefined
+  const [selected, setSelected] = useState<string[]>(() => (changing ? [...(state.enrolment ?? [])] : []))
   // The course whose details are shown beside the planner.
   const [focusId, setFocusId] = useState<string | null>(null)
   // What is being looked for: a person's name, a course code, a word of a title. Courses that answer it are picked out and the rest fade.
@@ -69,6 +73,7 @@ export function CoursesView({ content, state, onEnrol, toured, onToured }: Props
   // The tour of the screen, the first time it is seen: what each part is for, said by someone he knows.
   const guide = content.loveInterests.find((li) => li.id === GUIDE_ID)
   const taught = state.courses.find((course) => skillFor(content, course) && course.studentIds.includes(GUIDE_ID)) ?? state.courses.find((course) => skillFor(content, course))
+  const deadline = classChangeDeadline(content)
   const tour: TourStep[] = config
     ? [
         {
@@ -95,6 +100,7 @@ export function CoursesView({ content, state, onEnrol, toured, onToured }: Props
           target: '[data-tour="help"]',
           text: t('screens.courses.tourHelp')
         },
+        ...(deadline ? [{ text: t('screens.courses.tourChange', { week: deadline.week, weekday: deadline.weekday }) }] : []),
         { expression: 'happy', text: t('screens.courses.tourDone', { player: state.player.name }) }
       ]
     : []
@@ -136,12 +142,12 @@ export function CoursesView({ content, state, onEnrol, toured, onToured }: Props
           </div>
         </Dialog>
       )}
-      {!toured && guide && tour.length > 0 && state.courses.length > 0 && <Tour guide={guide} steps={tour} onDone={onToured} />}
+      {!toured && !changing && guide && tour.length > 0 && state.courses.length > 0 && <Tour guide={guide} steps={tour} onDone={onToured} />}
       <Backdrop screen="courses" location={location} periodId={date.period.id} light={date.period.light} />
       <div className="planner-panel glass framed">
         <div className="market-head">
           <div>
-            <span className="caps">{t('screens.courses.startOfTerm')}</span>
+            <span className="caps">{t(changing ? 'screens.courses.changeOfClasses' : 'screens.courses.startOfTerm')}</span>
             <h1>{t('screens.courses.planYourWeek')}</h1>
           </div>
           <label className="planner-search">
@@ -158,8 +164,13 @@ export function CoursesView({ content, state, onEnrol, toured, onToured }: Props
           <Button variant="secondary" data-tour="help" onClick={() => setHelping(true)}>
             {t('screens.courses.helpMePick')}
           </Button>
+          {onCancel && (
+            <Button variant="quiet" onClick={onCancel}>
+              {t('screens.courses.cancel')}
+            </Button>
+          )}
           <Button variant="primary" disabled={!canBeginTerm(content, selected).ok} title={canBeginTerm(content, selected).reasons.join(' · ') || undefined} onClick={() => onEnrol(selected)}>
-            {t('screens.courses.beginTerm')}
+            {t(changing ? 'screens.courses.saveChanges' : 'screens.courses.beginTerm')}
           </Button>
         </div>
 

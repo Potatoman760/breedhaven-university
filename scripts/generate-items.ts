@@ -14,7 +14,7 @@
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { ComfyStore, generateArt } from '../src/main/comfy/studio'
-import { PACK, cutOut, minutes, settingsFile } from './lib/pictures'
+import { PACK, cutOut, minutes, onCard, settingsFile } from './lib/pictures'
 
 const FILE = join(PACK, 'items.json')
 // The folder the pictures are filed under.
@@ -80,7 +80,7 @@ async function main(): Promise<void> {
     if (cancel.signal.aborted) break
     const began = Date.now()
     process.stdout.write(`[${i + 1}/${todo.length}] ${item.name}... `)
-    const result = await generateArt(readSettings(), PACK, PACK, { kind: 'sprite', subjectId: SUBJECT, name: item.id, workflow: '', positive: promptOf(item), negative: '', ...SIZE }, cancel.signal, '')
+    const result = await generateArt(readSettings(), PACK, PACK, { kind: 'sprite', subjectId: SUBJECT, name: item.id, workflow: onCard(readSettings()), positive: promptOf(item), negative: '', ...SIZE }, cancel.signal, '')
     if (cancel.signal.aborted) {
       console.log('cancelled.')
       break

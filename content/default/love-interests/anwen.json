@@ -38,31 +38,31 @@
       "description": "white tube top with cleavage, black miniskirt, black leather jacket off her shoulders",
       "sprites": {
         "neutral": {
-          "image": "sprites/anwen/default-neutral-2-cutout.webp",
+          "image": "sprites/anwen/default-neutral.webp",
           "description": ""
         },
         "happy": {
-          "image": "sprites/anwen/default-happy-6-cutout.webp",
+          "image": "sprites/anwen/default-happy.webp",
           "description": ""
         },
         "sad": {
-          "image": "sprites/anwen/default-sad-cutout-2.webp",
+          "image": "sprites/anwen/default-sad.webp",
           "description": ""
         },
         "angry": {
-          "image": "sprites/anwen/default-angry-cutout-2.webp",
+          "image": "sprites/anwen/default-angry.webp",
           "description": ""
         },
         "surprised": {
-          "image": "sprites/anwen/default-surprised-6-cutout.webp",
+          "image": "sprites/anwen/default-surprised.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/anwen/default-embarrassed-cutout-2.webp",
+          "image": "sprites/anwen/default-embarrassed.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/anwen/default-aroused-cutout-2.webp",
+          "image": "sprites/anwen/default-aroused.webp",
           "description": ""
         }
       },
@@ -95,11 +95,11 @@
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/anwen/pregnant-embarrassed-cutout.webp",
+          "image": "sprites/anwen/pregnant-embarrassed.webp",
           "description": ""
         },
         "aroused": {
-          "image": "sprites/anwen/pregnant-aroused-cutout.webp",
+          "image": "sprites/anwen/pregnant-aroused.webp",
           "description": ""
         }
       },
@@ -152,27 +152,101 @@
           "description": ""
         },
         "sad": {
-          "image": "sprites/anwen/nude-pregnant-sad-cutout-2.webp",
+          "image": "sprites/anwen/nude-pregnant-sad.webp",
           "description": ""
         },
         "angry": {
           "image": "sprites/anwen/nude-pregnant-angry-cutout-2.webp",
           "description": ""
         },
-        "neutral": {
-          "image": "sprites/anwen/nude-pregnant-neutral-cutout.webp",
-          "description": ""
-        },
         "surprised": {
           "image": "sprites/anwen/nude-pregnant-surprised-4-cutout.webp",
           "description": ""
         },
-        "aroused": {
-          "image": "sprites/anwen/nude-pregnant-aroused-8-cutout.webp",
+        "neutral": {
+          "image": "sprites/anwen/nude-pregnant-neutral.webp",
           "description": ""
         },
         "embarrassed": {
-          "image": "sprites/anwen/nude-pregnant-embarrassed-9-cutout.webp",
+          "image": "sprites/anwen/nude-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/anwen/nude-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "casual",
+      "name": "Off duty",
+      "description": "a fitted black turtleneck crop top, high-waisted black leather trousers with a silver-buckled belt, a long charcoal duster coat worn open, and a silver chain choker",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/anwen/casual-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/anwen/casual-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/anwen/casual-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/anwen/casual-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/anwen/casual-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/anwen/casual-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/anwen/casual-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Off duty, pregnant",
+      "description": "She has a large, round, heavily pregnant belly, bare between her crop top and her leather trousers, which she wears low beneath it.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/anwen/casual-pregnant-neutral-2.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/anwen/casual-pregnant-happy-2.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/anwen/casual-pregnant-sad-2.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/anwen/casual-pregnant-angry-2.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/anwen/casual-pregnant-surprised-2.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/anwen/casual-pregnant-embarrassed-2.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/anwen/casual-pregnant-aroused-2.webp",
           "description": ""
         }
       },
@@ -184,7 +258,7 @@
       "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",
       "sprites": {
         "neutral": {
-          "image": "sprites/anwen/bathrobe-neutral-cutout.webp",
+          "image": "sprites/anwen/bathrobe-neutral.webp",
           "description": ""
         }
       },
@@ -197,7 +271,7 @@
       "inherits": "bathrobe",
       "sprites": {
         "neutral": {
-          "image": "sprites/anwen/bathrobe-pregnant-neutral-cutout.webp",
+          "image": "sprites/anwen/bathrobe-pregnant-neutral.webp",
           "description": ""
         }
       },
