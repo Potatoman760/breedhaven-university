@@ -29,6 +29,8 @@ export interface EpilogueScreen {
 
 // What a love screen is told over: a wedding arch on a beach at sunset, with whoever it is about standing before it.
 export const LOVE_PICTURE = 'sprites/epilogue/love.webp'
+// What the house he kept is told over: its family room on a winter evening, the fire lit and the toys out.
+export const HOME_PICTURE = 'sprites/epilogue/home.webp'
 // The certificate's signatures, in ink on nothing: the Chancellor's and the Registrar's.
 export const SIGNATURES = { chancellor: 'sprites/epilogue/sign-chancellor.webp', registrar: 'sprites/epilogue/sign-registrar.webp' } as const
 
@@ -230,7 +232,8 @@ export function buildEpilogue(content: ContentPack, state: GameState): EpilogueS
         (household.length > 0 ? t('game.epilogue.household', { kept, names: names(household), n: household.length }) : t('game.epilogue.nobodyHome', { kept })) +
         (kids?.text ?? ''),
       details: kids?.details,
-      loveInterestIds: household.map((li) => li.id)
+      loveInterestIds: household.map((li) => li.id),
+      image: HOME_PICTURE
     })
   } else if (housing && state.housing.status === 'evicted') {
     screens.push({ kind: 'home', heading: t('game.epilogue.homeHeading'), text: t('game.epilogue.evicted', { home: housing.name }) })
