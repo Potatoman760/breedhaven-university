@@ -64,7 +64,9 @@ export const HouseRoomSchema = z.object({
 export type HouseRoom = z.infer<typeof HouseRoomSchema>
 
 /** How a baby is doing, from worst to best: a name, and what its mother is told of it. */
-export const BabyLevelSchema = z.object({ name: z.string(), description: z.string().default('') })
+export const BabyLevelSchema = z.object({
+  /** What the nanny says of a child at this level, beside it in the house. */
+  said: z.string().default(''), name: z.string(), description: z.string().default('') })
 
 /** The rules of the house. A content pack without this has no housing. */
 export const HousingConfigSchema = z.object({

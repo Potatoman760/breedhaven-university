@@ -81,6 +81,8 @@ export interface ChatResponse {
   offControlIds: string[]
   /** A change to the relationship the character has just asked for, for the player to accept or decline. */
   bondProposal?: BondProposal
+  /** A sound of hers the reply says is heard: the file in the pack to play. */
+  reaction?: string
 }
 
 export interface SummarizeResponse {

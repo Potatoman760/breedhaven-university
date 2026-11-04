@@ -288,6 +288,7 @@
   },
   "skinTone": "medium",
   "babyTint": "The baby's skin is tinted a soft pale blue, like its mother's",
+  "babyPicture": "sprites/babies/blue.webp",
   "ownBabyTone": "medium",
   "birthPictures": {
     "medium": "sprites/lira/birth-medium.webp"
@@ -438,5 +439,16 @@
         "loop": true
       }
     ]
+  },
+  "reactions": {
+    "aww": "sounds/voices/lira/aww.ogg",
+    "gasp": "sounds/voices/lira/gasp.ogg",
+    "giggle": "sounds/voices/lira/giggle.ogg",
+    "huff": "sounds/voices/lira/huff.ogg",
+    "satisfied": "sounds/voices/lira/satisfied.ogg",
+    "sigh-content": "sounds/voices/lira/sigh-content.ogg",
+    "sigh": "sounds/voices/lira/sigh.ogg",
+    "surprised": "sounds/voices/lira/surprised.ogg",
+    "yawn": "sounds/voices/lira/yawn.ogg"
   }
 }

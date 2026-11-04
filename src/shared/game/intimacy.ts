@@ -49,6 +49,12 @@ export function sexGate(content: ContentPack, state: GameState, li: Pick<LoveInt
   return { open: true }
 }
 
+/** In a group, that one of them will not go to bed with him, said of her by name: nothing when she will. */
+export function shutLine(content: ContentPack, state: GameState, li: Pick<LoveInterest, 'id' | 'name' | 'traitIds'>, uninhibited = false): string | undefined {
+  const gate = sexGate(content, state, li, uninhibited)
+  return gate.open ? undefined : t('scene.intimacy.shutGroup', { first: li.name.split(' ')[0], player: state.player.name, why: gate.why })
+}
+
 /** The LLM writes this when she decides, in a scene, to stop taking what she takes against the Bloom. */
 export const OFF_CONTROL_TAG = '[STOPS BIRTH CONTROL]'
 
@@ -73,6 +79,8 @@ export function describeSexGate(content: ContentPack, state: GameState, li: Pick
   // Whatever of his is working on her is told to her as something she feels, not as something done to her.
   const charmed = liveBoons(state).filter((boon) => boon.targetId === li.id && boon.telling).map((boon) => boon.telling!)
   if (gate.open) return [...charmed, control]
+  // In a group, that she will not is said of her by name, ahead of the lines written to her (`shutLine`).
+  if (group) return [...charmed, control]
   const why = gate.why === 'first' ? t('scene.intimacy.justMet', { player }) : t('scene.intimacy.notYet', { player })
   return [
     t('scene.intimacy.shut', { why }),

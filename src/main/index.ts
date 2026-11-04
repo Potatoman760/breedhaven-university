@@ -4,7 +4,7 @@ import { dirname, extname, join, resolve, sep } from 'node:path'
 import { z } from 'zod'
 import { chatCompletion, listModels } from './ai/openai'
 import { completeWithFallback, notConfigured } from './ai/router'
-import { firstNames, firstToSpeak, leavers, lookLines, namesHer, parseDirectives, sceneCast, sceneWitnesses, validLook, whoSpoke } from '../shared/game/scene'
+import { firstNames, firstToSpeak, leavers, lookLines, namesHer, parseDirectives, sceneCast, sceneWitnesses, sexWrittenOf, validLook, whoSpoke } from '../shared/game/scene'
 import { canSleepOver } from '../shared/game/sleep'
 import { sexGate } from '../shared/game/intimacy'
 import { sceneRelicUses } from '../shared/game/relics'
@@ -721,7 +721,7 @@ function registerIpc(
           walkTo = { withIds }
           moving(t('llm.main.goingTo', { place: content.locations.find((l) => l.id === next.locationId)?.name ?? next.title }))
         })
-    const { reply, profileId } = await completeWithFallback(settings.get(), scene.nsfw, {
+    const asked = {
       system: systemPrompt,
       signal: stop.signal,
       // With nothing said yet, the character opens the scene.
@@ -743,8 +743,31 @@ function registerIpc(
             ]),
         ...(move ? [move] : [])
       ]
+    }
+    let { reply, profileId } = await completeWithFallback(settings.get(), scene.nsfw, asked)
+    // Those here who will not go to bed with him: a reply that has one of them doing so anyway is written again, once,
+    // told who, and what its tools did is undone first. The second is kept, whatever it says.
+    const shut = npc ? [] : sceneCast(scene).filter((id) => {
+      const who = cast.loveInterests.find((c) => c.id === id)
+      return who !== undefined && !sexGate(content, state, who, scene.uninhibited?.includes(id)).open
     })
-    const { text, ended, seeded, stopsControl, named, comfort: readings, leaving, attending: saidGoing, agreed, slept, ...asked } = parseDirectives(reply)
+    const broke = sexWrittenOf(reply, sceneCast(scene).flatMap((id) => cast.loveInterests.filter((c) => c.id === id)), shut, scene.loveInterestId)
+    if (broke.length > 0) {
+      proposal = undefined
+      bondProposal = undefined
+      rolls.length = 0
+      movedTo = undefined
+      movedPlace = undefined
+      hoursPassed = 0
+      left = undefined
+      walkTo = undefined
+      const names = firstNames(cast, broke)
+      ;({ reply, profileId } = await completeWithFallback(settings.get(), scene.nsfw, {
+        ...asked,
+        system: `${systemPrompt}\n\n${t('llm.main.gateBroken', { names, player: state.player.name, count: broke.length })}`
+      }))
+    }
+    const { text, ended, seeded, stopsControl, named, comfort: readings, leaving, attending: saidGoing, reactions, agreed, slept, ...lookAsked } = parseDirectives(reply)
     const li = cast.loveInterests.find((c) => c.id === scene.loveInterestId)
     // A tag without a name means the scene's love interest; with one, whoever in the scene it names.
     const present = sceneCast(scene)
@@ -793,8 +816,16 @@ function registerIpc(
       const id = idOf(name)
       if (id && !npc) comfort[id] = { level, reason }
     }
+    // A sound of hers that is heard: the first one named that she has, one a reply.
+    const reaction = npc
+      ? undefined
+      : reactions.flatMap((one) => {
+          const who = cast.loveInterests.find((c) => c.id === idOf(one.name))
+          const key = who && Object.keys(who.reactions).find((id) => id.toLowerCase() === one.reaction)
+          return who && key ? [who.reactions[key]] : []
+        })[0]
     // Each love interest's face and outfit: the lead's on the scene itself, the others' beside it.
-    let look: typeof asked = asked
+    let look: typeof lookAsked = lookAsked
     const looks: Record<string, { outfitId?: string; expression?: string }> = {}
     for (const one of named) {
       const id = idOf(one.name)
@@ -862,7 +893,8 @@ function registerIpc(
       comfort,
       hours: hoursPassed > 0 ? hoursPassed : undefined,
       look: li ? { ...fitted(validLook({ outfitId: look.outfitId, expression: look.expression }, li, scene), li), ...posed } : {},
-      looks
+      looks,
+      reaction
     }
   })
 

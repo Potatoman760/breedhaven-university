@@ -24,7 +24,7 @@ import { NpcSchema, type Npc } from './npc'
 import { OrientationSchema, type Intro } from './orientation'
 import { PokerConfigSchema } from './poker'
 import { PregnancyConfigSchema } from './pregnancy'
-import { StorySchema } from './story'
+import { StorySchema, THRIVING_BEAT } from './story'
 import { RelationshipConfigSchema } from './relationship'
 import { SoundsSchema } from './sound'
 import { NewGameSchema } from './state'
@@ -306,7 +306,7 @@ function checkReferences(pack: ContentPack): string[] {
     }
     beats.forEach((beat, i) => {
       const where = `story.${id}[${i}]`
-      need(stages, beat.stage, `${where}.stage`, 'relationshipStage')
+      if (beat.stage !== THRIVING_BEAT) need(stages, beat.stage, `${where}.stage`, 'relationshipStage')
       need(locations, beat.locationId, where, 'location')
       const place = pack.locations.find((l) => l.id === beat.locationId)
       if (place && beat.viewId !== undefined && !place.backgrounds.some((view) => view.id === beat.viewId)) issues.push(t('game.content.noView', { where, owner: place.id, id: beat.viewId }))

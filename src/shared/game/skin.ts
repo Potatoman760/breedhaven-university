@@ -59,6 +59,17 @@ export function withSkinTone(content: ContentPack, tone: SkinTone): ContentPack 
   return pack
 }
 
+/**
+ * The picture of a child of hers by itself, swaddled: one of the pack's `sprites/babies/`, by the tone it is drawn in,
+ * or by what it takes from its mother instead where it does (`babyPicture` on her, a tint's own picture).
+ */
+export function babySprite(content: ContentPack, state: GameState, motherId: string): string {
+  const mother = content.loveInterests.find((li) => li.id === motherId)
+  const tone = mother ? babyToneBy(mother, state.player.skinTone) : state.player.skinTone
+  const own = mother && takesHerTint(mother, tone) ? mother.babyPicture : undefined
+  return own ?? `sprites/babies/${tone}.webp`
+}
+
 /** The tone a child of hers by the player is drawn in, in this game. */
 export function babyToneFor(content: ContentPack, state: GameState, motherId: string): SkinTone {
   const mother = content.loveInterests.find((li) => li.id === motherId)

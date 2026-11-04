@@ -717,5 +717,16 @@
         "loop": true
       }
     ]
+  },
+  "reactions": {
+    "aww": "sounds/voices/seraphine/aww.ogg",
+    "gasp": "sounds/voices/seraphine/gasp.ogg",
+    "giggle": "sounds/voices/seraphine/giggle.ogg",
+    "huff": "sounds/voices/seraphine/huff.ogg",
+    "satisfied": "sounds/voices/seraphine/satisfied.ogg",
+    "sigh-content": "sounds/voices/seraphine/sigh-content.ogg",
+    "sigh": "sounds/voices/seraphine/sigh.ogg",
+    "surprised": "sounds/voices/seraphine/surprised.ogg",
+    "yawn": "sounds/voices/seraphine/yawn.ogg"
   }
 }

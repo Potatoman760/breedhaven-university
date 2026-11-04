@@ -703,5 +703,16 @@
         "loop": true
       }
     ]
+  },
+  "reactions": {
+    "aww": "sounds/voices/lola-hopworth/aww.ogg",
+    "gasp": "sounds/voices/lola-hopworth/gasp.ogg",
+    "giggle": "sounds/voices/lola-hopworth/giggle.ogg",
+    "huff": "sounds/voices/lola-hopworth/huff.ogg",
+    "satisfied": "sounds/voices/lola-hopworth/satisfied.ogg",
+    "sigh-content": "sounds/voices/lola-hopworth/sigh-content.ogg",
+    "sigh": "sounds/voices/lola-hopworth/sigh.ogg",
+    "surprised": "sounds/voices/lola-hopworth/surprised.ogg",
+    "yawn": "sounds/voices/lola-hopworth/yawn.ogg"
   }
 }

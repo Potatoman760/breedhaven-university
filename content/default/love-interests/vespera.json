@@ -711,5 +711,16 @@
       }
     ],
     "extraInstructions": "Keep her teasing and playful but never cruel: the sass is an invitation, not a wall. She flirts like she breathes, but she notices everything and remembers what people say when they think she is only joking. Let warmth surface when someone is genuinely struggling."
+  },
+  "reactions": {
+    "aww": "sounds/voices/vespera/aww.ogg",
+    "gasp": "sounds/voices/vespera/gasp.ogg",
+    "giggle": "sounds/voices/vespera/giggle.ogg",
+    "huff": "sounds/voices/vespera/huff.ogg",
+    "satisfied": "sounds/voices/vespera/satisfied.ogg",
+    "sigh-content": "sounds/voices/vespera/sigh-content.ogg",
+    "sigh": "sounds/voices/vespera/sigh.ogg",
+    "surprised": "sounds/voices/vespera/surprised.ogg",
+    "yawn": "sounds/voices/vespera/yawn.ogg"
   }
 }

@@ -540,6 +540,7 @@
   },
   "skinTone": "medium",
   "babyTint": "The baby has green skin like its mother's, a soft light green",
+  "babyPicture": "sprites/babies/green.webp",
   "ownBabyTone": "light",
   "birthPictures": {
     "light": "sprites/grushka/birth-light.webp"
@@ -700,5 +701,16 @@
         "loop": true
       }
     ]
+  },
+  "reactions": {
+    "aww": "sounds/voices/grushka/aww.ogg",
+    "gasp": "sounds/voices/grushka/gasp.ogg",
+    "giggle": "sounds/voices/grushka/giggle.ogg",
+    "huff": "sounds/voices/grushka/huff.ogg",
+    "satisfied": "sounds/voices/grushka/satisfied.ogg",
+    "sigh-content": "sounds/voices/grushka/sigh-content.ogg",
+    "sigh": "sounds/voices/grushka/sigh.ogg",
+    "surprised": "sounds/voices/grushka/surprised.ogg",
+    "yawn": "sounds/voices/grushka/yawn.ogg"
   }
 }

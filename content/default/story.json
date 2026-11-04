@@ -2,7 +2,7 @@
   "anwen": [
     {
       "stage": "friend",
-      "invitation": "Get down to the Foundry, Prize Pig. I need two hands that don't shake and you're the only one awake.",
+      "invitation": "Get down to the Foundry, pretty boy. I need two hands that don't shake and you're the only one awake.",
       "locationId": "foundry",
       "outfitId": "casual",
       "startHour": 20,
@@ -15,7 +15,7 @@
             "locationId": "foundry",
             "lines": [
               "*The Foundry smells of ozone and hot oil, and Anwen is crouched beside her stripped bike in a black turtleneck and leather trousers.*",
-              "Don't just hover, Prize Pig. Take the drop-light and hold it over the housing.",
+              "Don't just hover, pretty boy. Take the drop-light and hold it over the housing.",
               "*You hold the light steady while she touches a finger to the frame, a white-hot bead of magic sealing a bracket cleanly in place.*",
               "She hates having her ribs open like this. Touch the paintwork and she'll bite your fingers off, or I will.",
               "*She pulls a brass-caged crystal pulsing with amber heat from the belly of the engine and holds it out to you.*",
@@ -26,7 +26,7 @@
           }
         ]
       },
-      "direction": "The Foundry at night, the charm-core out of her bike: she needs a second pair of hands and let {player} hold the core, which nobody touches. She talks about the bike as a person and him as \"Prize Pig\". Being let into the shed is the point; she will not say so.",
+      "direction": "The Foundry at night, the charm-core out of her bike: she needs a second pair of hands and let {player} hold the core, which nobody touches. She talks about the bike as a person and him as \"pretty boy\". Being let into the shed is the point; she will not say so.",
       "effects": [
         {
           "type": "meter",
@@ -50,7 +50,7 @@
             "locationId": "ridge-road",
             "lines": [
               "*The engine ticks as it cools in the dark lay-by, the town spread out below the ridge like a spilled handful of sparks.*",
-              "Stop gripping my ribs, Prize Pig, we aren't moving anymore. You ride like a sack of flour.",
+              "Stop gripping my ribs, pretty boy, we aren't moving anymore. You ride like a sack of flour.",
               "*She pulls her helmet off, shakes out her hair, and leans back against the saddle in her black turtleneck and leather trousers.*",
               "Nobody sits behind me on her. Not even Elowen, and Elowen gets half of everything I own.",
               "*She looks down at the road, her jaw set hard in the cold wind.*",
@@ -131,7 +131,7 @@
               "lines": [
                 "*The red VACANCY sign outside the window bleeds through the blinds, striping the black quilt between you.*",
                 "*Anwen reaches over and sets a single heavy brass key down on the mattress.*",
-                "She's a temperamental bitch in second gear, Prize Pig, and she hates strangers.",
+                "She's a temperamental bitch in second gear, pretty boy, and she hates strangers.",
                 "Nobody else has ever sat on her without me, let alone taken the bars.",
                 "*She pulls her thumb back from the brass, her jaw set hard in the neon dark.*",
                 "Elowen and I have split everything down the middle since we were ten—rooms, smokes, men.",
@@ -152,6 +152,48 @@
         }
       ],
       "stopsBirthControl": true
+    },
+    {
+      "stage": "thriving",
+      "invitation": "Get up to the nursery, pretty boy. Don't make me ask twice.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "anwen",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*Anwen is leaning against the railing of the cot, one hand resting on the wood while {child} sleeps.*",
+              "You actually showed up. Miracles never cease.",
+              "I've been watching the ledger for a month, {player}. Every week the bill comes due, and every week you pay it without whining.",
+              "Look at {them}. Fat cheeks, quiet lungs, nanny jumping at every squeak because you bankrolled the whole setup.",
+              "I treat my bike better than most sires treat their kids, and she's just iron and oil.",
+              "*She glances away from the cot, her jaw tight, refusing to meet your eyes for a second.*",
+              "You're not useless, pretty boy. In fact, you're kind of a big deal to me right now.",
+              "So what are you standing by the door for, an applause track?"
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ],
   "elowen": [
@@ -316,6 +358,48 @@
           "amount": 5
         }
       ]
+    },
+    {
+      "stage": "thriving",
+      "invitation": "get to the nursery rn, no shot you're busy. {child} and i are waiting.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "elowen",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*Elowen is bouncing {child} gently on her shoulder, swaying in the middle of the nursery.*",
+              "Chat, look who finally entered the lobby.",
+              "No joke, {player}, I've been watching the stats on {child} for four weeks straight and {they} are literally thriving.",
+              "You kept the gold flowing every single week, upgraded the whole house meta, and didn't drop the ball once.",
+              "*She presses her cheek against the top of {child}'s head, looking at you with wide, shiny eyes.*",
+              "Lowkey thought you'd get bored of the grind, {player}, because maintenance isn't the flashy part of the game.",
+              "Instead you hard-carried us both and now I'm super attached to you, gg go next, I'm never leaving.",
+              "Come hold {them} with me already, what's the play?"
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ],
   "caelwen": [
@@ -479,6 +563,48 @@
         }
       ],
       "stopsBirthControl": true
+    },
+    {
+      "stage": "thriving",
+      "invitation": "Come up to the nursery when you have a moment, my dear. There is something I wish to show you.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "caelwen",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*Caelwen stands beside the window with {child} cradled in the crook of her arm, looking out over the grounds.*",
+              "A century ago, my dear, this room had a draft from the eastern chimney that took three winters to mend.",
+              "I raised four daughters under this roof in the twenty-nineties, when the house was half as warm and twice as noisy.",
+              "For the past four weeks I have watched you pay the household accounts on the hour and see to every small comfort {child} requires.",
+              "*She turns to you, her expression calm and remarkably gentle as {child} stirs against her.*",
+              "Young men of your station are rarely remembered for their constancy once the novelty of a cradle wears thin.",
+              "You have made a very old house feel generous again, {player}, and I hold you in the highest regard for it.",
+              "Now, will you come and see how much {they} have grown since last week?"
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ],
   "daphne": [
@@ -638,6 +764,48 @@
           "amount": 10
         }
       ]
+    },
+    {
+      "stage": "thriving",
+      "invitation": "Nursery. Come check the board with me.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "daphne",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*Daphne is standing over the cot, one hand on {child}'s back, keeping a steady rhythm.*",
+              "Four weeks in the books, {player}. Not a single missed payment on the keep.",
+              "{child} is putting on weight like a freshman on the starting roster. Nanny says {their} numbers are top tier.",
+              "Coach always said anybody can play the first quarter, it's the fourth that shows your conditioning.",
+              "*She looks up at you, her face calm and completely serious.*",
+              "You didn't coast after {they} got here. You built the house up and you paid the price every week.",
+              "I respect a guy who does the tape study and shows up for the boring drills.",
+              "You coming over here to take the handoff, or what?"
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ],
   "dinah": [
@@ -794,6 +962,48 @@
           "amount": 10
         }
       ]
+    },
+    {
+      "stage": "thriving",
+      "invitation": "Please come to the nursery when you are able, {player}. I would speak with you beside {child}.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "dinah",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*Dinah sits in the wooden chair beside the cot, {child} resting across her lap while she keeps one hand over {their} chest.*",
+              "The Order teaches much about the Sower and the Furrow, {player}, yet the books say very little of the weeks that follow the harvest.",
+              "For four weeks I have watched the steward bring the accounts, and four times you have answered the cost without hesitation.",
+              "{child} breathes easily and grows strong because you have made this house a sanctuary around {them}.",
+              "*She lowers her eyes for a moment, her fingers steadying against the edge of the blanket.*",
+              "I had believed a True Sire's duty ended at the threshold of the miracle, yet you have kept the covenant in coin and care.",
+              "Receive the gratitude of a mother whose heart you have set wholly at rest, {player}.",
+              "Will you sit beside us and tell me what you see in {them}?"
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ],
   "faye": [
@@ -953,6 +1163,48 @@
         }
       ],
       "stopsBirthControl": true
+    },
+    {
+      "stage": "thriving",
+      "invitation": "Come up to the nursery, {player}. I've finished reviewing the month's figures.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "faye",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*Faye is leaning against the dresser with {child} tucked securely in her arm, watching the door as you enter.*",
+              "Four weeks of full keep, nanny retainers, and house upgrades. I know to the copper what this room has cost you.",
+              "Most men write the first check for the ego and start looking for discounts by week three.",
+              "*She lets a slow pause hang between you, her eyes moving from your face down to {child}.*",
+              "Look at {them}, sweetheart. Thriving, quiet, completely insulated from the market.",
+              "I put a number on everything in this town, {player}. It's how I sleep at night.",
+              "What you've done here over the last month is the first thing I've seen that I won't insult with a price tag.",
+              "Don't just stand there looking solvent—what do you have to say for yourself?"
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ],
   "grushka": [
@@ -1108,6 +1360,48 @@
         }
       ],
       "stopsBirthControl": true
+    },
+    {
+      "stage": "thriving",
+      "invitation": "Come to the nursery, {player}. I have a word for you.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "grushka",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*Grushka holds {child} easily in one broad forearm, her other hand resting on the rail of the cot.*",
+              "My first two girls grew up in my sisters' hall back home. That is the custom, and I never questioned it.",
+              "A sire gives the seed, the clan keeps the blood. Those were always the terms.",
+              "Here, for four weeks, you have paid the nanny, stocked the rooms, and kept {child} strong under your own roof.",
+              "*She looks down at {child}, her heavy shoulders dropping an inch.*",
+              "*Kharad-vor*, we call a man who holds the wall after the horn has blown. I did not expect to find one in a university house.",
+              "You have done right by my child and by me, {player}, and I will not forget the weight you carried.",
+              "Come closer and tell me how {they} look to your eyes."
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ],
   "isolde": [
@@ -1266,6 +1560,48 @@
         }
       ],
       "stopsBirthControl": true
+    },
+    {
+      "stage": "thriving",
+      "invitation": "If you have five minutes, {player}, please join me in the nursery. The four-week figures are worth reviewing.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "isolde",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*Isolde stands beside the cot with a small notebook closed in her hand, looking down at {child}.*",
+              "My thesis examined thirty-two Sire households over a six-month window, {player}.",
+              "The median expenditure per child drops by forty-one percent after the second week—or rather, the mean drops; the median is worse.",
+              "Your outlays for {child} have remained entirely flat at the maximum tier for four consecutive weeks, alongside capital improvements to the house.",
+              "*She sets the notebook on the shelf and touches {child}'s cheek with the back of one finger.*",
+              "The result is a thoroughly robust infant and a mother whose confidence in you is no longer merely theoretical.",
+              "I find competence deeply attractive, {player}, and your consistency is a complete outlier.",
+              "Would you care to examine the subject with me, or do you dispute my findings?"
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ],
   "lira": [
@@ -1423,6 +1759,48 @@
           "amount": 10
         }
       ]
+    },
+    {
+      "stage": "thriving",
+      "invitation": "Come to the nursery room, {player}. {child} is very round and I have news.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "lira",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*Lira is pooled halfway over the side of the cot, her blue core bright and still while {child} sleeps against her arm.*",
+              "My surface tension has been steady for twenty-eight days. Not a single ripple.",
+              "Twelve rains have fallen since {child} was small, and four times you gave the house-woman the shiny coins so {they} would stay warm.",
+              "In two hundred summers, nobody ever built walls around something that came out of me.",
+              "*Her color deepens by a shade round the edges, warming the light on the cot.*",
+              "{child} is heavy and loud and very healthy because you kept paying for the room.",
+              "My core moves toward the door whenever you walk up the stairs now, {player}. That is new information.",
+              "Put your hand here and tell me if {they} feel warmer to you too?"
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ],
   "lola-hopworth": [
@@ -1582,6 +1960,48 @@
           "amount": 10
         }
       ]
+    },
+    {
+      "stage": "thriving",
+      "invitation": "Up to the nursery, love. Come see what a month of good keeping looks like.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "lola-hopworth",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*Lola has {child} propped on her hip, patting {their} back with a practiced, steady hand.*",
+              "Look at the heft on this one, {player}. Proper butter-fed dumpling, and not an ounce of pinch on {them}.",
+              "I grew up with six sisters in the back of a brewery kitchen—warm enough, sure, but we scraped the pan every Friday.",
+              "Four weeks running you've paid the full tab here, kept the nanny on, and built this place up like a three-star kitchen.",
+              "*She shifts {child} higher on her shoulder, giving you a bright, crooked smile.*",
+              "Any bastard can turn the oven on, dear, it's watching the pot so it doesn't scorch that makes a chef.",
+              "You've got real backbone, {player}, and I'm bloody proud to have my kid in your house.",
+              "Well, come on then, love—don't I get a word before {they} go back down?"
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ],
   "maren": [
@@ -1742,6 +2162,48 @@
         }
       ],
       "stopsBirthControl": true
+    },
+    {
+      "stage": "thriving",
+      "invitation": "Come to the nursery right now, {player}, or I'll sulk for a whole minute. {child} and I have something to show you.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "maren",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*You find Maren by the cot, her fox ears perked as she measures a tiny ribbon against {child}'s wrist.*",
+              "You're late, and I was going to pout, except look at how plump {their} cheeks got this month.",
+              "I used to think a Sire just made a baby and wandered off, like some grand danna-sama—that's master of the house, if you please.",
+              "*Her tail swishes once and settles as she looks up at you, her voice softening.*",
+              "Every week you paid the keep, bought the good milk, built this whole place up around {them} even when your coin purse looked flat.",
+              "Anyone can make a pretty thing, {player}, {child} is proof of that, but you stitch the seams so they hold.",
+              "We call that mamoru where my grandmother's from—to guard and keep—and you do it better than anyone I've ever known.",
+              "Now tell me I'm right about you, or do I have to make you say it?"
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ],
   "morwenna": [
@@ -1901,6 +2363,48 @@
         }
       ],
       "stopsBirthControl": true
+    },
+    {
+      "stage": "thriving",
+      "invitation": "Join me in the nursery when you have a moment, darling. I have a month of empirical evidence to discuss with you.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "morwenna",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*Morwenna stands beside the cradle, one hand resting on the carved rail as {child} sleeps.*",
+              "I have spent three years studying the economics of Siredom, darling, and the literature is quite clear on how men of your station behave.",
+              "They provide the spark and leave the stewardship to the crown or the mother's house.",
+              "*She gives you a slow blink, her low voice dropping a fraction.*",
+              "Yet for four weeks I have watched you tally the ledgers, pay {child}'s keep without fail, and make this house a sanctuary.",
+              "It is an exquisite refutation of everything I was prepared to resent in you.",
+              "You have made it entirely intolerable how much I admire you, {player}.",
+              "What have you to say for yourself?"
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ],
   "ottilie": [
@@ -2060,6 +2564,48 @@
         }
       ],
       "stopsBirthControl": true
+    },
+    {
+      "stage": "thriving",
+      "invitation": "Come to the nursery, {player}. The four-week developmental metrics on {child} are in, and they require your presence.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "ottilie",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*Ottilie holds {child} upright against her shoulder, a small notebook lying closed on the table beside her.*",
+              "{child} has gained weight above the ninetieth percentile for the fourth consecutive week.",
+              "That is not genetics. That is consistent expenditure on nutrition, nanny care, and the expansion of this house.",
+              "*She looks at you over {child}'s head, her jaw tight.*",
+              "My father was a Sire. The staff kept him under glass in the south wing, and I don't think he knew what my keep cost a week.",
+              "My throat is constricted. That will be because you work yourself tired to pay for {their} cot and never ask for praise.",
+              "You are a statistically anomalous father, {player}, and a good man.",
+              "You are staring at me. Say something."
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ],
   "seraphine": [
@@ -2220,6 +2766,48 @@
         },
         "direction": "Her bedchamber, the doors unguarded. The council chose everything else and would have chosen her heart; she chose him because he looked at a girl and not a queen, told to no one until now. She has asked how an ordinary girl says it. Nothing about what her body is doing."
       }
+    },
+    {
+      "stage": "thriving",
+      "invitation": "We—I mean I—would like to see you in the nursery, {player}. {child} is awake, and I wanted to speak with you.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "seraphine",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*Seraphine sits in the rocking chair with {child} cradled in her lap, her posture straight until she sees it's only you.*",
+              "When I was small, forty people were paid from the treasury to keep me well, and not one of them was my father.",
+              "We thought—I thought that was simply how children of high blood were raised.",
+              "*She traces a finger over {child}'s cheek, her voice very soft.*",
+              "Is this how ordinary fathers do it, {player}? Working every week to pay the keep themselves, adding rooms so {they} have light and warmth?",
+              "{child} is thriving because of your hands, not a royal decree.",
+              "I have a whole kingdom to govern, and yet watching you keep our child is the finest thing I have ever seen.",
+              "Will you sit with us and tell me how you knew how to do this?"
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ],
   "tamsin": [
@@ -2337,6 +2925,47 @@
         },
         "direction": "Her room, the seedlings shot up into a thicket since he walked in. She has said the thing she would rather be thrown in the river than say: she has been his since they were nine and six years did not fix it; she shoved him before he could answer and dared him to say it back. Nothing about what her body is doing."
       }
+    },
+    {
+      "stage": "thriving",
+      "invitation": "Get yourself up to the nursery, {player}. I've been watching you for a month and I've got a bone to pick.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "tamsin",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*Tamsin has {child} propped on her hip, bouncing {them} with the easy rhythm of a girl who raised six younger cousins.*",
+              "Look at the heft on {them}. That's four straight weeks of good cream and a warm roof, like a prize calf in clover.",
+              "Back home, we figured a university Sire wouldn't know which end of a ledger to hold once the baby came.",
+              "*She gives your shoulder a quick, awkward shove with her free hand, her ears going pink.*",
+              "Then you go and scrape together the silver every single week, building this whole house up so {child} never wants for a thing.",
+              "You're steady as an oak post, {player}, same as when we were ten, only now it's our kid you're holding the sky up for.",
+              "I dare you to stand there and tell me you didn't do right by {them}."
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ],
   "tink": [
@@ -2499,6 +3128,48 @@
           "amount": 5
         }
       ]
+    },
+    {
+      "stage": "thriving",
+      "invitation": "Nursery, {player}, ten silver says you can't get up here in two minutes. Come look at {child}.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "tink",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*Tink is perched on the arm of the nursing chair, grinning down at {child} in the cot while eyeing a silver rattle on the shelf.*",
+              "I could pocket that rattle and fence it for three crowns, easy—only joking, keep your hair on.",
+              "Besides, you'd just buy {them} another one next week, the way you've been going.",
+              "*Her grin fades into something smaller as she taps the rail of the cot.*",
+              "There were seven of us in my old man's den, and if the coin ran short, you just went hungry till Tuesday.",
+              "I made a bet with myself the day {child} was born that you'd skip a week's keep inside a month, because everyone drops the ball eventually.",
+              "You never missed once, {player}, and {they}'re fat and rosy because of you.",
+              "So I lost the bet—what do you want for your winnings?"
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ],
   "vespera": [
@@ -2659,6 +3330,48 @@
         }
       ],
       "stopsBirthControl": true
+    },
+    {
+      "stage": "thriving",
+      "invitation": "Come up to the nursery, pet. There is a spell at work in this room and I want you to see it.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "vespera",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*Vespera stands by the window with {child} curled against her chest, her dark eyes fixing on you as you enter.*",
+              "Tell me, puppy, do you know what the hardest magic in this university is?",
+              "It isn't bloodcraft or hexing; it is the quiet, dull business of paying a bill four Mondays in a row.",
+              "*She strokes {child}'s back with a slow, unhurried hand.*",
+              "I have watched you empty your pockets to keep this nursery full and {child} glowing with health, without a single word of complaint.",
+              "Most boys your age want to be worshipped for their seed, yet here you are building a fortress plank by plank.",
+              "If {child} loves you fiercely when {they} grow, that will be a hex you earned, {player}.",
+              "Now, aren't you going to come closer and ask me what I think of you?"
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ],
   "yelena": [
@@ -2818,6 +3531,48 @@
         }
       ],
       "stopsBirthControl": true
+    },
+    {
+      "stage": "thriving",
+      "invitation": "I would be most pleased if you joined me in the nursery, {player}. Like, come up here whenever, I want to talk to you.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "yelena",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*Yelena stands over the bassinet, her hands folded neatly before she forgets herself and leans on the rail.*",
+              "My tutors always said a lord's duty is measured by the constancy of his patronage toward his house.",
+              "Which is a super stiff way of saying most guys with a title just throw gold at a steward and never even look.",
+              "*She glances at you as if to ask if she may go on, then catches herself with a little toss of her head.*",
+              "You actually work for {child}'s keep every week, {player}, and you've made this house so nice {they}'re basically glowing.",
+              "Do you mind if I say—no, wait, nobody can tell me not to say it.",
+              "You're a hundred times better than the lords my father wanted me to marry.",
+              "So, are you going to say thank you, or what?"
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ],
   "yulia": [
@@ -2973,6 +3728,48 @@
           "amount": 10
         }
       ]
+    },
+    {
+      "stage": "thriving",
+      "invitation": "Hey babe, get up to the nursery when you can. {child} is looking huge and I've got something on my mind.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "yulia",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*Yulia is pacing a slow circle with {child} bundled in her arms, humming a northern tune that stops when you walk in.*",
+              "Look at {them}, babe. A whole month and {they} haven't had so much as a sniffle.",
+              "All the girls in the dorms talk like a Sire's just a pretty prize you share around—that's so Breedhaven, right?",
+              "*She clicks her tongue once, then goes utterly still, her eyes steady on yours.*",
+              "My mother told me when I left the north that no man down here would ever pay my child's way when the novelty wore off.",
+              "Four weeks straight you've paid {their} keep, built these walls out, kept {them} warm and fed like {they}'re the only thing that matters.",
+              "I don't know how to take it when someone's this good to us, {player}.",
+              "Say something normal before I go soft on you, yeah?"
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ],
   "zelie": [
@@ -3136,6 +3933,48 @@
         }
       ],
       "stopsBirthControl": true
+    },
+    {
+      "stage": "thriving",
+      "invitation": "Come to the nursery, mon cher. The weekly ledger is closed and I wish to show you the result.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "zelie",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "backgroundId": "nursery",
+            "lines": [
+              "*Zelie adjusts the blanket over {child} with practiced grace, tutting softly at a wrinkle before smoothing it flat.*",
+              "Voilà. Four weeks of perfect health, clear eyes, strong lungs, non?",
+              "I have kept eleven babies for eleven rich families before I came to Haven House, {player}.",
+              "*She turns from the cot to face you, her hands resting quiet at her waist.*",
+              "Those fathers signed a draft once a year and did not know if the milk was warm or the roof leaked.",
+              "You count the coin into my hand every week, you build this house room by room, and for the first time the child thriving in my arms is mine.",
+              "You are a rare man, chéri, and I do not say that for your blood.",
+              "Now, will you hold {child} a moment and tell me you are proud of what you have built?"
+            ]
+          }
+        ]
+      },
+      "direction": "The nursery of his house, {child} kept thriving in it a month: she has just told him what that has meant to her, and the three of them are there together. Warm, and about the child and the house he has made for {them}; she is proud of him and says so in her own way. No sex, and nothing of another child.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
     }
   ]
 }

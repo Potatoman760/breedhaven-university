@@ -7,6 +7,7 @@ import { createInitialState } from './state'
 import { fixture } from './testFixture'
 
 // Ana has a beat at Friend and one at Lover, each with a cutscene of one line; the Lover beat has all three tellings.
+// Her thanks for their child are about the child, by the words put in for it.
 const telling = (line: string, direction: string) => ({ cutscene: { speakerId: 'ana', scenes: [{ locationId: 'home', lines: [line] }] }, direction })
 const base = fixture()
 const content: ContentPack = {
@@ -26,7 +27,8 @@ const content: ContentPack = {
         ifIntimate: telling('Again.', 'Lovers already.'),
         ifUnprotected: telling('Only love.', 'A confession.'),
         stopsBirthControl: true
-      })
+      }),
+      StoryBeatSchema.parse({ stage: 'thriving', invitation: 'Come and see {child}.', locationId: 'home', startHour: 18, hours: 1, ...telling('Look at {child}: {they} smiled. Look at {them}, and {their} cheeks.', 'About {child}.'), effects: [] })
     ]
   }
 }
@@ -73,6 +75,19 @@ describe('story beats', () => {
     expect(told.scene.roomOf).toBeUndefined()
     expect(told.state.relationships.ana.trust).toBe(30)
     expect(told.state.appointments).toEqual([])
+  })
+
+  it('ask her thanks for their child kept thriving a month ahead of any stage, once, with the child named in them', () => {
+    const child = { motherId: 'ana', bornAt: 0, daughter: true, name: 'Ada', health: 3, thrivingWeeks: 4 }
+    expect(sendStoryInvitation(content, { ...at(10), children: [{ ...child, thrivingWeeks: 3 }] })).toBeUndefined()
+    const asked = sendStoryInvitation(content, { ...at(10), children: [child] })!
+    expect(courierThread(asked, 'ana').at(-1)!.proposal!.story).toBe('thriving')
+    const told = keep(asked)
+    expect(told.cutscene.scenes[0].lines).toEqual(['Look at Ada: she smiled. Look at her, and her cheeks.'])
+    expect(told.scene.beats[0].direction).toBe('About Ada.')
+    expect(sendStoryInvitation(content, told.state)).toBeUndefined()
+    // A stage reached meanwhile is asked after, in her order.
+    expect(courierThread(sendStoryInvitation(content, { ...told.state, relationships: { ...told.state.relationships, ana: { affection: 40, trust: 20, desire: 20 } } })!, 'ana').at(-1)!.proposal!.story).toBe('friend')
   })
 
   it('tell the Lover beat as it is for them: first time, lovers already, or one already unprotected', () => {

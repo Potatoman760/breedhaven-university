@@ -83,6 +83,17 @@ export function play(cue: Cue): void {
   audio.play().catch(() => undefined)
 }
 
+// A voice is louder than a click: her sounds are mastered quieter than the interface's.
+const VOICE_LEVEL = 0.9
+
+/** Plays a sound of her voice once, a file in the pack, over whatever else is playing. */
+export function playVoice(file: string): void {
+  if (volumes.effects === 0) return
+  const audio = new Audio(url(file))
+  audio.volume = Math.min(1, VOICE_LEVEL * volumes.effects)
+  audio.play().catch(() => undefined)
+}
+
 // The loop playing behind the place, and the timer of each loop still fading in or out.
 let ambience: { sound: Sound; audio: HTMLAudioElement } | null = null
 const fades = new WeakMap<HTMLAudioElement, number>()

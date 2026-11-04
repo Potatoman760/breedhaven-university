@@ -665,5 +665,16 @@
         "loop": true
       }
     ]
+  },
+  "reactions": {
+    "aww": "sounds/voices/anwen/aww.ogg",
+    "gasp": "sounds/voices/anwen/gasp.ogg",
+    "giggle": "sounds/voices/anwen/giggle.ogg",
+    "huff": "sounds/voices/anwen/huff.ogg",
+    "satisfied": "sounds/voices/anwen/satisfied.ogg",
+    "sigh-content": "sounds/voices/anwen/sigh-content.ogg",
+    "sigh": "sounds/voices/anwen/sigh.ogg",
+    "surprised": "sounds/voices/anwen/surprised.ogg",
+    "yawn": "sounds/voices/anwen/yawn.ogg"
   }
 }

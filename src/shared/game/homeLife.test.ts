@@ -88,7 +88,7 @@ describe('who is where in the house', () => {
   it('shows a mother with their child in her arms about the house while it is up, in its tone, and dresses a scene there so', () => {
     // Their daughter born and living in the house; Tamsin no longer carrying.
     const { [`tamsin`]: _done, ...pregnancies } = home.pregnancies
-    const born: GameState = { ...home, pregnancies, children: [{ motherId: 'tamsin', bornAt: 0, daughter: true, name: 'Ada', health: 5 }] }
+    const born: GameState = { ...home, pregnancies, children: [{ motherId: 'tamsin', bornAt: 0, daughter: true, name: 'Ada', health: 5, thrivingWeeks: 0 }] }
     const tamsin = written.loveInterests.find((li) => li.id === 'tamsin')!
     const day = at(born, 14)
     expect(outfitAtHome(seen(day), day, tamsin)?.id).toBe('baby-medium')
@@ -96,6 +96,9 @@ describe('who is where in the house', () => {
     const darker = { ...day, player: { ...day.player, skinTone: 'dark' as const } }
     expect(outfitAtHome(seen(darker), darker, tamsin)?.id).toBe('baby-dark')
     expect(outfitAtHome(seen(at(born, 23)), at(born, 23), tamsin)).toBeUndefined()
+    // A child doing poorly is in its cot, not her arms.
+    const poorly = { ...day, children: [{ ...born.children[0], health: 1 }] }
+    expect(outfitAtHome(seen(poorly), poorly, tamsin)).toBeUndefined()
     expect(outfitAtHome(seen(day), { ...day, locationId: 'great-court' }, tamsin)).toBeUndefined()
     expect(outfitAtHome(seen(at(home, 14)), at(home, 14), tamsin)).toBeUndefined()
     const scene = dressForHome(seen(day), day, movingInScene(seen(home), home, 'tamsin', master)!.scene)

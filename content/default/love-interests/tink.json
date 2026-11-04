@@ -700,5 +700,16 @@
         "loop": true
       }
     ]
+  },
+  "reactions": {
+    "aww": "sounds/voices/tink/aww.ogg",
+    "gasp": "sounds/voices/tink/gasp.ogg",
+    "giggle": "sounds/voices/tink/giggle.ogg",
+    "huff": "sounds/voices/tink/huff.ogg",
+    "satisfied": "sounds/voices/tink/satisfied.ogg",
+    "sigh-content": "sounds/voices/tink/sigh-content.ogg",
+    "sigh": "sounds/voices/tink/sigh.ogg",
+    "surprised": "sounds/voices/tink/surprised.ogg",
+    "yawn": "sounds/voices/tink/yawn.ogg"
   }
 }

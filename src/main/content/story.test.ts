@@ -8,9 +8,9 @@ describe('the story beats of the default pack', () => {
   const content = loadContentPack(join(process.cwd(), 'content', 'default'))
   const story = content.story
 
-  it('are written for every love interest at Friend, Dating and Lover, but for Tamsin, a friend from the start, at Dating and Lover', () => {
+  it('are written for every love interest at Friend, Dating and Lover, but for Tamsin, a friend from the start, at Dating and Lover, and for their child kept thriving', () => {
     expect(Object.keys(story).sort()).toEqual(content.loveInterests.map((li) => li.id).sort())
-    for (const [id, beats] of Object.entries(story)) expect(beats.map((beat) => beat.stage), id).toEqual(id === 'tamsin' ? ['dating', 'lover'] : ['friend', 'dating', 'lover'])
+    for (const [id, beats] of Object.entries(story)) expect(beats.map((beat) => beat.stage), id).toEqual(id === 'tamsin' ? ['dating', 'lover', 'thriving'] : ['friend', 'dating', 'lover', 'thriving'])
     const tamsin = content.loveInterests.find((li) => li.id === 'tamsin')!
     expect(stageFor(content.relationships, tamsin.startsAt!.affection).id).toBe('friend')
   })
@@ -33,6 +33,16 @@ describe('the story beats of the default pack', () => {
     for (const [id, beats] of Object.entries(story)) {
       const lover = beats.find((beat) => beat.stage === 'lover')!
       for (const line of lover.ifUnprotected!.cutscene.scenes.flatMap((scene) => scene.lines)) expect(line, id).not.toMatch(forbidden)
+    }
+  })
+
+  it('thank him for their child in the nursery of his house, naming the child only by what is put in', () => {
+    for (const [id, beats] of Object.entries(story)) {
+      const thanks = beats.find((beat) => beat.stage === 'thriving')!
+      expect(thanks, id).toMatchObject({ locationId: content.housing!.locationId, viewId: 'nursery', inHerRoom: false, stopsBirthControl: false })
+      for (const line of [thanks.invitation, ...thanks.cutscene.scenes.flatMap((scene) => scene.lines)]) {
+        for (const [, word] of line.matchAll(/\{(\w+)\}/g)) expect(['player', 'child', 'they', 'them', 'their'], `${id}: ${line}`).toContain(word)
+      }
     }
   })
 

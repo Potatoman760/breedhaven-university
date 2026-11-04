@@ -705,5 +705,16 @@
         "loop": true
       }
     ]
+  },
+  "reactions": {
+    "aww": "sounds/voices/caelwen/aww.ogg",
+    "gasp": "sounds/voices/caelwen/gasp.ogg",
+    "giggle": "sounds/voices/caelwen/giggle.ogg",
+    "huff": "sounds/voices/caelwen/huff.ogg",
+    "satisfied": "sounds/voices/caelwen/satisfied.ogg",
+    "sigh-content": "sounds/voices/caelwen/sigh-content.ogg",
+    "sigh": "sounds/voices/caelwen/sigh.ogg",
+    "surprised": "sounds/voices/caelwen/surprised.ogg",
+    "yawn": "sounds/voices/caelwen/yawn.ogg"
   }
 }

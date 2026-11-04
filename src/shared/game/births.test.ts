@@ -115,9 +115,9 @@ describe('a birth on the calendar', () => {
     expect(suggestName(content, none, 'ana', true, 0)).toBe('Mab')
     expect(suggestName(content, none, 'ana', true, 0.99)).toBe('Nell')
     expect(suggestName(content, none, 'ana', false, 0.5)).toBe('Tam')
-    const one = { children: [{ motherId: 'ana', bornAt: 0, daughter: true, name: 'mab' }] }
+    const one = { children: [{ motherId: 'ana', bornAt: 0, daughter: true, name: 'mab', thrivingWeeks: 0 }] }
     expect(suggestName(content, one, 'ana', true, 0)).toBe('Nell')
-    const both = { children: [...one.children, { motherId: 'ana', bornAt: 1, daughter: true, name: 'Nell' }] }
+    const both = { children: [...one.children, { motherId: 'ana', bornAt: 1, daughter: true, name: 'Nell', thrivingWeeks: 0 }] }
     const pack: ContentPack = { ...content, pregnancy: { ...content.pregnancy!, names: { daughters: ['Ivy'], sons: [] } } }
     expect(suggestName(pack, both, 'ana', true, 0)).toBe('Ivy')
     // With nothing written anywhere, there is still a name.

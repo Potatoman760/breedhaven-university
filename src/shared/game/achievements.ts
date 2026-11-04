@@ -1,6 +1,7 @@
 import { STATS, kindOf, type BondProposal, type ContentPack, type GameState } from '../model'
 import { END_BOND, bondOf } from './bonds'
 import { enrolledCourses } from './courses'
+import { babiesAtHome, houseTotals } from './housing'
 import { eventsOn } from './events'
 import { trustOf } from './modifiers'
 import { LEGENDARY, statOf } from './stats'
@@ -28,7 +29,10 @@ export const ACHIEVEMENTS = [
   'teach-me',
   'maid-my-day',
   'diplomacy',
-  'bffs'
+  'bffs',
+  'full-house',
+  'true-sire',
+  'family-matters'
 ] as const
 export type AchievementId = (typeof ACHIEVEMENTS)[number]
 
@@ -40,7 +44,10 @@ export const HIDDEN_ACHIEVEMENTS: readonly AchievementId[] = [
   'teach-me',
   'maid-my-day',
   'diplomacy',
-  'bffs'
+  'bffs',
+  'full-house',
+  'true-sire',
+  'family-matters'
 ]
 
 export const isHidden = (id: AchievementId): boolean => HIDDEN_ACHIEVEMENTS.includes(id)
@@ -77,6 +84,16 @@ export function earnedInState(content: ContentPack, state: GameState): Achieveme
   if (state.housing.movedInAt !== undefined || state.housing.status === 'resident') earned.push('wheres-the-landlady')
   // BFFs: Tamsin carrying his child, and with him in any arrangement.
   if (state.pregnancies['tamsin'] !== undefined && bondOf(state, 'tamsin') !== undefined) earned.push('bffs')
+  // Full house: every cot the house has filled.
+  if (content.housing && state.housing.status === 'resident') {
+    const cots = houseTotals(content.housing, state).cots
+    if (cots > 0 && babiesAtHome(state).length >= cots) earned.push('full-house')
+  }
+  // True Sire: every love interest has carried his child, or is carrying it.
+  const carried = (id: string) => state.pregnancies[id] !== undefined || state.children.some((child) => child.motherId === id)
+  if (content.loveInterests.length > 0 && content.loveInterests.every((li) => carried(li.id))) earned.push('true-sire')
+  // Family matters: one of them has carried his child twice: a child born and another coming, or two born.
+  if (content.loveInterests.some((li) => state.children.filter((child) => child.motherId === li.id).length + (state.pregnancies[li.id] ? 1 : 0) >= 2)) earned.push('family-matters')
   return earned
 }
 

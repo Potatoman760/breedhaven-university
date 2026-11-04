@@ -149,7 +149,7 @@ export function deliverChild(content: ContentPack, state: GameState, motherId: s
   const index = seedOf(motherId)
   const { dayIndex } = toDate(content.calendar, at)
   const daughter = roll(state.weatherSeed, dayIndex, index, 2) < (content.pregnancy?.daughterChance ?? 0.5)
-  const child: Child = { motherId, bornAt: at, daughter, name: suggestName(content, state, motherId, daughter, roll(state.weatherSeed, dayIndex, index, 3)) }
+  const child: Child = { motherId, bornAt: at, daughter, name: suggestName(content, state, motherId, daughter, roll(state.weatherSeed, dayIndex, index, 3)), thrivingWeeks: 0 }
   const { [motherId]: _born, ...pregnancies } = state.pregnancies
   return { state: { ...state, pregnancies, children: [...state.children, child] }, child }
 }

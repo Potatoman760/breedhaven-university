@@ -709,5 +709,16 @@
         "loop": true
       }
     ]
+  },
+  "reactions": {
+    "aww": "sounds/voices/ottilie/aww.ogg",
+    "gasp": "sounds/voices/ottilie/gasp.ogg",
+    "giggle": "sounds/voices/ottilie/giggle.ogg",
+    "huff": "sounds/voices/ottilie/huff.ogg",
+    "satisfied": "sounds/voices/ottilie/satisfied.ogg",
+    "sigh-content": "sounds/voices/ottilie/sigh-content.ogg",
+    "sigh": "sounds/voices/ottilie/sigh.ogg",
+    "surprised": "sounds/voices/ottilie/surprised.ogg",
+    "yawn": "sounds/voices/ottilie/yawn.ogg"
   }
 }

@@ -483,6 +483,8 @@ export const LoveInterestSchema = z.object({
   animations: z.array(AnimationSchema).default([]),
   /** The same, drawn with a man of medium or dark skin, by tone: shown for a player of it, act by act (`withSkinTone`). */
   tonedAnimations: z.partialRecord(z.enum(["medium", "dark"]), z.array(AnimationSchema)).default({}),
+  /** Her wordless sounds in her own voice (a giggle, a gasp), by name: a file each, heard when a reply of hers names one. */
+  reactions: z.record(z.string(), z.string()).default({}),
   schedule: z.array(ScheduleEntrySchema).default([]),
   /** Where she lives. A scene can move there. */
   room: RoomSchema.optional(),
@@ -495,6 +497,8 @@ export const LoveInterestSchema = z.object({
   babyTint: z.string().optional(),
   /** The one tone every child of hers is drawn in, whoever the father, where what she gives it outweighs his. */
   ownBabyTone: SkinToneSchema.optional(),
+  /** The picture of a child of hers by itself where it takes her tint (`babyTint`): in place of the pack's by tone. */
+  babyPicture: z.string().optional(),
   /**
    * Pictures of her just after giving birth, sitting up in a hospital bed with the child in her arms, one for each
    * tone a child of hers may have (`babyTone`). It is the whole stage of the scene of a birth he is there for.

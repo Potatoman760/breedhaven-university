@@ -11,6 +11,7 @@
  *   npx jiti scripts/make-test-save.ts 16 --break    the same game the first morning of the Mistmoon Break, the trip booked with Tamsin and Faye
  *   npx jiti scripts/make-test-save.ts 17 --masquerade   the same game an hour before the Masquerade Ball, at home
  *   npx jiti scripts/make-test-save.ts 18 --frost    the same game the morning of the Feast of First Frost, at home
+ *   npx jiti scripts/make-test-save.ts 19 --house    the same game a month into the house, Tamsin and Faye living there with a child each
  */
 import { existsSync } from 'node:fs'
 import { homedir } from 'node:os'
@@ -19,15 +20,22 @@ import { loadContentPack } from '../src/main/content/loader'
 import { SaveStore } from '../src/main/saves/store'
 import {
   addMemory,
+  answerHousingOffer,
   applyForJob,
+  buildRoom,
   canEnrol,
+  courierThread,
   createInitialState,
+  deliverChild,
   examSlot,
   factsOf,
   formBond,
   giveContact,
   housingOfferDue,
+  invite,
   meet,
+  moveIn,
+  sendHousingOffer,
   revealFacts,
   skillsOf,
   tellSkills,
@@ -46,6 +54,7 @@ const booking = args.includes('--booking')
 const onBreak = args.includes('--break')
 const masquerade = args.includes('--masquerade')
 const frost = args.includes('--frost')
+const house = args.includes('--house')
 const slot = `slot${args.find((arg) => /^\d+$/.test(arg)) ?? '8'}`
 
 const appData = process.platform === 'win32' ? (process.env.APPDATA ?? join(homedir(), 'AppData', 'Roaming')) : process.platform === 'darwin' ? join(homedir(), 'Library', 'Application Support') : (process.env.XDG_CONFIG_HOME ?? join(homedir(), '.config'))
@@ -177,9 +186,41 @@ if (goBelow && content.expedition) {
   }
 }
 
+// For trying the house with children in it: he took it a month ago, built the nursery and the west suite, and Tamsin
+// and Faye live there with a child each. The household is settled to this morning; Tamsin's child has been kept
+// thriving every week of the month, so her thanks are due, and Faye's, newer to the house, is settled.
+if (house && content.housing) {
+  const config = content.housing
+  const movedAt = timeOn(content, DAY - 30, 10)
+  let then: GameState = { ...state, time: movedAt }
+  then = sendHousingOffer(content, then)
+  then = answerHousingOffer(content, then, courierThread(then, config.officerId).length - 1, true)
+  // The Office shows the house before it hands it over: he has been shown it.
+  then = moveIn(content, then)
+  const home = withHousing(written, then)
+  for (const key of ['nursery', 'suite-west']) then = buildRoom(home, then, key)
+  // Tamsin's child was born the day he moved in; Faye carried his from the start of term and was delivered a week after.
+  then = deliverChild(home, then, 'tamsin', movedAt + hours).state
+  const fayeDue = movedAt + 7 * hours
+  then = { ...then, pregnancies: { ...then.pregnancies, faye: { conceivedAt: fayeDue - (content.pregnancy?.lengthDays ?? 48) * hours, dueAt: fayeDue } } }
+  then = deliverChild(home, then, 'faye', fayeDue).state
+  then = invite(home, { ...then, time: movedAt + hours }, 'tamsin', 'master')
+  then = invite(home, { ...then, time: fayeDue + hours }, 'faye', 'suite-west')
+  const now = timeOn(content, DAY, 9)
+  state = {
+    ...then,
+    time: now,
+    locationId: config.locationId,
+    inOwnRoom: false,
+    housing: { ...then.housing, settledTo: now },
+    job: then.job && { ...then.job, settledTo: now },
+    children: then.children.map((child) => (child.motherId === 'tamsin' ? { ...child, health: 3, thrivingWeeks: 4 } : { ...child, health: 2, thrivingWeeks: 0 }))
+  }
+}
+
 const checked = GameStateSchema.parse(state)
-if (!housingOfferDue(content, checked)) throw new Error('The save does not meet what the offer of a house asks: a woman carrying his child whom he has an arrangement with.')
-const saved = new SaveStore(dir).save(slot, { state: checked, scene: null }, new Date(), midterm ? 'Before a midterm' : goBelow ? 'At the way down' : booking ? 'Booking Saltmere' : onBreak ? 'Break morning' : masquerade ? 'Before the masquerade' : frost ? 'First Frost morning' : 'Late game test')
+if (!house && !housingOfferDue(content, checked)) throw new Error('The save does not meet what the offer of a house asks: a woman carrying his child whom he has an arrangement with.')
+const saved = new SaveStore(dir).save(slot, { state: checked, scene: null }, new Date(), midterm ? 'Before a midterm' : goBelow ? 'At the way down' : booking ? 'Booking Saltmere' : onBreak ? 'Break morning' : masquerade ? 'Before the masquerade' : frost ? 'First Frost morning' : house ? 'Children at home' : 'Late game test')
 console.log(`Written to ${join(dir, `${slot}.json`)}: ${saved.unreadable ? 'unreadable' : `${saved.playerName}, day ${Math.floor(checked.time / hours) + 1}`}.`)
 console.log(`Courses: ${enrolment.map((id) => checked.courses.find((course) => course.id === id)?.number).join(', ')}. Skills: ${skillsOf(content, checked).map((skill) => skill.name).join(', ')}.`)
-console.log('The offer of the house arrives as a DM from the housing officer as soon as the save is loaded.')
+console.log(house ? 'He is at the house; Tamsin and Faye live there with a child each, and Tamsin writes with her thanks for hers.' : 'The offer of the house arrives as a DM from the housing officer as soon as the save is loaded.')

@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { earnedInState } from './achievements'
 import { validateContentPack, type ContentPack, type GameState } from '../model'
 import { dayAgenda } from './agenda'
 import { courierThread, hasContact } from './courier'
@@ -94,7 +95,7 @@ const written: ContentPack = validateContentPack({
 const start = createInitialState(written)
 const at = (state: GameState, day: number, hour = 6): GameState => ({ ...state, time: day * 20 + (hour - 6) })
 const rich = (state: GameState, money: number): GameState => ({ ...state, player: { ...state.player, money } })
-const withChild = (state: GameState, motherId: string): GameState => ({ ...state, children: [...state.children, { motherId, bornAt: 0, daughter: true, name: 'Ada' }] })
+const withChild = (state: GameState, motherId: string): GameState => ({ ...state, children: [...state.children, { motherId, bornAt: 0, daughter: true, name: 'Ada', thrivingWeeks: 0 }] })
 const bonded = (state: GameState, id: string, affection = 50): GameState => ({
   ...state,
   bonds: [...state.bonds, { statusId: 'casual', memberIds: [id], since: 0 }],
@@ -314,12 +315,27 @@ describe('what the house costs', () => {
     const kept = settle(at(rich(home, 20), 2))
     expect(kept.state.player.money).toBe(6)
     expect(kept.state.children[0].health).toBe(2)
-    expect(kept.notices).toEqual(['Rent paid: $10.', "The children's week is paid: $4."])
+    expect(kept.state.children[0].thrivingWeeks).toBe(0)
+    expect(kept.notices).toEqual(['Rent paid: $10.', 'Weekly expenses paid: $4.'])
     // With a nursery, it thrives, and its mother is glad of it.
     const nursery = buildRoom(seen(home), rich(home, 30), 'nursery')
     const thriving = settle(at(nursery, 2))
     expect(thriving.state.children[0].health).toBe(3)
+    expect(thriving.state.children[0].thrivingWeeks).toBe(1)
     expect(thriving.state.relationships['ana'].affection).toBe(home.relationships['ana'].affection + 1)
+    // The weeks it has been thriving are counted on, and lost with one it is not.
+    const kept2 = settle(at(rich(thriving.state, 20), 5))
+    expect(kept2.state.children[0].thrivingWeeks).toBe(2)
+    expect(settle(at(rich(thriving.state, 0), 5)).state.children[0].thrivingWeeks).toBe(0)
+  })
+
+  it('earns Full House with a child in every cot', () => {
+    // The master bedroom's one cot, filled; a nursery built adds two more to fill.
+    expect(earnedInState(seen(home), home)).toContain('full-house')
+    const nursery = buildRoom(seen(home), rich(home, 30), 'nursery')
+    expect(earnedInState(seen(nursery), nursery)).not.toContain('full-house')
+    const full = { ...nursery, children: [nursery.children[0], nursery.children[0], nursery.children[0]] }
+    expect(earnedInState(seen(full), full)).toContain('full-house')
   })
 
   it('comes down with each child of his, wherever it lives, to no less than the Office lets a house for', () => {
@@ -340,6 +356,7 @@ describe('what the house costs', () => {
     // Day 2 is a rent day as well: he can find neither.
     const once = settle(at(home, 2)).state
     expect(once.children[0].health).toBe(1)
+    expect(once.children[0].thrivingWeeks).toBe(0)
     expect(once.relationships['ana']).toEqual({ affection: home.relationships['ana'].affection - 6, trust: home.relationships['ana'].trust - 8, desire: 0 })
     expect(once.housing.residents).toEqual({ ana: 'master' })
 
@@ -356,7 +373,7 @@ describe('what the house costs', () => {
   })
 
   it('pays first for the child doing worst when he cannot pay for them all', () => {
-    const two: GameState = { ...home, children: [{ motherId: 'ana', bornAt: 0, daughter: true, name: 'Ada', health: 2 }, { motherId: 'ana', bornAt: 1, daughter: false, name: 'Bram', health: 1 }] }
+    const two: GameState = { ...home, children: [{ motherId: 'ana', bornAt: 0, daughter: true, name: 'Ada', health: 2, thrivingWeeks: 0 }, { motherId: 'ana', bornAt: 1, daughter: false, name: 'Bram', health: 1, thrivingWeeks: 0 }] }
     // Money for the rent and one child.
     const week = settle(at(rich(two, 14), 2)).state
     expect(week.player.money).toBe(0)

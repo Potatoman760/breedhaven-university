@@ -14,7 +14,9 @@ export function outfitAtHome(content: ContentPack, state: GameState, li: LoveInt
   const hour = toDate(content.calendar, state.time).hour
   if (hour < AWAKE_HOURS.from || hour >= AWAKE_HOURS.to) return undefined
   if (state.locationId !== content.housing?.locationId || whereAtHome(content, state, li.id) === undefined) return undefined
-  if (!babiesAtHome(state).some((child) => child.motherId === li.id) || pregnancyStage(content, state, li.id)?.showing) return undefined
+  // Held only while it does well: a child below the house's own start level is in its cot, and she is not drawn with it.
+  const startLevel = content.housing?.babies.startLevel ?? 0
+  if (!babiesAtHome(state).some((child) => child.motherId === li.id && (child.health ?? 0) >= startLevel) || pregnancyStage(content, state, li.id)?.showing) return undefined
   const outfit = li.outfits.find((one) => one.id === babyOutfitId(babyToneFor(content, state, li.id)))
   return outfit?.sprites.neutral ? outfit : undefined
 }

@@ -23,6 +23,15 @@ describe('the sounds of the default pack', () => {
     expect(['creampie', 'facial'].filter((id) => !sounds.poses[id]?.clip)).toEqual([])
   })
 
+  it("has every sound of every love interest's voice, the same ones for each", () => {
+    const { loveInterests } = loadContentPack(dir)
+    const files = loveInterests.flatMap((li) => Object.values(li.reactions))
+    expect(files.filter((file) => !existsSync(join(dir, file)))).toEqual([])
+    const sets = new Set(loveInterests.map((li) => Object.keys(li.reactions).sort().join(',')))
+    expect([...sets]).toHaveLength(1)
+    expect([...sets][0]).not.toBe('')
+  })
+
   it('credits every sound', () => {
     const all = { ...sounds.cues, ...sounds.ambience, ...sounds.poses }
     expect(Object.entries(all).filter(([, sound]) => sound.credit === '').map(([id]) => id)).toEqual([])

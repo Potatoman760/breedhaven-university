@@ -15,6 +15,7 @@ import {
   meet,
   sceneCast,
   parseDirectives,
+  sexWrittenOf,
   lookLines,
   plainName,
   namesHer,
@@ -86,6 +87,7 @@ describe('look directives', () => {
       comfort: [],
       leaving: [],
       attending: [],
+      reactions: [],
       agreed: false,
       slept: false
     })
@@ -107,9 +109,31 @@ describe('look directives', () => {
       comfort: [],
       leaving: [],
       attending: [],
+      reactions: [],
       agreed: false,
       slept: false
     })
+  })
+
+  it('finds who a reply writes having sex: her tags, her own lines, and lines that name her', () => {
+    const cast = [{ id: 'mor', name: 'Morwenna Thriceborn' }, { id: 'elo', name: 'Elowen' }]
+    const both = ['mor', 'elo']
+    expect(sexWrittenOf('Morwenna: *She sinks down onto him, inch by inch.* I take.', cast, both, 'mor')).toEqual(['mor'])
+    expect(sexWrittenOf('Morwenna: *She plants her hands and drives her hips down, hard.*', cast, both, 'mor')).toEqual(['mor'])
+    expect(sexWrittenOf('Elowen: *She curls against his side, watching Morwenna ride him.*', cast, ['mor'], 'mor')).toEqual(['mor'])
+    expect(sexWrittenOf('Elowen: Oh, yes.\n[SEX-ACT: Morwenna=cowgirl]', cast, ['mor'], 'mor')).toEqual(['mor'])
+    // Flirting, kissing and a refusal are not sex.
+    expect(sexWrittenOf('Morwenna: *She kisses him slowly.* Not tonight, darling. You will have to earn more than that.', cast, ['mor'], 'mor')).toEqual([])
+    expect(sexWrittenOf('Morwenna: I ride my bicycle to lectures, darling.', cast, ['mor'], 'mor')).toEqual([])
+    // Alone, every unnamed line is hers; a pose taken down is nothing.
+    expect(sexWrittenOf('*She straddles him on the sofa.*', [cast[0]], ['mor'], 'mor')).toEqual(['mor'])
+    expect(sexWrittenOf('Fine.\n[SEX-ACT: none]', [cast[0]], ['mor'], 'mor')).toEqual([])
+  })
+
+  it('reads the sounds she makes aloud, whose each is, and hides them', () => {
+    const read = parseDirectives('[EXPRESSION: happy]\nOh, stop it.\n[REACTS: Giggle]\n[REACTS: Faye=sigh]')
+    expect(read.text).toBe('Oh, stop it.')
+    expect(read.reactions).toEqual([{ name: '', reaction: 'giggle' }, { name: 'Faye', reaction: 'sigh' }])
   })
 
   it('reads how comfortable she says she is, hides it, and keeps it for the next prompt', () => {

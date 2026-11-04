@@ -196,7 +196,7 @@ import { MAX_SCENE_CAST, type Activity, type ContentPack, type EventPart, type E
 import { CHAT_CANCELLED } from '../../shared/ipc'
 import { AUTO_SLOT_ID, type SaveData } from '../../shared/saves'
 import { errorMessage } from './errors'
-import { play, playSong, setAmbience, useSounds } from './sound'
+import { play, playSong, playVoice, setAmbience, useSounds } from './sound'
 import { onLanguageContent } from './language'
 import { t } from '../../shared/i18n'
 import { EpilogueView } from './ui/EpilogueView'
@@ -780,6 +780,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setBusy(true)
     try {
       const response = await window.api.chat({ state: at, scene: asked })
+      if (response.reaction) playVoice(response.reaction)
       // The game, not the LLM, decides whether she conceives.
       // She may have chosen, in this reply, to stop what she takes against it: that counts from this reply on.
       const stopped = response.offControlIds.filter((id) => onBirthControl(content, at, id))

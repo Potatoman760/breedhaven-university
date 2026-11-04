@@ -21,7 +21,7 @@ import { attendableEvents, describeEvent, eventGoers, eventsOn, upcomingEvents }
 import { describeAge, describeBeat, describeIntimacy, feelingWord, selectMemories } from './memory'
 import { groupActs } from './groups'
 import { stageFor } from './relationships'
-import { describeSexGate, sexGate } from './intimacy'
+import { describeSexGate, sexGate, shutLine } from './intimacy'
 import { describeOwnChildren, describePregnancy, canConceive, ordinaryOutfit, pregnancyStage, wearableOutfits, wornOutfit } from './pregnancy'
 import { AGREED_TAG, firstNames, SCENE_END_TAG, SEEDED_TAG, SLEEP_TAG } from './scene'
 import { describePlayerRoom, playerRoom, describePlace, describeRoom, describeWeather, roomOwner, sceneView } from './sceneMoves'
@@ -383,10 +383,14 @@ export function buildCharacterPrompt(input: PromptInput): string {
       !byCourier &&
       section(
         t('scene.prompt.sex.title', { player: player.name }),
-        cast.flatMap((c) => {
-          const lines = describeSexGate(content, state, c, group, input.uninhibited?.includes(c.id))
-          return group ? [t('scene.prompt.sex.for', { first: c.name.split(' ')[0] }), ...lines] : lines
-        })
+        [
+          // Who will not, by name and before anything else, so that it is not lost among the lines written to each.
+          ...(group ? cast.flatMap((c) => shutLine(content, state, c, input.uninhibited?.includes(c.id)) ?? []) : []),
+          ...cast.flatMap((c) => {
+            const lines = describeSexGate(content, state, c, group, input.uninhibited?.includes(c.id))
+            return group ? [t('scene.prompt.sex.for', { first: c.name.split(' ')[0] }), ...lines] : lines
+          })
+        ]
       ),
 
     !isNpc && section(
@@ -619,6 +623,17 @@ export function buildCharacterPrompt(input: PromptInput): string {
                   ]
                 : [])
             ]),
+        // The sounds of her voice that can be heard, one at a time.
+        ...(group
+          ? voices.some((c) => Object.keys(c.reactions).length > 0)
+            ? [
+                t('scene.prompt.appear.reactionsGroup', { tag: '[REACTS: Name=id]' }),
+                ...voices.filter((c) => Object.keys(c.reactions).length > 0).map((c) => `- ${c.name.split(' ')[0]}: ${Object.keys(c.reactions).join(', ')}`)
+              ]
+            : []
+          : Object.keys(li.reactions).length > 0
+            ? [t('scene.prompt.appear.reactions', { tag: '[REACTS: id]', reactions: Object.keys(li.reactions).join(', ') })]
+            : []),
         t('scene.prompt.appear.onlyListed')
       ]),
 

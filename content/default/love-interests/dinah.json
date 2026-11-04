@@ -631,6 +631,7 @@
   },
   "skinTone": "light",
   "babyTint": "The baby is very pale, its skin nearly as porcelain-white as its mother's",
+  "babyPicture": "sprites/babies/pale.webp",
   "birthPictures": {
     "light": "sprites/dinah/birth-light.webp",
     "medium": "sprites/dinah/birth-medium.webp"
@@ -663,5 +664,16 @@
     "knowledge": [],
     "secrets": [],
     "extraInstructions": ""
+  },
+  "reactions": {
+    "aww": "sounds/voices/dinah/aww.ogg",
+    "gasp": "sounds/voices/dinah/gasp.ogg",
+    "giggle": "sounds/voices/dinah/giggle.ogg",
+    "huff": "sounds/voices/dinah/huff.ogg",
+    "satisfied": "sounds/voices/dinah/satisfied.ogg",
+    "sigh-content": "sounds/voices/dinah/sigh-content.ogg",
+    "sigh": "sounds/voices/dinah/sigh.ogg",
+    "surprised": "sounds/voices/dinah/surprised.ogg",
+    "yawn": "sounds/voices/dinah/yawn.ogg"
   }
 }

@@ -658,5 +658,16 @@
         "loop": true
       }
     ]
+  },
+  "reactions": {
+    "aww": "sounds/voices/daphne/aww.ogg",
+    "gasp": "sounds/voices/daphne/gasp.ogg",
+    "giggle": "sounds/voices/daphne/giggle.ogg",
+    "huff": "sounds/voices/daphne/huff.ogg",
+    "satisfied": "sounds/voices/daphne/satisfied.ogg",
+    "sigh-content": "sounds/voices/daphne/sigh-content.ogg",
+    "sigh": "sounds/voices/daphne/sigh.ogg",
+    "surprised": "sounds/voices/daphne/surprised.ogg",
+    "yawn": "sounds/voices/daphne/yawn.ogg"
   }
 }

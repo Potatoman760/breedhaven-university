@@ -204,8 +204,10 @@ a part of the Lantern Festival is attended with someone (`earnedAtEvent`), Heart
 breakup is agreed (`earnedByBond`), and, as a scene in which he had sex ends (`earnedInScene`), Oil
 and Water (Dinah and Morwenna), Forbidden (Anwen and Elowen), Teach me! (any three professors), Diplomacy (Yelena and Seraphine),
 Maid my Day (Zélie) and XXXmas (anyone, during First Frost). BFFs is read off the game: Tamsin pregnant
-and in any arrangement with him.
-Those six and BFFs are hidden, as Steam has it (`HIDDEN_ACHIEVEMENTS`): until earned, the panel names
+and in any arrangement with him, and so are the three of the children: Full House (a child in every cot of
+Haven House), True Sire (every love interest carrying his child or delivered of one) and Family Matters
+(one of them twice).
+Those six, BFFs and the three of the children are hidden, as Steam has it (`HIDDEN_ACHIEVEMENTS`): until earned, the panel names
 none of them and only counts them.
 Each has two icons in `src/assets/achievements/`, at Steam's size (256 square, JPG): `<id>.jpg`, shown
 once it is earned, and `<id>-locked.jpg`, the same in grey, before. Both are uploaded to Steam as
@@ -523,7 +525,14 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
     him, nor until her desire has reached `minDesire` (25), or `reluctantMinDesire` (50)
     with one of `reluctantTraitIds` (prude). It is settled as a scene stands (`sexGate`),
     told to her as a rule, and enforced: while it is shut no sex-act is shown and nothing
-    can be conceived, whatever the reply says.
+    can be conceived, whatever the reply says. In a group it is said of her by name at the
+    head of the sex section (`shutLine`), not among the lines written to each. Both say that
+    a reply breaking it is rejected, and one is: main runs `sexWrittenOf` over each scene
+    reply (a sex-act or `[SEEDED]` tag of hers, or sex in a line she speaks or that names
+    her, by a list of English phrases in `scene.ts`), and if it has a woman whose gate is
+    shut having sex, asks for the reply again, once, with a note saying who and that she
+    refuses; what the first draft's tools did is undone. The second draft is kept whatever
+    it says.
   - **Birth control** (`onBirthControl`): a love interest's `birthControl` flag (the
     editor's Family tab; on unless written off) says whether she takes something against
     the Bloom when the game begins. While she does, the chance is `birthControlChance`
@@ -579,8 +588,10 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
   - **With the baby**: for each of the same tones, an outfit of her holding a swaddled newborn of it (`babyTone` on
     the outfit, `baby-<tone>`, built on her day clothes by `babyOutfit` in `src/shared/comfy.ts`), drawn neutral and
     shown on the Family tab, not with her outfits. She is shown in it about the house while the household is up,
-    with a child of theirs living there and herself not showing with another (`outfitAtHome` in
-    `src/shared/game/homeOutfit.ts`): in the house's views, and as a scene there opens (`dressForHome`).
+    with a child of theirs living there, at least Settled, and herself not showing with another (`outfitAtHome` in
+    `src/shared/game/homeOutfit.ts`): in the house's views, and as a scene there opens (`dressForHome`). The
+    child by itself is one of six in `sprites/babies/`: the three tones, and the pale, green and blue of
+    Dinah's, Grushka's and Lira's (`babyPicture`).
   - **Her sex-acts by his tone**: the sex-acts show the player, so each is drawn once for each tone of the man
     (`animations` for light, `tonedAnimations.medium` and `.dark` beside it; the tabs over the NSFW section of the
     Sprites tab, whose pictures are drawn with a line for the man's skin, `nsfwPrompt`). The pack a game reads has
@@ -644,9 +655,15 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
     on a level, as far as the house's comfort allows (`babies.caps`); not paid for, it drops
     a level and its mother's affection and trust fall (`babies.neglect`). At the bottom she
     takes it back to the creche and leaves. No child is ever lost. The house's sidebar lists each
-    child at home with her level, and the comfort the house needs for the next one (`nextHealthStep`).
+    child at home with her level, the nanny's word on it (`said` on the level), and the comfort the house
+    needs for the next one (`nextHealthStep`). Each child is pictured by itself, swaddled, in the picture for
+    its tone (`sprites/babies/<tone>.webp`, or its mother's `babyPicture` where it takes her tint;
+    `babySprite` in `src/shared/game/skin.ts`), there and in the Children list; its mother holds it about the
+    house only from Settled (`babies.startLevel`) up. Weeks it is kept thriving (`babies.thrivingFrom` or
+    better, paid for) are counted on it (`thrivingWeeks`, back to nothing with one it is not); four of them
+    earn its mother's thanks, a story beat (see Story beats). Filling every cot earns Full House.
   - **Reckoning** (`settleHousehold`) walks every day since it was last done, so a jump of
-    several days settles each once. Rent day and the children's week are on the calendar.
+    several days settles each once. Rent day and the weekly expenses (the children's keep) are on the calendar.
   - **The epilogue** has a Home screen, with how the children raised there fared, and a mother
     who lived with him raised the child with him.
 - **The calendar** opens on the week, laid out by the hour like a diary: the player's
@@ -1332,13 +1349,19 @@ anything against the Bloom in this game (`offBirthControl` in the save), or is a
 took it, as Dinah, Lira and Lola never did, is not "already off" it: for her only a pregnancy brings that telling. Each beat is one ask, had once: reaching the stage sends her invitation
 and puts a card on his calendar, marked as hers and not an ordinary plan; going reads the cutscene and opens the
 scene with her alone; missed, it is gone. The default pack has a beat at Friend, Dating and Lover for every love
-interest (Tamsin starts a friend, so has no Friend beat), fifty-nine in all, each at a place of hers: Seraphine's
+interest (Tamsin starts a friend, so has no Friend beat), fifty-nine of the stages, each at a place of hers: Seraphine's
 warding lesson is at Aether and Anwen's night ride at the Ridge Road, two places off the map that exist for these
 (`eventOnly`). At Lover most stop taking anything against the Bloom; Daphne, Elowen, Tink and Yulia do not, and
 Dinah, Lira and Lola never took it. The load check holds a beat to a stage, place, view, outfit and weekday there
 are, and to cutscenes spoken by her; `src/main/content/story.test.ts` pins the pack's, and that the unprotected
 telling says nothing of birth control or a child. The lines are written with nano-gpt (see `CLAUDE.md`), not by
 hand.
+
+One more beat is not of a stage: `thriving`, her thanks for their child kept thriving in his house for
+`THRIVING_WEEKS` (four) weeks running (`thrivingWeeks` on the child, see The house), in its nursery at six in the
+evening. It is asked whenever it is earned, ahead of whatever stage she is at, and once; its lines are written
+with `{child}`, `{they}`, `{them}` and `{their}`, filled with the child's name and pronouns as it is read
+(`aboutChild`). Every love interest has one, eighty beats in all.
 
 Delivery (`src/shared/game/story.ts`): from 09:00, an idle effect in `App.tsx` sends the next invitation there is
 (`sendStoryInvitation`): from the first love interest whose Bloomr he has and whose next beat's stage she has reached,
@@ -1388,6 +1411,13 @@ at least the cap on a hand (`canPlayPoker`).
 - **Ambience** (`ambience`, loops by an id of their own) and **places** (location id to an ambience by `day`, and
   by `night` if it differs): the loop for where he is fades in as he arrives and changes with the dark
   (`ambienceAt`). A place left out is silent.
+- **Her voice** (`reactions` on a love interest, a sound's name to a file under `sounds/voices/<id>/`): a few
+  wordless sounds each (giggle, sigh, sigh-content, gasp, huff, surprised, yawn, aww, satisfied), designed and
+  recorded on ElevenLabs by `scripts/generate-voice.ts` (each voice's id in `sounds/voices/voices.json`, the key in
+  `.env`). Her scene prompt lists hers, and a reply may write `[REACTS: giggle]`, or `[REACTS: Faye=giggle]` in a
+  group, one a reply; `parseDirectives` hides it, main keeps the first one named that the one named has, and the
+  renderer plays it on the effects volume as the reply comes in (`playVoice`). The test checks every love interest
+  has the same set and every file is there.
 - **Volumes** for effects, ambience and the title music are the Sound tab of Settings, kept on the computer.
 - Everything shipped is CC0 (Kenney's packs for cues, Freesound for ambience), credited in each entry's `credit`.
   `src/main/content/sounds.test.ts` fails if a cue has no sound, a file is missing or a sound is uncredited.

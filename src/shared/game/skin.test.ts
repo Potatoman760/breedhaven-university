@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { babyTone, babyToneFor, babyTonesOf, birthPictureFor, posesForTone, withSkinTone } from './skin'
+import { babySprite, babyTone, babyToneFor, babyTonesOf, birthPictureFor, posesForTone, withSkinTone } from './skin'
 import { createInitialState } from './state'
 import { fixture } from './testFixture'
 
@@ -20,6 +20,17 @@ describe('a child of theirs', () => {
     expect(babyTonesOf({ skinTone: 'medium' })).toEqual(['medium', 'dark'])
     expect(babyTonesOf({ skinTone: 'dark' })).toEqual(['medium', 'dark'])
     expect(babyTonesOf({ skinTone: 'medium', ownBabyTone: 'light' })).toEqual(['light'])
+  })
+
+  it("is pictured by itself in the pack's picture for its tone, or its mother's own where it takes her tint", () => {
+    const base = fixture()
+    const ana = base.loveInterests.find((li) => li.id === 'ana')!
+    const tinted = { ...base, loveInterests: [{ ...ana, skinTone: 'light' as const, babyTint: 'Pale.', babyPicture: 'sprites/babies/pale.webp' }] }
+    const his = (skinTone: 'light' | 'medium' | 'dark') => ({ ...createInitialState(base), player: { ...createInitialState(base).player, skinTone } })
+    expect(babySprite(tinted, his('light'), 'ana')).toBe('sprites/babies/pale.webp')
+    // A darker father outweighs her tint, and the child is drawn as any of its tone.
+    expect(babySprite(tinted, his('dark'), 'ana')).toBe('sprites/babies/medium.webp')
+    expect(babySprite(base, his('dark'), 'ana')).toBe(`sprites/babies/${babyToneFor(base, his('dark'), 'ana')}.webp`)
   })
 
   it("shows a player her sex-acts for his tone, act by act, and the light ones for any act it has none of", () => {

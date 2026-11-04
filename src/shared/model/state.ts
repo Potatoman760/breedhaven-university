@@ -29,7 +29,7 @@ export const PlayerSchema = z.object({
   /** What the player added to it when the game began, told along with it. `{player}` stands for his name here too. */
   about: z.string().default(''),
   /** His skin tone, chosen as a game begins: told to everyone, and what a child of his takes from him. */
-  skinTone: SkinToneSchema.default('medium')
+  skinTone: SkinToneSchema.default('light')
 })
 export type Player = z.infer<typeof PlayerSchema>
 

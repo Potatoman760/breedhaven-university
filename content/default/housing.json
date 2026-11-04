@@ -21,23 +21,28 @@
     "levels": [
       {
         "name": "Poorly",
-        "description": "The child is not doing well in his house: underfed, unsettled, and you are frightened for it."
+        "description": "The child is not doing well in his house: underfed, unsettled, and you are frightened for it.",
+        "said": "Zélie: I will not soften it, monsieur: this little one is going short, and I am frightened."
       },
       {
         "name": "Fretful",
-        "description": "The child is fretful and going short, and you lie awake counting what it lacks."
+        "description": "The child is fretful and going short, and you lie awake counting what it lacks.",
+        "said": "Zélie: Fretful, and not sleeping through. Pay the keep and give me a warmer house."
       },
       {
         "name": "Settled",
-        "description": "The child is settled: fed, warm and sleeping, and wanting for nothing that matters."
+        "description": "The child is settled: fed, warm and sleeping, and wanting for nothing that matters.",
+        "said": "Zélie: Settled. Fed, warm, and asking nothing of me but my arms. It is a start."
       },
       {
         "name": "Thriving",
-        "description": "The child is thriving in his house: growing fast, sleeping well, quick to smile."
+        "description": "The child is thriving in his house: growing fast, sleeping well, quick to smile.",
+        "said": "Zélie: Thriving. Growing like a weed and smiling at everyone. Keep this up and I will say nice things about you."
       },
       {
         "name": "Blooming",
-        "description": "The child is blooming: the healthiest, happiest baby you have ever seen, and the whole house dotes on it."
+        "description": "The child is blooming: the healthiest, happiest baby you have ever seen, and the whole house dotes on it.",
+        "said": "Zélie: Blooming. The happiest baby I have ever held, and I have held a great many. You did this, monsieur."
       }
     ],
     "caps": [

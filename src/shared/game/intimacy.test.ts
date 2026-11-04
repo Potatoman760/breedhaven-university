@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { PregnancyConfigSchema, type ContentPack, type GameState } from '../model'
-import { desireNeeded, describeSexGate, isEasy, onBirthControl, sexGate, stopBirthControl } from './intimacy'
+import { desireNeeded, describeSexGate, isEasy, onBirthControl, sexGate, shutLine, stopBirthControl } from './intimacy'
 import { parseDirectives } from './scene'
 import { conceive } from './pregnancy'
 import { buildCharacterPrompt } from './prompt'
@@ -67,6 +67,12 @@ describe('whether she will', () => {
     expect(describeSexGate(content, start, a)[0]).toContain('You have only just met Pat')
     expect(describeSexGate(content, known(start, 'ana', 5), a)[0]).toContain('You will refuse Pat if he tries to have sex with you')
     expect(describeSexGate(content, known(start, 'ana', 5), a)[0]).toContain('turn him down in your own way')
+    expect(describeSexGate(content, known(start, 'ana', 5), a)[0]).toContain('rejected and has to be written again')
+    // In a group it is said of her by name, not to her among the others' lines.
+    expect(describeSexGate(content, known(start, 'ana', 5), a, true).join(' ')).not.toContain('You will refuse')
+    expect(shutLine(content, known(start, 'ana', 5), a)).toMatch(/^Ana will not have sex with Pat in this scene: she is not ready\./)
+    expect(shutLine(content, start, a)).toContain('she has only just met him')
+    expect(shutLine(content, start, b)).toBeUndefined()
     expect(describeSexGate(content, start, b)).toHaveLength(1)
     const prompt = buildCharacterPrompt({ content, state: start, loveInterestId: 'ana', sceneBeats: [{ activityName: 'Tea' }] })
     expect(prompt).toContain('## Sex with Pat')

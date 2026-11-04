@@ -4849,6 +4849,25 @@ button.btn.small,
   font-size: 0.875rem;
 }
 
+/* The player's skin tone: a row of buttons spaced as any row of them, each with its swatch before the name. */
+.skin-tones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skin-tones button.btn.small {
+  padding: 0 14px;
+}
+
+.skin-swatch {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.35);
+  border-radius: 50%;
+}
+
 /* An outfit's own actions, in one row, with the one that removes it set apart at the end. */
 .outfit-actions {
   display: flex;
@@ -8099,14 +8118,6 @@ button.btn.back-button.house-close {
   gap: 6px;
 }
 
-.house-children {
-  padding: 2px 10px;
-  border: 1px solid var(--gold-deep);
-  border-radius: 999px;
-  color: var(--gold-soft);
-  font-weight: 700;
-}
-
 /* The figures of the house down the side, a name and its figure to a line. */
 .house-side .facts {
   flex-direction: column;
@@ -9987,11 +9998,30 @@ button.btn.ornate-help:hover:not(:disabled) {
   gap: 6px;
 }
 
+/* The picture down the left of two lines: the name, then how it is doing and its pips. */
 .house-kid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: auto auto minmax(0, 1fr);
   align-items: center;
-  gap: 10px;
+  gap: 2px 10px;
+}
+
+.house-kid > .house-baby {
+  grid-row: 1 / span 2;
+}
+
+.house-kid > .house-kid-name {
+  grid-column: 2 / -1;
+  align-self: end;
+}
+
+.house-kid > .house-pips {
+  justify-self: start;
+  align-self: start;
+}
+
+.house-kid > .house-kid-health {
+  align-self: start;
 }
 
 .house-kid-name {
@@ -10000,6 +10030,24 @@ button.btn.ornate-help:hover:not(:disabled) {
   font: 600 1.0625rem var(--display);
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+/* The child itself, small, beside its name: its picture by its tone. */
+.house-baby {
+  width: 44px;
+  height: 78px;
+  object-fit: contain;
+  flex: none;
+}
+
+/* The nanny's word on how it is doing, under the pips. */
+.house-kid-said {
+  grid-column: 1 / -1;
+  margin-top: 4px;
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+  font-style: italic;
+  line-height: 1.3;
 }
 
 .house-kid-health {

@@ -66,6 +66,8 @@ export const ChildSchema = z.object({
    * How the child is doing, as a level of the house's own scale, when it lives in his house. Left out, it is at the
    * University's creche, where it costs him nothing and is nobody's worry.
    */
-  health: z.number().int().min(0).optional()
+  health: z.number().int().min(0).optional(),
+  /** How many weeks running it has been paid for and thriving in his house: what its mother's regard for that is earned by. */
+  thrivingWeeks: z.number().int().min(0).default(0)
 })
 export type Child = z.infer<typeof ChildSchema>

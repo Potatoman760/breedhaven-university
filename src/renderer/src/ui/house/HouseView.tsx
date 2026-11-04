@@ -3,6 +3,7 @@ import {
   arrearsDeadline,
   askToLeave,
   babiesAtHome,
+  babySprite,
   buildRoom,
   builtTier,
   canBuild,
@@ -177,7 +178,6 @@ export function HouseView({ content, state, onChange, onClose, onMovedIn }: Prop
             {residents.map((li) => (
               <Portrait key={li.id} who={li} image={wornSprite(content, state, li)} size={72} className="room-face" />
             ))}
-            {babiesAtHome(state).length > 0 && <span className="house-children" title={t('panels.house.childrenAtHome')}>+{babiesAtHome(state).length}</span>}
           </div>
         </div>
         <HouseChildren content={content} state={state} config={config} />
@@ -280,9 +280,11 @@ function HouseChildren({ content, state, config }: { content: ContentPack; state
       <span className="caps">{t('panels.house.children')}</span>
       {children.map((child, i) => (
         <div key={i} className="house-kid" title={config.babies.levels[child.health ?? 0]?.description}>
+          <img className="house-baby" src={`content://pack/${babySprite(content, state, child.motherId)}`} alt="" draggable={false} />
           <span className="house-kid-name">{child.name}</span>
           <span className="house-kid-health">{healthName(config, child.health ?? 0)}</span>
           <ChildPips config={config} health={child.health ?? 0} cap={cap} />
+          {config.babies.levels[child.health ?? 0]?.said && <span className="house-kid-said">{config.babies.levels[child.health ?? 0].said}</span>}
         </div>
       ))}
       {step && (
@@ -465,6 +467,7 @@ function Household({ content, state, config, onAskToLeave }: { content: ContentP
       {state.children.length === 0 && <p className="hint">{t('panels.house.noneYet')}</p>}
       {state.children.map((child, i) => (
         <div key={i} className="card house-person">
+          <img className="house-baby" src={`content://pack/${babySprite(content, state, child.motherId)}`} alt="" draggable={false} />
           <div>
             <strong>{t('panels.house.childOf', { name: child.name, mother: firstOf(child.motherId), daughter: child.daughter })}</strong>
             {child.health === undefined ? (

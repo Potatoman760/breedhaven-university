@@ -685,5 +685,16 @@
         "loop": true
       }
     ]
+  },
+  "reactions": {
+    "aww": "sounds/voices/yulia/aww.ogg",
+    "gasp": "sounds/voices/yulia/gasp.ogg",
+    "giggle": "sounds/voices/yulia/giggle.ogg",
+    "huff": "sounds/voices/yulia/huff.ogg",
+    "satisfied": "sounds/voices/yulia/satisfied.ogg",
+    "sigh-content": "sounds/voices/yulia/sigh-content.ogg",
+    "sigh": "sounds/voices/yulia/sigh.ogg",
+    "surprised": "sounds/voices/yulia/surprised.ogg",
+    "yawn": "sounds/voices/yulia/yawn.ogg"
   }
 }

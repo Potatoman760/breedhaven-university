@@ -34,7 +34,7 @@ describe('soundCues', () => {
   })
 
   it('puts a birth before the rest of what came with it', () => {
-    const after = { ...start, children: [{ motherId: 'ana', bornAt: 0, daughter: true, name: 'Mab' }], skillsTold: ['x'] }
+    const after = { ...start, children: [{ motherId: 'ana', bornAt: 0, daughter: true, name: 'Mab', thrivingWeeks: 0 }], skillsTold: ['x'] }
     expect(soundCues(content, start, after)).toEqual(['birth', 'skill'])
   })
 })

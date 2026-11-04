@@ -215,7 +215,7 @@ describe('birth', () => {
     const girls = Array.from({ length: 400 }, (_, seed) => deliverChild(content, at({ ...pregnant, weatherSeed: seed }, 10), 'ana', 200).child!.daughter).filter(Boolean).length
     expect(girls).toBeGreaterThan(150)
     expect(girls).toBeLessThan(250)
-    const child = (daughter: boolean) => ({ motherId: 'ana', bornAt: 0, daughter, name: 'Ada' })
+    const child = (daughter: boolean) => ({ motherId: 'ana', bornAt: 0, daughter, name: 'Ada', thrivingWeeks: 0 })
     expect(describeChildren([child(true)])).toBe('a daughter')
     expect(describeChildren([child(true), child(false), child(true)])).toBe('2 daughters and a son')
   })

@@ -249,7 +249,7 @@
   "calendar.seeWeek": "See this week",
   "calendar.more": "+{n} more",
   "calendar.rent": "Rent",
-  "calendar.childrensWeek": "Children's week",
+  "calendar.childrensWeek": "Weekly expenses",
   "calendar.pickedAllDay": "{weekday} {day} {month} · all day",
   "calendar.pickedHours": "{weekday} {day} {month} · {from} to {to}",
   "calendar.inThisClass": "In this class",

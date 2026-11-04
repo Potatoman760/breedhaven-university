@@ -419,6 +419,7 @@
   "main.connected": "Connected. The model replied: {reply}",
   "main.goingTo": "Going to {place}",
   "main.stayedBehind": "stayed behind when the others left",
+  "main.gateBroken": "Your first draft of this reply had {names} having sex with {player}, which cannot happen in this scene. Write the reply again: {names} {count, plural, one {refuses} other {refuse}} him in {count, plural, one {her} other {their}} own way, and the scene goes on from there.",
   "main.cueUnprompted": "(Write your message now, between {open} and {close}.)",
   "main.cueReply": "({player} has just messaged you{hasSaid, select, true {: \"{said}\"} other {}}. Write your answer to that, in keeping with what the two of you have already said in this thread, between {open} and {close}.)",
   "main.noTime": "The note did not settle on a time.",

@@ -705,5 +705,16 @@
         "loop": true
       }
     ]
+  },
+  "reactions": {
+    "aww": "sounds/voices/maren/aww.ogg",
+    "gasp": "sounds/voices/maren/gasp.ogg",
+    "giggle": "sounds/voices/maren/giggle.ogg",
+    "huff": "sounds/voices/maren/huff.ogg",
+    "satisfied": "sounds/voices/maren/satisfied.ogg",
+    "sigh-content": "sounds/voices/maren/sigh-content.ogg",
+    "sigh": "sounds/voices/maren/sigh.ogg",
+    "surprised": "sounds/voices/maren/surprised.ogg",
+    "yawn": "sounds/voices/maren/yawn.ogg"
   }
 }

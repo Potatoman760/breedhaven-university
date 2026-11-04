@@ -90,8 +90,19 @@ describe('achievements', () => {
     expect(earnedInState(content, together)).toContain('bffs')
   })
 
-  it('the hidden ones are those of what he does in bed', () => {
-    expect(HIDDEN_ACHIEVEMENTS).toEqual(['oil-and-water', 'xxxmas', 'forbidden', 'teach-me', 'maid-my-day', 'diplomacy', 'bffs'])
+  it('True Sire and Family Matters: every one of them carrying or delivered of his child, and one twice', () => {
+    const born = { motherId: 'ana', bornAt: 0, daughter: true, name: 'Ada', thrivingWeeks: 0 }
+    expect(earnedInState(content, start())).not.toContain('true-sire')
+    expect(earnedInState(content, { ...start(), pregnancies: { ana: { conceivedAt: 0, dueAt: 100 } } })).toContain('true-sire')
+    const once = { ...start(), children: [born] }
+    expect(earnedInState(content, once)).toContain('true-sire')
+    expect(earnedInState(content, once)).not.toContain('family-matters')
+    expect(earnedInState(content, { ...once, pregnancies: { ana: { conceivedAt: 0, dueAt: 100 } } })).toContain('family-matters')
+    expect(earnedInState(content, { ...once, children: [born, { ...born, name: 'Bram' }] })).toContain('family-matters')
+  })
+
+  it('the hidden ones are those of what he does in bed, and of the children', () => {
+    expect(HIDDEN_ACHIEVEMENTS).toEqual(['oil-and-water', 'xxxmas', 'forbidden', 'teach-me', 'maid-my-day', 'diplomacy', 'bffs', 'full-house', 'true-sire', 'family-matters'])
   })
 
   it('Heartbreaker: what they had is ended', () => {

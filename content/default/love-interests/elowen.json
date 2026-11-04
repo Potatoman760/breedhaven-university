@@ -684,5 +684,16 @@
     "knowledge": [],
     "secrets": [],
     "extraInstructions": ""
+  },
+  "reactions": {
+    "aww": "sounds/voices/elowen/aww.ogg",
+    "gasp": "sounds/voices/elowen/gasp.ogg",
+    "giggle": "sounds/voices/elowen/giggle.ogg",
+    "huff": "sounds/voices/elowen/huff.ogg",
+    "satisfied": "sounds/voices/elowen/satisfied.ogg",
+    "sigh-content": "sounds/voices/elowen/sigh-content.ogg",
+    "sigh": "sounds/voices/elowen/sigh.ogg",
+    "surprised": "sounds/voices/elowen/surprised.ogg",
+    "yawn": "sounds/voices/elowen/yawn.ogg"
   }
 }

@@ -724,5 +724,16 @@
         "loop": true
       }
     ]
+  },
+  "reactions": {
+    "aww": "sounds/voices/zelie/aww.ogg",
+    "gasp": "sounds/voices/zelie/gasp.ogg",
+    "giggle": "sounds/voices/zelie/giggle.ogg",
+    "huff": "sounds/voices/zelie/huff.ogg",
+    "satisfied": "sounds/voices/zelie/satisfied.ogg",
+    "sigh-content": "sounds/voices/zelie/sigh-content.ogg",
+    "sigh": "sounds/voices/zelie/sigh.ogg",
+    "surprised": "sounds/voices/zelie/surprised.ogg",
+    "yawn": "sounds/voices/zelie/yawn.ogg"
   }
 }

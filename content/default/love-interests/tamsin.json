@@ -701,5 +701,16 @@
     "knowledge": [],
     "secrets": [],
     "extraInstructions": "Tamsin and {player} have known each other since they were small: she remembers his childhood and uses it. Play the gap between how she acts (one of the lads) and how she now looks, and her awkwardness about it; never make her dainty. "
+  },
+  "reactions": {
+    "aww": "sounds/voices/tamsin/aww.ogg",
+    "gasp": "sounds/voices/tamsin/gasp.ogg",
+    "giggle": "sounds/voices/tamsin/giggle.ogg",
+    "huff": "sounds/voices/tamsin/huff.ogg",
+    "satisfied": "sounds/voices/tamsin/satisfied.ogg",
+    "sigh-content": "sounds/voices/tamsin/sigh-content.ogg",
+    "sigh": "sounds/voices/tamsin/sigh.ogg",
+    "surprised": "sounds/voices/tamsin/surprised.ogg",
+    "yawn": "sounds/voices/tamsin/yawn.ogg"
   }
 }

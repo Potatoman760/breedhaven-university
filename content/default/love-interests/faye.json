@@ -684,5 +684,16 @@
         "loop": true
       }
     ]
+  },
+  "reactions": {
+    "aww": "sounds/voices/faye/aww.ogg",
+    "gasp": "sounds/voices/faye/gasp.ogg",
+    "giggle": "sounds/voices/faye/giggle.ogg",
+    "huff": "sounds/voices/faye/huff.ogg",
+    "satisfied": "sounds/voices/faye/satisfied.ogg",
+    "sigh-content": "sounds/voices/faye/sigh-content.ogg",
+    "sigh": "sounds/voices/faye/sigh.ogg",
+    "surprised": "sounds/voices/faye/surprised.ogg",
+    "yawn": "sounds/voices/faye/yawn.ogg"
   }
 }

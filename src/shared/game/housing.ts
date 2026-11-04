@@ -656,7 +656,13 @@ function settleWeek(content: ContentPack, config: HousingConfig, state: GameStat
   let next: GameState = {
     ...state,
     player: { ...state.player, money },
-    children: state.children.map((child, index) => (health.has(index) ? { ...child, health: health.get(index) } : child))
+    children: state.children.map((child, index) => {
+      if (!health.has(index)) return child
+      const level = health.get(index)!
+      // A week kept and thriving is one more in a row; any other starts the count again.
+      const thrivingWeeks = !unpaid.has(child.motherId) && level >= config.babies.thrivingFrom ? child.thrivingWeeks + 1 : 0
+      return { ...child, health: level, thrivingWeeks }
+    })
   }
   next = ledger(next, t('game.housing.ledger.week', { paid, total: at.length }), -paid * cost)
   const notices = [paid === at.length ? t('game.housing.notice.weekPaid', { amount: paid * cost }) : t('game.housing.notice.weekShort', { paid, total: at.length })]

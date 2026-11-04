@@ -53,13 +53,13 @@ describe('who the player is', () => {
     const read = written
     const state = createInitialState(written, 'Wren')
     const prompt = buildCharacterPrompt({ content: read, state, loveInterestId: 'ana' })
-    expect(prompt).toContain('## About Wren\nWren has medium-brown skin.\nWren is nineteen and new in town.')
+    expect(prompt).toContain('## About Wren\nWren has light skin.\nWren is nineteen and new in town.')
     // With no bio, his skin is all there is to say.
     expect(buildCharacterPrompt({ content: base, state: createInitialState(base, 'Wren', 0, undefined, '', 'dark'), loveInterestId: 'ana' })).toContain('## About Wren\nWren has dark skin.\n\n')
     // What the player wrote of himself when the game began is told after the content's own, which stays.
     const own = createInitialState(written, 'Wren', 0, undefined, ` ${PLAYER_TOKEN} grew up on a barge. `)
     expect(own.player).toMatchObject({ bio: `${PLAYER_TOKEN} is nineteen and new in town.`, about: `${PLAYER_TOKEN} grew up on a barge.` })
-    expect(buildCharacterPrompt({ content: read, state: own, loveInterestId: 'ana' })).toContain('## About Wren\nWren has medium-brown skin.\nWren is nineteen and new in town.\nWren grew up on a barge.')
+    expect(buildCharacterPrompt({ content: read, state: own, loveInterestId: 'ana' })).toContain('## About Wren\nWren has light skin.\nWren is nineteen and new in town.\nWren grew up on a barge.')
   })
 
   it('is said in his bio and not in the codex, which every character is given whole', () => {

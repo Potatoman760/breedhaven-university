@@ -1,4 +1,4 @@
-import type { Appointment, ContentPack, GameState, Intro, Scene, StoryBeat } from '../model'
+import { THRIVING_BEAT, THRIVING_WEEKS, type Appointment, type Child, type ContentPack, type GameState, type Intro, type Scene, type StoryBeat } from '../model'
 import { allFree, keepAppointment } from './appointments'
 import { isGameOver, toDate } from './calendar'
 import { applyEffects } from './conditions'
@@ -30,8 +30,24 @@ function beatDue(content: ContentPack, state: GameState, loveInterestId: string)
   if (!rel) return undefined
   const order = [...content.relationships.stages].sort((a, b) => a.minAffection - b.minAffection).map((stage) => stage.id)
   const reached = order.indexOf(stageFor(content.relationships, rel.affection).id)
-  const next = (content.story[loveInterestId] ?? []).find((beat) => !state.flags[storyFlag(loveInterestId, beat.stage)])
+  const unasked = (content.story[loveInterestId] ?? []).filter((beat) => !state.flags[storyFlag(loveInterestId, beat.stage)])
+  // Her thanks for their child kept well comes whenever it is earned, ahead of whatever stage she is at.
+  const thanks = unasked.find((beat) => beat.stage === THRIVING_BEAT)
+  if (thanks && thrivingChildOf(state, loveInterestId)) return thanks
+  const next = unasked.find((beat) => beat.stage !== THRIVING_BEAT)
   return next && order.indexOf(next.stage) <= reached ? next : undefined
+}
+
+/** A child of hers in his house that has been kept thriving for the weeks that earn her thanks, if there is one. */
+export function thrivingChildOf(state: GameState, motherId: string): Child | undefined {
+  return state.children.find((child) => child.motherId === motherId && child.health !== undefined && child.thrivingWeeks >= THRIVING_WEEKS)
+}
+
+/** A cutscene with the child's name and pronouns put in: `{child}`, `{they}`, `{them}`, `{their}`. */
+export function aboutChild(intro: Intro, child: Child): Intro {
+  const words: Record<string, string> = { child: child.name, they: child.daughter ? 'she' : 'he', them: child.daughter ? 'her' : 'him', their: child.daughter ? 'her' : 'his' }
+  const fill = (line: string) => line.replace(/\{(child|they|them|their)\}/g, (_, key: string) => words[key])
+  return { ...intro, scenes: intro.scenes.map((scene) => ({ ...scene, lines: scene.lines.map(fill) })) }
 }
 
 /** The first time from now that the beat can be had: its hour, on its weekday if it has one, with them both free. */
@@ -103,7 +119,9 @@ export function attendStory(content: ContentPack, state: GameState, appointmentI
   const beat = plan?.story !== undefined ? storyBeat(content, plan.loveInterestId, plan.story) : undefined
   if (!plan || !beat) throw new Error(`"${appointmentId}" is not a story beat`)
   const id = plan.loveInterestId
-  const telling = tellingOf(state, id, beat)
+  const child = beat.stage === THRIVING_BEAT ? thrivingChildOf(state, id) : undefined
+  const told = tellingOf(state, id, beat)
+  const telling = child ? { cutscene: aboutChild(told.cutscene, child), direction: aboutChild({ speakerId: id, scenes: [{ locationId: '', lines: [told.direction] }] }, child).scenes[0].lines[0] } : told
   // As any plan kept: it comes off the calendar and its hours are spent.
   let after: GameState = { ...keepAppointment(content, state, appointmentId).state, inOwnRoom: false }
   after = applyEffects(after, beat.effects, { content, loveInterestId: id, source: t('game.story.title') })

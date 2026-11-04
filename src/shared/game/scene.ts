@@ -56,6 +56,8 @@ export interface Directives extends SceneLook {
   leaving: { name: string; feeling: DepartureFeeling; reason: string }[]
   /** Who the reply says will be at an event, by the name written (empty for the scene's love interest), and the event's id as written. */
   attending: { name: string; eventId: string }[]
+  /** The sounds the reply says are heard, by the name written (empty for the scene's love interest) and the sound's id as written. */
+  reactions: { name: string; reaction: string }[]
   /** The reply says the plan suggested earlier has been agreed to. */
   agreed: boolean
   /** The reply says they go to sleep for the night where they are. */
@@ -88,6 +90,8 @@ export const SLEEP_TAG = '[SLEEP]'
 // A hidden line is one line: one the model forgot to close with a bracket is closed by the end of its line, and still hidden.
 // [LEAVES: Bea=hurt saw she was not wanted]: who goes, how she feels, and a few words why.
 const LEAVES_TAG = /\[\s*LEAVES?\s*:\s*([^\]\n]*?)\s*(?:\]|$)/gim
+// [REACTS: giggle] or, in a group, [REACTS: Bea=giggle]: a sound of hers that is heard.
+const REACTS_TAG = /\[\s*REACTS?\s*:\s*([^\]\n]*?)\s*(?:\]|$)/gim
 // [ATTENDING: societies-fair] or, in a group, [ATTENDING: Bea=societies-fair].
 const ATTENDING_TAG = /\[\s*ATTENDING\s*:\s*([^\]\n]*?)\s*(?:\]|$)/gim
 
@@ -184,12 +188,18 @@ export function parseDirectives(written: string): Directives {
     if (eventId) attending.push({ name: (who ?? '').trim(), eventId: eventId.trim().toLowerCase() })
     return ''
   })
+  const reactions: Directives['reactions'] = []
+  const withoutReactions = withoutAttending.replace(REACTS_TAG, (_tag, written: string) => {
+    const [, who, reaction] = /^(?:([^=:]*?)\s*[=:]\s*)?(\S.*)$/.exec(written) ?? []
+    if (reaction) reactions.push({ name: (who ?? '').trim(), reaction: reaction.trim().toLowerCase() })
+    return ''
+  })
   const agreedTag = /\[\s*AGREED\s*\]/gi
   const sleepTag = /\[\s*SLEEP\s*\]/gi
-  const agreed = agreedTag.test(withoutAttending)
-  const slept = sleepTag.test(withoutAttending)
-  const plain = withoutAttending.replace(/\[\s*(?:AGREED|SLEEP)\s*\]/gi, '')
-  return { ...splitSceneEnd(plain), ...look, seeded, stopsControl, named, comfort, leaving, attending, agreed, slept }
+  const agreed = agreedTag.test(withoutReactions)
+  const slept = sleepTag.test(withoutReactions)
+  const plain = withoutReactions.replace(/\[\s*(?:AGREED|SLEEP)\s*\]/gi, '')
+  return { ...splitSceneEnd(plain), ...look, seeded, stopsControl, named, comfort, leaving, attending, reactions, agreed, slept }
 }
 
 /**
@@ -318,6 +328,47 @@ export function dialogueLines(reply: string, cast: Pick<LoveInterest, 'id' | 'na
       const voice = named && voices.find((name) => name.toLowerCase() === named[1].trim().toLowerCase() || last(name) === last(named[1]))
       return voice && named ? { action: false, text: named[2], speakerName: voice } : { action: false, text: line }
     })
+}
+
+// Sex, as a reply writes it of a woman: what she does with him, or what he does to her. English, as the replies are.
+const SEX_WRITTEN = new RegExp(
+  [
+    'penetrat\\w*', 'thrust\\w*', 'cock', 'dick', 'straddl\\w*', 'cum(?:s|ming)?', 'climax\\w*', 'orgasm\\w*', 'his length', 'ridden',
+    'inside (?:me|her)', '(?:ride[sd]?|riding) (?:him|you|me)', 'sinks? (?:down )?on(?:to)? (?:him|you|me)', 'takes? (?:him|you) (?:in|into|deep)',
+    '(?:in|into) (?:her|my) mouth', 'grind\\w* (?:on|against|into) (?:him|you)', '(?:roll|drive|rock|grind|work)\\w* (?:her|my) hips', 'him deeper',
+    'how I fuck', 'fuck(?:s|ing|ed)? (?:me|him|you|her)'
+  ].join('|').replace(/^/, '\\b(?:').replace(/$/, ')\\b'),
+  'i'
+)
+// Her tags that only sex writes.
+const SEX_TAGS = /\[\s*(?:SEX[\s_-]?ACT|POSE|ANIMATION|SEEDED)\s*(?::\s*([^\]\n]*?))?\s*\]/gi
+
+/**
+ * Which of those named a reply writes having sex: a sex-act or [SEEDED] tag of hers, or sex in a line of her own or
+ * in a line narrated of her by name. Alone in a scene, every unnamed line is hers. For holding a woman who will not to
+ * it: the reply is written again.
+ */
+export function sexWrittenOf(reply: string, cast: Pick<LoveInterest, 'id' | 'name'>[], ids: string[], leadId: string): string[] {
+  const found = new Set<string>()
+  const whose = (written: string | undefined) => {
+    const named = written?.split(/[=:]/)[0]?.trim()
+    return named ? cast.find((li) => namesHer(named, li))?.id : leadId
+  }
+  for (const match of reply.matchAll(SEX_TAGS)) {
+    if (/^\s*(?:none|off|stop)\s*$/i.test(match[1] ?? '')) continue
+    // A bare sex-act tag is the lead's; [SEEDED] bare is too.
+    const id = whose(match[1] && /[=:]/.test(match[1]) ? match[1] : /SEEDED/i.test(match[0]) ? match[1] : undefined)
+    if (id) found.add(id)
+  }
+  const alone = cast.length < 2
+  for (const line of dialogueLines(reply.replace(/\[[^\]\n]*\]/g, ''), cast)) {
+    if (!SEX_WRITTEN.test(line.text)) continue
+    if (line.speakerId) found.add(line.speakerId)
+    else if (alone) found.add(leadId)
+    // Anyone the line names is in it too: "watching Morwenna ride him", whoever says it, is of Morwenna.
+    for (const li of cast) if (plainName(line.text).includes(plainName(li.name.split(' ')[0]))) found.add(li.id)
+  }
+  return ids.filter((id) => found.has(id))
 }
 
 /** Who of the cast has a line of her own in a reply, by id: in a group, only she can say she will do something. */

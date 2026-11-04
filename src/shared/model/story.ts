@@ -14,7 +14,10 @@ const TellingSchema = z.object({
  * and opens a scene with her alone, run on the beat's direction. One ask: missed, it is gone. Each is had once.
  */
 export const StoryBeatSchema = z.object({
-  /** The relationship stage that earns it, by id. */
+  /**
+   * What earns it: the relationship stage, by id; or `thriving`, a child of theirs kept thriving in his house for
+   * `THRIVING_WEEKS` running, whatever they are to each other.
+   */
   stage: z.string(),
   /** What she writes to ask him to come. */
   invitation: z.string(),
@@ -45,6 +48,10 @@ export const StoryBeatSchema = z.object({
   stopsBirthControl: z.boolean().default(false),
 });
 export type StoryBeat = z.infer<typeof StoryBeatSchema>;
+
+/** The beat a mother has for their child being kept well, and how many weeks running earn it. */
+export const THRIVING_BEAT = "thriving";
+export const THRIVING_WEEKS = 4;
 
 /** The story beats of the pack, by love interest id, each in the order her stages come. */
 export const StorySchema = z.record(z.string(), z.array(StoryBeatSchema));

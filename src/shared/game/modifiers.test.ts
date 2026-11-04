@@ -111,7 +111,7 @@ describe('what he has learnt', () => {
 
   it('has every mother of his child want him as much as a woman can, those he has and those to come', () => {
     const { content, state, plain } = learnt(passive('RBI', { kind: 'devoted', amount: 1 }))
-    const mother = (s: GameState): GameState => ({ ...known(s, 'ana'), children: [{ motherId: 'ana', bornAt: 0, daughter: true, name: 'Kit' }] })
+    const mother = (s: GameState): GameState => ({ ...known(s, 'ana'), children: [{ motherId: 'ana', bornAt: 0, daughter: true, name: 'Kit', thrivingWeeks: 0 }] })
     const without = mother(plain)
     expect(devotedMothers(content, without)).toBe(without)
     expect(devotedMothers(content, mother(state)).relationships['ana'].desire).toBe(content.relationships.meterMax)
@@ -250,7 +250,7 @@ describe('what he carries and uses', () => {
 
   it('has her ready for another child sooner in a house that knows how a mother is looked after', () => {
     const mid = learnt(passive('MID', { kind: 'recovery', amount: 0.5 }), { pregnancy: content.pregnancy })
-    const born = (s: GameState, days: number): GameState => ({ ...known(s, 'ana'), time: days * mid.content.calendar.hoursPerDay, children: [{ motherId: 'ana', bornAt: 0, daughter: true, name: 'Ada' }] })
+    const born = (s: GameState, days: number): GameState => ({ ...known(s, 'ana'), time: days * mid.content.calendar.hoursPerDay, children: [{ motherId: 'ana', bornAt: 0, daughter: true, name: 'Ada', thrivingWeeks: 0 }] })
     expect(canConceive(mid.content, born(mid.plain, 5), 'ana')).toBe(false)
     expect(canConceive(mid.content, born(mid.state, 5), 'ana')).toBe(true)
     expect(canConceive(mid.content, born(mid.state, 3), 'ana')).toBe(false)

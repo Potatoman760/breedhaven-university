@@ -664,5 +664,16 @@
         "loop": true
       }
     ]
+  },
+  "reactions": {
+    "aww": "sounds/voices/isolde/aww.ogg",
+    "gasp": "sounds/voices/isolde/gasp.ogg",
+    "giggle": "sounds/voices/isolde/giggle.ogg",
+    "huff": "sounds/voices/isolde/huff.ogg",
+    "satisfied": "sounds/voices/isolde/satisfied.ogg",
+    "sigh-content": "sounds/voices/isolde/sigh-content.ogg",
+    "sigh": "sounds/voices/isolde/sigh.ogg",
+    "surprised": "sounds/voices/isolde/surprised.ogg",
+    "yawn": "sounds/voices/isolde/yawn.ogg"
   }
 }

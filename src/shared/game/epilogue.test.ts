@@ -106,7 +106,7 @@ describe('the children of the year', () => {
   it('have a screen for each mother: a girl or a boy, and how she took it', () => {
     const family = {
       ...start,
-      children: [{ motherId: 'ana', bornAt: 5, daughter: true, name: 'Ada' }],
+      children: [{ motherId: 'ana', bornAt: 5, daughter: true, name: 'Ada', thrivingWeeks: 0 }],
       relationships: { ...start.relationships, ana: rel(70), bea: rel(2) },
       pregnancies: { bea: { conceivedAt: 10, dueAt: 9999 } }
     }
@@ -127,8 +127,8 @@ describe('the children of the year', () => {
       ...start,
       relationships: { ...start.relationships, ana: rel(70) },
       children: [
-        { motherId: 'ana', bornAt: 5, daughter: true, name: 'Ada' },
-        { motherId: 'ana', bornAt: 90, daughter: false, name: 'Bram' }
+        { motherId: 'ana', bornAt: 5, daughter: true, name: 'Ada', thrivingWeeks: 0 },
+        { motherId: 'ana', bornAt: 90, daughter: false, name: 'Bram', thrivingWeeks: 0 }
       ]
     }
     expect(buildEpilogue(content, twice).find((screen) => screen.kind === 'child')?.text).toBe(
@@ -151,8 +151,8 @@ describe('the children of the year', () => {
     const family = {
       ...start,
       children: [
-        { motherId: 'ana', bornAt: 5, daughter: true, name: 'Ada' },
-        { motherId: 'ana', bornAt: 90, daughter: false, name: 'Bram' }
+        { motherId: 'ana', bornAt: 5, daughter: true, name: 'Ada', thrivingWeeks: 0 },
+        { motherId: 'ana', bornAt: 90, daughter: false, name: 'Bram', thrivingWeeks: 0 }
       ],
       pregnancies: { bea: { conceivedAt: 10, dueAt: 9999 } }
     }
