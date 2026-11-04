@@ -2266,6 +2266,11 @@ textarea.memory {
   --scrim: rgba(48, 16, 34, 0.74);
 }
 
+/* At the arch, the sunset is the screen: only a little shade over it, and her standing in front. */
+.epilogue.of-love.with-art {
+  --scrim: rgba(30, 12, 24, 0.22);
+}
+
 .epilogue.of-child,
 .epilogue.of-legacy {
   --scrim: rgba(18, 30, 44, 0.76);
@@ -2353,6 +2358,206 @@ textarea.memory {
   opacity: 0.8;
   /* What is listed under the text comes in after it. */
   animation: epilogue-in 1.1s ease 0.6s both;
+}
+
+/* The year's studies as a certificate: a sheet of parchment in a double gilt rule, corners flourished, letterheaded,
+   his name large, the grades ruled off, and a wax seal between the signatures. It comes up like a page laid down. */
+.certificate {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: min(760px, calc(100vw - 96px));
+  max-height: calc(100vh - 120px);
+  overflow: auto;
+  padding: 44px 64px 36px;
+  border: 2px solid var(--gold-deep);
+  outline: 1px solid var(--gold);
+  outline-offset: -12px;
+  border-radius: 6px;
+  background:
+    radial-gradient(ellipse at center, rgba(255, 252, 240, 0.9) 40%, rgba(226, 210, 170, 0.95) 100%),
+    var(--parchment);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), inset 0 0 40px rgba(156, 122, 46, 0.25);
+  color: var(--ink);
+  text-align: center;
+  cursor: default;
+  animation: certificate-in 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* The flourishes in each corner, inside the inner rule. */
+.certificate::before,
+.certificate::after {
+  content: '❦';
+  position: absolute;
+  top: 18px;
+  font-size: 1.6rem;
+  color: var(--gold-deep);
+}
+
+.certificate::before {
+  left: 24px;
+}
+
+.certificate::after {
+  right: 24px;
+  transform: scaleX(-1);
+}
+
+.certificate-crest {
+  color: var(--gold-deep);
+  font: 700 0.95rem var(--ui);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+
+.certificate-title {
+  margin: 4px 0 6px;
+  font: 600 2.6rem/1.1 var(--display);
+  color: #3b2a10;
+}
+
+.certificate-certifies {
+  font: italic 500 1.1rem var(--display);
+  color: var(--ink-soft);
+}
+
+.certificate-name {
+  padding: 0 32px 6px;
+  border-bottom: 1px solid var(--gold-deep);
+  font: italic 600 2.8rem/1.1 var(--display);
+  color: #5a3d10;
+}
+
+.certificate-text {
+  max-width: 560px;
+  margin: 8px 0 4px;
+  font: 500 1.25rem/1.4 var(--display);
+  text-wrap: balance;
+}
+
+.certificate-grades {
+  width: 100%;
+  max-width: 520px;
+  border-collapse: collapse;
+  font-size: 1rem;
+  animation: epilogue-in 1.1s ease 0.5s both;
+}
+
+.certificate-grades td {
+  padding: 7px 4px;
+  border-bottom: 1px dotted rgba(156, 122, 46, 0.6);
+  text-align: left;
+}
+
+.certificate-letter {
+  width: 56px;
+  text-align: center !important;
+  font: 700 1.6rem var(--display);
+  color: #3b2a10;
+}
+
+.certificate-letter.grade-a {
+  color: #8a6416;
+}
+
+.certificate-letter.grade-f {
+  color: #8c2a20;
+}
+
+.certificate-foot {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+  gap: 24px;
+  width: 100%;
+  margin-top: 18px;
+}
+
+/* Whoever signed: the signature in ink, sitting on the line, and under the line who it is. */
+.certificate-signer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.certificate-signature {
+  width: 190px;
+  height: 64px;
+  margin-bottom: -10px;
+  object-fit: contain;
+  /* Signed after the seal is pressed: the ink comes up as if just written. */
+  animation: certificate-ink 0.9s ease 1.3s both;
+}
+
+@keyframes certificate-ink {
+  from {
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.certificate-signed {
+  align-self: stretch;
+  padding-top: 6px;
+  border-top: 1px solid var(--ink-soft);
+  font: italic 500 1rem var(--display);
+  color: var(--ink-soft);
+}
+
+/* A wax seal: deep red, raised, the University's letters pressed into it. */
+.certificate-seal {
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #c0392b, #7d1a12 70%);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4), inset 0 -4px 8px rgba(0, 0, 0, 0.35), inset 0 3px 6px rgba(255, 255, 255, 0.25);
+  color: rgba(255, 220, 200, 0.85);
+  font: 700 1.6rem var(--display);
+  letter-spacing: 0.05em;
+  animation: certificate-seal 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) 0.9s both;
+}
+
+/* Withdrawn, the sheet is the plainer notice, and its seal is gray. */
+.certificate.failing .certificate-seal {
+  background: radial-gradient(circle at 35% 30%, #8a8a8a, #4a4a4a 70%);
+}
+
+@keyframes certificate-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96) rotate(-1deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes certificate-seal {
+  from {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .certificate,
+  .certificate-signature,
+  .certificate-seal {
+    animation: none;
+  }
 }
 
 .epilogue-exit {

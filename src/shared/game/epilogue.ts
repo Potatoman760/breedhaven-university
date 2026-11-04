@@ -3,6 +3,7 @@ import { statusOf } from './bonds'
 import { gradeFor } from './exams'
 import { babiesAtHome, healthName } from './housing'
 import { seedOf } from './seed'
+import { birthPictureFor } from './skin'
 import { t, type MessageKey } from '../i18n'
 
 /** How the year went for him as a student. */
@@ -16,6 +17,8 @@ export interface EpilogueScreen {
   text: string
   /** Lines shown small beneath it: each course and its grade. */
   details?: string[]
+  /** For the first screen, each course he took and its letter, for the certificate's table. */
+  grades?: { course: string; letter: string }[]
   /** Who the screen is about, for the picture it will one day have. */
   loveInterestIds?: string[]
   /** For the first screen: how he did. */
@@ -23,6 +26,11 @@ export interface EpilogueScreen {
   /** A picture in the pack the screen is told over, in place of the title screen's. */
   image?: string
 }
+
+// What a love screen is told over: a wedding arch on a beach at sunset, with whoever it is about standing before it.
+export const LOVE_PICTURE = 'sprites/epilogue/love.webp'
+// The certificate's signatures, in ink on nothing: the Chancellor's and the Registrar's.
+export const SIGNATURES = { chancellor: 'sprites/epilogue/sign-chancellor.webp', registrar: 'sprites/epilogue/sign-registrar.webp' } as const
 
 // What each letter is worth, as a grade point.
 const POINTS: Record<string, number> = { A: 4, B: 3, C: 2, F: 0 }
@@ -172,7 +180,7 @@ export function buildEpilogue(content: ContentPack, state: GameState): EpilogueS
 
   const grades = finalGrades(content, state)
   const standing = standingOf(grades)
-  screens.push({ kind: 'academics', heading: t('game.epilogue.academicsHeading'), text: t(ACADEMICS[standing]), standing, details: grades.map((grade) => t('game.epilogue.line', { label: `${grade.number} ${grade.title}`, value: grade.letter })) })
+  screens.push({ kind: 'academics', heading: t('game.epilogue.academicsHeading'), text: t(ACADEMICS[standing]), standing, details: grades.map((grade) => t('game.epilogue.line', { label: `${grade.number} ${grade.title}`, value: grade.letter })), grades: grades.map((grade) => ({ course: `${grade.number} ${grade.title}`, letter: grade.letter })) })
 
   // What a Sire is here for, told before anything else that came of the year.
   // Told wherever a child can be had, and wherever one was, though it is nothing to boast of.
@@ -191,7 +199,9 @@ export function buildEpilogue(content: ContentPack, state: GameState): EpilogueS
       : onGoodTerms(content, state, li.id)
         ? t('game.epilogue.childOverjoyed', { pronoun })
         : t('game.epilogue.childAlone', { pronoun, n: children.length })
-    screens.push({ kind: 'child', heading: t('game.epilogue.familyHeading'), text: t('game.epilogue.child', { first, pronoun, children: describeChildren(children), ending }), loveInterestIds: [li.id] })
+    // Told over her picture with the child in her arms, in the tone their child is, where she has one.
+    const image = birthPictureFor(content, state, li.id)
+    screens.push({ kind: 'child', heading: t('game.epilogue.familyHeading'), text: t('game.epilogue.child', { first, pronoun, children: describeChildren(children), ending }), loveInterestIds: [li.id], ...(image && { image }) })
   }
 
   // Each arrangement that is a couple or more, in the order they were made.
@@ -203,7 +213,7 @@ export function buildEpilogue(content: ContentPack, state: GameState): EpilogueS
       members.length === 1
         ? t('game.epilogue.loveOne', { pronoun: pronounOf(members[0]), names: names(members), exclusive: status.exclusive })
         : t('game.epilogue.loveMany', { names: names(members), n: members.length + 1, exclusive: status.exclusive })
-    screens.push({ kind: 'love', heading: status.name, text, loveInterestIds: members.map((li) => li.id) })
+    screens.push({ kind: 'love', heading: status.name, text, loveInterestIds: members.map((li) => li.id), image: LOVE_PICTURE })
   }
 
   // The house, if it came to that: kept, with whoever shared it and how the children in it fared, or lost.

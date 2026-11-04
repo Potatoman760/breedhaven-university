@@ -49,6 +49,7 @@ import {
   focusName,
   setFocus,
   attendStory,
+  writtenLines,
   attendViewing,
   scheduleViewing,
   renameNewborn,
@@ -199,7 +200,7 @@ import { MAX_SCENE_CAST, type Activity, type ContentPack, type EventPart, type E
 import { CHAT_CANCELLED } from '../../shared/ipc'
 import { AUTO_SLOT_ID, type SaveData } from '../../shared/saves'
 import { errorMessage } from './errors'
-import { lineFile, play, playSong, playVoices, setAmbience, setWeather, usePlayerName, useSounds } from './sound'
+import { lineFile, play, playSong, playVoices, setAmbience, setWeather, setWrittenLines, usePlayerName, useSounds } from './sound'
 import { onLanguageContent } from './language'
 import { t } from '../../shared/i18n'
 import { EpilogueView } from './ui/EpilogueView'
@@ -945,6 +946,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     // Her story beat: what she has written for it is read, and then the scene she asked him to.
     if (at.appointments.find((plan) => plan.id === appointmentId)?.story !== undefined) {
       const told = attendStory(content, at, appointmentId)
+      setWrittenLines(told.written ? writtenLines(told.written, told.cutscene, [...content.npcs, ...content.loveInterests]) : {})
       setNotice('')
       setState(told.state)
       introThenScene(told.cutscene, told.scene)

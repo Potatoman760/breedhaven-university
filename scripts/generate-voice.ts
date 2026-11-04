@@ -59,7 +59,7 @@ const DESCRIBED: Record<string, string> = {
   ottilie:
     "A woman of thirty-six with a crisp, quick, dry mid-range voice and a precise Scottish accent. Clinical, exact and unsentimental, a brilliant scientist; deadpan, with no change of expression.",
   tamsin:
-    "A young American woman of eighteen with a bright, energetic, tomboyish voice and a rural American country accent, a farm girl from a small town. Quick, blunt and teasing, loud and warm, a little gruff when embarrassed.",
+    "A young American woman of eighteen with a natural, everyday California voice and a slight vocal fry. Earnest and warm, sporty and teasing, quick and a little blunt, gruff when embarrassed. A normal girl-next-door, not a country or Midwestern accent, not exaggerated valley girl.",
   tink:
     "A young woman of nineteen with a cheeky, playful, light and quick voice and a lilting Irish accent. Mischievous and grinning, casual and teasing, always half a laugh away.",
   vespera:
@@ -89,7 +89,7 @@ const SAMPLE: Record<string, string> = {
   "lola-hopworth": "Right, apron on, hands washed, no, properly. You've got the look of a man who burns toast. Don't argue with me, love, I can smell it on you. Stir that and don't stop.",
   maren: "Ah, you came! Look, look, I wore the new ribbons. Kawaii, ne? That means cute, you have to say so. Hmph. If you don't say so I'll pout all through tea.",
   ottilie: "Sit. Roll up your sleeve. No, the other one. You're an extraordinary specimen, which I mean as a compliment, though I'm told it doesn't sound like one. Hold still.",
-  tamsin: "Hey! Took you long enough. Race you to the old oak, loser buys the burgers. And don't you dare let me win again, I saw you do it last time, you big dummy.",
+  tamsin: "Okay, finally. You're here. Race you to the end of the block, loser buys smoothies. And don't you dare let me win again, I literally saw you do it last time. Like, I'm serious.",
   tink: "Shh, don't look so shocked, I'll give it back. Probably. Fancy a game of cards? Friendly stakes. Well, friendly for me. Come on, you've got a lucky face.",
   vespera: "Well, well. Look what wandered into my classroom. Did you come to learn a hex, sugar, or did you just want to see if the rumors were true? Either way, sit down.",
   yelena: "Good evening. My father would be appalled that I'm here, which is rather the point. I've never done anything I wasn't told to before. Show me something I'm not supposed to see.",

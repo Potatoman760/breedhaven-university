@@ -19,6 +19,12 @@ let cues: Sounds['cues'] = {}
 let lines: Sounds['lines'] = {}
 let fightSounds: Sounds['fight'] = {}
 let playerName = ''
+// Lines as shown, to the same as written, for a cutscene being read that the game filled in.
+let written: Record<string, string> = {}
+/** The lines of the cutscene now being read, as shown, to the same as written: their recordings are of the words as written. */
+export function setWrittenLines(pairs: Record<string, string>): void {
+  written = pairs
+}
 
 function readVolumes(): Volumes {
   try {
@@ -125,7 +131,7 @@ export function lineFile(speakerId: string, text: string): string | undefined {
 /** Reads a line written ahead aloud in its speaker's voice, where it has been recorded; stops whatever line was before. */
 export function playLine(speakerId: string | undefined, text: string): void {
   stopLine()
-  const file = speakerId === undefined ? undefined : lines[lineKey(speakerId, text, playerName)]
+  const file = speakerId === undefined ? undefined : lines[lineKey(speakerId, written[text] ?? text, playerName)]
   if (!file || volumes.effects === 0) return
   const audio = new Audio(url(file))
   audio.volume = Math.min(1, VOICE_LEVEL * volumes.effects)

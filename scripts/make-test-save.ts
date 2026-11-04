@@ -12,6 +12,7 @@
  *   npx jiti scripts/make-test-save.ts 17 --masquerade   the same game an hour before the Masquerade Ball, at home
  *   npx jiti scripts/make-test-save.ts 18 --frost    the same game the morning of the Feast of First Frost, at home
  *   npx jiti scripts/make-test-save.ts 19 --house    the same game a month into the house, Tamsin and Faye living there with a child each
+ *   npx jiti scripts/make-test-save.ts 20 --epilogue the house game run on to the end of the year: loading it opens the epilogue
  */
 import { existsSync } from 'node:fs'
 import { homedir } from 'node:os'
@@ -54,7 +55,9 @@ const booking = args.includes('--booking')
 const onBreak = args.includes('--break')
 const masquerade = args.includes('--masquerade')
 const frost = args.includes('--frost')
-const house = args.includes('--house')
+const epilogue = args.includes('--epilogue')
+// The end of the year is the house game, run on.
+const house = args.includes('--house') || epilogue
 const slot = `slot${args.find((arg) => /^\d+$/.test(arg)) ?? '8'}`
 
 const appData = process.platform === 'win32' ? (process.env.APPDATA ?? join(homedir(), 'AppData', 'Roaming')) : process.platform === 'darwin' ? join(homedir(), 'Library', 'Application Support') : (process.env.XDG_CONFIG_HOME ?? join(homedir(), '.config'))
@@ -218,9 +221,34 @@ if (house && content.housing) {
   }
 }
 
+// For the epilogue: the year over, with something for every screen of it. His grades in every course, a third child at
+// the creche and a fourth on the way, and Dinah and Seraphine among those he is with. Everything that settles as the
+// clock goes on is settled to the end, so that loading it opens the epilogue and nothing else.
+if (epilogue) {
+  const end = content.calendar.lengthDays * hours
+  const grade = (letter: 'A' | 'B', time: number) => ({ letter, points: letter === 'A' ? 46 : 38, outOf: 50, passed: true, sat: true, topics: [0, 1, 2], correct: letter === 'A' ? 3 : 2, time })
+  state = formBond(content, { ...state, relationships: { ...state.relationships, dinah: { affection: 70, trust: 75, desire: 55 } } }, { statusId: 'casual', memberIds: ['dinah'] })
+  state = formBond(content, { ...state, relationships: { ...state.relationships, seraphine: { affection: 88, trust: 85, desire: 70 } } }, { statusId: 'casual', memberIds: ['seraphine'] })
+  const dinahBorn = end - 40 * hours
+  state = {
+    ...state,
+    time: end,
+    grades: Object.fromEntries(enrolment.map((id, i) => [id, { midterm: grade(i % 2 === 0 ? 'A' : 'B', end - 100 * hours), final: grade(i % 3 === 0 ? 'B' : 'A', end - 5 * hours) }])),
+    // Dinah's daughter at the creche, and Lira carrying his.
+    children: [...state.children, { motherId: 'dinah', bornAt: dinahBorn, daughter: true, name: 'Hollis', thrivingWeeks: 0 }],
+    pregnancies: { ...state.pregnancies, lira: { conceivedAt: end - 20 * hours, dueAt: end + 28 * hours } },
+    timesIntimate: { ...state.timesIntimate, dinah: 6, seraphine: 3, lira: 5 },
+    appointments: [],
+    // The Undercroft held: every depth cleared, so the epilogue ends well below too.
+    expedition: { ...state.expedition, cleared: content.expedition?.depths.length ?? 0 },
+    housing: { ...state.housing, settledTo: end },
+    job: state.job && { ...state.job, settledTo: end }
+  }
+}
+
 const checked = GameStateSchema.parse(state)
 if (!house && !housingOfferDue(content, checked)) throw new Error('The save does not meet what the offer of a house asks: a woman carrying his child whom he has an arrangement with.')
-const saved = new SaveStore(dir).save(slot, { state: checked, scene: null }, new Date(), midterm ? 'Before a midterm' : goBelow ? 'At the way down' : booking ? 'Booking Saltmere' : onBreak ? 'Break morning' : masquerade ? 'Before the masquerade' : frost ? 'First Frost morning' : house ? 'Children at home' : 'Late game test')
+const saved = new SaveStore(dir).save(slot, { state: checked, scene: null }, new Date(), midterm ? 'Before a midterm' : goBelow ? 'At the way down' : booking ? 'Booking Saltmere' : onBreak ? 'Break morning' : masquerade ? 'Before the masquerade' : frost ? 'First Frost morning' : epilogue ? 'The end of the year' : house ? 'Children at home' : 'Late game test')
 console.log(`Written to ${join(dir, `${slot}.json`)}: ${saved.unreadable ? 'unreadable' : `${saved.playerName}, day ${Math.floor(checked.time / hours) + 1}`}.`)
 console.log(`Courses: ${enrolment.map((id) => checked.courses.find((course) => course.id === id)?.number).join(', ')}. Skills: ${skillsOf(content, checked).map((skill) => skill.name).join(', ')}.`)
-console.log(house ? 'He is at the house; Tamsin and Faye live there with a child each, and Tamsin writes with her thanks for hers.' : 'The offer of the house arrives as a DM from the housing officer as soon as the save is loaded.')
+console.log(epilogue ? 'The year is over: loading it opens the epilogue.' : house ? 'He is at the house; Tamsin and Faye live there with a child each, and Tamsin writes with her thanks for hers.' : 'The offer of the house arrives as a DM from the housing officer as soon as the save is loaded.')

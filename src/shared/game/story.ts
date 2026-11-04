@@ -114,7 +114,7 @@ function tellingOf(state: GameState, loveInterestId: string, beat: StoryBeat): {
  * against the Bloom, when this telling is the one in which she says so), and what comes back is the cutscene to read
  * and the scene with her alone after it, run on the beat's direction, in her room where the beat is.
  */
-export function attendStory(content: ContentPack, state: GameState, appointmentId: string): { state: GameState; cutscene: Intro; scene: Scene } {
+export function attendStory(content: ContentPack, state: GameState, appointmentId: string): { state: GameState; cutscene: Intro; scene: Scene; written?: Intro } {
   const plan = state.appointments.find((a) => a.id === appointmentId)
   const beat = plan?.story !== undefined ? storyBeat(content, plan.loveInterestId, plan.story) : undefined
   if (!plan || !beat) throw new Error(`"${appointmentId}" is not a story beat`)
@@ -143,5 +143,6 @@ export function attendStory(content: ContentPack, state: GameState, appointmentI
     npc: false,
     baseline: sceneBaseline(after, id, [])
   }
-  return { state: after, cutscene: telling.cutscene, scene }
+  // As written as well, where the child was filled in: its recorded lines are found by the words as written.
+  return { state: after, cutscene: telling.cutscene, scene, ...(child && { written: told.cutscene }) }
 }

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { buildEpilogue, spriteFor, wornOutfit } from '../../../shared/game'
+import { SIGNATURES } from '../../../shared/game/epilogue'
 import type { ContentPack, GameState, LoveInterest } from '../../../shared/model'
 import { ChevronIcon } from './icons'
 import { playSong, stopSong } from '../sound'
@@ -32,8 +33,9 @@ export function EpilogueView({ content, state, onExit }: Props) {
   const index = Math.min(at, screens.length - 1)
   const screen = screens[index]
   const last = index === screens.length - 1
-  // Whoever the screen is about, as she looks when the year ends, smiling if she has a smile drawn.
-  const about = (screen.loveInterestIds ?? []).flatMap((id) => {
+  // Whoever the screen is about, as she looks when the year ends, smiling if she has a smile drawn: not over her birth
+  // picture, which already shows her with the child, but before any other picture, as at the arch.
+  const about = (screen.kind === 'child' && screen.image ? [] : (screen.loveInterestIds ?? [])).flatMap((id) => {
     const li = content.loveInterests.find((c) => c.id === id)
     const sprite = li && spriteFor(li, wornOutfit(content, state, li), 'happy')
     return li && sprite ? [{ li, sprite }] : []
@@ -70,7 +72,41 @@ export function EpilogueView({ content, state, onExit }: Props) {
           ))}
         </div>
       )}
-      {/* Keyed by the screen, so that each one fades in afresh over the one before. */}
+      {/* The year's studies, as the University would put them: a certificate with his name on it. */}
+      {screen.kind === 'academics' ? (
+        <div key={index} className={`certificate ${screen.standing ?? ''}`}>
+          <span className="certificate-crest">{t('screens.epilogue.certUniversity')}</span>
+          <h1 className="certificate-title">{t(`screens.epilogue.certTitle.${screen.standing ?? 'gettingBy'}` as const)}</h1>
+          <span className="certificate-certifies">{t('screens.epilogue.certCertifies')}</span>
+          <span className="certificate-name">{state.player.name}</span>
+          <p className="certificate-text">{screen.text}</p>
+          {screen.grades && screen.grades.length > 0 && (
+            <table className="certificate-grades">
+              <tbody>
+                {screen.grades.map((grade) => (
+                  <tr key={grade.course}>
+                    <td>{grade.course}</td>
+                    <td className={`certificate-letter grade-${grade.letter.toLowerCase()}`}>{grade.letter}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          <div className="certificate-foot">
+            <span className="certificate-signer">
+              <img className="certificate-signature" src={`content://pack/${SIGNATURES.chancellor}`} alt="" draggable={false} />
+              <span className="certificate-signed">{t('screens.epilogue.certSigned')}</span>
+            </span>
+            <span className="certificate-seal" aria-hidden="true">
+              {t('screens.epilogue.certSeal')}
+            </span>
+            <span className="certificate-signer">
+              <img className="certificate-signature" src={`content://pack/${SIGNATURES.registrar}`} alt="" draggable={false} />
+              <span className="certificate-signed">{t('screens.epilogue.certRegistrar')}</span>
+            </span>
+          </div>
+        </div>
+      ) : (
       <div key={index} className="epilogue-screen">
         <span className="caps epilogue-heading">{screen.heading}</span>
         <p className="epilogue-text">{screen.text}</p>
@@ -94,6 +130,7 @@ export function EpilogueView({ content, state, onExit }: Props) {
           </button>
         )}
       </div>
+      )}
       <div className="epilogue-foot">
         <span>
           {index + 1} / {screens.length}

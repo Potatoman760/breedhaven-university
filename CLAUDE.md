@@ -2,7 +2,7 @@
 
 An adult, LLM-driven dating sim: Electron, React 19, TypeScript, zod. The player is a rare fertile man at a university of women; scenes are conversations written by an LLM, and everything around them (time, money, courses, relationships, pregnancy, the house) is deterministic game logic.
 
-`README.md` is the full reference for how each system works and where it lives. Read the relevant section before changing a system. This file is the short version: how to work here.
+`docs/SYSTEMS.md` is the full reference for how each system works and where it lives (`README.md` is what the game is, how to start, and every command). Read the relevant section before changing a system. This file is the short version: how to work here.
 
 ## Commands
 
@@ -29,6 +29,7 @@ Run `npm run typecheck` and `npm test` after every change and say what they repo
 | `generate-ambience.ts` | A place's ambience loop on ElevenLabs, 30 seconds and seamless, into `sounds.json` (`<ids>`, `--overwrite`). Prompts and places are in the script. |
 | `voice-lines.ts` | Record the lines written ahead (tours, orientation, the Societies Fair) in their speakers' voices (`--dry`, `[tours|orientation|fair]`, `--overwrite`). Run it after changing one. |
 | `generate-voice.ts` | A love interest's voice on ElevenLabs and her wordless sounds in it (`<id> --design`, `--pick <n>`, then `<id>`; `--overwrite`). Key in `.env`. Run it after adding one. |
+| `generate-items.ts`, `generate-below.ts` | Draw item pictures and the Undercroft (depths, enemies, relics) on ComfyUI (`npm run items`, `npm run below`; `--overwrite`, `--dry`). |
 | `generate-walks.ts` | Draw each love interest's walking profile (hips up, facing right) for the loading screen (`npm run walks`, `-- <ids>`, `--overwrite`, `--dry`). Run it after adding one. |
 | `preview-loading.ts` | Open the app in dev on the loading screen alone (`npm run preview:loading`, `-- <id or first name>`; random, and a click shows another, when none is named). |
 | `preview-lantern.ts` | Open the app in dev on the Lantern Festival's lantern release alone (`npm run preview:lantern`, `-- <id>` or `-- <id>,<id>` for two; one and then two at random when none is named). |
@@ -56,7 +57,7 @@ scripts/                One-off and maintenance scripts
 - Periodic work (settling rent, scheduling births, announcing skills) is an idle `useEffect` in `App.tsx` guarded by a marker in the state, so it runs once however far the clock jumped.
 - The content one game sees is derived: `withHousing(withSkinTone(personalise(content, name), state.player.skinTone), state)`. Use it wherever content is prepared for a state.
 - Anything that changes a number of the game for a while or for good goes through `src/shared/game/modifiers.ts` (`factor`, `bonus`), not a one-off `if`.
-- Text the code writes, for the player or for the LLM, is never a literal: it is `t('<namespace>.<module>.<name>', params)` from `src/shared/i18n`, with the English in `src/shared/i18n/en/<namespace>.json`. Tags the parser reads, ids and image prompts stay in code and go in as params. See "Languages" in `README.md`.
+- Text the code writes, for the player or for the LLM, is never a literal: it is `t('<namespace>.<module>.<name>', params)` from `src/shared/i18n`, with the English in `src/shared/i18n/en/<namespace>.json`. Tags the parser reads, ids and image prompts stay in code and go in as params. See "Languages" in `docs/SYSTEMS.md`.
 
 ## Rules for this project
 
