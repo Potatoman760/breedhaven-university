@@ -3,7 +3,7 @@ import { CourseSchema, CourseworkConfigSchema, type ContentPack, type GameState 
 import { attend } from './courses'
 import { createInitialState } from './state'
 import { fixture } from './testFixture'
-import { arriveFor, canGoTo, nextUp, sharedUpcoming } from './upcoming'
+import { arriveFor, canGoTo, nextUp, sharedUpcoming, toldTitle } from './upcoming'
 
 // The fixture starts at 06:00 at home, on a Two, on a 20-hour day. Classes are at the shop.
 const base = fixture()
@@ -49,6 +49,17 @@ describe('the next thing on his timetable', () => {
     // Too tired for it, he is told so before he sets out.
     expect(canGoTo(content, { ...start, player: { ...start.player, energy: 0 } }, next).reasons).toEqual(['Requires 5 energy'])
     expect(canGoTo(content, { ...start, appointments: [plan] }, nextUp(content, { ...start, appointments: [plan] })!).ok).toBe(true)
+  })
+})
+
+describe('a plan of his, told to the women he is with', () => {
+  it('is named where it is theirs or nobody else\'s, and is only something he has on where it is with another', () => {
+    const date = { title: 'Dinner at the Mana Bar', withIds: ['bea'] }
+    expect(toldTitle(date, ['bea'])).toBe('Dinner at the Mana Bar')
+    expect(toldTitle(date, ['ana', 'bea'])).toBe('Dinner at the Mana Bar')
+    expect(toldTitle(date, ['ana'])).toBe('a prior engagement')
+    expect(toldTitle({ title: 'The viewing of the house', withIds: [] }, ['ana'])).toBe('The viewing of the house')
+    expect(toldTitle({ title: 'Midterm: 101' }, ['ana'])).toBe('Midterm: 101')
   })
 })
 

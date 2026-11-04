@@ -25,6 +25,8 @@ export interface AgendaItem {
   description?: string
   /** A plan that is more than an ordinary one, marked as what it is: her story beat, the house, the way down. */
   mark?: PlanMark
+  /** For a plan or a birth, the love interests it is with. */
+  withIds?: string[]
 }
 
 /** One hour of the day a plan is suggested for: what of his is then, and whether the plan is. */
@@ -161,6 +163,7 @@ export function dayAgenda(content: ContentPack, state: GameState, dayIndex: numb
       detail: place,
       startHour: date.hour,
       hours: plan.hours,
+      withIds: plan.kind === 'viewing' || plan.kind === 'below' ? [] : attendees(plan),
       ...(planMark(plan) && { mark: planMark(plan) })
     })
   }

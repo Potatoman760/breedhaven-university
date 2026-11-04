@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import {
   acceptBond,
   ambienceAt,
+  weatherSoundAt,
   songAt,
   attendEventPart,
   leaveTable,
@@ -168,6 +169,8 @@ import {
   withNpc,
   inMasks,
   newStrangers,
+  firstLinesIn,
+  firstLineFlag,
   withStrangers,
   nextDance,
   guessable,
@@ -196,7 +199,7 @@ import { MAX_SCENE_CAST, type Activity, type ContentPack, type EventPart, type E
 import { CHAT_CANCELLED } from '../../shared/ipc'
 import { AUTO_SLOT_ID, type SaveData } from '../../shared/saves'
 import { errorMessage } from './errors'
-import { play, playSong, playVoice, setAmbience, useSounds } from './sound'
+import { lineFile, play, playSong, playVoices, setAmbience, setWeather, usePlayerName, useSounds } from './sound'
 import { onLanguageContent } from './language'
 import { t } from '../../shared/i18n'
 import { EpilogueView } from './ui/EpilogueView'
@@ -347,6 +350,7 @@ const NOTICE_MS = 9000
 /** Owns the running game: its state, the open scene, and whichever dialog is showing. */
 function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   const [state, setState] = useState<GameState>(initial.state)
+  usePlayerName(state.player.name)
   // The content as this game reads it: the player's name wherever the content wrote the token, and the house he has been let in it or out of it.
   const content = useMemo(() => withHousing(withSkinTone(personalise(written, state.player.name), state.player.skinTone), state), [written, state.player.name, state.player.skinTone, state.housing])
   const [scene, setScene] = useState<Scene | null>(initial.scene)
@@ -407,12 +411,15 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   // An achievement is heard as it comes, not as it goes.
   const unlocksHeard = useRef(0)
   useEffect(() => {
-    if (unlocked.length > unlocksHeard.current) play('skill')
+    if (unlocked.length > unlocksHeard.current) play('achievement')
     unlocksHeard.current = unlocked.length
   }, [unlocked.length])
   // The loop behind where he is, which changes with the place and the dark, and stops when the game is left.
   const ambience = ambienceAt(content, state)
   useEffect(() => setAmbience(ambience), [ambience])
+  const outside = weatherSoundAt(content, state)
+  useEffect(() => setWeather(outside), [outside?.sound, outside?.indoors])
+  useEffect(() => () => setWeather(undefined), [])
   // Coming to a place dressed for a festival with a song of its own, the song plays once through: each time he arrives.
   const arrival = `${state.locationId}:${toDate(content.calendar, state.time).dayIndex}`
   useEffect(() => {
@@ -754,6 +761,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     if (!said) return
     // Kept so that the line, and whatever it leads to, can be taken back.
     if (text !== undefined) setTurns((kept) => [...kept, { state: when, scene: said, text }].slice(-MAX_TURNS_KEPT))
+    if (text !== undefined) play('sent')
     // If someone was on her way, this is when she arrives: before the line is answered, so the answer is hers.
     const arrival = dramaDue(content, when, said) ? fireDrama(content, when, said) : undefined
     const from = arrival?.scene ?? said
@@ -780,7 +788,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setBusy(true)
     try {
       const response = await window.api.chat({ state: at, scene: asked })
-      if (response.reaction) playVoice(response.reaction)
+      play('reply')
+      playVoices(response.voices)
       // The game, not the LLM, decides whether she conceives.
       // She may have chosen, in this reply, to stop what she takes against it: that counts from this reply on.
       const stopped = response.offControlIds.filter((id) => onBirthControl(content, at, id))
@@ -874,6 +883,15 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
   const openedFor = useRef<Scene['beats'] | null>(null)
   useEffect(() => {
     if (!scene || busy || scene.messages.length > 0 || openedFor.current === scene.beats) return
+    // Someone he has never met opens with who she is, in her own recorded voice; then it is his turn.
+    const first = firstLinesIn(content, state, scene)
+    if (first) {
+      openedFor.current = scene.beats
+      setScene({ ...scene, messages: [{ role: 'assistant', content: first.text }] })
+      setState((current) => ({ ...current, flags: { ...current.flags, ...Object.fromEntries(first.ids.map((id) => [firstLineFlag(id), true])) } }))
+      playVoices(first.ids.flatMap((id) => lineFile(id, content.loveInterests.find((li) => li.id === id)?.firstLine ?? '') ?? []))
+      return
+    }
     // A present due today is put on the scene first, for her to open with: the scene comes back here once it is.
     if (!scene.npc && bringPresents(content, state, sceneCast(scene)).presents.length > 0) return
     openedFor.current = scene.beats

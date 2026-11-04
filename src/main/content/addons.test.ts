@@ -2,8 +2,9 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
+import { NSFW_POSES, posesOf } from '../../shared/model'
 import { resolveContentPath } from './assets'
-import { deleteGroup, saveGroup, deleteLocation, deleteLook, deleteLoveInterest, deleteTrait, saveLook, importAsset, loadWithAddons, rebuildCatalogue, saveMajor, deleteMajor, removeUnusedAssets, resetPlayer, saveLocation, saveLoveInterest, savePlayer, saveTrait } from './addons'
+import { deleteGroup, saveGroup, deleteLocation, deleteLook, deleteLoveInterest, deleteTrait, saveActPrompts, saveLook, importAsset, loadWithAddons, rebuildCatalogue, saveMajor, deleteMajor, removeUnusedAssets, resetPlayer, saveLocation, saveLoveInterest, savePlayer, saveTrait } from './addons'
 
 // The game's own pack is the base; each test gets an empty add-on folder of its own.
 const packDir = join(process.cwd(), 'content', 'default')
@@ -73,6 +74,22 @@ describe('saveLoveInterest', () => {
 })
 
 describe('faces and sex-acts added in the editor', () => {
+  it("word a standard sex-act's picture the pack's own way, over the code's, and keep the rest of the file", () => {
+    const dir = addons()
+    expect(saveLook(dir, base.content, { kind: 'acts', look: press })).toEqual([])
+    expect(saveActPrompts(dir, base.content, { id: 'doggy', prompts: { draws: 'from behind, seen from the side', groupDraws: '', foursomeDraws: 'three of them' } })).toEqual([])
+    const file = JSON.parse(readFileSync(join(dir, 'looks.json'), 'utf8'))
+    // Beside whatever the pack already words its own way.
+    expect(file.prompts).toEqual({ ...base.content.looks.prompts, doggy: { draws: 'from behind, seen from the side', foursomeDraws: 'three of them' } })
+    expect(file.acts.map((act: { id: string }) => act.id)).toEqual(['press'])
+    const doggy = posesOf({ ...base.content.looks, prompts: file.prompts }).poses.find((pose) => pose.id === 'doggy')!
+    expect(doggy.draws).toBe('from behind, seen from the side')
+    // Left empty, the code's wording stands; and the pregnant form is drawn from the same words.
+    expect(doggy.groupDraws).toBe(NSFW_POSES.find((pose) => pose.id === 'doggy')!.groupDraws)
+    expect(posesOf({ ...base.content.looks, prompts: file.prompts }).pregnant.find((pose) => pose.id === 'pregnant-doggy')!.draws).toBe('from behind, seen from the side')
+    expect(saveActPrompts(dir, base.content, { id: 'press', prompts: { draws: 'x' } })).not.toEqual([])
+  })
+
   const smug = { id: 'smug', name: 'Smug', description: 'pleased with herself', draws: 'a smug expression' }
   const press = { id: 'press', name: 'Press', description: 'legs pinned back', draws: 'she lies on her back, legs pinned back', seeding: true }
 
@@ -84,7 +101,7 @@ describe('faces and sex-acts added in the editor', () => {
     expect(loaded.info.issues).toEqual([])
     // Laid after those the game comes with.
     expect(loaded.content.looks.expressions).toEqual([...base.content.looks.expressions, smug])
-    expect(loaded.content.looks.acts).toEqual([...base.content.looks.acts, { ...press, groupDraws: '', moment: false, manShown: true }])
+    expect(loaded.content.looks.acts).toEqual([...base.content.looks.acts, { ...press, groupDraws: '', foursomeDraws: '', moment: false, manShown: true }])
     expect(loaded.info.looks).toMatchObject({ expressions: { smug: 'addon' }, acts: { press: 'addon' } })
 
     // Her picture for it keeps it: it would be left in no slot.

@@ -7,6 +7,8 @@ import {
   DEFAULT_VIEW,
   LocationSchema,
   LooksSchema,
+  ActPromptsSchema,
+  NSFW_POSES,
   GroupSchema,
   groupFiles,
   CustomActSchema,
@@ -280,7 +282,7 @@ export function loadWithAddons(packDir: string, addonDir: string, languageDir?: 
   const baseLooks: Looks = parsedLooks.success ? parsedLooks.data : { expressions: [], acts: [] }
   const addonLooks = readAddonLooks(addonDir, issues)
   const acceptedLooks: Looks = { expressions: [], acts: [] }
-  const looksOf = (added: Looks): Looks => ({ expressions: overlay(baseLooks.expressions, added.expressions), acts: overlay(baseLooks.acts, added.acts) })
+  const looksOf = (added: Looks): Looks => ({ ...baseLooks, expressions: overlay(baseLooks.expressions, added.expressions), acts: overlay(baseLooks.acts, added.acts) })
   for (const kind of LOOK_KINDS) {
     for (const raw of addonLooks[kind]) {
       const parsed = LOOK_SCHEMAS[kind].safeParse(raw)
@@ -700,9 +702,34 @@ export function deleteTrait(addonDir: string, content: ContentPack, baseTraitIds
   return []
 }
 
-function writeLooks(addonDir: string, looks: Record<LookKind, unknown[]>): void {
+function writeLooks(addonDir: string, looks: Record<string, unknown>): void {
   mkdirSync(addonDir, { recursive: true })
-  writeFileSync(join(addonDir, LOOKS_FILE), `${JSON.stringify(looks, null, 2)}\n`)
+  // Whatever else the file holds (the standard sex-acts' prompts, in the base pack) is kept as it was.
+  const path = join(addonDir, LOOKS_FILE)
+  const before = existsSync(path) ? (readJsonFile(path) as Record<string, unknown>) : {}
+  writeFileSync(path, `${JSON.stringify({ ...before, ...looks }, null, 2)}\n`)
+}
+
+/**
+ * Words a standard sex-act's image prompts the pack's own way, after checking the game would still load with them. For
+ * the game being written: kept in the base pack's `looks.json`, over the wording in the code. A prompt left empty is
+ * the code's again.
+ */
+export function saveActPrompts(addonDir: string, content: ContentPack, raw: unknown): string[] {
+  const parsed = z.object({ id: z.string(), prompts: ActPromptsSchema }).safeParse(raw)
+  if (!parsed.success) return parsed.error.issues.map((issue) => t('editor.addons.issue', { path: issue.path.join('.') || t('editor.addons.whatLook'), message: issue.message }))
+  const { id, prompts } = parsed.data
+  if (!NSFW_POSES.some((pose) => pose.id === id)) return [t('editor.addons.lookNotAddon')]
+  const kept = Object.fromEntries(Object.entries(prompts).filter((entry): entry is [string, string] => typeof entry[1] === 'string' && entry[1].trim() !== ''))
+  const { [id]: _was, ...others } = content.looks.prompts ?? {}
+  const next = Object.keys(kept).length > 0 ? { ...others, [id]: kept } : others
+  try {
+    validateContentPack({ ...content, looks: { ...content.looks, prompts: next } })
+  } catch (error) {
+    return (error as { issues?: string[] }).issues ?? [(error as Error).message]
+  }
+  writeLooks(addonDir, { prompts: next })
+  return []
 }
 
 /**

@@ -4,6 +4,7 @@ import { Portrait } from './Portrait'
 import type { LoveInterest } from '../../../shared/model'
 import { Button } from './Button'
 import { isMouseBack } from '../mouseBack'
+import { playLine, stopLine } from '../sound'
 import { t } from '../../../shared/i18n'
 
 export interface TourStep {
@@ -40,6 +41,9 @@ export function Tour({ guide, steps, onDone, onSkip }: { guide: LoveInterest; st
   const [leaving, setLeaving] = useState(false)
   const step = steps[index]
   const last = index === steps.length - 1
+  // Each step said aloud as it comes up, where it has been recorded; the voice stops with the tour.
+  useEffect(() => playLine(guide.id, step.text), [index])
+  useEffect(() => stopLine, [])
 
   // What the step points at is found once the step has brought it onto the screen, and found again as the window changes.
   useLayoutEffect(() => {

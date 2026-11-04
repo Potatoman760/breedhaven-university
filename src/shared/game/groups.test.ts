@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { LooksSchema, PregnancyConfigSchema, posesOf, validateContentPack, type ContentPack, type Group, type Scene } from '../model'
+import { LooksSchema, PregnancyConfigSchema, positioned, posesOf, validateContentPack, type ContentPack, type Group, type Scene } from '../model'
 import { groupNsfwPrompt } from '../comfy'
 import { groupActs, groupPose, sceneGroup } from './groups'
 import { conceive } from './pregnancy'
@@ -14,7 +14,7 @@ const ana = base.loveInterests[0]
 const bea = { ...ana, id: 'bea', name: 'Bea Moss' }
 const cy = { ...ana, id: 'cy', name: 'Cy Fenn' }
 const act = (id: string, media = true) => ({ id, name: id, description: '', loop: true, ...(media && { image: `sprites/group-pair/${id}.webp` }) })
-const pair: Group = { id: 'pair', name: 'Ana & Bea', memberIds: ['ana', 'bea'], animations: [act('missionary'), act('doggy', false)], tonedAnimations: {} }
+const pair: Group = { id: 'pair', name: 'Ana & Bea', memberIds: ['ana', 'bea'], animations: [act('missionary'), act('doggy', false)], tonedAnimations: {}, positions: {} }
 const content: ContentPack = {
   ...base,
   loveInterests: [ana, bea, cy],
@@ -39,6 +39,13 @@ const scene = (companionIds: string[]): Pick<Scene, 'loveInterestId' | 'companio
 const everyone = () => true
 
 describe('the group a scene is of', () => {
+  it('describes its women in the order an act is positioned in, and in their own order where it is not', () => {
+    const three = { memberIds: ['ana', 'bea', 'cy'], positions: { doggy: ['cy', 'ana'], cowgirl: ['bea', 'gone'] } }
+    expect(positioned(three, 'doggy')).toEqual(['cy', 'ana', 'bea'])
+    expect(positioned(three, 'cowgirl')).toEqual(['bea', 'ana', 'cy'])
+    expect(positioned(three, 'missionary')).toEqual(['ana', 'bea', 'cy'])
+  })
+
   it('is the one of exactly the love interests in it, whoever leads', () => {
     expect(sceneGroup(content, scene(['bea']))?.id).toBe('pair')
     expect(sceneGroup(content, { loveInterestId: 'bea', companionIds: ['ana'], npc: false })?.id).toBe('pair')
@@ -108,6 +115,9 @@ describe('what a group picture is asked for with', () => {
   it('is the act in its group wording, for every standard act', () => {
     for (const pose of posesOf(content.looks).poses) expect(pose.groupDraws?.trim(), pose.id).not.toBe('')
     expect(posesOf(content.looks).poses.every((pose) => pose.groupDraws !== pose.draws)).toBe(true)
+    // And for three women, each its own again.
+    for (const pose of posesOf(content.looks).poses) expect(pose.foursomeDraws?.trim(), pose.id).not.toBe('')
+    expect(posesOf(content.looks).poses.every((pose) => pose.foursomeDraws !== pose.groupDraws)).toBe(true)
   })
 
   it("is a custom act's own group wording, kept apart from what one woman is drawn with", () => {

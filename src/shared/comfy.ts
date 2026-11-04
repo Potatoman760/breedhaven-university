@@ -148,8 +148,10 @@ export const ComfySettingsSchema = z.object({
   sizes: z.partialRecord(z.enum(ART_KINDS), SizeSchema).default({}),
   /** What a clip of each pose is asked for with, by pose id, in place of the built-in ones. */
   videoPrompts: z.record(z.string(), z.string()).default({}),
-  /** What a clip of a group's sex-act is asked for with, all of them in it, by the act's id. Left out, the act's own. */
+  /** What a clip of a group's sex-act is asked for with, all of them in it, by the act's id: a threesome's, two women and him. Left out, the act's own. */
   groupVideoPrompts: z.record(z.string(), z.string()).default({}),
+  /** The same for a foursome, three women and him. Left out, the threesome's. */
+  foursomeVideoPrompts: z.record(z.string(), z.string()).default({}),
   /** Whether a clip is made to loop: asked to end on the picture it starts from, so that it goes round without a jump. One that is not is played once. */
   videoLastFrame: z.boolean().default(false),
   /** How long a clip runs, in seconds. */
@@ -171,7 +173,7 @@ export const defaultsFor = (settings: Pick<ComfySettings, 'defaults' | 'videoWor
  * picture, and nothing of the player's own machine. Kept in the content beside the workflows, and read under
  * whatever a player has changed for themselves.
  */
-export const ComfyBundleSettingsSchema = ComfySettingsSchema.pick({ promptPrefixes: true, negativePrefixes: true, overrides: true, defaults: true, framing: true, sizes: true, videoPrompts: true, groupVideoPrompts: true })
+export const ComfyBundleSettingsSchema = ComfySettingsSchema.pick({ promptPrefixes: true, negativePrefixes: true, overrides: true, defaults: true, framing: true, sizes: true, videoPrompts: true, groupVideoPrompts: true, foursomeVideoPrompts: true })
 export type ComfyBundleSettings = z.infer<typeof ComfyBundleSettingsSchema>
 
 /** The game's workflows, and what each calls for that the player has to fetch themselves. */
@@ -269,8 +271,9 @@ export function videoPromptFor(settings: Pick<ComfySettings, 'videoPrompts'>, po
 }
 
 /** What a clip of a group's sex-act is asked for with: its group prompt, or until one is written, the act's own. */
-export function groupVideoPromptFor(settings: Pick<ComfySettings, 'videoPrompts' | 'groupVideoPrompts'>, poseId: string): string {
-  return settings.groupVideoPrompts[basePoseId(poseId)] ?? videoPromptFor(settings, poseId)
+export function groupVideoPromptFor(settings: Pick<ComfySettings, 'videoPrompts' | 'groupVideoPrompts' | 'foursomeVideoPrompts'>, poseId: string, women = 2): string {
+  const id = basePoseId(poseId)
+  return (women >= 3 ? settings.foursomeVideoPrompts[id] : undefined) ?? settings.groupVideoPrompts[id] ?? videoPromptFor(settings, poseId)
 }
 
 /** A prompt with a workflow's prefix in front of it, as a paragraph of its own, when it has one. */

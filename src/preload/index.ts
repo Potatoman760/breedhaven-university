@@ -54,6 +54,7 @@ const api: RendererApi = {
     saveTrait: (trait) => ipcRenderer.invoke(IPC.editorSaveTrait, trait),
     deleteTrait: (id) => ipcRenderer.invoke(IPC.editorDeleteTrait, id),
     saveLook: (change) => ipcRenderer.invoke(IPC.editorSaveLook, change),
+    saveActPrompts: (change) => ipcRenderer.invoke(IPC.editorSaveActPrompts, change),
     deleteLook: (which) => ipcRenderer.invoke(IPC.editorDeleteLook, which),
     saveGroup: (group) => ipcRenderer.invoke(IPC.editorSaveGroup, group),
     deleteGroup: (id) => ipcRenderer.invoke(IPC.editorDeleteGroup, id),

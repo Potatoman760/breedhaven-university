@@ -395,6 +395,12 @@ describe('a group clip', () => {
     expect(groupVideoPromptFor(settings, 'missionary')).toBe('they rock together')
     expect(groupVideoPromptFor(settings, 'doggy')).toBe('she rocks')
     expect(groupVideoPromptFor(settings, 'doggy')).toBe(videoPromptFor(settings, 'doggy'))
+    // A foursome's falls back to the threesome's, and then to the act's own.
+    const four = ComfySettingsSchema.parse({ videoPrompts: { doggy: 'she rocks' }, groupVideoPrompts: { missionary: 'they rock together' }, foursomeVideoPrompts: { cowgirl: 'all three ride' } })
+    expect(groupVideoPromptFor(four, 'cowgirl', 3)).toBe('all three ride')
+    expect(groupVideoPromptFor(four, 'cowgirl', 2)).toBe(videoPromptFor(four, 'cowgirl'))
+    expect(groupVideoPromptFor(four, 'missionary', 3)).toBe('they rock together')
+    expect(groupVideoPromptFor(four, 'doggy', 3)).toBe('she rocks')
   })
 
   it("is the game's to ship, and a player's change is kept on their own computer", () => {

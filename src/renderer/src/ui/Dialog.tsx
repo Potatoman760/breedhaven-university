@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import type { Cue } from '../../../shared/model'
 import { t } from '../../../shared/i18n'
 import { play } from '../sound'
@@ -34,10 +34,16 @@ export function Overlay({ onClose, sounds = ['open', 'close'], children }: { onC
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
-  // What it sounds like to open and to close: a window by default, the phone its own.
+  // What it sounds like to open and to close: a window by default, the phone its own. The close is put off a tick, so
+  // that a teardown followed at once by a mount again (StrictMode, in development) is neither a closing nor a reopening.
+  const closing = useRef<number | undefined>(undefined)
   useEffect(() => {
-    play(sounds[0])
-    return () => play(sounds[1])
+    window.clearTimeout(closing.current)
+    if (closing.current === undefined) play(sounds[0])
+    closing.current = undefined
+    return () => {
+      closing.current = window.setTimeout(() => play(sounds[1]), 0)
+    }
   }, [])
 
   return (

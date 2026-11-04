@@ -26,8 +26,10 @@ export const CustomActSchema = z.object({
   description: z.string().default(''),
   /** What its picture is asked for with. */
   draws: z.string().default(''),
-  /** What a group's picture of it is asked for with, all of them in it. Left empty, its own, for one woman. */
+  /** What a group's picture of it is asked for with, all of them in it: two women. Left empty, its own, for one woman. */
   groupDraws: z.string().default(''),
+  /** The same for a group of three women. Left empty, the two women's. */
+  foursomeDraws: z.string().default(''),
   /** A single moment, as a creampie is: shown for the one reply and never twice running. */
   moment: z.boolean().default(false),
   /** It shows him finishing inside her: choosing it counts as the [SEEDED] tag does. */
@@ -37,10 +39,20 @@ export const CustomActSchema = z.object({
 })
 export type CustomAct = z.infer<typeof CustomActSchema>
 
+/** A standard sex-act's image prompts as the pack has rewritten them, over the ones in the code: any left out are the code's. */
+export const ActPromptsSchema = z.object({
+  draws: z.string().optional(),
+  groupDraws: z.string().optional(),
+  foursomeDraws: z.string().optional()
+})
+export type ActPrompts = z.infer<typeof ActPromptsSchema>
+
 /** The faces and sex-acts added in the editor's section for them, over the standard ones in the code. */
 export const LooksSchema = z.object({
   expressions: z.array(CustomExpressionSchema).default([]),
-  acts: z.array(CustomActSchema).default([])
+  acts: z.array(CustomActSchema).default([]),
+  /** The standard sex-acts' image prompts, by id, where the pack words them its own way. Written in the editor while the game is written. */
+  prompts: z.record(z.string(), ActPromptsSchema).optional()
 })
 export type Looks = z.infer<typeof LooksSchema>
 
@@ -55,8 +67,9 @@ export interface StandardPose {
   name: string
   description: string
   draws: string
-  /** What a group's picture of it is asked for with, in place of `draws`. */
+  /** What a group's picture of it is asked for with, in place of `draws`: two women, and three. */
   groupDraws?: string
+  foursomeDraws?: string
   /** He is in the picture. Left out, he is. */
   manShown?: boolean
 }
@@ -66,7 +79,14 @@ export interface StandardPose {
  * drawn pregnant (`pregnant`).
  */
 export function posesOf(looks: Looks): { poses: StandardPose[]; pregnant: StandardPose[]; all: StandardPose[] } {
-  const poses: StandardPose[] = [...NSFW_POSES, ...looks.acts]
-  const pregnant: StandardPose[] = [...NSFW_PREGNANT_POSES, ...looks.acts.map((act) => ({ ...act, id: pregnantPoseId(act.id), name: `${act.name}, pregnant` }))]
+  // A standard one as the pack words it, where it does; its pregnant form is drawn from the same words.
+  const worded = <P extends StandardPose>(pose: P, id: string): P => {
+    const own = looks.prompts?.[id]
+    if (!own) return pose
+    const kept = Object.fromEntries(Object.entries(own).filter(([, text]) => text !== undefined && text.trim() !== ''))
+    return { ...pose, ...kept }
+  }
+  const poses: StandardPose[] = [...NSFW_POSES.map((pose) => worded(pose, pose.id)), ...looks.acts]
+  const pregnant: StandardPose[] = [...NSFW_PREGNANT_POSES.map((pose) => worded(pose, pose.base)), ...looks.acts.map((act) => ({ ...act, id: pregnantPoseId(act.id), name: `${act.name}, pregnant` }))]
   return { poses, pregnant, all: [...poses, ...pregnant] }
 }

@@ -44,6 +44,7 @@ export const IPC = {
   editorSaveTrait: 'editor:saveTrait',
   editorDeleteTrait: 'editor:deleteTrait',
   editorSaveLook: 'editor:saveLook',
+  editorSaveActPrompts: 'editor:saveActPrompts',
   editorDeleteLook: 'editor:deleteLook',
   editorSaveGroup: 'editor:saveGroup',
   achievementsList: 'achievements:list',

@@ -686,14 +686,18 @@
     ]
   },
   "reactions": {
-    "aww": "sounds/voices/faye/aww.ogg",
-    "gasp": "sounds/voices/faye/gasp.ogg",
     "giggle": "sounds/voices/faye/giggle.ogg",
-    "huff": "sounds/voices/faye/huff.ogg",
-    "satisfied": "sounds/voices/faye/satisfied.ogg",
-    "sigh-content": "sounds/voices/faye/sigh-content.ogg",
     "sigh": "sounds/voices/faye/sigh.ogg",
+    "sigh-content": "sounds/voices/faye/sigh-content.ogg",
+    "gasp": "sounds/voices/faye/gasp.ogg",
+    "huff": "sounds/voices/faye/huff.ogg",
     "surprised": "sounds/voices/faye/surprised.ogg",
-    "yawn": "sounds/voices/faye/yawn.ogg"
-  }
+    "yawn": "sounds/voices/faye/yawn.ogg",
+    "aww": "sounds/voices/faye/aww.ogg",
+    "satisfied": "sounds/voices/faye/satisfied.ogg"
+  },
+  "catchphrases": {
+    "sweetheart": "sounds/voices/faye/phrase-sweetheart.ogg"
+  },
+  "firstLine": "Well, aren't you an interesting new acquisition. I'm Faye Fertillay, and I do love getting in on the ground floor... sweetheart."
 }

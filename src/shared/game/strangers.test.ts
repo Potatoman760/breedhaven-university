@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { Scene } from '../model'
 import { buildCharacterPrompt } from './prompt'
 import { createInitialState } from './state'
-import { newStrangers, saysName, unnamedIn, UNNAMED, withStrangers } from './strangers'
+import { firstLineFlag, firstLinesIn, newStrangers, saysName, unnamedIn, UNNAMED, withStrangers } from './strangers'
 import { fixture } from './testFixture'
 
 const content = fixture()
@@ -12,6 +12,21 @@ const scene = (extra: Partial<Scene> = {}): Scene =>
   ({ loveInterestId: 'ana', companionIds: [], npc: false, nsfw: false, beats: [], messages: [], gifts: [], conceived: [], departed: [], ...extra }) as Scene
 
 describe('a woman he is meeting for the first time', () => {
+  it('opens her first scene with him with her first line, once, and in a group with her name before it', () => {
+    const first = ana.name.split(' ')[0]
+    const said = { ...content, loveInterests: content.loveInterests.map((li) => (li.id === 'ana' ? { ...li, firstLine: `I'm ${first}.` } : li)) }
+    expect(firstLinesIn(said, state, scene())).toEqual({ ids: ['ana'], text: `I'm ${first}.` })
+    expect(firstLinesIn(said, state, scene({ companionIds: ['bea'] }))?.text).toBe(`${first}: I'm ${first}.`)
+    // Said once; and not where she has been met, in a class, or once anything has been said.
+    expect(firstLinesIn(said, { ...state, flags: { [firstLineFlag('ana')]: true } }, scene())).toBeUndefined()
+    expect(firstLinesIn(said, { ...state, met: ['ana'] }, scene())).toBeUndefined()
+    expect(firstLinesIn(said, state, scene({ lesson: {} as never }))).toBeUndefined()
+    expect(firstLinesIn(said, state, scene({ messages: [{ role: 'user', content: 'Hi.' }] }))).toBeUndefined()
+    expect(firstLinesIn(content, state, scene())).toBeUndefined()
+    // Her name is said in it, so she is no longer a stranger to the screen.
+    expect(unnamedIn(said, scene({ strangers: ['ana'], messages: [{ role: 'assistant', content: `I'm ${first}.` }] }))).toEqual([])
+  })
+
   it('is a stranger in the scene she meets him in, and not once they have met, nor at a masked ball', () => {
     expect(newStrangers(content, state, scene())).toEqual(['ana'])
     expect(newStrangers(content, { ...state, met: ['ana'] }, scene())).toEqual([])

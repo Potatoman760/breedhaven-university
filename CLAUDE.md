@@ -25,6 +25,9 @@ Run `npm run typecheck` and `npm test` after every change and say what they repo
 | `prompt-size.ts` | Size of the opening scene prompt per character; `<id> --print` dumps it; `--class <courseId>` shows a lecture's opening instruction. |
 | `make-test-save.ts` | Write a late-game save to a slot (`8` by default) for trying the house, births and skills. Needs `--force` to overwrite. |
 | `generate-icons.ts` | Paint the emblems shown in place of drawn icons for jobs, places, societies, stalls, weather and Undercroft stops (`npm run icons`, `-- <group or id>`, `--overwrite`, `--dry`). Run it after adding one. |
+| `generate-cues.ts` | The interface's cues on ElevenLabs as one set: takes into `out/cue-takes/` (`[cues]`, `--again <cues>`), and `--use cue=take` puts one into the pack. |
+| `generate-ambience.ts` | A place's ambience loop on ElevenLabs, 30 seconds and seamless, into `sounds.json` (`<ids>`, `--overwrite`). Prompts and places are in the script. |
+| `voice-lines.ts` | Record the lines written ahead (tours, orientation, the Societies Fair) in their speakers' voices (`--dry`, `[tours|orientation|fair]`, `--overwrite`). Run it after changing one. |
 | `generate-voice.ts` | A love interest's voice on ElevenLabs and her wordless sounds in it (`<id> --design`, `--pick <n>`, then `<id>`; `--overwrite`). Key in `.env`. Run it after adding one. |
 | `generate-walks.ts` | Draw each love interest's walking profile (hips up, facing right) for the loading screen (`npm run walks`, `-- <ids>`, `--overwrite`, `--dry`). Run it after adding one. |
 | `preview-loading.ts` | Open the app in dev on the loading screen alone (`npm run preview:loading`, `-- <id or first name>`; random, and a click shows another, when none is named). |

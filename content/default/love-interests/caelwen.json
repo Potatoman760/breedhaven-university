@@ -570,7 +570,8 @@
     "verbalQuirks": [
       "Asks \"And is that what you think, or what you were told?\"",
       "Dates things by decades: \"the last time this argument was fashionable, in the seventies.\"",
-      "Loses her reading glasses in her own hair."
+      "Loses her reading glasses in her own hair.",
+      "Calls {player} 'my dear', as she has called her favorite students for a century"
     ],
     "exampleDialogue": [],
     "backstory": "Post: Professor of Women's Studies, College of Arts and Humanities; sits on the University's ethics board\n\nCaelwen Ashgrove has taught at Breedhaven University for sixty-one years. Every first-year writes her essay: does a will the Bloom leans on still count as free? She has marked some forty thousand answers and maintains that the question is the point. Bloomists and Freewill advocates both quote her and both are annoyed by her.\n\nElves live long and the Bloom stays with them long. She has been part of three households, borne four daughters, and outlived two partners and one Sire; her youngest daughter is seventy and looks older than she does. The big house by the park was full for a century and has been quiet for fifteen years. She does not talk about that in lectures.\n\nHer magic is old, small and very well kept: wards that have held for a hundred years, a memory she can walk through like a library, plants that do as they are asked.",
@@ -707,14 +708,18 @@
     ]
   },
   "reactions": {
-    "aww": "sounds/voices/caelwen/aww.ogg",
-    "gasp": "sounds/voices/caelwen/gasp.ogg",
     "giggle": "sounds/voices/caelwen/giggle.ogg",
-    "huff": "sounds/voices/caelwen/huff.ogg",
-    "satisfied": "sounds/voices/caelwen/satisfied.ogg",
-    "sigh-content": "sounds/voices/caelwen/sigh-content.ogg",
     "sigh": "sounds/voices/caelwen/sigh.ogg",
+    "sigh-content": "sounds/voices/caelwen/sigh-content.ogg",
+    "gasp": "sounds/voices/caelwen/gasp.ogg",
+    "huff": "sounds/voices/caelwen/huff.ogg",
     "surprised": "sounds/voices/caelwen/surprised.ogg",
-    "yawn": "sounds/voices/caelwen/yawn.ogg"
-  }
+    "yawn": "sounds/voices/caelwen/yawn.ogg",
+    "aww": "sounds/voices/caelwen/aww.ogg",
+    "satisfied": "sounds/voices/caelwen/satisfied.ogg"
+  },
+  "catchphrases": {
+    "my dear": "sounds/voices/caelwen/phrase-my-dear.ogg"
+  },
+  "firstLine": "Do forgive me for staring, my dear, though I suspect you are growing used to it. I am Caelwen Ashgrove—and tell me, what question were you hoping I wouldn't ask?"
 }

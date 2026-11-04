@@ -175,21 +175,36 @@ export function ComfySetup({ settings, list, onSave, connectionOnly, acts = [] }
           ))}
         </div>
 
-        <div className="editor-group">
-          <h2>{t('comfy.setup.videoClips')}</h2>
+        {/* The clips' prompts, a long list each: closed until wanted. */}
+        <details className="editor-group clip-prompts">
+          <summary>
+            <h2>{t('comfy.setup.videoClips')}</h2>
+          </summary>
           <p className="hint">{t('comfy.setup.videoClipsHint')}</p>
           {[...NSFW_POSES, ...acts].map((pose) => (
             <VideoPromptRow key={pose.id} pose={pose} settings={settings} onChange={(prompt) => patch({ videoPrompts: { ...settings.videoPrompts, [pose.id]: prompt } })} />
           ))}
-        </div>
+        </details>
 
-        <div className="editor-group">
-          <h2>{t('comfy.setup.groupClips')}</h2>
-          <p className="hint">{t('comfy.setup.groupClipsHint')}</p>
+        <details className="editor-group clip-prompts">
+          <summary>
+            <h2>{t('comfy.setup.threesomeClips')}</h2>
+          </summary>
+          <p className="hint">{t('comfy.setup.threesomeClipsHint')}</p>
           {[...NSFW_POSES, ...acts].map((pose) => (
-            <VideoPromptRow key={pose.id} pose={pose} settings={settings} group onChange={(prompt) => patch({ groupVideoPrompts: { ...settings.groupVideoPrompts, [pose.id]: prompt } })} />
+            <VideoPromptRow key={pose.id} pose={pose} settings={settings} group={2} onChange={(prompt) => patch({ groupVideoPrompts: { ...settings.groupVideoPrompts, [pose.id]: prompt } })} />
           ))}
-        </div>
+        </details>
+
+        <details className="editor-group clip-prompts">
+          <summary>
+            <h2>{t('comfy.setup.foursomeClips')}</h2>
+          </summary>
+          <p className="hint">{t('comfy.setup.foursomeClipsHint')}</p>
+          {[...NSFW_POSES, ...acts].map((pose) => (
+            <VideoPromptRow key={pose.id} pose={pose} settings={settings} group={3} onChange={(prompt) => patch({ foursomeVideoPrompts: { ...settings.foursomeVideoPrompts, [pose.id]: prompt } })} />
+          ))}
+        </details>
         </>
         )}
       </div>
@@ -278,13 +293,14 @@ interface VideoPromptRowProps {
   pose: { id: string; name: string }
   settings: ComfySettings
   /** The prompt for a group's clip of the act, in place of one woman's. */
-  group?: boolean
+  /** For a group's clip, how many women: the threesome's prompts for two, the foursome's for three. */
+  group?: number
   onChange: (prompt: string) => void
 }
 
 /** What a clip of one pose is asked for with. Held as it is typed, and saved when it is left. */
 function VideoPromptRow({ pose, settings, group, onChange }: VideoPromptRowProps) {
-  const saved = group ? groupVideoPromptFor(settings, pose.id) : videoPromptFor(settings, pose.id)
+  const saved = group ? groupVideoPromptFor(settings, pose.id, group) : videoPromptFor(settings, pose.id)
   const [prompt, setPrompt] = useState(saved)
   return (
     <label>

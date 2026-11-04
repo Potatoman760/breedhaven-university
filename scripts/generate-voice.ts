@@ -28,6 +28,8 @@ mkdirSync(out, { recursive: true })
 
 // How each one voices her, for the voice design: who she is and how she speaks, not what she looks like.
 const DESCRIBED: Record<string, string> = {
+  edda:
+    'A woman of fifty-five, a university history professor, with a clear, crisp, authoritative mid-low voice and a refined educated English accent. Brisk, exacting and drily funny, every sentence a lecture with a footnote; warm underneath but businesslike. Mature, not elderly.',
   seraphine:
     'A young woman of eighteen with a soft, gentle, slightly breathy voice, clear and well-spoken with a refined received-pronunciation English accent. Shy and warm in private, a little hesitant, with a poised, formal edge she puts on when nervous. Light, youthful, sweet, never husky.',
   morwenna:
@@ -61,7 +63,7 @@ const DESCRIBED: Record<string, string> = {
   tink:
     "A young woman of nineteen with a cheeky, playful, light and quick voice and a lilting Irish accent. Mischievous and grinning, casual and teasing, always half a laugh away.",
   vespera:
-    "A woman of thirty-four with a low, smooth, lazy drawl and a thick, syrupy Deep South accent, Georgia or Louisiana. Sassy and teasing, unhurried and amused, confident to the point of arrogance, every line sounding like a private joke. Strongly Southern.",
+    "A Black American woman of thirty-six from the Deep South, with a rich, warm, smoky low alto voice and a thick, syrupy Southern drawl. Mature, grown and self-possessed, never girlish or young-sounding. Sassy, teasing and unhurried, amused and confident to the point of arrogance, every line sounding like a private joke.",
   yelena:
     "A young woman of eighteen with a clear, bright, crisp and polished voice and an aristocratic upper-class English accent. Poised, well-mannered and precise on the surface, with an eager, youthful excitement breaking through.",
   yulia:
@@ -72,6 +74,7 @@ const DESCRIBED: Record<string, string> = {
 
 // What she says in the previews: a line in her own manner, so the voice is heard doing what she does.
 const SAMPLE: Record<string, string> = {
+  edda: "Sit down. You have read the syllabus, I assume, which puts you ahead of most. Today is the basics: what you are, what that means here, and why the University would very much like you to be happy.",
   seraphine: "Oh, you came. I wasn't sure you would. Forgive me, I'm not very good at this part, the part where nobody is watching. Will you sit with me a little while?",
   morwenna: "You came back. How exquisite. Most men lose their nerve after the first conversation... I find that intolerable, and rather predictable. Sit down, darling. Tell me what it is you actually want.",
   anwen: "Oh, look who it is. Don't flatter yourself, I was just passing. Get on the back of the bike, and hold on properly this time. I'm not scraping you off the road.",
@@ -96,7 +99,7 @@ const SAMPLE: Record<string, string> = {
 
 // Her reactions: what each is, and the line spoken in eleven_v3 with its audio tags to draw it out.
 const REACTIONS: Record<string, string> = {
-  giggle: '[giggles] Hehe.',
+  giggle: '[giggle] hahaha',
   sigh: '[sighs] Hhh...',
   'sigh-content': '[contented sigh] Mm.',
   gasp: '[gasps] Oh!',
@@ -105,6 +108,33 @@ const REACTIONS: Record<string, string> = {
   yawn: '[yawns] Haah...',
   aww: '[softly, touched] Aww.',
   satisfied: '[blissful, savoring the most decadent chocolate] Mmmmm...'
+}
+
+// An accent the voice holds to only when it is asked to, put before everything she records.
+const ACCENT: Record<string, string> = {
+  zelie: '[French accent]',
+  yulia: '[Russian accent]',
+  grushka: '[heavy Eastern European accent]',
+  vespera: '[thick Southern drawl]'
+}
+const accented = (text: string) => (ACCENT[id] ? `${ACCENT[id]} ${text}` : text)
+
+// A reaction drawn out some way of its own, where the common line does not suit her.
+const OWN_REACTION: Record<string, Record<string, string>> = {}
+
+// A phrase said some way of its own, in place of plainly in her tone.
+const SAY: Record<string, Record<string, string>> = {
+  lira: { hello: '[bright, dreamy, airheaded] Hellooo!' },
+  anwen: { 'hey cowboy': '[smirking, cool, unhurried] Hey, cowboy...' },
+  maren: { kawaii: '[delighted, gushing] Kawaii!' },
+  tamsin: { 'shut up': '[flustered, scoffing] Shut up!' },
+  yulia: { "that's so Breedhaven": "[teasing, laughing] That's so Breedhaven." },
+  elowen: { 'player two': '[playful, bright] Player two!' },
+  grushka: { cub: '[gruff, warm] Cub.' },
+  isolde: { 'my baby': '[soft, intimate, composed] My baby.' },
+  ottilie: { 'my True Sire': '[dry, quietly fond] My True Sire.' },
+  seraphine: { 'my lord': '[shy, formal, a little breathless] My lord.' },
+  tink: { 'big guy': '[cheeky, teasing] Big guy.' }
 }
 
 const ledger = (): Record<string, string> => (existsSync(LEDGER) ? JSON.parse(readFileSync(LEDGER, 'utf8')) : {})
@@ -146,11 +176,12 @@ async function record() {
   const voice = ledger()[id]
   if (!voice) throw new Error(`${id} has no voice yet: --design, then --pick.`)
   const reactions: Record<string, string> = {}
-  for (const [name, text] of Object.entries(REACTIONS)) {
+  for (const [name, said] of Object.entries(REACTIONS)) {
+    const text = OWN_REACTION[id]?.[name] ?? said
     const file = join(out, `${name}.ogg`)
     reactions[name] = `sounds/voices/${id}/${name}.ogg`
     if (existsSync(file) && !args.includes('--overwrite')) continue
-    const res = await call(`/text-to-speech/${voice}?output_format=mp3_44100_128`, { text, model_id: 'eleven_v3', voice_settings: { stability: 0.5, similarity_boost: 0.8 } })
+    const res = await call(`/text-to-speech/${voice}?output_format=mp3_44100_128`, { text: accented(text), model_id: 'eleven_v3', voice_settings: { stability: 0.5, similarity_boost: 0.8 } })
     // ElevenLabs gives mp3; the pack's sounds are ogg.
     const mp3 = join(out, `${name}.mp3`)
     writeFileSync(mp3, Buffer.from(await res.arrayBuffer()))
@@ -158,9 +189,26 @@ async function record() {
     rmSync(mp3)
     console.log(`${name}: ${file}`)
   }
-  // Her file names them, so that the game plays them.
+  // Her catch phrases, as her file lists them: each said once, alone, as she would say it.
   const path = join(ROOT, 'love-interests', `${id}.json`)
-  writeFileSync(path, JSON.stringify({ ...JSON.parse(readFileSync(path, 'utf8')), reactions }, null, 2) + '\n')
+  const file = JSON.parse(readFileSync(path, 'utf8'))
+  const catchphrases: Record<string, string> = {}
+  for (const phrase of Object.keys(file.catchphrases ?? {})) {
+    const slug = phrase.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+    const ogg = join(out, `phrase-${slug}.ogg`)
+    catchphrases[phrase] = `sounds/voices/${id}/phrase-${slug}.ogg`
+    if (existsSync(ogg) && !args.includes('--overwrite')) continue
+    const spoken = SAY[id]?.[phrase] ?? `[${file.ai?.tone || 'in character'}] ${phrase.charAt(0).toUpperCase()}${phrase.slice(1)}${/[.!?]$/.test(phrase) ? '' : '.'}`
+    const res = await call(`/text-to-speech/${voice}?output_format=mp3_44100_128`, { text: accented(spoken), model_id: 'eleven_v3', voice_settings: { stability: 0.5, similarity_boost: 0.8 } })
+    const mp3 = join(out, `phrase-${slug}.mp3`)
+    writeFileSync(mp3, Buffer.from(await res.arrayBuffer()))
+    // A little quiet after it, so that the last word is not clipped where the recording stops on it.
+    execFileSync('ffmpeg', ['-v', 'error', '-y', '-i', mp3, '-af', 'apad=pad_dur=0.35', '-c:a', 'libvorbis', '-q:a', '5', ogg])
+    rmSync(mp3)
+    console.log(`"${phrase}": ${ogg}`)
+  }
+  // Her file names them, so that the game plays them.
+  writeFileSync(path, JSON.stringify({ ...file, reactions, catchphrases }, null, 2) + '\n')
   // The previews are kept on ElevenLabs once one is picked.
   for (const n of [0, 1, 2]) rmSync(join(out, `preview-${n}.mp3`), { force: true })
   rmSync(join(out, 'previews.json'), { force: true })

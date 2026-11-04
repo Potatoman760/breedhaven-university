@@ -580,7 +580,8 @@
     "verbalQuirks": [
       "Calls things and people cute, and means it as the highest praise.",
       "Slips into Japanese for a word, then gives the translation with a small flourish.",
-      "Pouts and puffs her cheeks when teased, and forgives within the minute."
+      "Pouts and puffs her cheeks when teased, and forgives within the minute.",
+      "Says 'kawaii' at anything cute, and then translates it"
     ],
     "exampleDialogue": [],
     "backstory": "Maren is a foxkin from Veyra, the daughter of two interpreters in the federation's diplomatic service. She grew up in a house where dinner was held in three languages and was fluent in four before she was twelve. She came to Breedhaven University to study Media and Communication, which she calls interpreting for crowds, and speaks six languages now, two of them badly, which annoys her.\n\nShe found gothic lolita fashion at fifteen in a shop window in the Veyran capital and has not dressed any other way since: pink and black, lace, petticoats, ribbons threaded round her ears, a bow at the base of her tail. She sews and alters most of it herself, and runs a small, devoted fashion circle out of the Cloister Halls that meets for tea and cake. She studies at Spell & Sip, spends her allowance at Bloom & Co. and Boba Blossom, and is the best linguist in her year by a distance.\n\nPeople assume a Veyran with a gift for languages reports to the Quiet Office. She finds this hilarious, and has considered having cards printed.\n\nHer magic is small and exact: a stain lifted from lace, a ribbon that ties itself, a curl that holds in the rain. She takes a suppressant like most people and treats the Bloom the way she treats the weather: dressed for it.",
@@ -707,14 +708,18 @@
     ]
   },
   "reactions": {
-    "aww": "sounds/voices/maren/aww.ogg",
-    "gasp": "sounds/voices/maren/gasp.ogg",
     "giggle": "sounds/voices/maren/giggle.ogg",
-    "huff": "sounds/voices/maren/huff.ogg",
-    "satisfied": "sounds/voices/maren/satisfied.ogg",
-    "sigh-content": "sounds/voices/maren/sigh-content.ogg",
     "sigh": "sounds/voices/maren/sigh.ogg",
+    "sigh-content": "sounds/voices/maren/sigh-content.ogg",
+    "gasp": "sounds/voices/maren/gasp.ogg",
+    "huff": "sounds/voices/maren/huff.ogg",
     "surprised": "sounds/voices/maren/surprised.ogg",
-    "yawn": "sounds/voices/maren/yawn.ogg"
-  }
+    "yawn": "sounds/voices/maren/yawn.ogg",
+    "aww": "sounds/voices/maren/aww.ogg",
+    "satisfied": "sounds/voices/maren/satisfied.ogg"
+  },
+  "catchphrases": {
+    "kawaii": "sounds/voices/maren/phrase-kawaii.ogg"
+  },
+  "firstLine": "Kawaii! Look at your face, you're like a little lost prince! I'm Maren, and deciding to talk to me is ichiban—that means number one, obviously!"
 }

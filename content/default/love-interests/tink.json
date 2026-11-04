@@ -575,7 +575,8 @@
       "Turns anything into a bet, a dare",
       "Makes the joke about her height before anyone else can.",
       "Names the thing in the room most worth stealing, mid-conversation, and says she is only joking.",
-      "Calls {player} daddy during sex"
+      "Calls {player} daddy during sex",
+      "Calls {player} 'big guy', a joke about her height"
     ],
     "exampleDialogue": [],
     "backstory": "Job: Keeps an eye on the crowd at the Honeyed Bee for its landlord, Rosk, in exchange for a room and a bar tab\n\nTink grew up in the cramped apartments behind Seedblossom's old market, one of seven children in a family of pickpockets and fences. She could lift a wallet before she could read and beat a card reader before she was twelve. At fourteen she struck out on her own and drifted between the cities of the Expanse, taking what she needed and most of what she wanted.\n\nShe has been arrested four times and walked out four times: once through a ventilation shaft, once through a bathroom window, once by spoofing a door ward with a hairpin and a phone battery, and once by making the officer laugh so hard she dropped her keys. She will recount all four at the slightest excuse.\n\nThe fifth time, the magistrate noticed that the girl in front of her had defeated a commercial ward with scrap, and offered a choice: a sentence, or a probationary place in Magical Engineering. Tink is, to her own irritation, very good at it.\n\nHer magic is all in her fingertips: she feels the seams in a ward the way a locksmith feels pins. It was the whole of her criminal career and is now most of her coursework.",
@@ -702,14 +703,18 @@
     ]
   },
   "reactions": {
-    "aww": "sounds/voices/tink/aww.ogg",
-    "gasp": "sounds/voices/tink/gasp.ogg",
     "giggle": "sounds/voices/tink/giggle.ogg",
-    "huff": "sounds/voices/tink/huff.ogg",
-    "satisfied": "sounds/voices/tink/satisfied.ogg",
-    "sigh-content": "sounds/voices/tink/sigh-content.ogg",
     "sigh": "sounds/voices/tink/sigh.ogg",
+    "sigh-content": "sounds/voices/tink/sigh-content.ogg",
+    "gasp": "sounds/voices/tink/gasp.ogg",
+    "huff": "sounds/voices/tink/huff.ogg",
     "surprised": "sounds/voices/tink/surprised.ogg",
-    "yawn": "sounds/voices/tink/yawn.ogg"
-  }
+    "yawn": "sounds/voices/tink/yawn.ogg",
+    "aww": "sounds/voices/tink/aww.ogg",
+    "satisfied": "sounds/voices/tink/satisfied.ogg"
+  },
+  "catchphrases": {
+    "big guy": "sounds/voices/tink/phrase-big-guy.ogg"
+  },
+  "firstLine": "Eyes down here, tall stuff—I'm Tink Lightfoot! Five copper says I already know what's in your pockets, and relax, I'm only joking about keeping your watch."
 }

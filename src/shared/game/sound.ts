@@ -1,5 +1,7 @@
 import type { ContentPack, Cue, GameState, Sound } from '../model'
 import { toDate } from './calendar'
+import { isIndoors } from './schedule'
+import { weatherOn } from './weather'
 
 /**
  * What a change of the game calls to be heard, the weightiest first. Read off the state before and after
@@ -16,6 +18,15 @@ export function soundCues(content: ContentPack, before: GameState, after: GameSt
   if (after.player.money !== before.player.money) cues.push('coins')
   if (after.locationId !== before.locationId && content.locations.find((l) => l.id === after.locationId)?.indoors) cues.push('door')
   return cues
+}
+
+/** The weather's own loop where he is, if today's has one: and whether he hears it from indoors. */
+export function weatherSoundAt(content: ContentPack, state: GameState): { sound: Sound; indoors: boolean } | undefined {
+  const weather = weatherOn(content, state)
+  const sound = weather && content.sounds.weather[weather.id]
+  if (!sound) return undefined
+  const location = content.locations.find((l) => l.id === state.locationId)
+  return { sound, indoors: state.inOwnRoom || isIndoors(location, undefined) }
 }
 
 /** The loop to play behind where he is at this hour, if the place has one. */

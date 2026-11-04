@@ -3,12 +3,12 @@
     "click": {
       "file": "sounds/ui/click.ogg",
       "volume": 0.4,
-      "credit": "Kenney, Interface Sounds: click_001 (CC0), kenney.nl"
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "open": {
       "file": "sounds/ui/open.ogg",
       "volume": 0.5,
-      "credit": "Kenney, RPG Audio: cloth2 (CC0), kenney.nl"
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "close": {
       "file": "sounds/ui/close.ogg",
@@ -28,77 +28,112 @@
     "bagOpen": {
       "file": "sounds/ui/bag-open.ogg",
       "volume": 0.6,
-      "credit": "Fission9, \"Inventory Open\" (CC0), https://freesound.org/people/Fission9/sounds/568992/"
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "bagClose": {
       "file": "sounds/ui/bag-close.ogg",
       "volume": 0.6,
-      "credit": "Fission9, \"Inventory Close\" (CC0), https://freesound.org/people/Fission9/sounds/568991/"
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "cards": {
       "file": "sounds/poker/cards.ogg",
       "volume": 0.5,
-      "credit": "Kenney, Casino Audio: card-slide-1 (CC0), kenney.nl"
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "chips": {
       "file": "sounds/poker/chips.ogg",
       "volume": 0.5,
-      "credit": "Kenney, Casino Audio: chips-stack-1 (CC0), kenney.nl"
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "build": {
       "file": "sounds/ui/build.ogg",
       "volume": 0.6,
-      "credit": "Kenney, Impact Sounds: impactWood_medium_000, impactWood_medium_002, impactWood_heavy_001 (CC0), kenney.nl"
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "notice": {
       "file": "sounds/ui/notice.ogg",
       "volume": 0.5,
-      "credit": "qubodup, \"Good Phone Notification Sound\" (CC0), https://freesound.org/people/qubodup/sounds/782969/"
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "message": {
       "file": "sounds/ui/message.ogg",
       "volume": 0.7,
-      "credit": "Kenney, Interface Sounds: glass_001 (CC0), kenney.nl"
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "coins": {
       "file": "sounds/ui/coins.ogg",
       "volume": 0.6,
-      "credit": "Kenney, RPG Audio: handleCoins (CC0), kenney.nl"
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "door": {
       "file": "sounds/ui/door.ogg",
       "volume": 0.5,
-      "credit": "Kenney, RPG Audio: doorOpen_1 (CC0), kenney.nl"
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "skill": {
       "file": "sounds/events/skill.ogg",
       "volume": 0.7,
-      "credit": "Kenney, Music Jingles: jingles_PIZZI10 (CC0), kenney.nl"
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "bond": {
       "file": "sounds/events/bond.ogg",
       "volume": 0.7,
-      "credit": "Kenney, Music Jingles: jingles_PIZZI03 (CC0), kenney.nl"
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "pregnancy": {
       "file": "sounds/events/pregnancy.ogg",
       "volume": 0.7,
-      "credit": "Kenney, Music Jingles: jingles_PIZZI07 (CC0), kenney.nl"
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "birth": {
       "file": "sounds/events/birth.ogg",
       "volume": 0.7,
-      "credit": "Kenney, Music Jingles: jingles_PIZZI12 (CC0), kenney.nl"
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "relic": {
       "file": "sounds/events/relic.ogg",
       "volume": 0.6,
-      "credit": "qubodup, \"Cliche Magic Spell Sound\" (CC0), https://freesound.org/people/qubodup/sounds/817466/"
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "stamp": {
       "file": "sounds/ui/stamp.ogg",
       "volume": 0.35,
       "credit": "I.fekry, \"traditional stamp.wav\" (CC0), https://freesound.org/people/I.fekry/sounds/470710/, trimmed to the hit"
+    },
+    "sent": {
+      "file": "sounds/ui/sent.ogg",
+      "credit": "Generated with ElevenLabs sound effects",
+      "volume": 0.35
+    },
+    "reply": {
+      "file": "sounds/ui/reply.ogg",
+      "credit": "Generated with ElevenLabs sound effects",
+      "volume": 0.45
+    },
+    "achievement": {
+      "file": "sounds/events/achievement.ogg",
+      "credit": "Generated with ElevenLabs sound effects",
+      "volume": 0.7
+    },
+    "victory": {
+      "file": "sounds/events/victory.ogg",
+      "credit": "Generated with ElevenLabs sound effects",
+      "volume": 0.6
+    },
+    "defeat": {
+      "file": "sounds/events/defeat.ogg",
+      "credit": "Generated with ElevenLabs sound effects",
+      "volume": 0.6
+    },
+    "descend": {
+      "file": "sounds/events/descend.ogg",
+      "credit": "Generated with ElevenLabs sound effects",
+      "volume": 0.55
+    },
+    "dawn": {
+      "file": "sounds/events/dawn.ogg",
+      "volume": 0.5,
+      "credit": "Generated with ElevenLabs sound effects"
     }
   },
   "ambience": {
@@ -129,8 +164,8 @@
     },
     "arena": {
       "file": "sounds/ambience/arena.ogg",
-      "volume": 0.6,
-      "credit": "bmadore, \"Crowd and field noise before and during homerun hit at MLB baseball stadium\" (CC0), https://freesound.org/people/bmadore/sounds/691975/"
+      "volume": 0.55,
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "garden": {
       "file": "sounds/ambience/garden.ogg",
@@ -139,8 +174,8 @@
     },
     "bathhouse": {
       "file": "sounds/ambience/bathhouse.ogg",
-      "volume": 0.6,
-      "credit": "xkeril, \"Entrance thermal baths 01\" (CC0), https://freesound.org/people/xkeril/sounds/677262/"
+      "volume": 0.55,
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "workshop": {
       "file": "sounds/ambience/workshop.ogg",
@@ -149,13 +184,13 @@
     },
     "clinic": {
       "file": "sounds/ambience/clinic.ogg",
-      "volume": 0.6,
-      "credit": "gladkiy, \"Suburban hospital ambience - Moscow region, mostly old ladies & gents calmly talking and walking around, door closes, general noises OMNI mics.wav\" (CC0), https://freesound.org/people/gladkiy/sounds/348110/"
+      "volume": 0.45,
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "street": {
       "file": "sounds/ambience/street.ogg",
-      "volume": 0.6,
-      "credit": "SignatureSoundsOrg, \"Giza_Street_Walking_Cairo_Egypt_2\" (CC0), https://freesound.org/people/SignatureSoundsOrg/sounds/869028/"
+      "volume": 0.55,
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "pub": {
       "file": "sounds/ambience/pub.ogg",
@@ -189,18 +224,78 @@
     },
     "cinema": {
       "file": "sounds/ambience/cinema.ogg",
-      "volume": 0.6,
-      "credit": "guidofm, \"AMBPubic_Cinematis_CinemaLobby_Crowd_Hungarian_5_Freebie\" (CC0), https://freesound.org/people/guidofm/sounds/826013/"
+      "volume": 0.5,
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "club": {
       "file": "sounds/ambience/club.ogg",
-      "volume": 0.6,
-      "credit": "LampEight, \"NightclubEntrance_quiet\" (CC0), https://freesound.org/people/LampEight/sounds/178016/"
+      "volume": 0.5,
+      "credit": "Generated with ElevenLabs sound effects"
     },
     "river": {
       "file": "sounds/ambience/river.ogg",
       "volume": 0.6,
       "credit": "ykozy, \"forest-river-ambience\" (CC0), https://freesound.org/people/ykozy/sounds/710263/"
+    },
+    "aether": {
+      "file": "sounds/ambience/aether.ogg",
+      "volume": 0.45,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "lecture-hall": {
+      "file": "sounds/ambience/lecture-hall.ogg",
+      "volume": 0.5,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "ballroom": {
+      "file": "sounds/ambience/ballroom.ogg",
+      "volume": 0.55,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "ridge-road": {
+      "file": "sounds/ambience/ridge-road.ogg",
+      "volume": 0.45,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "saltmere-day": {
+      "file": "sounds/ambience/saltmere-day.ogg",
+      "volume": 0.55,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "saltmere-night": {
+      "file": "sounds/ambience/saltmere-night.ogg",
+      "volume": 0.45,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "dawnbloom": {
+      "file": "sounds/ambience/dawnbloom.ogg",
+      "volume": 0.4,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "restaurant": {
+      "file": "sounds/ambience/restaurant.ogg",
+      "volume": 0.55,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "boba": {
+      "file": "sounds/ambience/boba.ogg",
+      "volume": 0.55,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "street-night": {
+      "file": "sounds/ambience/street-night.ogg",
+      "volume": 0.5,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "pub-night": {
+      "file": "sounds/ambience/pub-night.ogg",
+      "volume": 0.55,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "river-night": {
+      "file": "sounds/ambience/river-night.ogg",
+      "volume": 0.45,
+      "credit": "Generated with ElevenLabs sound effects"
     }
   },
   "places": {
@@ -235,10 +330,12 @@
       "day": "clinic"
     },
     "lantern-row": {
-      "day": "street"
+      "day": "street",
+      "night": "street-night"
     },
     "honeyed-bee-inn": {
-      "day": "pub"
+      "day": "pub",
+      "night": "pub-night"
     },
     "market": {
       "day": "market",
@@ -254,10 +351,10 @@
       "day": "arcade"
     },
     "boba-blossom": {
-      "day": "cafe"
+      "day": "boba"
     },
     "cauldron": {
-      "day": "cafe"
+      "day": "restaurant"
     },
     "ironroot": {
       "day": "gym"
@@ -270,7 +367,26 @@
     },
     "riverside-park": {
       "day": "river",
-      "night": "night-outdoor"
+      "night": "river-night"
+    },
+    "aether": {
+      "day": "aether"
+    },
+    "lecture-halls": {
+      "day": "lecture-hall"
+    },
+    "ballroom": {
+      "day": "ballroom"
+    },
+    "ridge-road": {
+      "day": "ridge-road"
+    },
+    "saltmere": {
+      "day": "saltmere-day",
+      "night": "saltmere-night"
+    },
+    "dawnbloom-house": {
+      "day": "dawnbloom"
     }
   },
   "poses": {
@@ -305,6 +421,320 @@
       "volume": 0.5,
       "credit": "Uncredited: clipped from source2.mp4, 9:30 to 9:40",
       "clip": true
+    }
+  },
+  "lines": {
+    "30833632": "sounds/voices/dinah/line-30833632.ogg",
+    "61374887": "sounds/voices/zelie/line-61374887.ogg",
+    "c7db3468": "sounds/voices/tamsin/line-c7db3468.ogg",
+    "a678b421": "sounds/voices/tamsin/line-a678b421.ogg",
+    "0ba37187": "sounds/voices/tamsin/line-0ba37187.ogg",
+    "fb168a70": "sounds/voices/tamsin/line-fb168a70.ogg",
+    "89d41186": "sounds/voices/tamsin/line-89d41186.ogg",
+    "31972a2f": "sounds/voices/tamsin/line-31972a2f.ogg",
+    "e81219fa": "sounds/voices/vespera/line-e81219fa.ogg",
+    "42c39aba": "sounds/voices/vespera/line-42c39aba.ogg",
+    "3c1c34a9": "sounds/voices/vespera/line-3c1c34a9.ogg",
+    "31316c2a": "sounds/voices/vespera/line-31316c2a.ogg",
+    "e2daddd7": "sounds/voices/vespera/line-e2daddd7.ogg",
+    "97acc078": "sounds/voices/vespera/line-97acc078.ogg",
+    "3983ff4c": "sounds/voices/vespera/line-3983ff4c.ogg",
+    "f90eaf8c": "sounds/voices/vespera/line-f90eaf8c.ogg",
+    "9ba5b71c": "sounds/voices/vespera/line-9ba5b71c.ogg",
+    "47de2168": "sounds/voices/vespera/line-47de2168.ogg",
+    "a0cedff4": "sounds/voices/vespera/line-a0cedff4.ogg",
+    "8e0a784e": "sounds/voices/vespera/line-8e0a784e.ogg",
+    "2ee60b10": "sounds/voices/vespera/line-2ee60b10.ogg",
+    "67f4d2f7": "sounds/voices/vespera/line-67f4d2f7.ogg",
+    "f6042dd8": "sounds/voices/tamsin/line-f6042dd8.ogg",
+    "da62b092": "sounds/voices/tamsin/line-da62b092.ogg",
+    "28bba7ab": "sounds/voices/tamsin/line-28bba7ab.ogg",
+    "e2ef582d": "sounds/voices/tamsin/line-e2ef582d.ogg",
+    "17eee5eb": "sounds/voices/tamsin/line-17eee5eb.ogg",
+    "70ca37e2": "sounds/voices/tamsin/line-70ca37e2.ogg",
+    "2fa3227e": "sounds/voices/tamsin/line-2fa3227e.ogg",
+    "61cbff9a": "sounds/voices/seraphine/line-61cbff9a.ogg",
+    "90ca8359": "sounds/voices/seraphine/line-90ca8359.ogg",
+    "e17227ee": "sounds/voices/seraphine/line-e17227ee.ogg",
+    "e765e1d8": "sounds/voices/yelena/line-e765e1d8.ogg",
+    "fdb1ab8e": "sounds/voices/seraphine/line-fdb1ab8e.ogg",
+    "1bb5ba00": "sounds/voices/yelena/line-1bb5ba00.ogg",
+    "e5ce28f0": "sounds/voices/caelwen/line-e5ce28f0.ogg",
+    "262bf00c": "sounds/voices/seraphine/line-262bf00c.ogg",
+    "e32dc1f0": "sounds/voices/yelena/line-e32dc1f0.ogg",
+    "4299bed8": "sounds/voices/caelwen/line-4299bed8.ogg",
+    "539f7be8": "sounds/voices/seraphine/line-539f7be8.ogg",
+    "d92b2498": "sounds/voices/caelwen/line-d92b2498.ogg",
+    "a3a0349a": "sounds/voices/seraphine/line-a3a0349a.ogg",
+    "daee1211": "sounds/voices/caelwen/line-daee1211.ogg",
+    "c367a71d": "sounds/voices/tamsin/line-c367a71d.ogg",
+    "1afdd099": "sounds/voices/daphne/line-1afdd099.ogg",
+    "37658f9e": "sounds/voices/tamsin/line-37658f9e.ogg",
+    "d22537b8": "sounds/voices/daphne/line-d22537b8.ogg",
+    "b89aab8c": "sounds/voices/grushka/line-b89aab8c.ogg",
+    "3d87d0dd": "sounds/voices/daphne/line-3d87d0dd.ogg",
+    "efbee15d": "sounds/voices/grushka/line-efbee15d.ogg",
+    "f1cdcdff": "sounds/voices/daphne/line-f1cdcdff.ogg",
+    "1b918c3b": "sounds/voices/grushka/line-1b918c3b.ogg",
+    "299ff313": "sounds/voices/daphne/line-299ff313.ogg",
+    "564c2856": "sounds/voices/grushka/line-564c2856.ogg",
+    "6382c39e": "sounds/voices/daphne/line-6382c39e.ogg",
+    "e00e30de": "sounds/voices/lira/line-e00e30de.ogg",
+    "a0b76c2d": "sounds/voices/lira/line-a0b76c2d.ogg",
+    "27ed1dbf": "sounds/voices/lira/line-27ed1dbf.ogg",
+    "1206e599": "sounds/voices/lira/line-1206e599.ogg",
+    "9ebef64c": "sounds/voices/tamsin/line-9ebef64c.ogg",
+    "5848d5e2": "sounds/voices/lira/line-5848d5e2.ogg",
+    "e8e8f934": "sounds/voices/tamsin/line-e8e8f934.ogg",
+    "05265591": "sounds/voices/lira/line-05265591.ogg",
+    "be8fe43e": "sounds/voices/tamsin/line-be8fe43e.ogg",
+    "00b1589e": "sounds/voices/lira/line-00b1589e.ogg",
+    "90de74c9": "sounds/voices/maren/line-90de74c9.ogg",
+    "c4e7474b": "sounds/voices/morwenna/line-c4e7474b.ogg",
+    "fba9c22f": "sounds/voices/maren/line-fba9c22f.ogg",
+    "74ab180d": "sounds/voices/morwenna/line-74ab180d.ogg",
+    "8a3ffcb9": "sounds/voices/maren/line-8a3ffcb9.ogg",
+    "8644c583": "sounds/voices/morwenna/line-8644c583.ogg",
+    "1b92288f": "sounds/voices/lola-hopworth/line-1b92288f.ogg",
+    "5676b623": "sounds/voices/dinah/line-5676b623.ogg",
+    "4fe5b9bd": "sounds/voices/lola-hopworth/line-4fe5b9bd.ogg",
+    "fb1fe535": "sounds/voices/dinah/line-fb1fe535.ogg",
+    "5c18aa5a": "sounds/voices/lola-hopworth/line-5c18aa5a.ogg",
+    "2003e7d8": "sounds/voices/lola-hopworth/line-2003e7d8.ogg",
+    "48f69525": "sounds/voices/elowen/line-48f69525.ogg",
+    "d0af4db9": "sounds/voices/ottilie/line-d0af4db9.ogg",
+    "fc3e5979": "sounds/voices/elowen/line-fc3e5979.ogg",
+    "745db475": "sounds/voices/ottilie/line-745db475.ogg",
+    "e4ca465f": "sounds/voices/elowen/line-e4ca465f.ogg",
+    "2bbd27a8": "sounds/voices/ottilie/line-2bbd27a8.ogg",
+    "6e38dd8e": "sounds/voices/morwenna/line-6e38dd8e.ogg",
+    "bb045d5e": "sounds/voices/elowen/line-bb045d5e.ogg",
+    "cbb7fe2a": "sounds/voices/morwenna/line-cbb7fe2a.ogg",
+    "7310c3d3": "sounds/voices/ottilie/line-7310c3d3.ogg",
+    "81d47c8e": "sounds/voices/morwenna/line-81d47c8e.ogg",
+    "5d2edd60": "sounds/voices/elowen/line-5d2edd60.ogg",
+    "1dc1b66a": "sounds/voices/morwenna/line-1dc1b66a.ogg",
+    "19b53433": "sounds/voices/tink/line-19b53433.ogg",
+    "6f70d1ff": "sounds/voices/isolde/line-6f70d1ff.ogg",
+    "ab007e66": "sounds/voices/tink/line-ab007e66.ogg",
+    "64a99951": "sounds/voices/isolde/line-64a99951.ogg",
+    "4ec6a4a5": "sounds/voices/tink/line-4ec6a4a5.ogg",
+    "d728cfba": "sounds/voices/isolde/line-d728cfba.ogg",
+    "af32f32b": "sounds/voices/tink/line-af32f32b.ogg",
+    "c671d4a1": "sounds/voices/faye/line-c671d4a1.ogg",
+    "29ce753d": "sounds/voices/anwen/line-29ce753d.ogg",
+    "970bb198": "sounds/voices/faye/line-970bb198.ogg",
+    "11df3c7f": "sounds/voices/anwen/line-11df3c7f.ogg",
+    "2287a1ea": "sounds/voices/faye/line-2287a1ea.ogg",
+    "c04baf3c": "sounds/voices/anwen/line-c04baf3c.ogg",
+    "bff4b687": "sounds/voices/anwen/line-bff4b687.ogg",
+    "5da75a9b": "sounds/voices/anwen/line-5da75a9b.ogg",
+    "a72d9c53": "sounds/voices/anwen/line-a72d9c53.ogg",
+    "68706fc2": "sounds/voices/anwen/line-68706fc2.ogg",
+    "b7740c4e": "sounds/voices/maren/line-b7740c4e.ogg",
+    "f3071196": "sounds/voices/yelena/line-f3071196.ogg",
+    "d1da0c22": "sounds/voices/maren/line-d1da0c22.ogg",
+    "61a928e4": "sounds/voices/yelena/line-61a928e4.ogg",
+    "ce85dbaa": "sounds/voices/maren/line-ce85dbaa.ogg",
+    "e371d3ce": "sounds/voices/yelena/line-e371d3ce.ogg",
+    "39fa5b59": "sounds/voices/maren/line-39fa5b59.ogg",
+    "4a0e0cf7": "sounds/voices/yulia/line-4a0e0cf7.ogg",
+    "d39ed6a8": "sounds/voices/vespera/line-d39ed6a8.ogg",
+    "09a31451": "sounds/voices/yulia/line-09a31451.ogg",
+    "af6beb79": "sounds/voices/vespera/line-af6beb79.ogg",
+    "d00886e9": "sounds/voices/yulia/line-d00886e9.ogg",
+    "231e8c55": "sounds/voices/vespera/line-231e8c55.ogg",
+    "cdd702d2": "sounds/voices/faye/line-cdd702d2.ogg",
+    "83081bd3": "sounds/voices/yulia/line-83081bd3.ogg",
+    "a376c31d": "sounds/voices/vespera/line-a376c31d.ogg",
+    "1c6dcb76": "sounds/voices/faye/line-1c6dcb76.ogg",
+    "cc17e91f": "sounds/voices/yulia/line-cc17e91f.ogg",
+    "ede65020": "sounds/voices/dinah/line-ede65020.ogg",
+    "abe35e83": "sounds/voices/morwenna/line-abe35e83.ogg",
+    "a9f77e4a": "sounds/voices/dinah/line-a9f77e4a.ogg",
+    "dbb20fc5": "sounds/voices/morwenna/line-dbb20fc5.ogg",
+    "dff5dc9e": "sounds/voices/dinah/line-dff5dc9e.ogg",
+    "c0ad20c3": "sounds/voices/morwenna/line-c0ad20c3.ogg",
+    "50f85640": "sounds/voices/dinah/line-50f85640.ogg",
+    "7655ff3d": "sounds/voices/morwenna/line-7655ff3d.ogg",
+    "d41799f8": "sounds/voices/edda/line-d41799f8.ogg",
+    "7779d444": "sounds/voices/edda/line-7779d444.ogg",
+    "ff73f57b": "sounds/voices/edda/line-ff73f57b.ogg",
+    "7d5b885d": "sounds/voices/edda/line-7d5b885d.ogg",
+    "549fb183": "sounds/voices/edda/line-549fb183.ogg",
+    "6300ff8e": "sounds/voices/edda/line-6300ff8e.ogg",
+    "33f68d19": "sounds/voices/edda/line-33f68d19.ogg",
+    "ab037052": "sounds/voices/edda/line-ab037052.ogg",
+    "2e653749": "sounds/voices/edda/line-2e653749.ogg",
+    "2e576a15": "sounds/voices/edda/line-2e576a15.ogg",
+    "2d43622d": "sounds/voices/edda/line-2d43622d.ogg",
+    "3fc7ff08": "sounds/voices/edda/line-3fc7ff08.ogg",
+    "2e3cfa22": "sounds/voices/edda/line-2e3cfa22.ogg",
+    "2b6a4a56": "sounds/voices/edda/line-2b6a4a56.ogg",
+    "4f6eb171": "sounds/voices/edda/line-4f6eb171.ogg",
+    "43fe7299": "sounds/voices/edda/line-43fe7299.ogg",
+    "a866ede3": "sounds/voices/edda/line-a866ede3.ogg",
+    "cda218d3": "sounds/voices/edda/line-cda218d3.ogg",
+    "3eab91c3": "sounds/voices/edda/line-3eab91c3.ogg",
+    "1d6f08b7": "sounds/voices/edda/line-1d6f08b7.ogg",
+    "aa981b9c": "sounds/voices/edda/line-aa981b9c.ogg",
+    "9c5e8e9d": "sounds/voices/edda/line-9c5e8e9d.ogg",
+    "2c1bd3e4": "sounds/voices/edda/line-2c1bd3e4.ogg",
+    "c4bc078a": "sounds/voices/edda/line-c4bc078a.ogg",
+    "13a3bf14": "sounds/voices/edda/line-13a3bf14.ogg",
+    "8bd5a399": "sounds/voices/edda/line-8bd5a399.ogg",
+    "5573f876": "sounds/voices/edda/line-5573f876.ogg",
+    "c27a2b2f": "sounds/voices/edda/line-c27a2b2f.ogg",
+    "79ec86f6": "sounds/voices/edda/line-79ec86f6.ogg",
+    "9303a852": "sounds/voices/edda/line-9303a852.ogg",
+    "b7f623da": "sounds/voices/edda/line-b7f623da.ogg",
+    "fe1a9c27": "sounds/voices/edda/line-fe1a9c27.ogg",
+    "124efb32": "sounds/voices/edda/line-124efb32.ogg",
+    "a1bcd993": "sounds/voices/zelie/line-a1bcd993.ogg",
+    "f41299b6": "sounds/voices/zelie/line-f41299b6.ogg",
+    "83f5a3a6": "sounds/voices/zelie/line-83f5a3a6.ogg",
+    "2a9c4a6f": "sounds/voices/zelie/line-2a9c4a6f.ogg",
+    "548b5784": "sounds/voices/zelie/line-548b5784.ogg",
+    "7f7d9954": "sounds/voices/zelie/line-7f7d9954.ogg",
+    "573f5b4c": "sounds/voices/zelie/line-573f5b4c.ogg",
+    "06438b63": "sounds/voices/anwen/line-06438b63.ogg",
+    "f8e9399d": "sounds/voices/caelwen/line-f8e9399d.ogg",
+    "735ddb04": "sounds/voices/daphne/line-735ddb04.ogg",
+    "1a71eae3": "sounds/voices/dinah/line-1a71eae3.ogg",
+    "00d5fa46": "sounds/voices/elowen/line-00d5fa46.ogg",
+    "06391cdb": "sounds/voices/faye/line-06391cdb.ogg",
+    "5fea65dd": "sounds/voices/grushka/line-5fea65dd.ogg",
+    "d5f48a36": "sounds/voices/isolde/line-d5f48a36.ogg",
+    "6f87ff30": "sounds/voices/lira/line-6f87ff30.ogg",
+    "fe1cf41f": "sounds/voices/lola-hopworth/line-fe1cf41f.ogg",
+    "c94722f7": "sounds/voices/maren/line-c94722f7.ogg",
+    "f1ce54e9": "sounds/voices/morwenna/line-f1ce54e9.ogg",
+    "a59f4be6": "sounds/voices/ottilie/line-a59f4be6.ogg",
+    "8e750736": "sounds/voices/tink/line-8e750736.ogg",
+    "45bef04d": "sounds/voices/vespera/line-45bef04d.ogg",
+    "f46824bd": "sounds/voices/yelena/line-f46824bd.ogg",
+    "43e95c8c": "sounds/voices/yulia/line-43e95c8c.ogg"
+  },
+  "fight": {
+    "slash": [
+      {
+        "file": "sounds/fight/slash.ogg",
+        "credit": "Generated with ElevenLabs sound effects",
+        "volume": 0.55
+      }
+    ],
+    "crit": [
+      {
+        "file": "sounds/fight/crit.ogg",
+        "credit": "Generated with ElevenLabs sound effects",
+        "volume": 0.55
+      }
+    ],
+    "hit": [
+      {
+        "file": "sounds/fight/hit-1.ogg",
+        "credit": "Generated with ElevenLabs sound effects",
+        "volume": 0.55
+      },
+      {
+        "file": "sounds/fight/hit-2.ogg",
+        "credit": "Generated with ElevenLabs sound effects",
+        "volume": 0.55
+      }
+    ],
+    "ward": [
+      {
+        "file": "sounds/fight/ward.ogg",
+        "credit": "Generated with ElevenLabs sound effects",
+        "volume": 0.55
+      }
+    ],
+    "absorb": [
+      {
+        "file": "sounds/fight/ward.ogg",
+        "credit": "Generated with ElevenLabs sound effects",
+        "volume": 0.55
+      }
+    ],
+    "heal": [
+      {
+        "file": "sounds/fight/heal.ogg",
+        "credit": "Generated with ElevenLabs sound effects",
+        "volume": 0.55
+      }
+    ],
+    "ground": [
+      {
+        "file": "sounds/fight/ground.ogg",
+        "credit": "Generated with ElevenLabs sound effects",
+        "volume": 0.55
+      }
+    ],
+    "anchor": [
+      {
+        "file": "sounds/fight/ground.ogg",
+        "credit": "Generated with ElevenLabs sound effects",
+        "volume": 0.55
+      }
+    ],
+    "hex": [
+      {
+        "file": "sounds/fight/hex.ogg",
+        "credit": "Generated with ElevenLabs sound effects",
+        "volume": 0.55
+      }
+    ],
+    "weaken": [
+      {
+        "file": "sounds/fight/hex.ogg",
+        "credit": "Generated with ElevenLabs sound effects",
+        "volume": 0.55
+      }
+    ],
+    "misfire": [
+      {
+        "file": "sounds/fight/misfire.ogg",
+        "credit": "Generated with ElevenLabs sound effects",
+        "volume": 0.55
+      }
+    ],
+    "fall": [
+      {
+        "file": "sounds/fight/fall.ogg",
+        "credit": "Generated with ElevenLabs sound effects",
+        "volume": 0.55
+      }
+    ],
+    "guard": [
+      {
+        "file": "sounds/fight/guard.ogg",
+        "volume": 0.55,
+        "credit": "Generated with ElevenLabs sound effects"
+      }
+    ]
+  },
+  "weather": {
+    "downpour": {
+      "file": "sounds/weather/downpour.ogg",
+      "credit": "Generated with ElevenLabs sound effects",
+      "volume": 0.5
+    },
+    "windy": {
+      "file": "sounds/weather/windy.ogg",
+      "credit": "Generated with ElevenLabs sound effects",
+      "volume": 0.5
+    },
+    "drizzle": {
+      "file": "sounds/weather/drizzle.ogg",
+      "volume": 0.5,
+      "credit": "Generated with ElevenLabs sound effects"
+    }
+  },
+  "music": {
+    "epilogue": {
+      "file": "sounds/music/epilogue.ogg",
+      "volume": 1,
+      "credit": "Generated with ElevenLabs music"
     }
   }
 }

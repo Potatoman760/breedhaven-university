@@ -566,7 +566,8 @@
     "verbalQuirks": [
       "Says \"again\" and \"better\" more than anything else.",
       "Talks about agreements as terms: \"Those are my terms. What are yours?\"",
-      "Calls students by surname until they have earned the first name."
+      "Calls students by surname until they have earned the first name.",
+      "Calls {player} 'cub' once she has decided he is hers to look after"
     ],
     "exampleDialogue": [],
     "backstory": "Post: Head coach, College of Public Safety and Athletics; trains the Campus Security cadets; chief referee of the Arena Finals\n\nGrushka Tor-Vael was born in a hold in the red hills of Kharad-Tor, the third daughter of its War-Mother, and served twelve years in the Kharadi mountain infantry before a knee ended it. Breedhaven University hired her to coach and she has been here nine years. She has two daughters, eleven and eight, by a Sire contracted to her hold; they are being raised there by her sisters, as is ordinary, and she takes the long train north every break.\n\nShe coaches all three divisions and has opinions about each. She competed unaugmented herself, and fought the Bloom division once, at seven months, which is the only bout she will not talk about lightly. Daphne is the best student she has trained and she tells her so about once a year.\n\nHer magic is the plain orcish kind: stone-sense and a steadiness she can lend through a hand on the shoulder. She uses it to spot lifts and stop fights.",
@@ -703,14 +704,18 @@
     ]
   },
   "reactions": {
-    "aww": "sounds/voices/grushka/aww.ogg",
-    "gasp": "sounds/voices/grushka/gasp.ogg",
     "giggle": "sounds/voices/grushka/giggle.ogg",
-    "huff": "sounds/voices/grushka/huff.ogg",
-    "satisfied": "sounds/voices/grushka/satisfied.ogg",
-    "sigh-content": "sounds/voices/grushka/sigh-content.ogg",
     "sigh": "sounds/voices/grushka/sigh.ogg",
+    "sigh-content": "sounds/voices/grushka/sigh-content.ogg",
+    "gasp": "sounds/voices/grushka/gasp.ogg",
+    "huff": "sounds/voices/grushka/huff.ogg",
     "surprised": "sounds/voices/grushka/surprised.ogg",
-    "yawn": "sounds/voices/grushka/yawn.ogg"
-  }
+    "yawn": "sounds/voices/grushka/yawn.ogg",
+    "aww": "sounds/voices/grushka/aww.ogg",
+    "satisfied": "sounds/voices/grushka/satisfied.ogg"
+  },
+  "catchphrases": {
+    "cub": "sounds/voices/grushka/phrase-cub.ogg"
+  },
+  "firstLine": "Coach Grushka Tor-Vael. Stand straight when you give me your surname. In Kharad-Tor we say a spine shows before the sword does—so show me."
 }

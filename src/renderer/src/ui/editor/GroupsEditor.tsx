@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { framingFor, groupNsfwPrompt, sizeFor } from '../../../../shared/comfy'
 import { isSafeId, slugify, type EditorInfo, type EditorResult } from '../../../../shared/editor'
-import { GROUP_SIZE, SKIN_TONES, groupFiles, posesOf, type Animation, type ContentPack, type Group as GroupData, type SkinTone } from '../../../../shared/model'
+import { GROUP_SIZE, SKIN_TONES, groupFiles, positioned, posesOf, type Animation, type ContentPack, type Group as GroupData, type SkinTone } from '../../../../shared/model'
 import { errorMessage } from '../../errors'
 import { ArtTool } from '../art/ArtTool'
 import { BatchProgress, useBatch, type BatchOutcome } from '../art/batch'
 import { clipRequest } from '../art/ClipForm'
 import { Button } from '../Button'
 import { useConfirm } from '../Confirm'
-import { VideoIcon } from '../icons'
+import { HelpIcon, VideoIcon } from '../icons'
 import { Lightbox } from '../Lightbox'
 import { EditorFoot, Group, Text } from './fields'
 import { EmptySlot, PictureSlot, SlotGrid } from './slots'
@@ -22,7 +22,7 @@ interface Props {
   switcher: (mayLeave: () => boolean) => ReactNode
 }
 
-const blank = (): GroupData => ({ id: '', name: '', memberIds: ['', ''], animations: [], tonedAnimations: {} })
+const blank = (): GroupData => ({ id: '', name: '', memberIds: ['', ''], animations: [], tonedAnimations: {}, positions: {} })
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
 // The runs that draw the group's missing sex-acts, and make their missing clips.
 const POSES_BATCH = '(group-poses)'
@@ -66,8 +66,18 @@ export function GroupsEditor({ content, onContent, switcher }: Props) {
   const mayLeave = () => !dirty || window.confirm(t('editor.common.discard'))
   const slots = posesOf(content.looks).poses
   // A group's picture of an act is asked for in the act's group wording, all of them in it; one with none, in its own.
-  const drawsOf = (slot: (typeof slots)[number]) => slot.groupDraws?.trim() || slot.draws
+  const drawsOf = (slot: (typeof slots)[number]) => (members.length >= 3 && slot.foursomeDraws?.trim()) || slot.groupDraws?.trim() || slot.draws
   const manIn = (id: string) => slots.find((slot) => slot.id === id)?.manShown !== false
+  // The women of an act's picture in its positioning: first, second and third as the prompt describes them.
+  const womenIn = (group: GroupData, actId: string) => positioned(group, actId).flatMap((id) => content.loveInterests.find((li) => li.id === id) ?? [])
+  /** Puts one of them at a place in an act's order, and whoever was there where she was. */
+  const place = (actId: string, at: number, id: string) => {
+    const order = positioned(draft, actId)
+    const from = order.indexOf(id)
+    const next = [...order]
+    ;[next[at], next[from]] = [next[from], next[at]]
+    set({ positions: { ...draft.positions, [actId]: next } })
+  }
   /** The group's sex-acts of a tone. */
   const posesIn = (group: Pick<GroupData, 'animations' | 'tonedAnimations'>, of: SkinTone = tone): Animation[] =>
     of === 'light' ? group.animations : (group.tonedAnimations[of] ?? [])
@@ -140,7 +150,7 @@ export function GroupsEditor({ content, onContent, switcher }: Props) {
     const { failed } = await run(POSES_BATCH, t('editor.common.drawing'), missing, (slot) => slot.name, async (slot) => {
       const stopped = owner(id)
       if (stopped) return stopped
-      const result = await window.api.comfy.generate({ kind: 'nsfw', subjectId: groupFiles(id), name: of === 'light' ? `nsfw-${slot.id}` : `nsfw-${of}-${slot.id}`, positive: groupNsfwPrompt(women, drawsOf(slot), framingFor(settings, 'nsfw'), manIn(slot.id), of), width: size.width, height: size.height, seed: lead?.imageSeed })
+      const result = await window.api.comfy.generate({ kind: 'nsfw', subjectId: groupFiles(id), name: of === 'light' ? `nsfw-${slot.id}` : `nsfw-${of}-${slot.id}`, positive: groupNsfwPrompt(womenIn(latest.current, slot.id), drawsOf(slot), framingFor(settings, 'nsfw'), manIn(slot.id), of), width: size.width, height: size.height, seed: lead?.imageSeed })
       if (!result.ok || !result.path) return { ok: false, message: result.message, fatal: true }
       if (latest.current.id === id) setPose(slot.id, { image: result.path }, of)
       return { ok: true }
@@ -159,7 +169,7 @@ export function GroupsEditor({ content, onContent, switcher }: Props) {
     const { failed } = await run(CLIPS_BATCH, t('editor.sprites.animating'), missing, (pose) => pose.name, async (pose) => {
       const stopped = owner(id)
       if (stopped) return stopped
-      const asked = clipRequest(settings, list, groupFiles(id), { id: pose.id, image: pose.image!, clipPrompt: pose.clipPrompt }, {}, true)
+      const asked = clipRequest(settings, list, groupFiles(id), { id: pose.id, image: pose.image!, clipPrompt: pose.clipPrompt }, {}, latest.current.memberIds.filter((one) => one !== '').length)
       if (!asked) return { ok: false, message: t('editor.sprites.noClipWorkflow'), fatal: true }
       const result = await window.api.comfy.generateVideo(asked.request)
       if (!result.ok || !result.path) return { ok: false, message: result.message, fatal: true }
@@ -184,7 +194,7 @@ export function GroupsEditor({ content, onContent, switcher }: Props) {
             who: { id: files, name: nameOf(draft), pronouns: 'she/her', appearance: '', outfits: [], imageSeed: lead?.imageSeed },
             poses: slots.map((slot) => ({ id: slot.id, name: slot.name, draws: drawsOf(slot) })),
             pose: posing,
-            prompt: (draws, framing, poseId) => groupNsfwPrompt(women, draws, framing, manIn(poseId), tone),
+            prompt: (draws, framing, poseId) => groupNsfwPrompt(womenIn(draft, poseId), draws, framing, manIn(poseId), tone),
             onUse: (poseId, image) => setPose(poseId, { image })
           }}
           onClose={() => setPosing(null)}
@@ -194,7 +204,7 @@ export function GroupsEditor({ content, onContent, switcher }: Props) {
         <ArtTool
           target={{
             kind: 'video',
-            group: true,
+            group: members.length,
             who: { id: files, name: nameOf(draft) },
             pose: { id: clipping, name: clip.name, image: clip.image, clip: clip.clip, loop: clip.loop, clipPrompt: clip.clipPrompt },
             onUse: (poseId, path, loop) => setPose(poseId, loop === undefined ? { clip: path } : { clip: path, loop }),
@@ -338,6 +348,39 @@ export function GroupsEditor({ content, onContent, switcher }: Props) {
               })}
             </SlotGrid>
           </Group>
+
+          {/* Who is described first, second and third in each act's picture: where each of them is drawn. */}
+          {women.length >= GROUP_SIZE.least && (
+            <Group title={t('editor.groups.positioning')}>
+              <div className="group-positions">
+                {slots.map((slot) => (
+                  <div key={slot.id} className="group-position" title={t('editor.groups.positioningTitle')}>
+                    <span className="group-positions-act">
+                      {slot.name}
+                      {/* What helps an act come out as it should, where there is something to say: told on hover. */}
+                      {slot.id === 'doggy' && (
+                        <span className="group-position-tip" title={t('editor.groups.tipDoggy')} aria-label={t('editor.groups.tipDoggy')}>
+                          <HelpIcon size={16} />
+                        </span>
+                      )}
+                    </span>
+                    {positioned(draft, slot.id).map((id, at) => (
+                      <label key={at}>
+                        {t(`editor.groups.position${(at + 1) as 1 | 2 | 3}` as const)}
+                        <select value={id} onChange={(e) => place(slot.id, at, e.target.value)}>
+                          {women.map((li) => (
+                            <option key={li.id} value={li.id}>
+                              {li.name.split(' ')[0]}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </Group>
+          )}
         </div>
 
         <EditorFoot

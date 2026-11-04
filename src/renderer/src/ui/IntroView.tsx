@@ -5,6 +5,7 @@ import type { ContentPack, GameState, Intro } from '../../../shared/model'
 import { Backdrop } from './Backdrop'
 import { ChevronIcon } from './icons'
 import { emphasise } from './SceneView'
+import { playLine, stopLine } from '../sound'
 
 interface Props {
   content: ContentPack
@@ -35,6 +36,13 @@ export function IntroView({ content, state, intro, onDone }: Props) {
   // Whose line it is: the one it names, else the speaker's. Narration is nobody's.
   const speaker = line.action ? undefined : people.find((one) => one.id === (line.speakerId ?? intro.speakerId))
   const sprite = speaker && spriteOf(speaker)
+
+  // Each line said aloud as it is read, where it has been recorded; narration is nobody's, and is silent.
+  useEffect(() => {
+    if (speaker) playLine(speaker.id, line.text)
+    else stopLine()
+  }, [index])
+  useEffect(() => stopLine, [])
 
   const next = () => (index < beats.length - 1 ? setIndex(index + 1) : onDone())
   const back = () => setIndex(Math.max(0, index - 1))

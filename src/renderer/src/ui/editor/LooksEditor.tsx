@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { isSafeId, slugify, type EditorInfo, type EditorResult, type LookKind } from '../../../../shared/editor'
 import { FACES } from '../../../../shared/comfy'
-import { EXPRESSIONS, NSFW_POSES, isMoment, isSeeding, poseDescription, type ContentPack, type CustomAct, type CustomExpression } from '../../../../shared/model'
+import { EXPRESSIONS, NSFW_POSES, isMoment, isSeeding, poseDescription, posesOf, type ContentPack, type CustomAct, type CustomExpression } from '../../../../shared/model'
 import { errorMessage } from '../../errors'
 import { Button } from '../Button'
 import { useConfirm } from '../Confirm'
@@ -21,7 +21,7 @@ type Draft = { kind: LookKind } & CustomAct
 
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b)
 
-const blank = (kind: LookKind): Draft => ({ kind, id: '', name: '', description: '', draws: '', groupDraws: '', moment: false, seeding: false, manShown: true })
+const blank = (kind: LookKind): Draft => ({ kind, id: '', name: '', description: '', draws: '', groupDraws: '', foursomeDraws: '', moment: false, seeding: false, manShown: true })
 
 const HEADINGS: Record<LookKind, { title: MessageKey; add: MessageKey }> = {
   expressions: { title: 'editor.looks.expressions', add: 'editor.looks.newExpression' },
@@ -32,7 +32,7 @@ const HEADINGS: Record<LookKind, { title: MessageKey; add: MessageKey }> = {
 function saved(draft: Draft): CustomExpression | CustomAct {
   const { kind, ...look } = draft
   if (kind === 'acts') return look
-  const { moment: _moment, seeding: _seeding, groupDraws: _groupDraws, manShown: _manShown, ...face } = look
+  const { moment: _moment, seeding: _seeding, groupDraws: _groupDraws, foursomeDraws: _foursomeDraws, manShown: _manShown, ...face } = look
   return face
 }
 
@@ -43,16 +43,17 @@ const draftOf = (kind: LookKind, look: CustomExpression | CustomAct): Draft => (
  * The standard ones, as the game has them in its code: shown as the added ones are, to be looked at and not changed.
  * Made as they are shown, so that what the LLM is told of an act is in the language the game is in now.
  */
-const standardOf = (): Record<LookKind, Draft[]> => ({
+const standardOf = (looks: ContentPack['looks']): Record<LookKind, Draft[]> => ({
   expressions: EXPRESSIONS.map((face) => ({ ...blank('expressions'), id: face, name: face, draws: FACES[face] ?? '' })),
-  acts: NSFW_POSES.map((pose) => ({
+  acts: posesOf(looks).poses.filter((pose) => NSFW_POSES.some((known) => known.id === pose.id)).map((pose) => ({
     ...blank('acts'),
     id: pose.id,
     name: pose.name,
     description: poseDescription({ id: pose.id, description: '' }),
     draws: pose.draws,
-    groupDraws: pose.groupDraws,
-    manShown: pose.manShown,
+    groupDraws: pose.groupDraws ?? '',
+    foursomeDraws: pose.foursomeDraws ?? '',
+    manShown: pose.manShown ?? true,
     moment: isMoment(pose.id),
     seeding: isSeeding(pose.id)
   }))
@@ -119,7 +120,28 @@ export function LooksEditor({ content, onContent, switcher }: Props) {
     }
   }
 
-  const standard = standardOf()
+  const standard = standardOf(content.looks)
+  // While the game is being written, a standard one's image prompts are its own to change, and kept in the base pack.
+  const authoring = info?.base === true
+  const wording = locked && authoring
+  async function saveWording() {
+    setBusy(true)
+    try {
+      const result = await window.api.editor.saveActPrompts({ id: draft.id, prompts: { draws: draft.draws, groupDraws: draft.groupDraws, foursomeDraws: draft.foursomeDraws } })
+      setIssues(result.issues)
+      if (result.issues.length > 0) return
+      onContent(result.content)
+      setInfo(result.info)
+      const next = standardOf(result.content.looks).acts.find((one) => one.id === draft.id) ?? null
+      setOriginal(next)
+      if (next) setDraft(next)
+      setStatus(t('editor.common.saved'))
+    } catch (error) {
+      setStatus(errorMessage(error))
+    } finally {
+      setBusy(false)
+    }
+  }
   const isOpen = (kind: LookKind, id: string, standardOne: boolean) => !isNew && locked === standardOne && draft.kind === kind && id === original?.id
 
   return (
@@ -181,7 +203,7 @@ export function LooksEditor({ content, onContent, switcher }: Props) {
               label={t('editor.looks.draws')}
               value={draft.draws}
               rows={draft.kind === 'acts' ? 3 : 2}
-              disabled={locked}
+              disabled={locked && !wording}
               placeholder={draft.kind === 'acts' ? NSFW_POSES[0].draws : t('editor.looks.drawsFace')}
               onChange={(draws) => set({ draws })}
             />
@@ -190,9 +212,19 @@ export function LooksEditor({ content, onContent, switcher }: Props) {
                 label={t('editor.looks.groupDraws')}
                 value={draft.groupDraws}
                 rows={3}
-                disabled={locked}
+                disabled={locked && !wording}
                 placeholder={NSFW_POSES[0].groupDraws}
                 onChange={(groupDraws) => set({ groupDraws })}
+              />
+            )}
+            {draft.kind === 'acts' && (
+              <Text
+                label={t('editor.looks.foursomeDraws')}
+                value={draft.foursomeDraws}
+                rows={3}
+                disabled={locked && !wording}
+                placeholder={NSFW_POSES[0].foursomeDraws}
+                onChange={(foursomeDraws) => set({ foursomeDraws })}
               />
             )}
             {draft.kind === 'acts' && (
@@ -214,6 +246,17 @@ export function LooksEditor({ content, onContent, switcher }: Props) {
           </Group>
         </div>
 
+        {wording && (
+          <EditorFoot
+            issues={issues}
+            status={status}
+            busy={busy}
+            dirty={dirty}
+            canSave
+            onUndo={() => (setDraft(original ?? blank(draft.kind)), setIssues([]))}
+            onSave={() => void saveWording()}
+          />
+        )}
         {!locked && <EditorFoot
           issues={issues}
           status={status}

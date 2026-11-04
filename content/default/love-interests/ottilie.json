@@ -574,7 +574,8 @@
     "verbalQuirks": [
       "Corrects loose wording: \"fertile\" is not \"virile\", \"instinct\" is not \"compulsion\".",
       "Says \"interesting\" when she means it and nothing at all when she does not.",
-      "Explains her own feelings as observations: \"My pulse is up. That will be you.\""
+      "Explains her own feelings as observations: \"My pulse is up. That will be you.\"",
+      "Calls {player} 'my True Sire' once they are at the Dating stage or beyond, as though it were a clinical term"
     ],
     "exampleDialogue": [],
     "backstory": "Post: Reader in Sire Genetics, College of Life Sciences and Agriculture; head of the fertility lab at the Reproductive Health Center\n\nOttilie Marrow has spent fifteen years on one question: why only one man in ten is fertile, and what Bloom-resonance actually is. Her lab runs the University's Sire Assays. She is a Freewill woman on scientific grounds: she has measured what the Bloom does to judgement and thinks anyone who calls that sacred has not looked at the data. She opposes the national Sire Registry in print and yet uses its figures every day\n\nShe grew up in a household of four mothers and a Sire father who was treated, as she puts it, like the good china. She has never formed a household of her own and says she has not had the time.\n\nHer magic is a diagnostician's: she can feel a pulse, a temperature or a hormone surge across a room, her own included, which she finds more irritating than useful.",
@@ -711,14 +712,18 @@
     ]
   },
   "reactions": {
-    "aww": "sounds/voices/ottilie/aww.ogg",
-    "gasp": "sounds/voices/ottilie/gasp.ogg",
     "giggle": "sounds/voices/ottilie/giggle.ogg",
-    "huff": "sounds/voices/ottilie/huff.ogg",
-    "satisfied": "sounds/voices/ottilie/satisfied.ogg",
-    "sigh-content": "sounds/voices/ottilie/sigh-content.ogg",
     "sigh": "sounds/voices/ottilie/sigh.ogg",
+    "sigh-content": "sounds/voices/ottilie/sigh-content.ogg",
+    "gasp": "sounds/voices/ottilie/gasp.ogg",
+    "huff": "sounds/voices/ottilie/huff.ogg",
     "surprised": "sounds/voices/ottilie/surprised.ogg",
-    "yawn": "sounds/voices/ottilie/yawn.ogg"
-  }
+    "yawn": "sounds/voices/ottilie/yawn.ogg",
+    "aww": "sounds/voices/ottilie/aww.ogg",
+    "satisfied": "sounds/voices/ottilie/satisfied.ogg"
+  },
+  "catchphrases": {
+    "my True Sire": "sounds/voices/ottilie/phrase-my-true-sire.ogg"
+  },
+  "firstLine": "I'm Dr. Ottilie Marrow. Your resting heart rate is visibly elevated—an understandable stress response, not a defect. Interesting."
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Cue, Sound, Sounds } from '../../shared/model'
+import { lineKey } from '../../shared/game/voice'
 
 // The player's own volumes, each from 0 to 1, kept on this computer: how loud the game is is the machine's business, not the save's.
 export const VOLUME_KINDS = ['effects', 'ambience', 'music'] as const
@@ -15,6 +16,9 @@ const FADE_STEP_MS = 50
 let volumes = readVolumes()
 const listeners = new Set<(volumes: Volumes) => void>()
 let cues: Sounds['cues'] = {}
+let lines: Sounds['lines'] = {}
+let fightSounds: Sounds['fight'] = {}
+let playerName = ''
 
 function readVolumes(): Volumes {
   try {
@@ -34,6 +38,10 @@ export function setVolume(kind: VolumeKind, value: number): void {
   if (ambience) {
     window.clearInterval(fades.get(ambience.audio))
     ambience.audio.volume = ambienceLevel(ambience.sound)
+  }
+  if (weather) {
+    window.clearInterval(fades.get(weather.audio))
+    weather.audio.volume = weatherLevel(weather.sound, weather.indoors)
   }
   if (song) {
     window.clearInterval(fades.get(song))
@@ -62,6 +70,11 @@ const url = (file: string) => `content://pack/${file}`
 const NOTICE_GAP_MS = 300
 const EVENT_CUES: Cue[] = ['message', 'coins', 'skill', 'bond', 'pregnancy', 'birth', 'relic']
 let lastEventAt = 0
+// A press that opens or closes something is heard as that and not as a click first: the click waits a moment, and
+// one of these, played meanwhile, takes its place. Longer than the tick a dialog's close is put off by.
+const OPENINGS: Cue[] = ['open', 'close', 'phoneOn', 'phoneOff', 'bagOpen', 'bagClose']
+const CLICK_WAIT_MS = 30
+let pendingClick: number | undefined
 
 /** Plays a cue once, this long after the component is first shown: as an animation lands. */
 export function useCueAt(cue: Cue, delayMs: number): void {
@@ -73,6 +86,10 @@ export function useCueAt(cue: Cue, delayMs: number): void {
 
 /** Plays a cue once, over whatever else is playing. A cue the content has no sound for is silent. */
 export function play(cue: Cue): void {
+  if (OPENINGS.includes(cue)) {
+    window.clearTimeout(pendingClick)
+    pendingClick = undefined
+  }
   const sound = cues[cue]
   if (!sound || volumes.effects === 0) return
   if (EVENT_CUES.includes(cue)) lastEventAt = Date.now()
@@ -86,12 +103,46 @@ export function play(cue: Cue): void {
 // A voice is louder than a click: her sounds are mastered quieter than the interface's.
 const VOICE_LEVEL = 0.9
 
-/** Plays a sound of her voice once, a file in the pack, over whatever else is playing. */
-export function playVoice(file: string): void {
-  if (volumes.effects === 0) return
+/** Plays sounds of her voice, files in the pack, one after another, over whatever else is playing. */
+export function playVoices(files: string[]): void {
+  const [file, ...rest] = files
+  if (!file || volumes.effects === 0) return
+  const audio = new Audio(url(file))
+  audio.volume = Math.min(1, VOICE_LEVEL * volumes.effects)
+  // The next once this one is done, or at once if it cannot play.
+  audio.addEventListener('ended', () => playVoices(rest), { once: true })
+  audio.play().catch(() => playVoices(rest))
+}
+
+// The line being read aloud: one at a time, cut off by the next, or by the reading ending.
+let line: HTMLAudioElement | null = null
+
+/** The recording of a line written ahead, if it has been recorded. */
+export function lineFile(speakerId: string, text: string): string | undefined {
+  return lines[lineKey(speakerId, text, playerName)]
+}
+
+/** Reads a line written ahead aloud in its speaker's voice, where it has been recorded; stops whatever line was before. */
+export function playLine(speakerId: string | undefined, text: string): void {
+  stopLine()
+  const file = speakerId === undefined ? undefined : lines[lineKey(speakerId, text, playerName)]
+  if (!file || volumes.effects === 0) return
   const audio = new Audio(url(file))
   audio.volume = Math.min(1, VOICE_LEVEL * volumes.effects)
   audio.play().catch(() => undefined)
+  line = audio
+}
+
+/** The player's name, for finding a recorded line by its words: his name is put back as the token it was written as. */
+export function usePlayerName(name: string): void {
+  useEffect(() => {
+    playerName = name
+  }, [name])
+}
+
+export function stopLine(): void {
+  line?.pause()
+  line = null
 }
 
 // The loop playing behind the place, and the timer of each loop still fading in or out.
@@ -138,6 +189,44 @@ function ambienceLevel(sound: Sound): number {
   return song ? 0 : sound.volume * volumes.ambience
 }
 
+// The weather, a second loop under the place's: heard through the walls, faintly, from indoors.
+const INDOORS_WEATHER = 0.3
+let weather: { sound: Sound; indoors: boolean; audio: HTMLAudioElement } | null = null
+const weatherLevel = (sound: Sound, indoors: boolean) => (song ? 0 : sound.volume * volumes.ambience * (indoors ? INDOORS_WEATHER : 1))
+
+/** Sets the weather's loop, fading from the one before; the same file carries on, louder or fainter as he goes in or out. */
+export function setWeather(heard: { sound: Sound; indoors: boolean } | undefined): void {
+  if (weather && heard && weather.sound.file === heard.sound.file) {
+    weather = { ...weather, ...heard }
+    fade(weather.audio, weatherLevel(heard.sound, heard.indoors))
+    return
+  }
+  if (weather) {
+    const { audio } = weather
+    fade(audio, 0, () => audio.pause())
+  }
+  weather = null
+  if (!heard) return
+  const audio = new Audio(url(heard.sound.file))
+  audio.loop = true
+  audio.volume = 0
+  audio.play().catch(() => undefined)
+  fade(audio, weatherLevel(heard.sound, heard.indoors))
+  weather = { ...heard, audio }
+}
+
+/** Plays what a thing done in a fight sounds like, this long from now: as it lands. */
+export function playFight(kind: string, delayMs = 0): void {
+  const choices = fightSounds[kind]
+  if (!choices || volumes.effects === 0) return
+  const sound = choices[Math.floor(Math.random() * choices.length)]
+  window.setTimeout(() => {
+    const audio = new Audio(url(sound.file))
+    audio.volume = sound.volume * volumes.effects
+    audio.play().catch(() => undefined)
+  }, Math.max(0, delayMs))
+}
+
 // The songs for love-making: one, picked at random, plays once through behind a scene that has come to it.
 const SONGS = Object.values(import.meta.glob<string>('../../assets/songs/*.mp3', { eager: true, import: 'default' }))
 // A song is on the music volume, and under the sounds of the pose, which are on the effects volume.
@@ -149,6 +238,7 @@ const songLevel = () => volumes.music * SONG_LEVEL
 
 /** Puts the place's loop back as it should be, now that a song has started or stopped. */
 function settleAmbience(): void {
+  if (weather) fade(weather.audio, weatherLevel(weather.sound, weather.indoors))
   if (ambience) fade(ambience.audio, ambienceLevel(ambience.sound))
 }
 
@@ -223,10 +313,17 @@ function fadeFor(audio: HTMLAudioElement, to: number, ms: number, done?: () => v
 export function useSounds(sounds: Sounds | undefined): void {
   useEffect(() => {
     cues = sounds?.cues ?? {}
+    lines = sounds?.lines ?? {}
+    fightSounds = sounds?.fight ?? {}
   }, [sounds])
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
-      if (event.target instanceof Element && event.target.closest('button:not(:disabled), [role="tab"]')) play('click')
+      if (!(event.target instanceof Element) || !event.target.closest('button:not(:disabled), [role="tab"]')) return
+      window.clearTimeout(pendingClick)
+      pendingClick = window.setTimeout(() => {
+        pendingClick = undefined
+        play('click')
+      }, CLICK_WAIT_MS)
     }
     window.addEventListener('click', onClick, true)
     return () => window.removeEventListener('click', onClick, true)

@@ -547,7 +547,8 @@
     "verbalQuirks": [
       "Sums up a situation in a few words, as if briefing the team before a set.",
       "Answers a compliment with a deadpan remark or a raised eyebrow rather than thanks.",
-      "Says \"Coach\" when she means Grushka, and quotes her to settle a point."
+      "Says \"Coach\" when she means Grushka, and quotes her to settle a point.",
+      "Calls {player} 'rookie', whatever he has done to earn better"
     ],
     "exampleDialogue": [],
     "backstory": "Studies: Fourth year, College of Athletics\n\nCaptain of the Campus volleyball team\n\nDaphne grew up by Seedblossom's South Gate, where her family repaired body armor and duty gear for the city police, and spent her childhood watching officers train. Her coach is Grushka Tor-Vael, whose good opinion she values more than the titles. She has magic like any woman and rarely bothers with it: she competes in the unaugmented division on purpose, and trusts training over tricks.",
@@ -660,14 +661,18 @@
     ]
   },
   "reactions": {
-    "aww": "sounds/voices/daphne/aww.ogg",
-    "gasp": "sounds/voices/daphne/gasp.ogg",
     "giggle": "sounds/voices/daphne/giggle.ogg",
-    "huff": "sounds/voices/daphne/huff.ogg",
-    "satisfied": "sounds/voices/daphne/satisfied.ogg",
-    "sigh-content": "sounds/voices/daphne/sigh-content.ogg",
     "sigh": "sounds/voices/daphne/sigh.ogg",
+    "sigh-content": "sounds/voices/daphne/sigh-content.ogg",
+    "gasp": "sounds/voices/daphne/gasp.ogg",
+    "huff": "sounds/voices/daphne/huff.ogg",
     "surprised": "sounds/voices/daphne/surprised.ogg",
-    "yawn": "sounds/voices/daphne/yawn.ogg"
-  }
+    "yawn": "sounds/voices/daphne/yawn.ogg",
+    "aww": "sounds/voices/daphne/aww.ogg",
+    "satisfied": "sounds/voices/daphne/satisfied.ogg"
+  },
+  "catchphrases": {
+    "rookie": "sounds/voices/daphne/phrase-rookie.ogg"
+  },
+  "firstLine": "Daphne. Fourth-year Athletics. Short version: you're new, you're staring, and we're saying hello."
 }

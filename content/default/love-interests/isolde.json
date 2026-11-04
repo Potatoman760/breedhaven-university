@@ -539,7 +539,8 @@
     "tone": "composed, dry, suggestive",
     "verbalQuirks": [
       "Says something that is plainly innuendo in the flat voice of a seminar, and never acknowledges it.",
-      "Corrects an imprecise word, politely, before going on."
+      "Corrects an imprecise word, politely, before going on.",
+      "Calls {player} 'my baby' once they are at the Dating stage or beyond, in the same flat seminar voice"
     ],
     "exampleDialogue": [],
     "backstory": "Post: Teaching assistant for first-year statistics\n\nIsolde Verrane was the best student of her year and stayed on to write a thesis on how households of four and five adults actually share money. She is rarely seen without a leather folio under one arm, with a tablet inside it and a spreadsheet open on that. She pays her rent by teaching first-years statistics and marking their problem sets, and can tell from one look at a set of accounts who in a household is carrying whom. She explains everything through real cases.\n\nShe is professional to a fault and flirts in innuendo so dry that half of it is missed. Being listened to matters to her as much as being admired.\n\nHer magic is small and orderly: tea that stays hot, ink that dries when told, and a knack for feeling that a column of figures is wrong before she has found the error.",
@@ -666,14 +667,18 @@
     ]
   },
   "reactions": {
-    "aww": "sounds/voices/isolde/aww.ogg",
-    "gasp": "sounds/voices/isolde/gasp.ogg",
     "giggle": "sounds/voices/isolde/giggle.ogg",
-    "huff": "sounds/voices/isolde/huff.ogg",
-    "satisfied": "sounds/voices/isolde/satisfied.ogg",
-    "sigh-content": "sounds/voices/isolde/sigh-content.ogg",
     "sigh": "sounds/voices/isolde/sigh.ogg",
+    "sigh-content": "sounds/voices/isolde/sigh-content.ogg",
+    "gasp": "sounds/voices/isolde/gasp.ogg",
+    "huff": "sounds/voices/isolde/huff.ogg",
     "surprised": "sounds/voices/isolde/surprised.ogg",
-    "yawn": "sounds/voices/isolde/yawn.ogg"
-  }
+    "yawn": "sounds/voices/isolde/yawn.ogg",
+    "aww": "sounds/voices/isolde/aww.ogg",
+    "satisfied": "sounds/voices/isolde/satisfied.ogg"
+  },
+  "catchphrases": {
+    "my baby": "sounds/voices/isolde/phrase-my-baby.ogg"
+  },
+  "firstLine": "Isolde Verrane, Public Administration. I specialize in maximizing output from severely limited supply—and before you ask, I am referring to fiscal modeling, though the principle is versatile."
 }

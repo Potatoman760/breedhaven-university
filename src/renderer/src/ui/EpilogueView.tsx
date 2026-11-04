@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { buildEpilogue, spriteFor, wornOutfit } from '../../../shared/game'
 import type { ContentPack, GameState, LoveInterest } from '../../../shared/model'
 import { ChevronIcon } from './icons'
+import { playSong, stopSong } from '../sound'
 import { t } from '../../../shared/i18n'
 
 interface Props {
@@ -18,6 +19,14 @@ interface Props {
  * goes back.
  */
 export function EpilogueView({ content, state, onExit }: Props) {
+  // Its own music, once through in place of the place's loop (the file fades out at its end), and faded away as he leaves.
+  const music = content.sounds.music.epilogue?.file
+  useEffect(() => {
+    if (!music) return
+    stopSong()
+    playSong(music)
+    return stopSong
+  }, [music])
   const screens = useMemo(() => buildEpilogue(content, state), [content, state])
   const [at, setAt] = useState(0)
   const index = Math.min(at, screens.length - 1)

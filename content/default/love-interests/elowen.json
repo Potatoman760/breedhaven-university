@@ -677,7 +677,8 @@
     "verbalQuirks": [
       "Narrates her life as if her stream chat could hear it.",
       "Uses gamer and internet slang: gg, lowkey, no shot, it's giving.",
-      "Says what the Bloom is doing to her out loud, and laughs about it."
+      "Says what the Bloom is doing to her out loud, and laughs about it.",
+      "Calls {player} 'player two', her co-op partner"
     ],
     "exampleDialogue": [],
     "backstory": "Anwen and Elowen are long time BFFs; at the University they have at last begun to grow apart, one into her screens and the other onto her bike. They are still willing to share everything with each other, including men.\n\nElowen found computers at thirteen through a secondhand console and never looked back. She streams games most nights as elowen.exe to a small, devoted chat she calls her goblins, and pays her way with their tips and the odd commission fixing a shop's charm-till. She is better at code than she lets on, and writes scrappy little programs for anything that annoys her.\n\nHer magic runs into machines: a flicker that brings a dead screen back, lag that clears when she glares at it.",
@@ -686,14 +687,18 @@
     "extraInstructions": ""
   },
   "reactions": {
-    "aww": "sounds/voices/elowen/aww.ogg",
-    "gasp": "sounds/voices/elowen/gasp.ogg",
     "giggle": "sounds/voices/elowen/giggle.ogg",
-    "huff": "sounds/voices/elowen/huff.ogg",
-    "satisfied": "sounds/voices/elowen/satisfied.ogg",
-    "sigh-content": "sounds/voices/elowen/sigh-content.ogg",
     "sigh": "sounds/voices/elowen/sigh.ogg",
+    "sigh-content": "sounds/voices/elowen/sigh-content.ogg",
+    "gasp": "sounds/voices/elowen/gasp.ogg",
+    "huff": "sounds/voices/elowen/huff.ogg",
     "surprised": "sounds/voices/elowen/surprised.ogg",
-    "yawn": "sounds/voices/elowen/yawn.ogg"
-  }
+    "yawn": "sounds/voices/elowen/yawn.ogg",
+    "aww": "sounds/voices/elowen/aww.ogg",
+    "satisfied": "sounds/voices/elowen/satisfied.ogg"
+  },
+  "catchphrases": {
+    "player two": "sounds/voices/elowen/phrase-player-two.ogg"
+  },
+  "firstLine": "Oh my gosh, hi! I'm Elowen. Not gonna lie, it's giving main character energy right now—what's your build, are you even real?"
 }

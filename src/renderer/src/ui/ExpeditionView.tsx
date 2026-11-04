@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { play } from '../sound'
 import { banterDue, act, comeUp, describeFinds, fighterName, goOn, inForce, nodeAt, pregnancyPower, roleOf, runReport, spriteFor, toDate, turnActions, turnBack, turnOf, wornOutfit, type BanterLine, type TurnAction } from '../../../shared/game'
 import { HIM, type ContentPack, type Fighter, type Finds, type GameState } from '../../../shared/model'
 import { BelowFx, EVENT_GAP_MS } from '../fx/BelowFx'
@@ -83,6 +84,12 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fightKey])
   const talking = fighting && opened !== fightKey
+  // A fight won, the run lost, and every depth gone down to: each heard once as it comes.
+  const wonFight = run.spoils && fight ? `${run.startedAt}:${run.depth}:${run.node}` : null
+  useEffect(() => void (wonFight && play('victory')), [wonFight])
+  const lost = report?.outcome === 'lost' ? `${run.startedAt}` : null
+  useEffect(() => void (lost && play('defeat')), [lost])
+  useEffect(() => play('descend'), [run.startedAt, run.depth])
   // And what they say over a guardian they have beaten: asked for as the reckoning comes up, and said beside it when it arrives.
   const wonKey = report?.outcome === 'won' ? `won:${run.startedAt}:${run.depth}` : null
   const askedWon = useRef<string | null>(null)

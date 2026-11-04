@@ -7,6 +7,7 @@ import { isOrientationDay } from './orientation'
 import { firstNames } from './scene'
 import { societyMeetingNow, societyPeople } from './societies'
 import { awayOnDay } from './trips'
+import { toldTitle } from './upcoming'
 import { t } from '../i18n'
 
 // What on his calendar he is held to, by the calendar's kind: an event he may or may not go to is not among them.
@@ -35,7 +36,8 @@ export function busyWith(content: ContentPack, state: GameState, loveInterestIds
   const reasons: string[] = []
   for (const item of dayAgenda(content, state, dayIndex)) {
     const said = HELD[item.kind]
-    if (said && item.startHour !== undefined && overlaps(item.startHour, item.hours ?? 1)) reasons.push(said(item.title, item.detail))
+    // A plan or a birth with another woman is said only to be something he has on.
+    if (said && item.startHour !== undefined && overlaps(item.startHour, item.hours ?? 1)) reasons.push(toldTitle(item, loveInterestIds) === item.title ? said(item.title, item.detail) : t('game.freeTime.prior'))
   }
   for (const event of eventsOn(content, state, time)) {
     for (const part of event.program) {

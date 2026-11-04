@@ -63,7 +63,9 @@ export function DawnTransition({ content, state, onDone }: { content: ContentPac
     return { offset, date: toDate(calendar, time), weather: offset >= 0 ? weatherOn(content, state, time) : undefined }
   })
 
-  // As the kiss comes down on the day: two thirds of the way through its animation (`dawn-kiss` in styles.css).
+  // The night going by under it all, crickets giving way to the morning's birds; and as the kiss comes down on the day,
+  // two thirds of the way through its animation (`dawn-kiss` in styles.css), the stamp.
+  useCueAt('dawn', 0)
   useCueAt('stamp', KISS_LANDS_MS)
   return (
     <div className="dawn" onClick={onDone} role="presentation">

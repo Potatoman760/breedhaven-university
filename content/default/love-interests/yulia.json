@@ -687,14 +687,19 @@
     ]
   },
   "reactions": {
-    "aww": "sounds/voices/yulia/aww.ogg",
-    "gasp": "sounds/voices/yulia/gasp.ogg",
     "giggle": "sounds/voices/yulia/giggle.ogg",
-    "huff": "sounds/voices/yulia/huff.ogg",
-    "satisfied": "sounds/voices/yulia/satisfied.ogg",
-    "sigh-content": "sounds/voices/yulia/sigh-content.ogg",
     "sigh": "sounds/voices/yulia/sigh.ogg",
+    "sigh-content": "sounds/voices/yulia/sigh-content.ogg",
+    "gasp": "sounds/voices/yulia/gasp.ogg",
+    "huff": "sounds/voices/yulia/huff.ogg",
     "surprised": "sounds/voices/yulia/surprised.ogg",
-    "yawn": "sounds/voices/yulia/yawn.ogg"
-  }
+    "yawn": "sounds/voices/yulia/yawn.ogg",
+    "aww": "sounds/voices/yulia/aww.ogg",
+    "satisfied": "sounds/voices/yulia/satisfied.ogg"
+  },
+  "catchphrases": {
+    "babe": "sounds/voices/yulia/phrase-babe.ogg",
+    "that's so Breedhaven": "sounds/voices/yulia/phrase-that-s-so-breedhaven.ogg"
+  },
+  "firstLine": "Whoa, hold up—an actual boy, and you're not even hiding? Look at you being all polite, that's so Breedhaven! I'm Yulia Starkfelt, babe, and you're about to have way more fun."
 }

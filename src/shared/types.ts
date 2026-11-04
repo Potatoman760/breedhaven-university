@@ -81,8 +81,8 @@ export interface ChatResponse {
   offControlIds: string[]
   /** A change to the relationship the character has just asked for, for the player to accept or decline. */
   bondProposal?: BondProposal
-  /** A sound of hers the reply says is heard: the file in the pack to play. */
-  reaction?: string
+  /** Her voice in the reply, files in the pack to play one after another: a sound she makes, then a catch phrase she says. */
+  voices: string[]
 }
 
 export interface SummarizeResponse {
@@ -307,6 +307,8 @@ export interface RendererApi {
     deleteTrait(id: string): Promise<EditorResult>
     /** Adds or changes a face (`expressions`) or a sex-act (`acts`) added to the standard ones. */
     saveLook(change: { kind: LookKind; look: unknown }): Promise<EditorResult>
+    /** A standard sex-act's image prompts, for the game being written: kept in the base pack. */
+    saveActPrompts(change: { id: string; prompts: { draws?: string; groupDraws?: string; foursomeDraws?: string } }): Promise<EditorResult>
     deleteLook(which: { kind: LookKind; id: string }): Promise<EditorResult>
     /** Adds a group or changes one, then clears out whatever of its pictures and clips the saved group no longer uses. */
     saveGroup(group: unknown): Promise<EditorResult>

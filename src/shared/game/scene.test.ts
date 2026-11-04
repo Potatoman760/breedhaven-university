@@ -14,6 +14,7 @@ import {
   hasMet,
   meet,
   sceneCast,
+  catchphraseIn,
   parseDirectives,
   sexWrittenOf,
   lookLines,
@@ -113,6 +114,22 @@ describe('look directives', () => {
       agreed: false,
       slept: false
     })
+  })
+
+  it("hears a catch phrase of hers in a line she speaks, set off as a word of address is", () => {
+    const mor = { id: 'mor', name: 'Morwenna Thriceborn', catchphrases: { darling: 'd.ogg', 'little one': 'l.ogg' } }
+    const lola = { id: 'lola', name: 'Lola Hopworth', catchphrases: { 'my dear': 'm.ogg', chéri: 'c.ogg' } }
+    expect(catchphraseIn('Sit down, darling. You look tired.', [mor], 'mor')).toBe('d.ogg')
+    expect(catchphraseIn('Lola: Oh, my dear, look at you.\nMorwenna: Darling!', [mor, lola], 'mor')).toBe('m.ogg')
+    // Narrated, or the word inside another, or in a line not hers, it is not heard.
+    expect(catchphraseIn('*She calls him darling, softly.*', [mor], 'mor')).toBeUndefined()
+    expect(catchphraseIn('Lola: Darling, really.', [mor, lola], 'mor')).toBeUndefined()
+    expect(catchphraseIn('Lola: That is my dearest wish.', [mor, lola], 'mor')).toBeUndefined()
+    // Not set off by anything, it is a word in passing.
+    expect(catchphraseIn('Lola: I think my dear friend is late.', [mor, lola], 'mor')).toBeUndefined()
+    // Accents as they come, and none recorded is nothing.
+    expect(catchphraseIn('Lola: Merci, cheri.', [mor, lola], 'mor')).toBe('c.ogg')
+    expect(catchphraseIn('Sit, darling.', [{ ...mor, catchphrases: { darling: '' } }], 'mor')).toBeUndefined()
   })
 
   it('finds who a reply writes having sex: her tags, her own lines, and lines that name her', () => {
@@ -269,7 +286,7 @@ describe('look directives', () => {
   it('offers a face added in the editor only to one who has its picture, in its own words', () => {
     const looks = {
       expressions: [{ id: 'smug', name: 'Smug', description: 'pleased with herself', draws: '' }],
-      acts: [{ id: 'press', name: 'Press', description: 'legs pinned back', draws: '', groupDraws: '', moment: false, seeding: false, manShown: true }]
+      acts: [{ id: 'press', name: 'Press', description: 'legs pinned back', draws: '', groupDraws: '', foursomeDraws: '', moment: false, seeding: false, manShown: true }]
     }
     const smug = { ...li, outfits: li.outfits.map((o) => (o.id === 'default' ? { ...o, sprites: { ...o.sprites, smug: { image: 's.png', description: '' } } } : o)), animations: [...li.animations, { id: 'press', name: 'Press', description: '', image: 'p.png', loop: true }] }
     const others = [{ ...li, id: 'bea', name: 'Bea Moss' }]

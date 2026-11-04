@@ -31,6 +31,27 @@ export function newStrangers(content: ContentPack, state: GameState, scene: Pick
   return sceneCast(scene).filter((id) => content.loveInterests.some((li) => li.id === id) && !state.met.includes(id) && !(scene.strangers ?? []).includes(id))
 }
 
+/** That she has said her first line to him: once said, never again. */
+export const firstLineFlag = (id: string) => `first-line:${id}`
+
+/**
+ * The scene's opening as the strangers in it say who they are: each of them with a first line, not yet said, in the
+ * order they are in it; alone, as she says it, and in a group with her name before it. Nothing for a class, which the
+ * teacher opens, a masked ball, or an NPC.
+ */
+export function firstLinesIn(
+  content: ContentPack,
+  state: GameState,
+  scene: Pick<Scene, 'loveInterestId' | 'companionIds' | 'npc' | 'mask' | 'strangers' | 'lesson' | 'messages'>
+): { ids: string[]; text: string } | undefined {
+  if (scene.npc || scene.mask || scene.lesson || scene.messages.length > 0) return undefined
+  const strangers = new Set([...(scene.strangers ?? []), ...newStrangers(content, state, scene)])
+  const saying = sceneCast(scene).flatMap((id) => content.loveInterests.find((li) => li.id === id && strangers.has(id) && li.firstLine && !state.flags[firstLineFlag(id)]) ?? [])
+  if (saying.length === 0) return undefined
+  const group = sceneCast(scene).length > 1
+  return { ids: saying.map((li) => li.id), text: saying.map((li) => (group ? `${li.name.split(' ')[0]}: ${li.firstLine}` : li.firstLine)).join('\n\n') }
+}
+
 /** The strangers of a scene whose name nobody has yet said in it. */
 export function unnamedIn(content: ContentPack, scene: Pick<Scene, 'strangers' | 'messages'>): string[] {
   return (scene.strangers ?? []).filter((id) => {

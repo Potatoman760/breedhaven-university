@@ -15,9 +15,21 @@ export const GroupSchema = z.object({
   /** Its sex-acts, as a character's are written: by the act's id, each a picture and, if it has one, a clip. Drawn with a man of light skin. */
   animations: z.array(AnimationSchema).default([]),
   /** The same, drawn with a man of medium or dark skin, by tone, as a character's are (`withSkinTone`). */
-  tonedAnimations: z.partialRecord(z.enum(['medium', 'dark']), z.array(AnimationSchema)).default({})
+  tonedAnimations: z.partialRecord(z.enum(['medium', 'dark']), z.array(AnimationSchema)).default({}),
+  /**
+   * Positioning: for a sex-act, the order its picture describes the women in, by id, first to last: who is the first
+   * woman, the one on top, the one in the middle. Left out, the order of `memberIds`. The same for every tone.
+   */
+  positions: z.record(z.string(), z.array(z.string())).default({})
 })
 export type Group = z.infer<typeof GroupSchema>
+
+/** The group's members in the order a sex-act's picture describes them: its positioning, then any it leaves out. */
+export function positioned(group: Pick<Group, 'memberIds' | 'positions'>, actId: string): string[] {
+  const members = group.memberIds.filter((id) => id !== '')
+  const order = (group.positions[actId] ?? []).filter((id) => members.includes(id))
+  return [...new Set([...order, ...members])]
+}
 
 /** What a group's pictures and clips are filed under in the content: a folder of its own beside the characters'. */
 export function groupFiles(groupId: string): string {

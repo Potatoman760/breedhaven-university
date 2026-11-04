@@ -12,7 +12,7 @@ import { describeRapport } from './rapport'
 import { locationOf } from './map'
 import { classSoon } from './courses'
 import { PLAYER_TOKEN } from './personalise'
-import { nextUp } from './upcoming'
+import { nextUp, toldTitle } from './upcoming'
 import { canSleepOver } from './sleep'
 import { jobFacts } from './jobs'
 import { describeAppeal } from './stats'
@@ -738,7 +738,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
         due &&
           t('scene.prompt.moving.due', {
             player: player.name,
-            title: due.title,
+            title: toldTitle(due, cast.map((c) => c.id)),
             time: formatTime(toDate(content.calendar, due.time)),
             there: duePlace !== undefined,
             place: duePlace?.name,

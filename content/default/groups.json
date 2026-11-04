@@ -346,5 +346,66 @@
         }
       ]
     }
+  },
+  {
+    "id": "debate-society",
+    "name": "debate-society",
+    "memberIds": [
+      "yelena",
+      "seraphine",
+      "caelwen"
+    ],
+    "animations": [
+      {
+        "id": "blowjob",
+        "name": "Blowjob",
+        "description": "",
+        "image": "sprites/group-debate-society/nsfw-blowjob-2.png",
+        "clip": "sprites/group-debate-society/nsfw-blowjob.mp4",
+        "loop": true
+      },
+      {
+        "id": "missionary",
+        "name": "Missionary",
+        "description": "",
+        "image": "sprites/group-debate-society/nsfw-missionary.png",
+        "clip": "sprites/group-debate-society/nsfw-missionary-2.mp4",
+        "loop": true
+      },
+      {
+        "id": "cowgirl",
+        "name": "Cowgirl",
+        "description": "",
+        "image": "sprites/group-debate-society/nsfw-cowgirl.png",
+        "clip": "sprites/group-debate-society/nsfw-cowgirl-2.mp4",
+        "loop": true
+      },
+      {
+        "id": "creampie",
+        "name": "Creampie",
+        "description": "",
+        "image": "sprites/group-debate-society/nsfw-creampie.png",
+        "clip": "sprites/group-debate-society/nsfw-creampie-3.mp4",
+        "loop": true
+      },
+      {
+        "id": "facial",
+        "name": "Facial",
+        "description": "",
+        "image": "sprites/group-debate-society/nsfw-facial.png",
+        "clip": "sprites/group-debate-society/nsfw-facial-3.mp4",
+        "loop": true
+      },
+      {
+        "id": "doggy",
+        "name": "Doggy",
+        "description": "",
+        "image": "sprites/group-debate-society/nsfw-doggy-3.png",
+        "clip": "sprites/group-debate-society/nsfw-doggy-3.mp4",
+        "loop": true
+      }
+    ],
+    "tonedAnimations": {},
+    "positions": {}
   }
 ]

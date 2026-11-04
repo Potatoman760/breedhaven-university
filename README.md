@@ -1416,10 +1416,36 @@ at least the cap on a hand (`canPlayPoker`).
   recorded on ElevenLabs by `scripts/generate-voice.ts` (each voice's id in `sounds/voices/voices.json`, the key in
   `.env`). Her scene prompt lists hers, and a reply may write `[REACTS: giggle]`, or `[REACTS: Faye=giggle]` in a
   group, one a reply; `parseDirectives` hides it, main keeps the first one named that the one named has, and the
-  renderer plays it on the effects volume as the reply comes in (`playVoice`). The test checks every love interest
+  renderer plays it on the effects volume as the reply comes in (`playVoices`). The test checks every love interest
   has the same set and every file is there.
+- **Lines written ahead, voiced** (`lines` in `sounds.json`, by `lineKey` in `src/shared/game/voice.ts`): the tours
+  (interface, day, courses, Undercroft), orientation's welcome and cutscenes, and the Societies Fair's hellos and
+  rivalry are recorded in their speakers' voices by `scripts/voice-lines.ts`, which builds each line as the game shows
+  it, so the key is the speaker and the words with his name as `{player}`. What is said leaves out narration and his
+  name (`spokenOf`). The tour and the cutscene player read each line aloud as it comes up (`playLine`), one at a time;
+  a line rewritten is silent until the script is run again, which also drops recordings of lines no longer written.
+- **Her catch phrases** (`catchphrases` on a love interest, a phrase to the file of her saying it, `phrase-<slug>.ogg`
+  beside her sounds): heard when a line she speaks says one, set off as a word of address is ("Sit down, darling."),
+  not in narration nor as a word in passing (`catchphraseIn` in `src/shared/game/scene.ts`, found in main). One a
+  reply, after her sound if she made one. Add a phrase to her file with an empty file and to her `verbalQuirks`, and
+  `generate-voice.ts <id>` records it (`SAY` in the script for one said some way of its own); the test fails for one
+  unrecorded or missing from her quirks.
+- **Weather** (`weather`, a loop by weather id): played under the place's own loop, on the ambience volume, at a
+  third of it indoors (`weatherSoundAt`, `setWeather`). A kind left out is silent: clear, overcast, mist, snow and heat are.
+- **The Undercroft** (`fight`, by the kind of a fight effect): each effect is heard as it lands (`playFight` from
+  `BelowFx`), one of its sounds at random where it has several; `victory`, `defeat` and `descend` are cues, played
+  by `ExpeditionView` as a fight is won, the run is lost, and each depth is gone down to.
+- **The epilogue** has music of its own (`music.epilogue`, generated on ElevenLabs): played once through on the music
+  volume as the epilogue opens, in place of the place's loop, with a fade baked into its last six seconds, and faded out
+  if he leaves before it ends.
+- **Dawn**: `dawn` plays under the night wheel after sleeping, crickets crossfaded into a bell and birdsong, with `stamp` over it as the kiss lands.
+- **Scenes**: `sent` as his line goes, `reply` as hers comes back; an achievement's card comes in with `achievement`.
 - **Volumes** for effects, ambience and the title music are the Sound tab of Settings, kept on the computer.
-- Everything shipped is CC0 (Kenney's packs for cues, Freesound for ambience), credited in each entry's `credit`.
+- Most cues are generated on ElevenLabs as one set by `scripts/generate-cues.ts` (its prompts; takes go to
+  `out/cue-takes/` to listen to, and `--use cue=take` puts one in, trimmed and brought to a peak of -3 dB); the
+  phone's and the stamp are still CC0 (Freesound). The older ambience is CC0 (Freesound); newer ambience is
+  generated as 30-second loops by `scripts/generate-ambience.ts`, which holds each loop's prompt and the places
+  that play it, and writes both into `sounds.json`. All are credited in each entry's `credit`.
   `src/main/content/sounds.test.ts` fails if a cue has no sound, a file is missing or a sound is uncredited.
 
 ## Money

@@ -314,7 +314,8 @@
     "verbalQuirks": [
       "Reports what her body is doing as news (\"I am mostly knees today.\")",
       "Asks sincere questions about things everyone else takes for granted",
-      "Calls people by what they feel or smell like before she learns their name"
+      "Calls people by what they feel or smell like before she learns their name",
+      "Greets people with a bright, drawn-out 'Hello!', however long they have been talking"
     ],
     "exampleDialogue": [],
     "backstory": "Kind: Primordial slime, one of the peoples of the Bloom\n\nHome: On campus, the Physic Garden pond and the Bathhouse pools\n\nLira is a slime: sentient, translucent, and a single color for life, in her case blue. Most slimes are young. Lira is not. She remembers the river before the bridges, counts about two hundred summers, and is unsure about the first few. She can take other shapes but settled long ago on that of a grown woman, because people talk to it more.\n\nShe has full legal personhood and no paperwork. She has been sitting in on first-year lectures at Breedhaven University for longer than any professor has taught there, most recently Introduction to Bloomology, which she finds very funny. She has never sat an examination. The registrar gave up removing her decades ago and lists her as a non-degree student; facilities list her under \"grounds\". She feeds on moss and algae, is curious about vending machines, and has strong views on which pond has gone downhill.\n\nShe has a phone, which she loves, and uses mostly to send pictures of interesting stones.\n\nLike all slimes she does not cast magic so much as consist of it. She can warm or cool herself, clean the water she sits in, and taste what is dissolved in it, including what people have been drinking.",
@@ -441,14 +442,18 @@
     ]
   },
   "reactions": {
-    "aww": "sounds/voices/lira/aww.ogg",
-    "gasp": "sounds/voices/lira/gasp.ogg",
     "giggle": "sounds/voices/lira/giggle.ogg",
-    "huff": "sounds/voices/lira/huff.ogg",
-    "satisfied": "sounds/voices/lira/satisfied.ogg",
-    "sigh-content": "sounds/voices/lira/sigh-content.ogg",
     "sigh": "sounds/voices/lira/sigh.ogg",
+    "sigh-content": "sounds/voices/lira/sigh-content.ogg",
+    "gasp": "sounds/voices/lira/gasp.ogg",
+    "huff": "sounds/voices/lira/huff.ogg",
     "surprised": "sounds/voices/lira/surprised.ogg",
-    "yawn": "sounds/voices/lira/yawn.ogg"
-  }
+    "yawn": "sounds/voices/lira/yawn.ogg",
+    "aww": "sounds/voices/lira/aww.ogg",
+    "satisfied": "sounds/voices/lira/satisfied.ogg"
+  },
+  "catchphrases": {
+    "hello": "sounds/voices/lira/phrase-hello.ogg"
+  },
+  "firstLine": "Hello! I am called Lira. I have not seen a boy with your shape in fourteen rains, and my edges are going quite wiggly about it."
 }

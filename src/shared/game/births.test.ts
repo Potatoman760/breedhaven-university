@@ -62,7 +62,7 @@ describe('a birth on the calendar', () => {
     expect(scheduleBirths(content, set).state).toBe(set)
 
     // On the calendar it is a birth at its hour, and no longer only a day she is due.
-    expect(dayAgenda(content, set, 3)).toEqual([{ kind: 'birth', id: 'plan-birth-ana', title: 'Ana gives birth', detail: 'the Shop', startHour: 6, hours: 2 }])
+    expect(dayAgenda(content, set, 3)).toEqual([{ kind: 'birth', id: 'plan-birth-ana', title: 'Ana gives birth', detail: 'the Shop', startHour: 6, hours: 2, withIds: ['ana'] }])
     expect(dayAgenda(content, near, 3)).toEqual([{ kind: 'birth', id: 'birth-ana', title: 'Ana is due' }])
     // It is the next thing on his day, when the day comes.
     expect(nextUp(content, at(set, 59))).toMatchObject({ kind: 'plan', id: 'birth-ana', time: 60, locationId: 'shop' })

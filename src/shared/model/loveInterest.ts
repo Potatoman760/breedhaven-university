@@ -181,7 +181,7 @@ export type Animation = z.infer<typeof AnimationSchema>;
  * The poses every character has a slot for in the NSFW section, as she has a slot for every
  * face in an outfit. `description` is what the LLM is told of one whose own is left empty,
  * and `draws` is what the picture is asked for with. `groupDraws` is what a group's picture of it is asked for with
- * in its place: the same act, with all of them in it. `manShown` says whether he is in the picture: not in what
+ * in its place: the same act, with all of them in it, two women; `foursomeDraws` the same with three. `manShown` says whether he is in the picture: not in what
  * follows the act, which shows only them.
  */
 export const NSFW_POSES = [
@@ -193,6 +193,8 @@ export const NSFW_POSES = [
       "POV from above: she kneels in front of a man and performs oral sex on him, penis in her mouth, looking up at the camera",
     groupDraws:
       "POV from above: the women kneel side by side in front of a man, sharing his penis between them, one with it in her mouth while the other licks its shaft, both looking up at the camera",
+    foursomeDraws:
+      "POV from above: three women kneel side by side in front of a man, sharing his penis between them, the woman in the middle with it in her mouth while the women on either side lick its shaft, all three looking up at the camera",
     manShown: true,
   },
   {
@@ -203,6 +205,8 @@ export const NSFW_POSES = [
       "POV: she lies on her back on a bed, head on a pillow, having sex in the missionary position, legs apart, looking up at the camera. a mans penis is penetrating her pussy",
     groupDraws:
       "POV: the women lie side by side on their backs on a bed, legs spread apart, looking up at the camera; a mans penis is penetrating the pussy of the left woman while the woman on the right has her fingers inside her own pussy and kisses the woman on the left.",
+    foursomeDraws:
+      "POV: three women lie side by side on their backs on a bed, legs spread apart, looking up at the camera; a mans penis is penetrating the pussy of the woman in the middle while the women on either side have their fingers inside their own pussies and kiss her",
     manShown: true,
   },
   {
@@ -213,6 +217,8 @@ export const NSFW_POSES = [
       "she is on her hands and knees on a bed having sex from behind, seen from the side, looking back over her shoulder. a mans penis is penetrating her pussy from behind",
     groupDraws:
       "side view, the first woman is laying on the bed face down. The second woman is laying on top of her body; a mans penis is penetrating  the top woman's ass from behind",
+    foursomeDraws:
+      "side view: three women are stacked on a bed, the first lying face down, the second lying on top of her, the third kneeling beside them; a mans penis is penetrating the top woman's pussy from behind while the third woman kisses her",
     manShown: true,
   },
   {
@@ -223,6 +229,8 @@ export const NSFW_POSES = [
       "POV from below: she sits astride a man having sex in the cowgirl position, her hands on his chest, looking down at the camera",
     groupDraws:
       "POV from below: one of the women sits astride a man having sex in the cowgirl position while the other kneels beside them with her hands on his chest, both looking down at the camera",
+    foursomeDraws:
+      "POV from below: one of three women sits astride a man having sex in the cowgirl position while the other two kneel on either side of them with their hands on his chest, all three looking down at the camera",
     manShown: true,
   },
   {
@@ -233,6 +241,8 @@ export const NSFW_POSES = [
       "she lies back on a bed after sex, legs apart, lots of white semen leaking from her vagina, flushed and out of breath",
     groupDraws:
       "the women lie back side by side on a bed after sex, legs apart, white semen leaking from the vagina of one of them, both flushed and out of breath",
+    foursomeDraws:
+      "three women lie back side by side on a bed after sex, legs apart, white semen leaking from the vagina of the woman in the middle, all three flushed and out of breath",
     manShown: false,
   },
   {
@@ -243,6 +253,8 @@ export const NSFW_POSES = [
       "close on her face and shoulders after sex, semen on her face, eyes half closed, lips parted",
     groupDraws:
       "close on the women's faces and shoulders side by side after sex, semen on both their faces, eyes half closed, lips parted",
+    foursomeDraws:
+      "close on three women's faces and shoulders side by side after sex, semen on all three of their faces, eyes half closed, lips parted",
     manShown: false,
   },
 ] as const;
@@ -485,6 +497,10 @@ export const LoveInterestSchema = z.object({
   tonedAnimations: z.partialRecord(z.enum(["medium", "dark"]), z.array(AnimationSchema)).default({}),
   /** Her wordless sounds in her own voice (a giggle, a gasp), by name: a file each, heard when a reply of hers names one. */
   reactions: z.record(z.string(), z.string()).default({}),
+  /** Her catch phrases ("darling"), each to the file of her saying it: heard when a line of hers says it. Empty until recorded. */
+  catchphrases: z.record(z.string(), z.string()).default({}),
+  /** Her first words to him, saying who she is: the first line of the first scene she is in with him, said once, and recorded. */
+  firstLine: z.string().optional(),
   schedule: z.array(ScheduleEntrySchema).default([]),
   /** Where she lives. A scene can move there. */
   room: RoomSchema.optional(),

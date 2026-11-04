@@ -4,14 +4,14 @@ import { dirname, extname, join, resolve, sep } from 'node:path'
 import { z } from 'zod'
 import { chatCompletion, listModels } from './ai/openai'
 import { completeWithFallback, notConfigured } from './ai/router'
-import { firstNames, firstToSpeak, leavers, lookLines, namesHer, parseDirectives, sceneCast, sceneWitnesses, sexWrittenOf, validLook, whoSpoke } from '../shared/game/scene'
+import { catchphraseIn, firstNames, firstToSpeak, leavers, lookLines, namesHer, parseDirectives, sceneCast, sceneWitnesses, sexWrittenOf, validLook, whoSpoke } from '../shared/game/scene'
 import { canSleepOver } from '../shared/game/sleep'
 import { sexGate } from '../shared/game/intimacy'
 import { sceneRelicUses } from '../shared/game/relics'
 import { CONTENT_SCHEME, resolveContentPath, serveContent } from './content/assets'
 import { deleteLoveInterest,
   removeUnusedAssets,
-  deleteLook, saveLook,
+  deleteLook, saveLook, saveActPrompts,
   deleteGroup, groupAssets, saveGroup,
   deleteTrait, deleteJob, saveJob, deleteSociety, saveSociety, importAsset, loadBase, loadWithAddons, rebuildCatalogue, saveCatalogue, saveMajor, deleteMajor, saveLocation, deleteLocation, saveLoveInterest, saveTrait,
   resetPlayer,
@@ -391,6 +391,8 @@ function registerIpc(
     change(() => deleteTrait(info.addonDir, content, baseTraitIds(), z.string().parse(raw)))
   )
   ipcMain.handle(IPC.editorSaveLook, (_event, raw: unknown) => change(() => saveLook(info.addonDir, content, raw)))
+  // Only while the game is being written: a player's game keeps the standard ones as they come.
+  ipcMain.handle(IPC.editorSaveActPrompts, (_event, raw: unknown) => change(() => (info.base ? saveActPrompts(info.addonDir, content, raw) : [t('editor.looks.standard')])))
   ipcMain.handle(IPC.editorDeleteLook, (_event, raw: unknown) => {
     const { kind, id } = z.object({ kind: z.enum(LOOK_KINDS), id: z.string() }).parse(raw)
     return change(() => deleteLook(info.addonDir, content, kind, id))
@@ -894,7 +896,9 @@ function registerIpc(
       hours: hoursPassed > 0 ? hoursPassed : undefined,
       look: li ? { ...fitted(validLook({ outfitId: look.outfitId, expression: look.expression }, li, scene), li), ...posed } : {},
       looks,
-      reaction
+      voices: [reaction, npc ? undefined : catchphraseIn(text, present.flatMap((id) => cast.loveInterests.filter((c) => c.id === id)), scene.loveInterestId)].filter(
+        (file): file is string => file !== undefined
+      )
     }
   })
 

@@ -554,7 +554,8 @@
     "verbalQuirks": [
       "Gives people unflattering nicknames, and uses them.",
       "Answers a question she finds boring with a look.",
-      "Talks about her bike as if it were the only one who gets her."
+      "Talks about her bike as if it were the only one who gets her.",
+      "Greets him with a smirk and 'hey cowboy'"
     ],
     "exampleDialogue": [],
     "backstory": "Anwen and Elowen are long time BFFs; at the University they have at last begun to grow apart, one into her screens and the other onto her bike. They are still willing to share everything with each other, including men.\n\nAnwen spent her teens in the guesthouse's back shed, rebuilding a dead motorbike piece by piece until it ran, then rebuilding it again to run on a charm-core. She rides it to class, parks it where she likes, and has never let anyone else drive it. At the University she found she could make people do what she wanted with a look, and stopped being the quiet twin. She runs with a small, sharp crowd, decides who is in and who is out, and is meanest to the ones she likes.\n\nHer magic is hot and exact: a weld that seals at a touch, an engine that turns over when she tells it to.",
@@ -667,14 +668,18 @@
     ]
   },
   "reactions": {
-    "aww": "sounds/voices/anwen/aww.ogg",
-    "gasp": "sounds/voices/anwen/gasp.ogg",
     "giggle": "sounds/voices/anwen/giggle.ogg",
-    "huff": "sounds/voices/anwen/huff.ogg",
-    "satisfied": "sounds/voices/anwen/satisfied.ogg",
-    "sigh-content": "sounds/voices/anwen/sigh-content.ogg",
     "sigh": "sounds/voices/anwen/sigh.ogg",
+    "sigh-content": "sounds/voices/anwen/sigh-content.ogg",
+    "gasp": "sounds/voices/anwen/gasp.ogg",
+    "huff": "sounds/voices/anwen/huff.ogg",
     "surprised": "sounds/voices/anwen/surprised.ogg",
-    "yawn": "sounds/voices/anwen/yawn.ogg"
-  }
+    "yawn": "sounds/voices/anwen/yawn.ogg",
+    "aww": "sounds/voices/anwen/aww.ogg",
+    "satisfied": "sounds/voices/anwen/satisfied.ogg"
+  },
+  "catchphrases": {
+    "hey cowboy": "sounds/voices/anwen/phrase-hey-cowboy.ogg"
+  },
+  "firstLine": "Hey, cowboy. Name's Anwen. Don't flatter yourself—my bike's still the prettiest thing I've seen all week, not you."
 }

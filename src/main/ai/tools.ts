@@ -1,7 +1,7 @@
 import { proposeMeeting } from '../../shared/game/appointments'
 import { bondName, bondOf, canBond, END_BOND, statusOf } from '../../shared/game/bonds'
 import { MAX_SCENE_CAST, type BondProposal, type ContentPack, type DepartureFeeling, type GameState, type Proposal, type Scene } from '../../shared/model'
-import { moveClash, sharedUpcoming, type Upcoming } from '../../shared/game/upcoming'
+import { moveClash, sharedUpcoming, toldTitle, type Upcoming } from '../../shared/game/upcoming'
 import { shiftLaterToday } from '../../shared/game/jobs'
 import { hiddenFacts } from '../../shared/game/facts'
 import { firstNames, leavers, sceneCast } from '../../shared/game/scene'
@@ -278,7 +278,7 @@ export function moveTool(
         return t('llm.tools.moveClash', {
           place: destination.name,
           player,
-          title: clash.title,
+          title: toldTitle(clash, cast),
           time: formatTime(toDate(content.calendar, clash.time)),
           at: where !== undefined,
           where: where?.name,

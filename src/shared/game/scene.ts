@@ -371,6 +371,31 @@ export function sexWrittenOf(reply: string, cast: Pick<LoveInterest, 'id' | 'nam
   return ids.filter((id) => found.has(id))
 }
 
+/**
+ * The first of their catch phrases a reply has one of them say, as the file of her saying it: in a line she speaks,
+ * not in what is narrated, and set off by punctuation or the line's start or end on one side at least, as a word of
+ * address is ("Thank you, love."), so that "I love it" is not one. Alone in a scene, every unnamed line is hers.
+ */
+export function catchphraseIn(reply: string, cast: Pick<LoveInterest, 'id' | 'name' | 'catchphrases'>[], leadId: string): string | undefined {
+  const alone = cast.length < 2
+  const escape = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  for (const line of dialogueLines(reply.replace(/\[[^\]\n]*\]/g, ''), cast)) {
+    if (line.action) continue
+    const who = cast.find((li) => li.id === (line.speakerId ?? (alone ? leadId : undefined)))
+    if (!who) continue
+    // Spoken only: what is between asterisks is what she does.
+    const said = plainName(line.text.replace(/\*[^*]*\*/g, ' '))
+    for (const [phrase, file] of Object.entries(who.catchphrases)) {
+      if (!file) continue
+      const word = escape(plainName(phrase))
+      const set = new RegExp(`(?:^|[^\\p{L}\\p{N}'])${word}(?=$|[^\\p{L}\\p{N}'])`, 'u')
+      const offset = new RegExp(`(?:^\\s*|[,.;:!?—–-]\\s*)${word}(?![\\p{L}\\p{N}'])|${word}\\s*(?:[,.;:!?—–-]|$)`, 'u')
+      if (set.test(said) && offset.test(said)) return file
+    }
+  }
+  return undefined
+}
+
 /** Who of the cast has a line of her own in a reply, by id: in a group, only she can say she will do something. */
 export function whoSpoke(reply: string, cast: Pick<LoveInterest, 'id' | 'name'>[]): string[] {
   return [...new Set(dialogueLines(reply, cast).flatMap((line) => line.speakerId ?? []))]

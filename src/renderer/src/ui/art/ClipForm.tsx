@@ -23,7 +23,8 @@ export interface ClipTarget {
   /** Keeps a prompt on the pose for its clips from now on, or with none, goes back to the settings' own. */
   onKeepPrompt: (prompt: string | undefined) => void
   /** The pose is a group's: its clip is asked for with the settings' group prompt for the act. */
-  group?: boolean
+  /** A group's pose: how many women are in it, for the threesome's or the foursome's prompt. */
+  group?: number
 }
 
 /** The workflows that make clips: those with somewhere to put a first frame. */
@@ -41,7 +42,7 @@ export function clipRequest(
   pose: { id: string; image: string; clipPrompt?: string },
   choice: { workflow?: string; prompt?: string; seed?: number; seconds?: number } = {},
   /** A group's pose, whose clip is asked for with the group prompt for the act. */
-  group = false
+  group?: number
 ): { request: GenerateVideoRequest; loop?: boolean; workflow: string } | null {
   const usable = clipWorkflows(list)
   const chosen = usable.find((w) => w.file === choice.workflow) ?? usable.find((w) => w.file === defaultsFor(settings).video) ?? usable[0]
@@ -56,7 +57,7 @@ export function clipRequest(
       name: `nsfw-${pose.id}`,
       workflow: chosen.file,
       image: pose.image,
-      prompt: choice.prompt ?? pose.clipPrompt ?? (group ? groupVideoPromptFor(settings, pose.id) : videoPromptFor(settings, pose.id)),
+      prompt: choice.prompt ?? pose.clipPrompt ?? (group ? groupVideoPromptFor(settings, pose.id, group) : videoPromptFor(settings, pose.id)),
       lastImage: looping ? pose.image : undefined,
       seed: choice.seed,
       seconds: chosen.bindings.length !== null ? (choice.seconds ?? settings.videoSeconds) : undefined
@@ -80,7 +81,7 @@ interface Props {
 export function GenerateClip({ target, settings, list, onSave }: Props) {
   const { pose } = target
   // Her own for the pose, when one was kept, or else the settings' for the sex-act.
-  const own = pose.clipPrompt ?? (target.group ? groupVideoPromptFor(settings, pose.id) : videoPromptFor(settings, pose.id))
+  const own = pose.clipPrompt ?? (target.group ? groupVideoPromptFor(settings, pose.id, target.group) : videoPromptFor(settings, pose.id))
   const [prompt, setPrompt] = useState(own)
   // The prompt is the one kept for the pose until it is edited by hand; putting it back follows it again.
   const [edited, setEdited] = useState(false)

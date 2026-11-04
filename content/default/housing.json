@@ -106,7 +106,8 @@
         {
           "locationId": "sire-house",
           "castIds": [
-            "zelie"
+            "zelie",
+            "una"
           ],
           "lines": [
             "*Una walks you back into the hearth room, keys in hand. A slim woman in a black dress with a white collar is waiting by the fire, and straightens as you come in.*",

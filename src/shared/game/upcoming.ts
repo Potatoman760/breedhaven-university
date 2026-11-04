@@ -19,6 +19,17 @@ export interface Upcoming {
   /** Game time at which it starts. */
   time: number
   locationId: string
+  /** For a plan, who it is with. */
+  withIds?: string[]
+}
+
+/**
+ * What one of his plans is called, said to the women given: its title where it is with one of them or with nobody
+ * else, and otherwise only that he has something on. Which women he sees, and when, is not theirs to know.
+ */
+export function toldTitle(item: { title: string; withIds?: string[] }, toIds: readonly string[]): string {
+  const others = (item.withIds ?? []).filter((id) => !toIds.includes(id))
+  return others.length > 0 && !(item.withIds ?? []).some((id) => toIds.includes(id)) ? t('game.upcoming.prior') : item.title
 }
 
 /**
@@ -32,7 +43,7 @@ export function nextUp(content: ContentPack, state: GameState): Upcoming | undef
 
   for (const plan of state.appointments) {
     if (plan.time > state.time && toDate(content.calendar, plan.time).dayIndex === dayIndex) {
-      found.push({ kind: 'plan', id: plan.id, title: plan.title, time: plan.time, locationId: plan.locationId })
+      found.push({ kind: 'plan', id: plan.id, title: plan.title, time: plan.time, locationId: plan.locationId, withIds: plan.kind === 'viewing' || plan.kind === 'below' ? [] : attendees(plan) })
     }
   }
 

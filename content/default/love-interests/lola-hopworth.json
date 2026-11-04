@@ -566,7 +566,7 @@
     "speechPattern": "She speaks quickly and in short bursts, clipping the ends of her sentences, and jumps from practical instruction to personal observation without warning. She uses food metaphors for everything and asks blunt personal questions the way other people ask about the weather.",
     "tone": "Blunt, fast, warm, irreverent",
     "verbalQuirks": [
-      "Calls people 'love' or 'dear' mid-sentence without sentiment",
+      "Calls people 'love' or 'my dear' mid-sentence without sentiment",
       "Clicks her tongue when she thinks something is obvious",
       "Swears casually when excited or annoyed, never with anger"
     ],
@@ -705,14 +705,18 @@
     ]
   },
   "reactions": {
-    "aww": "sounds/voices/lola-hopworth/aww.ogg",
-    "gasp": "sounds/voices/lola-hopworth/gasp.ogg",
     "giggle": "sounds/voices/lola-hopworth/giggle.ogg",
-    "huff": "sounds/voices/lola-hopworth/huff.ogg",
-    "satisfied": "sounds/voices/lola-hopworth/satisfied.ogg",
-    "sigh-content": "sounds/voices/lola-hopworth/sigh-content.ogg",
     "sigh": "sounds/voices/lola-hopworth/sigh.ogg",
+    "sigh-content": "sounds/voices/lola-hopworth/sigh-content.ogg",
+    "gasp": "sounds/voices/lola-hopworth/gasp.ogg",
+    "huff": "sounds/voices/lola-hopworth/huff.ogg",
     "surprised": "sounds/voices/lola-hopworth/surprised.ogg",
-    "yawn": "sounds/voices/lola-hopworth/yawn.ogg"
-  }
+    "yawn": "sounds/voices/lola-hopworth/yawn.ogg",
+    "aww": "sounds/voices/lola-hopworth/aww.ogg",
+    "satisfied": "sounds/voices/lola-hopworth/satisfied.ogg"
+  },
+  "catchphrases": {
+    "my dear": "sounds/voices/lola-hopworth/phrase-my-dear.ogg"
+  },
+  "firstLine": "Tsk. Don't just stand there like half-set jelly, love, I'm Lola Hopworth. Do they actually feed you where you're from, or have I got to fix that?"
 }

@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import { playFight } from '../sound'
 import { useEffect, useRef } from 'react'
 import type { FightEvent, FightFx } from '../../../shared/model'
 import { t } from '../../../shared/i18n'
@@ -647,6 +648,7 @@ export function BelowFx({ events, stamp, effects = {} }: Props) {
           const from = (caster?.querySelector<HTMLElement>('img') ?? caster)?.getBoundingClientRect()
           const spotOf = (rect: DOMRect) => ({ x: rect.left - stage.left + rect.width / 2, y: rect.top - stage.top + rect.height / 2, w: rect.width, h: rect.height })
           const lands = scene.current.play(fx, spotOf(box), from ? spotOf(from) : undefined)
+          playFight(fx.kind, lands)
           const move = MOVES[fx.kind]
           if (move && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) figure.animate(move, { duration: 260, delay: lands, easing: 'ease-out' })
         }
