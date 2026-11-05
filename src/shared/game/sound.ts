@@ -29,10 +29,12 @@ export function weatherSoundAt(content: ContentPack, state: GameState): { sound:
   return { sound, indoors: state.inOwnRoom || isIndoors(location, undefined) }
 }
 
-/** The loop to play behind where he is at this hour, if the place has one. */
-export function ambienceAt(content: ContentPack, state: GameState): Sound | undefined {
+/** The loop to play behind where he is at this hour, if the place has one: in a scene in one of its views, that view's own. */
+export function ambienceAt(content: ContentPack, state: GameState, viewId?: string): Sound | undefined {
   const place = content.sounds.places[state.locationId]
   if (!place) return undefined
+  const own = viewId === undefined ? undefined : place.views?.[viewId]
+  if (own && content.sounds.ambience[own]) return content.sounds.ambience[own]
   const dark = toDate(content.calendar, state.time).period.light === 'night'
   return content.sounds.ambience[(dark && place.night) || place.day]
 }

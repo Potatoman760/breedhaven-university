@@ -425,6 +425,20 @@ const paragraph = (text: string): string => {
 /** A prompt's paragraphs, a blank line between them, as the game's own sprites were written. */
 const paragraphs = (parts: (string | false | undefined)[]): string => parts.filter((part): part is string => typeof part === 'string' && part.trim() !== '').join('\n\n')
 
+// The abs in an appearance, with the comma or "and" after them: "defined abdominal muscles, ".
+const ABS = /\b(?:(?:clearly|well|finely)[- ])?(?:defined |toned |chiseled |sculpted |visible |muscular )?(?:abdominal muscles|abs|six-pack)\b(?:,\s*|\s+and\s+)?/gi
+
+/** Her appearance with no abs in it, for an outfit that covers her stomach. */
+export function withoutAbs(appearance: string): string {
+  return appearance.replace(ABS, '').replace(/,\s*([.;:])/g, '$1').replace(/\s{2,}/g, ' ').trim()
+}
+
+/** Whether an outfit covers her stomach: it says so, or the outfit it is the pregnant form of does. */
+function coversStomach(outfits: Outfit[], outfit: Outfit | undefined): boolean {
+  for (let at = outfit, seen = 0; at && seen < 8; at = outfits.find((o) => o.id === at!.inherits), seen++) if (at.coversStomach) return true
+  return false
+}
+
 /**
  * The prompt for a sprite, laid out as the prompts the game's own sprites were made
  * from: her body, what she wears, how the picture is framed, and last the look on her
@@ -447,7 +461,7 @@ export function spritePrompt(
   const { subject, has } = pronounWords(who.pronouns)
   const wears = subject === 'they' ? 'wear' : 'wears'
   return paragraphs([
-    paragraph(who.appearance),
+    paragraph(coversStomach(who.outfits, outfit) ? withoutAbs(who.appearance) : who.appearance),
     worn && paragraph(`${subject[0].toUpperCase()}${subject.slice(1)} ${wears} ${worn}`),
     ...added.map(paragraph),
     framing.trim(),

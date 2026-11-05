@@ -1084,10 +1084,10 @@ function registerIpc(
 
   // Never fails: the moment plays whether or not anyone has anything to say.
   ipcMain.handle(IPC.momentLines, async (_event, raw: unknown): Promise<BanterResponse> => {
-    const { state, ids, moment, history } = MomentLinesRequestSchema.parse(raw)
+    const { state, ids, moment, history, tripId } = MomentLinesRequestSchema.parse(raw)
     const content = readBy(state)
     try {
-      const { system, user } = buildMomentPrompt(content, state, ids, moment, history)
+      const { system, user } = buildMomentPrompt(content, state, ids, moment, history, tripId)
       const { reply } = await completeWithFallback(settings.get(), false, { system, messages: [{ role: 'user', content: user }] })
       return { lines: parseMomentLines(reply, content, ids) }
     } catch {

@@ -379,6 +379,134 @@
       "pregnant": false,
       "oneOff": true,
       "babyTone": "dark"
+    },
+    {
+      "id": "swimsuit",
+      "name": "Swimsuit",
+      "description": "an elegant deep crimson one-piece swimsuit with a plunging neckline edged in gold, cut high at the hips, a fine gold chain belt at the waist, and a sheer gold-embroidered silk sarong tied low at one hip",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yelena/swimsuit-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "Swimsuit, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "swimsuit",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yelena/swimsuit-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "ao-dai",
+      "name": "Ao dai",
+      "description": "a fitted deep crimson silk Vietnamese ao dai: a long close-fitting tunic of thick opaque silk, following her figure but lying smooth and unbroken over her stomach, with a high mandarin collar, long sleeves and side slits up to the waist, richly embroidered with gold phoenixes, worn over loose flowing gold silk trousers",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yelena/ao-dai-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "Ao dai, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "ao-dai",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yelena/ao-dai-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sari",
+      "name": "Sari",
+      "description": "a traditional deep crimson silk sari with a gold woven border, the pallu draped over one shoulder, worn with a matching short fitted blouse, and thin gold bangles",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yelena/sari-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "Sari, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sari",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yelena/sari-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "holi",
+      "name": "Festival whites",
+      "description": "a simple, loose-fitting white cotton kurta tunic of thick opaque cotton, hanging straight and loose from her chest to her knees and hiding her stomach completely, over loose white cotton trousers, with a thin deep crimson scarf, the clothes, her arms and her cheeks splashed and smeared with bright pink, yellow, green and blue festival color powder",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yelena/holi-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "Festival whites, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "holi",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yelena/holi-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sarong",
+      "name": "Sarong",
+      "description": "a long deep crimson silk sarong printed with large gold and white tropical hibiscus flowers, wrapped around her body and knotted at one shoulder as a one-shoulder dress, the thick opaque fabric hanging loose and smooth from her chest, hiding her stomach completely, falling to mid-calf with a slit at one side, and a white plumeria flower behind one ear",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yelena/sarong-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "Sarong, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sarong",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yelena/sarong-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -593,6 +721,21 @@
       }
     ]
   },
+  "reactions": {
+    "giggle": "sounds/voices/yelena/giggle.ogg",
+    "sigh": "sounds/voices/yelena/sigh.ogg",
+    "sigh-content": "sounds/voices/yelena/sigh-content.ogg",
+    "gasp": "sounds/voices/yelena/gasp.ogg",
+    "huff": "sounds/voices/yelena/huff.ogg",
+    "surprised": "sounds/voices/yelena/surprised.ogg",
+    "yawn": "sounds/voices/yelena/yawn.ogg",
+    "aww": "sounds/voices/yelena/aww.ogg",
+    "satisfied": "sounds/voices/yelena/satisfied.ogg"
+  },
+  "catchphrases": {
+    "sweetie": "sounds/voices/yelena/phrase-sweetie.ogg"
+  },
+  "firstLine": "It is an honor to make your acquaintance; I am Yelena Goldvine. Wait, no, that sounded super stiff—may I start over? Oh right, I can literally just do what I want.",
   "schedule": [
     {
       "weekdays": [
@@ -655,6 +798,11 @@
     "dark": "sprites/yelena/birth-dark.webp"
   },
   "walkSprite": "sprites/yelena/walk-cutout.webp",
+  "walkHead": {
+    "top": 3.5,
+    "chin": 22.5,
+    "x": 50.1
+  },
   "childNames": {
     "daughters": [
       "Katya",
@@ -682,20 +830,5 @@
     "knowledge": [],
     "secrets": [],
     "extraInstructions": "She knows the correct greeting and uses it before she has time to think. With someone she trusts, she wants to take off the formal shoes, laugh, explore, and make an ordinary choice without asking her family. Her wish for freedom should show up in specific things she wants to do. Pride and court skill remain, but she is more than a rival claimant."
-  },
-  "reactions": {
-    "giggle": "sounds/voices/yelena/giggle.ogg",
-    "sigh": "sounds/voices/yelena/sigh.ogg",
-    "sigh-content": "sounds/voices/yelena/sigh-content.ogg",
-    "gasp": "sounds/voices/yelena/gasp.ogg",
-    "huff": "sounds/voices/yelena/huff.ogg",
-    "surprised": "sounds/voices/yelena/surprised.ogg",
-    "yawn": "sounds/voices/yelena/yawn.ogg",
-    "aww": "sounds/voices/yelena/aww.ogg",
-    "satisfied": "sounds/voices/yelena/satisfied.ogg"
-  },
-  "catchphrases": {
-    "sweetie": "sounds/voices/yelena/phrase-sweetie.ogg"
-  },
-  "firstLine": "It is an honor to make your acquaintance; I am Yelena Goldvine. Wait, no, that sounded super stiff—may I start over? Oh right, I can literally just do what I want."
+  }
 }

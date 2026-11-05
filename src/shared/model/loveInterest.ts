@@ -92,6 +92,11 @@ export const OutfitSchema = z.object({
   /** Worn only where the content puts her in it, as a cutscene of a society's night does: never offered to the LLM to choose. */
   oneOff: z.boolean().optional(),
   /**
+   * It covers her stomach: drawn in it, the abs her appearance gives her are left out, or they show through the cloth.
+   * Its pregnant form goes by its parent.
+   */
+  coversStomach: z.boolean().optional(),
+  /**
    * Lasts the day: she may be dressed in it as a day begins, and one she changes into in a scene she keeps on after it.
    * Any other is worn for the scene alone. Her usual clothes always last the day; a pregnant outfit goes by its parent.
    */
@@ -522,6 +527,12 @@ export const LoveInterestSchema = z.object({
   birthPictures: z.partialRecord(SkinToneSchema, z.string()).default({}),
   /** Her walking in profile, facing right, in her usual clothes, cut out: she walks across the loading screen of a scene with her. */
   walkSprite: z.string().optional(),
+  /**
+   * Where her head is in that picture, in percent of it: the top of her hair (not ears or headphones) and her chin, down
+   * from its top, and the middle of her head across from its left. The car's window is fitted to it, so that every head
+   * in it is the same size and in the same place, however she was drawn.
+   */
+  walkHead: z.object({ top: z.number().min(0).max(100), chin: z.number().min(0).max(100), x: z.number().min(0).max(100) }).optional(),
   /** The names she would give a child of hers: she suggests the next one not yet used when it is born. */
   childNames: ChildNamesSchema.prefault({}),
   /** She takes something against the Bloom when the game begins, as most women do. She may stop, in a scene, when she chooses to. */

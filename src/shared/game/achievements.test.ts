@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { STATS, type Course, type GameState } from '../model'
-import { ACHIEVEMENTS, HIDDEN_ACHIEVEMENTS, describeAchievement, earnedAtEvent, earnedByBond, earnedInScene, earnedInState } from './achievements'
+import { ACHIEVEMENTS, HIDDEN_ACHIEVEMENTS, TOUR_FLAGS, describeAchievement, earnedAtEvent, earnedByBond, earnedByGuess, earnedByLeaving, earnedInScene, earnedInState } from './achievements'
 import { END_BOND } from './bonds'
 import { toDate } from './calendar'
 import { createInitialState } from './state'
@@ -31,6 +31,43 @@ describe('achievements', () => {
     expect(earnedInState(content, { ...taking, grades: { a: { midterm: grade('A') } } })).not.toContain('aced')
     expect(earnedInState(content, { ...taking, grades: { a: { midterm: grade('A') }, b: { midterm: grade('B') } } })).not.toContain('aced')
     expect(earnedInState(content, { ...taking, grades: { a: { midterm: grade('A') }, b: { midterm: grade('A') } } })).toContain('aced')
+  })
+
+  it('Genius: an A on the midterm and the final of every course, so not before the finals', () => {
+    const taking = { ...start(), courses: [course('a'), course('b')], enrolment: ['a', 'b'] }
+    const midterms = { a: { midterm: grade('A') }, b: { midterm: grade('A') } }
+    expect(earnedInState(content, { ...taking, grades: midterms })).not.toContain('genius')
+    expect(earnedInState(content, { ...taking, grades: { a: { midterm: grade('A'), final: grade('A') }, b: { midterm: grade('A'), final: grade('B') } } })).not.toContain('genius')
+    expect(earnedInState(content, { ...taking, grades: { a: { midterm: grade('A'), final: grade('A') }, b: { midterm: grade('A'), final: grade('A') } } })).toContain('genius')
+  })
+
+  it('Have a Ball and Slime Ball: a masked dancer named, and Lira the only one masked', () => {
+    expect(earnedByGuess(true)).toEqual(['have-a-ball'])
+    expect(earnedByGuess(false)).toEqual([])
+    const ball = (dancers: { id: string; maskId?: string }[]) => earnedInState(content, { ...start(), masquerade: { part: 'ball:dance', dancers, danced: 1, startedAt: 0 } })
+    expect(ball([{ id: 'lira', maskId: 'm1' }, { id: 'stand-in' }])).toContain('slime-ball')
+    expect(ball([{ id: 'lira', maskId: 'm1' }, { id: 'ana', maskId: 'm2' }])).not.toContain('slime-ball')
+    expect(ball([{ id: 'ana', maskId: 'm1' }])).not.toContain('slime-ball')
+  })
+
+  it('Society Secrets: the second of a society\'s special meetings been to', () => {
+    const night = (meeting: number) => ({ meeting, name: '', intro: { speakerId: 'ana', scenes: [] }, direction: '', reserved: [] })
+    const clubs = { ...content, societies: { societies: [{ id: 'club', adultEvents: [night(5), night(2)] }] } } as never
+    const been = (n: number) => ({ ...start(), societyMeetings: Array.from({ length: n }, (_, day) => `club:${day}`) })
+    expect(earnedInState(clubs, been(4))).not.toContain('society-secrets')
+    expect(earnedInState(clubs, been(5))).toContain('society-secrets')
+  })
+
+  it('Good Listener: the opening tutorials all seen through, and none skipped', () => {
+    const seen = { [TOUR_FLAGS.interface]: true, [TOUR_FLAGS.day]: true, [TOUR_FLAGS.courses]: true }
+    expect(earnedInState(content, { ...start(), flags: seen })).toContain('good-listener')
+    expect(earnedInState(content, { ...start(), flags: { ...seen, [TOUR_FLAGS.skipped]: true } })).not.toContain('good-listener')
+    expect(earnedInState(content, { ...start(), flags: { [TOUR_FLAGS.interface]: true, [TOUR_FLAGS.courses]: true } })).not.toContain('good-listener')
+  })
+
+  it("I'm Outta Here: a love interest walked out", () => {
+    expect(earnedByLeaving(content, ['ana'])).toEqual(['im-outta-here'])
+    expect(earnedByLeaving(content, ['someone-else'])).toEqual([])
   })
 
   it('those of who he was intimate with in a scene', () => {
@@ -102,7 +139,7 @@ describe('achievements', () => {
   })
 
   it('the hidden ones are those of what he does in bed, and of the children', () => {
-    expect(HIDDEN_ACHIEVEMENTS).toEqual(['oil-and-water', 'xxxmas', 'forbidden', 'teach-me', 'maid-my-day', 'diplomacy', 'bffs', 'full-house', 'true-sire', 'family-matters'])
+    expect(HIDDEN_ACHIEVEMENTS).toEqual(['oil-and-water', 'xxxmas', 'forbidden', 'teach-me', 'maid-my-day', 'diplomacy', 'bffs', 'full-house', 'true-sire', 'family-matters', 'slime-ball', 'good-listener'])
   })
 
   it('Heartbreaker: what they had is ended', () => {

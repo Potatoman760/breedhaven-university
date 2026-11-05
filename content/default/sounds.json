@@ -296,6 +296,81 @@
       "file": "sounds/ambience/river-night.ogg",
       "volume": 0.45,
       "credit": "Generated with ElevenLabs sound effects"
+    },
+    "brightshore-day": {
+      "file": "sounds/ambience/brightshore-day.ogg",
+      "volume": 0.55,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "brightshore-night": {
+      "file": "sounds/ambience/brightshore-night.ogg",
+      "volume": 0.45,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "fernhollow-day": {
+      "file": "sounds/ambience/fernhollow-day.ogg",
+      "volume": 0.5,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "fernhollow-night": {
+      "file": "sounds/ambience/fernhollow-night.ogg",
+      "volume": 0.45,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "brightshore-cove": {
+      "file": "sounds/ambience/brightshore-cove.ogg",
+      "volume": 0.45,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "fernhollow-lake": {
+      "file": "sounds/ambience/fernhollow-lake.ogg",
+      "volume": 0.45,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "jadewater-deck": {
+      "file": "sounds/ambience/jadewater-deck.ogg",
+      "volume": 0.5,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "jadewater-cabin": {
+      "file": "sounds/ambience/jadewater-cabin.ogg",
+      "volume": 0.4,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "jadewater-cave": {
+      "file": "sounds/ambience/jadewater-cave.ogg",
+      "volume": 0.45,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "coralmere-reef": {
+      "file": "sounds/ambience/coralmere-reef.ogg",
+      "volume": 0.5,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "coralmere-bungalow": {
+      "file": "sounds/ambience/coralmere-bungalow.ogg",
+      "volume": 0.4,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "coralmere-sandbar": {
+      "file": "sounds/ambience/coralmere-sandbar.ogg",
+      "volume": 0.45,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "saffron-lake": {
+      "file": "sounds/ambience/saffron-lake.ogg",
+      "volume": 0.45,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "saffron-rooftop": {
+      "file": "sounds/ambience/saffron-rooftop.ogg",
+      "volume": 0.4,
+      "credit": "Generated with ElevenLabs sound effects"
+    },
+    "saffron-colors": {
+      "file": "sounds/ambience/saffron-colors.ogg",
+      "volume": 0.45,
+      "credit": "Generated with ElevenLabs sound effects"
     }
   },
   "places": {
@@ -387,6 +462,51 @@
     },
     "dawnbloom-house": {
       "day": "dawnbloom"
+    },
+    "brightshore": {
+      "day": "brightshore-day",
+      "night": "brightshore-night",
+      "views": {
+        "beach": "brightshore-day",
+        "boardwalk": "brightshore-night",
+        "cove": "brightshore-cove"
+      }
+    },
+    "fernhollow": {
+      "day": "fernhollow-day",
+      "night": "fernhollow-night",
+      "views": {
+        "trail": "fernhollow-day",
+        "campfire": "fernhollow-night",
+        "lake": "fernhollow-lake"
+      }
+    },
+    "jadewater": {
+      "day": "jadewater-deck",
+      "night": "jadewater-cabin",
+      "views": {
+        "deck": "jadewater-deck",
+        "cabin": "jadewater-cabin",
+        "cave": "jadewater-cave"
+      }
+    },
+    "coralmere": {
+      "day": "coralmere-reef",
+      "night": "coralmere-bungalow",
+      "views": {
+        "reef": "coralmere-reef",
+        "bungalow": "coralmere-bungalow",
+        "sandbar": "coralmere-sandbar"
+      }
+    },
+    "saffron-lake": {
+      "day": "saffron-lake",
+      "night": "saffron-rooftop",
+      "views": {
+        "lake": "saffron-lake",
+        "rooftop": "saffron-rooftop",
+        "colors": "saffron-colors"
+      }
     }
   },
   "poses": {

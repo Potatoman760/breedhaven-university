@@ -380,6 +380,134 @@
       "pregnant": false,
       "oneOff": true,
       "babyTone": "dark"
+    },
+    {
+      "id": "swimsuit",
+      "name": "Swimsuit",
+      "description": "a lavender bikini trimmed with black, and little pink cat-ear clips in her hair",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/swimsuit-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "Swimsuit, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "swimsuit",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/swimsuit-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "ao-dai",
+      "name": "Ao dai",
+      "description": "a fitted lavender silk Vietnamese ao dai: a long close-fitting tunic of thick opaque silk, following her figure but lying smooth and unbroken over her stomach, with a high mandarin collar, long sleeves and side slits up to the waist, embroidered with small white plum blossoms, worn over loose flowing white silk trousers",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/ao-dai-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "Ao dai, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "ao-dai",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/ao-dai-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sari",
+      "name": "Sari",
+      "description": "a traditional lavender silk sari with a silver woven border, the pallu draped over one shoulder, worn with a matching short fitted blouse, and thin silver bangles",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/sari-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "Sari, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sari",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/sari-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "holi",
+      "name": "Festival whites",
+      "description": "a simple, loose-fitting white cotton kurta tunic of thick opaque cotton, hanging straight and loose from her chest to her knees and hiding her stomach completely, over loose white cotton trousers, with a thin lavender scarf, the clothes, her arms and her cheeks splashed and smeared with bright pink, yellow, green and blue festival color powder",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/holi-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "Festival whites, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "holi",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/holi-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sarong",
+      "name": "Sarong",
+      "description": "a long lavender silk sarong printed with large silver and white tropical hibiscus flowers, wrapped around her body and knotted at one shoulder as a one-shoulder dress, the thick opaque fabric hanging loose and smooth from her chest, hiding her stomach completely, falling to mid-calf with a slit at one side, and a white plumeria flower behind one ear",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/sarong-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "Sarong, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sarong",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/sarong-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -594,6 +722,21 @@
       }
     ]
   },
+  "reactions": {
+    "giggle": "sounds/voices/elowen/giggle.ogg",
+    "sigh": "sounds/voices/elowen/sigh.ogg",
+    "sigh-content": "sounds/voices/elowen/sigh-content.ogg",
+    "gasp": "sounds/voices/elowen/gasp.ogg",
+    "huff": "sounds/voices/elowen/huff.ogg",
+    "surprised": "sounds/voices/elowen/surprised.ogg",
+    "yawn": "sounds/voices/elowen/yawn.ogg",
+    "aww": "sounds/voices/elowen/aww.ogg",
+    "satisfied": "sounds/voices/elowen/satisfied.ogg"
+  },
+  "catchphrases": {
+    "player two": "sounds/voices/elowen/phrase-player-two.ogg"
+  },
+  "firstLine": "Oh my gosh, hi! I'm Elowen. Not gonna lie, it's giving main character energy right now—what's your build, are you even real?",
   "schedule": [
     {
       "weekdays": [
@@ -657,6 +800,11 @@
     "dark": "sprites/elowen/birth-dark.webp"
   },
   "walkSprite": "sprites/elowen/walk-cutout.webp",
+  "walkHead": {
+    "top": 4.5,
+    "chin": 27,
+    "x": 49.2
+  },
   "childNames": {
     "daughters": [
       "Kerra",
@@ -685,20 +833,5 @@
     "knowledge": [],
     "secrets": [],
     "extraInstructions": ""
-  },
-  "reactions": {
-    "giggle": "sounds/voices/elowen/giggle.ogg",
-    "sigh": "sounds/voices/elowen/sigh.ogg",
-    "sigh-content": "sounds/voices/elowen/sigh-content.ogg",
-    "gasp": "sounds/voices/elowen/gasp.ogg",
-    "huff": "sounds/voices/elowen/huff.ogg",
-    "surprised": "sounds/voices/elowen/surprised.ogg",
-    "yawn": "sounds/voices/elowen/yawn.ogg",
-    "aww": "sounds/voices/elowen/aww.ogg",
-    "satisfied": "sounds/voices/elowen/satisfied.ogg"
-  },
-  "catchphrases": {
-    "player two": "sounds/voices/elowen/phrase-player-two.ogg"
-  },
-  "firstLine": "Oh my gosh, hi! I'm Elowen. Not gonna lie, it's giving main character energy right now—what's your build, are you even real?"
+  }
 }

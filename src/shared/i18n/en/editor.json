@@ -459,7 +459,6 @@
   "sprites.spriteName": "Sprite name",
   "sprites.spriteDescription": "Sprite description",
   "sprites.addOutfit": "Add an outfit",
-  "sprites.addBathrobe": "Add a bathrobe for the trip",
   "sprites.nsfw": "NSFW",
   "sprites.manTone": "Skin tone of the man",
   "sprites.manToneTip": "The sex-acts drawn with a man of this skin. A player of this tone sees these, act by act, and the light ones for any act that has none here.",
@@ -619,5 +618,9 @@
   "characters.graduate": "Graduate",
   "characters.givesJob": "{name} gives the job of {job}, and is at {place} for exactly its shifts: {shifts}. Those hours come from the job and are not set here.",
   "characters.thisCharacter": "This character",
-  "characters.scheduleBefore": "Classes and plans with the player come before all of them."
+  "characters.scheduleBefore": "Classes and plans with the player come before all of them.",
+  "sprites.eventOutfits": "Event outfits ({count})",
+  "sprites.addEventOutfit": "Add {name}",
+  "sprites.coversStomach": "Covers her stomach",
+  "sprites.coversStomachTitle": "Her pictures in it are drawn without the abs her appearance gives her"
 }

@@ -130,7 +130,9 @@ export const MomentLinesRequestSchema = z.object({
   state: GameStateSchema,
   ids: z.array(z.string()).min(1).max(3),
   moment: z.enum(MOMENTS),
-  history: z.array(z.object({ speaker: z.string(), text: z.string() })).default([])
+  history: z.array(z.object({ speaker: z.string(), text: z.string() })).default([]),
+  /** For a moment of a trip: which, by its event's id. */
+  tripId: z.string().optional()
 })
 export type MomentLinesRequest = z.input<typeof MomentLinesRequestSchema>
 

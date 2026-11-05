@@ -37,7 +37,17 @@ export const SoundsSchema = z.object({
   /** Lines written ahead and recorded in the speaker's voice, by `lineKey`: the file of each. Written by `scripts/voice-lines.ts`. */
   lines: z.record(z.string(), z.string()).default({}),
   /** Which ambience plays at each location, by location id: by day, and by night if it differs. A place left out is silent. */
-  places: z.record(z.string(), z.object({ day: z.string(), night: z.string().optional() })).default({}),
+  places: z
+    .record(
+      z.string(),
+      z.object({
+        day: z.string(),
+        night: z.string().optional(),
+        /** A loop of its own for a scene in one of its views, by the view's id, whatever the hour: the cove at dawn. */
+        views: z.record(z.string(), z.string()).optional()
+      })
+    )
+    .default({}),
   /** What plays while an NSFW pose is up in a scene, by the id of the pose (one drawn pregnant plays its base pose's). */
   poses: z.record(z.string(), PoseSoundSchema).default({})
 })

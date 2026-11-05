@@ -376,6 +376,134 @@
       "pregnant": false,
       "oneOff": true,
       "babyTone": "medium"
+    },
+    {
+      "id": "swimsuit",
+      "name": "Swimsuit",
+      "description": "rimless rectangular glasses; a charcoal-gray one-piece swimsuit with a high neck and an open back",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/swimsuit-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "Swimsuit, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "swimsuit",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/swimsuit-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "ao-dai",
+      "name": "Ao dai",
+      "description": "rimless rectangular glasses; a traditional pure white silk Vietnamese ao dai: a long close-fitting tunic of thick opaque silk, following her figure but lying smooth and unbroken over her stomach, with a high mandarin collar, long sleeves and side slits up to the waist, plain and unadorned, worn over loose flowing pure white silk trousers",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/ao-dai-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "Ao dai, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "ao-dai",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/ao-dai-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sari",
+      "name": "Sari",
+      "description": "a traditional ivory silk sari with a silver woven border, the pallu draped over one shoulder, worn with a matching short fitted blouse, and thin silver bangles",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/sari-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "Sari, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sari",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/sari-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "holi",
+      "name": "Festival whites",
+      "description": "a simple, loose-fitting white cotton kurta tunic of thick opaque cotton, hanging straight and loose from her chest to her knees and hiding her stomach completely, over loose white cotton trousers, with a thin ivory scarf, the clothes, her arms and her cheeks splashed and smeared with bright pink, yellow, green and blue festival color powder",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/holi-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "Festival whites, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "holi",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/holi-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sarong",
+      "name": "Sarong",
+      "description": "a long ivory silk sarong printed with large silver and white tropical hibiscus flowers, wrapped around her body under her arms as a strapless dress knotted above her chest, the thick opaque fabric hanging loose and smooth from her chest, hiding her stomach completely, falling to mid-calf, her shoulders bare, and a single white hibiscus flower in her hair",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/sarong-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "Sarong, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sarong",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/sarong-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -487,112 +615,6 @@
       "loop": true
     }
   ],
-  "schedule": [
-    {
-      "weekdays": [
-        "Saturday"
-      ],
-      "periods": [
-        "morning"
-      ],
-      "locationId": "riverside-park"
-    },
-    {
-      "weekdays": [
-        "Sunday"
-      ],
-      "periods": [
-        "afternoon"
-      ],
-      "locationId": "spell-and-sip"
-    },
-    {
-      "weekdays": [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday"
-      ],
-      "periods": [
-        "morning",
-        "afternoon"
-      ],
-      "locationId": "health-centre"
-    },
-    {
-      "weekdays": [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday"
-      ],
-      "periods": [
-        "evening"
-      ],
-      "locationId": "library"
-    },
-    {
-      "periods": [
-        "night"
-      ],
-      "locationId": "lantern-row"
-    }
-  ],
-  "room": {
-    "name": "her apartment above Petal & Pill",
-    "description": "A bare, bright flat over the pharmacy: journals in stacks on the floor, one good chair, a very expensive coffee machine, a whiteboard where a picture should be, and a bed she treats as a place to read.",
-    "locationId": "lantern-row",
-    "images": {
-      "day": "generated/backgrounds/ottilie/view-5.webp"
-    }
-  },
-  "skinTone": "light",
-  "birthPictures": {
-    "light": "sprites/ottilie/birth-light.webp",
-    "medium": "sprites/ottilie/birth-medium.webp"
-  },
-  "walkSprite": "sprites/ottilie/walk-cutout.webp",
-  "childNames": {
-    "daughters": [
-      "Beatrix",
-      "Cordelia",
-      "Henrietta",
-      "Florence",
-      "Winifred"
-    ],
-    "sons": [
-      "Edmund",
-      "Ambrose"
-    ]
-  },
-  "birthControl": true,
-  "ai": {
-    "speechPattern": "Precise, quick and unsentimental. Short declarative sentences and exact words. Asks direct questions, often clinical ones, and waits for the answer. Dry humor delivered with no change of expression.",
-    "tone": "cool, exact, dry",
-    "verbalQuirks": [
-      "Corrects loose wording: \"fertile\" is not \"virile\", \"instinct\" is not \"compulsion\".",
-      "Says \"interesting\" when she means it and nothing at all when she does not.",
-      "Explains her own feelings as observations: \"My pulse is up. That will be you.\"",
-      "Calls {player} 'my True Sire' once they are at the Dating stage or beyond, as though it were a clinical term"
-    ],
-    "exampleDialogue": [],
-    "backstory": "Post: Reader in Sire Genetics, College of Life Sciences and Agriculture; head of the fertility lab at the Reproductive Health Center\n\nOttilie Marrow has spent fifteen years on one question: why only one man in ten is fertile, and what Bloom-resonance actually is. Her lab runs the University's Sire Assays. She is a Freewill woman on scientific grounds: she has measured what the Bloom does to judgement and thinks anyone who calls that sacred has not looked at the data. She opposes the national Sire Registry in print and yet uses its figures every day\n\nShe grew up in a household of four mothers and a Sire father who was treated, as she puts it, like the good china. She has never formed a household of her own and says she has not had the time.\n\nHer magic is a diagnostician's: she can feel a pulse, a temperature or a hormone surge across a room, her own included, which she finds more irritating than useful.",
-    "knowledge": [],
-    "secrets": [
-      {
-        "text": "She knows who leaked the record assay, or is nearly sure: someone on the Registry side, not the University. She has told nobody because she cannot prove it.",
-        "revealWhen": [
-          {
-            "type": "stage",
-            "min": "dating"
-          }
-        ]
-      }
-    ],
-    "extraInstructions": " Do not make her cold for its own sake: she is curious, honest and awkward about tenderness."
-  },
   "tonedAnimations": {
     "medium": [
       {
@@ -725,5 +747,116 @@
   "catchphrases": {
     "my True Sire": "sounds/voices/ottilie/phrase-my-true-sire.ogg"
   },
-  "firstLine": "I'm Dr. Ottilie Marrow. Your resting heart rate is visibly elevated—an understandable stress response, not a defect. Interesting."
+  "firstLine": "I'm Dr. Ottilie Marrow. Your resting heart rate is visibly elevated—an understandable stress response, not a defect. Interesting.",
+  "schedule": [
+    {
+      "weekdays": [
+        "Saturday"
+      ],
+      "periods": [
+        "morning"
+      ],
+      "locationId": "riverside-park"
+    },
+    {
+      "weekdays": [
+        "Sunday"
+      ],
+      "periods": [
+        "afternoon"
+      ],
+      "locationId": "spell-and-sip"
+    },
+    {
+      "weekdays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "periods": [
+        "morning",
+        "afternoon"
+      ],
+      "locationId": "health-centre"
+    },
+    {
+      "weekdays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "periods": [
+        "evening"
+      ],
+      "locationId": "library"
+    },
+    {
+      "periods": [
+        "night"
+      ],
+      "locationId": "lantern-row"
+    }
+  ],
+  "room": {
+    "name": "her apartment above Petal & Pill",
+    "description": "A bare, bright flat over the pharmacy: journals in stacks on the floor, one good chair, a very expensive coffee machine, a whiteboard where a picture should be, and a bed she treats as a place to read.",
+    "locationId": "lantern-row",
+    "images": {
+      "day": "generated/backgrounds/ottilie/view-5.webp"
+    }
+  },
+  "skinTone": "light",
+  "birthPictures": {
+    "light": "sprites/ottilie/birth-light.webp",
+    "medium": "sprites/ottilie/birth-medium.webp"
+  },
+  "walkSprite": "sprites/ottilie/walk-cutout.webp",
+  "walkHead": {
+    "top": 2.5,
+    "chin": 21.5,
+    "x": 48.6
+  },
+  "childNames": {
+    "daughters": [
+      "Beatrix",
+      "Cordelia",
+      "Henrietta",
+      "Florence",
+      "Winifred"
+    ],
+    "sons": [
+      "Edmund",
+      "Ambrose"
+    ]
+  },
+  "birthControl": true,
+  "ai": {
+    "speechPattern": "Precise, quick and unsentimental. Short declarative sentences and exact words. Asks direct questions, often clinical ones, and waits for the answer. Dry humor delivered with no change of expression.",
+    "tone": "cool, exact, dry",
+    "verbalQuirks": [
+      "Corrects loose wording: \"fertile\" is not \"virile\", \"instinct\" is not \"compulsion\".",
+      "Says \"interesting\" when she means it and nothing at all when she does not.",
+      "Explains her own feelings as observations: \"My pulse is up. That will be you.\"",
+      "Calls {player} 'my True Sire' once they are at the Dating stage or beyond, as though it were a clinical term"
+    ],
+    "exampleDialogue": [],
+    "backstory": "Post: Reader in Sire Genetics, College of Life Sciences and Agriculture; head of the fertility lab at the Reproductive Health Center\n\nOttilie Marrow has spent fifteen years on one question: why only one man in ten is fertile, and what Bloom-resonance actually is. Her lab runs the University's Sire Assays. She is a Freewill woman on scientific grounds: she has measured what the Bloom does to judgement and thinks anyone who calls that sacred has not looked at the data. She opposes the national Sire Registry in print and yet uses its figures every day\n\nShe grew up in a household of four mothers and a Sire father who was treated, as she puts it, like the good china. She has never formed a household of her own and says she has not had the time.\n\nHer magic is a diagnostician's: she can feel a pulse, a temperature or a hormone surge across a room, her own included, which she finds more irritating than useful.",
+    "knowledge": [],
+    "secrets": [
+      {
+        "text": "She knows who leaked the record assay, or is nearly sure: someone on the Registry side, not the University. She has told nobody because she cannot prove it.",
+        "revealWhen": [
+          {
+            "type": "stage",
+            "min": "dating"
+          }
+        ]
+      }
+    ],
+    "extraInstructions": " Do not make her cold for its own sake: she is curious, honest and awkward about tenderness."
+  }
 }

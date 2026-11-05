@@ -1,5 +1,6 @@
 import type { ContentPack, GameState } from '../model'
 import { readLines, type BanterLine } from './banter'
+import { allEvents } from './events'
 import { stageFor } from './relationships'
 import { t, type MessageKey } from '../i18n'
 
@@ -23,14 +24,16 @@ const SETTING: Record<Moment, { where: MessageKey; about: MessageKey; tone: Mess
   'drive-home': { where: 'llm.momentLines.driveHome.where', about: 'llm.momentLines.driveHome.about', tone: 'llm.momentLines.driveHome.tone' }
 }
 
-/** The prompt asking for the lines. */
-export function buildMomentPrompt(content: ContentPack, state: GameState, ids: string[], moment: Moment, history: { speaker: string; text: string }[] = []): { system: string; user: string } {
+/** The prompt asking for the lines: for a moment of a trip, of the trip by its event's id. */
+export function buildMomentPrompt(content: ContentPack, state: GameState, ids: string[], moment: Moment, history: { speaker: string; text: string }[] = [], tripId?: string): { system: string; user: string } {
   const player = state.player.name
+  const trip = allEvents(content, state).find((event) => event.id === tripId)
+  const place = content.locations.find((location) => location.id === trip?.locationId)
   const women = ids.flatMap((id) => content.loveInterests.find((li) => li.id === id) ?? [])
   const names = women.map((li) => firstName(li.name))
   const many = women.length > 1
   const both = names.join(t('llm.momentLines.and'))
-  const said = { player, names: both, many }
+  const said = { player, names: both, many, trip: trip?.name ?? '', place: place?.name ?? '', summary: trip?.summary ?? '', days: trip?.durationDays ?? 1, air: trip?.travel === 'airship' }
   const setting = { where: t(SETTING[moment].where, said), about: t(SETTING[moment].about, said), tone: t(SETTING[moment].tone, said) }
   const system = [
     t('llm.momentLines.systemRole', { where: setting.where }),

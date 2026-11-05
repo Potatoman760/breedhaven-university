@@ -655,7 +655,8 @@
           "onTrip": true
         }
       ],
-      "homeAt": 18
+      "homeAt": 18,
+      "summary": "a hot-spring spa town in the wooded hills"
     },
     {
       "id": "first-frost",

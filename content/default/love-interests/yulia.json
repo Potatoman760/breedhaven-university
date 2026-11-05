@@ -381,6 +381,134 @@
       "pregnant": false,
       "oneOff": true,
       "babyTone": "medium"
+    },
+    {
+      "id": "swimsuit",
+      "name": "Swimsuit",
+      "description": "a bubblegum-pink high-cut bikini",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/swimsuit-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "Swimsuit, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "swimsuit",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/swimsuit-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "ao-dai",
+      "name": "Ao dai",
+      "description": "a fitted bubblegum-pink silk Vietnamese ao dai: a long close-fitting tunic of thick opaque silk, following her figure but lying smooth and unbroken over her stomach, with a high mandarin collar, long sleeves and side slits up to the waist, embroidered with small white blossoms, worn over loose flowing white silk trousers",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/ao-dai-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "Ao dai, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "ao-dai",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/ao-dai-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sari",
+      "name": "Sari",
+      "description": "a traditional bubblegum-pink silk sari with a silver woven border, the pallu draped over one shoulder, worn with a matching short fitted blouse, and thin silver bangles",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/sari-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "Sari, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sari",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/sari-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "holi",
+      "name": "Festival whites",
+      "description": "a simple white cotton kurta tunic and loose white cotton trousers with a thin bubblegum-pink scarf, the clothes, her arms and her cheeks splashed and smeared with bright pink, yellow, green and blue festival color powder",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/holi-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "Festival whites, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "holi",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/holi-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sarong",
+      "name": "Sarong",
+      "description": "a long bubblegum-pink silk sarong printed with large silver and white tropical hibiscus flowers, wrapped around her body and tied behind her neck as a halter dress, the thick opaque fabric hanging loose and smooth from her chest, hiding her stomach completely, falling to mid-calf, her shoulders bare, and a lei of fresh white and pink plumeria flowers around her neck",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/sarong-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "Sarong, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sarong",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/sarong-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -478,96 +606,6 @@
       "loop": true
     }
   ],
-  "schedule": [
-    {
-      "weekdays": [
-        "Tuesday",
-        "Wednesday",
-        "Thursday"
-      ],
-      "periods": [
-        "morning"
-      ],
-      "locationId": "lecture-halls"
-    },
-    {
-      "weekdays": [
-        "Tuesday",
-        "Wednesday"
-      ],
-      "periods": [
-        "afternoon"
-      ],
-      "locationId": "foundry"
-    },
-    {
-      "periods": [
-        "evening"
-      ],
-      "locationId": "honeyed-bee-inn"
-    },
-    {
-      "weekdays": [
-        "Saturday",
-        "Sunday"
-      ],
-      "periods": [
-        "night"
-      ],
-      "locationId": "undergrowth"
-    },
-    {
-      "weekdays": [
-        "Monday"
-      ],
-      "periods": [
-        "afternoon"
-      ],
-      "locationId": "market"
-    }
-  ],
-  "room": {
-    "name": "an apartment above Byte & Bloom on Lantern Row",
-    "description": "A studio apartment, small and cluttered and lit by strings of colored charms. The bed is unmade and heaped with cushions and coats. A shelf holds half-dead houseplants, a speaker stack, and a tray of vials and powders beside a cracked mirror. The window stands open to the street noise and the lantern-light, and the air smells of perfume and smoke.",
-    "locationId": "lantern-row",
-    "images": {
-      "day": "generated/backgrounds/yulia/view.webp"
-    }
-  },
-  "skinTone": "light",
-  "birthPictures": {
-    "light": "sprites/yulia/birth-light.webp",
-    "medium": "sprites/yulia/birth-medium.webp"
-  },
-  "walkSprite": "sprites/yulia/walk-cutout.webp",
-  "childNames": {
-    "daughters": [
-      "Saga",
-      "Ingrid",
-      "Liv",
-      "Svea",
-      "Runa"
-    ],
-    "sons": [
-      "Joven",
-      "Torvald"
-    ]
-  },
-  "birthControl": true,
-  "ai": {
-    "speechPattern": "She talks fast and loose, dropping contractions and trailing off into laughs. She code-switches between normal and valley girl when excited or angry, slipping in words nobody else uses. She asks questions she already knows the answers to, because she likes hearing people talk.",
-    "tone": "Loud, teasing, careless, warm.",
-    "verbalQuirks": [
-      "Calls everyone 'babe'  regardless of how well she knows them",
-      "Clicks her tongue when she thinks someone is lying",
-      "Says 'that's so Breedhaven' as a gentle tease about anything dull or proper"
-    ],
-    "exampleDialogue": [],
-    "backstory": "Yulia grew up in Hjalmark, a wind-bitten university town in the northern Starkelands, where the magic is older and rougher and the winters are six months long. Her mother is an elemental surveyor who maps storm-lines across the tundra; her older sister followed the same path. Yulia was the disappointment who preferred house parties to fieldwork and got through school on charm and last-minute cramming.\n\nShe transferred to Breedhaven University in her third year, nominally to finish her Magical Engineering degree at a better-equipped college, really because her mother told her to stop embarrassing the family in Hjalmark. The Starkelands are poorer and colder than Breedhaven, and Yulia arrived in Seedblossom with two bags, a fake ID that fooled nobody, and a determination to find out what a rich country feels like from the inside.\n\nShe rents a studio above Byte & Bloom, works the occasional bar shift at the Undergrowth when rent is due, and has built a wide and shallow network of friends across every college. She takes recreational drugs the way other students take coffee: openly, often, and with strong opinions about which alchemist does the best work. The Bloom pulls at her the way it pulls at every woman, and she handles it by not handling it, by staying out late and staying close to whoever is closest.",
-    "knowledge": [],
-    "secrets": [],
-    "extraInstructions": "Play her as genuinely fun, not as a joke. She is careless, not stupid, and she notices more than she lets on. Let her Starklandish pride surface when someone assumes she is just a pretty face. She should flirt as easily as breathing but go still and quiet if someone is actually kind to her without wanting something."
-  },
   "tonedAnimations": {
     "medium": [
       {
@@ -701,5 +739,100 @@
     "babe": "sounds/voices/yulia/phrase-babe.ogg",
     "that's so Breedhaven": "sounds/voices/yulia/phrase-that-s-so-breedhaven.ogg"
   },
-  "firstLine": "Whoa, hold up—an actual boy, and you're not even hiding? Look at you being all polite, that's so Breedhaven! I'm Yulia Starkfelt, babe, and you're about to have way more fun."
+  "firstLine": "Whoa, hold up—an actual boy, and you're not even hiding? Look at you being all polite, that's so Breedhaven! I'm Yulia Starkfelt, babe, and you're about to have way more fun.",
+  "schedule": [
+    {
+      "weekdays": [
+        "Tuesday",
+        "Wednesday",
+        "Thursday"
+      ],
+      "periods": [
+        "morning"
+      ],
+      "locationId": "lecture-halls"
+    },
+    {
+      "weekdays": [
+        "Tuesday",
+        "Wednesday"
+      ],
+      "periods": [
+        "afternoon"
+      ],
+      "locationId": "foundry"
+    },
+    {
+      "periods": [
+        "evening"
+      ],
+      "locationId": "honeyed-bee-inn"
+    },
+    {
+      "weekdays": [
+        "Saturday",
+        "Sunday"
+      ],
+      "periods": [
+        "night"
+      ],
+      "locationId": "undergrowth"
+    },
+    {
+      "weekdays": [
+        "Monday"
+      ],
+      "periods": [
+        "afternoon"
+      ],
+      "locationId": "market"
+    }
+  ],
+  "room": {
+    "name": "an apartment above Byte & Bloom on Lantern Row",
+    "description": "A studio apartment, small and cluttered and lit by strings of colored charms. The bed is unmade and heaped with cushions and coats. A shelf holds half-dead houseplants, a speaker stack, and a tray of vials and powders beside a cracked mirror. The window stands open to the street noise and the lantern-light, and the air smells of perfume and smoke.",
+    "locationId": "lantern-row",
+    "images": {
+      "day": "generated/backgrounds/yulia/view.webp"
+    }
+  },
+  "skinTone": "light",
+  "birthPictures": {
+    "light": "sprites/yulia/birth-light.webp",
+    "medium": "sprites/yulia/birth-medium.webp"
+  },
+  "walkSprite": "sprites/yulia/walk-cutout.webp",
+  "walkHead": {
+    "top": 2.5,
+    "chin": 21,
+    "x": 51.1
+  },
+  "childNames": {
+    "daughters": [
+      "Saga",
+      "Ingrid",
+      "Liv",
+      "Svea",
+      "Runa"
+    ],
+    "sons": [
+      "Joven",
+      "Torvald"
+    ]
+  },
+  "birthControl": true,
+  "ai": {
+    "speechPattern": "She talks fast and loose, dropping contractions and trailing off into laughs. She code-switches between normal and valley girl when excited or angry, slipping in words nobody else uses. She asks questions she already knows the answers to, because she likes hearing people talk.",
+    "tone": "Loud, teasing, careless, warm.",
+    "verbalQuirks": [
+      "Calls everyone 'babe'  regardless of how well she knows them",
+      "Clicks her tongue when she thinks someone is lying",
+      "Says 'that's so Breedhaven' as a gentle tease about anything dull or proper"
+    ],
+    "exampleDialogue": [],
+    "backstory": "Yulia grew up in Hjalmark, a wind-bitten university town in the northern Starkelands, where the magic is older and rougher and the winters are six months long. Her mother is an elemental surveyor who maps storm-lines across the tundra; her older sister followed the same path. Yulia was the disappointment who preferred house parties to fieldwork and got through school on charm and last-minute cramming.\n\nShe transferred to Breedhaven University in her third year, nominally to finish her Magical Engineering degree at a better-equipped college, really because her mother told her to stop embarrassing the family in Hjalmark. The Starkelands are poorer and colder than Breedhaven, and Yulia arrived in Seedblossom with two bags, a fake ID that fooled nobody, and a determination to find out what a rich country feels like from the inside.\n\nShe rents a studio above Byte & Bloom, works the occasional bar shift at the Undergrowth when rent is due, and has built a wide and shallow network of friends across every college. She takes recreational drugs the way other students take coffee: openly, often, and with strong opinions about which alchemist does the best work. The Bloom pulls at her the way it pulls at every woman, and she handles it by not handling it, by staying out late and staying close to whoever is closest.",
+    "knowledge": [],
+    "secrets": [],
+    "extraInstructions": "Play her as genuinely fun, not as a joke. She is careless, not stupid, and she notices more than she lets on. Let her Starklandish pride surface when someone assumes she is just a pretty face. She should flirt as easily as breathing but go still and quiet if someone is actually kind to her without wanting something."
+  }
 }

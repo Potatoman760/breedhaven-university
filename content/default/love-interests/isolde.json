@@ -377,6 +377,134 @@
       "pregnant": false,
       "oneOff": true,
       "babyTone": "dark"
+    },
+    {
+      "id": "swimsuit",
+      "name": "Swimsuit",
+      "description": "a slate-green halter bikini trimmed with ivory piping",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/isolde/swimsuit-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "Swimsuit, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "swimsuit",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/isolde/swimsuit-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "ao-dai",
+      "name": "Ao dai",
+      "description": "a fitted slate-green silk Vietnamese ao dai: a long close-fitting tunic of thick opaque silk, following her figure but lying smooth and unbroken over her stomach, with a high mandarin collar, long sleeves and side slits up to the waist, with ivory piping at the collar, worn over loose flowing ivory silk trousers",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/isolde/ao-dai-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "Ao dai, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "ao-dai",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/isolde/ao-dai-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sari",
+      "name": "Sari",
+      "description": "a traditional slate-green silk sari with a ivory woven border, the pallu draped over one shoulder, worn with a matching short fitted blouse, and thin ivory bangles",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/isolde/sari-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "Sari, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sari",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/isolde/sari-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "holi",
+      "name": "Festival whites",
+      "description": "a simple, loose-fitting white cotton kurta tunic of thick opaque cotton, hanging straight and loose from her chest to her knees and hiding her stomach completely, over loose white cotton trousers, with a thin slate-green scarf, the clothes, her arms and her cheeks splashed and smeared with bright pink, yellow, green and blue festival color powder",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/isolde/holi-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "Festival whites, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "holi",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/isolde/holi-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sarong",
+      "name": "Sarong",
+      "description": "a long slate-green silk sarong printed with large ivory and white tropical hibiscus flowers, wrapped around her body under her arms as a strapless dress knotted above her chest, the thick opaque fabric hanging loose and smooth from her chest, hiding her stomach completely, falling to mid-calf, her shoulders bare, and a single white hibiscus flower in her hair",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/isolde/sarong-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "Sarong, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sarong",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/isolde/sarong-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -480,74 +608,6 @@
       "loop": true
     }
   ],
-  "schedule": [
-    {
-      "periods": [
-        "morning"
-      ],
-      "locationId": "spell-and-sip"
-    },
-    {
-      "periods": [
-        "afternoon"
-      ],
-      "locationId": "library"
-    },
-    {
-      "periods": [
-        "evening"
-      ],
-      "locationId": "commons"
-    },
-    {
-      "periods": [
-        "night"
-      ],
-      "locationId": "lantern-row"
-    }
-  ],
-  "room": {
-    "name": "a study-bedroom on Lantern Row",
-    "description": "A rented room that is more study than bedroom: a wide desk under two screens and a wall of modern art, shelves in strict order, and a posh modern bed",
-    "locationId": "lantern-row",
-    "images": {
-      "day": "generated/backgrounds/isolde/view-4.webp"
-    }
-  },
-  "skinTone": "medium",
-  "birthPictures": {
-    "medium": "sprites/isolde/birth-medium.webp",
-    "dark": "sprites/isolde/birth-dark.webp"
-  },
-  "walkSprite": "sprites/isolde/walk-cutout.webp",
-  "childNames": {
-    "daughters": [
-      "Vivienne",
-      "Odette",
-      "Elise",
-      "Lucienne",
-      "Margaux"
-    ],
-    "sons": [
-      "Tristan",
-      "Lucan"
-    ]
-  },
-  "birthControl": true,
-  "ai": {
-    "speechPattern": "Professional and composed, with frequent innuendo that also makes sense as work talk",
-    "tone": "composed, dry, suggestive",
-    "verbalQuirks": [
-      "Says something that is plainly innuendo in the flat voice of a seminar, and never acknowledges it.",
-      "Corrects an imprecise word, politely, before going on.",
-      "Calls {player} 'my baby' once they are at the Dating stage or beyond, in the same flat seminar voice"
-    ],
-    "exampleDialogue": [],
-    "backstory": "Post: Teaching assistant for first-year statistics\n\nIsolde Verrane was the best student of her year and stayed on to write a thesis on how households of four and five adults actually share money. She is rarely seen without a leather folio under one arm, with a tablet inside it and a spreadsheet open on that. She pays her rent by teaching first-years statistics and marking their problem sets, and can tell from one look at a set of accounts who in a household is carrying whom. She explains everything through real cases.\n\nShe is professional to a fault and flirts in innuendo so dry that half of it is missed. Being listened to matters to her as much as being admired.\n\nHer magic is small and orderly: tea that stays hot, ink that dries when told, and a knack for feeling that a column of figures is wrong before she has found the error.",
-    "knowledge": [],
-    "secrets": [],
-    "extraInstructions": ""
-  },
   "tonedAnimations": {
     "medium": [
       {
@@ -680,5 +740,78 @@
   "catchphrases": {
     "my baby": "sounds/voices/isolde/phrase-my-baby.ogg"
   },
-  "firstLine": "Isolde Verrane, Public Administration. I specialize in maximizing output from severely limited supply—and before you ask, I am referring to fiscal modeling, though the principle is versatile."
+  "firstLine": "Isolde Verrane, Public Administration. I specialize in maximizing output from severely limited supply—and before you ask, I am referring to fiscal modeling, though the principle is versatile.",
+  "schedule": [
+    {
+      "periods": [
+        "morning"
+      ],
+      "locationId": "spell-and-sip"
+    },
+    {
+      "periods": [
+        "afternoon"
+      ],
+      "locationId": "library"
+    },
+    {
+      "periods": [
+        "evening"
+      ],
+      "locationId": "commons"
+    },
+    {
+      "periods": [
+        "night"
+      ],
+      "locationId": "lantern-row"
+    }
+  ],
+  "room": {
+    "name": "a study-bedroom on Lantern Row",
+    "description": "A rented room that is more study than bedroom: a wide desk under two screens and a wall of modern art, shelves in strict order, and a posh modern bed",
+    "locationId": "lantern-row",
+    "images": {
+      "day": "generated/backgrounds/isolde/view-4.webp"
+    }
+  },
+  "skinTone": "medium",
+  "birthPictures": {
+    "medium": "sprites/isolde/birth-medium.webp",
+    "dark": "sprites/isolde/birth-dark.webp"
+  },
+  "walkSprite": "sprites/isolde/walk-cutout.webp",
+  "walkHead": {
+    "top": 5,
+    "chin": 24.5,
+    "x": 46.9
+  },
+  "childNames": {
+    "daughters": [
+      "Vivienne",
+      "Odette",
+      "Elise",
+      "Lucienne",
+      "Margaux"
+    ],
+    "sons": [
+      "Tristan",
+      "Lucan"
+    ]
+  },
+  "birthControl": true,
+  "ai": {
+    "speechPattern": "Professional and composed, with frequent innuendo that also makes sense as work talk",
+    "tone": "composed, dry, suggestive",
+    "verbalQuirks": [
+      "Says something that is plainly innuendo in the flat voice of a seminar, and never acknowledges it.",
+      "Corrects an imprecise word, politely, before going on.",
+      "Calls {player} 'my baby' once they are at the Dating stage or beyond, in the same flat seminar voice"
+    ],
+    "exampleDialogue": [],
+    "backstory": "Post: Teaching assistant for first-year statistics\n\nIsolde Verrane was the best student of her year and stayed on to write a thesis on how households of four and five adults actually share money. She is rarely seen without a leather folio under one arm, with a tablet inside it and a spreadsheet open on that. She pays her rent by teaching first-years statistics and marking their problem sets, and can tell from one look at a set of accounts who in a household is carrying whom. She explains everything through real cases.\n\nShe is professional to a fault and flirts in innuendo so dry that half of it is missed. Being listened to matters to her as much as being admired.\n\nHer magic is small and orderly: tea that stays hot, ink that dries when told, and a knack for feeling that a column of figures is wrong before she has found the error.",
+    "knowledge": [],
+    "secrets": [],
+    "extraInstructions": ""
+  }
 }

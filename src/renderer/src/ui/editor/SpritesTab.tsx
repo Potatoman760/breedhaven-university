@@ -39,6 +39,14 @@ const CLIPS_BATCH = '(clips)'
 // What the run that makes her pictures smaller is filed under.
 const OPTIMIZE_BATCH = '(optimize)'
 
+// The outfits the game puts a woman in, ready to be added and drawn: the bathrobe at the springs, the swimsuit at the beach,
+// the ao dai on the bay cruise.
+const EVENT_OUTFITS = [
+  { id: 'bathrobe', name: 'Bathrobe', description: 'a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs' },
+  { id: 'swimsuit', name: 'Swimsuit', description: 'a bikini' },
+  { id: 'ao-dai', name: 'Ao dai', coversStomach: true, description: 'a fitted silk Vietnamese ao dai: a long close-fitting tunic with a high mandarin collar, long sleeves and side slits up to the waist, worn over loose flowing silk trousers' }
+] as const
+
 /** A name not already taken in the list, made from the wanted one: "happy", "happy-2"... */
 function unique(wanted: string, taken: string[]): string {
   const base = wanted || 'new'
@@ -236,16 +244,29 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
     set({ outfits: [...draft.outfits, { id, name: 'New outfit', description: '', sprites: {}, pregnant: false }] })
   }
 
-  // What the trip to the springs starts her in, and its pregnant form: without it she goes into the bath dressed.
-  function addBathrobe() {
+  /** An outfit the game puts her in, and its pregnant form: without it she goes as she is dressed. */
+  function addEventOutfit(id: string) {
+    const made = EVENT_OUTFITS.find((one) => one.id === id)
+    if (!made) return
     set({
       outfits: [
         ...draft.outfits,
-        { id: 'bathrobe', name: 'Bathrobe', description: 'a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs', sprites: {}, pregnant: false },
-        { id: 'bathrobe-pregnant', name: 'Bathrobe, pregnant', inherits: 'bathrobe', description: 'She has a round, pregnant belly.', sprites: {}, pregnant: true }
+        { id: made.id, name: made.name, description: made.description, sprites: {}, pregnant: false, ...('coversStomach' in made && { coversStomach: made.coversStomach }) },
+        { id: `${made.id}-pregnant`, name: `${made.name}, pregnant`, inherits: made.id, description: 'She has a round, pregnant belly.', sprites: {}, pregnant: true }
       ]
     })
   }
+
+  // The outfits of hers the game puts her in, by the id it names (the form she wears pregnant goes by its parent): not her
+  // usual clothes, nor one she wears through a day.
+  const eventIds = new Set(eventOutfits.map((one) => one.id))
+  const isEventOutfit = (outfit: Outfit): boolean => {
+    const own = outfit.pregnant && outfit.inherits ? draft.outfits.find((o) => o.id === outfit.inherits) : outfit
+    return !plain && own !== undefined && eventIds.has(own.id) && !isStandardOutfit(own.id) && own.id !== draft.defaultOutfitId && own.day !== true
+  }
+  const eventOwn = draft.outfits.flatMap((outfit, index) => (!outfit.babyTone && isEventOutfit(outfit) ? [{ outfit, index }] : []))
+  // Those the game has, made ready to draw, that she has not yet.
+  const addable = EVENT_OUTFITS.filter((one) => eventIds.has(one.id) && !draft.outfits.some((outfit) => outfit.id === one.id))
 
   function removeOutfit(index: number) {
     const outfits = draft.outfits.filter((_, i) => i !== index)
@@ -443,6 +464,233 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
     )
   }
 
+  /** One outfit: its fields, what can be done to it, and its pictures. */
+  const outfitCard = (outfit: Outfit, index: number) => (
+        <div key={index} className="outfit card">
+          <div className="row">
+            <Text label={t('editor.common.id')} value={outfit.id} disabled={isStandardOutfit(outfit.id)} onChange={(id) => {
+              const next = slugify(id)
+              setOutfit(index, { id: next })
+              if (draft.defaultOutfitId === outfit.id) set({ outfits: draft.outfits.map((o, i) => (i === index ? { ...o, id: next } : o)), defaultOutfitId: next })
+            }} />
+            <Text label={t('editor.common.name')} value={outfit.name} onChange={(name) => setOutfit(index, { name })} />
+            {/* An outfit by the id an event names is the one she wears there. */}
+            {!isStandardOutfit(outfit.id) && eventOutfits.length > 0 && (
+              <label>
+                {t('editor.sprites.wornFor')}
+                <select
+                  value={eventOutfits.some((one) => one.id === outfit.id) ? outfit.id : ''}
+                  onChange={(e) => {
+                    if (!e.target.value) return
+                    const next = e.target.value
+                    set({ outfits: draft.outfits.map((o, i) => (i === index ? { ...o, id: next } : o)), ...(draft.defaultOutfitId === outfit.id && { defaultOutfitId: next }) })
+                  }}
+                >
+                  <option value="">{t('editor.sprites.ownChoosing')}</option>
+                  {eventOutfits
+                    .filter((one) => one.id === outfit.id || !draft.outfits.some((o) => o.id === one.id))
+                    .map((one) => (
+                      <option key={one.id} value={one.id}>
+                        {one.worn.join('; ')}
+                      </option>
+                    ))}
+                </select>
+              </label>
+            )}
+          </div>
+          {!isStandardOutfit(outfit.id) && (
+            <label className="inline">
+              <input type="checkbox" checked={outfit.oneOff === true} onChange={(e) => setOutfit(index, { oneOff: e.target.checked || undefined, ...(e.target.checked && { day: undefined }) })} />
+              {t('editor.sprites.oneOff')}
+            </label>
+          )}
+          {/* Drawn in it, her abs are left out: they would show through what covers them. */}
+          {!outfit.pregnant && (
+            <label className="inline" title={t('editor.sprites.coversStomachTitle')}>
+              <input type="checkbox" checked={outfit.coversStomach === true} onChange={(e) => setOutfit(index, { coversStomach: e.target.checked || undefined })} />
+              {t('editor.sprites.coversStomach')}
+            </label>
+          )}
+          {/* Her usual clothes always last the day, and a pregnant outfit goes by its parent. */}
+          {!outfit.pregnant && (
+            <label className="inline" title={t('editor.sprites.dayOutfitTitle')}>
+              <input
+                type="checkbox"
+                checked={outfit.id === draft.defaultOutfitId || outfit.day === true}
+                disabled={outfit.id === draft.defaultOutfitId || outfit.oneOff === true}
+                onChange={(e) => setOutfit(index, { day: e.target.checked || undefined })}
+              />
+              {t('editor.sprites.dayOutfit')}
+            </label>
+          )}
+          <label>
+            {t('editor.sprites.parent')}
+            <select
+              value={outfit.inherits ?? ''}
+              disabled={isStandardOutfit(outfit.id)}
+              onChange={(e) => setOutfit(index, { inherits: e.target.value || undefined })}
+            >
+              <option value="">{t('editor.sprites.noParent')}</option>
+              {draft.outfits
+                .filter((other) => other.id !== outfit.id)
+                .map((other) => (
+                  <option key={other.id} value={other.id}>
+                    {other.name} ({other.id})
+                  </option>
+                ))}
+            </select>
+            {outfit.inherits && (
+              <span className="hint">
+                {t('editor.sprites.inherits', { description: outfitDescription(draft.outfits, draft.outfits.find((o) => o.id === outfit.inherits)) || t('editor.sprites.nothingWritten') })}
+              </span>
+            )}
+          </label>
+          {/* A pregnant outfit is the pregnant form of its parent. The two standard ones are fixed; any other can be made one. */}
+          {!plain && (
+            <label className="inline">
+              <input
+                type="checkbox"
+                checked={outfit.pregnant}
+                disabled={isStandardOutfit(outfit.id) || (!outfit.pregnant && !outfit.inherits)}
+                onChange={(e) => setOutfit(index, { pregnant: e.target.checked })}
+              />
+              {t('editor.sprites.pregnantForm')}
+            </label>
+          )}
+          <Text
+            label={outfit.inherits ? t('editor.sprites.addsToIt') : t('editor.common.description')}
+            value={outfit.description}
+            onChange={(description) => setOutfit(index, { description })}
+            rows={outfit.inherits ? 2 : 3}
+            placeholder={outfit.inherits ? t('editor.sprites.addsPlaceholder') : t('editor.sprites.wearingPlaceholder')}
+          />
+          <label>
+            {t('editor.sprites.pictures')}
+            <select
+              value={outfit.fallback ?? ''}
+              disabled={outfit.id === draft.defaultOutfitId}
+              onChange={(e) => setOutfit(index, { fallback: e.target.value || undefined })}
+            >
+              <option value="">{t('editor.room.itsOwn')}</option>
+              {draft.outfits
+                .filter((other) => other.id !== outfit.id && other.fallback !== outfit.id)
+                .map((other) => (
+                  <option key={other.id} value={other.id}>
+                    {t('editor.sprites.sameAs', { name: other.name, id: other.id })}
+                  </option>
+                ))}
+            </select>
+            {outfit.fallback && (
+              <span className="hint">
+                {t('editor.sprites.fallbackHint', { kept: Object.keys(outfit.sprites).length > 0, count: Object.keys(outfit.sprites).length })}
+              </span>
+            )}
+          </label>
+          {!outfit.fallback && (
+          <>
+          <div className="outfit-actions">
+            {!plain && faces.some((face) => !(face in outfit.sprites)) && (
+              <Button
+                disabled={!ready || batch !== null}
+                title={t('editor.sprites.generateMissingTitle')}
+                onClick={() => generateMissing(outfit.id)}
+              >
+                {t('editor.sprites.generateMissing', { count: faces.filter((face) => !(face in outfit.sprites)).length })}
+              </Button>
+            )}
+            {!plain && faces.some((face) => !(face in outfit.sprites)) && (
+              <input
+                className="batch-seed"
+                inputMode="numeric"
+                aria-label={t('editor.sprites.batchSeed')}
+                title={t('editor.sprites.batchSeedTitle')}
+                value={batchSeeds[outfit.id] ?? ''}
+                placeholder={draft.imageSeed === undefined ? t('editor.sprites.seedRandom') : t('editor.sprites.seedIs', { seed: draft.imageSeed })}
+                disabled={batch !== null}
+                onChange={(e) => setBatchSeeds({ ...batchSeeds, [outfit.id]: e.target.value.replace(/\D/g, '').slice(0, 15) })}
+              />
+            )}
+            <Button
+              disabled={!ready}
+              title={t('editor.sprites.drawSpriteTitle')}
+              onClick={() => setDrawing({ outfitId: outfit.id, expression: faces.find((face) => !(face in outfit.sprites)) ?? '' })}
+            >
+              {t('editor.player.generate')}
+            </Button>
+            <Button disabled={!ready} onClick={() => addSprite(index)}>
+              {plain ? t('editor.player.addPicture') : t('editor.sprites.addAnother')}
+            </Button>
+            <Button variant="quiet" className="outfit-remove" disabled={draft.outfits.length <= 1 || isStandardOutfit(outfit.id) || outfit.id === draft.defaultOutfitId} onClick={() => removeOutfit(index)}>
+              {t('editor.sprites.removeOutfit')}
+            </Button>
+          </div>
+          <BatchProgress batch={batch} at={outfit.id} onStop={stop} />
+
+          <SlotGrid>
+            {ordered(outfit).map(([name, sprite]) => (
+              <PictureSlot
+                key={name}
+                image={sprite.image}
+                name={name}
+                onView={() => setViewing({ outfitId: outfit.id, name })}
+                actions={
+                  <>
+                    <Button
+                      disabled={!ready}
+                      onClick={async () => {
+                        const image = await pick('image')
+                        if (image) setOutfit(index, { sprites: { ...outfit.sprites, [name]: { ...sprite, image } } })
+                      }}
+                    >
+                      {t('editor.common.replace')}
+                    </Button>
+                    <Button disabled={!ready} title={t('editor.sprites.drawSpriteAgain')} onClick={() => setDrawing({ outfitId: outfit.id, expression: name })}>
+                      {t('editor.common.generate')}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        const { [name]: _removed, ...rest } = outfit.sprites
+                        setOutfit(index, { sprites: rest })
+                      }}
+                    >
+                      {t('editor.common.remove')}
+                    </Button>
+                  </>
+                }
+              >
+                <input
+                  aria-label={t('editor.sprites.spriteName')}
+                  defaultValue={name}
+                  key={name}
+                  disabled={isFace(name)}
+                  onBlur={(e) => renameSprite(index, name, slugify(e.target.value) || name)}
+                />
+                <textarea
+                  aria-label={t('editor.sprites.spriteDescription')}
+                  rows={2}
+                  value={sprite.description}
+                  placeholder={t('editor.sprites.descriptionPlaceholder')}
+                  onChange={(e) => setOutfit(index, { sprites: { ...outfit.sprites, [name]: { ...sprite, description: e.target.value } } })}
+                />
+              </PictureSlot>
+            ))}
+            {!plain &&
+              faces.filter((face) => !(face in outfit.sprites)).map((face) => (
+                <EmptySlot key={face} name={face} disabled={!ready} onAdd={() => addFace(index, face)} onGenerate={() => setDrawing({ outfitId: outfit.id, expression: face })} />
+              ))}
+          </SlotGrid>
+          </>
+          )}
+          {outfit.fallback && (
+            <div className="outfit-actions">
+              <Button variant="quiet" className="outfit-remove" disabled={draft.outfits.length <= 1 || isStandardOutfit(outfit.id)} onClick={() => removeOutfit(index)}>
+                {t('editor.sprites.removeOutfit')}
+              </Button>
+            </div>
+          )}
+        </div>
+  )
+
   return (
     <>
       {viewedOutfit && viewed && (
@@ -595,233 +843,30 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
           </select>
         </label>
         {/* Holding a child is on the Family tab, one for each tone a child of hers can have. */}
-        {draft.outfits.map((outfit, index) => outfit.babyTone ? null : (
-          <div key={index} className="outfit card">
-            <div className="row">
-              <Text label={t('editor.common.id')} value={outfit.id} disabled={isStandardOutfit(outfit.id)} onChange={(id) => {
-                const next = slugify(id)
-                setOutfit(index, { id: next })
-                if (draft.defaultOutfitId === outfit.id) set({ outfits: draft.outfits.map((o, i) => (i === index ? { ...o, id: next } : o)), defaultOutfitId: next })
-              }} />
-              <Text label={t('editor.common.name')} value={outfit.name} onChange={(name) => setOutfit(index, { name })} />
-              {/* An outfit by the id an event names is the one she wears there. */}
-              {!isStandardOutfit(outfit.id) && eventOutfits.length > 0 && (
-                <label>
-                  {t('editor.sprites.wornFor')}
-                  <select
-                    value={eventOutfits.some((one) => one.id === outfit.id) ? outfit.id : ''}
-                    onChange={(e) => {
-                      if (!e.target.value) return
-                      const next = e.target.value
-                      set({ outfits: draft.outfits.map((o, i) => (i === index ? { ...o, id: next } : o)), ...(draft.defaultOutfitId === outfit.id && { defaultOutfitId: next }) })
-                    }}
-                  >
-                    <option value="">{t('editor.sprites.ownChoosing')}</option>
-                    {eventOutfits
-                      .filter((one) => one.id === outfit.id || !draft.outfits.some((o) => o.id === one.id))
-                      .map((one) => (
-                        <option key={one.id} value={one.id}>
-                          {one.worn.join('; ')}
-                        </option>
-                      ))}
-                  </select>
-                </label>
-              )}
-            </div>
-            {!isStandardOutfit(outfit.id) && (
-              <label className="inline">
-                <input type="checkbox" checked={outfit.oneOff === true} onChange={(e) => setOutfit(index, { oneOff: e.target.checked || undefined, ...(e.target.checked && { day: undefined }) })} />
-                {t('editor.sprites.oneOff')}
-              </label>
-            )}
-            {/* Her usual clothes always last the day, and a pregnant outfit goes by its parent. */}
-            {!outfit.pregnant && (
-              <label className="inline" title={t('editor.sprites.dayOutfitTitle')}>
-                <input
-                  type="checkbox"
-                  checked={outfit.id === draft.defaultOutfitId || outfit.day === true}
-                  disabled={outfit.id === draft.defaultOutfitId || outfit.oneOff === true}
-                  onChange={(e) => setOutfit(index, { day: e.target.checked || undefined })}
-                />
-                {t('editor.sprites.dayOutfit')}
-              </label>
-            )}
-            <label>
-              {t('editor.sprites.parent')}
-              <select
-                value={outfit.inherits ?? ''}
-                disabled={isStandardOutfit(outfit.id)}
-                onChange={(e) => setOutfit(index, { inherits: e.target.value || undefined })}
-              >
-                <option value="">{t('editor.sprites.noParent')}</option>
-                {draft.outfits
-                  .filter((other) => other.id !== outfit.id)
-                  .map((other) => (
-                    <option key={other.id} value={other.id}>
-                      {other.name} ({other.id})
-                    </option>
-                  ))}
-              </select>
-              {outfit.inherits && (
-                <span className="hint">
-                  {t('editor.sprites.inherits', { description: outfitDescription(draft.outfits, draft.outfits.find((o) => o.id === outfit.inherits)) || t('editor.sprites.nothingWritten') })}
-                </span>
-              )}
-            </label>
-            {/* A pregnant outfit is the pregnant form of its parent. The two standard ones are fixed; any other can be made one. */}
-            {!plain && (
-              <label className="inline">
-                <input
-                  type="checkbox"
-                  checked={outfit.pregnant}
-                  disabled={isStandardOutfit(outfit.id) || (!outfit.pregnant && !outfit.inherits)}
-                  onChange={(e) => setOutfit(index, { pregnant: e.target.checked })}
-                />
-                {t('editor.sprites.pregnantForm')}
-              </label>
-            )}
-            <Text
-              label={outfit.inherits ? t('editor.sprites.addsToIt') : t('editor.common.description')}
-              value={outfit.description}
-              onChange={(description) => setOutfit(index, { description })}
-              rows={outfit.inherits ? 2 : 3}
-              placeholder={outfit.inherits ? t('editor.sprites.addsPlaceholder') : t('editor.sprites.wearingPlaceholder')}
-            />
-            <label>
-              {t('editor.sprites.pictures')}
-              <select
-                value={outfit.fallback ?? ''}
-                disabled={outfit.id === draft.defaultOutfitId}
-                onChange={(e) => setOutfit(index, { fallback: e.target.value || undefined })}
-              >
-                <option value="">{t('editor.room.itsOwn')}</option>
-                {draft.outfits
-                  .filter((other) => other.id !== outfit.id && other.fallback !== outfit.id)
-                  .map((other) => (
-                    <option key={other.id} value={other.id}>
-                      {t('editor.sprites.sameAs', { name: other.name, id: other.id })}
-                    </option>
-                  ))}
-              </select>
-              {outfit.fallback && (
-                <span className="hint">
-                  {t('editor.sprites.fallbackHint', { kept: Object.keys(outfit.sprites).length > 0, count: Object.keys(outfit.sprites).length })}
-                </span>
-              )}
-            </label>
-            {!outfit.fallback && (
-            <>
-            <div className="outfit-actions">
-              {!plain && faces.some((face) => !(face in outfit.sprites)) && (
-                <Button
-                  disabled={!ready || batch !== null}
-                  title={t('editor.sprites.generateMissingTitle')}
-                  onClick={() => generateMissing(outfit.id)}
-                >
-                  {t('editor.sprites.generateMissing', { count: faces.filter((face) => !(face in outfit.sprites)).length })}
-                </Button>
-              )}
-              {!plain && faces.some((face) => !(face in outfit.sprites)) && (
-                <input
-                  className="batch-seed"
-                  inputMode="numeric"
-                  aria-label={t('editor.sprites.batchSeed')}
-                  title={t('editor.sprites.batchSeedTitle')}
-                  value={batchSeeds[outfit.id] ?? ''}
-                  placeholder={draft.imageSeed === undefined ? t('editor.sprites.seedRandom') : t('editor.sprites.seedIs', { seed: draft.imageSeed })}
-                  disabled={batch !== null}
-                  onChange={(e) => setBatchSeeds({ ...batchSeeds, [outfit.id]: e.target.value.replace(/\D/g, '').slice(0, 15) })}
-                />
-              )}
-              <Button
-                disabled={!ready}
-                title={t('editor.sprites.drawSpriteTitle')}
-                onClick={() => setDrawing({ outfitId: outfit.id, expression: faces.find((face) => !(face in outfit.sprites)) ?? '' })}
-              >
-                {t('editor.player.generate')}
-              </Button>
-              <Button disabled={!ready} onClick={() => addSprite(index)}>
-                {plain ? t('editor.player.addPicture') : t('editor.sprites.addAnother')}
-              </Button>
-              <Button variant="quiet" className="outfit-remove" disabled={draft.outfits.length <= 1 || isStandardOutfit(outfit.id) || outfit.id === draft.defaultOutfitId} onClick={() => removeOutfit(index)}>
-                {t('editor.sprites.removeOutfit')}
-              </Button>
-            </div>
-            <BatchProgress batch={batch} at={outfit.id} onStop={stop} />
-
-            <SlotGrid>
-              {ordered(outfit).map(([name, sprite]) => (
-                <PictureSlot
-                  key={name}
-                  image={sprite.image}
-                  name={name}
-                  onView={() => setViewing({ outfitId: outfit.id, name })}
-                  actions={
-                    <>
-                      <Button
-                        disabled={!ready}
-                        onClick={async () => {
-                          const image = await pick('image')
-                          if (image) setOutfit(index, { sprites: { ...outfit.sprites, [name]: { ...sprite, image } } })
-                        }}
-                      >
-                        {t('editor.common.replace')}
-                      </Button>
-                      <Button disabled={!ready} title={t('editor.sprites.drawSpriteAgain')} onClick={() => setDrawing({ outfitId: outfit.id, expression: name })}>
-                        {t('editor.common.generate')}
-                      </Button>
-                      <Button
-                        onClick={() => {
-                          const { [name]: _removed, ...rest } = outfit.sprites
-                          setOutfit(index, { sprites: rest })
-                        }}
-                      >
-                        {t('editor.common.remove')}
-                      </Button>
-                    </>
-                  }
-                >
-                  <input
-                    aria-label={t('editor.sprites.spriteName')}
-                    defaultValue={name}
-                    key={name}
-                    disabled={isFace(name)}
-                    onBlur={(e) => renameSprite(index, name, slugify(e.target.value) || name)}
-                  />
-                  <textarea
-                    aria-label={t('editor.sprites.spriteDescription')}
-                    rows={2}
-                    value={sprite.description}
-                    placeholder={t('editor.sprites.descriptionPlaceholder')}
-                    onChange={(e) => setOutfit(index, { sprites: { ...outfit.sprites, [name]: { ...sprite, description: e.target.value } } })}
-                  />
-                </PictureSlot>
-              ))}
-              {!plain &&
-                faces.filter((face) => !(face in outfit.sprites)).map((face) => (
-                  <EmptySlot key={face} name={face} disabled={!ready} onAdd={() => addFace(index, face)} onGenerate={() => setDrawing({ outfitId: outfit.id, expression: face })} />
-                ))}
-            </SlotGrid>
-            </>
-            )}
-            {outfit.fallback && (
-              <div className="outfit-actions">
-                <Button variant="quiet" className="outfit-remove" disabled={draft.outfits.length <= 1 || isStandardOutfit(outfit.id)} onClick={() => removeOutfit(index)}>
-                  {t('editor.sprites.removeOutfit')}
-                </Button>
-              </div>
-            )}
-          </div>
-        ))}
+        {draft.outfits.map((outfit, index) => (outfit.babyTone || isEventOutfit(outfit) ? null : outfitCard(outfit, index)))}
         <div className="row checks">
           <Button onClick={addOutfit}>{t('editor.sprites.addOutfit')}</Button>
-          {!plain && !draft.outfits.some((outfit) => outfit.id === 'bathrobe') && eventOutfits.some((one) => one.id === 'bathrobe') && (
-            <Button title={eventOutfits.find((one) => one.id === 'bathrobe')?.worn.join(', ')} onClick={addBathrobe}>
-              {t('editor.sprites.addBathrobe')}
-            </Button>
-          )}
         </div>
       </Group>
+
+      {/* What the game's events, trips and story beats put her in: kept out of the way, folded, under her own. */}
+      {!plain && (eventOwn.length > 0 || addable.length > 0) && (
+        <details className="editor-group event-outfits">
+          <summary>
+            <h2>{t('editor.sprites.eventOutfits', { count: eventOwn.length })}</h2>
+          </summary>
+          {eventOwn.map(({ outfit, index }) => outfitCard(outfit, index))}
+          {addable.length > 0 && (
+            <div className="row checks">
+              {addable.map((one) => (
+                <Button key={one.id} title={eventOutfits.find((worn) => worn.id === one.id)?.worn.join(', ')} onClick={() => addEventOutfit(one.id)}>
+                  {t('editor.sprites.addEventOutfit', { name: one.name })}
+                </Button>
+              ))}
+            </div>
+          )}
+        </details>
+      )}
 
       {/* The sex-acts are drawn once for each tone of the man in them: the player's is shown, or the light one where his has none. */}
       <div className="tabs" role="tablist" aria-label={t('editor.sprites.manTone')}>

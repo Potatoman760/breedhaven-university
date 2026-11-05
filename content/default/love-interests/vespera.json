@@ -380,6 +380,134 @@
       "pregnant": false,
       "oneOff": true,
       "babyTone": "dark"
+    },
+    {
+      "id": "swimsuit",
+      "name": "Swimsuit",
+      "description": "a deep violet bikini with thin black straps crossing above the hips",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/vespera/swimsuit-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "Swimsuit, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "swimsuit",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/vespera/swimsuit-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "ao-dai",
+      "name": "Ao dai",
+      "description": "a fitted deep violet silk Vietnamese ao dai: a long close-fitting tunic of thick opaque silk, following her figure but lying smooth and unbroken over her stomach, with a high mandarin collar, long sleeves and side slits up to the waist, embroidered with silver lotus flowers, worn over loose flowing white silk trousers",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/vespera/ao-dai-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "Ao dai, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "ao-dai",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/vespera/ao-dai-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sari",
+      "name": "Sari",
+      "description": "a traditional deep violet silk sari with a silver woven border, the pallu draped over one shoulder, worn with a matching short fitted blouse, and thin silver bangles",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/vespera/sari-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "Sari, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sari",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/vespera/sari-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "holi",
+      "name": "Festival whites",
+      "description": "a simple, loose-fitting white cotton kurta tunic of thick opaque cotton, hanging straight and loose from her chest to her knees and hiding her stomach completely, over loose white cotton trousers, with a thin deep violet scarf, the clothes, her arms and her cheeks splashed and smeared with bright pink, yellow, green and blue festival color powder",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/vespera/holi-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "Festival whites, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "holi",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/vespera/holi-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sarong",
+      "name": "Sarong",
+      "description": "a long deep violet silk sarong printed with large silver and white tropical hibiscus flowers, wrapped around her body under her arms as a strapless dress knotted above her chest, the thick opaque fabric hanging loose and smooth from her chest, hiding her stomach completely, falling to mid-calf, her shoulders bare, and a single white hibiscus flower in her hair",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/vespera/sarong-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "Sarong, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sarong",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/vespera/sarong-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -612,6 +740,23 @@
       }
     ]
   },
+  "reactions": {
+    "giggle": "sounds/voices/vespera/giggle.ogg",
+    "sigh": "sounds/voices/vespera/sigh.ogg",
+    "sigh-content": "sounds/voices/vespera/sigh-content.ogg",
+    "gasp": "sounds/voices/vespera/gasp.ogg",
+    "huff": "sounds/voices/vespera/huff.ogg",
+    "surprised": "sounds/voices/vespera/surprised.ogg",
+    "yawn": "sounds/voices/vespera/yawn.ogg",
+    "aww": "sounds/voices/vespera/aww.ogg",
+    "satisfied": "sounds/voices/vespera/satisfied.ogg"
+  },
+  "catchphrases": {
+    "pet": "sounds/voices/vespera/phrase-pet.ogg",
+    "puppy": "sounds/voices/vespera/phrase-puppy.ogg",
+    "darling": "sounds/voices/vespera/phrase-darling.ogg"
+  },
+  "firstLine": "Easy there, puppy, I don't bite unless the moon's right. I'm Vespera Midnight... now, are you gonna say hello, or are you scared I'll hex your tongue?",
   "schedule": [
     {
       "weekdays": [
@@ -674,6 +819,11 @@
     "dark": "sprites/vespera/birth-dark.webp"
   },
   "walkSprite": "sprites/vespera/walk-cutout.webp",
+  "walkHead": {
+    "top": 2.5,
+    "chin": 21.5,
+    "x": 46.4
+  },
   "childNames": {
     "daughters": [
       "Nocturne",
@@ -711,22 +861,5 @@
       }
     ],
     "extraInstructions": "Keep her teasing and playful but never cruel: the sass is an invitation, not a wall. She flirts like she breathes, but she notices everything and remembers what people say when they think she is only joking. Let warmth surface when someone is genuinely struggling."
-  },
-  "reactions": {
-    "giggle": "sounds/voices/vespera/giggle.ogg",
-    "sigh": "sounds/voices/vespera/sigh.ogg",
-    "sigh-content": "sounds/voices/vespera/sigh-content.ogg",
-    "gasp": "sounds/voices/vespera/gasp.ogg",
-    "huff": "sounds/voices/vespera/huff.ogg",
-    "surprised": "sounds/voices/vespera/surprised.ogg",
-    "yawn": "sounds/voices/vespera/yawn.ogg",
-    "aww": "sounds/voices/vespera/aww.ogg",
-    "satisfied": "sounds/voices/vespera/satisfied.ogg"
-  },
-  "catchphrases": {
-    "pet": "sounds/voices/vespera/phrase-pet.ogg",
-    "puppy": "sounds/voices/vespera/phrase-puppy.ogg",
-    "darling": "sounds/voices/vespera/phrase-darling.ogg"
-  },
-  "firstLine": "Easy there, puppy, I don't bite unless the moon's right. I'm Vespera Midnight... now, are you gonna say hello, or are you scared I'll hex your tongue?"
+  }
 }

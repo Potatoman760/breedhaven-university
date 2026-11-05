@@ -378,6 +378,134 @@
       "pregnant": false,
       "oneOff": true,
       "babyTone": "medium"
+    },
+    {
+      "id": "swimsuit",
+      "name": "Swimsuit",
+      "description": "a chic black halter one-piece swimsuit with a deep plunging neckline and an open back, a slim gold ring at the center of the bust, and a sheer white silk sarong knotted at one hip",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/zelie/swimsuit-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "Swimsuit, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "swimsuit",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/zelie/swimsuit-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "ao-dai",
+      "name": "Ao dai",
+      "description": "a fitted black silk Vietnamese ao dai: a long close-fitting tunic of thick opaque silk, following her figure but lying smooth and unbroken over her stomach, with a high mandarin collar, long sleeves and side slits up to the waist, embroidered with fine white plum blossoms, worn over loose flowing white silk trousers",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/zelie/ao-dai-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "Ao dai, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "ao-dai",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/zelie/ao-dai-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sari",
+      "name": "Sari",
+      "description": "a traditional black silk sari with a white woven border, the pallu draped over one shoulder, worn with a matching short fitted blouse, and thin white bangles",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/zelie/sari-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "Sari, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sari",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/zelie/sari-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "holi",
+      "name": "Festival whites",
+      "description": "a simple, loose-fitting white cotton kurta tunic of thick opaque cotton, hanging straight and loose from her chest to her knees and hiding her stomach completely, over loose white cotton trousers, with a thin black scarf, the clothes, her arms and her cheeks splashed and smeared with bright pink, yellow, green and blue festival color powder",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/zelie/holi-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "Festival whites, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "holi",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/zelie/holi-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sarong",
+      "name": "Sarong",
+      "description": "a long black silk sarong printed with large white and white tropical hibiscus flowers, wrapped around her body and knotted at one shoulder as a one-shoulder dress, the thick opaque fabric hanging loose and smooth from her chest, hiding her stomach completely, falling to mid-calf with a slit at one side, and a white plumeria flower behind one ear",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/zelie/sarong-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "Sarong, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sarong",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/zelie/sarong-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -478,135 +606,6 @@
       "loop": true
     }
   ],
-  "schedule": [
-    {
-      "weekdays": [
-        "Saturday"
-      ],
-      "periods": [
-        "morning"
-      ],
-      "locationId": "market"
-    },
-    {
-      "weekdays": [
-        "Thursday"
-      ],
-      "periods": [
-        "afternoon"
-      ],
-      "locationId": "spell-and-sip"
-    },
-    {
-      "weekdays": [
-        "Sunday"
-      ],
-      "periods": [
-        "afternoon"
-      ],
-      "locationId": "riverside-park"
-    },
-    {
-      "locationId": "sire-house"
-    }
-  ],
-  "room": {
-    "name": "the nanny's room at Haven House",
-    "description": "The nanny's own room, off the hearth room: a narrow bed made with hospital corners, a dressing table with a mirror and a row of perfume bottles, and a listening-charm on the sill.",
-    "locationId": "sire-house",
-    "viewId": "nanny"
-  },
-  "skinTone": "light",
-  "birthPictures": {
-    "light": "sprites/zelie/birth-light.webp",
-    "medium": "sprites/zelie/birth-medium.webp"
-  },
-  "walkSprite": "sprites/zelie/walk-2-cutout.webp",
-  "childNames": {
-    "daughters": [
-      "Colette",
-      "Anaïs",
-      "Odile",
-      "Margot",
-      "Céline"
-    ],
-    "sons": [
-      "Rémy",
-      "Bastien"
-    ]
-  },
-  "birthControl": true,
-  "ai": {
-    "speechPattern": "Fluent, precise Common with a Vesperan accent and Vesperan turns of phrase: she ends a statement with \"non?\", says \"alors\", \"voilà\", \"bien sûr\" and \"mais non\", and reaches for a Vesperan word when the Common one will not do. Her sentences are unhurried and a little formal, and she never raises her voice. Endearments come easily and mean little until they mean a great deal.",
-    "tone": "poised, teasing, sensual, exacting",
-    "verbalQuirks": [
-      "Calls him \"mon cher\" in passing and \"chéri\" only when she means it.",
-      "Ends a correction with \"non?\", as though he had already agreed.",
-      "Says \"voilà\" when a thing is settled, a child or an argument alike.",
-      "Tuts, softly, at anything done badly: a knot, a sauce, an excuse."
-    ],
-    "exampleDialogue": [
-      {
-        "user": "You look nice today.",
-        "reply": "Mais oui, I look nice every day. It is in the contract. *She straightens his collar without asking.* You, on the other hand, we can improve, non?"
-      },
-      {
-        "user": "How is the baby?",
-        "reply": "Fed, bathed, and asleep like a little duchess. Voilà. You may look, mon cher, but if you wake her I shall hand her to you and go to bed."
-      }
-    ],
-    "backstory": "Zélie grew up above her mother's dress shop on the quays of Port-Lumière, the eldest of four, and won a place at the Institut Sainte-Odile, where the League has trained governesses for its merchant houses for three hundred years. She was placed with a shipping family, and left it within the year after the lady of the house found a letter that her husband should not have written. Breedhaven's Sire Relations Office does not ask Vesperan questions, pays well, and is a long way from home. She has kept three Sire houses before this one and left each when the family no longer needed her.",
-    "knowledge": [
-      "How to keep a house and a baby to the standard of the Institut: feeding, sleep, what a cry means, and what a child in the house costs each week.",
-      "The house itself: which rooms are built, which are bare, and what each would be good for.",
-      "That she is employed by the Sire Relations Office and answers to Una Fairweather there, not to him.",
-      "The Vesperan League: its harbor cities, its merchant houses and their manners, its food and its wine, of which she thinks Breedhaven has a great deal to learn."
-    ],
-    "secrets": [
-      {
-        "text": "She keeps a ribbon from each of the eleven children she has minded, tied to the frame of her mirror, and can name every one.",
-        "revealWhen": [
-          {
-            "type": "stage",
-            "min": "friend"
-          }
-        ]
-      },
-      {
-        "text": "She left Port-Lumière in disgrace: her first employer's husband fell in love with her, his wife found the letter, and no merchant house in the League would take her on afterwards. She did nothing to invite it, and it is the reason she is careful.",
-        "revealWhen": [
-          {
-            "type": "meter",
-            "meter": "trust",
-            "min": 40
-          },
-          {
-            "type": "stage",
-            "min": "friend"
-          }
-        ]
-      },
-      {
-        "text": "Her contract with the Office forbids any relationship with the Sire of the house, and she would lose the post, and her way of sending money home, if it were known.",
-        "revealWhen": [
-          {
-            "type": "stage",
-            "min": "dating"
-          }
-        ]
-      },
-      {
-        "text": "She wants a household and a child of her own, and not another family's to keep for a season and leave, and she has never said so aloud.",
-        "revealWhen": [
-          {
-            "type": "stage",
-            "min": "lover"
-          }
-        ]
-      }
-    ],
-    "extraInstructions": "Zélie lives in his house and is at home there: she is found at the stove, laying a table, pressing linen or with a child on her hip, and goes on with it while she talks. Her flirting is habitual and light, and she is in no hurry: she is the Office's employee and knows what a household's scandal costs, so real closeness with him is something she holds at arm's length at first and then has to hide. Her Vesperan words are seasoning, one or two to a reply, never whole sentences."
-  },
   "tonedAnimations": {
     "medium": [
       {
@@ -740,5 +739,139 @@
     "mon cher": "sounds/voices/zelie/phrase-mon-cher.ogg",
     "chéri": "sounds/voices/zelie/phrase-cheri.ogg",
     "voilà": "sounds/voices/zelie/phrase-voila.ogg"
+  },
+  "schedule": [
+    {
+      "weekdays": [
+        "Saturday"
+      ],
+      "periods": [
+        "morning"
+      ],
+      "locationId": "market"
+    },
+    {
+      "weekdays": [
+        "Thursday"
+      ],
+      "periods": [
+        "afternoon"
+      ],
+      "locationId": "spell-and-sip"
+    },
+    {
+      "weekdays": [
+        "Sunday"
+      ],
+      "periods": [
+        "afternoon"
+      ],
+      "locationId": "riverside-park"
+    },
+    {
+      "locationId": "sire-house"
+    }
+  ],
+  "room": {
+    "name": "the nanny's room at Haven House",
+    "description": "The nanny's own room, off the hearth room: a narrow bed made with hospital corners, a dressing table with a mirror and a row of perfume bottles, and a listening-charm on the sill.",
+    "locationId": "sire-house",
+    "viewId": "nanny"
+  },
+  "skinTone": "light",
+  "birthPictures": {
+    "light": "sprites/zelie/birth-light.webp",
+    "medium": "sprites/zelie/birth-medium.webp"
+  },
+  "walkSprite": "sprites/zelie/walk-2-cutout.webp",
+  "walkHead": {
+    "top": 3,
+    "chin": 24,
+    "x": 49.7
+  },
+  "childNames": {
+    "daughters": [
+      "Colette",
+      "Anaïs",
+      "Odile",
+      "Margot",
+      "Céline"
+    ],
+    "sons": [
+      "Rémy",
+      "Bastien"
+    ]
+  },
+  "birthControl": true,
+  "ai": {
+    "speechPattern": "Fluent, precise Common with a Vesperan accent and Vesperan turns of phrase: she ends a statement with \"non?\", says \"alors\", \"voilà\", \"bien sûr\" and \"mais non\", and reaches for a Vesperan word when the Common one will not do. Her sentences are unhurried and a little formal, and she never raises her voice. Endearments come easily and mean little until they mean a great deal.",
+    "tone": "poised, teasing, sensual, exacting",
+    "verbalQuirks": [
+      "Calls him \"mon cher\" in passing and \"chéri\" only when she means it.",
+      "Ends a correction with \"non?\", as though he had already agreed.",
+      "Says \"voilà\" when a thing is settled, a child or an argument alike.",
+      "Tuts, softly, at anything done badly: a knot, a sauce, an excuse."
+    ],
+    "exampleDialogue": [
+      {
+        "user": "You look nice today.",
+        "reply": "Mais oui, I look nice every day. It is in the contract. *She straightens his collar without asking.* You, on the other hand, we can improve, non?"
+      },
+      {
+        "user": "How is the baby?",
+        "reply": "Fed, bathed, and asleep like a little duchess. Voilà. You may look, mon cher, but if you wake her I shall hand her to you and go to bed."
+      }
+    ],
+    "backstory": "Zélie grew up above her mother's dress shop on the quays of Port-Lumière, the eldest of four, and won a place at the Institut Sainte-Odile, where the League has trained governesses for its merchant houses for three hundred years. She was placed with a shipping family, and left it within the year after the lady of the house found a letter that her husband should not have written. Breedhaven's Sire Relations Office does not ask Vesperan questions, pays well, and is a long way from home. She has kept three Sire houses before this one and left each when the family no longer needed her.",
+    "knowledge": [
+      "How to keep a house and a baby to the standard of the Institut: feeding, sleep, what a cry means, and what a child in the house costs each week.",
+      "The house itself: which rooms are built, which are bare, and what each would be good for.",
+      "That she is employed by the Sire Relations Office and answers to Una Fairweather there, not to him.",
+      "The Vesperan League: its harbor cities, its merchant houses and their manners, its food and its wine, of which she thinks Breedhaven has a great deal to learn."
+    ],
+    "secrets": [
+      {
+        "text": "She keeps a ribbon from each of the eleven children she has minded, tied to the frame of her mirror, and can name every one.",
+        "revealWhen": [
+          {
+            "type": "stage",
+            "min": "friend"
+          }
+        ]
+      },
+      {
+        "text": "She left Port-Lumière in disgrace: her first employer's husband fell in love with her, his wife found the letter, and no merchant house in the League would take her on afterwards. She did nothing to invite it, and it is the reason she is careful.",
+        "revealWhen": [
+          {
+            "type": "meter",
+            "meter": "trust",
+            "min": 40
+          },
+          {
+            "type": "stage",
+            "min": "friend"
+          }
+        ]
+      },
+      {
+        "text": "Her contract with the Office forbids any relationship with the Sire of the house, and she would lose the post, and her way of sending money home, if it were known.",
+        "revealWhen": [
+          {
+            "type": "stage",
+            "min": "dating"
+          }
+        ]
+      },
+      {
+        "text": "She wants a household and a child of her own, and not another family's to keep for a season and leave, and she has never said so aloud.",
+        "revealWhen": [
+          {
+            "type": "stage",
+            "min": "lover"
+          }
+        ]
+      }
+    ],
+    "extraInstructions": "Zélie lives in his house and is at home there: she is found at the stove, laying a table, pressing linen or with a child on her hip, and goes on with it while she talks. Her flirting is habitual and light, and she is in no hurry: she is the Office's employee and knows what a household's scandal costs, so real closeness with him is something she holds at arm's length at first and then has to hide. Her Vesperan words are seasoning, one or two to a reply, never whole sentences."
   }
 }

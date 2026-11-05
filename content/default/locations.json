@@ -935,5 +935,202 @@
     "eventOnly": true,
     "private": false,
     "drills": []
+  },
+  {
+    "id": "brightshore",
+    "name": "Brightshore",
+    "icon": "droplet",
+    "description": "A sunny coastal resort town known for its white beaches, cliffside cottages, and lively wooden pier.",
+    "appearance": "A bright coastal resort town with whitewashed cottages on rocky cliffs overlooking a white-sand beach, clear turquoise ocean water, and a wooden pier with a Ferris wheel under a clear sky.",
+    "backgrounds": [
+      {
+        "id": "beach",
+        "name": "The beach",
+        "images": {
+          "day": "generated/backgrounds/brightshore/beach.webp",
+          "night": "generated/backgrounds/brightshore/beach.webp"
+        },
+        "clip": "sprites/brightshore/beach.mp4"
+      },
+      {
+        "id": "boardwalk",
+        "name": "The boardwalk",
+        "images": {
+          "day": "generated/backgrounds/brightshore/boardwalk.webp",
+          "night": "generated/backgrounds/brightshore/boardwalk.webp"
+        },
+        "clip": "sprites/brightshore/boardwalk.mp4"
+      },
+      {
+        "id": "cove",
+        "name": "The cove",
+        "images": {
+          "day": "generated/backgrounds/brightshore/cove.webp",
+          "night": "generated/backgrounds/brightshore/cove.webp"
+        },
+        "clip": "sprites/brightshore/cove.mp4"
+      }
+    ],
+    "indoors": false,
+    "private": false,
+    "eventOnly": true,
+    "drills": []
+  },
+  {
+    "id": "fernhollow",
+    "name": "Fernhollow",
+    "icon": "tree",
+    "description": "A quiet forest campground set among old-growth pines on the shore of a clear mountain lake.",
+    "appearance": "A peaceful campground in an old pine forest beside a glassy lake with a wooden dock, tall evergreens, dirt trails, and a canvas tent beside a stone fire ring.",
+    "backgrounds": [
+      {
+        "id": "trail",
+        "name": "The trail",
+        "images": {
+          "day": "generated/backgrounds/fernhollow/trail.webp",
+          "night": "generated/backgrounds/fernhollow/trail.webp"
+        }
+      },
+      {
+        "id": "campfire",
+        "name": "The campsite",
+        "images": {
+          "day": "generated/backgrounds/fernhollow/campfire.webp",
+          "night": "generated/backgrounds/fernhollow/campfire.webp"
+        },
+        "clip": "sprites/fernhollow/campfire.mp4"
+      },
+      {
+        "id": "lake",
+        "name": "The lake",
+        "images": {
+          "day": "generated/backgrounds/fernhollow/lake.webp",
+          "night": "generated/backgrounds/fernhollow/lake.webp"
+        }
+      }
+    ],
+    "indoors": false,
+    "private": false,
+    "eventOnly": true,
+    "drills": []
+  },
+  {
+    "id": "jadewater",
+    "name": "Jadewater Bay",
+    "icon": "droplet",
+    "description": "Jadewater Bay is a sheltered expanse of calm emerald water where thousands of jungle-covered limestone islands rise toward the clouds.",
+    "appearance": "A vast bay of calm emerald water among thousands of towering jungle-covered limestone karst islands, with a luxury wooden cruise junk with red sails gliding between them.",
+    "backgrounds": [
+      {
+        "id": "deck",
+        "name": "The deck",
+        "images": {
+          "day": "generated/backgrounds/jadewater/deck.webp",
+          "night": "generated/backgrounds/jadewater/deck.webp"
+        },
+        "clip": "sprites/jadewater/deck.mp4"
+      },
+      {
+        "id": "cabin",
+        "name": "The cabin",
+        "images": {
+          "day": "generated/backgrounds/jadewater/cabin.webp",
+          "night": "generated/backgrounds/jadewater/cabin.webp"
+        },
+        "clip": "sprites/jadewater/cabin.mp4"
+      },
+      {
+        "id": "cave",
+        "name": "The sea cave",
+        "images": {
+          "day": "generated/backgrounds/jadewater/cave.webp",
+          "night": "generated/backgrounds/jadewater/cave.webp"
+        }
+      }
+    ],
+    "indoors": false,
+    "private": false,
+    "eventOnly": true,
+    "drills": []
+  },
+  {
+    "id": "coralmere",
+    "name": "Coralmere Atoll",
+    "icon": "droplet",
+    "description": "Coralmere Atoll is a remote ring of palm-fringed islets encircling a shallow, crystal-clear lagoon in the open ocean.",
+    "appearance": "A ring of tiny palm islets around a crystal-clear turquoise lagoon in the open ocean, with thatched overwater bungalows on stilts and white sandbars.",
+    "backgrounds": [
+      {
+        "id": "reef",
+        "name": "The reef",
+        "images": {
+          "day": "generated/backgrounds/coralmere/reef.webp",
+          "night": "generated/backgrounds/coralmere/reef.webp"
+        },
+        "clip": "sprites/coralmere/reef.mp4"
+      },
+      {
+        "id": "bungalow",
+        "name": "The bungalow",
+        "images": {
+          "day": "generated/backgrounds/coralmere/bungalow.webp",
+          "night": "generated/backgrounds/coralmere/bungalow.webp"
+        },
+        "clip": "sprites/coralmere/bungalow.mp4"
+      },
+      {
+        "id": "sandbar",
+        "name": "The sandbar",
+        "images": {
+          "day": "generated/backgrounds/coralmere/sandbar.webp",
+          "night": "generated/backgrounds/coralmere/sandbar.webp"
+        },
+        "clip": "sprites/coralmere/sandbar.mp4"
+      }
+    ],
+    "indoors": false,
+    "private": false,
+    "eventOnly": true,
+    "drills": []
+  },
+  {
+    "id": "saffron-lake",
+    "name": "Saffron Lake",
+    "icon": "droplet",
+    "description": "Saffron Lake is a historic desert oasis city famous for its white marble palaces, lakeside ghats, and richly painted courtyard mansions.",
+    "appearance": "An old desert lake city of white marble palaces with domed pavilions, carved stone ghats and painted havelis reflected in a calm lake.",
+    "backgrounds": [
+      {
+        "id": "lake",
+        "name": "The lake",
+        "images": {
+          "day": "generated/backgrounds/saffron-lake/lake.webp",
+          "night": "generated/backgrounds/saffron-lake/lake.webp"
+        },
+        "clip": "sprites/saffron-lake/lake.mp4"
+      },
+      {
+        "id": "rooftop",
+        "name": "The rooftop",
+        "images": {
+          "day": "generated/backgrounds/saffron-lake/rooftop.webp",
+          "night": "generated/backgrounds/saffron-lake/rooftop.webp"
+        },
+        "clip": "sprites/saffron-lake/rooftop.mp4"
+      },
+      {
+        "id": "colors",
+        "name": "The festival",
+        "images": {
+          "day": "generated/backgrounds/saffron-lake/colors.webp",
+          "night": "generated/backgrounds/saffron-lake/colors.webp"
+        },
+        "clip": "sprites/saffron-lake/colors.mp4"
+      }
+    ],
+    "indoors": false,
+    "private": false,
+    "eventOnly": true,
+    "drills": []
   }
 ]

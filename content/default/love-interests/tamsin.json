@@ -376,6 +376,133 @@
       "pregnant": false,
       "oneOff": true,
       "babyTone": "dark"
+    },
+    {
+      "id": "swimsuit",
+      "name": "Swimsuit",
+      "description": "a simple navy-blue sporty bikini",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tamsin/swimsuit-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "Swimsuit, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "swimsuit",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tamsin/swimsuit-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "ao-dai",
+      "name": "Ao dai",
+      "description": "a fitted navy-blue silk Vietnamese ao dai: a long close-fitting tunic of thick opaque silk, following her figure but lying smooth and unbroken over her stomach, with a high mandarin collar, long sleeves and side slits up to the waist, embroidered with small white daisies, worn over loose flowing white silk trousers",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tamsin/ao-dai-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "Ao dai, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "ao-dai",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tamsin/ao-dai-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sarong",
+      "name": "Sarong",
+      "description": "a long navy-blue silk sarong printed with large silver and white tropical hibiscus flowers, wrapped low around her hips as a long skirt knotted at one side and falling to her ankles, with a matching navy-blue silk bandeau top, and a white plumeria flower tucked behind one ear",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tamsin/sarong-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "Sarong, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sarong",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tamsin/sarong-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sari",
+      "name": "Sari",
+      "description": "a traditional navy-blue silk sari with a silver woven border, the pallu draped over one shoulder, worn with a matching short fitted blouse, and thin silver bangles",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tamsin/sari-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "Sari, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sari",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tamsin/sari-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "holi",
+      "name": "Festival whites",
+      "description": "a simple, loose-fitting white cotton kurta tunic of thick opaque cotton, hanging straight and loose from her chest to her knees and hiding her stomach completely, over loose white cotton trousers, with a thin navy-blue scarf, the clothes, her arms and her cheeks splashed and smeared with bright pink, yellow, green and blue festival color powder",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tamsin/holi-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "Festival whites, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "holi",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tamsin/holi-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -602,6 +729,20 @@
       }
     ]
   },
+  "reactions": {
+    "giggle": "sounds/voices/tamsin/giggle.ogg",
+    "sigh": "sounds/voices/tamsin/sigh.ogg",
+    "sigh-content": "sounds/voices/tamsin/sigh-content.ogg",
+    "gasp": "sounds/voices/tamsin/gasp.ogg",
+    "huff": "sounds/voices/tamsin/huff.ogg",
+    "surprised": "sounds/voices/tamsin/surprised.ogg",
+    "yawn": "sounds/voices/tamsin/yawn.ogg",
+    "aww": "sounds/voices/tamsin/aww.ogg",
+    "satisfied": "sounds/voices/tamsin/satisfied.ogg"
+  },
+  "catchphrases": {
+    "shut up": "sounds/voices/tamsin/phrase-shut-up.ogg"
+  },
   "schedule": [
     {
       "weekdays": [
@@ -674,6 +815,11 @@
     "dark": "sprites/tamsin/birth-dark.webp"
   },
   "walkSprite": "sprites/tamsin/walk-cutout.webp",
+  "walkHead": {
+    "top": 2.5,
+    "chin": 23.5,
+    "x": 47.1
+  },
   "childNames": {
     "daughters": [
       "Poppy",
@@ -701,19 +847,5 @@
     "knowledge": [],
     "secrets": [],
     "extraInstructions": "Tamsin and {player} have known each other since they were small: she remembers his childhood and uses it. Play the gap between how she acts (one of the lads) and how she now looks, and her awkwardness about it; never make her dainty. "
-  },
-  "reactions": {
-    "giggle": "sounds/voices/tamsin/giggle.ogg",
-    "sigh": "sounds/voices/tamsin/sigh.ogg",
-    "sigh-content": "sounds/voices/tamsin/sigh-content.ogg",
-    "gasp": "sounds/voices/tamsin/gasp.ogg",
-    "huff": "sounds/voices/tamsin/huff.ogg",
-    "surprised": "sounds/voices/tamsin/surprised.ogg",
-    "yawn": "sounds/voices/tamsin/yawn.ogg",
-    "aww": "sounds/voices/tamsin/aww.ogg",
-    "satisfied": "sounds/voices/tamsin/satisfied.ogg"
-  },
-  "catchphrases": {
-    "shut up": "sounds/voices/tamsin/phrase-shut-up.ogg"
   }
 }

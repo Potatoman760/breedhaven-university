@@ -379,6 +379,134 @@
       "pregnant": false,
       "oneOff": true,
       "babyTone": "medium"
+    },
+    {
+      "id": "swimsuit",
+      "name": "Swimsuit",
+      "description": "a black one-piece swimsuit laced up the front with high-cut legs, and a sheer black lace sarong",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/morwenna/swimsuit-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "Swimsuit, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "swimsuit",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/morwenna/swimsuit-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "ao-dai",
+      "name": "Ao dai",
+      "description": "a fitted black silk Vietnamese ao dai: a long close-fitting tunic of thick opaque silk, following her figure but lying smooth and unbroken over her stomach, with a high mandarin collar, long sleeves and side slits up to the waist, plain except for a thin deep red piping along the collar and the side slits, worn over loose flowing black silk trousers",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/morwenna/ao-dai-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "Ao dai, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "ao-dai",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/morwenna/ao-dai-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sari",
+      "name": "Sari",
+      "description": "a traditional black silk sari with a deep red woven border, the pallu draped over one shoulder, worn with a matching short fitted blouse, and thin deep red bangles",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/morwenna/sari-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "Sari, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sari",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/morwenna/sari-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "holi",
+      "name": "Festival whites",
+      "description": "a simple, loose-fitting white cotton kurta tunic of thick opaque cotton, hanging straight and loose from her chest to her knees and hiding her stomach completely, over loose white cotton trousers, with a thin black scarf, the clothes, her arms and her cheeks splashed and smeared with bright pink, yellow, green and blue festival color powder",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/morwenna/holi-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "Festival whites, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "holi",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/morwenna/holi-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sarong",
+      "name": "Sarong",
+      "description": "a long black silk sarong printed with large deep red and white tropical hibiscus flowers, wrapped around her body and knotted at one shoulder as a one-shoulder dress, the thick opaque fabric hanging loose and smooth from her chest, hiding her stomach completely, falling to mid-calf with a slit at one side, and a white plumeria flower behind one ear",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/morwenna/sarong-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "Sarong, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sarong",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/morwenna/sarong-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -573,6 +701,23 @@
       }
     ]
   },
+  "reactions": {
+    "giggle": "sounds/voices/morwenna/giggle.ogg",
+    "sigh": "sounds/voices/morwenna/sigh.ogg",
+    "sigh-content": "sounds/voices/morwenna/sigh-content.ogg",
+    "gasp": "sounds/voices/morwenna/gasp.ogg",
+    "huff": "sounds/voices/morwenna/huff.ogg",
+    "surprised": "sounds/voices/morwenna/surprised.ogg",
+    "yawn": "sounds/voices/morwenna/yawn.ogg",
+    "aww": "sounds/voices/morwenna/aww.ogg",
+    "satisfied": "sounds/voices/morwenna/satisfied.ogg"
+  },
+  "catchphrases": {
+    "darling": "sounds/voices/morwenna/phrase-darling.ogg",
+    "little one": "sounds/voices/morwenna/phrase-little-one.ogg",
+    "exquisite": "sounds/voices/morwenna/phrase-exquisite.ogg"
+  },
+  "firstLine": "I am Morwenna Thriceborn, darling. You needn't pretend you weren't looking—I find honesty far less tedious than manners.",
   "schedule": [
     {
       "weekdays": [
@@ -637,6 +782,11 @@
     "medium": "sprites/morwenna/birth-medium.webp"
   },
   "walkSprite": "sprites/morwenna/walk-cutout.webp",
+  "walkHead": {
+    "top": 4,
+    "chin": 23,
+    "x": 52
+  },
   "childNames": {
     "daughters": [
       "Nyx",
@@ -675,22 +825,5 @@
       }
     ],
     "extraInstructions": "Play her as someone whose control is her deepest feature and whose vulnerability is the thing she guards most carefully. She should never break composure involuntarily in public; her softening happens in stages and in private. The Bloom's pull on her is a source of genuine conflict she engages with intellectually before she engages with it physically, and she should be allowed to be both aroused and angry about being aroused without resolving the tension quickly."
-  },
-  "reactions": {
-    "giggle": "sounds/voices/morwenna/giggle.ogg",
-    "sigh": "sounds/voices/morwenna/sigh.ogg",
-    "sigh-content": "sounds/voices/morwenna/sigh-content.ogg",
-    "gasp": "sounds/voices/morwenna/gasp.ogg",
-    "huff": "sounds/voices/morwenna/huff.ogg",
-    "surprised": "sounds/voices/morwenna/surprised.ogg",
-    "yawn": "sounds/voices/morwenna/yawn.ogg",
-    "aww": "sounds/voices/morwenna/aww.ogg",
-    "satisfied": "sounds/voices/morwenna/satisfied.ogg"
-  },
-  "catchphrases": {
-    "darling": "sounds/voices/morwenna/phrase-darling.ogg",
-    "little one": "sounds/voices/morwenna/phrase-little-one.ogg",
-    "exquisite": "sounds/voices/morwenna/phrase-exquisite.ogg"
-  },
-  "firstLine": "I am Morwenna Thriceborn, darling. You needn't pretend you weren't looking—I find honesty far less tedious than manners."
+  }
 }

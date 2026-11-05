@@ -1,6 +1,7 @@
 export * from './activity'
 export * from './appointment'
 export * from './calendar'
+export * from './getaway'
 export * from './codex'
 export * from './condition'
 export * from './content'

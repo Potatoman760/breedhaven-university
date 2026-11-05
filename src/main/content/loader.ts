@@ -32,6 +32,8 @@ const OPTIONAL_FILES = {
   orientation: 'orientation.json',
   // Scenes written for a love interest, earned stage by stage.
   story: 'story.json',
+  // Weekends away he books from his phone.
+  getaways: 'getaways.json',
   jobs: 'jobs.json',
   societies: 'societies.json',
   housing: 'housing.json',

@@ -377,6 +377,134 @@
       "pregnant": false,
       "oneOff": true,
       "babyTone": "dark"
+    },
+    {
+      "id": "swimsuit",
+      "name": "Swimsuit",
+      "description": "a pink frilly bikini with little satin ribbon bows at the hips",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/maren/swimsuit-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "Swimsuit, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "swimsuit",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/maren/swimsuit-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "ao-dai",
+      "name": "Ao dai",
+      "description": "a fitted rose-pink silk Vietnamese ao dai: a long close-fitting tunic of thick opaque silk, following her figure but lying smooth and unbroken over her stomach, with a high mandarin collar, long sleeves and side slits up to the waist, embroidered with small white and pale pink flowers, worn over loose flowing white silk trousers",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/maren/ao-dai-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "Ao dai, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "ao-dai",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/maren/ao-dai-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sari",
+      "name": "Sari",
+      "description": "a traditional rose-pink silk sari with a gold woven border, the pallu draped over one shoulder, worn with a matching short fitted blouse, and thin gold bangles",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/maren/sari-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "Sari, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sari",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/maren/sari-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "holi",
+      "name": "Festival whites",
+      "description": "a simple, loose-fitting white cotton kurta tunic of thick opaque cotton, hanging straight and loose from her chest to her knees and hiding her stomach completely, over loose white cotton trousers, with a thin rose-pink scarf, the clothes, her arms and her cheeks splashed and smeared with bright pink, yellow, green and blue festival color powder",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/maren/holi-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "Festival whites, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "holi",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/maren/holi-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sarong",
+      "name": "Sarong",
+      "description": "a long rose-pink silk sarong printed with large gold and white tropical hibiscus flowers, wrapped around her body and tied behind her neck as a halter dress, the thick opaque fabric hanging loose and smooth from her chest, hiding her stomach completely, falling to mid-calf, her shoulders bare, and a lei of fresh white and pink plumeria flowers around her neck",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/maren/sarong-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "Sarong, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sarong",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/maren/sarong-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -480,115 +608,6 @@
       "loop": true
     }
   ],
-  "schedule": [
-    {
-      "weekdays": [
-        "Saturday"
-      ],
-      "periods": [
-        "morning",
-        "afternoon"
-      ],
-      "locationId": "bloom-and-co"
-    },
-    {
-      "weekdays": [
-        "Saturday"
-      ],
-      "periods": [
-        "evening"
-      ],
-      "locationId": "lantern-row"
-    },
-    {
-      "weekdays": [
-        "Sunday"
-      ],
-      "periods": [
-        "morning",
-        "afternoon"
-      ],
-      "locationId": "boba-blossom"
-    },
-    {
-      "weekdays": [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday"
-      ],
-      "periods": [
-        "morning"
-      ],
-      "locationId": "library"
-    },
-    {
-      "weekdays": [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday"
-      ],
-      "periods": [
-        "afternoon"
-      ],
-      "locationId": "spell-and-sip"
-    },
-    {
-      "periods": [
-        "evening"
-      ],
-      "locationId": "physic-garden"
-    },
-    {
-      "locationId": "dormitories"
-    }
-  ],
-  "room": {
-    "name": "her pink room in the Cloister Halls",
-    "description": "A small modern dormitory room turned into a pink gothic lolita bedroom. Smooth white walls hung with black lace and pink ribbon garlands, a flat ceiling with a strip of soft rose-tinted ward-light. A single bed piled with frilled pink and black cushions and plush toys, a white vanity with a heart-shaped mirror ringed in small glowing crystals, a dress rail crowded with ruffled dresses and petticoats, a row of platform shoes, a lace parasol in a stand. A built-in desk holds a tiered cake stand, a floral teapot and cups, a tablet showing vocabulary flashcards, and a stack of foreign-language dictionaries. Soft pink light through a tall window with lace curtains.",
-    "locationId": "dormitories",
-    "images": {
-      "day": "generated/backgrounds/maren/view.webp"
-    }
-  },
-  "skinTone": "medium",
-  "birthPictures": {
-    "medium": "sprites/maren/birth-medium.webp",
-    "dark": "sprites/maren/birth-dark.webp"
-  },
-  "walkSprite": "sprites/maren/walk-cutout.webp",
-  "childNames": {
-    "daughters": [
-      "Kit",
-      "Saffron",
-      "Ember",
-      "Rusty",
-      "Vixie"
-    ],
-    "sons": [
-      "Todd",
-      "Russet"
-    ]
-  },
-  "birthControl": true,
-  "ai": {
-    "speechPattern": "Bright, quick and girlish, with a lilt. Gushes about what she finds cute and says so at once. Drops a word or an endearment from another language into a sentence and then translates it, pleased with herself.",
-    "tone": "sweet, playful, a little bratty",
-    "verbalQuirks": [
-      "Calls things and people cute, and means it as the highest praise.",
-      "Slips into Japanese for a word, then gives the translation with a small flourish.",
-      "Pouts and puffs her cheeks when teased, and forgives within the minute.",
-      "Says 'kawaii' at anything cute, and then translates it"
-    ],
-    "exampleDialogue": [],
-    "backstory": "Maren is a foxkin from Veyra, the daughter of two interpreters in the federation's diplomatic service. She grew up in a house where dinner was held in three languages and was fluent in four before she was twelve. She came to Breedhaven University to study Media and Communication, which she calls interpreting for crowds, and speaks six languages now, two of them badly, which annoys her.\n\nShe found gothic lolita fashion at fifteen in a shop window in the Veyran capital and has not dressed any other way since: pink and black, lace, petticoats, ribbons threaded round her ears, a bow at the base of her tail. She sews and alters most of it herself, and runs a small, devoted fashion circle out of the Cloister Halls that meets for tea and cake. She studies at Spell & Sip, spends her allowance at Bloom & Co. and Boba Blossom, and is the best linguist in her year by a distance.\n\nPeople assume a Veyran with a gift for languages reports to the Quiet Office. She finds this hilarious, and has considered having cards printed.\n\nHer magic is small and exact: a stain lifted from lace, a ribbon that ties itself, a curl that holds in the rain. She takes a suppressant like most people and treats the Bloom the way she treats the weather: dressed for it.",
-    "knowledge": [],
-    "secrets": [],
-    "extraInstructions": "Maren is cute and girlish and never stupid: let her quickness with languages and people show. Her sweetness is sincere, not an act, and her pouting is brief and playful. "
-  },
   "tonedAnimations": {
     "medium": [
       {
@@ -721,5 +740,119 @@
   "catchphrases": {
     "kawaii": "sounds/voices/maren/phrase-kawaii.ogg"
   },
-  "firstLine": "Kawaii! Look at your face, you're like a little lost prince! I'm Maren, and deciding to talk to me is ichiban—that means number one, obviously!"
+  "firstLine": "Kawaii! Look at your face, you're like a little lost prince! I'm Maren, and deciding to talk to me is ichiban—that means number one, obviously!",
+  "schedule": [
+    {
+      "weekdays": [
+        "Saturday"
+      ],
+      "periods": [
+        "morning",
+        "afternoon"
+      ],
+      "locationId": "bloom-and-co"
+    },
+    {
+      "weekdays": [
+        "Saturday"
+      ],
+      "periods": [
+        "evening"
+      ],
+      "locationId": "lantern-row"
+    },
+    {
+      "weekdays": [
+        "Sunday"
+      ],
+      "periods": [
+        "morning",
+        "afternoon"
+      ],
+      "locationId": "boba-blossom"
+    },
+    {
+      "weekdays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "periods": [
+        "morning"
+      ],
+      "locationId": "library"
+    },
+    {
+      "weekdays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "periods": [
+        "afternoon"
+      ],
+      "locationId": "spell-and-sip"
+    },
+    {
+      "periods": [
+        "evening"
+      ],
+      "locationId": "physic-garden"
+    },
+    {
+      "locationId": "dormitories"
+    }
+  ],
+  "room": {
+    "name": "her pink room in the Cloister Halls",
+    "description": "A small modern dormitory room turned into a pink gothic lolita bedroom. Smooth white walls hung with black lace and pink ribbon garlands, a flat ceiling with a strip of soft rose-tinted ward-light. A single bed piled with frilled pink and black cushions and plush toys, a white vanity with a heart-shaped mirror ringed in small glowing crystals, a dress rail crowded with ruffled dresses and petticoats, a row of platform shoes, a lace parasol in a stand. A built-in desk holds a tiered cake stand, a floral teapot and cups, a tablet showing vocabulary flashcards, and a stack of foreign-language dictionaries. Soft pink light through a tall window with lace curtains.",
+    "locationId": "dormitories",
+    "images": {
+      "day": "generated/backgrounds/maren/view.webp"
+    }
+  },
+  "skinTone": "medium",
+  "birthPictures": {
+    "medium": "sprites/maren/birth-medium.webp",
+    "dark": "sprites/maren/birth-dark.webp"
+  },
+  "walkSprite": "sprites/maren/walk-cutout.webp",
+  "walkHead": {
+    "top": 8,
+    "chin": 27.5,
+    "x": 53.9
+  },
+  "childNames": {
+    "daughters": [
+      "Kit",
+      "Saffron",
+      "Ember",
+      "Rusty",
+      "Vixie"
+    ],
+    "sons": [
+      "Todd",
+      "Russet"
+    ]
+  },
+  "birthControl": true,
+  "ai": {
+    "speechPattern": "Bright, quick and girlish, with a lilt. Gushes about what she finds cute and says so at once. Drops a word or an endearment from another language into a sentence and then translates it, pleased with herself.",
+    "tone": "sweet, playful, a little bratty",
+    "verbalQuirks": [
+      "Calls things and people cute, and means it as the highest praise.",
+      "Slips into Japanese for a word, then gives the translation with a small flourish.",
+      "Pouts and puffs her cheeks when teased, and forgives within the minute.",
+      "Says 'kawaii' at anything cute, and then translates it"
+    ],
+    "exampleDialogue": [],
+    "backstory": "Maren is a foxkin from Veyra, the daughter of two interpreters in the federation's diplomatic service. She grew up in a house where dinner was held in three languages and was fluent in four before she was twelve. She came to Breedhaven University to study Media and Communication, which she calls interpreting for crowds, and speaks six languages now, two of them badly, which annoys her.\n\nShe found gothic lolita fashion at fifteen in a shop window in the Veyran capital and has not dressed any other way since: pink and black, lace, petticoats, ribbons threaded round her ears, a bow at the base of her tail. She sews and alters most of it herself, and runs a small, devoted fashion circle out of the Cloister Halls that meets for tea and cake. She studies at Spell & Sip, spends her allowance at Bloom & Co. and Boba Blossom, and is the best linguist in her year by a distance.\n\nPeople assume a Veyran with a gift for languages reports to the Quiet Office. She finds this hilarious, and has considered having cards printed.\n\nHer magic is small and exact: a stain lifted from lace, a ribbon that ties itself, a curl that holds in the rain. She takes a suppressant like most people and treats the Bloom the way she treats the weather: dressed for it.",
+    "knowledge": [],
+    "secrets": [],
+    "extraInstructions": "Maren is cute and girlish and never stupid: let her quickness with languages and people show. Her sweetness is sincere, not an act, and her pouting is brief and playful. "
+  }
 }

@@ -1,7 +1,7 @@
 import type { CalendarEvent, ContentPack, EventPart, GameState, LoveInterest } from '../model'
 import type { PerformCheck } from './activities'
 import { toDate } from './calendar'
-import { eventDay, eventsOn } from './events'
+import { allEvents, eventDay, eventsOn } from './events'
 import { partKey } from './eventParts'
 import { addGroupNote, startGroupChat } from './courier'
 import { stageFor, stageRank } from './relationships'
@@ -14,6 +14,8 @@ import { t } from '../i18n'
  */
 
 type Booking = NonNullable<EventPart['booking']>
+/** What booking a trip needs to know: the trip's event, how many may come, what it costs a head, and how close each must be. */
+export type TripTerms = Pick<Booking, 'eventId' | 'most' | 'price' | 'minStage'>
 
 /** Who he could take: the women he has met who are at the stage it asks or closer with him. */
 export function tripChoices(content: ContentPack, state: GameState, booking: Pick<Booking, 'minStage'>): LoveInterest[] {
@@ -26,7 +28,7 @@ export function tripChoices(content: ContentPack, state: GameState, booking: Pic
 export const tripCost = (booking: Pick<Booking, 'price'>, ids: string[]): number => booking.price * (ids.length + 1)
 
 /** Whether he can book the trip with these: one at least, no more than it takes, each willing, and the money for it. */
-export function canBookTrip(content: ContentPack, state: GameState, booking: Booking, ids: string[]): PerformCheck {
+export function canBookTrip(content: ContentPack, state: GameState, booking: Omit<TripTerms, 'eventId'>, ids: string[]): PerformCheck {
   const willing = tripChoices(content, state, booking).map((li) => li.id)
   const reasons = [
     ids.length === 0 && t('game.trips.takeSomeone'),
@@ -42,21 +44,21 @@ export const tripChatId = (eventId: string): string => `trip:${eventId}`
 
 /**
  * Books the trip: paid for, and who is going kept in the save. A group chat is started for it, named for the break,
- * with those going in it, and he tells them.
+ * with those going in it, and he tells them. The trip is one of the calendar's, or one already put in the save.
  */
-export function bookTrip(content: ContentPack, state: GameState, booking: Booking, ids: string[]): GameState {
+export function bookTrip(content: ContentPack, state: GameState, booking: TripTerms, ids: string[], told?: string): GameState {
   if (!canBookTrip(content, state, booking, ids).ok) return state
-  const trip = content.calendar.events.find((event) => event.id === booking.eventId)
+  const trip = allEvents(content, state).find((event) => event.id === booking.eventId)
   const place = content.locations.find((location) => location.id === trip?.locationId)
   const name = (trip?.name ?? t('game.trips.theTrip')).replace(/^the /i, '')
   const paid: GameState = { ...state, player: { ...state.player, money: state.player.money - tripCost(booking, ids) }, trips: { ...state.trips, [booking.eventId]: ids } }
   const chat = startGroupChat(paid, tripChatId(booking.eventId), name, ids)
-  const told = t('game.trips.booked', { at: place !== undefined, place: place?.name, name, days: trip?.durationDays ?? 4 })
-  return addGroupNote(chat, tripChatId(booking.eventId), { from: 'player', text: told, read: true })
+  const said = told ?? t('game.trips.booked', { at: place !== undefined, place: place?.name, name, days: trip?.durationDays ?? 4 })
+  return addGroupNote(chat, tripChatId(booking.eventId), { from: 'player', text: said, read: true })
 }
 
 const tripEvents = (content: ContentPack, state: GameState): CalendarEvent[] =>
-  [...content.calendar.events, ...state.events].filter((event) => state.trips[event.id] !== undefined && event.program.some((part) => part.onTrip))
+  allEvents(content, state).filter((event) => state.trips[event.id] !== undefined && event.program.some((part) => part.onTrip))
 
 const unfinished = (state: GameState, event: CalendarEvent): boolean => event.program.some((part) => part.onTrip && !state.partsAttended.includes(partKey(event, part)))
 
@@ -90,12 +92,12 @@ export function awayOnDay(content: ContentPack, state: GameState, dayIndex: numb
  * Home from a trip: once he is still at its place and nothing of it is left, he is taken home. The same state when he
  * is not; otherwise who went with him, for the drive home.
  */
-export function comeHome(content: ContentPack, state: GameState): { state: GameState; companions: string[] } {
+export function comeHome(content: ContentPack, state: GameState): { state: GameState; companions: string[]; tripId?: string } {
   const trip = tripEvents(content, state).find((event) => event.locationId === state.locationId && !unfinished(state, event))
   if (!trip) return { state, companions: [] }
   const home = content.newGame.room?.locationId ?? content.newGame.locationId
   // The drive back takes him to the hour the trip has him home, if that is later.
   const { hour } = toDate(content.calendar, state.time)
   const time = trip.homeAt !== undefined && hour < trip.homeAt ? state.time + trip.homeAt - hour : state.time
-  return { state: { ...state, time, locationId: home, inOwnRoom: false }, companions: state.trips[trip.id] ?? [] }
+  return { state: { ...state, time, locationId: home, inOwnRoom: false }, companions: state.trips[trip.id] ?? [], tripId: trip.id }
 }

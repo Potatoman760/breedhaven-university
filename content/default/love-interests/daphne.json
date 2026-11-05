@@ -379,6 +379,133 @@
       "pregnant": false,
       "oneOff": true,
       "babyTone": "dark"
+    },
+    {
+      "id": "swimsuit",
+      "name": "Swimsuit",
+      "description": "a red sporty bikini with crisscrossed straps over the shoulders and high-cut red bottoms with a wide black waistband",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/daphne/swimsuit-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "Swimsuit, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "swimsuit",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/daphne/swimsuit-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "ao-dai",
+      "name": "Ao dai",
+      "description": "a fitted red silk Vietnamese ao dai: a long close-fitting tunic of thick opaque silk, following her figure but lying flat and smooth across her stomach, a plain unbroken panel of silk from her chest to her hips, with a high mandarin collar, long sleeves and side slits up to the waist, with a black trim at the collar and cuffs, worn over loose flowing black silk trousers",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/daphne/ao-dai-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "Ao dai, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "ao-dai",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/daphne/ao-dai-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sarong",
+      "name": "Sarong",
+      "description": "a long red silk sarong printed with large gold and white tropical hibiscus flowers, wrapped low around her hips as a long skirt knotted at one side and falling to her ankles, with a matching red silk bandeau top, and a white plumeria flower tucked behind one ear",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/daphne/sarong-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "Sarong, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sarong",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/daphne/sarong-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sari",
+      "name": "Sari",
+      "description": "a traditional red silk sari with a gold woven border, the pallu draped over one shoulder, worn with a matching short fitted blouse, and thin gold bangles",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/daphne/sari-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "Sari, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sari",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/daphne/sari-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "holi",
+      "name": "Festival whites",
+      "description": "a simple, loose-fitting white cotton kurta tunic of thick opaque cotton, hanging straight and loose from her chest to her knees and hiding her stomach completely, over loose white cotton trousers, with a thin red scarf, the clothes, her arms and her cheeks splashed and smeared with bright pink, yellow, green and blue festival color powder",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/daphne/holi-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "Festival whites, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "holi",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/daphne/holi-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -468,94 +595,6 @@
       "loop": true
     }
   ],
-  "schedule": [
-    {
-      "weekdays": [
-        "Wednesday",
-        "Friday"
-      ],
-      "periods": [
-        "evening"
-      ],
-      "locationId": "ironroot"
-    },
-    {
-      "weekdays": [
-        "Sunday"
-      ],
-      "periods": [
-        "morning"
-      ],
-      "locationId": "riverside-park"
-    },
-    {
-      "periods": [
-        "morning"
-      ],
-      "locationId": "tiltyard"
-    },
-    {
-      "periods": [
-        "afternoon"
-      ],
-      "locationId": "tiltyard"
-    },
-    {
-      "periods": [
-        "evening"
-      ],
-      "locationId": "honeyed-bee-inn"
-    },
-    {
-      "periods": [
-        "night"
-      ],
-      "locationId": "dormitories"
-    }
-  ],
-  "room": {
-    "name": "a duty flat over the Cloister Halls gate",
-    "description": "A modern Breedhaven university apartment bedroom belonging to a fourth-year female volleyball captain: spacious and stylish, with magitech touches, a large bed, university volleyball trophies and medals, framed team photos, volleyball gear, athletic shoes, and a captain’s jacket. Warm wood furniture, soft ambient magical lighting, subtle Bloom-inspired decorations, laptop and textbooks on a desk, lived-in but tidy, confident sporty atmosphere.",
-    "locationId": "dormitories",
-    "images": {
-      "day": "generated/backgrounds/daphne/view.webp"
-    }
-  },
-  "skinTone": "medium",
-  "birthPictures": {
-    "medium": "sprites/daphne/birth-medium.webp",
-    "dark": "sprites/daphne/birth-dark.webp"
-  },
-  "walkSprite": "sprites/daphne/walk-cutout.webp",
-  "childNames": {
-    "daughters": [
-      "Thea",
-      "Calla",
-      "Ione",
-      "Phoebe",
-      "Xanthe"
-    ],
-    "sons": [
-      "Leander",
-      "Damon"
-    ]
-  },
-  "birthControl": true,
-  "ai": {
-    "speechPattern": "Short, direct sentences, said evenly: a captain's voice that expects to be heard without being raised. Dry jokes delivered with a straight face, and easy banter with anyone who can keep up. She says what she means and then stops.",
-    "tone": "direct, dry, steady",
-    "verbalQuirks": [
-      "Sums up a situation in a few words, as if briefing the team before a set.",
-      "Answers a compliment with a deadpan remark or a raised eyebrow rather than thanks.",
-      "Says \"Coach\" when she means Grushka, and quotes her to settle a point.",
-      "Calls {player} 'rookie', whatever he has done to earn better"
-    ],
-    "exampleDialogue": [],
-    "backstory": "Studies: Fourth year, College of Athletics\n\nCaptain of the Campus volleyball team\n\nDaphne grew up by Seedblossom's South Gate, where her family repaired body armor and duty gear for the city police, and spent her childhood watching officers train. Her coach is Grushka Tor-Vael, whose good opinion she values more than the titles. She has magic like any woman and rarely bothers with it: she competes in the unaugmented division on purpose, and trusts training over tricks.",
-    "knowledge": [],
-    "secrets": [],
-    "extraInstructions": ""
-  },
   "tonedAnimations": {
     "medium": [
       {
@@ -674,5 +713,98 @@
   "catchphrases": {
     "rookie": "sounds/voices/daphne/phrase-rookie.ogg"
   },
-  "firstLine": "Daphne. Fourth-year Athletics. Short version: you're new, you're staring, and we're saying hello."
+  "firstLine": "Daphne. Fourth-year Athletics. Short version: you're new, you're staring, and we're saying hello.",
+  "schedule": [
+    {
+      "weekdays": [
+        "Wednesday",
+        "Friday"
+      ],
+      "periods": [
+        "evening"
+      ],
+      "locationId": "ironroot"
+    },
+    {
+      "weekdays": [
+        "Sunday"
+      ],
+      "periods": [
+        "morning"
+      ],
+      "locationId": "riverside-park"
+    },
+    {
+      "periods": [
+        "morning"
+      ],
+      "locationId": "tiltyard"
+    },
+    {
+      "periods": [
+        "afternoon"
+      ],
+      "locationId": "tiltyard"
+    },
+    {
+      "periods": [
+        "evening"
+      ],
+      "locationId": "honeyed-bee-inn"
+    },
+    {
+      "periods": [
+        "night"
+      ],
+      "locationId": "dormitories"
+    }
+  ],
+  "room": {
+    "name": "a duty flat over the Cloister Halls gate",
+    "description": "A modern Breedhaven university apartment bedroom belonging to a fourth-year female volleyball captain: spacious and stylish, with magitech touches, a large bed, university volleyball trophies and medals, framed team photos, volleyball gear, athletic shoes, and a captain’s jacket. Warm wood furniture, soft ambient magical lighting, subtle Bloom-inspired decorations, laptop and textbooks on a desk, lived-in but tidy, confident sporty atmosphere.",
+    "locationId": "dormitories",
+    "images": {
+      "day": "generated/backgrounds/daphne/view.webp"
+    }
+  },
+  "skinTone": "medium",
+  "birthPictures": {
+    "medium": "sprites/daphne/birth-medium.webp",
+    "dark": "sprites/daphne/birth-dark.webp"
+  },
+  "walkSprite": "sprites/daphne/walk-cutout.webp",
+  "walkHead": {
+    "top": 3.5,
+    "chin": 24.5,
+    "x": 44.7
+  },
+  "childNames": {
+    "daughters": [
+      "Thea",
+      "Calla",
+      "Ione",
+      "Phoebe",
+      "Xanthe"
+    ],
+    "sons": [
+      "Leander",
+      "Damon"
+    ]
+  },
+  "birthControl": true,
+  "ai": {
+    "speechPattern": "Short, direct sentences, said evenly: a captain's voice that expects to be heard without being raised. Dry jokes delivered with a straight face, and easy banter with anyone who can keep up. She says what she means and then stops.",
+    "tone": "direct, dry, steady",
+    "verbalQuirks": [
+      "Sums up a situation in a few words, as if briefing the team before a set.",
+      "Answers a compliment with a deadpan remark or a raised eyebrow rather than thanks.",
+      "Says \"Coach\" when she means Grushka, and quotes her to settle a point.",
+      "Calls {player} 'rookie', whatever he has done to earn better"
+    ],
+    "exampleDialogue": [],
+    "backstory": "Studies: Fourth year, College of Athletics\n\nCaptain of the Campus volleyball team\n\nDaphne grew up by Seedblossom's South Gate, where her family repaired body armor and duty gear for the city police, and spent her childhood watching officers train. Her coach is Grushka Tor-Vael, whose good opinion she values more than the titles. She has magic like any woman and rarely bothers with it: she competes in the unaugmented division on purpose, and trusts training over tricks.",
+    "knowledge": [],
+    "secrets": [],
+    "extraInstructions": ""
+  }
 }

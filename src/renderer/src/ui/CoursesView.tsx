@@ -16,7 +16,8 @@ interface Props {
   onEnrol: (courseIds: string[]) => void
   /** Whether he has been shown round the screen already. */
   toured: boolean
-  onToured: () => void
+  /** The tour is over: seen through, or skipped. */
+  onToured: (skipped: boolean) => void
   /** Given when he is changing the classes he has, from his calendar: the way back without changing them. */
   onCancel?: () => void
 }
@@ -142,7 +143,7 @@ export function CoursesView({ content, state, onEnrol, toured, onToured, onCance
           </div>
         </Dialog>
       )}
-      {!toured && !changing && guide && tour.length > 0 && state.courses.length > 0 && <Tour guide={guide} steps={tour} onDone={onToured} />}
+      {!toured && !changing && guide && tour.length > 0 && state.courses.length > 0 && <Tour guide={guide} steps={tour} onDone={() => onToured(false)} onSkip={() => onToured(true)} />}
       <Backdrop screen="courses" location={location} periodId={date.period.id} light={date.period.light} />
       <div className="planner-panel glass framed">
         <div className="market-head">

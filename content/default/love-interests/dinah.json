@@ -377,6 +377,133 @@
       "pregnant": false,
       "oneOff": true,
       "babyTone": "medium"
+    },
+    {
+      "id": "swimsuit",
+      "name": "Swimsuit",
+      "description": "an ivory one-piece swimsuit with a plunging neckline and a thin gold belt at the waist",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/dinah/swimsuit-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "Swimsuit, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "swimsuit",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/dinah/swimsuit-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "ao-dai",
+      "name": "Ao dai",
+      "description": "a fitted ivory silk Vietnamese ao dai: a long close-fitting tunic of thick opaque silk, following her figure but lying smooth and unbroken over her stomach, with a high mandarin collar, long sleeves and side slits up to the waist, embroidered with pale gold lotus flowers, worn over loose flowing ivory silk trousers",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/dinah/ao-dai-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "Ao dai, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "ao-dai",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/dinah/ao-dai-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sarong",
+      "name": "Sarong",
+      "description": "a long ivory silk sarong printed with large pale gold and white tropical hibiscus flowers, wrapped around her waist as a long skirt knotted at the front and falling to her ankles, with a short white cotton blouse tied under her chest, and a thin lei of white plumeria flowers around her neck",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/dinah/sarong-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "Sarong, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sarong",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/dinah/sarong-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sari",
+      "name": "Sari",
+      "description": "a traditional ivory silk sari with a pale gold woven border, the pallu draped over one shoulder, worn with a matching short fitted blouse, and thin pale gold bangles",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/dinah/sari-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "Sari, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sari",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/dinah/sari-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "holi",
+      "name": "Festival whites",
+      "description": "a simple, loose-fitting white cotton kurta tunic of thick opaque cotton, hanging straight and loose from her chest to her knees and hiding her stomach completely, over loose white cotton trousers, with a thin ivory scarf, the clothes, her arms and her cheeks splashed and smeared with bright pink, yellow, green and blue festival color powder",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/dinah/holi-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "Festival whites, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "holi",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/dinah/holi-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -591,6 +718,21 @@
       }
     ]
   },
+  "reactions": {
+    "giggle": "sounds/voices/dinah/giggle.ogg",
+    "sigh": "sounds/voices/dinah/sigh.ogg",
+    "sigh-content": "sounds/voices/dinah/sigh-content.ogg",
+    "gasp": "sounds/voices/dinah/gasp.ogg",
+    "huff": "sounds/voices/dinah/huff.ogg",
+    "surprised": "sounds/voices/dinah/surprised.ogg",
+    "yawn": "sounds/voices/dinah/yawn.ogg",
+    "aww": "sounds/voices/dinah/aww.ogg",
+    "satisfied": "sounds/voices/dinah/satisfied.ogg"
+  },
+  "catchphrases": {
+    "trust in the Bloom": "sounds/voices/dinah/phrase-trust-in-the-bloom.ogg"
+  },
+  "firstLine": "I am Dinah Silverith. When the noise of this city becomes a little too much to hold, I am someone you may speak with plainly. Are you breathing well enough?",
   "schedule": [
     {
       "weekdays": [
@@ -637,6 +779,11 @@
     "medium": "sprites/dinah/birth-medium.webp"
   },
   "walkSprite": "sprites/dinah/walk-cutout.webp",
+  "walkHead": {
+    "top": 4,
+    "chin": 24,
+    "x": 52.3
+  },
   "childNames": {
     "daughters": [
       "Elarie",
@@ -665,20 +812,5 @@
     "knowledge": [],
     "secrets": [],
     "extraInstructions": ""
-  },
-  "reactions": {
-    "giggle": "sounds/voices/dinah/giggle.ogg",
-    "sigh": "sounds/voices/dinah/sigh.ogg",
-    "sigh-content": "sounds/voices/dinah/sigh-content.ogg",
-    "gasp": "sounds/voices/dinah/gasp.ogg",
-    "huff": "sounds/voices/dinah/huff.ogg",
-    "surprised": "sounds/voices/dinah/surprised.ogg",
-    "yawn": "sounds/voices/dinah/yawn.ogg",
-    "aww": "sounds/voices/dinah/aww.ogg",
-    "satisfied": "sounds/voices/dinah/satisfied.ogg"
-  },
-  "catchphrases": {
-    "trust in the Bloom": "sounds/voices/dinah/phrase-trust-in-the-bloom.ogg"
-  },
-  "firstLine": "I am Dinah Silverith. When the noise of this city becomes a little too much to hold, I am someone you may speak with plainly. Are you breathing well enough?"
+  }
 }

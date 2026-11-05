@@ -9,10 +9,10 @@ const raw = rawFixture()
 const content: ContentPack = validateContentPack({
   ...raw,
   calendar: { ...raw.calendar, periods: [raw.calendar.periods[0], { ...raw.calendar.periods[1], light: 'night' }] },
-  locations: raw.locations.map((l) => (l.id === 'shop' ? { ...l, indoors: true } : l)),
+  locations: raw.locations.map((l) => (l.id === 'shop' ? { ...l, indoors: true } : l.id === 'home' ? { ...l, backgrounds: [{ id: 'porch', name: 'The porch', images: {} }] } : l)),
   sounds: {
     ambience: { birds: { file: 'sounds/birds.ogg' }, crickets: { file: 'sounds/crickets.ogg', volume: 0.5 }, shop: { file: 'sounds/shop.ogg' } },
-    places: { home: { day: 'birds', night: 'crickets' }, shop: { day: 'shop' } }
+    places: { home: { day: 'birds', night: 'crickets', views: { porch: 'shop' } }, shop: { day: 'shop' } }
   }
 })
 const start = createInitialState(content)
@@ -43,6 +43,12 @@ describe('ambienceAt', () => {
   it('plays the place by day and its night loop after dark', () => {
     expect(ambienceAt(content, start)?.file).toBe('sounds/birds.ogg')
     expect(ambienceAt(content, { ...start, time: 9 })).toEqual({ file: 'sounds/crickets.ogg', volume: 0.5, credit: '' })
+  })
+
+  it("plays a view's own loop in a scene in it, whatever the hour, and the place's in any other", () => {
+    expect(ambienceAt(content, start, 'porch')?.file).toBe('sounds/shop.ogg')
+    expect(ambienceAt(content, { ...start, time: 9 }, 'porch')?.file).toBe('sounds/shop.ogg')
+    expect(ambienceAt(content, start, 'kitchen')?.file).toBe('sounds/birds.ogg')
   })
 
   it('keeps the day loop at night for a place with none of its own, and is silent where none is set', () => {

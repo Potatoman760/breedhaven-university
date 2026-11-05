@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { backgroundPrompt, birthPrompt, ComfySettingsSchema, DEFAULT_SIZES, DEFAULT_VIDEO_PROMPT, normaliseComfyUrl, nsfwPrompt, prependPrompt, spritePrompt, videoPromptFor, groupVideoPromptFor } from '../../shared/comfy'
+import { backgroundPrompt, birthPrompt, withoutAbs, ComfySettingsSchema, DEFAULT_SIZES, DEFAULT_VIDEO_PROMPT, normaliseComfyUrl, nsfwPrompt, prependPrompt, spritePrompt, videoPromptFor, groupVideoPromptFor } from '../../shared/comfy'
 import { NSFW_POSES, outfitDescription, poseDescription } from '../../shared/model'
 import { analyse, applyBindings, effectiveBindings, parseGraph, unplugLastFrame } from './graph'
 import { ComfyStore, fileArt } from './studio'
@@ -413,5 +413,24 @@ describe('a group clip', () => {
     store.update({ ...store.get(), groupVideoPrompts: { ...store.get().groupVideoPrompts, doggy: 'mine' } })
     expect(new ComfyStore(join(root, 'comfy.json'), pack).get().groupVideoPrompts).toEqual({ missionary: 'shipped', doggy: 'mine' })
     expect(JSON.parse(readFileSync(join(pack, 'comfy', 'bundle.json'), 'utf8')).groupVideoPrompts).toEqual({ missionary: 'shipped' })
+  })
+})
+
+describe('a sprite in an outfit that covers her stomach', () => {
+  const who = {
+    appearance: 'An athletic, muscular build: defined abdominal muscles, strong shoulders and thighs, a full bust, and wide hips.',
+    outfits: [
+      { id: 'crop', name: 'Crop top', description: 'a crop top', sprites: {}, pregnant: false },
+      { id: 'ao-dai', name: 'Ao dai', description: 'an ao dai', sprites: {}, pregnant: false, coversStomach: true },
+      { id: 'ao-dai-pregnant', name: 'Ao dai, pregnant', inherits: 'ao-dai', description: 'She has a round, pregnant belly.', sprites: {}, pregnant: true }
+    ]
+  }
+
+  it('is drawn without the abs, and so is its pregnant form; one that shows her stomach keeps them', () => {
+    expect(withoutAbs(who.appearance)).toBe('An athletic, muscular build: strong shoulders and thighs, a full bust, and wide hips.')
+    expect(withoutAbs('Broad shoulders, toned arms, defined abdominal muscles, a very full bust.')).toBe('Broad shoulders, toned arms, a very full bust.')
+    expect(spritePrompt(who, 'ao-dai', 'neutral', '')).not.toContain('abdominal')
+    expect(spritePrompt(who, 'ao-dai-pregnant', 'neutral', '')).not.toContain('abdominal')
+    expect(spritePrompt(who, 'crop', 'neutral', '')).toContain('defined abdominal muscles')
   })
 })

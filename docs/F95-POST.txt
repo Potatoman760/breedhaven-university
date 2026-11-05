@@ -1,0 +1,77 @@
+[CENTER][IMG]BANNER_IMAGE_URL[/IMG]
+
+[SIZE=5][B][URL='DEV_THREAD_URL']Dev Thread[/URL][/B][/SIZE]
+
+[SIZE=6][B]Breedhaven Dating Sim[/B][/SIZE]
+[SIZE=4][I]An LLM-driven dating sim at a university, in a world where women outnumber men seven to one, and you are the rarest man of all, a true sire[/I][/SIZE]
+
+-
+
+[B]Version:[/B] 0.8.5
+[B]Developer:[/B] Potatoman760
+[B]Platforms:[/B] Windows
+[B]Language:[/B] English
+[B]Genre:[/B] Dating Sim / Life Sim / Sandbox
+[B]Requires:[/B] An OpenAI-compatible LLM (a hosted provider like OpenRouter, or a model running on your own PC). GLM 5.2 tested.
+[B]Optional:[/B] ComfyUI on your own PC
+
+[IMG]SCREENSHOT_1_URL[/IMG]
+
+[IMG]ANIMATED_1_URL[/IMG]
+
+[SIZE=5][B]Overview[/B][/SIZE]
+
+Breedhaven is a modern kingdom of trams, phones and magic, where every woman works some spell
+and only women can. Seven girls are born for every boy, and only one man in ten can father a child.
+
+You have just been measured a [B]True Sire[/B]: the rare man with whom a woman always conceives.
+Now you are starting your first year at Breedhaven University, in the capital, Seedblossom,
+and everyone on campus knows exactly what you are.
+
+Twenty women, from classmates and roommates to professors, a slime girl, an orc and the newly crowned queen,
+all have their own lives, schedules and secrets. What happens with each of them is up to you.
+
+[IMG]ANIMATED_2_URL[/IMG]
+
+[SIZE=5][B]How it plays[/B][/SIZE]
+
+Every conversation is written live by the LLM you point the game at. You type what you say, and she answers in
+character. You aren't picking from a list of replies.
+
+Everything around the conversations is ordinary game logic: the calendar, your money and stats, classes and grades,
+what each woman will and won't do, pregnancy, children and the house you build for them. 
+
+[LIST]
+[*][B]20 love interests[/B], each with her own personality, voice, wardrobe, story beats and secrets
+[*][B]A full university semester[/B]: enroll in courses, sit midterms and finals, take a job, join societies
+[*][B]Festivals and trips[/B]: the Societies Fair, the Lantern Festival, a masquerade ball, a hot-spring trip
+[*][B]Relationships[/B] from casual to exclusive to throuples, and group scenes
+[*][B]Pregnancy and family[/B]: birth control, pregnancy, and family happiness management
+[*][B]The Undercroft[/B]: a turn-based dungeon under the campus, fought with a party of the women you know
+[*][B]Voiced[/B]: almost 1,000 lines and reactions in 21 voices
+[*][B]An in-game editor[/B] for characters, places, outfits and more, with art drawn on your own ComfyUI
+[/LIST]
+
+[IMG]SCREENSHOT_2_URL[/IMG]
+
+[SIZE=5][B]Tags[/B][/SIZE]
+
+[B]Technical:[/B]
+AI CG, Animated, Male Protagonist, Multiple Endings, Voiced
+
+[B]Gameplay / Setting:[/B]
+Dating Sim, Fantasy, Management, Romance, Rpg, Sandbox, School Setting, Simulator, Turn Based Combat
+
+[B]Sexual Content:[/B]
+Creampie, Group Sex, Harem, Oral Sex, Pregnancy, Vaginal Sex
+
+[IMG]ANIMATED_3_URL[/IMG]
+
+[SIZE=5][B]Development Notes[/B][/SIZE]
+
+This thread is updated with each release. Bug reports and ideas are welcome.
+Art and voices are made with AI tools (ComfyUI and ElevenLabs). Scenes are written by the LLM you connect.
+
+[SIZE=4][B]Follow development:[/B][/SIZE]
+[URL='https://www.patreon.com/cw/Potatoman760']Patreon[/URL] | [URL='https://potatoman760.itch.io/breedhaven-university'][/URL] | [URL='https://discord.gg/7d8YqfW6p']Discord[/URL]
+[/CENTER]

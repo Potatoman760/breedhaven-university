@@ -5,4 +5,4 @@ export type Panel =
   | { kind: 'courier'; id?: string; app?: PhoneApp; chat?: string }
 
 /** The phone's apps, down its left edge. */
-export type PhoneApp = 'chats' | 'friends' | 'updates' | 'jobs' | 'societies' | 'shop'
+export type PhoneApp = 'chats' | 'friends' | 'updates' | 'jobs' | 'societies' | 'shop' | 'trips'

@@ -496,14 +496,16 @@ details summary {
 }
 
 /* The clips' prompts in the ComfyUI setup: each list a section closed until it is opened, its heading the summary. */
-details.clip-prompts > summary {
+details.clip-prompts > summary,
+details.event-outfits > summary {
   display: flex;
   align-items: center;
   gap: 10px;
   color: var(--ink);
 }
 
-details.clip-prompts > summary h2 {
+details.clip-prompts > summary h2,
+details.event-outfits > summary h2 {
   margin: 0;
 }
 
@@ -3869,6 +3871,11 @@ button.btn.pack-all {
   white-space: nowrap;
 }
 
+/* As tall as the arrows beside it. */
+.calendar .month-nav button.change-classes {
+  align-self: stretch;
+}
+
 /* The phone: a tablet in a black bezel, its apps down a vine-hung rail on the left and the open one beside it on parchment. */
 .phone {
   box-sizing: border-box;
@@ -3986,6 +3993,41 @@ button.btn.pack-all {
   position: absolute;
   top: 4px;
   right: 14px;
+}
+
+/* The pages of apps, as a phone's home screen has them: a dot each on a dark pill under the apps, the one shown lit. A
+   click on the pill turns to the next. */
+.phone-rail button.btn.phone-pages {
+  gap: 15px;
+  min-height: 0;
+  /* At the foot of the rail, above the way back, however many apps are on the page. */
+  margin-top: auto;
+  padding: 18px 22px;
+  border: 0;
+  border-radius: 999px;
+  /* Frosted glass: what is behind it blurred through a translucent grey, as a phone's home screen has it. */
+  background: rgb(118 118 118 / 0.55);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  backdrop-filter: blur(20px) saturate(1.4);
+  box-shadow: none;
+  text-decoration: none;
+}
+.phone-rail button.btn.phone-pages:hover {
+  background: rgb(134 134 134 / 0.62);
+  transform: none;
+}
+button.btn.phone-pages + button.btn.back-button.phone-back {
+  margin-top: 12px;
+}
+.phone-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.45);
+  transition: background 0.2s;
+}
+.phone-dot.on {
+  background: #fff;
 }
 
 button.btn.back-button.phone-back {
@@ -10980,6 +11022,24 @@ video.trip-scene {
   transform: translateX(-50%);
   animation: trip-car-in 1s cubic-bezier(0.2, 0.8, 0.2, 1) both, trip-bob 0.42s ease-in-out 1s infinite alternate;
 }
+/* The airship: the sky goes by slowly, and it rides the air with a slow rise and fall in place of the car's bump. */
+.trip-drive.by-airship .trip-road {
+  animation-duration: 30s;
+}
+.trip-drive.by-airship .trip-car {
+  animation: trip-car-in 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) both, trip-float 3.6s ease-in-out 1.6s infinite alternate;
+}
+.trip-window.round {
+  border-radius: 50%;
+}
+/* Behind a porthole: the airship's cabin, warm wood in lamplight. */
+.trip-inside {
+  background: radial-gradient(circle at 50% 35%, #8a5a34, #4a2c18 70%);
+}
+@keyframes trip-float {
+  from { transform: translateX(-50%) translateY(0) rotate(-0.4deg); }
+  to { transform: translateX(-50%) translateY(-1.6vh) rotate(0.4deg); }
+}
 .trip-car-body {
   position: absolute;
   inset: 0;
@@ -11016,8 +11076,9 @@ video.trip-scene {
   border-width: 20px 8px 0 8px;
   border-color: #fffdf5 transparent transparent transparent;
 }
-/* Her head shows through the glass: the window clips her, and the car's frame covers its edge. Seated, everyone's head
-   is at the same height, however tall she stands. */
+/* Her head shows through the glass: the window clips her, and the car's frame covers its edge. Every head is the same
+   size and in the same place in its window, however she was drawn: her picture is scaled so that crown to chin is
+   most of the window's height, and moved so that the middle of her head is a little below its middle. */
 .trip-window {
   position: absolute;
   overflow: hidden;
@@ -11025,9 +11086,10 @@ video.trip-scene {
 .trip-head {
   position: absolute;
   left: 50%;
-  top: 335%;
-  height: 330%;
-  transform: translate(-50%, -100%);
+  top: 54%;
+  max-width: none;
+  height: calc(6400% / var(--head));
+  transform: translate(calc(-1% * var(--hx)), calc(-1% * var(--hy)));
 }
 /* The outdoor bath at night: the view tilts down from the moon to the steaming water. */
 .trip-soak .trip-scene {
@@ -11108,6 +11170,318 @@ video.trip-scene {
   background: repeating-conic-gradient(from 0deg at 70% 20%, rgb(255 236 180 / 0.16) 0 6deg, transparent 6deg 18deg);
   mix-blend-mode: screen;
   animation: trip-rays 6s linear both;
+}
+
+/* The getaways' openings, each its own way in. The beach: down from the sky to the sand, gulls across it. */
+.trip-beach .trip-scene {
+  animation: trip-pan-down 5.2s cubic-bezier(0.45, 0, 0.3, 1) both;
+}
+.trip-gull {
+  position: absolute;
+  top: var(--y);
+  left: -8vw;
+  width: calc(4vw * var(--s));
+  height: calc(1.4vw * var(--s));
+  border: solid #1d2a33;
+  border-width: 3px 0 0 0;
+  border-radius: 50% 50% 0 0;
+  animation: trip-gull 5.2s linear var(--d) both;
+}
+.trip-gull::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -3px;
+  width: 50%;
+  height: 100%;
+  border: inherit;
+  border-radius: inherit;
+}
+/* The boardwalk: the string of lights comes on bulb by bulb, the view settling back from the Ferris wheel. */
+.trip-boardwalk .trip-scene {
+  animation: trip-pull-back 5.2s cubic-bezier(0.3, 0, 0.3, 1) both;
+}
+.trip-bulb {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 1.1vw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff6d8, #ffc860 55%, transparent 72%);
+  box-shadow: 0 0 18px 6px rgb(255 190 90 / 0.55);
+  mix-blend-mode: screen;
+  animation: trip-bulb 0.5s ease-out var(--d) both, trip-twinkle 1.8s ease-in-out calc(var(--d) + 0.5s) infinite alternate;
+}
+/* The cove at sunrise: the sun flares over the sea, and glints come and go on the water. */
+.trip-sunrise-swim .trip-scene {
+  animation: trip-dawn 5.2s ease both;
+}
+.trip-flare {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 70% 30%, rgb(255 222 160 / 0.55), transparent 45%);
+  mix-blend-mode: screen;
+  animation: trip-flare 5.2s ease-in-out both;
+}
+.trip-glint {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 1.6vw;
+  height: 0.3vw;
+  border-radius: 50%;
+  background: #fffbe8;
+  box-shadow: 0 0 10px 3px rgb(255 240 200 / 0.8);
+  mix-blend-mode: screen;
+  opacity: 0;
+  animation: trip-glint 1.4s ease-in-out var(--d) infinite;
+}
+/* The trail: the view walks on between the pines, motes turning in the sunbeams. */
+.trip-trail .trip-scene {
+  animation: trip-walk 5.2s ease-out both;
+}
+.trip-rays-pines {
+  background: repeating-linear-gradient(105deg, rgb(255 230 160 / 0.14) 0 3vw, transparent 3vw 9vw);
+  animation: trip-rays 5.2s linear both;
+}
+.trip-pollen {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: calc(0.5vw * var(--s));
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgb(255 238 190 / 0.9);
+  box-shadow: 0 0 6px 2px rgb(255 228 150 / 0.6);
+  animation: trip-pollen 4.4s ease-in-out var(--d) both;
+}
+/* The fire: the view draws in toward it, sparks going up into the dark. */
+.trip-campfire .trip-scene {
+  animation: trip-draw-in 5.2s cubic-bezier(0.3, 0, 0.3, 1) both;
+}
+.trip-ember {
+  position: absolute;
+  bottom: 30vh;
+  left: var(--x);
+  width: 0.45vw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #ffcf6a;
+  box-shadow: 0 0 8px 3px rgb(255 140 40 / 0.85);
+  animation: trip-ember 3.2s ease-out var(--d) infinite;
+}
+/* The lake at dawn: the light comes up, bands of mist going by on the water. */
+.trip-dawn-lake .trip-scene {
+  animation: trip-dawn 5.2s ease both;
+}
+.trip-mist {
+  position: absolute;
+  top: var(--y);
+  left: -30vw;
+  width: calc(70vw * var(--s));
+  height: 9vh;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgb(255 255 255 / 0.3), transparent 70%);
+  filter: blur(10px);
+  animation: trip-mist 9s linear var(--d) infinite;
+}
+
+/* The bay: the junk glides in among the islands, mist going by between them. */
+.trip-bay .trip-scene {
+  animation: trip-glide 5.2s ease-out both;
+}
+.trip-mist-high {
+  height: 12vh;
+  background: radial-gradient(ellipse, rgb(255 255 255 / 0.22), transparent 70%);
+}
+/* The cabin: the lanterns' warm light comes up around them. */
+.trip-cabin .trip-scene {
+  animation: trip-dawn 3s ease both;
+}
+.trip-lantern-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 25%, rgb(255 190 110 / 0.35), transparent 40%), radial-gradient(circle at 46% 20%, rgb(255 190 110 / 0.3), transparent 35%);
+  mix-blend-mode: screen;
+  animation: trip-flicker 1.8s ease-in-out infinite alternate;
+}
+/* The sea cave: the shaft of daylight from above, drips falling, glints on the pool. */
+.trip-sea-cave .trip-scene {
+  animation: trip-row-in 5.2s ease-out both;
+}
+.trip-rays-cave {
+  background: linear-gradient(160deg, transparent 30%, rgb(255 250 220 / 0.18) 38%, transparent 46%), linear-gradient(170deg, transparent 40%, rgb(255 250 220 / 0.12) 46%, transparent 52%);
+  animation: trip-rays 5.2s linear both;
+}
+.trip-drip {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 0.35vw;
+  height: 0.9vw;
+  border-radius: 50% 50% 50% 50% / 35% 35% 65% 65%;
+  background: rgb(200 240 255 / 0.85);
+  animation: trip-drip 2.2s ease-in var(--d) infinite;
+}
+
+/* The reef: light rippling down through the water, bubbles going up. */
+.trip-reef .trip-scene {
+  animation: trip-pan-down 5.2s cubic-bezier(0.45, 0, 0.3, 1) both;
+}
+.trip-caustics {
+  position: absolute;
+  inset: -10%;
+  background: repeating-radial-gradient(circle at 30% 70%, rgb(255 255 255 / 0.1) 0 2vw, transparent 2vw 5vw), repeating-radial-gradient(circle at 70% 80%, rgb(255 255 255 / 0.08) 0 1.5vw, transparent 1.5vw 4vw);
+  mix-blend-mode: screen;
+  animation: trip-caustics 5.2s ease-in-out infinite alternate;
+}
+.trip-bubble {
+  position: absolute;
+  bottom: -4vh;
+  left: var(--x);
+  width: calc(1.2vw * var(--s));
+  aspect-ratio: 1;
+  border: 2px solid rgb(255 255 255 / 0.7);
+  border-radius: 50%;
+  animation: trip-bubble 4s ease-in var(--d) infinite;
+}
+/* The bungalow: the water's glow coming up through the glass floor. */
+.trip-bungalow .trip-scene {
+  animation: trip-dawn 3s ease both;
+}
+.trip-floor-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 45% 90%, rgb(80 230 255 / 0.35), transparent 45%);
+  mix-blend-mode: screen;
+  animation: trip-flicker 2.4s ease-in-out infinite alternate;
+}
+.trip-glint.gold {
+  background: #ffe7a8;
+  box-shadow: 0 0 10px 3px rgb(255 200 110 / 0.8);
+}
+/* The rooftop: sky lanterns going up from the city into the night. */
+.trip-rooftop .trip-scene {
+  animation: trip-pull-back 5.2s cubic-bezier(0.3, 0, 0.3, 1) both;
+}
+.trip-sky-lantern {
+  position: absolute;
+  bottom: 20vh;
+  left: var(--x);
+  width: calc(1.4vw * var(--s));
+  height: calc(1.8vw * var(--s));
+  border-radius: 40% 40% 20% 20%;
+  background: radial-gradient(circle at 50% 70%, #fff2c2, #ffab45 60%, #c2581d);
+  box-shadow: 0 0 16px 5px rgb(255 160 60 / 0.6);
+  animation: trip-lantern-rise 5.2s ease-out var(--d) both;
+}
+/* The festival: bursts of colored powder thrown into the air. */
+.trip-powder {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 18vw;
+  aspect-ratio: 1;
+  margin: -9vw 0 0 -9vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--c), transparent 65%);
+  filter: blur(6px);
+  opacity: 0;
+  animation: trip-powder 2.4s ease-out var(--d) both;
+}
+
+@keyframes trip-caustics {
+  from { transform: translate(0, 0) scale(1); }
+  to { transform: translate(2%, -2%) scale(1.06); }
+}
+@keyframes trip-bubble {
+  0% { opacity: 0; transform: translateY(0); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-60vh); }
+}
+@keyframes trip-lantern-rise {
+  0% { opacity: 0; transform: translate(0, 0) scale(1); }
+  15% { opacity: 1; }
+  100% { opacity: 0.2; transform: translate(var(--sway), -70vh) scale(0.5); }
+}
+@keyframes trip-powder {
+  0% { opacity: 0; transform: scale(0.2); }
+  25% { opacity: 0.85; }
+  100% { opacity: 0; transform: scale(1.4); }
+}
+
+@keyframes trip-glide {
+  from { transform: scale(1.22) translateY(4%); }
+  to { transform: scale(1.03); }
+}
+@keyframes trip-flicker {
+  from { opacity: 0.7; }
+  to { opacity: 1; }
+}
+@keyframes trip-row-in {
+  from { transform: scale(1.3); filter: brightness(0.5); }
+  to { transform: scale(1.04); filter: none; }
+}
+@keyframes trip-drip {
+  0% { opacity: 0; transform: translateY(0); }
+  10% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(40vh); }
+}
+
+@keyframes trip-pan-down {
+  0%, 8% { transform: scale(1.35) translateY(14%); }
+  100% { transform: scale(1.05) translateY(-2%); }
+}
+@keyframes trip-gull {
+  from { transform: translate(0, 0); }
+  50% { transform: translate(60vw, -3vh); }
+  to { transform: translate(120vw, 1vh); }
+}
+@keyframes trip-pull-back {
+  from { transform: scale(1.4); transform-origin: 75% 35%; }
+  to { transform: scale(1.03); transform-origin: 75% 35%; }
+}
+@keyframes trip-bulb {
+  from { opacity: 0; transform: scale(0.3); }
+}
+@keyframes trip-twinkle {
+  to { opacity: 0.6; }
+}
+@keyframes trip-dawn {
+  from { filter: brightness(0.45) saturate(0.7); transform: scale(1.06); }
+  to { filter: none; transform: scale(1.01); }
+}
+@keyframes trip-flare {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+@keyframes trip-glint {
+  0%, 100% { opacity: 0; transform: scaleX(0.4); }
+  50% { opacity: 1; transform: scaleX(1); }
+}
+@keyframes trip-walk {
+  from { transform: scale(1.25) translateY(3%); }
+  to { transform: scale(1.04); }
+}
+@keyframes trip-pollen {
+  0% { opacity: 0; transform: translate(0, 0); }
+  30%, 70% { opacity: 1; }
+  100% { opacity: 0; transform: translate(3vw, -5vh); }
+}
+@keyframes trip-draw-in {
+  from { transform: scale(1.02); transform-origin: 40% 70%; }
+  to { transform: scale(1.22); transform-origin: 40% 70%; }
+}
+@keyframes trip-ember {
+  0% { opacity: 0; transform: translate(0, 0) scale(1); }
+  10% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--sway), -50vh) scale(0.4); }
+}
+@keyframes trip-mist {
+  from { transform: translateX(0); }
+  to { transform: translateX(160vw); }
 }
 
 @keyframes trip-in {
@@ -11326,6 +11700,110 @@ button.trip-who-row.picked {
 }
 .trip-price dd {
   margin: 0;
+}
+
+/* The Trips app: what he has booked, then the getaways as cards; one opened is its listing beside who comes. */
+.trips-app {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 0;
+  padding: 20px 26px;
+  overflow-y: auto;
+}
+.trips-app h2 {
+  margin: 0 0 10px;
+  font-size: 1.25rem;
+}
+.trip-booked {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  background: var(--paper-raised);
+}
+.trip-booked + .trip-booked {
+  margin-top: 8px;
+}
+.trip-booked-photo {
+  flex: none;
+  width: 120px;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  background: #2a1d14 center / cover no-repeat;
+}
+.trip-booked-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  font: 600 0.95rem var(--ui);
+}
+.trip-booked-text strong {
+  font-size: 1.05rem;
+}
+.trip-booked-who {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-soft);
+}
+.trip-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+button.trip-card {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  min-height: 0;
+  padding: 10px 10px 12px;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  background: var(--paper-raised);
+  color: var(--ink);
+  text-align: left;
+}
+button.trip-card:hover {
+  border-color: var(--moss);
+}
+.trip-card-photo {
+  aspect-ratio: 16 / 9;
+  border-radius: 10px;
+  background: #2a1d14 center / cover no-repeat;
+}
+.trip-card strong {
+  font: 400 1.6rem / 1.1 'Kaushan Script', var(--display);
+}
+.trip-card-meta {
+  display: flex;
+  justify-content: space-between;
+  font: 700 0.95rem var(--ui);
+}
+.trip-card .trip-rating {
+  font-size: 0.95rem;
+  letter-spacing: 0;
+}
+.trip-card-when {
+  color: var(--ink-soft);
+  font: 600 0.9rem var(--ui);
+}
+.trips-detail {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  min-height: 0;
+}
+.trip-when {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font: 700 0.95rem var(--ui);
 }
 
 /* A group chat: its members' faces overlapping on its row, and in it the name of whoever said each line. */

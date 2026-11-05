@@ -294,6 +294,11 @@
     "medium": "sprites/lira/birth-medium.webp"
   },
   "walkSprite": "sprites/lira/walk-cutout.webp",
+  "walkHead": {
+    "top": 3,
+    "chin": 21.5,
+    "x": 50.0
+  },
   "childNames": {
     "daughters": [
       "Dew",

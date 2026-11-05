@@ -126,7 +126,7 @@ export function CalendarPanel({ content, state, onChange, onClose, onChangeClass
               {t('screens.calendar.today')}
             </Button>
             {onChangeClasses && (
-              <Button variant="secondary" size="small" title={classChangeDeadline(content) && t('screens.calendar.changeUntil', classChangeDeadline(content)!)} onClick={onChangeClasses}>
+              <Button variant="secondary" className="change-classes" title={classChangeDeadline(content) && t('screens.calendar.changeUntil', classChangeDeadline(content)!)} onClick={onChangeClasses}>
                 {t('screens.calendar.changeClasses')}
               </Button>
             )}

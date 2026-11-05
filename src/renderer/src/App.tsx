@@ -17,6 +17,10 @@ import {
   attendees,
   addGlobalMemory,
   earnedAtEvent,
+  earnedByGuess,
+  earnedByLeaving,
+  earnedByRelic,
+  TOUR_FLAGS,
   earnedByBond,
   earnedInScene,
   earnedInState,
@@ -36,6 +40,8 @@ import {
   devotedMothers,
   settleMissedDates,
   bookTrip,
+  allEvents,
+  tellOfGetaways,
   comeHome,
   nextTripPart,
   tripChatId,
@@ -196,7 +202,7 @@ import {
   joinSociety,
   societyPeople
 } from '../../shared/game'
-import { MAX_SCENE_CAST, type Activity, type ContentPack, type EventPart, type ExamKind, type GameState, type Intro, type PostPlan, type Proposal, type Relic, type RelicUse, type Scene } from '../../shared/model'
+import { MAX_SCENE_CAST, type Activity, type ContentPack, type EventPart, type ExamKind, type GameState, type Intro, type PostPlan, type Proposal, type Relic, type RelicUse, type Scene, type Travel } from '../../shared/model'
 import { CHAT_CANCELLED } from '../../shared/ipc'
 import { AUTO_SLOT_ID, type SaveData } from '../../shared/saves'
 import { errorMessage } from './errors'
@@ -340,9 +346,7 @@ interface GameProps {
 }
 
 // Kept in the save once he has been shown round the course planner, once he has been welcomed, and once he has been shown round his day, so that each is shown once a game.
-const COURSES_TOURED = 'toured-courses'
 const WELCOMED = 'welcomed'
-const INTERFACE_TOURED = 'toured-interface'
 
 // How long a toast stays up, and a notice shown as one.
 const TOAST_MS = 6000
@@ -387,6 +391,9 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       () => undefined
     )
   }, [])
+  // A tutorial over: seen through, or skipped, which Good Listener is not.
+  const toured = (flag: string, skipped: boolean) =>
+    setState((current) => ({ ...current, flags: { ...current.flags, [flag]: true, ...(skipped && { [TOUR_FLAGS.skipped]: true }) } }))
   // The game and the scene as they stood before each line he has said in this scene, newest last, so that a turn can be taken back.
   const [turns, setTurns] = useState<Turn[]>(() => (initial.scene ? unpackTurns(initial.turns ?? [], initial.state, initial.scene) : []))
   useEffect(() => {
@@ -416,7 +423,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     unlocksHeard.current = unlocked.length
   }, [unlocked.length])
   // The loop behind where he is, which changes with the place and the dark, and stops when the game is left.
-  const ambience = ambienceAt(content, state)
+  const ambience = ambienceAt(content, state, scene?.viewId)
   useEffect(() => setAmbience(ambience), [ambience])
   const outside = weatherSoundAt(content, state)
   useEffect(() => setWeather(outside), [outside?.sound, outside?.indoors])
@@ -633,6 +640,12 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setState((current) => scheduleBirths(content, current).state)
   }, [idle, over, state, content])
 
+  // Told of the weekend getaways once, from the day and hour it is sent on.
+  useEffect(() => {
+    if (!idle || over || tellOfGetaways(content, state) === state) return
+    setState((current) => tellOfGetaways(content, current))
+  }, [idle, over, state, content])
+
   // Home from a trip once the last of it is done: the drive back, and he is home.
   useEffect(() => {
     if (!idle) return
@@ -641,7 +654,9 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     setState(home.state)
     if (home.companions.length > 0) {
       const ids = home.companions
-      setTripMoment({ kind: 'drive-home', companions: gladOf(ids, state), lines: () => window.api.momentLines({ state, ids, moment: 'drive-home' }).then((got) => got.lines), then: () => undefined })
+      const tripId = home.tripId
+      const trip = allEvents(content, state).find((event) => event.id === tripId)
+      setTripMoment({ kind: 'drive-home', companions: gladOf(ids, state), lines: () => window.api.momentLines({ state, ids, moment: 'drive-home', tripId }).then((got) => got.lines), road: trip?.road, travel: trip?.travel, then: () => undefined })
     }
   }, [idle, state, content])
 
@@ -824,6 +839,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
       const placed = destination ? movedScene(asked, destination) : asked
       // What walking out cost him is hers to decide with the rest, when the scene is over.
       const { left } = response
+      if (left) earn(earnedByLeaving(content, left.ids))
       // She hears the reply she leaves in, and nothing after it.
       // If the scene moved on in the same reply, she was left where it had been, and is not seen where it now is.
       const replied = (next: Scene): Scene => {
@@ -1055,7 +1071,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     after?.()
   }, [lanterns])
   // A moment of a trip away, playing, and what comes after it.
-  const [tripMoment, setTripMoment] = useState<{ kind: TripMomentKind; companions: TripCompanion[]; title?: string; lines?: () => Promise<BanterLine[]>; then: () => void } | null>(null)
+  const [tripMoment, setTripMoment] = useState<{ kind: TripMomentKind; companions: TripCompanion[]; title?: string; lines?: () => Promise<BanterLine[]>; road?: string; travel?: Travel; then: () => void } | null>(null)
   const endTripMoment = useCallback(() => {
     const after = tripMoment?.then
     setTripMoment(null)
@@ -1084,7 +1100,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
    * first who he takes.
    */
   function attendPart(eventId: string, partId: string, dateIds?: string[]) {
-    const event = content.calendar.events.find((one) => one.id === eventId)
+    // A trip he booked for a weekend is the save's own event, not the calendar's.
+    const event = allEvents(content, state).find((one) => one.id === eventId)
     const part = event?.program.find((one) => one.id === partId)
     if (event && part?.date && !dateIds) {
       setDating({ eventId, partId, title: event.name, most: part.date.most })
@@ -1099,7 +1116,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
     const begin = () => (result.booking ? setBooking(result.booking) : setScene(result.scene))
     // Whatever the part plays as it begins comes first, in turn, with those in it; then its lines, then the scene.
     const cast = result.scene ? sceneCast(result.scene) : []
-    const dates = gladOf(cast, result.state)
+    const dates = gladOf(cast, result.state, part?.outfitId)
     // A part that books a trip goes on to its booking screen once its lines are read; any other, under its lines, to its scene.
     const read = () => (!result.cutscene ? begin() : result.booking ? setCutscene({ intro: result.cutscene, then: begin }) : introThenScene(result.cutscene, result.scene))
     const lines = () => window.api.momentLines({ state: result.state, ids: cast, moment: 'lanterns' }).then((got) => got.lines)
@@ -1112,19 +1129,24 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           kind,
           companions: dates,
           title: drive ? undefined : part?.name,
-          lines: drive ? () => window.api.momentLines({ state: result.state, ids: cast, moment: 'drive-there' }).then((got) => got.lines) : undefined,
+          lines: drive ? () => window.api.momentLines({ state: result.state, ids: cast, moment: 'drive-there', tripId: eventId }).then((got) => got.lines) : undefined,
+          road: drive ? event?.road : undefined,
+          travel: drive ? event?.travel : undefined,
           then
         })
     }, read)
     played()
   }
 
-  /** Those named, each in her glad sprite as she is dressed: for the moments played before a scene. */
-  function gladOf(ids: string[], at: GameState) {
+  /**
+   * Those named, each in her glad sprite as she is dressed, or in the outfit a part puts her in where she has it: for the
+   * moments played before a scene.
+   */
+  function gladOf(ids: string[], at: GameState, outfitId?: string) {
     return ids.flatMap((id) => {
       const li = content.loveInterests.find((one) => one.id === id)
-      const image = li && spriteFor(li, wornOutfit(content, at, li), 'happy')
-      return li && image ? [{ id, image, walk: li.walkSprite, stageHeight: li.stageHeight }] : []
+      const image = li && spriteFor(li, wornOutfit(content, at, li, outfitId), 'happy')
+      return li && image ? [{ id, image, walk: li.walkSprite, head: li.walkHead, stageHeight: li.stageHeight }] : []
     })
   }
 
@@ -1619,8 +1641,8 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           content={content}
           state={state}
           onEnrol={(enrolment) => setState({ ...state, enrolment })}
-          toured={state.flags[COURSES_TOURED] === true}
-          onToured={() => setState((current) => ({ ...current, flags: { ...current.flags, [COURSES_TOURED]: true } }))}
+          toured={state.flags[TOUR_FLAGS.courses] === true}
+          onToured={(skipped) => toured(TOUR_FLAGS.courses, skipped)}
         />
       ) : content.coursework && changingClasses ? (
         // Back to the calendar either way, which shows his week as it now is.
@@ -1779,10 +1801,13 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
             onOpen={setPanel}
           onFair={goToFair}
             touring={dayTour}
-            onToured={() => setDayTour(false)}
+            onToured={(skipped) => {
+              setDayTour(false)
+              toured(TOUR_FLAGS.day, skipped)
+            }}
           />
           {/* The first time he sees his day, on the first day of the game, whoever welcomed him shows him round it. */}
-          {state.flags[WELCOMED] && !state.flags[INTERFACE_TOURED] && toDate(content.calendar, state.time).dayIndex === 0 && (
+          {state.flags[WELCOMED] && !state.flags[TOUR_FLAGS.interface] && toDate(content.calendar, state.time).dayIndex === 0 && (
             <InterfaceTour
               content={content}
               state={state}
@@ -1790,10 +1815,10 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
               onOpen={setPanel}
               // Seen through, it goes straight on round the day's choices; skipped, it is over.
               onDone={() => {
-                setState((current) => ({ ...current, flags: { ...current.flags, [INTERFACE_TOURED]: true } }))
+                toured(TOUR_FLAGS.interface, false)
                 setDayTour(true)
               }}
-              onSkip={() => setState((current) => ({ ...current, flags: { ...current.flags, [INTERFACE_TOURED]: true } }))}
+              onSkip={() => toured(TOUR_FLAGS.interface, true)}
             />
           )}
         </>
@@ -1801,7 +1826,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
 
       {relicMoment && <RelicMoment relic={relicMoment} onDone={endRelicMoment} />}
       {lanterns && <LanternRelease dates={lanterns.dates} lines={lanterns.lines} onDone={endLanterns} />}
-      {tripMoment && <TripMoment kind={tripMoment.kind} companions={tripMoment.companions} title={tripMoment.title} lines={tripMoment.lines} onDone={endTripMoment} />}
+      {tripMoment && <TripMoment kind={tripMoment.kind} companions={tripMoment.companions} title={tripMoment.title} lines={tripMoment.lines} road={tripMoment.road} travel={tripMoment.travel} onDone={endTripMoment} />}
       {!scene && !summary && guessable(content, state).length > 0 && (
         <MasqueradeGuess
           content={content}
@@ -1809,6 +1834,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
           onGuess={(dancerId, guessedId) => {
             const result = guessDancer(content, state, dancerId, guessedId)
             setState(result.state)
+            earn(earnedByGuess(result.correct))
             if (result.scene) {
               setNotice('')
               setScene(result.scene)
@@ -1829,7 +1855,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
             setBooking(null)
             setPanel({ kind: 'courier', app: 'chats', chat: `group:${chatId}` })
             const history = (booked.groupChats[chatId]?.notes ?? []).map((note) => ({ speaker: booked.player.name, text: note.text }))
-            void window.api.momentLines({ state: booked, ids, moment: 'trip-booked', history }).then(({ lines }) =>
+            void window.api.momentLines({ state: booked, ids, moment: 'trip-booked', history, tripId: booking.eventId }).then(({ lines }) =>
               applyUpdate((current) => lines.reduce((next, line) => addGroupNote(next, chatId, { from: 'them', speakerId: line.speakerId, text: line.text, read: false }), current))
             )
           }}
@@ -1866,6 +1892,7 @@ function Game({ content: written, initial, onLoad, onExit }: GameProps) {
               const relic = relicsHeld(content, state).find((one) => one.id === relicId)
               setState(used.state)
               setPanel(null)
+              earn(earnedByRelic())
               if (relic?.use) setRelicMoment(relic as Relic & { use: RelicUse })
               if (used.line) void send(used.line, used.scene, used.state, used.cue)
               else setScene(used.scene)

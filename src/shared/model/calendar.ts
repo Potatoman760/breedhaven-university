@@ -51,8 +51,47 @@ export type Period = z.infer<typeof PeriodSchema>
  * attended once.
  */
 /** What an event part can play as it begins. */
-export const PART_ANIMATIONS = ['lanterns', 'drive-there', 'soak', 'cascade', 'market', 'private-bath', 'fireworks', 'last-morning'] as const
+export const PART_ANIMATIONS = [
+  'lanterns',
+  'drive-there',
+  'soak',
+  'cascade',
+  'market',
+  'private-bath',
+  'fireworks',
+  'last-morning',
+  // The weekend getaways' openings: the coast's, then the campground's.
+  'beach',
+  'boardwalk',
+  'sunrise-swim',
+  'trail',
+  'campfire',
+  'dawn-lake',
+  // The bay cruise's.
+  'bay',
+  'cabin',
+  'sea-cave',
+  // Coralmere Atoll's, then Saffron Lake's.
+  'reef',
+  'bungalow',
+  'sandbar',
+  'lake-boat',
+  'rooftop',
+  'colors'
+] as const
 export type PartAnimation = (typeof PART_ANIMATIONS)[number]
+
+/** How a trip is gone to and come back from: driven, or flown by airship. */
+export const TRAVELS = ['car', 'airship'] as const
+export type Travel = (typeof TRAVELS)[number]
+
+/** What a woman feels for being taken on a trip, on each of the three meters. */
+export const TripGainSchema = z.object({
+  affection: z.number().int().min(0),
+  trust: z.number().int().min(0),
+  desire: z.number().int().min(0)
+})
+export type TripGain = z.infer<typeof TripGainSchema>
 
 export const EventPartSchema = z.object({
   id: z.string(),
@@ -169,7 +208,18 @@ export const CalendarEventSchema = z.object({
   /** What happens at it, scripted, in the order it happens. */
   program: z.array(EventPartSchema).default([]),
   /** For a trip: the hour he is home on the day it ends, the drive back being as long as it takes. */
-  homeAt: z.number().int().min(0).optional()
+  homeAt: z.number().int().min(0).optional(),
+  /** For a trip: a few words of what the place is, for the lines asked of the women along. */
+  summary: z.string().optional(),
+  /**
+   * For a trip: the road the drives there and home go along, a picture in the pack that repeats as it scrolls, as wide
+   * for its height as the autumn road. Left out, that one.
+   */
+  road: z.string().optional(),
+  /** For a trip: how it is gone to, which is what the travel there and home shows. Left out, by car. */
+  travel: z.enum(TRAVELS).optional(),
+  /** For a trip: what each woman along feels for being taken, as it begins, whatever he has learnt or taken. */
+  gain: TripGainSchema.optional()
 })
 export type CalendarEvent = z.infer<typeof CalendarEventSchema>
 

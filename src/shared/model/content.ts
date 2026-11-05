@@ -25,6 +25,7 @@ import { OrientationSchema, type Intro } from './orientation'
 import { PokerConfigSchema } from './poker'
 import { PregnancyConfigSchema } from './pregnancy'
 import { StorySchema, THRIVING_BEAT } from './story'
+import { GetawaysSchema } from './getaway'
 import { RelationshipConfigSchema } from './relationship'
 import { SoundsSchema } from './sound'
 import { NewGameSchema } from './state'
@@ -82,6 +83,8 @@ export const ContentPackSchema = z.object({
   groups: z.array(GroupSchema).default([]),
   /** Scenes written for a love interest, earned as what they are reaches a stage. */
   story: StorySchema.default({}),
+  /** Weekends away he books himself, from his phone. */
+  getaways: GetawaysSchema.prefault({}),
   /** What the game sounds like: the files played for its cues, and the loops behind each place. */
   sounds: SoundsSchema.prefault({}),
   /** Without a map the player can't travel, so every activity must be at the starting location. */
@@ -229,6 +232,31 @@ function checkReferences(pack: ContentPack): string[] {
       if (part.viewId !== undefined && partPlace && !partPlace.backgrounds.some((view) => view.id === part.viewId)) issues.push(t('game.content.noView', { where: `${where}.viewId`, owner: partPlace.id, id: part.viewId }))
       for (const id of part.castIds ?? []) if (!pack.loveInterests.some((li) => li.id === id)) unknown(where, 'loveInterest', id)
       if (part.cutscene) checkCutscene(part.cutscene, `${where}.cutscene`)
+    }
+  }
+
+  // A getaway is at a place there is, in its views, on a weekday there is, between days there are, for a stage there is.
+  idSet(pack.getaways.trips, 'getaways.trips')
+  const notice = pack.getaways.notice
+  if (notice) {
+    if (!pack.loveInterests.some((li) => li.id === notice.fromId)) unknown('getaways.notice.fromId', 'loveInterest', notice.fromId)
+    checkHour(notice.hour, 'getaways.notice.hour')
+  }
+  for (const g of pack.getaways.trips) {
+    const where = `getaways.trips.${g.id}`
+    need(locations, g.locationId, where, 'location')
+    need(weekdays, g.startsOn, `${where}.startsOn`, 'weekday')
+    need(stages, g.minStage, `${where}.minStage`, 'relationshipStage')
+    checkMonthDay(g.from.month, g.from.day, `${where}.from`)
+    checkMonthDay(g.until.month, g.until.day, `${where}.until`)
+    checkHour(g.homeAt, `${where}.homeAt`)
+    idSet(g.program, `${where}.program`)
+    const place = pack.locations.find((l) => l.id === g.locationId)
+    for (const part of g.program) {
+      const at = `${where}.program.${part.id}`
+      if (part.day > g.days) issues.push(t('game.content.dayAfterEvent', { where: at, day: part.day }))
+      checkHour(part.startHour, at)
+      if (part.viewId !== undefined && place && !place.backgrounds.some((view) => view.id === part.viewId)) issues.push(t('game.content.noView', { where: `${at}.viewId`, owner: place.id, id: part.viewId }))
     }
   }
 
@@ -500,6 +528,12 @@ function checkReferences(pack: ContentPack): string[] {
     need(locations, locationId, `sounds.places.${locationId}`, 'location')
     need(ambience, place.day, `sounds.places.${locationId}.day`, 'ambience')
     if (place.night !== undefined) need(ambience, place.night, `sounds.places.${locationId}.night`, 'ambience')
+    // A view's own loop is one there is, for a view the place has.
+    const location = pack.locations.find((l) => l.id === locationId)
+    for (const [viewId, loop] of Object.entries(place.views ?? {})) {
+      need(ambience, loop, `sounds.places.${locationId}.views.${viewId}`, 'ambience')
+      if (location && !location.backgrounds.some((view) => view.id === viewId)) issues.push(t('game.content.noView', { where: `sounds.places.${locationId}.views`, owner: locationId, id: viewId }))
+    }
   }
 
   if (pack.pregnancy) {

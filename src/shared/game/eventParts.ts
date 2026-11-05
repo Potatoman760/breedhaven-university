@@ -111,7 +111,7 @@ export function attendEventPart(
   const went: GameState = { ...state, time: begins + part.hours, locationId, inOwnRoom: false, partsAttended: [...state.partsAttended, partKey(event, part)] }
   // A date is settled as he sets out: those he takes are glad of it, and those with a claim on him he leaves out are not.
   const hurt = part.date ? passedOver(content, state, dateIds) : []
-  const after = part.date ? dateFeelings(content, went, dateIds, hurt, part.date) : went
+  const after = part.date ? dateFeelings(content, went, dateIds, hurt, part.date) : part.onTrip ? setOff(content, state, went, event) : went
   const [leadId, ...companionIds] = part.date ? dateIds : partCast(content, state, event, part)
   return {
     hurt,
@@ -160,6 +160,17 @@ function dateFeelings(content: ContentPack, state: GameState, takenIds: string[]
     (next, id) => applyFeelings(content, next, id, { affection: -date.loss, trust: -date.loss, desire: -date.loss, reason: t('llm.eventParts.tookOther') }, true),
     taken
   )
+}
+
+/**
+ * A trip setting off, at the first of its parts: each woman along glad of being taken, by what the trip gives, as it is
+ * given. Nobody left at home minds: a trip is between him and those he takes. `before` is the state before this part.
+ */
+function setOff(content: ContentPack, before: GameState, state: GameState, event: CalendarEvent): GameState {
+  const first = !event.program.some((one) => one.onTrip && before.partsAttended.includes(partKey(event, one)))
+  if (!first || !event.gain) return state
+  const gain = event.gain
+  return (state.trips[event.id] ?? []).reduce((next, id) => applyFeelings(content, next, id, { ...gain, reason: t('llm.eventParts.tookAway') }, true), state)
 }
 
 /** Where a date was let go by: its day's end has come without his going. Kept in the save so it is reckoned once. */

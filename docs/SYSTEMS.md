@@ -198,8 +198,12 @@ and Water (Dinah and Morwenna), Forbidden (Anwen and Elowen), Teach me! (any thr
 Maid my Day (Zélie) and XXXmas (anyone, during First Frost). BFFs is read off the game: Tamsin pregnant
 and in any arrangement with him, and so are the three of the children: Full House (a child in every cot of
 Haven House), True Sire (every love interest carrying his child or delivered of one) and Family Matters
-(one of them twice).
-Those six, BFFs and the three of the children are hidden, as Steam has it (`HIDDEN_ACHIEVEMENTS`): until earned, the panel names
+(one of them twice). Also read off the game: Genius (an A on every midterm and every final), Slime Ball (Lira the only
+one masked at the masquerade), Society Secrets (the second of any society's special meetings been to) and Good Listener
+(the interface, day and courses tours each seen through, `TOUR_FLAGS`, with none skipped). Earned as they happen: Have
+a Ball when a masked dancer is named right (`earnedByGuess`), I Can Do Magic Too! when a relic is used in a scene
+(`earnedByRelic`) and I'm Outta Here when a love interest walks out of one (`earnedByLeaving`).
+Those six, BFFs, the three of the children, Slime Ball and Good Listener are hidden, as Steam has it (`HIDDEN_ACHIEVEMENTS`): until earned, the panel names
 none of them and only counts them.
 Each has two icons in `src/assets/achievements/`, at Steam's size (256 square, JPG): `<id>.jpg`, shown
 once it is earned, and `<id>-locked.jpg`, the same in grey, before. Both are uploaded to Steam as
@@ -1146,8 +1150,11 @@ already when a game starts (`startsAt`, with her three meters), what she knows, 
 each secret is told (`revealWhen`, the same conditions an activity's requirements use). On
 the Media tab an outfit can be her usual one, worn only where an event puts her in it
 (`oneOff`), or named for an event's outfit ("Worn for", from `eventOutfits` in
-`src/shared/game/events.ts`), and "Add a bathrobe for the trip" adds the bathrobe and its
-pregnant form the springs trip starts her in. An outfit ticked **Day outfit** (`day`) lasts
+`src/shared/game/events.ts`: those a calendar event's, a getaway's or a story beat's part puts her in). Those
+outfits of hers, with their pregnant forms, are kept under a folded **Event outfits** section below her own (not her
+usual clothes, nor a day outfit), and its buttons add one the game has that she lacks, with its pregnant form, ready
+to draw: the bathrobe the springs trip starts her in, the swimsuit the coast's beach does (`EVENT_OUTFITS` in
+`SpritesTab.tsx`). Both are drawn neutral only. An outfit ticked **Day outfit** (`day`) lasts
 the day; any other (nude, the bathrobe) lasts only the scene, and her usual clothes always
 last the day. As each day begins everyone is dressed (`dressForDay` in
 `src/shared/game/pregnancy.ts`, an idle effect in `App.tsx`): in the `outfitId` of an orientation
@@ -1302,8 +1309,30 @@ gone to as an outing. Two things make one more than that:
   he is (`tripUnderway`), his job's shifts on those days are not his to work (`awayOnDay`), and once its last part is
   done he is taken home (`comeHome`, an idle effect). Each part can play `animations` before its scene
   (`ui/TripMoment.tsx`): the drive there and home (a few LLM lines in balloons, `buildMomentPrompt` in
-  `src/shared/game/momentLines.ts`) and an opening of its own per outing. The Mistmoon Break at Saltmere Springs is
-  the one there is: booked on 27 Harvestwane, then six outings over four days (`npm run preview:trip`).
+  `src/shared/game/momentLines.ts`, told which trip by its event's id, `summary` for what the place is) and an
+  opening of its own per outing. The Mistmoon Break at Saltmere Springs is the calendar's one: booked on 27
+  Harvestwane, then six outings over four days (`npm run preview:trip`).
+- **Weekend getaways** (`getaways.json`, `src/shared/model/getaway.ts`, `src/shared/game/getaways.ts`): trips he books
+  himself from the phone's **Trips** app (`ui/TripsApp.tsx`), which also lists every trip he has coming, the Break's
+  among them, with who is going and its group chat. A getaway is a template: its place, its `days` from the weekday it
+  `startsOn`, the days of the year it can begin between (`from`, `until`), `most` along, `price` a head and `minStage`
+  (Friend for both there are), its listing, and its program. The weekends it can be booked for are those after today,
+  inside its window, all of it before the term ends, with nothing else on any day of it (`getawayDays`). Booked, it
+  becomes an event of the save's own on those days (`getawayEvent`, id `<getaway>@<day>`, every part `onTrip`) and is
+  booked as the Break is (`bookTrip`), so from then on it plays as a trip. Its `gain` (affection, trust, desire) goes
+  to each woman along as its first part begins, before the first scene, as given whatever he has learnt or taken
+  (`setOff` in `eventParts.ts`); nobody left at home minds. It rises with the price, less for each dollar the dearer
+  the trip, and leans on what the trip is about: desire at the beach and the atoll, affection at the lake. `getaways.json` holds them under `trips`, and beside them the `notice`: a DM sent once, from its hour on its day of term (`tellOfGetaways`, an idle effect, marked `getaways-told`), which in the default pack is Tamsin, the Sunday after class changes close, telling him to look in his phone and hinting she would come. The default pack's are a weekend at
+  Brightshore on the coast (the beach in swimsuits, the boardwalk at night, a sunrise swim) and camping at Fernhollow
+  (the trail, the campfire, dawn at the lake), and a cruise on Jadewater Bay (Dating, $250 a head: the deck among the karst
+  islands, the night in the private cabin, the sea cave), an escape to Coralmere Atoll (Dating, $250: the reef in
+  swimsuits, the overwater bungalow and the sandbar in sarongs, each woman's worn her own way) and a weekend at Saffron
+  Lake (Dating, $200: the boat at sunset and the palace rooftop in saris, the festival of colors in festival whites).
+  The last three are flown to (`travel: 'airship'` on the getaway and its
+  event): their travel there and home is the airship going by in the sky (`VEHICLES` in `TripMoment.tsx`, its heads in
+  its round portholes, the sky its `road`), and the lines asked on the way are aboard it. Each opening with a moment of its own over a looping clip of its view
+  (`TripMoment.tsx`, its effects kept over the clip for these: gulls, the lights coming on, glints on the water, motes
+  in the pines, sparks off the fire, mist on the lake).
 - **Masked balls** (`src/shared/game/masquerade.ts`): a part with `masquerade` is its dances, one after another
   through its hours. The women he has met who are closest to him (affection, trust and desire together) and in no
   arrangement with him come to him in turn, as many as there are `masks`, in a shuffled order, each in one of them; too

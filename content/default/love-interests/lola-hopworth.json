@@ -381,6 +381,133 @@
       "pregnant": false,
       "oneOff": true,
       "babyTone": "medium"
+    },
+    {
+      "id": "swimsuit",
+      "name": "Swimsuit",
+      "description": "a pale pink gingham bikini with ruffled bottoms and one small white ribbon bow on each",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/lola-hopworth/swimsuit-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "Swimsuit, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "swimsuit",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/lola-hopworth/swimsuit-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "ao-dai",
+      "name": "Ao dai",
+      "description": "a fitted pale pink silk Vietnamese ao dai: a long close-fitting tunic of thick opaque silk, following her figure but lying smooth and unbroken over her stomach, with a high mandarin collar, long sleeves and side slits up to the waist, embroidered with small white blossoms, worn over loose flowing white silk trousers",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/lola-hopworth/ao-dai-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "Ao dai, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "ao-dai",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/lola-hopworth/ao-dai-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sarong",
+      "name": "Sarong",
+      "description": "a long pale pink silk sarong printed with large white and white tropical hibiscus flowers, wrapped around her waist as a long skirt knotted at the front and falling to her ankles, with a short white cotton blouse tied under her chest, and a thin lei of white plumeria flowers around her neck",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/lola-hopworth/sarong-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "Sarong, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sarong",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/lola-hopworth/sarong-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sari",
+      "name": "Sari",
+      "description": "a traditional pale pink silk sari with a white woven border, the pallu draped over one shoulder, worn with a matching short fitted blouse, and thin white bangles",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/lola-hopworth/sari-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "Sari, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sari",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/lola-hopworth/sari-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "holi",
+      "name": "Festival whites",
+      "description": "a simple, loose-fitting white cotton kurta tunic of thick opaque cotton, hanging straight and loose from her chest to her knees and hiding her stomach completely, over loose white cotton trousers, with a thin pale pink scarf, the clothes, her arms and her cheeks splashed and smeared with bright pink, yellow, green and blue festival color powder",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/lola-hopworth/holi-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "Festival whites, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "holi",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/lola-hopworth/holi-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -495,97 +622,6 @@
       "loop": true
     }
   ],
-  "schedule": [
-    {
-      "weekdays": [
-        "Monday",
-        "Tuesday",
-        "Wednesday"
-      ],
-      "periods": [
-        "morning",
-        "afternoon"
-      ],
-      "locationId": "lecture-halls"
-    },
-    {
-      "weekdays": [
-        "Thursday",
-        "Friday"
-      ],
-      "periods": [
-        "evening",
-        "night"
-      ],
-      "locationId": "commons"
-    },
-    {
-      "weekdays": [
-        "Saturday",
-        "Sunday"
-      ],
-      "periods": [
-        "morning",
-        "afternoon"
-      ],
-      "locationId": "honeyed-bee-inn"
-    },
-    {
-      "locationId": "honeyed-bee-inn"
-    }
-  ],
-  "room": {
-    "name": "an apartment above the Honeyed Bee's kitchen",
-    "description": "A narrow flat above a pub kitchen, warm from the ovens below, with a single bed pushed against the wall and a counter crowded with jars of fermenting things. Copper pans hang from a rack above a scrubbed table, and a window looks out over Lantern Row's lanterns. The air smells of yeast, toasted grain and dried lavender. Light comes from a bare bulb and the orange glow rising through the floorboards.",
-    "locationId": "honeyed-bee-inn",
-    "images": {
-      "day": "generated/backgrounds/lola-hopworth/view-2.webp"
-    }
-  },
-  "skinTone": "light",
-  "birthPictures": {
-    "light": "sprites/lola-hopworth/birth-light.webp",
-    "medium": "sprites/lola-hopworth/birth-medium.webp"
-  },
-  "walkSprite": "sprites/lola-hopworth/walk-cutout.webp",
-  "childNames": {
-    "daughters": [
-      "Clover",
-      "Bunty",
-      "Hazel",
-      "Primrose",
-      "Tansy"
-    ],
-    "sons": [
-      "Bramble",
-      "Thistle"
-    ]
-  },
-  "birthControl": false,
-  "ai": {
-    "speechPattern": "She speaks quickly and in short bursts, clipping the ends of her sentences, and jumps from practical instruction to personal observation without warning. She uses food metaphors for everything and asks blunt personal questions the way other people ask about the weather.",
-    "tone": "Blunt, fast, warm, irreverent",
-    "verbalQuirks": [
-      "Calls people 'love' or 'my dear' mid-sentence without sentiment",
-      "Clicks her tongue when she thinks something is obvious",
-      "Swears casually when excited or annoyed, never with anger"
-    ],
-    "exampleDialogue": [],
-    "backstory": "Lola grew up in the market town of Butterford, west of Seedblossom, where her mother kept the kitchen of the Hopworth Brewery and raised seven daughters. She learned to cook standing on a stool beside the copper, and her magic showed itself early in her hands: anything she touched and tended grew richer. Bread rose higher under her palm, broths deepened, ferments took on a life of their own.\n\nShe believes that her main purpose in life is to be bred and bear children\n\nShe lives in the apartment above the Honeyed Bee's kitchen, where she keeps an eye on the stock and occasionally takes over a service when the bar is overwhelmed. Her own magic is tactile and specific: she can coax a flavor out of an ingredient that was not quite there, sense when a ferment has turned before anyone else can taste it, and keep food warm with a touch of her hand. She takes dampers and has done since university; the Bloom runs warm in her and she prefers to keep it at a manageable hum rather than fight it or indulge it carelessly. She has had relationships, most of them short and friendly and ended without drama, and a few longer ones that ended because she would not slow down for anyone.",
-    "knowledge": [],
-    "secrets": [
-      {
-        "text": "She has been writing a cookbook privately for three years, not a practical manual but a memoir of her mother's kitchen, and she has shown it to no one because she is afraid it is sentimental and she is not a sentimental person.",
-        "revealWhen": [
-          {
-            "type": "stage",
-            "min": "dating"
-          }
-        ]
-      }
-    ],
-    "extraInstructions": "She is direct about attraction and never coy, but she does not press where she is not wanted. She treats cooking as the most honest thing a person can do and is moved by anyone who takes it seriously. Her bluntness is warmth, not cruelty: she says the kind thing too, usually first and louder."
-  },
   "tonedAnimations": {
     "medium": [
       {
@@ -718,5 +754,101 @@
   "catchphrases": {
     "my dear": "sounds/voices/lola-hopworth/phrase-my-dear.ogg"
   },
-  "firstLine": "Tsk. Don't just stand there like half-set jelly, love, I'm Lola Hopworth. Do they actually feed you where you're from, or have I got to fix that?"
+  "firstLine": "Tsk. Don't just stand there like half-set jelly, love, I'm Lola Hopworth. Do they actually feed you where you're from, or have I got to fix that?",
+  "schedule": [
+    {
+      "weekdays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday"
+      ],
+      "periods": [
+        "morning",
+        "afternoon"
+      ],
+      "locationId": "lecture-halls"
+    },
+    {
+      "weekdays": [
+        "Thursday",
+        "Friday"
+      ],
+      "periods": [
+        "evening",
+        "night"
+      ],
+      "locationId": "commons"
+    },
+    {
+      "weekdays": [
+        "Saturday",
+        "Sunday"
+      ],
+      "periods": [
+        "morning",
+        "afternoon"
+      ],
+      "locationId": "honeyed-bee-inn"
+    },
+    {
+      "locationId": "honeyed-bee-inn"
+    }
+  ],
+  "room": {
+    "name": "an apartment above the Honeyed Bee's kitchen",
+    "description": "A narrow flat above a pub kitchen, warm from the ovens below, with a single bed pushed against the wall and a counter crowded with jars of fermenting things. Copper pans hang from a rack above a scrubbed table, and a window looks out over Lantern Row's lanterns. The air smells of yeast, toasted grain and dried lavender. Light comes from a bare bulb and the orange glow rising through the floorboards.",
+    "locationId": "honeyed-bee-inn",
+    "images": {
+      "day": "generated/backgrounds/lola-hopworth/view-2.webp"
+    }
+  },
+  "skinTone": "light",
+  "birthPictures": {
+    "light": "sprites/lola-hopworth/birth-light.webp",
+    "medium": "sprites/lola-hopworth/birth-medium.webp"
+  },
+  "walkSprite": "sprites/lola-hopworth/walk-cutout.webp",
+  "walkHead": {
+    "top": 3,
+    "chin": 24,
+    "x": 47.7
+  },
+  "childNames": {
+    "daughters": [
+      "Clover",
+      "Bunty",
+      "Hazel",
+      "Primrose",
+      "Tansy"
+    ],
+    "sons": [
+      "Bramble",
+      "Thistle"
+    ]
+  },
+  "birthControl": false,
+  "ai": {
+    "speechPattern": "She speaks quickly and in short bursts, clipping the ends of her sentences, and jumps from practical instruction to personal observation without warning. She uses food metaphors for everything and asks blunt personal questions the way other people ask about the weather.",
+    "tone": "Blunt, fast, warm, irreverent",
+    "verbalQuirks": [
+      "Calls people 'love' or 'my dear' mid-sentence without sentiment",
+      "Clicks her tongue when she thinks something is obvious",
+      "Swears casually when excited or annoyed, never with anger"
+    ],
+    "exampleDialogue": [],
+    "backstory": "Lola grew up in the market town of Butterford, west of Seedblossom, where her mother kept the kitchen of the Hopworth Brewery and raised seven daughters. She learned to cook standing on a stool beside the copper, and her magic showed itself early in her hands: anything she touched and tended grew richer. Bread rose higher under her palm, broths deepened, ferments took on a life of their own.\n\nShe believes that her main purpose in life is to be bred and bear children\n\nShe lives in the apartment above the Honeyed Bee's kitchen, where she keeps an eye on the stock and occasionally takes over a service when the bar is overwhelmed. Her own magic is tactile and specific: she can coax a flavor out of an ingredient that was not quite there, sense when a ferment has turned before anyone else can taste it, and keep food warm with a touch of her hand. She takes dampers and has done since university; the Bloom runs warm in her and she prefers to keep it at a manageable hum rather than fight it or indulge it carelessly. She has had relationships, most of them short and friendly and ended without drama, and a few longer ones that ended because she would not slow down for anyone.",
+    "knowledge": [],
+    "secrets": [
+      {
+        "text": "She has been writing a cookbook privately for three years, not a practical manual but a memoir of her mother's kitchen, and she has shown it to no one because she is afraid it is sentimental and she is not a sentimental person.",
+        "revealWhen": [
+          {
+            "type": "stage",
+            "min": "dating"
+          }
+        ]
+      }
+    ],
+    "extraInstructions": "She is direct about attraction and never coy, but she does not press where she is not wanted. She treats cooking as the most honest thing a person can do and is moved by anyone who takes it seriously. Her bluntness is warmth, not cruelty: she says the kind thing too, usually first and louder."
+  }
 }

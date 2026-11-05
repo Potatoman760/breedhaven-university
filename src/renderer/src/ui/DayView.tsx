@@ -100,7 +100,8 @@ interface Props {
    * orientation day, when they are not his to make: they are shown for it all the same, and hidden again after.
    */
   touring: boolean
-  onToured: () => void
+  /** The day's tour is over: seen through, or skipped. */
+  onToured: (skipped: boolean) => void
 }
 
 /** Between scenes: where and when you are, and the choice of what to do next. */
@@ -704,7 +705,12 @@ export function DayView(props: Props) {
           onDone={() => {
             setStudying(null)
             setShowStats(false)
-            props.onToured()
+            props.onToured(false)
+          }}
+          onSkip={() => {
+            setStudying(null)
+            setShowStats(false)
+            props.onToured(true)
           }}
         />
       )}

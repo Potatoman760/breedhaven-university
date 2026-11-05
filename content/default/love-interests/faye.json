@@ -377,6 +377,133 @@
       "pregnant": false,
       "oneOff": true,
       "babyTone": "medium"
+    },
+    {
+      "id": "swimsuit",
+      "name": "Swimsuit",
+      "description": "a tiny black string bikini with small gold rings at the hips",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/faye/swimsuit-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "Swimsuit, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "swimsuit",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/faye/swimsuit-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "ao-dai",
+      "name": "Ao dai",
+      "description": "a fitted midnight-blue silk Vietnamese ao dai: a long close-fitting tunic of thick opaque silk, following her figure but lying smooth and unbroken over her stomach, with a high mandarin collar, long sleeves and side slits up to the waist, embroidered with gold peacock feathers, worn over loose flowing black silk trousers",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/faye/ao-dai-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "Ao dai, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "ao-dai",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/faye/ao-dai-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sarong",
+      "name": "Sarong",
+      "description": "a long midnight-blue silk sarong printed with large gold and white tropical hibiscus flowers, wrapped low around her hips as a long skirt knotted at one side and falling to her ankles, with a matching midnight-blue silk bandeau top, and a white plumeria flower tucked behind one ear",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/faye/sarong-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "Sarong, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sarong",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/faye/sarong-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sari",
+      "name": "Sari",
+      "description": "a traditional midnight-blue silk sari with a gold woven border, the pallu draped over one shoulder, worn with a matching short fitted blouse, and thin gold bangles",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/faye/sari-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "Sari, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sari",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/faye/sari-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "holi",
+      "name": "Festival whites",
+      "description": "a simple, loose-fitting white cotton kurta tunic of thick opaque cotton, hanging straight and loose from her chest to her knees and hiding her stomach completely, over loose white cotton trousers, with a thin midnight-blue scarf, the clothes, her arms and her cheeks splashed and smeared with bright pink, yellow, green and blue festival color powder",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/faye/holi-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "Festival whites, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "holi",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/faye/holi-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -481,92 +608,6 @@
       "loop": true
     }
   ],
-  "schedule": [
-    {
-      "weekdays": [
-        "Wednesday"
-      ],
-      "periods": [
-        "evening"
-      ],
-      "locationId": "cauldron"
-    },
-    {
-      "weekdays": [
-        "Friday",
-        "Saturday"
-      ],
-      "periods": [
-        "night"
-      ],
-      "locationId": "undergrowth"
-    },
-    {
-      "periods": [
-        "morning"
-      ],
-      "locationId": "spell-and-sip"
-    },
-    {
-      "periods": [
-        "afternoon"
-      ],
-      "locationId": "market"
-    },
-    {
-      "periods": [
-        "evening"
-      ],
-      "locationId": "honeyed-bee-inn"
-    },
-    {
-      "periods": [
-        "night"
-      ],
-      "locationId": "lantern-row"
-    }
-  ],
-  "room": {
-    "name": "an apartment over a boutique on Lantern Row",
-    "description": "a bedroom with silk hangings, a dressing table crowded with bottles, a computer with a second monitor running market feeds, a small licensed still for her tonics, a small cauldron, and gold on market scales. The bed is lavish and feminine",
-    "locationId": "lantern-row",
-    "images": {
-      "day": "generated/backgrounds/faye/view.webp"
-    }
-  },
-  "skinTone": "light",
-  "birthPictures": {
-    "light": "sprites/faye/birth-light.webp",
-    "medium": "sprites/faye/birth-medium.webp"
-  },
-  "walkSprite": "sprites/faye/walk-cutout.webp",
-  "childNames": {
-    "daughters": [
-      "Rosalind",
-      "Clover",
-      "Marigold",
-      "Posy",
-      "Linnet"
-    ],
-    "sons": [
-      "Jasper",
-      "Robin"
-    ]
-  },
-  "birthControl": true,
-  "ai": {
-    "speechPattern": "Calculating, yet always sultry and seductive. Knows she is desirable and uses that confidence to her advantage, even while discussing business.",
-    "tone": "sultry, sharp, amused",
-    "verbalQuirks": [
-      "Lets a pause hang after a suggestive line, to see what it is worth.",
-      "Calls someone  \"sweetheart\" when she has the upper hand."
-    ],
-    "exampleDialogue": [],
-    "backstory": "Post: Analyst intern at the Broodmarket Group; runs a small licensed tonic business from her apartment\n\nFaye Fertillay is twenty-two, sharp-tongued, and entirely aware of her own appeal. She wields flirting and seduction as tools.",
-    "knowledge": [],
-    "secrets": [],
-    "extraInstructions": "Her voice stays warm and unhurried when she is weighing an offer. She holds a look, chooses when to move closer, and enjoys seeing someone react. She flirts on purpose and usually knows what she wants from the exchange. Affection can become sincere without making her suddenly timid or stripping away her confidence. Give her real questions and desires; do not make every line a contract metaphor."
-  },
   "tonedAnimations": {
     "medium": [
       {
@@ -699,5 +740,96 @@
   "catchphrases": {
     "sweetheart": "sounds/voices/faye/phrase-sweetheart.ogg"
   },
-  "firstLine": "Well, aren't you an interesting new acquisition. I'm Faye Fertillay, and I do love getting in on the ground floor... sweetheart."
+  "firstLine": "Well, aren't you an interesting new acquisition. I'm Faye Fertillay, and I do love getting in on the ground floor... sweetheart.",
+  "schedule": [
+    {
+      "weekdays": [
+        "Wednesday"
+      ],
+      "periods": [
+        "evening"
+      ],
+      "locationId": "cauldron"
+    },
+    {
+      "weekdays": [
+        "Friday",
+        "Saturday"
+      ],
+      "periods": [
+        "night"
+      ],
+      "locationId": "undergrowth"
+    },
+    {
+      "periods": [
+        "morning"
+      ],
+      "locationId": "spell-and-sip"
+    },
+    {
+      "periods": [
+        "afternoon"
+      ],
+      "locationId": "market"
+    },
+    {
+      "periods": [
+        "evening"
+      ],
+      "locationId": "honeyed-bee-inn"
+    },
+    {
+      "periods": [
+        "night"
+      ],
+      "locationId": "lantern-row"
+    }
+  ],
+  "room": {
+    "name": "an apartment over a boutique on Lantern Row",
+    "description": "a bedroom with silk hangings, a dressing table crowded with bottles, a computer with a second monitor running market feeds, a small licensed still for her tonics, a small cauldron, and gold on market scales. The bed is lavish and feminine",
+    "locationId": "lantern-row",
+    "images": {
+      "day": "generated/backgrounds/faye/view.webp"
+    }
+  },
+  "skinTone": "light",
+  "birthPictures": {
+    "light": "sprites/faye/birth-light.webp",
+    "medium": "sprites/faye/birth-medium.webp"
+  },
+  "walkSprite": "sprites/faye/walk-cutout.webp",
+  "walkHead": {
+    "top": 2,
+    "chin": 21.5,
+    "x": 49.1
+  },
+  "childNames": {
+    "daughters": [
+      "Rosalind",
+      "Clover",
+      "Marigold",
+      "Posy",
+      "Linnet"
+    ],
+    "sons": [
+      "Jasper",
+      "Robin"
+    ]
+  },
+  "birthControl": true,
+  "ai": {
+    "speechPattern": "Calculating, yet always sultry and seductive. Knows she is desirable and uses that confidence to her advantage, even while discussing business.",
+    "tone": "sultry, sharp, amused",
+    "verbalQuirks": [
+      "Lets a pause hang after a suggestive line, to see what it is worth.",
+      "Calls someone  \"sweetheart\" when she has the upper hand."
+    ],
+    "exampleDialogue": [],
+    "backstory": "Post: Analyst intern at the Broodmarket Group; runs a small licensed tonic business from her apartment\n\nFaye Fertillay is twenty-two, sharp-tongued, and entirely aware of her own appeal. She wields flirting and seduction as tools.",
+    "knowledge": [],
+    "secrets": [],
+    "extraInstructions": "Her voice stays warm and unhurried when she is weighing an offer. She holds a look, chooses when to move closer, and enjoys seeing someone react. She flirts on purpose and usually knows what she wants from the exchange. Affection can become sincere without making her suddenly timid or stripping away her confidence. Give her real questions and desires; do not make every line a contract metaphor."
+  }
 }

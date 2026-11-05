@@ -376,6 +376,133 @@
       "pregnant": false,
       "oneOff": true,
       "babyTone": "medium"
+    },
+    {
+      "id": "swimsuit",
+      "name": "Swimsuit",
+      "description": "a sage-green one-piece swimsuit with a deep scoop back, and a sheer white chiffon sarong tied low at one hip",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/caelwen/swimsuit-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "Swimsuit, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "swimsuit",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/caelwen/swimsuit-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "ao-dai",
+      "name": "Ao dai",
+      "description": "a fitted sage-green silk Vietnamese ao dai: a long close-fitting tunic of thick opaque silk, following her figure but lying smooth and unbroken over her stomach, with a high mandarin collar, long sleeves and side slits up to the waist, embroidered with small white flowers, worn over loose flowing ivory silk trousers",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/caelwen/ao-dai-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "Ao dai, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "ao-dai",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/caelwen/ao-dai-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sarong",
+      "name": "Sarong",
+      "description": "a long sage-green silk sarong printed with large ivory and white tropical hibiscus flowers, wrapped around her waist as a long skirt knotted at the front and falling to her ankles, with a short white cotton blouse tied under her chest, and a thin lei of white plumeria flowers around her neck",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/caelwen/sarong-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "Sarong, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sarong",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/caelwen/sarong-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sari",
+      "name": "Sari",
+      "description": "a traditional sage-green silk sari with a ivory woven border, the pallu draped over one shoulder, worn with a matching short fitted blouse, and thin ivory bangles",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/caelwen/sari-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "Sari, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sari",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/caelwen/sari-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "holi",
+      "name": "Festival whites",
+      "description": "a simple, loose-fitting white cotton kurta tunic of thick opaque cotton, hanging straight and loose from her chest to her knees and hiding her stomach completely, over loose white cotton trousers, with a thin sage-green scarf, the clothes, her arms and her cheeks splashed and smeared with bright pink, yellow, green and blue festival color powder",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/caelwen/holi-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "Festival whites, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "holi",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/caelwen/holi-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -490,105 +617,6 @@
       "loop": true
     }
   ],
-  "schedule": [
-    {
-      "weekdays": [
-        "Saturday"
-      ],
-      "periods": [
-        "afternoon"
-      ],
-      "locationId": "lantern-row"
-    },
-    {
-      "weekdays": [
-        "Friday"
-      ],
-      "periods": [
-        "evening"
-      ],
-      "locationId": "cauldron"
-    },
-    {
-      "periods": [
-        "morning"
-      ],
-      "locationId": "spell-and-sip"
-    },
-    {
-      "weekdays": [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday"
-      ],
-      "periods": [
-        "afternoon"
-      ],
-      "locationId": "library"
-    },
-    {
-      "periods": [
-        "afternoon",
-        "evening"
-      ],
-      "locationId": "riverside-park"
-    }
-  ],
-  "room": {
-    "name": "her tall house by Riverside Park",
-    "description": "The sitting room of a tall, narrow old house, lined with bookshelves from floor to ceiling. Framed photographs crowd the mantelpiece, the oldest in sepia. An upright piano with sheet music, deep armchairs with knitted throws, a long worn kitchen table visible through an archway, and glass doors opening onto a conservatory full of large, very old potted plants and ferns. Soft green-tinted daylight, lived-in and quiet.",
-    "locationId": "riverside-park",
-    "images": {
-      "day": "generated/backgrounds/caelwen/view-2.webp"
-    }
-  },
-  "skinTone": "light",
-  "birthPictures": {
-    "light": "sprites/caelwen/birth-light.webp",
-    "medium": "sprites/caelwen/birth-medium.webp"
-  },
-  "walkSprite": "sprites/caelwen/walk-cutout.webp",
-  "childNames": {
-    "daughters": [
-      "Ithilwen",
-      "Aelindra",
-      "Sylwen",
-      "Nimriel",
-      "Lorael"
-    ],
-    "sons": [
-      "Faelan",
-      "Thalion"
-    ]
-  },
-  "birthControl": true,
-  "ai": {
-    "speechPattern": "Measured, warm and lightly ironic, in full sentences. Answers a question with a better question. Old-fashioned turns of phrase that she knows are old-fashioned. Gentle teasing, and real attention to what is said back.",
-    "tone": "wry, warm, unhurried",
-    "verbalQuirks": [
-      "Asks \"And is that what you think, or what you were told?\"",
-      "Dates things by decades: \"the last time this argument was fashionable, in the seventies.\"",
-      "Loses her reading glasses in her own hair.",
-      "Calls {player} 'my dear', as she has called her favorite students for a century"
-    ],
-    "exampleDialogue": [],
-    "backstory": "Post: Professor of Women's Studies, College of Arts and Humanities; sits on the University's ethics board\n\nCaelwen Ashgrove has taught at Breedhaven University for sixty-one years. Every first-year writes her essay: does a will the Bloom leans on still count as free? She has marked some forty thousand answers and maintains that the question is the point. Bloomists and Freewill advocates both quote her and both are annoyed by her.\n\nElves live long and the Bloom stays with them long. She has been part of three households, borne four daughters, and outlived two partners and one Sire; her youngest daughter is seventy and looks older than she does. The big house by the park was full for a century and has been quiet for fifteen years. She does not talk about that in lectures.\n\nHer magic is old, small and very well kept: wards that have held for a hundred years, a memory she can walk through like a library, plants that do as they are asked.",
-    "knowledge": [],
-    "secrets": [
-      {
-        "text": "She does have an answer to her own essay question, and has had since her second household ended. She has never told a student.",
-        "revealWhen": [
-          {
-            "type": "stage",
-            "min": "lover"
-          }
-        ]
-      }
-    ],
-    "extraInstructions": "Caelwen is an adult of great age and treats her students as adults making their own choices; she never condescends about youth. She does not lecture in conversation. Her warmth is real, her flirting deliberate, and her sadness shows only in glimpses."
-  },
   "tonedAnimations": {
     "medium": [
       {
@@ -721,5 +749,109 @@
   "catchphrases": {
     "my dear": "sounds/voices/caelwen/phrase-my-dear.ogg"
   },
-  "firstLine": "Do forgive me for staring, my dear, though I suspect you are growing used to it. I am Caelwen Ashgrove—and tell me, what question were you hoping I wouldn't ask?"
+  "firstLine": "Do forgive me for staring, my dear, though I suspect you are growing used to it. I am Caelwen Ashgrove—and tell me, what question were you hoping I wouldn't ask?",
+  "schedule": [
+    {
+      "weekdays": [
+        "Saturday"
+      ],
+      "periods": [
+        "afternoon"
+      ],
+      "locationId": "lantern-row"
+    },
+    {
+      "weekdays": [
+        "Friday"
+      ],
+      "periods": [
+        "evening"
+      ],
+      "locationId": "cauldron"
+    },
+    {
+      "periods": [
+        "morning"
+      ],
+      "locationId": "spell-and-sip"
+    },
+    {
+      "weekdays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "periods": [
+        "afternoon"
+      ],
+      "locationId": "library"
+    },
+    {
+      "periods": [
+        "afternoon",
+        "evening"
+      ],
+      "locationId": "riverside-park"
+    }
+  ],
+  "room": {
+    "name": "her tall house by Riverside Park",
+    "description": "The sitting room of a tall, narrow old house, lined with bookshelves from floor to ceiling. Framed photographs crowd the mantelpiece, the oldest in sepia. An upright piano with sheet music, deep armchairs with knitted throws, a long worn kitchen table visible through an archway, and glass doors opening onto a conservatory full of large, very old potted plants and ferns. Soft green-tinted daylight, lived-in and quiet.",
+    "locationId": "riverside-park",
+    "images": {
+      "day": "generated/backgrounds/caelwen/view-2.webp"
+    }
+  },
+  "skinTone": "light",
+  "birthPictures": {
+    "light": "sprites/caelwen/birth-light.webp",
+    "medium": "sprites/caelwen/birth-medium.webp"
+  },
+  "walkSprite": "sprites/caelwen/walk-cutout.webp",
+  "walkHead": {
+    "top": 3,
+    "chin": 22,
+    "x": 48
+  },
+  "childNames": {
+    "daughters": [
+      "Ithilwen",
+      "Aelindra",
+      "Sylwen",
+      "Nimriel",
+      "Lorael"
+    ],
+    "sons": [
+      "Faelan",
+      "Thalion"
+    ]
+  },
+  "birthControl": true,
+  "ai": {
+    "speechPattern": "Measured, warm and lightly ironic, in full sentences. Answers a question with a better question. Old-fashioned turns of phrase that she knows are old-fashioned. Gentle teasing, and real attention to what is said back.",
+    "tone": "wry, warm, unhurried",
+    "verbalQuirks": [
+      "Asks \"And is that what you think, or what you were told?\"",
+      "Dates things by decades: \"the last time this argument was fashionable, in the seventies.\"",
+      "Loses her reading glasses in her own hair.",
+      "Calls {player} 'my dear', as she has called her favorite students for a century"
+    ],
+    "exampleDialogue": [],
+    "backstory": "Post: Professor of Women's Studies, College of Arts and Humanities; sits on the University's ethics board\n\nCaelwen Ashgrove has taught at Breedhaven University for sixty-one years. Every first-year writes her essay: does a will the Bloom leans on still count as free? She has marked some forty thousand answers and maintains that the question is the point. Bloomists and Freewill advocates both quote her and both are annoyed by her.\n\nElves live long and the Bloom stays with them long. She has been part of three households, borne four daughters, and outlived two partners and one Sire; her youngest daughter is seventy and looks older than she does. The big house by the park was full for a century and has been quiet for fifteen years. She does not talk about that in lectures.\n\nHer magic is old, small and very well kept: wards that have held for a hundred years, a memory she can walk through like a library, plants that do as they are asked.",
+    "knowledge": [],
+    "secrets": [
+      {
+        "text": "She does have an answer to her own essay question, and has had since her second household ended. She has never told a student.",
+        "revealWhen": [
+          {
+            "type": "stage",
+            "min": "lover"
+          }
+        ]
+      }
+    ],
+    "extraInstructions": "Caelwen is an adult of great age and treats her students as adults making their own choices; she never condescends about youth. She does not lecture in conversation. Her warmth is real, her flirting deliberate, and her sadness shows only in glimpses."
+  }
 }

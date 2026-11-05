@@ -102,6 +102,8 @@ import jobsArt from '../../../assets/phone/apps/jobs.webp'
 import societiesArt from '../../../assets/phone/apps/societies.webp'
 import shopArt from '../../../assets/phone/apps/shop.webp'
 import profileArt from '../../../assets/phone/apps/profile.webp'
+import tripsArt from '../../../assets/phone/apps/trips.webp'
+import { TripsApp } from './TripsApp'
 import { Stalls } from './MarketView'
 import { BackButton } from './BackButton'
 import { SkinTonePicker } from './SkinTonePicker'
@@ -132,19 +134,22 @@ interface Props {
 }
 
 /**
- * The phone's apps, down its left edge. A new one is a line here and a branch where the
- * apps are drawn.
+ * The phone's apps, down its left edge, on as many pages as there are (`page`), turned by the dots under them. A new one
+ * is a line here and a branch where the apps are drawn.
  */
 const APPS = [
-  { id: 'profile', label: 'panels.phone.profile', title: 'panels.phone.profile', art: profileArt },
-  { id: 'chats', label: 'panels.phone.app.chats', title: 'panels.phone.app.chatsTitle', art: chatsArt },
-  { id: 'friends', label: 'panels.phone.app.friends', title: 'panels.phone.app.friendsTitle', art: friendsArt },
-  { id: 'updates', label: 'panels.phone.app.updates', title: 'panels.phone.app.updatesTitle', art: updatesArt },
-  { id: 'jobs', label: 'panels.phone.app.jobs', title: 'panels.phone.app.jobsTitle', art: jobsArt },
-  { id: 'societies', label: 'panels.phone.app.societies', title: 'panels.phone.app.societiesTitle', art: societiesArt },
-  { id: 'shop', label: 'panels.phone.app.shop', title: 'panels.phone.app.shopTitle', art: shopArt }
-] as const satisfies readonly { id: string; label: MessageKey; title: MessageKey; art: string }[]
+  { id: 'chats', page: 0, label: 'panels.phone.app.chats', title: 'panels.phone.app.chatsTitle', art: chatsArt },
+  { id: 'friends', page: 0, label: 'panels.phone.app.friends', title: 'panels.phone.app.friendsTitle', art: friendsArt },
+  { id: 'updates', page: 0, label: 'panels.phone.app.updates', title: 'panels.phone.app.updatesTitle', art: updatesArt },
+  { id: 'jobs', page: 0, label: 'panels.phone.app.jobs', title: 'panels.phone.app.jobsTitle', art: jobsArt },
+  { id: 'societies', page: 0, label: 'panels.phone.app.societies', title: 'panels.phone.app.societiesTitle', art: societiesArt },
+  { id: 'shop', page: 0, label: 'panels.phone.app.shop', title: 'panels.phone.app.shopTitle', art: shopArt },
+  { id: 'profile', page: 1, label: 'panels.phone.profile', title: 'panels.phone.profile', art: profileArt },
+  { id: 'trips', page: 1, label: 'panels.phone.app.trips', title: 'panels.phone.app.tripsTitle', art: tripsArt }
+] as const satisfies readonly { id: string; page: number; label: MessageKey; title: MessageKey; art: string }[]
 type App = (typeof APPS)[number]['id']
+const PAGES = Math.max(...APPS.map((one) => one.page)) + 1
+const pageOf = (id: App): number => APPS.find((one) => one.id === id)?.page ?? 0
 
 /** An ability's name as the phone writes it, in lower case. */
 const statName = (stat: Stat) => t(`panels.common.stat.${stat}` as const)
@@ -182,8 +187,12 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, initi
   // Everyone who can be in his DMs: the love interests, and any NPC he has worked for.
   const people = messageable(content)
   const [app, setApp] = useState<App>(shown ?? (initialId === undefined ? 'chats' : 'friends'))
+  // The page of apps the rail shows: the open app's, until the dots turn it.
+  const [page, setPage] = useState(() => pageOf(app))
   useEffect(() => {
-    if (shown) setApp(shown)
+    if (!shown) return
+    setApp(shown)
+    setPage(pageOf(shown))
   }, [shown])
   // Looking at the feed is seeing what is on it: its count is cleared while it is open, and whatever goes up meanwhile with it.
   const newPosts = unreadPosts(state)
@@ -199,6 +208,7 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, initi
   const message = (id: string) => {
     setChatId(id)
     setApp('chats')
+    setPage(pageOf('chats'))
   }
   const date = toDate(content.calendar, state.time)
   const weather = weatherOn(content, state)
@@ -216,7 +226,7 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, initi
           </span>
         </div>
         <nav className="phone-rail" role="tablist" aria-orientation="vertical">
-          {APPS.map(({ id, label, art }) => (
+          {APPS.filter((one) => one.page === page).map(({ id, label, art }) => (
             <button
               key={id}
               role="tab"
@@ -234,6 +244,14 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, initi
               {id === 'updates' && unreadPosts(state) > 0 && <span className="badge">{unreadPosts(state)}</span>}
             </button>
           ))}
+          {/* One dot for each page of apps, the one shown lit: a click anywhere on them turns to the next. */}
+          {PAGES > 1 && (
+            <Button variant="quiet" className="phone-pages" aria-label={t('panels.phone.page', { page: page + 1, pages: PAGES })} title={t('panels.phone.page', { page: page + 1, pages: PAGES })} onClick={() => setPage((page + 1) % PAGES)}>
+              {Array.from({ length: PAGES }, (_, i) => (
+                <i key={i} className={i === page ? 'phone-dot on' : 'phone-dot'} />
+              ))}
+            </Button>
+          )}
           <BackButton className="phone-back" label={t('panels.phone.putAway')} onClick={onClose} />
         </nav>
 
@@ -263,6 +281,7 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, initi
           {app === 'jobs' && <Jobs content={content} state={state} onChange={onChange} onMessage={message} />}
           {app === 'societies' && <Societies content={content} state={state} onChange={onChange} />}
           {app === 'shop' && <Market content={content} state={state} onChange={onChange} />}
+          {app === 'trips' && <TripsApp content={content} state={state} onChange={onChange} canAct={canAct} onOpenChat={message} />}
           {app === 'profile' && <Profile content={content} state={state} onChange={onChange} />}
         </div>
         </div>
@@ -671,6 +690,8 @@ function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadPr
 
 // How a group chat's id is told from a love interest's, where either can be the open chat.
 const GROUP = 'group:'
+// What a trip's group chat is called, before its event's id: `tripChatId`'s.
+const TRIP_CHAT = 'trip:'
 
 /** A group chat: what he and they have said in it, each line with who said it, and his answer to the rest. */
 function GroupThread({ content, state, chatId, onChange }: { content: ContentPack; state: GameState; chatId: string; onChange: (update: (state: GameState) => GameState) => void }) {
@@ -705,7 +726,9 @@ function GroupThread({ content, state, chatId, onChange }: { content: ContentPac
     setWaiting(true)
     try {
       const history = (sent.groupChats[chatId]?.notes ?? []).map((note) => ({ speaker: note.from === 'player' ? state.player.name : (who(note.speakerId)?.name.split(' ')[0] ?? t('panels.phone.someone')), text: note.text }))
-      const { lines } = await window.api.momentLines({ state: sent, ids: chat.memberIds, moment: 'group', history })
+      // A trip's chat is about that trip.
+      const tripId = chatId.startsWith(TRIP_CHAT) ? chatId.slice(TRIP_CHAT.length) : undefined
+      const { lines } = await window.api.momentLines({ state: sent, ids: chat.memberIds, moment: 'group', history, tripId })
       onChange((current) => lines.reduce((next, line) => addGroupNote(next, chatId, { from: 'them', speakerId: line.speakerId, text: line.text, read: false }), current))
     } catch (error) {
       setNotice(t('panels.phone.noAnswer', { error: errorMessage(error) }))

@@ -41,7 +41,8 @@ export function mapDressingAt(content: ContentPack, state: GameState, location: 
 
 /**
  * The outfits events put a woman in, for an outfit of hers to be made for: those a part starts its scene in (a
- * bathrobe at the springs), and one named for an event, worn all that day. Each with where it is worn.
+ * bathrobe at the springs, a swimsuit at the beach), one named for an event, worn all that day, and those a story beat
+ * dresses her in. Each with where it is worn.
  */
 export function eventOutfits(content: ContentPack): { id: string; worn: string[] }[] {
   const found = new Map<string, string[]>()
@@ -49,6 +50,13 @@ export function eventOutfits(content: ContentPack): { id: string; worn: string[]
   for (const event of content.calendar.events) {
     for (const part of event.program) if (part.outfitId) add(part.outfitId, t('llm.events.outfitPart', { event: event.name, part: part.name }))
     add(event.id, t('llm.events.outfitAll', { event: event.name }))
+  }
+  for (const getaway of content.getaways.trips) {
+    for (const part of getaway.program) if (part.outfitId) add(part.outfitId, t('llm.events.outfitPart', { event: getaway.name, part: part.name }))
+  }
+  for (const [id, beats] of Object.entries(content.story)) {
+    const name = content.loveInterests.find((li) => li.id === id)?.name.split(' ')[0] ?? id
+    for (const beat of beats) if (beat.outfitId) add(beat.outfitId, t('llm.events.outfitStory', { name, stage: beat.stage }))
   }
   return [...found].map(([id, worn]) => ({ id, worn }))
 }

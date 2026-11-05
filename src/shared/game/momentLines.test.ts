@@ -5,7 +5,9 @@ import { fixture } from './testFixture'
 
 const base = fixture()
 const [ana] = base.loveInterests
-const content = { ...base, loveInterests: [ana, { ...ana, id: 'bea', name: 'Bea Stone' }, { ...ana, id: 'cy', name: 'Cy Vane' }] }
+// A trip to the shop, for the drives there and back.
+const trip = { ...base.calendar.events[0], id: 'trip', name: 'the Trip', locationId: 'shop', summary: 'a shop by the sea', durationDays: 3 }
+const content = { ...base, calendar: { ...base.calendar, events: [...base.calendar.events, trip] }, loveInterests: [ana, { ...ana, id: 'bea', name: 'Bea Stone' }, { ...ana, id: 'cy', name: 'Cy Vane' }] }
 const state = createInitialState(content)
 
 describe('the lines at the lanterns', () => {
@@ -17,9 +19,10 @@ describe('the lines at the lanterns', () => {
     expect(user).toContain('Bea, ')
     expect(user).not.toContain('Cy, ')
     expect(buildMomentPrompt(content, state, ['ana'], 'lanterns').system).toContain('2 lines')
-    // The drives ask of whoever is in the car, about the trip.
-    expect(buildMomentPrompt(content, state, ['bea'], 'drive-there').system).toContain('Saltmere Springs')
-    expect(buildMomentPrompt(content, state, ['bea'], 'drive-home').system).toContain('road back')
+    // The drives ask of whoever is in the car, about the trip it is.
+    expect(buildMomentPrompt(content, state, ['bea'], 'drive-there', [], 'trip').system).toContain('on the way to the Shop, a shop by the sea, for the Trip')
+    expect(buildMomentPrompt(content, state, ['bea'], 'drive-there', [], 'trip').system).toContain('3 days away')
+    expect(buildMomentPrompt(content, state, ['bea'], 'drive-home', [], 'trip').system).toContain('road back from the Shop')
   })
 
   it('keeps what his dates say, and nothing said by anyone else', () => {
