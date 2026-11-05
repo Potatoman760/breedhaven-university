@@ -7,6 +7,7 @@ import { meet } from './scene'
 import { createInitialState } from './state'
 import { rawFixture } from './testFixture'
 import { toggleRelic } from './relics'
+import { belowOutfitId, outfitOpen, setEchoOutfit, wearableOutfits } from './pregnancy'
 
 // The fixture's Shop is the way down, open from 05:00 to 15:00 on a 20-hour day that begins at 06:00. Ana holds the
 // line and Bea mends. A run is two hours: a fight, something lying about, a place to rest and the guardian.
@@ -30,21 +31,30 @@ const expedition = ExpeditionConfigSchema.parse({
   surgeLimit: 2,
   misfire: 3,
   grounds: 1,
+  // Trust and desire make no difference here but where a test says.
+  footingPerTrust: 0,
   roles: [
-    { id: 'guard', name: 'Guard', footing: 30, actions: [{ id: 'bash', name: 'Bash', kind: 'attack', power: 4 }, { id: 'hold', name: 'Hold', kind: 'taunt', cooldown: 1 }, { id: 'guard', name: 'Brace', kind: 'guard' }] },
-    { id: 'healer', name: 'Healer', footing: 20, actions: [{ id: 'mend', name: 'Mend', kind: 'heal', power: 6 }, { id: 'jolt', name: 'Jolt', kind: 'attack', power: 3 }] }
+    { id: 'guard', name: 'Guard', footing: 30, actions: [{ id: 'bash', name: 'Bash', kind: 'attack', power: 4 }, { id: 'hold', name: 'Hold', kind: 'taunt', cooldown: 1 }, { id: 'guard', name: 'Brace', kind: 'guard' }], friendAction: { id: 'quake', name: 'Quake', kind: 'attack', power: 3, all: true, cooldown: 2 } },
+    { id: 'healer', name: 'Healer', footing: 20, actions: [{ id: 'mend', name: 'Mend', kind: 'heal', power: 6 }, { id: 'jolt', name: 'Jolt', kind: 'attack', power: 3 }], friendAction: { id: 'renew', name: 'Renew', kind: 'heal', power: 4, all: true, cooldown: 3 } }
   ],
   enemies: [
     { id: 'blob', name: 'Blob', footing: 40, attack: 4 },
     { id: 'boss', name: 'Boss', footing: 30, attack: 3, sweeps: true },
-    { id: 'wall', name: 'Wall', footing: 9999, attack: 500, sweeps: true }
+    { id: 'wall', name: 'Wall', footing: 9999, attack: 500, sweeps: true },
+    { id: 'shell', name: 'Shell', footing: 40, attack: 4, armor: 3 },
+    { id: 'brute', name: 'Brute', footing: 40, attack: 4, charges: 1 },
+    { id: 'caller', name: 'Caller', footing: 40, attack: 4, summons: { enemyId: 'blob', every: 1 } },
+    { id: 'mender', name: 'Mender', footing: 40, attack: 4, mends: 7 },
+    { id: 'hush', name: 'Hush', footing: 400, attack: 1, silences: true },
+    { id: 'turner', name: 'Turner', footing: 40, attack: 4, phases: [{ at: 0.5, text: 'turns.', attack: 40 }] },
+    { id: 'post', name: 'Post', footing: 400, attack: 1 }
   ],
   depths: [depth('the Drains', 'stone', 'boss'), depth('the Pit', 'seal', 'wall')]
 })
 const content: ContentPack = validateContentPack({
   ...raw,
   loveInterests: [
-    { ...ana, partyRole: 'guard' },
+    { ...ana, partyRole: 'guard', ultimate: { id: 'avalanche', name: 'Avalanche', kind: 'attack', power: 20, all: true, stuns: 1 } },
     { ...ana, id: 'bea', name: 'Bea Stone', partyRole: 'healer' },
     { ...ana, id: 'cy', name: 'Cy' }
   ],
@@ -185,6 +195,96 @@ describe('a fight', () => {
   })
 })
 
+// A depth of one fight with one of the fixture's enemies.
+const facing = (enemyId: string): ContentPack => ({ ...content, expedition: { ...expedition, depths: [{ ...expedition.depths[0], nodes: [{ kind: 'guardian', name: '', enemyIds: [enemyId], finds: { money: 0, items: {} } }] }] } })
+
+describe('what being close to him makes of her below', () => {
+  // As close to him as this, back from as many runs won.
+  const at = (affection: number, desire = 0, wins = 1): GameState => ({ ...start, relationships: { ...start.relationships, ana: { affection, trust: 50, desire } }, expedition: { ...start.expedition, wins: { ana: wins } } })
+  const herTurn = (state: GameState) => act(content, below(['ana'], state), { actionId: 'strike' })
+
+  it('gives her her role’s further move as a friend back from a run won, and her own ultimate as his lover, once a run', () => {
+    expect(turnActions(content, herTurn(at(0))).map((action) => action.id)).toEqual(['bash', 'hold', 'guard'])
+    expect(turnActions(content, herTurn(at(30))).map((action) => action.id)).toEqual(['bash', 'hold', 'guard', 'quake'])
+    // A friend who has not yet come back from a run won has only her role's first moves.
+    expect(turnActions(content, herTurn(at(30, 0, 0))).map((action) => action.id)).toEqual(['bash', 'hold', 'guard'])
+    const post = facing('post')
+    const lover = act(post, startRun(post, at(80), ['ana', 'bea'], 0), { actionId: 'strike' })
+    expect(turnActions(post, lover).map((action) => action.id)).toEqual(['bash', 'hold', 'guard', 'quake', 'avalanche'])
+    expect(turnActions(post, lover).find((action) => action.id === 'avalanche')?.description).toContain('Once a run')
+    // It stuns what it hits, which then means nothing on the enemies' turn, and it is not hers again this run.
+    const used = act(post, lover, { actionId: 'avalanche' })
+    expect(run(used).fight!.foes[0]).toMatchObject({ intent: { kind: 'stunned' } })
+    const answered = act(post, used, { actionId: 'jolt' })
+    expect(run(answered).fight!.events.some((event) => event.text.includes('does nothing'))).toBe(true)
+    expect(turnActions(post, act(post, answered, { actionId: 'strike' })).find((action) => action.id === 'avalanche')).toMatchObject({ ready: false, note: 'Used this run' })
+  })
+
+  it('has her trust in him as footing, and her desire for him fill a passion that makes her next action stronger', () => {
+    const trusted = { ...content, expedition: { ...expedition, footingPerTrust: 0.1 } }
+    expect(run(startRun(trusted, start, ['ana'], 0)).party.find((one) => one.id === 'ana')?.max).toBe(35)
+    // At full desire, two things she does fill it; the next is stronger, and it starts again.
+    const once = act(content, herTurn(at(0, 100)), { actionId: 'guard' })
+    expect(fighter(once, 'ana')).toMatchObject({ passion: 1.5, impassioned: false })
+    const twice = act(content, act(content, once, { actionId: 'strike' }), { actionId: 'guard' })
+    expect(fighter(twice, 'ana')).toMatchObject({ passion: 0, impassioned: true })
+    expect(run(twice).fight!.events.some((event) => event.text.includes('impassioned'))).toBe(true)
+    expect(fighter(act(content, act(content, twice, { actionId: 'strike' }), { actionId: 'guard' }), 'ana').impassioned).toBe(false)
+    // Wanting him not at all, it never fills.
+    expect(fighter(act(content, herTurn(at(0)), { actionId: 'guard' }), 'ana').passion).toBe(0)
+  })
+})
+
+describe('what is down there', () => {
+  const into = (enemyId: string, party = ['ana', 'bea']) => startRun(facing(enemyId), start, party, 0)
+  // Him, then each of them, doing this.
+  const round = (pack: ContentPack, state: GameState, moves: string[]) => moves.reduce((next, actionId) => act(pack, next, { actionId }), state)
+
+  it('says ahead what each enemy will do, and does it to whom it said unless someone draws it', () => {
+    const begun = into('blob')
+    const intent = run(begun).fight!.foes[0].intent
+    expect(intent?.kind).toBe('hit')
+    expect([HIM, 'ana', 'bea']).toContain(intent?.target)
+    const after = round(content, begun, ['strike', 'guard', 'jolt'])
+    const hurtOnes = [HIM, 'ana', 'bea'].filter((id) => fighter(after, id).footing < fighter(begun, id).footing)
+    expect(hurtOnes).toEqual([intent?.target])
+    // Drawn by a taunt, it goes for her instead.
+    const drawn = round(content, begun, ['strike', 'hold', 'jolt'])
+    expect(fighter(drawn, 'ana').footing).toBeLessThan(30)
+  })
+
+  it('has armor that blunts every blow until it is weakened, and blows it lands heavily when it says it will', () => {
+    const hit = (enemyId: string) => 40 - run(act(facing(enemyId), into(enemyId), { actionId: 'strike' })).fight!.foes[0].footing
+    expect(hit('blob') - hit('shell')).toBe(3)
+    expect(run(into('brute')).fight!.foes[0].intent?.kind).toBe('heavy')
+    const heavy = round(facing('brute'), into('brute'), ['strike', 'guard', 'jolt'])
+    expect(run(heavy).fight!.events.some((event) => event.text.includes('heavy blow'))).toBe(true)
+  })
+
+  it('calls up more of its kind, mends its side when it is worn, silences, and turns as it is worn down', () => {
+    expect(run(into('caller')).fight!.foes[0].intent?.kind).toBe('summon')
+    expect(run(round(facing('caller'), into('caller'), ['strike', 'guard', 'jolt'])).fight!.foes.length).toBe(2)
+
+    const worn = into('mender')
+    const low = { ...worn, expedition: { ...worn.expedition, run: { ...run(worn), fight: { ...run(worn).fight!, foes: [{ ...run(worn).fight!.foes[0], footing: 15 }] } } } }
+    // Nobody touching it, it hits once, then mends itself.
+    const quiet = (state: GameState) => [{ actionId: 'cover', target: 'ana' }, { actionId: 'guard' }, { actionId: 'mend', target: 'bea' }].reduce((then, move) => act(facing('mender'), then, move), state)
+    const next = quiet(low)
+    expect(run(next).fight!.foes[0].intent).toEqual({ kind: 'mend', target: 'mender-0' })
+    expect(run(quiet(next)).fight!.foes[0].footing).toBe(22)
+
+    const hushed = round(facing('hush'), into('hush'), ['strike', 'hold', 'jolt'])
+    expect(fighter(hushed, 'ana').silenced).toBeGreaterThan(0)
+    const herTurn = act(facing('hush'), hushed, { actionId: 'strike' })
+    expect(turnActions(facing('hush'), herTurn).map((action) => [action.id, action.ready])).toEqual([['bash', true], ['hold', false], ['guard', false]])
+
+    let worn2 = into('turner')
+    while (run(worn2).fight!.foes[0].footing > 20) worn2 = act(facing('turner'), worn2, { actionId: turnOf(run(worn2))!.id === HIM ? 'strike' : turnOf(run(worn2))!.id === 'ana' ? 'bash' : 'jolt' })
+    expect(run(worn2).fight!.foes[0].phase).toBe(1)
+    expect(run(worn2).fight!.events.some((event) => event.text === 'Turner turns.')).toBe(true)
+  })
+})
+
 describe('a run', () => {
   const won = (from: GameState = start) => playOut(content, below(['ana', 'bea'], from))
 
@@ -208,7 +308,7 @@ describe('a run', () => {
   it('won leaves him the relic, opens the next depth, and is remembered by those who came', () => {
     const { state, outcome } = won()
     expect(outcome).toBe('won')
-    expect(state.expedition).toMatchObject({ cleared: 1, relics: ['stone'] })
+    expect(state.expedition).toMatchObject({ cleared: 1, relics: ['stone'], wins: { ana: 1, bea: 1 } })
     expect(relicsHeld(content, state).map((relic) => relic.id)).toEqual(['stone'])
     expect(state.player.money).toBe(start.player.money + 10 + 5 + 20)
     expect(depthsOpen(content, state)).toBe(2)
@@ -230,9 +330,41 @@ describe('a run', () => {
     // He got as far as the checkpoint, and keeps that.
     expect(state.player.money).toBe(start.player.money + 15)
     expect(state.player.energy).toBe(0)
-    expect(state.expedition).toMatchObject({ cleared: 1, relics: [] })
+    expect(state.expedition).toMatchObject({ cleared: 1, relics: [], wins: {} })
     expect(state.relationships['ana'].trust).toBe(48)
     expect(state.memories['bea'].at(-1)?.summary).toContain('it went badly at the Pit')
+  })
+})
+
+describe('the echoes', () => {
+  // Every anchor set, and the wall of the Pit made something a party can beat in an echo.
+  const echoing = { ...content, expedition: { ...expedition, enemies: expedition.enemies.map((one) => (one.id === 'wall' ? { ...one, footing: 30, attack: 2 } : one)), echoes: { ...expedition.echoes, power: 1, fights: 1, foes: 1 } } }
+  const done = { ...start, expedition: { ...start.expedition, cleared: 2 } }
+  const robe = { id: 'echoes', name: 'Ranger garb', description: '', sprites: {}, pregnant: false, day: true, locked: 'echoes' as const }
+  const her = { ...content.loveInterests[0], outfits: [...content.loveInterests[0].outfits, robe] }
+
+  it('open past the last depth once every anchor is set, put together from the depths', () => {
+    expect(canGoBelow(echoing, start, ['ana'], 2).reasons).toContain('You have not opened the way that deep')
+    expect(canGoBelow(echoing, done, ['ana'], 2).ok).toBe(true)
+    const echo = run(startRun(echoing, done, ['ana', 'bea'], 2))
+    expect(echo.echo?.name).toMatch(/^An echo of the (Drains|Pit)$/)
+    expect(echo.echo?.nodes.map((node) => node.kind)).toEqual(['fight', 'find', 'checkpoint', 'guardian'])
+    expect(['boss', 'wall']).toContain(echo.echo?.nodes.at(-1)?.enemyIds[0])
+  })
+
+  it('won, leave no relic and open nothing, but each woman who came may wear what she earned for it, unless he puts it away', () => {
+    const { state, outcome } = playOut(echoing, startRun(echoing, done, ['ana', 'bea'], 2))
+    expect(outcome).toBe('won')
+    expect(state.expedition).toMatchObject({ cleared: 2, relics: [], echoes: 1, echoed: ['ana', 'bea'] })
+    expect(outfitOpen(start, her, robe)).toBe(false)
+    expect(outfitOpen(state, her, robe)).toBe(true)
+    expect(outfitOpen(setEchoOutfit(state, 'ana', false), her, robe)).toBe(false)
+    expect(outfitOpen(setEchoOutfit(setEchoOutfit(state, 'ana', false), 'ana', true), her, robe)).toBe(true)
+    expect(wearableOutfits(her, start).map((o) => o.id)).not.toContain('echoes')
+    expect(wearableOutfits(her, state).map((o) => o.id)).toContain('echoes')
+    // Below, she always goes in it once earned, even put away for her days.
+    expect(belowOutfitId(start, her)).toBeUndefined()
+    expect(belowOutfitId(setEchoOutfit(state, 'ana', false), her)).toBe('echoes')
   })
 })
 

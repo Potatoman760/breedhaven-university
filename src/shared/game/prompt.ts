@@ -228,7 +228,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
     return stage?.showing === true && t('scene.prompt.appear.pregnant', { self: who === undefined, who, stage: stage.name })
   }
   // What she is asked to wear is always one of her ordinary outfits: the game puts her in its pregnant form itself.
-  const outfits = wearableOutfits(li)
+  const outfits = wearableOutfits(li, state)
   const wearing = (c: LoveInterest, worn: ReturnType<typeof wornOutfit>): string => (worn ? ordinaryOutfit(c, worn).id : c.defaultOutfitId)
   const cast = [li, ...companions]
   // The same, from whoever answers first this time: what they are listed in is the order they answer in, and a list that
@@ -567,7 +567,7 @@ export function buildCharacterPrompt(input: PromptInput): string {
               t('scene.prompt.appear.outfitGroup', { tag: '[OUTFIT: Name=id]' }),
               ...voices.map((c) => {
                 const worn = wornOutfit(content, state, c, c.id === li.id ? look.outfitId : input.looks?.[c.id]?.outfitId)
-                const has = wearableOutfits(c).map((o) => `${o.id} (${o.name})`).join(', ')
+                const has = wearableOutfits(c, state).map((o) => `${o.id} (${o.name})`).join(', ')
                 const first = c.name.split(' ')[0]
                 const note = pregnantNote(c, first)
                 return t('scene.prompt.appear.wearingGroup', { first, outfit: wearing(c, worn), has, showing: note !== false, note: note || undefined })

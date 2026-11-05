@@ -533,6 +533,81 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Thief's leathers",
+      "description": "a fantasy halfling thief's outfit: a short dark green hooded cloak, a fitted brown leather vest with many small pockets, a cropped dark green shirt, brown leather shorts, a belt with a coin pouch and a pair of daggers, and fingerless gloves",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tink/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/tink/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/tink/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/tink/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/tink/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/tink/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/tink/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Thief's leathers, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tink/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/tink/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/tink/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/tink/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/tink/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/tink/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/tink/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -540,6 +615,17 @@
   "imageSeed": 62,
   "stageHeight": 70,
   "partyRole": "striker",
+  "ultimate": {
+    "id": "sticky-fingers",
+    "name": "Sticky Fingers",
+    "kind": "weaken",
+    "power": 6,
+    "cooldown": 0,
+    "all": true,
+    "stuns": 0,
+    "cleanses": false,
+    "once": false
+  },
   "studies": {
     "major": "MEN",
     "level": 1

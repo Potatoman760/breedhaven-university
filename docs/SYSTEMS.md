@@ -879,8 +879,21 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
   then the enemies (`act`, `enemiesAct`). He can Attack (strength), Protect a woman
   (endurance), Empower her next action or Ground a pregnant woman's surge (both for energy),
   or use an item with a `below` entry; each woman has her role's actions (`attack`,
-  `weaken`, `shield`, `heal`, `guard`, `taunt`, some on a cooldown). Her affection sets
-  how often she strikes true; a woman carrying is multiplied by `pregnancyPower` for her
+  `weaken`, `shield`, `heal`, `guard`, `taunt`, some on a cooldown; one may hit `all`,
+  `stun`, `cleanse` hexes and silences, or be `once` a run), and with them what she is to
+  him adds (`herActions`): from `roleMoveStage` (Friend), once she has come back from a run
+  won (`wins` in the save, counted by `comeUp`), her role's `friendAction`, and from
+  `ultimateStage` (Lover) her own `ultimate`, written in her file, once a run. Her affection
+  sets how often she strikes true, her trust adds `footingPerTrust` to her footing, and her
+  desire fills her **passion** as she acts (`passionPerAction` at full desire, to
+  `passionLimit`), which full makes her next action `passionPower` times as strong.
+  Each enemy shows what it will do on the enemies' next turn (`intent`, set by `plan` at the
+  start of the party's: a hit at someone, a sweep, a heavy blow, a call for help, a mend, or
+  nothing while stunned); a taunt still draws it. The deeper ones fight in more ways
+  (`armor` taken off each blow until weakened, a heavy blow every `charges` rounds, `summons`,
+  `mends`, `silences` leaving her only her first move), and a guardian turns as it is worn
+  down through its `phases`, each changing its ways from then on (`enemyNow`, `intoPhases`).
+  A woman carrying is multiplied by `pregnancyPower` for her
   stage and adds to her surge with each thing she does, which at `surgeLimit` breaks loose
   on everyone. The party is drawn with its ordinary sprites, the face chosen by what last
   happened to each (`FightEvent.faces`); an enemy without an `image` is a card with its
@@ -894,6 +907,26 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
   `first-seed` undoes their birth control for the scene. Using one is his turn at once
   ("*secretly uses the …*"), with what it did told to her beside it as a cue (nobody knows
   it was him) and, where it lasts, as a rule of the scene.
+  Each depth has a `power` its enemies' footing, blows, mends and those they call up are
+  multiplied by (kept on the run as `run.power`), rising from 1 at the top, and a depth with a
+  `partyStage` (the last two, Lover) takes only women at that stage with him. An enemy mends
+  and calls up others no more than three times a fight, so that any fight can be worn down.
+  The balance aims at: the first two depths won by two women who only just trust him, the
+  week it opens; the middle ones won some of the time while dating; the last two only by
+  lovers, about half the time.
+  **Echoes** (`echoes` in `expedition.json`) open past the last depth once every anchor is
+  set (`echoesOpen`; the depth past the last in `startRun`): a run put together as he goes
+  down (`echoOf`, the same for the same hour) in one of the depths' places, with fights drawn
+  from every depth's fights, a find, a rest and one of the guardians, all at `echoes.power`,
+  and asking the last depth's stage. It is kept on the run as `run.echo`; `runDepth` is the
+  depth a run is in, either way. Won, it sets no anchor and leaves no relic: it counts in
+  `expedition.echoes`, and each woman who came is in `expedition.echoed` from then on, which
+  opens her outfit `locked: 'echoes'` (`outfitOpen`): a day outfit with every face and a
+  pregnant form of its own (`echoes-pregnant`), that is drawn for her days and offered in
+  scenes once open. Her
+  Friend page in the phone has a switch for it (`setEchoOutfit`, `expedition.echoOutfitOff`):
+  off, it is as if she had not earned it for her days. Below, she always goes in it once she
+  has earned it, switched off or not (`belowOutfitId`, in the fight and the party dialog).
   Losing keeps only what was banked, empties his energy and costs the trust of whoever
   went down (`comeUp`); each woman who went remembers it, and ties between them grow. A
   course's skill may carry a `below` modifier beside what it teaches (`might`, `footing`,

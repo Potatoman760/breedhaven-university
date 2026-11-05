@@ -489,6 +489,81 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Barbarian's furs",
+      "description": "a fantasy barbarian's outfit: a deep red leather and fur armored top with a fur mantle over her shoulders, a wide leather belt with a gold buckle, a deep red loincloth over fur-lined leather leggings, leather bracers, and a great axe slung across her back, held by one thick brown leather strap that always runs diagonally across her chest from her right shoulder down to her left hip",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/grushka/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/grushka/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/grushka/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/grushka/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/grushka/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/grushka/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/grushka/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Barbarian's furs, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/grushka/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/grushka/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/grushka/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/grushka/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/grushka/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/grushka/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/grushka/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -497,6 +572,17 @@
   "stageHeight": 100,
   "kind": "teacher",
   "partyRole": "guard",
+  "ultimate": {
+    "id": "oath-kept",
+    "name": "Oath Kept",
+    "kind": "attack",
+    "power": 26,
+    "cooldown": 0,
+    "all": false,
+    "stuns": 0,
+    "cleanses": false,
+    "once": false
+  },
   "teaching": {
     "department": "the College of Public Safety and Athletics",
     "title": "Coach",

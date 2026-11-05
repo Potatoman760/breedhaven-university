@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
 import { play } from '../sound'
-import { banterDue, act, comeUp, describeFinds, fighterName, goOn, inForce, nodeAt, pregnancyPower, roleOf, runReport, spriteFor, toDate, turnActions, turnBack, turnOf, wornOutfit, type BanterLine, type TurnAction } from '../../../shared/game'
+import { banterDue, act, belowOutfitId, comeUp, describeFinds, enemyNow, runDepth, fighterName, goOn, inForce, nodeAt, pregnancyPower, roleOf, runReport, spriteFor, toDate, turnActions, turnBack, turnOf, wornOutfit, type BanterLine, type TurnAction } from '../../../shared/game'
 import { HIM, type ContentPack, type Fighter, type Finds, type GameState } from '../../../shared/model'
 import { BelowFx, EVENT_GAP_MS } from '../fx/BelowFx'
 import { Backdrop } from './Backdrop'
@@ -39,7 +39,7 @@ const share = (now: number, max: number): string => `${Math.max(0, Math.min(100,
 export function ExpeditionView({ content, state, onChange, practice = false }: Props) {
   const config = content.expedition!
   const run = state.expedition.run!
-  const depth = config.depths[run.depth]
+  const depth = runDepth(content, run)
   const node = nodeAt(content, run)
   const fight = run.fight
   const report = runReport(content, state)
@@ -158,7 +158,7 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
       .map((fighter) => {
         const li = content.loveInterests.find((one) => one.id === fighter.id)
         const look = content.newGame.look
-        const face = li ? <Portrait who={li} image={spriteFor(li, wornOutfit(content, state, li), undefined)} size={34} /> : look.sprite ? <Portrait who={{ name: state.player.name, faceY: look.faceY }} image={look.sprite} size={34} /> : null
+        const face = li ? <Portrait who={li} image={spriteFor(li, wornOutfit(content, state, li, belowOutfitId(state, li)), undefined)} size={34} /> : look.sprite ? <Portrait who={{ name: state.player.name, faceY: look.faceY }} image={look.sprite} size={34} /> : null
         return { id: fighter.id, name: fighterName(content, state, fighter.id), face, footing: fighter.footing, max: fighter.max }
       })
   }
@@ -174,7 +174,9 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
       fighter.guarding ? (fighter.taunting ? t('panels.expedition.status.taunting') : t('panels.expedition.status.defending')) : '',
       fighter.anchored ? t('panels.expedition.status.empowered') : '',
       fighter.covered ? t('panels.expedition.status.protected') : '',
-      fighter.hexed > 0 ? t('panels.expedition.status.hexed') : ''
+      fighter.hexed > 0 ? t('panels.expedition.status.hexed') : '',
+      fighter.silenced > 0 ? t('panels.expedition.status.silenced') : '',
+      fighter.impassioned ? t('panels.expedition.status.impassioned') : ''
     ]
       .filter(Boolean)
       .join(', ')
@@ -189,7 +191,7 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
           {women.map((fighter) => {
             const li = content.loveInterests.find((one) => one.id === fighter.id)
             const down = fighter.footing <= 0
-            const sprite = li && spriteFor(li, wornOutfit(content, state, li), down ? 'sad' : (faces[fighter.id] ?? 'neutral'))
+            const sprite = li && spriteFor(li, wornOutfit(content, state, li, belowOutfitId(state, li)), down ? 'sad' : (faces[fighter.id] ?? 'neutral'))
             const pick = pending !== null && allyFits(pending, fighter)
             return (
               <div key={fighter.id} data-fx={fighter.id} className={`below-figure${down ? ' down' : ''}${actor?.id === fighter.id && fighting ? ' acting' : ''}${pick ? ' pick' : ''}`} onClick={() => pick && pending && go(pending, fighter.id)}>
@@ -202,10 +204,14 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
         <div className="below-foes">
           {fight &&
             foes.map((foe) => {
-              const enemy = config.enemies.find((one) => one.id === foe.enemyId)!
+              const enemy = enemyNow(config, foe)
               const gone = foe.footing <= 0
               const pick = pending?.aim === 'foe' && !gone
-              const notes = [foe.weakened > 0 && t('panels.expedition.note.faltering'), enemy.sweeps && t('panels.expedition.note.sweeps'), enemy.hexes && t('panels.expedition.note.hexes'), sees && enemy.weakTo && t('panels.expedition.note.weakTo', { role: config.roles.find((role) => role.id === enemy.weakTo)?.name.toLowerCase() })].filter(Boolean)
+              const notes = [foe.weakened > 0 && t('panels.expedition.note.faltering'), enemy.armor > 0 && foe.weakened === 0 && t('panels.expedition.note.armor', { armor: enemy.armor }), enemy.sweeps && t('panels.expedition.note.sweeps'), enemy.hexes && t('panels.expedition.note.hexes'), sees && enemy.weakTo && t('panels.expedition.note.weakTo', { role: config.roles.find((role) => role.id === enemy.weakTo)?.name.toLowerCase() })].filter(Boolean)
+              // What it means to do on the enemies' turn, as it stands now.
+              const intent = foe.intent
+              const whom = intent?.target && (foes.find((one) => one.key === intent.target) ? enemyNow(config, foes.find((one) => one.key === intent.target)!).name : fighterName(content, state, intent.target))
+              const says = !gone && intent && (intent.kind === 'heavy' && !intent.target ? t('panels.expedition.intent.heavyAll') : t(`panels.expedition.intent.${intent.kind}`, { whom }))
               return (
                 <div key={foe.key} data-fx={foe.key} className={`below-figure foe${gone ? ' down' : ''}${pick ? ' pick' : ''}`} onClick={() => pick && pending && go(pending, foe.key)}>
                   {enemy.image ? <img src={`content://pack/${enemy.image}`} alt="" /> : <span className="below-card">{enemy.name}</span>}
@@ -218,6 +224,7 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
                       </b>
                     </span>
                     {notes.length > 0 && <span className="below-small">{notes.join(' · ')}</span>}
+                    {says && <span className={`below-intent ${intent!.kind}`}>{says}</span>}
                   </span>
                 </div>
               )
@@ -265,6 +272,13 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
                       <span className="below-bar energy"><span style={{ width: share(state.player.energy, state.player.maxEnergy) }} /></span>
                       <span className="below-number">
                         {state.player.energy}/{state.player.maxEnergy}
+                      </span>
+                    </span>
+                  )}
+                  {fighter.id !== HIM && (state.relationships[fighter.id]?.desire ?? 0) > 0 && (
+                    <span className="below-gauge" title={t('panels.expedition.passion')}>
+                      <span className={`below-bar passion${fighter.impassioned ? ' full' : ''}`}>
+                        <span style={{ width: share(fighter.impassioned ? config.passionLimit : fighter.passion, config.passionLimit) }} />
                       </span>
                     </span>
                   )}
@@ -404,6 +418,21 @@ export function ExpeditionView({ content, state, onChange, practice = false }: P
               </span>
             </p>
           )}
+          {/* An echo won: each who came, the first time, may now wear what she earned for it. */}
+          {report.echo &&
+            report.outcome === 'won' &&
+            report.wentIds
+              .filter((id) => !state.expedition.echoed.includes(id))
+              .flatMap((id) => {
+                const li = content.loveInterests.find((one) => one.id === id)
+                const earned = li?.outfits.find((o) => o.locked === 'echoes')
+                return li && earned ? [{ li, earned }] : []
+              })
+              .map(({ li, earned }) => (
+                <p key={li.id} className="below-relic">
+                  {t('panels.expedition.earnedOutfit', { name: li.name.split(' ')[0], outfit: earned.name })}
+                </p>
+              ))}
           {report.outcome === 'lost' && <p>{t('panels.expedition.spent')}</p>}
           <div className="actions center">
             <GrandButton label={t('panels.expedition.comeUp')} icon={<BackIcon size={22} />} chevron={false} onClick={() => onChange(comeUp(content, state))} />

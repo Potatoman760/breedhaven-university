@@ -509,6 +509,81 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Swashbuckler's coat",
+      "description": "a fantasy swashbuckler's outfit: a bubblegum-pink long coat with silver trim worn open over a white ruffled blouse tied at the front, a wide silver-buckled belt, tight white breeches, a pink tricorn hat with a white feather, and a cutlass at her hip",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/yulia/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/yulia/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/yulia/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/yulia/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/yulia/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/yulia/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Swashbuckler's coat, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yulia/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/yulia/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/yulia/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/yulia/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/yulia/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/yulia/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/yulia/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -517,6 +592,17 @@
   "stageHeight": 100,
   "kind": "student",
   "partyRole": "striker",
+  "ultimate": {
+    "id": "no-shame",
+    "name": "No Shame",
+    "kind": "attack",
+    "power": 34,
+    "cooldown": 0,
+    "all": false,
+    "stuns": 0,
+    "cleanses": false,
+    "once": false
+  },
   "studies": {
     "major": "MEN",
     "level": 3

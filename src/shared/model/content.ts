@@ -208,6 +208,11 @@ function checkReferences(pack: ContentPack): string[] {
     })
   }
 
+  // A part is over before its day is: going to one puts the clock at its end, so one ending at midnight would have its
+  // scene begin on the next day.
+  const checkEnds = (part: { startHour: number; hours: number }, where: string) => {
+    if (part.startHour + part.hours >= calendar.hoursPerDay) issues.push(t('game.content.partPastMidnight', { where, ends: part.startHour + part.hours }))
+  }
   for (const e of calendar.events) {
     checkMonthDay(e.month, e.day, `calendar.events.${e.id}`)
     if (e.locationId !== undefined) {
@@ -219,6 +224,7 @@ function checkReferences(pack: ContentPack): string[] {
       const where = `calendar.events.${e.id}.program.${part.id}`
       if (part.day > e.durationDays) issues.push(t('game.content.dayAfterEvent', { where, day: part.day }))
       checkHour(part.startHour, where)
+      checkEnds(part, where)
       if (part.locationId !== undefined) need(locations, part.locationId, where, 'location')
       if (part.masquerade) {
         const ball = part.masquerade
@@ -256,6 +262,7 @@ function checkReferences(pack: ContentPack): string[] {
       const at = `${where}.program.${part.id}`
       if (part.day > g.days) issues.push(t('game.content.dayAfterEvent', { where: at, day: part.day }))
       checkHour(part.startHour, at)
+      checkEnds(part, at)
       if (part.viewId !== undefined && place && !place.backgrounds.some((view) => view.id === part.viewId)) issues.push(t('game.content.noView', { where: `${at}.viewId`, owner: place.id, id: part.viewId }))
     }
   }
@@ -579,8 +586,17 @@ function checkReferences(pack: ContentPack): string[] {
     if (below.intro) checkCutscene(below.intro.cutscene, 'expedition.intro.cutscene')
     if (loveInterests.has(HIM)) issues.push(t('game.content.himId', { where: 'expedition', id: HIM }))
     const roles = idSet(below.roles, 'expedition.roles')
-    below.roles.forEach((role) => idSet(role.actions, `expedition.roles (${role.id})`))
+    below.roles.forEach((role) => idSet([...role.actions, role.friendAction], `expedition.roles (${role.id})`))
     const enemies = idSet(below.enemies, 'expedition.enemies')
+    // What an enemy calls up is one there is, and its phases come in the order it is worn down to them.
+    for (const enemy of below.enemies) {
+      const where = `expedition.enemies.${enemy.id}`
+      for (const summons of [enemy.summons, ...enemy.phases.map((phase) => phase.summons)]) if (summons) need(enemies, summons.enemyId, where, 'enemy')
+      if (enemy.phases.some((phase, i) => i > 0 && phase.at >= enemy.phases[i - 1].at)) issues.push(t('game.content.phaseOrder', { where }))
+    }
+    const relationshipStages = new Set(pack.relationships.stages.map((stage) => stage.id))
+    need(relationshipStages, below.roleMoveStage, 'expedition.roleMoveStage', 'relationshipStage')
+    need(relationshipStages, below.ultimateStage, 'expedition.ultimateStage', 'relationshipStage')
     idSet(below.depths.map((depth) => depth.relic), 'expedition relics')
     below.depths.forEach((depth, i) => {
       const at = `expedition.depths[${i}]`
@@ -591,7 +607,12 @@ function checkReferences(pack: ContentPack): string[] {
         Object.keys(node.finds.items).forEach((id) => need(items, id, at, 'item'))
       })
     })
-    for (const li of pack.loveInterests) if (li.partyRole && !roles.has(li.partyRole)) issues.push(t('game.content.unknownRole', { where: `loveInterests.${li.id}`, role: li.partyRole }))
+    for (const li of pack.loveInterests) {
+      if (li.partyRole && !roles.has(li.partyRole)) issues.push(t('game.content.unknownRole', { where: `loveInterests.${li.id}`, role: li.partyRole }))
+      // Her ultimate is hers alone among what she can do, and is for a woman who comes below.
+      const role = below.roles.find((one) => one.id === li.partyRole)
+      if (li.ultimate && (!role || [...role.actions, role.friendAction].some((action) => action.id === li.ultimate!.id))) issues.push(t('game.content.ultimate', { where: `loveInterests.${li.id}.ultimate` }))
+    }
     const stages = new Set((pack.pregnancy?.stages ?? []).map((stage) => stage.id))
     Object.keys(below.pregnancyPower).forEach((id) => need(stages, id, 'expedition.pregnancyPower', 'pregnancyStage'))
   }

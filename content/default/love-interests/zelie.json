@@ -506,6 +506,82 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Enchantress's dress",
+      "description": "a fantasy enchantress's outfit: a chic fitted black dress with a high neck and long sleeves embroidered in white enchanted runes, a short black capelet clasped with a white gem, and a slender black wand with a white star tip",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/zelie/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/zelie/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/zelie/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/zelie/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/zelie/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/zelie/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/zelie/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Enchantress's dress, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/zelie/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/zelie/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/zelie/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/zelie/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/zelie/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/zelie/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/zelie/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -514,6 +590,17 @@
   "stageHeight": 100,
   "kind": "outsider",
   "partyRole": "healer",
+  "ultimate": {
+    "id": "withering-look",
+    "name": "Withering Look",
+    "kind": "weaken",
+    "power": 5,
+    "cooldown": 0,
+    "all": true,
+    "stuns": 1,
+    "cleanses": false,
+    "once": false
+  },
   "animations": [
     {
       "id": "blowjob",

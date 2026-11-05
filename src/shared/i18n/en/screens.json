@@ -360,6 +360,7 @@
   "party.party": "Party",
   "party.depthAbove": "The depth above",
   "party.anchorState": "{set, select, true {Anchor set} other {Anchor unset}} · {n} of {total}",
+  "party.echoesWon": "{n, plural, =0 {Never the same twice} =1 {# won} other {# won}}",
   "party.depthBelow": "The depth below",
   "party.setToOpen": "Set this anchor to open the next",
   "party.whoComes": "Who comes",

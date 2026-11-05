@@ -507,6 +507,82 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Warlock's regalia",
+      "description": "a fantasy warlock's outfit: a fitted black robe with a high collar and deep red lining, black lace sleeves, a silver pendant with a glowing red gem, and a square black leather grimoire with silver corner guards and one round red gem set in the middle of its cover, hanging from a silver chain belt at her right hip",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/morwenna/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/morwenna/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/morwenna/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/morwenna/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/morwenna/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/morwenna/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/morwenna/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Warlock's regalia, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/morwenna/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/morwenna/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/morwenna/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/morwenna/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/morwenna/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/morwenna/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/morwenna/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -515,6 +591,17 @@
   "stageHeight": 95,
   "kind": "student",
   "partyRole": "hexer",
+  "ultimate": {
+    "id": "already-decided",
+    "name": "Already Decided",
+    "kind": "attack",
+    "power": 28,
+    "cooldown": 0,
+    "all": false,
+    "stuns": 2,
+    "cleanses": false,
+    "once": false
+  },
   "studies": {
     "major": "WOM",
     "level": 4

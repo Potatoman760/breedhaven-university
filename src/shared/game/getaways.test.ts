@@ -88,6 +88,11 @@ describe('a weekend getaway', () => {
     expect(upcomingTrips(content, { ...home.state, time: dayStart(content, 5) })).toEqual([])
   })
 
+  it('has every part over before midnight, so that its scene is on its own day', () => {
+    const late = { ...getaway, program: [{ id: 'night', name: 'A night', day: 1, startHour: 21, hours: 3 }] }
+    expect(() => validateContentPack({ ...raw, getaways: { trips: [late] } })).toThrow(/ends at 24:00/)
+  })
+
   it('makes those along glad of it as it sets off, once, before the first scene, and nobody left at home minds', () => {
     const booked = bookGetaway(content, { ...start, relationships: { ...start.relationships, bea: close } }, beach, 3, ['ana'])
     const swum = attendEventPart(content, { ...booked, time: dayStart(content, 3) + 12 }, 'beach@3', 'swim')

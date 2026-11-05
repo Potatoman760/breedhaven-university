@@ -22,7 +22,15 @@ export const PartyActionSchema = z.object({
   /** How much it does: footing taken, given back or warded, before anything about her is counted. Nothing for a guard. */
   power: z.number().min(0).default(0),
   /** Rounds before she can do it again. None, and it is always to hand. */
-  cooldown: z.number().int().min(0).default(0)
+  cooldown: z.number().int().min(0).default(0),
+  /** An attack or weakening on every enemy standing, or a heal on everyone in the party, each for the whole of it. */
+  all: z.boolean().default(false),
+  /** Rounds each enemy it lands on loses its turn. */
+  stuns: z.number().int().min(0).default(0),
+  /** It also lifts every hex and silence from the party. */
+  cleanses: z.boolean().default(false),
+  /** Once a run, however long: what an ultimate is. */
+  once: z.boolean().default(false)
 })
 export type PartyAction = z.infer<typeof PartyActionSchema>
 
@@ -31,9 +39,25 @@ export const RoleConfigSchema = z.object({
   name: z.string(),
   /** How much she can take before she is down. */
   footing: z.number().int().min(1),
-  actions: z.array(PartyActionSchema).min(1)
+  actions: z.array(PartyActionSchema).min(1),
+  /** What she can do besides once she is at `roleMoveStage` with him, as every woman of her role can. */
+  friendAction: PartyActionSchema
 })
 export type RoleConfig = z.infer<typeof RoleConfigSchema>
+
+/**
+ * The ways an enemy fights beyond hitting, which the deeper ones have more of. `armor` is taken off every blow on it
+ * until it is weakened; every `charges` rounds its hit is a heavy one, twice as hard and shown a turn ahead; every
+ * `summons.every` rounds it calls up another of its kind instead; with one of its side under half its footing, it
+ * mends it by `mends` instead of hitting; and its hit `silences` whoever it lands on, leaving her only her first move.
+ */
+const EnemyWaysSchema = z.object({
+  armor: z.number().int().min(0).default(0),
+  charges: z.number().int().min(0).default(0),
+  summons: z.object({ enemyId: z.string(), every: z.number().int().min(1) }).optional(),
+  mends: z.number().int().min(0).default(0),
+  silences: z.boolean().default(false)
+})
 
 /** Something the Bloom has made of itself below. */
 export const EnemySchema = z.object({
@@ -51,9 +75,36 @@ export const EnemySchema = z.object({
   /** Its hit leaves whoever it lands on doing less for a couple of rounds. */
   hexes: z.boolean().default(false),
   /** The role whose work it cannot stand: hers does half as much again to it. */
-  weakTo: RoleSchema.optional()
+  weakTo: RoleSchema.optional(),
+  ...EnemyWaysSchema.shape,
+  /**
+   * What it turns into as it is worn down: each phase from the share of its footing it begins at, what it says of
+   * itself then, and what of its ways it changes. Each holds from then on, over those before it.
+   */
+  phases: z
+    .array(
+      z.object({
+        at: z.number().gt(0).lt(1),
+        text: z.string(),
+        attack: z.number().min(0).optional(),
+        sweeps: z.boolean().optional(),
+        hexes: z.boolean().optional(),
+        armor: z.number().int().min(0).optional(),
+        charges: z.number().int().min(0).optional(),
+        summons: z.object({ enemyId: z.string(), every: z.number().int().min(1) }).optional(),
+        mends: z.number().int().min(0).optional(),
+        silences: z.boolean().optional()
+      })
+    )
+    .default([])
 })
 export type Enemy = z.infer<typeof EnemySchema>
+
+/** What an enemy means to do on the enemies' next turn, shown to the party before it: a hit, at whom, or something else. */
+export const INTENT_KINDS = ['hit', 'sweep', 'heavy', 'summon', 'mend', 'stunned'] as const
+export type IntentKind = (typeof INTENT_KINDS)[number]
+export const IntentSchema = z.object({ kind: z.enum(INTENT_KINDS), target: z.string().optional() })
+export type Intent = z.infer<typeof IntentSchema>
 
 /** What is carried up from below: money, and things for the bag. */
 export const FindsSchema = z.object({
@@ -108,9 +159,30 @@ export const DepthSchema = z.object({
   /** The picture it is fought in front of, relative to the pack. Without one, the way down is shown, darkened. */
   image: z.string().optional(),
   nodes: z.array(NodeSchema).min(1),
-  relic: RelicSchema
+  relic: RelicSchema,
+  /** What its enemies' footing and blows are multiplied by: how hard it is, beside what they are. */
+  power: z.number().min(0.1).default(1),
+  /** The stage with him every woman who comes needs, where it asks one. */
+  partyStage: z.string().optional()
 })
 export type Depth = z.infer<typeof DepthSchema>
+
+/**
+ * Echoes: once every anchor is set, a way down that is never the same twice, put together from the depths' places
+ * and enemies, all of them the stronger by `power`. Each woman who comes back from one won with him has `outfitId`
+ * from then on, if she has it.
+ */
+export const EchoesSchema = z.object({
+  name: z.string().default('Echoes'),
+  power: z.number().min(0.1).default(1.5),
+  /** How many fights before its rest, and how many enemies each. */
+  fights: z.number().int().min(1).default(2),
+  foes: z.number().int().min(1).default(3),
+  /** What its stops give up, before what it was found in is counted. */
+  money: z.number().int().min(0).default(60),
+  outfitId: z.string().default('echoes')
+})
+export type Echoes = z.infer<typeof EchoesSchema>
 
 /** The rules of going below. A content pack without this has no Undercroft. */
 export const ExpeditionConfigSchema = z.object({
@@ -158,6 +230,18 @@ export const ExpeditionConfigSchema = z.object({
   /** Affection at which she strikes true as often as she ever will, and how often that is. A true strike does half as much again. */
   critAffection: z.number().min(1).default(100),
   critChance: z.number().min(0).max(1).default(0.25),
+  /** Footing a woman has besides her role's for each point of the trust she has in him. */
+  footingPerTrust: z.number().min(0).default(0.1),
+  /**
+   * Her passion: what each thing she does adds to it at full desire for him (less as she has less), where it is full,
+   * and what her next action is multiplied by once it is.
+   */
+  passionPerAction: z.number().min(0).default(1.5),
+  passionLimit: z.number().min(1).default(3),
+  passionPower: z.number().min(1).default(1.5),
+  /** The stages with him a woman needs for her role's further move and for her own ultimate. */
+  roleMoveStage: z.string().default('friend'),
+  ultimateStage: z.string().default('lover'),
   /** What a woman's work is multiplied by at each stage of a pregnancy, by the stage's id. A stage not named here cannot come. */
   pregnancyPower: z.record(z.string(), z.number().min(1)).default({}),
   /** A pregnant woman's surge: what each thing she does adds, where it breaks loose, what breaking loose takes from everyone, and what grounding her clears. */
@@ -170,7 +254,8 @@ export const ExpeditionConfigSchema = z.object({
   trustLost: z.number().min(0).default(2),
   roles: z.array(RoleConfigSchema).min(1),
   enemies: z.array(EnemySchema).min(1),
-  depths: z.array(DepthSchema).min(1)
+  depths: z.array(DepthSchema).min(1),
+  echoes: EchoesSchema.prefault({})
 })
 export type ExpeditionConfig = z.infer<typeof ExpeditionConfigSchema>
 
@@ -193,7 +278,14 @@ export const FighterSchema = z.object({
   /** He is standing in front of her: the next hit meant for her is his. */
   covered: z.boolean().default(false),
   /** Rounds for which what she does counts for less. */
-  hexed: z.number().int().default(0)
+  hexed: z.number().int().default(0),
+  /** Rounds for which she has only her first move. */
+  silenced: z.number().int().default(0),
+  /** Her passion, filling as she acts; full, her next action is the stronger for it. */
+  passion: z.number().default(0),
+  impassioned: z.boolean().default(false),
+  /** What she can do once a run that she has done, by id. */
+  spent: z.array(z.string()).default([])
 })
 export type Fighter = z.infer<typeof FighterSchema>
 
@@ -204,7 +296,16 @@ export const FoeSchema = z.object({
   footing: z.number(),
   max: z.number(),
   /** Rounds for which it hits less hard. */
-  weakened: z.number().int().default(0)
+  weakened: z.number().int().default(0),
+  /** Rounds for which it does nothing. */
+  stunned: z.number().int().default(0),
+  /** How many of its phases it is into. */
+  phase: z.number().int().default(0),
+  /** How many times it has mended one of its side, and called up another, this fight. */
+  mended: z.number().int().default(0),
+  called: z.number().int().default(0),
+  /** What it means to do on the enemies' next turn. */
+  intent: IntentSchema.optional()
 })
 export type Foe = z.infer<typeof FoeSchema>
 
@@ -247,7 +348,12 @@ export type Fight = z.infer<typeof FightSchema>
 
 /** A run in progress, kept in the save so that it is there again after loading. */
 export const ExpeditionRunSchema = z.object({
+  /** The depth it is at, or for an echo, the one whose place it is in. */
   depth: z.number().int().min(0),
+  /** What its enemies are multiplied by. */
+  power: z.number().default(1),
+  /** An echo's own way down, put together as it began. */
+  echo: DepthSchema.optional(),
   node: z.number().int().min(0),
   startedAt: z.number().int(),
   party: z.array(FighterSchema).min(1),
@@ -283,6 +389,13 @@ export const ExpeditionStateSchema = z.object({
   relicsOn: z.array(z.string()).default([]),
   /** He has been shown the way down, and may go. */
   invited: z.boolean().default(false),
+  /** How many runs each woman has come back from won, by id: her role's further move waits on the first. */
+  wins: z.record(z.string(), z.number().int().min(0)).default({}),
+  /** How many echoes he has come back from won, and the women who have come back from one with him. */
+  echoes: z.number().int().min(0).default(0),
+  echoed: z.array(z.string()).default([]),
+  /** Those of them whose outfit for it he has put away: it is not drawn for her day, as if she had not earned it. */
+  echoOutfitOff: z.array(z.string()).default([]),
   run: ExpeditionRunSchema.optional()
 })
 export type ExpeditionState = z.infer<typeof ExpeditionStateSchema>

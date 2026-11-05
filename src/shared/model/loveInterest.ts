@@ -3,7 +3,7 @@ import { ConditionSchema } from "./condition";
 import { StudiesSchema, TeachingSchema } from "./course";
 import { StatSchema } from "./stats";
 import { ChildNamesSchema } from "./pregnancy";
-import { RoleSchema } from "./expedition";
+import { PartyActionSchema, RoleSchema } from "./expedition";
 import { SkinToneSchema } from "./skin";
 import { t } from "../i18n";
 
@@ -96,6 +96,8 @@ export const OutfitSchema = z.object({
    * Its pregnant form goes by its parent.
    */
   coversStomach: z.boolean().optional(),
+  /** Not hers to wear until she has earned it: `echoes`, until she has come back from an echo won with him. */
+  locked: z.enum(['echoes']).optional(),
   /**
    * Lasts the day: she may be dressed in it as a day begins, and one she changes into in a scene she keeps on after it.
    * Any other is worn for the scene alone. Her usual clothes always last the day; a pregnant outfit goes by its parent.
@@ -492,6 +494,8 @@ export const LoveInterestSchema = z.object({
   kind: z.enum(LOVE_INTEREST_KINDS).optional(),
   /** What she does in a party that goes below. Without one she does not come. */
   partyRole: RoleSchema.optional(),
+  /** What only she can do below, once a run, once she is his lover: an action as her role's are. */
+  ultimate: PartyActionSchema.optional(),
   /** A student's own subject. Omitted for anyone who isn't one. */
   studies: StudiesSchema.optional(),
   /** What a teacher teaches. Omitted for anyone who isn't one. */

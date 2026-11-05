@@ -504,6 +504,82 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Cleric's vestments",
+      "description": "a fantasy cleric's outfit: long ivory vestments over a light chainmail shirt, a pale gold stole embroidered with a holy symbol, a gold holy symbol on a chain around her neck, and a small flanged steel mace hanging upside down from her belt at her right hip, its head pointing at the ground and its handle up",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/dinah/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/dinah/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/dinah/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/dinah/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/dinah/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/dinah/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/dinah/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Cleric's vestments, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/dinah/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/dinah/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/dinah/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/dinah/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/dinah/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/dinah/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/dinah/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -511,6 +587,17 @@
   "imageSeed": 62,
   "stageHeight": 100,
   "partyRole": "healer",
+  "ultimate": {
+    "id": "benediction",
+    "name": "Benediction",
+    "kind": "heal",
+    "power": 16,
+    "cooldown": 0,
+    "all": true,
+    "stuns": 0,
+    "cleanses": true,
+    "once": false
+  },
   "studies": {
     "major": "BLM",
     "level": 5

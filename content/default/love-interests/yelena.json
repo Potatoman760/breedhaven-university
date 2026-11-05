@@ -507,6 +507,82 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Spellsword's armor",
+      "description": "a fantasy eldritch knight's outfit: elegant deep crimson enchanted half-plate armor with gold filigree and faintly glowing runes, a deep crimson cape hanging straight down her back close to her body, armored gloves, and a slim longsword at her hip",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yelena/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/yelena/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/yelena/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/yelena/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/yelena/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/yelena/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/yelena/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Spellsword's armor, pregnant",
+      "description": "She has a round, pregnant belly. Over her belly the armor gives way to smooth plain deep crimson cloth, with no runes, filigree or markings on it; the runes are only on the armor plates.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/yelena/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/yelena/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/yelena/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/yelena/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/yelena/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/yelena/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/yelena/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -514,6 +590,17 @@
   "imageSeed": 60,
   "stageHeight": 100,
   "partyRole": "warder",
+  "ultimate": {
+    "id": "noblesse-oblige",
+    "name": "Noblesse Oblige",
+    "kind": "shield",
+    "power": 30,
+    "cooldown": 0,
+    "all": false,
+    "stuns": 0,
+    "cleanses": false,
+    "once": false
+  },
   "studies": {
     "major": "LAW",
     "level": 1

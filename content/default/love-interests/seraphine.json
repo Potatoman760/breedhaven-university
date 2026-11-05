@@ -534,6 +534,82 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Druid's mantle",
+      "description": "a fantasy druid's outfit: a pale green dress of layered linen and leaves, a mantle of woven vines and small gold flowers over her shoulders, and a crown of twigs and gold leaves, her hands empty",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/seraphine/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/seraphine/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/seraphine/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/seraphine/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/seraphine/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/seraphine/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/seraphine/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Druid's mantle, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/seraphine/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/seraphine/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/seraphine/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/seraphine/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/seraphine/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/seraphine/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/seraphine/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -541,6 +617,17 @@
   "imageSeed": 60,
   "stageHeight": 100,
   "partyRole": "warder",
+  "ultimate": {
+    "id": "royal-decree",
+    "name": "Royal Decree",
+    "kind": "heal",
+    "power": 12,
+    "cooldown": 0,
+    "all": true,
+    "stuns": 0,
+    "cleanses": true,
+    "once": false
+  },
   "studies": {
     "major": "POL",
     "level": 1

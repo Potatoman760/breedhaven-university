@@ -504,6 +504,82 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Sorceress's gown",
+      "description": "a fantasy sorceress's outfit: an elegant midnight-blue gown with a fitted bodice embroidered in gold arcane patterns and a high slit at one side, long sheer sleeves, and gold circlet on her brow",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/faye/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/faye/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/faye/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/faye/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/faye/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/faye/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/faye/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Sorceress's gown, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/faye/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/faye/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/faye/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/faye/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/faye/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/faye/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/faye/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -511,6 +587,17 @@
   "imageSeed": 60,
   "stageHeight": 100,
   "partyRole": "striker",
+  "ultimate": {
+    "id": "dragons-kiss",
+    "name": "Dragon's Kiss",
+    "kind": "attack",
+    "power": 30,
+    "cooldown": 0,
+    "all": false,
+    "stuns": 1,
+    "cleanses": false,
+    "once": false
+  },
   "studies": {
     "major": "BUS",
     "level": 4

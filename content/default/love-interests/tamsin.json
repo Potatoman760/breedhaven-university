@@ -503,6 +503,82 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Ranger's kit",
+      "description": "a fantasy ranger's outfit: a navy-blue hooded cloak hanging straight down her back close to her body, a fitted brown leather tunic over a navy shirt, a quiver of arrows on her back, leather bracers, and sturdy brown trousers",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tamsin/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/tamsin/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/tamsin/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/tamsin/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/tamsin/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/tamsin/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/tamsin/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Ranger's kit, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/tamsin/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/tamsin/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/tamsin/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/tamsin/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/tamsin/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/tamsin/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/tamsin/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -515,6 +591,17 @@
     "desire": 10
   },
   "partyRole": "guard",
+  "ultimate": {
+    "id": "pile-on",
+    "name": "Pile On",
+    "kind": "attack",
+    "power": 9,
+    "cooldown": 0,
+    "all": true,
+    "stuns": 0,
+    "cleanses": false,
+    "once": false
+  },
   "studies": {
     "major": "KIN",
     "level": 1

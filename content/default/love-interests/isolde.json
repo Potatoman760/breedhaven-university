@@ -505,6 +505,82 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Spymaster's leathers",
+      "description": "a fantasy rogue spymaster's outfit: a fitted slate-green leather jerkin with ivory stitching, a hooded slate-green cloak hanging straight down her back close to her body, dark leather trousers, a belt of hidden daggers, and leather gloves",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/isolde/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/isolde/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/isolde/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/isolde/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/isolde/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/isolde/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/isolde/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Spymaster's leathers, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/isolde/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/isolde/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/isolde/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/isolde/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/isolde/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/isolde/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/isolde/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -512,6 +588,17 @@
   "imageSeed": 62,
   "stageHeight": 100,
   "partyRole": "warder",
+  "ultimate": {
+    "id": "closing-argument",
+    "name": "Closing Argument",
+    "kind": "attack",
+    "power": 20,
+    "cooldown": 0,
+    "all": false,
+    "stuns": 2,
+    "cleanses": false,
+    "once": false
+  },
   "studies": {
     "major": "POL",
     "level": 5

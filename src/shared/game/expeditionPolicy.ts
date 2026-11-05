@@ -1,10 +1,11 @@
 import { HIM, type ContentPack, type GameState } from '../model'
-import { act, comeUp, goOn, roleOf, turnActions, turnOf, type Move } from './expedition'
+import { act, comeUp, goOn, nodeAt, roleOf, turnActions, turnOf, type Move } from './expedition'
 
 /**
  * A plain way of playing a fight, for trying the numbers without a player: everyone hits the enemy nearest to
- * falling with the strongest thing she has ready, a healer mends whoever is worst off when someone is hurt, a warder
- * keeps a ward up, and he grounds a surge before it breaks. Not part of the game: the tests and the scripts use it.
+ * falling with the strongest thing she has ready, her ultimate kept for the guardian, a healer mends whoever is worst
+ * off when someone is hurt, a warder keeps a ward up, a heavy blow coming is warded or drawn, and he grounds a surge
+ * before it breaks. Not part of the game: the tests and the scripts use it.
  */
 export function plainMove(content: ContentPack, state: GameState): Move | undefined {
   const config = content.expedition!
@@ -22,14 +23,21 @@ export function plainMove(content: ContentPack, state: GameState): Move | undefi
     if (surging && can('ground')) return { actionId: 'ground', target: surging.id }
     return { actionId: 'strike', target: foe.key }
   }
-  const role = roleOf(config, content.loveInterests.find((li) => li.id === actor.id))!
+  const li = content.loveInterests.find((one) => one.id === actor.id)!
+  const role = roleOf(config, li)!
   const hurt = worst.footing / worst.max < 0.6
+  const hurtMany = up.filter((fighter) => fighter.footing / fighter.max < 0.6).length > 1
+  const foes = run.fight!.foes.filter((one) => one.footing > 0)
+  const heavy = foes.some((one) => one.intent?.kind === 'heavy')
+  // Her own ultimate at the guardian, her role's further move where it reaches more than one, and a heavy blow met.
+  const ultimate = nodeAt(content, run).kind === 'guardian' && li.ultimate ? [li.ultimate.id] : []
+  const friend = role.friendAction.all && role.friendAction.kind !== 'heal' && foes.length < 2 ? [] : [role.friendAction.id]
   const order: string[] =
-    role.id === 'healer' ? (hurt ? ['deep-mend', 'mend', 'jolt'] : ['jolt'])
-    : role.id === 'warder' ? (run.ward < 4 ? ['great-ward', 'ward', 'push'] : ['push'])
-    : role.id === 'guard' ? ['hold', 'bash']
-    : role.id === 'hexer' ? ['unravel', 'hex']
-    : ['all-in', 'strike']
+    role.id === 'healer' ? (hurtMany ? [...ultimate, 'renewal', 'deep-mend', 'mend', 'jolt'] : hurt ? ['deep-mend', 'mend', 'jolt'] : [...ultimate, 'jolt'])
+    : role.id === 'warder' ? (run.ward < 4 || heavy ? [...ultimate, 'great-ward', 'dispel', 'ward', 'push'] : ['push'])
+    : role.id === 'guard' ? (heavy ? ['hold', ...ultimate, ...friend, 'bash'] : [...ultimate, 'hold', ...friend, 'bash'])
+    : role.id === 'hexer' ? [...ultimate, ...friend, 'unravel', 'hex']
+    : [...ultimate, ...friend, 'all-in', 'strike']
   const actionId = order.find(can) ?? ready[0]?.id
   if (!actionId) return undefined
   const aim = ready.find((action) => action.id === actionId)?.aim

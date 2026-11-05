@@ -87,7 +87,15 @@
           "name": "Stoneskin",
           "kind": "guard"
         }
-      ]
+      ],
+      "friendAction": {
+        "id": "quake",
+        "name": "Earthquake",
+        "kind": "attack",
+        "power": 4,
+        "cooldown": 2,
+        "all": true
+      }
     },
     {
       "id": "striker",
@@ -112,7 +120,15 @@
           "name": "Flame Shield",
           "kind": "guard"
         }
-      ]
+      ],
+      "friendAction": {
+        "id": "flame-wave",
+        "name": "Flame Wave",
+        "kind": "attack",
+        "power": 5,
+        "cooldown": 3,
+        "all": true
+      }
     },
     {
       "id": "hexer",
@@ -137,7 +153,15 @@
           "name": "Shadow Veil",
           "kind": "guard"
         }
-      ]
+      ],
+      "friendAction": {
+        "id": "wither",
+        "name": "Withering Curse",
+        "kind": "weaken",
+        "power": 3,
+        "cooldown": 2,
+        "all": true
+      }
     },
     {
       "id": "warder",
@@ -163,7 +187,15 @@
           "power": 14,
           "cooldown": 3
         }
-      ]
+      ],
+      "friendAction": {
+        "id": "dispel",
+        "name": "Dispel",
+        "kind": "shield",
+        "power": 6,
+        "cooldown": 2,
+        "cleanses": true
+      }
     },
     {
       "id": "healer",
@@ -189,7 +221,15 @@
           "power": 15,
           "cooldown": 3
         }
-      ]
+      ],
+      "friendAction": {
+        "id": "renewal",
+        "name": "Renewal",
+        "kind": "heal",
+        "power": 5,
+        "cooldown": 3,
+        "all": true
+      }
     }
   ],
   "enemies": [
@@ -229,7 +269,8 @@
       "attack": 4,
       "sweeps": true,
       "weakTo": "hexer",
-      "image": "sprites/undercroft/loose-ward-cutout.webp"
+      "image": "sprites/undercroft/loose-ward-cutout.webp",
+      "armor": 2
     },
     {
       "id": "steam-shade",
@@ -238,7 +279,8 @@
       "footing": 16,
       "attack": 7,
       "weakTo": "guard",
-      "image": "sprites/undercroft/steam-shade-cutout.webp"
+      "image": "sprites/undercroft/steam-shade-cutout.webp",
+      "charges": 3
     },
     {
       "id": "drowned-valve",
@@ -247,7 +289,14 @@
       "footing": 42,
       "attack": 5,
       "weakTo": "striker",
-      "image": "sprites/undercroft/drowned-valve-cutout.webp"
+      "image": "sprites/undercroft/drowned-valve-cutout.webp",
+      "phases": [
+        {
+          "at": 0.5,
+          "text": "shudders and starts building pressure.",
+          "charges": 2
+        }
+      ]
     },
     {
       "id": "root-mother",
@@ -257,7 +306,21 @@
       "attack": 6,
       "hexes": true,
       "weakTo": "hexer",
-      "image": "sprites/undercroft/root-mother-cutout.webp"
+      "image": "sprites/undercroft/root-mother-cutout.webp",
+      "summons": {
+        "enemyId": "root-tangle",
+        "every": 3
+      },
+      "phases": [
+        {
+          "at": 0.5,
+          "text": "tears open and puts out new roots faster.",
+          "summons": {
+            "enemyId": "root-tangle",
+            "every": 2
+          }
+        }
+      ]
     },
     {
       "id": "broken-lattice",
@@ -267,7 +330,16 @@
       "attack": 6,
       "sweeps": true,
       "weakTo": "warder",
-      "image": "sprites/undercroft/broken-lattice-cutout.webp"
+      "image": "sprites/undercroft/broken-lattice-cutout.webp",
+      "armor": 4,
+      "phases": [
+        {
+          "at": 0.5,
+          "text": "sheds its plates and lashes out wildly.",
+          "armor": 0,
+          "attack": 8
+        }
+      ]
     },
     {
       "id": "boiler-saint",
@@ -276,7 +348,15 @@
       "footing": 88,
       "attack": 8,
       "weakTo": "guard",
-      "image": "sprites/undercroft/boiler-saint-cutout.webp"
+      "image": "sprites/undercroft/boiler-saint-cutout.webp",
+      "charges": 2,
+      "phases": [
+        {
+          "at": 0.5,
+          "text": "glows white-hot with fury.",
+          "attack": 11
+        }
+      ]
     },
     {
       "id": "chained-stack",
@@ -286,7 +366,18 @@
       "attack": 7,
       "hexes": true,
       "weakTo": "hexer",
-      "image": "sprites/undercroft/chained-stack-cutout.webp"
+      "image": "sprites/undercroft/chained-stack-cutout.webp",
+      "silences": true,
+      "phases": [
+        {
+          "at": 0.5,
+          "text": "rattles its chains and calls loose wards to it.",
+          "summons": {
+            "enemyId": "loose-ward",
+            "every": 3
+          }
+        }
+      ]
     },
     {
       "id": "stillwater",
@@ -296,7 +387,15 @@
       "attack": 8,
       "sweeps": true,
       "weakTo": "striker",
-      "image": "sprites/undercroft/stillwater-cutout.webp"
+      "image": "sprites/undercroft/stillwater-cutout.webp",
+      "mends": 8,
+      "phases": [
+        {
+          "at": 0.5,
+          "text": "freezes over into a hard shell.",
+          "armor": 3
+        }
+      ]
     },
     {
       "id": "first-ward",
@@ -305,7 +404,21 @@
       "footing": 120,
       "attack": 9,
       "weakTo": "warder",
-      "image": "sprites/undercroft/first-ward-cutout.webp"
+      "image": "sprites/undercroft/first-ward-cutout.webp",
+      "armor": 3,
+      "charges": 3,
+      "phases": [
+        {
+          "at": 0.66,
+          "text": "cracks wide and its light spills over everyone.",
+          "sweeps": true
+        },
+        {
+          "at": 0.33,
+          "text": "flares with the last of its strength.",
+          "attack": 12
+        }
+      ]
     },
     {
       "id": "wellspring",
@@ -315,7 +428,25 @@
       "attack": 9,
       "sweeps": true,
       "hexes": true,
-      "image": "sprites/undercroft/wellspring-cutout.webp"
+      "image": "sprites/undercroft/wellspring-cutout.webp",
+      "mends": 10,
+      "summons": {
+        "enemyId": "steam-shade",
+        "every": 3
+      },
+      "phases": [
+        {
+          "at": 0.66,
+          "text": "surges, its blows gathering weight.",
+          "charges": 2
+        },
+        {
+          "at": 0.33,
+          "text": "boils over, smothering every spell near it.",
+          "silences": true,
+          "attack": 11
+        }
+      ]
     }
   ],
   "depths": [
@@ -369,7 +500,8 @@
         ],
         "image": "sprites/undercroft/relic-silver-tongue-cutout.webp"
       },
-      "image": "generated/backgrounds/undercroft/the-old-drains.webp"
+      "image": "generated/backgrounds/undercroft/the-old-drains.webp",
+      "power": 1.0
     },
     {
       "name": "the Root Cellars",
@@ -422,7 +554,8 @@
         ],
         "image": "sprites/undercroft/relic-exhibitionists-lantern-cutout.webp"
       },
-      "image": "generated/backgrounds/undercroft/the-root-cellars.webp"
+      "image": "generated/backgrounds/undercroft/the-root-cellars.webp",
+      "power": 1.0
     },
     {
       "name": "the Ward Gallery",
@@ -479,7 +612,8 @@
         },
         "image": "sprites/undercroft/relic-apple-of-discord-cutout.webp"
       },
-      "image": "generated/backgrounds/undercroft/the-ward-gallery.webp"
+      "image": "generated/backgrounds/undercroft/the-ward-gallery.webp",
+      "power": 1.12
     },
     {
       "name": "the Boiler Vaults",
@@ -530,7 +664,8 @@
         "use": "unravel",
         "image": "sprites/undercroft/relic-unraveling-cutout.webp"
       },
-      "image": "generated/backgrounds/undercroft/the-boiler-vaults.webp"
+      "image": "generated/backgrounds/undercroft/the-boiler-vaults.webp",
+      "power": 1.15
     },
     {
       "name": "the Chained Stacks",
@@ -586,7 +721,8 @@
         "use": "stillness",
         "image": "sprites/undercroft/relic-hourglass-of-stillness-cutout.webp"
       },
-      "image": "generated/backgrounds/undercroft/the-chained-stacks.webp"
+      "image": "generated/backgrounds/undercroft/the-chained-stacks.webp",
+      "power": 1.2
     },
     {
       "name": "the Still Pools",
@@ -638,7 +774,8 @@
         "use": "sapphic",
         "image": "sprites/undercroft/relic-sapphic-charm-cutout.webp"
       },
-      "image": "generated/backgrounds/undercroft/the-still-pools.webp"
+      "image": "generated/backgrounds/undercroft/the-still-pools.webp",
+      "power": 1.38
     },
     {
       "name": "the First Foundations",
@@ -695,7 +832,9 @@
         "use": "minds-eye",
         "image": "sprites/undercroft/relic-minds-eye-cutout.webp"
       },
-      "image": "generated/backgrounds/undercroft/the-first-foundations.webp"
+      "image": "generated/backgrounds/undercroft/the-first-foundations.webp",
+      "power": 1.05,
+      "partyStage": "lover"
     },
     {
       "name": "the Wellspring",
@@ -748,7 +887,9 @@
         "use": "first-seed",
         "image": "sprites/undercroft/relic-seed-of-the-first-bloom-cutout.webp"
       },
-      "image": "generated/backgrounds/undercroft/the-wellspring.webp"
+      "image": "generated/backgrounds/undercroft/the-wellspring.webp",
+      "power": 1.18,
+      "partyStage": "lover"
     }
   ],
   "effects": {
@@ -767,5 +908,13 @@
     "find": "sprites/icons/stops-find-cutout.webp",
     "checkpoint": "sprites/icons/stops-checkpoint-cutout.webp",
     "guardian": "sprites/icons/stops-guardian-cutout.webp"
+  },
+  "echoes": {
+    "name": "Echoes",
+    "power": 1.45,
+    "fights": 2,
+    "foes": 3,
+    "money": 60,
+    "outfitId": "echoes"
   }
 }

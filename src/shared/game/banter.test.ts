@@ -20,7 +20,7 @@ const content: ContentPack = validateContentPack({
     entryLocationId: 'shop',
     hours: 2,
     trustNeeded: 0,
-    roles: [{ id: 'guard', name: 'Geomancer', footing: 30, actions: [{ id: 'bash', name: 'Stone Spike', kind: 'attack', power: 4 }] }],
+    roles: [{ id: 'guard', name: 'Geomancer', footing: 30, actions: [{ id: 'bash', name: 'Stone Spike', kind: 'attack', power: 4 }], friendAction: { id: 'quake', name: 'Quake', kind: 'attack', power: 3, all: true } }],
     enemies: [{ id: 'blob', name: 'Blob', appearance: 'A green blob.', footing: 10, attack: 1 }],
     depths: [{ name: 'the Drains', appearance: 'A wet tunnel.', nodes: [{ kind: 'guardian', enemyIds: ['blob'] }], relic: { id: 'stone', name: 'Stone', description: '', modifier: { kind: 'rent', amount: 0.5 } } }]
   })

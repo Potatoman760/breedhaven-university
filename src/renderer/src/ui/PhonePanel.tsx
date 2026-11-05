@@ -79,7 +79,8 @@ import {
   canJoinSociety,
   knownRelation,
   joinSociety,
-  leaveSociety
+  leaveSociety,
+  setEchoOutfit
 } from '../../../shared/game'
 import { Button } from './Button'
 import { PlanCompare } from './PlanCompare'
@@ -276,7 +277,7 @@ export function PhonePanel({ content, state, onChange, onClose, initialId, initi
 
         <div className={`phone-screen ${app}`}>
           {app === 'chats' && <Chats content={content} state={state} onChange={onChange} selectedId={chatId} onSelect={setChatId} onGoToInvite={onGoToInvite} canAct={canAct} />}
-          {app === 'friends' && <Friends content={content} state={state} selectedId={friendId} onSelect={setFriendId} onMessage={message} canMessage={canMessage} />}
+          {app === 'friends' && <Friends content={content} state={state} selectedId={friendId} onSelect={setFriendId} onMessage={message} canMessage={canMessage} onChange={onChange} />}
           {app === 'updates' && <Updates content={content} state={state} onChange={onChange} onMessage={message} canMessage={canMessage} error={feedError} onRetry={onRetryFeed} />}
           {app === 'jobs' && <Jobs content={content} state={state} onChange={onChange} onMessage={message} />}
           {app === 'societies' && <Societies content={content} state={state} onChange={onChange} />}
@@ -787,14 +788,16 @@ interface FriendsProps {
   onSelect: (id: string | undefined) => void
   onMessage: (id: string) => void
   canMessage: (id: string) => boolean
+  onChange: (update: (state: GameState) => GameState) => void
 }
 
 /** Friends: a card for everyone the player has met, and a page on each of them behind it. */
-function Friends({ content, state, selectedId, onSelect, onMessage, canMessage }: FriendsProps) {
+function Friends({ content, state, selectedId, onSelect, onMessage, canMessage, onChange }: FriendsProps) {
   const affection = (li: LoveInterest) => state.relationships[li.id]?.affection ?? 0
   // Closest first; among equals, as the content lists them.
   const listed = content.loveInterests.filter((li) => hasMet(state, li.id)).sort((a, b) => affection(b) - affection(a))
   const selected = listed.find((li) => li.id === selectedId)
+  const earned = selected && state.expedition.echoed.includes(selected.id) ? selected.outfits.find((o) => o.locked === 'echoes') : undefined
 
   if (selected) {
     return (
@@ -823,6 +826,13 @@ function Friends({ content, state, selectedId, onSelect, onMessage, canMessage }
           </div>
         </div>
         <About content={content} state={state} li={selected} />
+        {/* The outfit she earned below, worn on her days or put away. */}
+        {earned && (
+          <label className="friend-outfit">
+            <input type="checkbox" checked={!state.expedition.echoOutfitOff.includes(selected.id)} onChange={(e) => onChange((now) => setEchoOutfit(now, selected.id, e.target.checked))} />
+            {earned.name}
+          </label>
+        )}
       </div>
     )
   }

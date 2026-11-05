@@ -506,6 +506,82 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Paladin's armor",
+      "description": "a fantasy paladin's outfit: polished steel plate armor with a red tabard bearing a gold sun emblem, red cloth at the shoulders, armored gauntlets, and a longsword at her hip",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/daphne/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/daphne/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/daphne/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/daphne/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/daphne/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/daphne/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/daphne/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Paladin's armor, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/daphne/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/daphne/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/daphne/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/daphne/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/daphne/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/daphne/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/daphne/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -513,6 +589,17 @@
   "imageSeed": 60,
   "stageHeight": 100,
   "partyRole": "guard",
+  "ultimate": {
+    "id": "earthshatter",
+    "name": "Earthshatter",
+    "kind": "attack",
+    "power": 10,
+    "cooldown": 0,
+    "all": true,
+    "stuns": 1,
+    "cleanses": false,
+    "once": false
+  },
   "studies": {
     "major": "KIN",
     "level": 4

@@ -508,6 +508,82 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Hex witch's robes",
+      "description": "a fantasy hex witch's outfit: deep violet robes with a fitted bodice and wide bell sleeves embroidered with silver sigils, and a classic witch's hat of stiff deep violet felt: a wide flat round brim a little wider than her shoulders, a tall stiff pointed cone that bends once near the very tip, and a thin silver band around the base of the cone; her hands empty",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/vespera/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/vespera/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/vespera/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/vespera/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/vespera/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/vespera/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/vespera/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Hex witch's robes, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/vespera/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/vespera/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/vespera/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/vespera/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/vespera/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/vespera/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/vespera/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -516,6 +592,17 @@
   "stageHeight": 100,
   "kind": "teacher",
   "partyRole": "hexer",
+  "ultimate": {
+    "id": "last-word",
+    "name": "The Last Word",
+    "kind": "weaken",
+    "power": 10,
+    "cooldown": 0,
+    "all": true,
+    "stuns": 0,
+    "cleanses": false,
+    "once": false
+  },
   "teaching": {
     "department": "the College of Bloom Studies and Divinity",
     "title": "Professor",

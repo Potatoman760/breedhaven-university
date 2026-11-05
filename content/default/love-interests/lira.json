@@ -141,6 +141,14 @@
   "imageSeed": 60,
   "stageHeight": 100,
   "partyRole": "hexer",
+  "ultimate": {
+    "id": "two-centuries",
+    "name": "Two Centuries",
+    "kind": "weaken",
+    "power": 8,
+    "all": true,
+    "stuns": 2
+  },
   "studies": {
     "major": "BLM",
     "level": 1

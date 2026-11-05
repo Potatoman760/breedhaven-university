@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { canGoBelow, depthsOpen, outingMisses, partyChoices, pregnancyPower, relicsHeld, spriteFor, wornOutfit } from '../../../shared/game'
+import { belowOutfitId, canGoBelow, depthsOpen, echoesOpen, outingMisses, partyChoices, pregnancyPower, relicsHeld, spriteFor, wornOutfit } from '../../../shared/game'
 import { Portrait } from './Portrait'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { Button } from './Button'
@@ -22,14 +22,18 @@ interface Props {
 export function PartyDialog({ content, state, onGo, onClose }: Props) {
   const config = content.expedition!
   const open = depthsOpen(content, state)
-  const [depth, setDepth] = useState(open - 1)
+  // Past the last depth, once every anchor is set, are the echoes.
+  const echoes = echoesOpen(content, state)
+  const last = echoes ? config.depths.length : open - 1
+  const [depth, setDepth] = useState(last)
+  const echo = depth === config.depths.length
   const [party, setParty] = useState<string[]>([])
   const choices = partyChoices(content, state)
   const check = canGoBelow(content, state, party, depth)
   const relics = relicsHeld(content, state)
   // What going would cost him of his day: a class, a shift or a plan in those hours.
   const missed = outingMisses(content, state, { title: config.name, description: '', withIds: party, locationId: config.entryLocationId, hours: config.hours })
-  const shown = config.depths[depth]
+  const shown = echo ? { name: config.echoes.name, image: config.depths.at(-1)?.image } : config.depths[depth]
   const toggle = (id: string) => setParty(party.includes(id) ? party.filter((one) => one !== id) : party.length < config.partySize ? [...party, id] : party)
 
   return (
@@ -49,17 +53,15 @@ export function PartyDialog({ content, state, onGo, onClose }: Props) {
           <ChevronIcon size={24} />
         </Button>
         <div className="depth-card">
-          <span className="depth-art" style={shown.image ? { backgroundImage: `url("content://pack/${shown.image}")` } : undefined}>
+          <span className={`depth-art${echo ? ' echo' : ''}`} style={shown.image ? { backgroundImage: `url("content://pack/${shown.image}")` } : undefined}>
             {!shown.image && <span className="depth-number">{depth + 1}</span>}
           </span>
-          <strong>
-            {depth + 1}. {shown.name}
-          </strong>
+          <strong>{echo ? shown.name : `${depth + 1}. ${shown.name}`}</strong>
           <span className="caps">
-            {t('screens.party.anchorState', { set: depth < state.expedition.cleared, n: depth + 1, total: config.depths.length })}
+            {echo ? t('screens.party.echoesWon', { n: state.expedition.echoes }) : t('screens.party.anchorState', { set: depth < state.expedition.cleared, n: depth + 1, total: config.depths.length })}
           </span>
         </div>
-        <Button variant="secondary" aria-label={t('screens.party.depthBelow')} disabled={depth >= open - 1} title={depth >= open - 1 && open < config.depths.length ? t('screens.party.setToOpen') : undefined} onClick={() => setDepth(depth + 1)}>
+        <Button variant="secondary" aria-label={t('screens.party.depthBelow')} disabled={depth >= last} title={depth >= last && open < config.depths.length ? t('screens.party.setToOpen') : undefined} onClick={() => setDepth(depth + 1)}>
           <ChevronIcon size={24} />
         </Button>
       </div>
@@ -70,7 +72,7 @@ export function PartyDialog({ content, state, onGo, onClose }: Props) {
           const power = pregnancyPower(content, state, li.id) ?? 1
           const chosen = party.includes(li.id)
           const full = !chosen && party.length >= config.partySize
-          const sprite = spriteFor(li, wornOutfit(content, state, li), 'neutral')
+          const sprite = spriteFor(li, wornOutfit(content, state, li, belowOutfitId(state, li)), 'neutral')
           return (
             <button key={li.id} type="button" aria-pressed={chosen} className={`party-card${chosen ? ' picked' : ''}`} disabled={reason !== undefined || full} title={reason ?? (full ? t('screens.party.full', { n: config.partySize }) : power > 1 ? t('screens.party.carrying', { power }) : undefined)} onClick={() => toggle(li.id)}>
               <Portrait who={li} image={sprite} size="fill" className="party-face" />

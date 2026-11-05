@@ -508,6 +508,82 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Artificer's gear",
+      "description": "a fantasy artificer's outfit: a lavender leather vest over a white blouse with rolled sleeves, a utility belt hung with brass tools and glowing vials, brass goggles pushed up on her head, fingerless gloves, and lavender trousers",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/elowen/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/elowen/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/elowen/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/elowen/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/elowen/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/elowen/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Artificer's gear, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/elowen/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/elowen/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/elowen/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/elowen/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/elowen/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/elowen/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/elowen/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -515,6 +591,17 @@
   "imageSeed": 62,
   "stageHeight": 100,
   "partyRole": "striker",
+  "ultimate": {
+    "id": "speedrun",
+    "name": "Speedrun",
+    "kind": "attack",
+    "power": 12,
+    "cooldown": 0,
+    "all": true,
+    "stuns": 0,
+    "cleanses": false,
+    "once": false
+  },
   "studies": {
     "major": "CSC",
     "level": 2

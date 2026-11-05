@@ -4595,6 +4595,15 @@ button.btn.chat-photo {
   overflow: visible;
 }
 
+/* The outfit she earned below: a switch for whether it is among what she wears on her days. */
+.friend-outfit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+  font-weight: 600;
+}
+
 /* Updates: Bloomr's feed, one column of posts. */
 .feed {
   align-items: center;
@@ -7284,6 +7293,35 @@ button.item-square:hover {
 
 .below-bar.energy > span {
   background: #4a7fc1;
+}
+
+/* Her passion: thin and rose, glowing once it is full. */
+.below-bar.passion {
+  height: 6px;
+}
+
+.below-bar.passion > span {
+  background: #d4507a;
+}
+
+.below-bar.passion.full > span {
+  box-shadow: 0 0 6px 1px #ff7aa6;
+}
+
+/* What an enemy means to do on its next turn: a heavy blow in red, standing out from the rest. */
+.below-intent {
+  display: block;
+  font-size: 0.78em;
+  font-weight: 600;
+  color: #f3e2b8;
+}
+
+.below-intent.heavy {
+  color: #ff6b5a;
+}
+
+.below-intent.stunned {
+  color: #a9c4ff;
 }
 
 /* A ward that is up: a pale band over the end of the footing it guards, as wide as what it will absorb. */

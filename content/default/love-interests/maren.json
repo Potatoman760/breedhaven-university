@@ -505,6 +505,82 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Bard's finery",
+      "description": "a fantasy bard's outfit: a rose-pink doublet with gold embroidery and puffed sleeves over a white blouse, a short rose-pink cape, a feathered cap, long fitted rose-pink trousers covering both legs to her ankles, and a gilded lute slung on her back",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/maren/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/maren/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/maren/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/maren/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/maren/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/maren/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/maren/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Bard's finery, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/maren/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/maren/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/maren/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/maren/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/maren/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/maren/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/maren/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -512,6 +588,17 @@
   "imageSeed": 60,
   "stageHeight": 100,
   "partyRole": "hexer",
+  "ultimate": {
+    "id": "ribbon-bind",
+    "name": "Ribbon Bind",
+    "kind": "attack",
+    "power": 6,
+    "cooldown": 0,
+    "all": true,
+    "stuns": 2,
+    "cleanses": false,
+    "once": false
+  },
   "studies": {
     "major": "COM",
     "level": 2

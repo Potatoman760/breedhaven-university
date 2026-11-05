@@ -20,7 +20,7 @@ import {
   type Studies,
 } from "../../../../shared/model";
 import { errorMessage } from "../../errors";
-import { describeShift, handleOf } from "../../../../shared/game";
+import { describeAction, describeShift, handleOf } from "../../../../shared/game";
 import { eventOutfits } from "../../../../shared/game/events";
 import { RoomPictures } from "./RoomPictures";
 import { InstructionsPage } from "./InstructionsPage";
@@ -231,6 +231,12 @@ function LoveInterestEditor({
   const kind = kindOf(draft);
   // An NPC has a look, a voice and a place to be found, and nothing of a relationship.
   const isNpc = kind === "npc";
+  // The ultimates there are to choose hers from: the game's other women's, each once.
+  const ultimates = content.loveInterests
+    .filter((li) => li.id !== draft.id && li.ultimate)
+    .map((li) => li.ultimate!)
+    .filter((one, index, all) => all.findIndex((other) => other.id === one.id) === index)
+    .sort((a, b) => a.name.localeCompare(b.name));
   // The jobs this character is the boss of: she is at work for their shifts.
   const gives = (content.jobs?.jobs ?? []).filter(
     (job) => job.bossId === draft.id,
@@ -534,7 +540,8 @@ function LoveInterestEditor({
                   {t("editor.characters.partyRole")}
                   <select
                     value={draft.partyRole ?? ""}
-                    onChange={(e) => set({ partyRole: (e.target.value || undefined) as Role | undefined })}
+                    // An ultimate is for a woman who comes below: without a role, she has none.
+                    onChange={(e) => set({ partyRole: (e.target.value || undefined) as Role | undefined, ...(e.target.value ? {} : { ultimate: undefined }) })}
                   >
                     <option value="">{t("editor.common.none")}</option>
                     {content.expedition.roles.map((role) => (
@@ -544,6 +551,34 @@ function LoveInterestEditor({
                     ))}
                   </select>
                 </label>
+              )}
+              {/* Her ultimate, as his lover: one of those the game's women have, under a name of her own. */}
+              {!isNpc && content.expedition && draft.partyRole && (
+                <div className="row">
+                  <label>
+                    {t("editor.characters.ultimate")}
+                    <select
+                      value={draft.ultimate?.id ?? ""}
+                      onChange={(e) => {
+                        const chosen = ultimates.find((one) => one.id === e.target.value)
+                        set({ ultimate: chosen ? { ...chosen } : undefined })
+                      }}
+                    >
+                      <option value="">{t("editor.common.none")}</option>
+                      {ultimates.map((one) => (
+                        <option key={one.id} value={one.id} title={describeAction(one)}>
+                          {one.name}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  {draft.ultimate && (
+                    <label title={describeAction(draft.ultimate)}>
+                      {t("editor.characters.ultimateName")}
+                      <input value={draft.ultimate.name} onChange={(e) => set({ ultimate: { ...draft.ultimate!, name: e.target.value } })} />
+                    </label>
+                  )}
+                </div>
               )}
               <div className="row">
                 <label>

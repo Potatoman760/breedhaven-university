@@ -508,6 +508,81 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Monk's wraps",
+      "description": "a fantasy monk's outfit: a pale pink wrapped cotton top tied with a white sash, loose pale pink trousers bound at the shins with white wraps, white cloth hand wraps, and prayer beads around her neck",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/lola-hopworth/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/lola-hopworth/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/lola-hopworth/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/lola-hopworth/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/lola-hopworth/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/lola-hopworth/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/lola-hopworth/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Monk's wraps, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/lola-hopworth/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/lola-hopworth/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/lola-hopworth/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/lola-hopworth/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/lola-hopworth/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/lola-hopworth/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/lola-hopworth/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -516,6 +591,17 @@
   "stageHeight": 100,
   "kind": "teacher",
   "partyRole": "striker",
+  "ultimate": {
+    "id": "hop-barrage",
+    "name": "Hop Barrage",
+    "kind": "attack",
+    "power": 8,
+    "cooldown": 0,
+    "all": true,
+    "stuns": 1,
+    "cleanses": false,
+    "once": false
+  },
   "teaching": {
     "department": "the College of Arts and Humanities",
     "title": "Professor",

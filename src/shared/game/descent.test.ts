@@ -14,7 +14,7 @@ const expedition = (guided: boolean) =>
     entryLocationId: 'shop',
     hours: 2,
     ...(guided ? { guideId: 'ana', intro: { hours: 1, text: 'Meet me at {place}, {date}.', missedText: 'You were not at {place}. Again: {date}.', cutscene: { speakerId: 'ana', scenes: [{ locationId: 'shop', lines: ['Ana: Down here.'] }] } } } : {}),
-    roles: [{ id: 'guard', name: 'Guard', footing: 30, actions: [{ id: 'bash', name: 'Bash', kind: 'attack', power: 4 }] }],
+    roles: [{ id: 'guard', name: 'Guard', footing: 30, actions: [{ id: 'bash', name: 'Bash', kind: 'attack', power: 4 }], friendAction: { id: 'quake', name: 'Quake', kind: 'attack', power: 3, all: true } }],
     enemies: [{ id: 'blob', name: 'Blob', footing: 10, attack: 1 }],
     depths: [{ name: 'the Drains', nodes: [{ kind: 'guardian', enemyIds: ['blob'] }], relic: { id: 'stone', name: 'Stone', description: '', modifier: { kind: 'rent', amount: 0.5 } } }]
   })

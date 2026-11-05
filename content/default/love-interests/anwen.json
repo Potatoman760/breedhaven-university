@@ -507,6 +507,82 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Duelist's coat",
+      "description": "a fantasy duelist's outfit: a black leather long coat worn open all the way down the front, its two edges hanging straight down on either side of her body to her knees, with a row of silver buttons along each edge and a high turned-up collar; under it a plain black silk shirt tucked in, open at the throat, with no vest or corset over it; one brown leather sword belt with a round silver buckle worn low across her hips; slim black leather trousers; black leather gloves; and a slender silver rapier sheathed in a black scabbard hanging straight down along her left leg from the belt, only its silver hilt showing above the scabbard",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/anwen/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/anwen/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/anwen/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/anwen/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/anwen/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/anwen/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/anwen/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Duelist's coat, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/anwen/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/anwen/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/anwen/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/anwen/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/anwen/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/anwen/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/anwen/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -514,6 +590,17 @@
   "imageSeed": 62,
   "stageHeight": 100,
   "partyRole": "warder",
+  "ultimate": {
+    "id": "velvet-rope",
+    "name": "Velvet Rope",
+    "kind": "shield",
+    "power": 22,
+    "cooldown": 0,
+    "all": false,
+    "stuns": 0,
+    "cleanses": true,
+    "once": false
+  },
   "studies": {
     "major": "MEN",
     "level": 2

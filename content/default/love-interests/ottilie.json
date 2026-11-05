@@ -504,6 +504,82 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Alchemist's coat",
+      "description": "rimless rectangular glasses; a fantasy alchemist's outfit: a long ivory work coat with silver buttons and many pockets, a brown leather bandolier of small colored glass potion vials running diagonally across her chest from her right shoulder to her left hip, a wide brown leather belt with a silver diamond-shaped buckle, a short brown leather apron hanging from the belt in front, pointed at the bottom like a shield, edged with a thin silver trim and reaching her mid-thigh, and ivory trousers",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/ottilie/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/ottilie/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/ottilie/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/ottilie/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/ottilie/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/ottilie/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Alchemist's coat, pregnant",
+      "description": "She has a round, pregnant belly. Her coat hangs open on either side of it, and her belly is covered by smooth plain ivory cloth with no buttons, pockets or seams on it; the buttons are only along the edges of the coat.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/ottilie/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/ottilie/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/ottilie/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/ottilie/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/ottilie/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/ottilie/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/ottilie/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -512,6 +588,17 @@
   "stageHeight": 100,
   "kind": "teacher",
   "partyRole": "healer",
+  "ultimate": {
+    "id": "exact-dose",
+    "name": "Exact Dose",
+    "kind": "heal",
+    "power": 34,
+    "cooldown": 0,
+    "all": false,
+    "stuns": 0,
+    "cleanses": true,
+    "once": false
+  },
   "teaching": {
     "department": "the College of Life Sciences and Agriculture",
     "title": "Dr",

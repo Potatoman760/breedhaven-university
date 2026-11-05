@@ -20,7 +20,7 @@ const content: ContentPack = {
   traits: [...base.traits, { id: 'flirt', name: 'Flirt', definition: 'Flirts with anyone.', drama: { jealousy: 0, sociable: 0 } }],
   expedition: ExpeditionConfigSchema.parse({
     entryLocationId: 'shop',
-    roles: [{ id: 'guard', name: 'Guard', footing: 30, actions: [{ id: 'bash', name: 'Bash', kind: 'attack', power: 4 }] }],
+    roles: [{ id: 'guard', name: 'Guard', footing: 30, actions: [{ id: 'bash', name: 'Bash', kind: 'attack', power: 4 }], friendAction: { id: 'quake', name: 'Quake', kind: 'attack', power: 3, all: true } }],
     enemies: [{ id: 'blob', name: 'Blob', footing: 10, attack: 1 }],
     depths: [depth('tongue', { traitIds: ['flirt'] }), depth('apple', { modifier: { kind: 'drama', amount: 2 } }), depth('thread', { use: 'unravel' }), depth('glass', { use: 'stillness' }), depth('seed', { use: 'first-seed' }), depth('eye', { use: 'minds-eye' })]
   })

@@ -1,5 +1,5 @@
 import { HIM, type ContentPack, type GameState, type LoveInterest } from '../model'
-import { nodeAt, pregnancyPower, roleOf } from './expedition'
+import { nodeAt, pregnancyPower, roleOf, runDepth } from './expedition'
 import { pregnancyStage } from './pregnancy'
 import { stageFor } from './relationships'
 import { namesHer } from './scene'
@@ -41,7 +41,7 @@ export function banterDue(content: ContentPack, state: GameState, moment: Banter
 export function buildBanterPrompt(content: ContentPack, state: GameState, moment: BanterMoment = 'before'): { system: string; user: string } {
   const config = content.expedition!
   const run = state.expedition.run!
-  const depth = config.depths[run.depth]
+  const depth = runDepth(content, run)
   const node = nodeAt(content, run)
   const player = state.player.name
   const party = partyOf(content, state)

@@ -503,6 +503,82 @@
         }
       },
       "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Wizard's robes",
+      "description": "a fantasy wizard's outfit: flowing sage-green robes embroidered with ivory runes at the hems and cuffs, and a wide ivory sash at the waist hung with a small leather spellbook, her hands empty",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/caelwen/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/caelwen/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/caelwen/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/caelwen/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/caelwen/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/caelwen/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/caelwen/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Wizard's robes, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/caelwen/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/caelwen/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/caelwen/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/caelwen/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/caelwen/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/caelwen/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/caelwen/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
     }
   ],
   "defaultOutfitId": "default",
@@ -511,6 +587,17 @@
   "stageHeight": 100,
   "kind": "teacher",
   "partyRole": "warder",
+  "ultimate": {
+    "id": "unhurried-hour",
+    "name": "The Unhurried Hour",
+    "kind": "weaken",
+    "power": 6,
+    "cooldown": 0,
+    "all": true,
+    "stuns": 1,
+    "cleanses": false,
+    "once": false
+  },
   "teaching": {
     "department": "the College of Arts and Humanities",
     "title": "Professor",

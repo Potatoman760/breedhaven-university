@@ -154,6 +154,29 @@ export function deliverChild(content: ContentPack, state: GameState, motherId: s
   return { state: { ...state, pregnancies, children: [...state.children, child] }, child }
 }
 
+/**
+ * Whether an outfit is hers to wear now: one she earns below is hers once she has come back from an echo won with him,
+ * and while he has not put it away.
+ */
+export function outfitOpen(state: Pick<GameState, 'expedition'>, li: Pick<LoveInterest, 'id'>, outfit: Outfit): boolean {
+  return outfit.locked !== 'echoes' || (state.expedition.echoed.includes(li.id) && !state.expedition.echoOutfitOff.includes(li.id))
+}
+
+/**
+ * What she goes below in: the outfit she earned there, once she has, whether or not he has put it away for her days;
+ * nothing otherwise, and she goes in what she has on.
+ */
+export function belowOutfitId(state: Pick<GameState, 'expedition'>, li: Pick<LoveInterest, 'id' | 'outfits'>): string | undefined {
+  const earned = li.outfits.find((o) => o.locked === 'echoes')
+  return earned && state.expedition.echoed.includes(li.id) ? earned.id : undefined
+}
+
+/** Puts away or takes out again the outfit she earned below, for her days: put away, it is as if she had not earned it. */
+export function setEchoOutfit(state: GameState, loveInterestId: string, on: boolean): GameState {
+  const off = state.expedition.echoOutfitOff.filter((id) => id !== loveInterestId)
+  return { ...state, expedition: { ...state.expedition, echoOutfitOff: on ? off : [...off, loveInterestId] } }
+}
+
 /** Whether an outfit lasts the day, and not only the scene: her usual clothes always do. A pregnant one goes by its parent. */
 export function lastsTheDay(li: Pick<LoveInterest, 'defaultOutfitId'>, outfit: Outfit): boolean {
   return !outfit.pregnant && !outfit.oneOff && (outfit.day === true || outfit.id === li.defaultOutfitId)
@@ -174,7 +197,7 @@ function dayOutfit(content: ContentPack, state: GameState, li: LoveInterest, pla
   if (asked && lastsTheDay(li, asked)) return asked
   const dressed = eventsOn(content, state).map((event) => has(event.id)).find((outfit) => outfit !== undefined)
   if (dressed) return dressed
-  const choices = li.outfits.filter((o) => lastsTheDay(li, o))
+  const choices = li.outfits.filter((o) => lastsTheDay(li, o) && outfitOpen(state, li, o))
   return choices[Math.floor(roll(state.weatherSeed, dayIndex, seedOf(li.id), 7) * choices.length)]
 }
 
@@ -250,9 +273,9 @@ export function pregnantForm(li: Pick<LoveInterest, 'outfits'>, outfit: Outfit):
  * The outfits that can be asked for, whether or not she is with child: her ordinary ones. Being pregnant is the game's
  * to draw and nobody's to choose: `wornOutfit` gives whatever is asked for in its pregnant form once she shows.
  */
-export function wearableOutfits(li: Pick<LoveInterest, 'outfits'>): Outfit[] {
-  // One kept for a single night of the content is not hers to choose in any other scene.
-  const ordinary = li.outfits.filter((o) => !o.pregnant && !o.oneOff)
+export function wearableOutfits(li: Pick<LoveInterest, 'id' | 'outfits'>, state: Pick<GameState, 'expedition'>): Outfit[] {
+  // One kept for a single night of the content is not hers to choose in any other scene, nor one she has not yet earned.
+  const ordinary = li.outfits.filter((o) => !o.pregnant && !o.oneOff && outfitOpen(state, li, o))
   return ordinary.length > 0 ? ordinary : li.outfits
 }
 

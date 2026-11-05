@@ -50,7 +50,10 @@
           "startHour": 12,
           "hours": 4,
           "viewId": "beach",
-          "animations": ["drive-there", "beach"],
+          "animations": [
+            "drive-there",
+            "beach"
+          ],
           "description": "The afternoon sun is bright on the white sand, and the turquoise water rolls in gentle, clear waves. A striped umbrella shades their towels just above the tide line.",
           "direction": "You are away for the weekend with {player} at Brightshore, a seaside resort town on the coast: he asked you along, and you said yes. You have just arrived after the drive and come down to the beach in your swimsuit. Swim, sunbathe, play in the waves and enjoy the afternoon with him.",
           "castSize": 2,
@@ -63,7 +66,9 @@
           "startHour": 19,
           "hours": 3,
           "viewId": "boardwalk",
-          "animations": ["boardwalk"],
+          "animations": [
+            "boardwalk"
+          ],
           "description": "String lights and warm spell-lamps glow along the wooden boardwalk, reflecting on the dark water below. At the end of the pier, the Ferris wheel turns slowly past rows of game stalls and food stands.",
           "direction": "You are away for the weekend with {player} at Brightshore, a seaside resort town on the coast: he asked you along, and you said yes. It is the evening. Walk the boardwalk and the pier with him: eat from the stalls, play the games, and ride the Ferris wheel over the dark sea.",
           "castSize": 2
@@ -75,7 +80,9 @@
           "startHour": 7,
           "hours": 2,
           "viewId": "cove",
-          "animations": ["sunrise-swim"],
+          "animations": [
+            "sunrise-swim"
+          ],
           "description": "The little rocky cove is quiet and sheltered, with the Sunday sunrise turning the calm water gold and pink. The tide is high and still, clear all the way to the sandy bottom.",
           "direction": "You are away for the weekend with {player} at Brightshore, a seaside resort town on the coast: he asked you along, and you said yes. It is the last morning, early. You have slipped out to a sheltered cove with him for a swim at sunrise, with nobody else on the beach. Swim with him before the drive home.",
           "castSize": 2,
@@ -126,7 +133,10 @@
           "startHour": 11,
           "hours": 3,
           "viewId": "trail",
-          "animations": ["drive-there", "trail"],
+          "animations": [
+            "drive-there",
+            "trail"
+          ],
           "description": "Afternoon light filters through the high pine canopy onto a trail soft with fallen needles. The air smells of warm resin and damp earth, with the glint of the lake visible through the trunks ahead.",
           "direction": "You are away for the weekend with {player} at Fernhollow, a campground in the old pine woods by a lake: he asked you along, and you said yes. You have just arrived after the drive and pitched the tent. Now you are hiking the forest trail with him toward the lake. Enjoy the walk and the woods.",
           "castSize": 2
@@ -138,7 +148,9 @@
           "startHour": 19,
           "hours": 4,
           "viewId": "campfire",
-          "animations": ["campfire"],
+          "animations": [
+            "campfire"
+          ],
           "description": "A fire crackles in the stone ring outside the tent, throwing warm light against the surrounding pines. Above the dark treetops, the night sky is clear and crowded with stars.",
           "direction": "You are away for the weekend with {player} at Fernhollow, a campground in the old pine woods by a lake: he asked you along, and you said yes. It is night at the campsite. Sit around the fire with him: cook, talk, look at the stars, and share the one tent when it is time to sleep.",
           "castSize": 2
@@ -150,7 +162,9 @@
           "startHour": 7,
           "hours": 2,
           "viewId": "lake",
-          "animations": ["dawn-lake"],
+          "animations": [
+            "dawn-lake"
+          ],
           "description": "Pale dawn light spreads across the lake as thin ribbons of mist drift over the water. The old wooden dock reaches out into the stillness, damp with Sunday morning dew.",
           "direction": "You are away for the weekend with {player} at Fernhollow, a campground in the old pine woods by a lake: he asked you along, and you said yes. It is the last morning, at dawn. You are out on the dock with him over the misty lake, with coffee from the fire, before packing up and driving home.",
           "castSize": 2
@@ -203,7 +217,10 @@
           "hours": 4,
           "viewId": "deck",
           "outfitId": "ao-dai",
-          "animations": ["drive-there", "bay"],
+          "animations": [
+            "drive-there",
+            "bay"
+          ],
           "castSize": 2,
           "description": "Red canvas sails catch the warm afternoon breeze as the wooden junk glides across flat green water. All around the sunlit teak deck, steep limestone cliffs covered in thick jungle rise straight out of the bay.",
           "direction": "You are away for the weekend with {player} at Jadewater Bay, a bay of towering karst islands far to the south: he flew you there by airship and booked a luxury cruise junk for the night, and you said yes. You have just landed and come aboard. The junk is gliding between the islands, and you are on the deck with him: take in the view, the cliffs and the water, and enjoy being so far from campus with him."
@@ -212,11 +229,13 @@
           "id": "cabin",
           "name": "The cabin",
           "day": 1,
-          "startHour": 21,
+          "startHour": 20,
           "hours": 3,
           "viewId": "cabin",
           "outfitId": "ao-dai",
-          "animations": ["cabin"],
+          "animations": [
+            "cabin"
+          ],
           "castSize": 2,
           "description": "Warm brass lanterns cast a soft glow over the dark timber and silk bedding of the private aft cabin. Outside the wide windows, the silhouettes of the islands drift slowly across the moonlit water.",
           "direction": "You are away for the weekend with {player} at Jadewater Bay, a bay of towering karst islands far to the south: he flew you there by airship and booked a luxury cruise junk for the night, and you said yes. It is night, and you are in your private cabin aboard with him: the door locked, lantern light, the moonlit bay through the window. It is intimate and nobody will disturb you."
@@ -228,7 +247,9 @@
           "startHour": 9,
           "hours": 3,
           "viewId": "cave",
-          "animations": ["sea-cave"],
+          "animations": [
+            "sea-cave"
+          ],
           "castSize": 2,
           "description": "A wooden rowboat slips under a low stone arch into the cool quiet of a vast sea cavern. Morning sunlight reflects off the water at the entrance, sending ripples of green and gold light across the hanging stalactites.",
           "direction": "You are away for the weekend with {player} at Jadewater Bay, a bay of towering karst islands far to the south: he flew you there by airship and booked a luxury cruise junk for the night, and you said yes. It is the last morning. You have rowed with him into a vast sea cave of stalactites and colored light, before the airship home. Explore it with him and wonder at it."
@@ -281,7 +302,10 @@
           "hours": 4,
           "viewId": "reef",
           "outfitId": "swimsuit",
-          "animations": ["drive-there", "reef"],
+          "animations": [
+            "drive-there",
+            "reef"
+          ],
           "description": "Bright afternoon sunlight filters through the clear turquoise water, illuminating branching coral and schools of small, vivid fish along the sandy bottom. The surface of the lagoon is calm and warm, with the thatched roofs of the bungalows resting on stilts in the distance.",
           "direction": "You are away for the weekend with {player} at Coralmere Atoll, a ring of palm islands around a turquoise lagoon far out in the ocean: he flew you there by airship and booked an overwater bungalow, and you said yes. You have just landed and changed into your swimsuit. You are snorkeling the coral reef in the warm lagoon shallows with him: swim, point out the fish, and enjoy it.",
           "castSize": 2
@@ -290,11 +314,13 @@
           "id": "bungalow",
           "name": "The bungalow",
           "day": 1,
-          "startHour": 21,
+          "startHour": 20,
           "hours": 3,
           "viewId": "bungalow",
           "outfitId": "sarong",
-          "animations": ["bungalow"],
+          "animations": [
+            "bungalow"
+          ],
           "description": "Soft blue light rises through the glass floor panel from the glowing water below, mingling with the warm lamplight over the wide timber bed. Outside the open terrace doors, the moonlit lagoon stretches out smooth and silver to the dark line of the reef.",
           "direction": "You are away for the weekend with {player} at Coralmere Atoll, a ring of palm islands around a turquoise lagoon far out in the ocean: he flew you there by airship and booked an overwater bungalow, and you said yes. It is night, and you are in your private overwater bungalow with him: the lagoon glowing through the glass floor, the doors open onto the moonlit water, nobody anywhere near. It is intimate and nobody will disturb you.",
           "castSize": 2
@@ -307,7 +333,9 @@
           "hours": 3,
           "viewId": "sandbar",
           "outfitId": "sarong",
-          "animations": ["sandbar"],
+          "animations": [
+            "sandbar"
+          ],
           "description": "The morning tide has pulled back to reveal a long curve of powder-white sand surrounded on both sides by shallow, sparkling water. A woven blanket and a wicker picnic basket sit under the shade of a canvas umbrella while gentle waves lap at the shore.",
           "direction": "You are away for the weekend with {player} at Coralmere Atoll, a ring of palm islands around a turquoise lagoon far out in the ocean: he flew you there by airship and booked an overwater bungalow, and you said yes. It is the last morning. You are having a picnic with him on a long white sandbar the low tide has uncovered, the lagoon on both sides, before the airship home.",
           "castSize": 2
@@ -360,7 +388,10 @@
           "hours": 3,
           "viewId": "lake",
           "outfitId": "sari",
-          "animations": ["drive-there", "lake-boat"],
+          "animations": [
+            "drive-there",
+            "lake-boat"
+          ],
           "description": "Late afternoon sun turns the white marble domes and carved stone ghats along the shore to a warm gold as the wooden boat glides across the quiet water. Silk cushions rest under the boat's shaded canopy while the reflection of the old city ripples gently across the lake.",
           "direction": "You are away for the weekend with {player} at Saffron Lake, an old desert lake city of white marble palaces: he flew you there by airship and booked a palace suite, and you said yes. You have just landed and dressed for the evening in a sari. You are on a private boat on the palace lake with him at golden hour: take in the palaces and the light on the water, and enjoy it.",
           "castSize": 2
@@ -373,7 +404,9 @@
           "hours": 3,
           "viewId": "rooftop",
           "outfitId": "sari",
-          "animations": ["rooftop"],
+          "animations": [
+            "rooftop"
+          ],
           "description": "Pierced brass lanterns and garlands of fresh orange marigolds ring a low wooden table set with silver dishes on the open palace roof. Below the carved stone parapet, the warm lights of the havelis and lakeside palaces shimmer across the dark water.",
           "direction": "You are away for the weekend with {player} at Saffron Lake, an old desert lake city of white marble palaces: he flew you there by airship and booked a palace suite, and you said yes. It is night. You are having dinner for two with him on the palace rooftop among the lanterns, the lit city on the lake below: it is the most romantic night of the trip, and the suite is just downstairs.",
           "castSize": 2
@@ -386,7 +419,9 @@
           "hours": 3,
           "viewId": "colors",
           "outfitId": "holi",
-          "animations": ["colors"],
+          "animations": [
+            "colors"
+          ],
           "description": "Bright clouds of pink, yellow, and indigo powder hang in the warm morning air inside the sunny stone courtyard by the lake. Laughter and the steady beat of hand drums echo off the painted walls while brass trays of bright pigments sit ready on the marble steps.",
           "direction": "You are away for the weekend with {player} at Saffron Lake, an old desert lake city of white marble palaces: he flew you there by airship and booked a palace suite, and you said yes. It is the last morning, and the town's festival of colors is on in the courtyards by the lake. You are in white festival clothes already splashed with powder: throw colors at each other with him, laugh and dance, before the airship home.",
           "castSize": 2
