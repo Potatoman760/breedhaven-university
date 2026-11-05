@@ -80,6 +80,7 @@ import {
   knownRelation,
   joinSociety,
   leaveSociety,
+  buildSelfiePrompt,
   setEchoOutfit
 } from '../../../shared/game'
 import { Button } from './Button'
@@ -87,6 +88,8 @@ import { PlanCompare } from './PlanCompare'
 import { useModelName } from '../modelName'
 import type { PhoneApp } from './panels'
 import { Lightbox } from './Lightbox'
+import { Dialog } from './Dialog'
+import { Flyout } from './Flyout'
 import { MemoryField } from './MemoryField'
 import { Portrait } from './Portrait'
 import { RetryNotice } from './RetryNotice'
@@ -110,7 +113,7 @@ import { BackButton } from './BackButton'
 import { SkinTonePicker } from './SkinTonePicker'
 import { useBack } from '../mouseBack'
 import { EmojiPicker } from './EmojiPicker'
-import { t, type MessageKey } from '../../../shared/i18n'
+import { t, weekdayName, type MessageKey } from '../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -480,15 +483,28 @@ function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadPr
   const [selfieFailed, setSelfieFailed] = useState(false)
   const [viewing, setViewing] = useState<string>()
 
-  function askSelfie() {
+  // What she is asked when he writes it himself, while he does: the game's request, for him to change.
+  const [detailed, setDetailed] = useState<string | null>(null)
+  // What he last asked in his own words, for asking again after it failed.
+  const lastRequest = useRef<string | undefined>(undefined)
+
+  /** Asks her for a selfie: as the game would, or with what he wrote in its place. */
+  function askSelfie(request?: string) {
     if (waiting) return
     const ask = (current: GameState) => addNote(current, id, { from: 'player', text: t('panels.phone.selfieLine'), read: true })
     onChange(ask)
-    void getSelfie(ask(state))
+    lastRequest.current = request
+    void getSelfie(ask(state), request)
+  }
+
+  /** Opens the request the game would send, for him to change before it goes. */
+  function writeSelfie() {
+    const li = content.loveInterests.find((one) => one.id === id)
+    if (li) setDetailed(buildSelfiePrompt(content, addNote(state, id, { from: 'player', text: t('panels.phone.selfieLine'), read: true }), li).user)
   }
 
   /** Waits for the selfie he has asked for. It takes a while to draw: it can come after the phone is put away, but not into another game. */
-  async function getSelfie(sent: GameState) {
+  async function getSelfie(sent: GameState, request?: string) {
     const failed = (error: string) => {
       setNotice(t('panels.phone.noAnswer', { error }))
       setSelfieFailed(true)
@@ -497,7 +513,7 @@ function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadPr
     setSelfieFailed(false)
     setWaiting(true)
     try {
-      const { text, image, error } = await window.api.selfie({ state: sent, loveInterestId: id })
+      const { text, image, error } = await window.api.selfie({ state: sent, loveInterestId: id, request })
       if (text && image) onChange((current) => (current.weatherSeed === sent.weatherSeed ? addNote(current, id, { from: 'them', text, image, read: false }) : current))
       else failed(error ?? '')
     } catch (error) {
@@ -510,6 +526,28 @@ function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadPr
   return (
     <>
       {viewing && <Lightbox image={viewing} name={t('panels.phone.selfieFrom', { name: firstName })} onClose={() => setViewing(undefined)} />}
+      {/* The request the game would send her, for him to change before it goes. */}
+      {detailed !== null && (
+        <Dialog title={t('panels.phone.selfieDetailedTitle', { name: firstName })} onClose={() => setDetailed(null)} wide>
+          <textarea className="selfie-request" value={detailed} onChange={(e) => setDetailed(e.target.value)} rows={14} aria-label={t('panels.phone.selfieDetailedTitle', { name: firstName })} autoFocus />
+          <div className="actions">
+            <Button variant="quiet" onClick={() => setDetailed(null)}>
+              {t('shell.common.cancel')}
+            </Button>
+            <Button
+              variant="primary"
+              disabled={!detailed.trim() || waiting}
+              onClick={() => {
+                const request = detailed
+                setDetailed(null)
+                askSelfie(request)
+              }}
+            >
+              {t('panels.phone.selfieSend')}
+            </Button>
+          </div>
+        </Dialog>
+      )}
       {/* What the two of them have planned, a line each at the head of the thread: there to be seen, and called off, without crowding what is said. */}
       {(plans.length > 0 || shiftToCall) && (
         <ul className="chat-plans">
@@ -661,7 +699,7 @@ function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadPr
 
       {/* What he said has been kept: asking again only waits for her answer to it. */}
       {notice && (
-        <RetryNotice disabled={waiting} onRetry={() => void (selfieFailed ? getSelfie(state) : say((current) => current))}>
+        <RetryNotice disabled={waiting} onRetry={() => void (selfieFailed ? getSelfie(state, lastRequest.current) : say((current) => current))}>
           {notice}
         </RetryNotice>
       )}
@@ -677,9 +715,16 @@ function Thread({ content, state, li, onChange, onGoToInvite, canAct }: ThreadPr
           autoFocus
         />
         {canAskSelfie && (
-          <Button className="icon chat-selfie" disabled={waiting} aria-label={t('panels.phone.askSelfie', { name: firstName })} title={t('panels.phone.askSelfie', { name: firstName })} onClick={askSelfie}>
-            <CameraIcon size={18} />
-          </Button>
+          <Flyout
+            className="chat-selfie"
+            icon={<CameraIcon size={18} />}
+            label={t('panels.phone.askSelfie', { name: firstName })}
+            disabled={waiting}
+            items={[
+              { label: t('panels.phone.selfieSurprise'), onClick: () => askSelfie() },
+              { label: t('panels.phone.selfieDetailed'), onClick: writeSelfie }
+            ]}
+          />
         )}
         <button type="submit" disabled={!draft.trim() || waiting} aria-label={t('panels.phone.send')} className="icon" title={model || undefined} onMouseEnter={look}>
           <ChevronIcon size={18} />
@@ -1036,7 +1081,7 @@ function CalendarCompare({ content, state, job }: { content: ContentPack; state:
           <span />
           {week.days.map((day) => (
             <span key={day} className="caps compare-day">
-              {day.slice(0, 3)}
+              {weekdayName(day, true)}
             </span>
           ))}
           {week.hours.map((hour) => [

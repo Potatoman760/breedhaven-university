@@ -162,8 +162,11 @@ export const CourseworkConfigSchema = z.object({
   maxPerClass: z.number().int().min(1).default(2),
   /** The most a class may come to when those in it read its subject: her own subject's course is hers to sit, whoever else is in it. */
   maxMajorClass: z.number().int().min(1).default(3),
-  /** The most courses anyone, player or love interest, may take; the player takes exactly this many, and begins no term with fewer. */
+  /** The most courses a love interest takes, and the player's load too unless `minCourses` and `playerMaxCourses` say otherwise. */
   maxCourses: z.number().int().min(1).default(5),
+  /** The player's own load, where it differs: the fewest courses he begins a term with, and the most he may take. Left out, both are `maxCourses`. */
+  minCourses: z.number().int().min(1).optional(),
+  playerMaxCourses: z.number().int().min(1).optional(),
   /** The last day of term, counting from 1, on which he may still change his classes from his calendar. */
   changeUntilDay: z.number().int().min(1).default(13),
   /** Stat points an hour of class is worth, shared between the stats the course teaches. */

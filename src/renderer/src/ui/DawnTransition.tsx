@@ -3,7 +3,7 @@ import { toDate, weatherOn } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { useCueAt } from '../sound'
 import { WeatherIcon } from './icons'
-import { t } from '../../../shared/i18n'
+import { t, weekdayName } from '../../../shared/i18n'
 
 // How long the night takes to turn into the morning, in milliseconds; a click cuts it short.
 const LENGTH = 5400
@@ -79,7 +79,7 @@ export function DawnTransition({ content, state, onDone }: { content: ContentPac
             style={{ '--from': offset + 1, '--to': offset, '--from-size': 1 - Math.min(3, Math.abs(offset + 1)) * 0.18, '--to-size': 1 - Math.min(3, Math.abs(offset)) * 0.18 } as CSSProperties}
           >
             <strong>{date.day}</strong>
-            <span>{date.weekday}</span>
+            <span>{weekdayName(date.weekday)}</span>
             {weather && (
               <i className="dawn-weather" title={weather.name}>
                 <WeatherIcon kind={weather.icon} image={weather.iconImage} size={56} />

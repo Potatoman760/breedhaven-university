@@ -52,7 +52,7 @@ export type ArtTarget =
       kind: 'nsfw'
       who: Pick<LoveInterest | Npc, 'id' | 'name' | 'pronouns' | 'appearance' | 'outfits' | 'imageSeed'>
       /** The poses a picture can be made for: what each is called, and what it is drawn from. */
-      poses: { id: string; name: string; draws: string }[]
+      poses: { id: string; name: string; draws: string; manShown?: boolean }[]
       /** The pose it is opened on. It can be changed in the tool. */
       pose: string
       /** What the prompt is written from, in place of one woman's: a group's is all of them at once. */
@@ -212,8 +212,10 @@ function Generate({ target, settings, list }: GenerateProps) {
     if (target.kind === 'birth') return birthPrompt(target.who, framing, target.tone)
     if (target.kind === 'walk') return walkPrompt(target.who, framing)
     if (target.kind === 'nsfw') {
-      const draws = target.poses.find((pose) => pose.id === expression)?.draws ?? ''
-      return target.prompt ? target.prompt(draws, framing, expression) : nsfwPrompt(target.who, draws, framing, isPregnantPose(expression), target.man)
+      const pose = target.poses.find((one) => one.id === expression)
+      const draws = pose?.draws ?? ''
+      // A pose with no man in the picture says nothing of his skin, or the model draws him.
+      return target.prompt ? target.prompt(draws, framing, expression) : nsfwPrompt(target.who, draws, framing, isPregnantPose(expression), pose?.manShown === false ? undefined : target.man)
     }
     return [subject.trim(), framing].filter(Boolean).join('\n\n')
   }

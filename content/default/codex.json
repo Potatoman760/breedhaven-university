@@ -321,7 +321,7 @@
     "id": "the-sown-expanse",
     "title": "The Sown Expanse",
     "category": "Places",
-    "content": "The known world. The Bloom reaches all of it, and in every nation women outnumber men seven to one. Breedhaven is one prosperous state among several, linked to the rest by rail, sea, the net and a few long-range portal lines.\n\nIts neighbors: Kharad-Tor, the orc federation of the northern hills. Veyra, the beastkin democracy to the east. Iscara, where mages govern and the portal network is run. The Vesperan League, a maritime trading power. The Starkelands, the frozen north, most of whose people live in one great heated city.\n\nA Sire of record assay is international news.",
+    "content": "The known world. The Bloom reaches all of it, and in every nation women outnumber men seven to one. Breedhaven is one prosperous state among several, linked to the rest by rail, sea, the net and a few long-range portal lines.\n\nIts neighbors: Kharad-Tor, the orc federation of the northern hills. Veyra, the beastkin democracy to the east. Iscara, where mages govern and the portal network is run. The Vesperan League, a maritime trading power. The Starkelands, the frozen north, most of whose people live in one great heated city. Yuelan, the oldest empire in the world, far to the south.\n\nA Sire of record assay is international news.",
     "keywords": [
       "the Expanse",
       "abroad",
@@ -392,6 +392,21 @@
       "Hearthspire",
       "the Far North",
       "Joven Stormbreaker"
+    ],
+    "priority": 3
+  },
+  {
+    "id": "yuelan",
+    "title": "Yuelan",
+    "category": "Nations",
+    "content": "The Jade Realm of Yuelan is the oldest continuous state in the Expanse, an empire of river valleys, terraced karst mountains and cultivation sects now linked by megacities and maglev lines. Its matrilineal clans keep genealogy books spanning generations, making childbirth an ancestral duty, and the Empress holds the Jade Mandate only while births continue.\n\nEvery boy sits the Imperial Assay at sixteen for ranked titles and stipends, while the Bureau of Lineages allots Sires to clans like grain. No True Sire has ever sat the Assay, so a Bureau envoy has come with an honorary rank, a life stipend and a careful allotment among the great clans.",
+    "keywords": [
+      "Yuelan",
+      "Yuelanese",
+      "the Jade Realm",
+      "the Jade Mandate",
+      "the Imperial Assay",
+      "the Bureau of Lineages"
     ],
     "priority": 3
   },

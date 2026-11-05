@@ -6,7 +6,7 @@ import { Dialog } from './Dialog'
 import { BackButton } from './BackButton'
 import { ChevronIcon, PlanMarkIcon } from './icons'
 import { Portrait } from './Portrait'
-import { t } from '../../../shared/i18n'
+import { t, weekdayName } from '../../../shared/i18n'
 
 // How far ahead the "Coming up" list looks: the week ahead, and no further.
 const UPCOMING_DAYS = 7
@@ -155,7 +155,7 @@ export function CalendarPanel({ content, state, onChange, onClose, onChangeClass
                     key={d.dayIndex}
                     className={['week-head', d.dayIndex === today.dayIndex && 'today', (d.dayIndex < today.dayIndex || d.dayIndex >= calendar.lengthDays) && 'faded'].filter(Boolean).join(' ')}
                   >
-                    <span className="caps">{calendar.weekdays[weekdayOf(d.dayIndex)].slice(0, 3)}</span>
+                    <span className="caps">{weekdayName(calendar.weekdays[weekdayOf(d.dayIndex)], true)}</span>
                     <strong>{d.date ? d.date.day : ''}</strong>
                   </div>
                 ))}
@@ -228,7 +228,7 @@ export function CalendarPanel({ content, state, onChange, onClose, onChangeClass
               >
                 {calendar.weekdays.map((name) => (
                   <div key={name} className="caps weekday">
-                    {name.slice(0, 3)}
+                    {weekdayName(name, true)}
                   </div>
                 ))}
                 {Array.from({ length: lead }, (_, i) => (

@@ -64,6 +64,11 @@ export function t(key: MessageKey, params?: Params): string {
   return translated !== undefined ? format(translated, params, language) : format(english(key), params, DEFAULT_LANGUAGE)
 }
 
+/** Weekday values also identify scheduled classes, so only their display labels are translated. */
+export function weekdayName(day: string, short = false): string {
+  return t(short ? 'core.weekday.short' : 'core.weekday.name', { day })
+}
+
 /** Every key there is, for checking a translation. */
 export function allKeys(): MessageKey[] {
   return NAMESPACES.flatMap((ns) => Object.keys(ENGLISH[ns]).map((name) => `${ns}.${name}` as MessageKey))

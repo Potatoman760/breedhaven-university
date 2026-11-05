@@ -42,7 +42,7 @@ function readCase(cursor: Cursor): string | undefined {
 }
 
 /** The placeholder at the cursor, if it is one: what it comes to, with the cursor moved past it. */
-function placeholder(cursor: Cursor, params: Params, plural: (n: number) => string, count?: number): string | undefined {
+function placeholder(cursor: Cursor, params: Params, plural: (n: number) => string, count?: number, found?: Set<string>): string | undefined {
   const start = cursor.at
   cursor.at++
   const name = readName(cursor)
@@ -50,6 +50,7 @@ function placeholder(cursor: Cursor, params: Params, plural: (n: number) => stri
   skipSpace(cursor)
   if (cursor.text[cursor.at] === '}') {
     cursor.at++
+    found?.add(name)
     const value = params[name]
     return value === undefined ? cursor.text.slice(start, cursor.at) : String(value)
   }
@@ -78,6 +79,11 @@ function placeholder(cursor: Cursor, params: Params, plural: (n: number) => stri
     if (body === undefined) return undefined
     cases[exact ? `=${label}` : label] = body
   }
+  if (found) {
+    found.add(name)
+    for (const body of Object.values(cases)) render(body, params, plural, undefined, found)
+    return ''
+  }
   const value = params[name]
   if (kind === 'plural') {
     const n = Number(value)
@@ -88,7 +94,7 @@ function placeholder(cursor: Cursor, params: Params, plural: (n: number) => stri
   return render(chosen, params, plural, count)
 }
 
-function render(text: string, params: Params, plural: (n: number) => string, count?: number): string {
+function render(text: string, params: Params, plural: (n: number) => string, count?: number, found?: Set<string>): string {
   let out = ''
   const cursor: Cursor = { text, at: 0 }
   while (cursor.at < text.length) {
@@ -100,7 +106,7 @@ function render(text: string, params: Params, plural: (n: number) => string, cou
     }
     if (c === '{') {
       const start = cursor.at
-      const made = placeholder(cursor, params, plural, count)
+      const made = placeholder(cursor, params, plural, count, found)
       if (made !== undefined) {
         out += made
         continue
@@ -136,6 +142,7 @@ export function format(message: string, params: Params | undefined, language: st
 /** The names of the values a message takes, so a translation can be checked against the English. */
 export function placeholders(message: string): string[] {
   const found = new Set<string>()
-  for (const match of message.matchAll(/\{([A-Za-z_][A-Za-z0-9_]*)\s*[,}]/g)) found.add(match[1]!)
+  // Case bodies can be single words such as "son"; only the formatter knows which braces introduce variables.
+  render(message, {}, () => 'other', undefined, found)
   return [...found].sort()
 }

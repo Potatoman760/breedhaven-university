@@ -623,6 +623,7 @@
   "characters.scheduleBefore": "Classes and plans with the player come before all of them.",
   "sprites.eventOutfits": "Event outfits ({count})",
   "sprites.addEventOutfit": "Add {name}",
+  "sprites.newOutfit": "New outfit",
   "sprites.coversStomach": "Covers her stomach",
   "sprites.coversStomachTitle": "Her pictures in it are drawn without the abs her appearance gives her"
 }

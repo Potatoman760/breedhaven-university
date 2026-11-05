@@ -957,13 +957,17 @@ pre {
   gap: 8px;
 }
 
+/* Its label on one line, and the row not squeezing it: a word of a language that breaks between any two characters
+   (Chinese, Japanese) would otherwise stand one character to a line. */
 .tile-menu {
+  flex: none;
   gap: 6px;
   min-height: 34px;
   padding: 0 12px;
   color: var(--ink);
   font-size: 0.9375rem;
   font-weight: 400;
+  white-space: nowrap;
 }
 
 .tile-menu svg {
@@ -4447,13 +4451,25 @@ button.btn.back-button.phone-back {
   background: #e6dcc3;
 }
 
-/* Asking for a selfie: smaller than sending, beside it. */
-.chat-compose button.btn.chat-selfie {
+/* Asking for a selfie: smaller than sending, beside it, opening the ways to ask. */
+.chat-compose .chat-selfie {
   flex: none;
   align-self: center;
+}
+
+.chat-compose .chat-selfie button.btn {
   width: 40px;
   height: 40px;
   padding: 0;
+}
+
+/* The request for a selfie, as the game would send it, for him to change. */
+textarea.selfie-request {
+  width: 100%;
+  min-height: 16em;
+  resize: vertical;
+  font: inherit;
+  line-height: 1.4;
 }
 
 /* A selfie in a thread, opened by a click. */

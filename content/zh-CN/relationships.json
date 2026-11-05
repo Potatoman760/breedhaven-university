@@ -1,0 +1,78 @@
+{
+  "stages": [
+    {
+      "id": "stranger",
+      "name": "陌生人",
+      "description": "你们才刚认识。"
+    },
+    {
+      "id": "acquaintance",
+      "name": "相识",
+      "description": "你们知道彼此的名字，偶尔闲聊。"
+    },
+    {
+      "id": "friend",
+      "name": "朋友",
+      "description": "你们喜欢彼此陪伴，能够坦诚交谈。"
+    },
+    {
+      "id": "dating",
+      "name": "交往中",
+      "description": "你们已有恋爱关系，仍在摸索相处方式。"
+    },
+    {
+      "id": "lover",
+      "name": "恋人",
+      "description": "你们深爱彼此，愿意认真经营这段关系。"
+    }
+  ],
+  "statuses": [
+    {
+      "id": "casual",
+      "name": "无承诺情人",
+      "description": "双方愿意时共享床笫，不作更多承诺。"
+    },
+    {
+      "id": "exclusive",
+      "name": "专一伴侣",
+      "description": "你们是伴侣，承诺只与彼此交往。这是你们自愿选择的传统关系。"
+    },
+    {
+      "id": "open",
+      "name": "开放式伴侣",
+      "description": "你们是伴侣，也同意彼此可以与其他人交往。"
+    },
+    {
+      "id": "throuple",
+      "name": "三人伴侣",
+      "description": "你们三人彼此都是伴侣，不与关系之外的人交往。"
+    },
+    {
+      "id": "open-throuple",
+      "name": "开放式三人伴侣",
+      "description": "你们三人彼此都是伴侣，也都可以与其他人交往。"
+    }
+  ],
+  "tieLevels": [
+    {
+      "id": "strangers",
+      "name": "初识",
+      "description": "你只认得她的样子，还谈不上了解。"
+    },
+    {
+      "id": "friendly",
+      "name": "友好",
+      "description": "你喜欢她，与她相处很自在。"
+    },
+    {
+      "id": "close",
+      "name": "亲近",
+      "description": "你信任她，会主动找她，彼此的温暖已超出普通友情。"
+    },
+    {
+      "id": "intimate",
+      "name": "亲密",
+      "description": "你被她吸引，也会公开表达亲昵。"
+    }
+  ]
+}

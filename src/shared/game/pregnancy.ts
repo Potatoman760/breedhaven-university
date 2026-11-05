@@ -4,6 +4,7 @@ import { eventsOn } from './events'
 import { onBirthControl } from './intimacy'
 import { factor, inForce } from './modifiers'
 import { seedOf } from './seed'
+import { drawn } from './gameOutfits'
 import { t } from '../i18n'
 
 /** A repeatable number in [0, 1) for one love interest on one day of one game, by purpose. */
@@ -197,7 +198,7 @@ function dayOutfit(content: ContentPack, state: GameState, li: LoveInterest, pla
   if (asked && lastsTheDay(li, asked)) return asked
   const dressed = eventsOn(content, state).map((event) => has(event.id)).find((outfit) => outfit !== undefined)
   if (dressed) return dressed
-  const choices = li.outfits.filter((o) => lastsTheDay(li, o) && outfitOpen(state, li, o))
+  const choices = li.outfits.filter((o) => lastsTheDay(li, o) && outfitOpen(state, li, o) && drawn(o))
   return choices[Math.floor(roll(state.weatherSeed, dayIndex, seedOf(li.id), 7) * choices.length)]
 }
 
@@ -243,7 +244,9 @@ export function keepDayOutfits(content: ContentPack, state: GameState, scene: Pi
  */
 export function wornOutfit(content: ContentPack, state: GameState, li: LoveInterest, chosenId?: string): Outfit | undefined {
   const has = (id: string) => li.outfits.find((o) => o.id === id)
-  const chosen = (chosenId !== undefined ? has(chosenId) : undefined) ?? dayOutfit(content, state, li) ?? has(li.defaultOutfitId)
+  // One asked for that has no pictures yet is one she does not have: she is in what she has on.
+  const asked = chosenId !== undefined ? has(chosenId) : undefined
+  const chosen = (asked && drawn(asked) ? asked : undefined) ?? dayOutfit(content, state, li) ?? has(li.defaultOutfitId)
   if (!chosen) return undefined
   const showing = pregnancyStage(content, state, li.id)?.showing === true
   if (chosen.pregnant === showing) return chosen
@@ -258,7 +261,7 @@ export function wornOutfit(content: ContentPack, state: GameState, li: LoveInter
  * of undress, or her pregnant clothes.
  */
 export function pregnantForm(li: Pick<LoveInterest, 'outfits'>, outfit: Outfit): Outfit | undefined {
-  const childOf = (id: string) => li.outfits.find((o) => o.pregnant && o.inherits === id)
+  const childOf = (id: string) => li.outfits.find((o) => o.pregnant && o.inherits === id && drawn(o))
   const seen = new Set<string>()
   for (let at: Outfit | undefined = outfit; at && !seen.has(at.id); at = li.outfits.find((o) => o.id === at?.inherits)) {
     seen.add(at.id)
@@ -275,7 +278,7 @@ export function pregnantForm(li: Pick<LoveInterest, 'outfits'>, outfit: Outfit):
  */
 export function wearableOutfits(li: Pick<LoveInterest, 'id' | 'outfits'>, state: Pick<GameState, 'expedition'>): Outfit[] {
   // One kept for a single night of the content is not hers to choose in any other scene, nor one she has not yet earned.
-  const ordinary = li.outfits.filter((o) => !o.pregnant && !o.oneOff && outfitOpen(state, li, o))
+  const ordinary = li.outfits.filter((o) => !o.pregnant && !o.oneOff && outfitOpen(state, li, o) && drawn(o))
   return ordinary.length > 0 ? ordinary : li.outfits
 }
 

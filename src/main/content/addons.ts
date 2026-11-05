@@ -42,6 +42,7 @@ import { ADDON_PREFIX, LOOK_KINDS, isSafeId, type ContentOrigin, type EditorInfo
 import { readPack } from './loader'
 import { t } from '../../shared/i18n'
 import { catalogueBasis, catalogueIsStale, catalogueOf, writtenCatalogue } from '../../shared/game/catalogue'
+import { withGameOutfits } from '../../shared/game/gameOutfits'
 
 const LOVE_INTERESTS = 'love-interests'
 const LOCATIONS = 'locations'
@@ -214,6 +215,24 @@ export interface LoadedContent {
 }
 
 /**
+ * An add-on file of one of the game's own characters, saved by an older version of the game, brought up to date with
+ * her as she is now: every outfit she has that the file does not (one a later version added for an event or a trip) is
+ * added after its own, and every field she has that the file leaves out is hers. Whatever the file says, its outfits,
+ * their pictures and its animations, is kept as it is. A love interest of the player's own, with no one in the game of
+ * her id, is given each of the game's standard outfits she lacks, with no pictures. The file itself is not changed.
+ */
+export function upToDate(raw: unknown, base: LoveInterest | undefined): unknown {
+  if (typeof raw !== 'object' || raw === null) return raw
+  const file = raw as Record<string, unknown> & { outfits?: unknown }
+  const outfits = Array.isArray(file.outfits) ? (file.outfits as Partial<WithId>[]) : []
+  // One of the player's own has every outfit the game puts a love interest in, with no pictures until she is drawn in it.
+  if (!base) return kindOf(file as Pick<LoveInterest, 'kind' | 'studies' | 'teaching'>) === 'npc' || !Array.isArray(file.outfits) ? raw : withGameOutfits(file as unknown as LoveInterest)
+  const has = new Set(outfits.map((outfit) => outfit?.id))
+  const added = base.outfits.filter((outfit) => !has.has(outfit.id))
+  return { ...base, ...file, outfits: [...outfits, ...added] }
+}
+
+/**
  * Loads the game's content with the user's add-ons laid over it. The base pack has to be
  * valid. An add-on that isn't (bad JSON, a missing field, a reference to something that
  * doesn't exist) is left out and reported, so one bad file can't stop the game starting. The game's own content is
@@ -308,10 +327,12 @@ export function loadWithAddons(packDir: string, addonDir: string, languageDir?: 
     traits: overlay(baseTraits, traits),
     loveInterests: overlay(baseLoveInterests, loveInterests as LoveInterest[])
   })
-  for (const { file, raw } of readAddonFiles(addonDir, LOVE_INTERESTS, issues)) {
+  for (const { file, raw: read } of readAddonFiles(addonDir, LOVE_INTERESTS, issues)) {
     try {
-      const id = (raw as Partial<WithId>).id
+      const id = (read as Partial<WithId>).id
       if (typeof id !== 'string' || !isSafeId(id)) throw new Error(t('editor.addons.idMissing'))
+      // One of the game's own, as an older version of it was saved: brought up to date with what she has now.
+      const raw = upToDate(read, baseLoveInterests.find((li) => li.id === id))
       validateContentPack(pack([...accepted, raw]))
       accepted.push(raw as LoveInterest)
     } catch (error) {

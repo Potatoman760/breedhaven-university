@@ -255,7 +255,9 @@
       "images": [
         "17",
         0
-      ]
+      ],
+      "strength": 1.0,
+      "image_encoding": "8-bit RGB"
     },
     "class_type": "RTXVideoSuperResolution",
     "_meta": {

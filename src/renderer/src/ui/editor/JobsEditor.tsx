@@ -7,7 +7,7 @@ import { Button } from '../Button'
 import { useConfirm } from '../Confirm'
 import { JOB_ICON_PATHS, JobIcon } from '../icons'
 import { EditorFoot, Group, Text } from './fields'
-import { t } from '../../../../shared/i18n'
+import { t, weekdayName } from '../../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -212,7 +212,7 @@ export function JobsEditor({ content, onContent, switcher }: Props) {
                   <select value={shift.weekday} onChange={(e) => setShift(index, { weekday: e.target.value })}>
                     {weekdays.map((day) => (
                       <option key={day} value={day}>
-                        {day}
+                        {weekdayName(day)}
                       </option>
                     ))}
                   </select>

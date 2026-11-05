@@ -1,9 +1,9 @@
 import { Button } from './Button'
 import { useConfirm } from './Confirm'
 import { useEffect, useMemo, useRef, useState, type FormEvent, type CSSProperties, type KeyboardEvent } from 'react'
-import { createPortal } from 'react-dom'
 import { MAX_CHILD_NAME, COMFORT_WORDS, hasSkill, attendees, bondLifts, describeBond, describeWhen, statusOf, dialogueLines, firstNames, sceneCast, sceneClock, toDate, weatherOn, wornOutfit, lookOf, spriteFor, npcAsCharacter, UNNAMED, playerRoom, roomBackdrop, roomOwner, sceneExtras, sceneSuggestions, plain, type ScheduleRequest, type Suggestion } from '../../../shared/game'
 import { ScheduleDialog } from './ScheduleDialog'
+import { Flyout } from './Flyout'
 import { Portrait } from './Portrait'
 import { PlanCompare } from './PlanCompare'
 import { RetryNotice } from './RetryNotice'
@@ -93,60 +93,18 @@ interface ExitMenuProps {
 
 /** The way out of a scene, and the other things done on the way: a menu that opens upward from beside the text box. */
 function ExitMenu({ label, busy, photoBusy, onExit, onGoodbye, onPhoto, onSchedule }: ExitMenuProps) {
-  // Where it opens: its foot just above the button, its right edge on the button's. Nothing while it is shut.
-  const [at, setAt] = useState<{ right: number; bottom: number } | null>(null)
-  const open = at !== null
-  const menu = useRef<HTMLSpanElement>(null)
-  const flyout = useRef<HTMLSpanElement>(null)
-  // A press anywhere else, Escape, or the window changing size shuts it.
-  useEffect(() => {
-    if (!open) return
-    const away = (event: MouseEvent) => !menu.current?.contains(event.target as Node) && !flyout.current?.contains(event.target as Node) && setAt(null)
-    const escape = (event: globalThis.KeyboardEvent) => event.key === 'Escape' && setAt(null)
-    const shut = () => setAt(null)
-    document.addEventListener('mousedown', away)
-    document.addEventListener('keydown', escape)
-    window.addEventListener('resize', shut)
-    return () => {
-      document.removeEventListener('mousedown', away)
-      document.removeEventListener('keydown', escape)
-      window.removeEventListener('resize', shut)
-    }
-  }, [open])
-  const toggle = () => {
-    const box = menu.current?.getBoundingClientRect()
-    setAt(open || !box ? null : { right: window.innerWidth - box.right, bottom: window.innerHeight - box.top + 8 })
-  }
-  const pick = (action: () => void) => () => {
-    setAt(null)
-    action()
-  }
   return (
-    <span className="exit-menu" ref={menu}>
-      <Button className="icon" disabled={busy} aria-haspopup="menu" aria-expanded={open} aria-label={t('screens.sceneView.more')} title={t('screens.sceneView.more')} onClick={toggle}>
-        <ToolIcon size={18} />
-      </Button>
-      {/* Put on the page itself, over everything: inside the text box, which scrolls, it was cut off at the box's top. */}
-      {at && createPortal(
-        <span className="exit-flyout glass" role="menu" ref={flyout} style={{ right: at.right, bottom: at.bottom }}>
-          <Button role="menuitem" variant="quiet" size="small" onClick={pick(onExit)}>
-            {label}
-          </Button>
-          <Button role="menuitem" variant="quiet" size="small" onClick={pick(onGoodbye)}>
-            {t('screens.sceneView.goodbye')}
-          </Button>
-          <Button role="menuitem" variant="quiet" size="small" disabled={photoBusy} onClick={pick(onPhoto)}>
-            {photoBusy ? t('screens.sceneView.takingPicture') : t('screens.sceneView.takePicture')}
-          </Button>
-          {onSchedule && (
-            <Button role="menuitem" variant="quiet" size="small" onClick={pick(onSchedule)}>
-              {t('screens.sceneView.schedule')}
-            </Button>
-          )}
-        </span>,
-        document.body
-      )}
-    </span>
+    <Flyout
+      icon={<ToolIcon size={18} />}
+      label={t('screens.sceneView.more')}
+      disabled={busy}
+      items={[
+        { label, onClick: onExit },
+        { label: t('screens.sceneView.goodbye'), onClick: onGoodbye },
+        { label: photoBusy ? t('screens.sceneView.takingPicture') : t('screens.sceneView.takePicture'), onClick: onPhoto, disabled: photoBusy },
+        ...(onSchedule ? [{ label: t('screens.sceneView.schedule'), onClick: onSchedule }] : [])
+      ]}
+    />
   )
 }
 

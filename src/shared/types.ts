@@ -200,7 +200,8 @@ export interface ScenePhotoResponse {
   error?: string
 }
 
-export const SelfieRequestSchema = z.object({ state: GameStateSchema, loveInterestId: z.string() })
+// `request`: what she is asked, as the player wrote it over the game's, where he did.
+export const SelfieRequestSchema = z.object({ state: GameStateSchema, loveInterestId: z.string(), request: z.string().optional() })
 export type SelfieRequest = z.input<typeof SelfieRequestSchema>
 
 /** A selfie he asked for in his DMs: what she sent with it and its path in the content, or why there is none. */

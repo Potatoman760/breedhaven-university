@@ -52,12 +52,19 @@ export function coursesClash(a: Course, b: Course): boolean {
   )
 }
 
+/** How many courses the player takes: no fewer than `min` to begin a term, and no more than `max`. */
+export function courseLoad(content: ContentPack): { min: number; max: number } {
+  const all = content.coursework?.maxCourses ?? 0
+  const max = content.coursework?.playerMaxCourses ?? all
+  return { min: Math.min(content.coursework?.minCourses ?? all, max), max }
+}
+
 /** Whether a course can be added to a selection: room left, and no clash with one already picked. */
 export function canEnrol(content: ContentPack, state: GameState, selected: string[], courseId: string): PerformCheck {
   const course = state.courses.find((c) => c.id === courseId)
   if (!course) return { ok: false, reasons: [t('game.courses.noSuchCourse')] }
   const reasons: string[] = []
-  const max = content.coursework?.maxCourses ?? 0
+  const { max } = courseLoad(content)
   if (selected.length >= max) reasons.push(t('game.courses.atMost', { max }))
   // One section of a course is the course: he takes it once.
   const twin = state.courses.find((c) => selected.includes(c.id) && c.id !== courseId && courseOf(c) === courseOf(course))
@@ -72,10 +79,10 @@ export function courseLabel(course: Pick<Course, 'number' | 'section'>): string 
   return course.section ? t('game.courses.section', { number: course.number, section: course.section }) : course.number
 }
 
-/** Whether the term can begin with these courses: he takes a full load, no fewer. */
+/** Whether the term can begin with these courses: at least the least load he may take, and no more than the most. */
 export function canBeginTerm(content: ContentPack, selected: string[]): PerformCheck {
-  const load = content.coursework?.maxCourses ?? 0
-  return selected.length === load ? { ok: true, reasons: [] } : { ok: false, reasons: [t('game.courses.choose', { load })] }
+  const { min, max } = courseLoad(content)
+  return selected.length >= min && selected.length <= max ? { ok: true, reasons: [] } : { ok: false, reasons: [t('game.courses.choose', { min, max, range: min < max })] }
 }
 
 /** The last day he may change his classes on, as he is told it: its weekday and which week of term it is in. */

@@ -1027,14 +1027,16 @@ function registerIpc(
 
   // Never fails: a selfie he asked her for in his DMs, of her as she is and where she is right now.
   ipcMain.handle(IPC.selfie, async (_event, raw: unknown): Promise<SelfieResponse> => {
-    const { state, loveInterestId } = SelfieRequestSchema.parse(raw)
+    const { state, loveInterestId, request } = SelfieRequestSchema.parse(raw)
     const content = readBy(state)
     const li = content.loveInterests.find((c) => c.id === loveInterestId)
     if (!li) return { error: t('llm.selfie.unread') }
     if (!isConfigured(settings.get().main)) return { error: notConfigured() }
     if (!comfyReady()) return { error: t('llm.scenePhoto.noComfy') }
     try {
-      const { system, user } = buildSelfiePrompt(content, state, li)
+      // What she is asked is the game's, unless the player wrote his own in its place.
+      const { system, user: built } = buildSelfiePrompt(content, state, li)
+      const user = request?.trim() || built
       // The Main LLM first, and the NSFW one if it will not write it.
       const { reply } = await completeWithFallback(settings.get(), false, { system, messages: [{ role: 'user', content: user }] })
       const written = parseSelfie(reply)

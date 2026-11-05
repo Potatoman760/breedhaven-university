@@ -1,7 +1,7 @@
 {
   "fairId": "societies-fair",
   "hours": 1,
-  "maxJoined": 2,
+  "maxJoined": 3,
   "maxMembers": 2,
   "statGain": 1,
   "energy": 6,
@@ -836,70 +836,72 @@
     },
     {
       "id": "needle-and-thread",
-      "name": "Needle and Thread",
-      "description": "A sewing circle in the common room of the Cloister Halls: dressmaking, embroidery and alterations, with patterns passed round and opinions on everyone's clothes given freely.",
+      "name": "the Cloister Runway Society",
+      "description": "A fashion club in the common room of the Cloister Halls: styling, lookbooks and trend forecasting, with glossy magazines passed around and opinions on everyone's outfits given freely.",
       "locationId": "dormitories",
       "weekday": "Thursday",
       "startHour": 18,
       "stats": [
-        "dexterity"
+        "charisma"
       ],
       "memberIds": [
         "maren",
-        "yelena"
+        "baixue"
       ],
-      "iconImage": "sprites/icons/societies-needle-and-thread-cutout.webp",
+      "iconImage": "sprites/icons/societies-needle-and-thread-2.png",
       "syllabus": [
-        "Introductions, and the first argument about hemlines.",
-        "Basic stitches: running, back and blind. Maren brings biscuits.",
-        "A fitting session: {player} is measured for a made-to-measure suit.",
-        "Embroidery: everyone stitches their initials, and Yelena's are perfect.",
-        "Altering a thrift-shop dress until it is unrecognizable.",
-        "Pattern drafting, with a lot of chalk and a lot of opinions.",
-        "Lace: Maren's favorite and Yelena's nemesis.",
-        "Mending: socks, sleeves and Tamsin's volleyball shorts.",
-        "Yelena critiques everyone's clothes, honestly and at length.",
-        "A lingerie workshop, and the models are the makers.",
-        "Costumes for the Lantern Festival.",
-        "Knitting by the fire for the winter.",
-        "Designing a dress for the Feast of First Frost.",
-        "Quilting a gift for the Health Center's nursery.",
-        "The term's fashion show in the common room.",
-        "The last meeting: each member gives a gift she made, and Maren cries."
+        "Maren and Baixue welcome {player} with pastry boxes, mood boards, and a fierce debate over Veyran lace versus Yuelan leather.",
+        "The two audit {player}'s wardrobe and argue over whether he belongs in romantic velvet or minimalist designer streetwear.",
+        "Baixue brings a tape measure to take {player}'s measurements for a made-to-measure suit from her family's tailor in Yuelan.",
+        "Maren leads a critique of the latest glossy fashion magazines while Baixue points out which brands paid for the covers.",
+        "The club raids a thrift shop for high-low outfit flips: vintage coats, silk scarves and heavy designer belts.",
+        "Maren and Baixue corner Tamsin in the quad and restyle her out of her volleyball kit into an off-duty model look.",
+        "Baixue unpacks a trunk of runway sunglasses and challenges {player} to style each pair with an autumn trench coat.",
+        "The club practices runway walks and turns across the common room carpet with fashion monographs balanced on their heads.",
+        "Maren sets up studio lights and a backdrop to shoot lookbook portraits of {player} in two rival capsule wardrobes.",
+        "Maren and Baixue model designer lingerie for a private lookbook shoot, and {player} judges the winning look.",
+        "The club puts together glowing silk and sheer organza looks for the Lantern Festival.",
+        "Baixue brings warm red-bean buns and hosts a ruthless trend forecast on which winter boots deserve exile from campus.",
+        "Maren and Baixue clash over fur stoles and cashmere overcoats as they style {player} for the Feast of First Frost.",
+        "The club settles the lighting cues, front-row seating and music for the end-of-term show.",
+        "The common room becomes a runway for the term's show, before a packed crowd of cheering students.",
+        "The last meeting: both give {player} a styling gift, and Maren cries into her pink lace cuffs."
       ],
       "adultEvents": [
         {
           "meeting": 3,
-          "name": "the fitting",
+          "name": "made to measure",
           "intro": {
-            "speakerId": "yelena",
+            "speakerId": "baixue",
             "scenes": [
               {
                 "locationId": "dormitories",
                 "castIds": [
                   "maren",
-                  "yelena"
+                  "baixue"
                 ],
                 "lines": [
-                  "*The common room of the Cloister Halls. A tape measure, a pincushion, and a curtain strung across a corner.*",
-                  "Yelena: You're getting a suit, {player}. A proper one. Which means we need to measure you. All of you.",
-                  "Maren: Everything off behind the curtain, mon coeur! We cannot measure through clothes. It is not done.",
-                  "Yelena: Inseam first. Hold still. *She kneels with the tape.* And stop looking so pleased.",
-                  "Maren: He is allowed to look pleased. I am also very pleased.",
-                  "*The tape climbs the inside of his leg, and stops. Yelena looks up.*",
-                  "Yelena: You're making this very difficult to measure.",
+                  "*The common room of the Cloister Halls. A tailor's tape measure beside a tin of almond pastries, and a velvet curtain strung across the far corner.*",
+                  "Baixue: Step out from behind that curtain in nothing but your skin, 帅哥. My mother's tailor in Yuelan refuses to draft a bespoke suit off guesswork.",
+                  "*Baixue taps her knuckles twice on the wooden table for luck as {player} parts the curtain and steps onto the rug, naked.*",
+                  "Maren: Hiding a True Sire's figure in off-the-rack trousers, mon coeur? It is not done.",
+                  "*Baixue drops to her knees and presses the end of the tape to his inner ankle, trailing her fingers slowly up his calf and inner thigh for the inseam.*",
+                  "*Maren kneels beside her, pink skirts pooling on the floor and fox ears twitching, and cups him in her warm palms.*",
+                  "Maren: A proper stylist holds the gentleman neatly to one side for the trousers. Though he is getting wonderfully heavy in my hands.",
+                  "*Between Maren's thumbs and Baixue's knuckles brushing his groin with the tape, he swells into a thick, throbbing erection.*",
                   "[EXPRESSION: Maren=aroused]",
-                  "[EXPRESSION: Yelena=aroused]",
-                  "Maren: Then measure that too! For the trousers! *She kneels on his other side, and her hand closes around him to hold him still.*"
+                  "[EXPRESSION: Baixue=aroused]",
+                  "Baixue: My family is paying the tailor, so let go of him. I'm taking this measurement with my own mouth first.",
+                  "*Baixue pushes Maren's wrist aside and drags her tongue up the underside of his shaft while Maren leans in to kiss the flushed head.*"
                 ]
               }
             ]
           },
-          "direction": "They are measuring him for a made-to-measure suit, which means he is undressed and they are very thorough with the tape. Yelena is businesslike until she isn't; Maren is openly enjoying it. The scene opens with him naked behind the curtain, hard, Yelena kneeling with the tape measure and Maren holding him in her hand \"for the trousers\"."
+          "direction": "They are measuring him for a made-to-measure suit from Baixue's family tailor, which means he is naked and they are very thorough with the tape. Baixue is possessive and competitive; Maren is openly enjoying it. The scene opens with him naked by the curtain, hard, both women on their knees, Baixue's tongue on his shaft and Maren kissing the head."
         },
         {
           "meeting": 10,
-          "name": "the lingerie workshop",
+          "name": "the lookbook shoot",
           "intro": {
             "speakerId": "maren",
             "scenes": [
@@ -907,26 +909,26 @@
                 "locationId": "dormitories",
                 "castIds": [
                   "maren",
-                  "yelena"
+                  "baixue"
                 ],
                 "lines": [
-                  "*Tonight's lesson is lingerie. The work table is covered in silk, lace and ribbon, and two pieces are finished.*",
-                  "Maren: We have each made a set! And a good dressmaker always tests her work.",
-                  "Yelena: On a model. And we don't have one. So we are the models.",
-                  "Maren: And {player} is the judge. *She disappears behind the curtain, humming.*",
-                  "Yelena: Judge honestly. I made mine to be taken off.",
+                  "*Ring lights glow across the locked common room. Maren and Baixue shrug off their silk robes and step right up to {player}'s chair.*",
                   "[OUTFIT: Maren=lingerie]",
-                  "[OUTFIT: Yelena=lingerie]",
+                  "[OUTFIT: Baixue=lingerie]",
                   "[EXPRESSION: Maren=aroused]",
-                  "[EXPRESSION: Yelena=aroused]",
-                  "*Maren steps out in pink lace that hides nothing. Yelena follows in black silk, and walks straight to {player}.*",
-                  "Yelena: The clasp is at the front. A good design is one a man can open with one hand. Test it.",
-                  "Maren: *climbing onto the couch beside him* Then test mine after! I put the ribbons where you can pull them."
+                  "[EXPRESSION: Baixue=aroused]",
+                  "Maren: A romantic lookbook demands Veyran lace, mon coeur. Plain modern straps under an evening dress? It is not done.",
+                  "*Maren sways her fox tail and turns her hip toward him, guiding his fingers to the pink satin ribbons that hold her lace together.*",
+                  "Baixue: Nobody wants to fuss with twenty frilly ribbons when he can unwrap Yuelan silk in one pull, 帅哥.",
+                  "*Baixue steps between his knees in her garter belt and sheer white stockings, takes his other hand, and presses his palm over the small sky-blue bow between her breasts.*",
+                  "Maren: Pull my ribbons first, mon coeur, and show her what a True Sire wants on the cover.",
+                  "Baixue: Untie my bow, 帅哥. Once you have me in your hands we'll both know who won the cover.",
+                  "*Baixue taps her knuckles twice on the armrest for luck and slides his hand inside her ivory cups, while Maren straddles his thigh and pulls his fingers beneath her loosened pink lace.*"
                 ]
               }
             ]
           },
-          "direction": "Maren and Yelena have each sewn a set of lingerie and are modeling it for him, the judge. The fashion show turns into a demonstration of how easily it comes off. The scene opens with both women in the lingerie they made, Yelena guiding his hand to her front clasp and Maren beside him on the couch with her ribbons, asking him to test their work."
+          "direction": "Maren and Baixue are modeling the designer lingerie they chose for the club's lookbook, and he is the judge; they compete for his verdict by how easily it comes off. The scene opens with both women in their lingerie, Baixue between his knees with his hand inside her bra and Maren astride his thigh with his fingers under her lace."
         }
       ]
     },
@@ -1324,17 +1326,30 @@
         {
           "cast": [
             "maren",
-            "yelena"
+            "baixue"
           ],
           "lines": [
-            "*Needle and Thread's table is draped in fabric samples. Maren is pinning a lace collar onto a dressmaker's dummy, and Yelena Goldvine is unpinning it again with an expression of great patience.*",
-            "Maren: {player}! Come here, quick, tell her the lace is perfect.",
-            "Yelena: The lace is fine. It's the third collar she's put on that dummy. The dummy has one neck.",
-            "Maren: Needle and Thread! Thursdays at six, the common room in the Cloister Halls. Dressmaking, embroidery, alterations. I bring biscuits.",
-            "Yelena: And everyone gives their opinion on everyone else's clothes, whether it was asked for or not.",
-            "Maren: Mostly Yelena.",
-            "Yelena: Mostly me. I argue with the queen on Mondays and with Maren's hemlines on Thursdays. Don't ask me which is worse.",
-            "Maren: Come and sew with us, mon coeur. You'd look lovely in something I made."
+            "*The Cloister Runway Society's table is half pink lace and half sleek black leather, loaded with pastel mood boards, glossy magazines and a chrome rail of designer coats.*",
+            "Maren: {player}! The Cloister Runway Society: Thursdays at six, the common room in the Cloister Halls. Romance, trends and personal style!",
+            "Baixue: And honest critiques of everyone's outfits across campus, 帅哥, whether they asked for them or not.",
+            "Maren: Clashing colors in the quad break my heart. It is not done.",
+            "Baixue: Here, eat this chestnut pastry before you sign. When we put you on the cover of our winter lookbook, you'll need your strength.",
+            "*Baixue taps her knuckles twice on the tabletop for luck and slides a gold pen across the sign-up sheet toward {player}.*",
+            "Maren: We keep it lively, because I run straight to the Furrow Choir afterward.",
+            "Maren: Write your name down, mon coeur, before Baixue dresses the whole University in cold minimalist black!"
+          ]
+        },
+        {
+          "cast": [
+            "baixue"
+          ],
+          "lines": [
+            "*The Cloister Runway Society's table is all glossy magazines, mood boards and an overflowing clothes rail, and the chair beside Baixue is empty but for a frilly pink parasol.*",
+            "Baixue: Stop right there, {player}. Nobody walks past my table without saying hello and taking a macaron, 帅哥.",
+            "Baixue: Maren abandoned me to sing with the Furrow Choir and left her parasol to hold her seat, so I'm drafting you to keep me company.",
+            "Baixue: The Cloister Runway Society. Styling, lookbooks, and honest critiques of everyone's outfits.",
+            "*She leans forward with a playful smile and taps her knuckles twice on the tabletop for luck.*",
+            "Baixue: Thursdays at six in the Cloister Halls common room. Once I get you into our wardrobe, you'll never want to leave my side, 帅哥."
           ]
         }
       ],

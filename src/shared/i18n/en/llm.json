@@ -309,7 +309,7 @@
   "coursePick.with": "With {people}.",
   "coursePick.systemRole": "You choose a term's courses for {player}, a student, from a catalog, to suit what he says he wants.",
   "coursePick.systemReply": "Reply with one JSON object and nothing else:",
-  "coursePick.systemCourses": "- {field}: the numbers of the courses to take, exactly as listed, best first. Choose exactly {most}.",
+  "coursePick.systemCourses": "- {field}: the numbers of the courses to take, exactly as listed, best first. {range, select, true {Choose {max}, or {min} if the player asks for a lighter load.} other {Choose exactly {max}.}}",
   "coursePick.systemClash": "- No two may meet on the same day at the same hour.",
   "coursePick.systemWhy": "- {field}: one or two sentences to him, saying what you chose and why it suits what he asked.",
   "coursePick.systemOnly": "Use only course numbers from the catalog.",

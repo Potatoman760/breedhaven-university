@@ -20,7 +20,7 @@ import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { loadContentPack } from '../src/main/content/loader'
-import { childSpoken, classChangeDeadline, cutsceneBeats, lineKey, PLAYER_TOKEN, spokenOf } from '../src/shared/game'
+import { childSpoken, classChangeDeadline, courseLoad, cutsceneBeats, lineKey, PLAYER_TOKEN, spokenOf } from '../src/shared/game'
 import { t, type MessageKey } from '../src/shared/i18n'
 import type { Intro } from '../src/shared/model'
 
@@ -68,7 +68,7 @@ const config = content.coursework
 const deadline = classChangeDeadline(content)
 if (config) {
   tour('courses-tour', 'tamsin', [
-    ['screens.courses.tourWeek', { player: PLAYER_TOKEN, lectures: config.lecturesPerWeek, labHours: config.labHours, max: config.maxCourses }],
+    ['screens.courses.tourWeek', { player: PLAYER_TOKEN, lectures: config.lecturesPerWeek, labHours: config.labHours, ...courseLoad(content), range: courseLoad(content).min < courseLoad(content).max }],
     ['screens.courses.tourSkill'], ['screens.courses.tourSearch'], ['screens.courses.tourHelp'],
     ...(deadline ? [['screens.courses.tourChange', { week: deadline.week, weekday: deadline.weekday }] as [MessageKey, Record<string, unknown>]] : []),
     ['screens.courses.tourDone', { player: PLAYER_TOKEN }]

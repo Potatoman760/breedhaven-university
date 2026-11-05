@@ -1,4 +1,6 @@
 {
+  "weekday.name": "{day, select, other {{day}}}",
+  "weekday.short": "{day, select, Sunday {Sun} Monday {Mon} Tuesday {Tue} Wednesday {Wed} Thursday {Thu} Friday {Fri} Saturday {Sat} other {{day}}}",
   "llm.writeIn": "",
   "editor.englishOnly": "Content can only be changed while the game is in English.",
   "settings.language": "Language",

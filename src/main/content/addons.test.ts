@@ -4,6 +4,9 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { NSFW_POSES, posesOf } from '../../shared/model'
 import { resolveContentPath } from './assets'
+import { GAME_OUTFITS } from '../../shared/game/gameOutfits'
+import { wornOutfit } from '../../shared/game/pregnancy'
+import { createInitialState } from '../../shared/game/state'
 import { deleteGroup, saveGroup, deleteLocation, deleteLook, deleteLoveInterest, deleteTrait, saveActPrompts, saveLook, importAsset, loadWithAddons, rebuildCatalogue, saveMajor, deleteMajor, removeUnusedAssets, resetPlayer, saveLocation, saveLoveInterest, savePlayer, saveTrait } from './addons'
 
 // The game's own pack is the base; each test gets an empty add-on folder of its own.
@@ -35,6 +38,46 @@ describe('loadWithAddons', () => {
     expect(deleteLoveInterest(dir, 'faye')).toEqual([])
     expect(loadWithAddons(packDir, dir).content.loveInterests.find((li) => li.id === 'faye')?.age).toBe(faye.age)
     expect(deleteLoveInterest(dir, 'faye')).toEqual(['There is no add-on file for that character.'])
+  })
+
+  it("brings one of the game's own, saved by an older version, up to date as it loads, keeping all it says", () => {
+    const dir = addons()
+    mkdirSync(join(dir, 'love-interests'), { recursive: true })
+    // As 0.8.5 saved her: an outfit of the player's own with its pictures, none of the outfits added since, no walk head.
+    const raw = JSON.parse(readFileSync(join(packDir, 'love-interests', 'faye.json'), 'utf8'))
+    const mine = { id: 'mine', name: 'Mine', description: 'a red coat', sprites: { neutral: { image: 'addon://sprites/faye/mine.webp', description: '' } } }
+    const { walkHead: _walkHead, ...old } = { ...raw, age: 24, outfits: [...raw.outfits.filter((outfit: { id: string }) => ['default', 'pregnant', 'nude', 'nude-pregnant'].includes(outfit.id)), mine] }
+    const file = join(dir, 'love-interests', 'faye.json')
+    writeFileSync(file, JSON.stringify(old))
+    const { content, info } = loadWithAddons(packDir, dir)
+    expect(info.issues).toEqual([])
+    const loaded = content.loveInterests.find((li) => li.id === 'faye')!
+    expect(loaded.age).toBe(24)
+    // Her own outfits first, as the file has them, then each the game has given her since.
+    expect(loaded.outfits.slice(0, 5).map((outfit) => outfit.id)).toEqual(['default', 'pregnant', 'nude', 'nude-pregnant', 'mine'])
+    expect(loaded.outfits.find((outfit) => outfit.id === 'mine')?.sprites.neutral.image).toBe('addon://sprites/faye/mine.webp')
+    for (const id of ['swimsuit', 'ao-dai', 'echoes', 'echoes-pregnant']) expect(loaded.outfits.some((outfit) => outfit.id === id), id).toBe(true)
+    expect(loaded.walkHead).toEqual(faye.walkHead)
+    // The file is left as it was.
+    expect(JSON.parse(readFileSync(file, 'utf8'))).toEqual(old)
+  })
+
+  it("gives one of the player's own every outfit the game puts a love interest in, with no pictures for her to draw", () => {
+    const dir = addons()
+    const plain = { ...mira, outfits: mira.outfits.filter((outfit) => ['default', 'pregnant', 'nude', 'nude-pregnant'].includes(outfit.id)) }
+    mkdirSync(join(dir, 'love-interests'), { recursive: true })
+    writeFileSync(join(dir, 'love-interests', 'mira.json'), JSON.stringify(plain))
+    const { content, info } = loadWithAddons(packDir, dir)
+    expect(info.issues).toEqual([])
+    const loaded = content.loveInterests.find((li) => li.id === 'mira')!
+    expect(loaded.outfits.slice(0, 4)).toEqual(plain.outfits)
+    for (const { id } of GAME_OUTFITS) {
+      expect(loaded.outfits.find((outfit) => outfit.id === id)?.sprites, id).toEqual({})
+      expect(loaded.outfits.find((outfit) => outfit.id === `${id}-pregnant`), id).toMatchObject({ inherits: id, pregnant: true, sprites: {} })
+    }
+    expect(loaded.outfits.find((outfit) => outfit.id === 'echoes')).toMatchObject({ day: true, locked: 'echoes' })
+    // Until she is drawn in it, she goes to the beach as she is.
+    expect(wornOutfit(content, createInitialState(content), loaded, 'swimsuit')?.id).not.toBe('swimsuit')
   })
 
   it('leaves out an add-on that is broken, and says why, without stopping the game', () => {

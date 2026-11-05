@@ -1,0 +1,20 @@
+{
+  "stages": [
+    {
+      "id": "early",
+      "name": "孕早期"
+    },
+    {
+      "id": "showing",
+      "name": "孕中期"
+    },
+    {
+      "id": "heavy",
+      "name": "孕晚期"
+    },
+    {
+      "id": "due",
+      "name": "临产期"
+    }
+  ]
+}

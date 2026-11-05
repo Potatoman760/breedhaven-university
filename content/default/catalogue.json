@@ -1,6 +1,6 @@
 {
   "seed": 1,
-  "basis": "[[\"Monday\",\"Tuesday\",\"Wednesday\",\"Thursday\",\"Friday\"],8,18,\"lecture-halls\",1,3,2,2,3,4,[\"Professor Orlena Vey\",\"Dr Ysolde Marrin\",\"Professor Corwenna Ashby\",\"Dr Halcyon Reed\",\"Professor Petra Lindqvar\",\"Dr Sunniva Crane\",\"Professor Thessaly Rook\",\"Dr Maelis Varn\",\"Professor Isaura Penhallow\",\"Dr Winnow Sedge\",\"Professor Alba Quillon\",\"Dr Ferelith Moor\",\"Professor Hesper Lark\",\"Dr Odalys Brine\",\"Professor Sabel Thorn\",\"Dr Ianthe Coombe\",\"Professor Dagna Tor-Kesh\",\"Dr Senna Ashpaw\",\"Professor Aldous Thorne\",\"Dr Benedek Hale\"],[[\"POL\",false,false,[\"101\",\"153\"]],[\"LAW\",false,false,[\"101\",\"128\"]],[\"BUS\",false,false,[\"101\",\"184\"]],[\"CUL\",false,true,[\"101\",\"111\"]],[\"BLM\",false,true,[\"101\",\"147\"]],[\"WTC\",false,true,[\"101\",\"128\"]],[\"MEN\",false,true,[\"101\",\"135\",\"162\"]],[\"SGN\",false,true,[\"101\",\"146\"]],[\"KIN\",false,true,[\"101\",\"143\",\"176\"]],[\"PSF\",false,true,[\"101\",\"117\"]],[\"WOM\",false,false,[\"101\",\"193\"]],[\"EDU\",true,false,[\"101\"]],[\"COM\",false,false,[\"101\",\"119\"]],[\"HHS\",true,false,[\"101\"]],[\"BPS\",true,false,[\"101\"]],[\"CSC\",false,true,[\"101\",\"142\"]],[\"MTH\",true,false,[\"101\"]],[\"PTH\",true,true,[\"101\"]],[\"RBI\",true,true,[\"101\"]],[\"ART\",true,true,[\"101\"]],[\"ENG\",true,false,[\"101\"]],[\"GEO\",true,false,[\"101\"]],[\"HIS\",true,false,[\"101\"]],[\"MUS\",true,true,[\"101\"]],[\"RHE\",true,false,[\"101\"]]],[[\"anwen\",\"Anwen\",\"student\",\"MEN\",null],[\"caelwen\",\"Caelwen Ashgrove\",\"teacher\",null,[\"Professor\",[[\"WOM\",\"101\"],[\"WOM\",\"193\"]]]],[\"daphne\",\"Daphne\",\"student\",\"KIN\",null],[\"dinah\",\"Dinah Silverith\",\"student\",\"BLM\",null],[\"elowen\",\"Elowen\",\"student\",\"CSC\",null],[\"faye\",\"Faye Fertillay\",\"student\",\"BUS\",null],[\"grushka\",\"Grushka Tor-Vael\",\"teacher\",null,[\"Coach\",[[\"KIN\",\"101\"],[\"KIN\",\"143\"],[\"PSF\",\"101\"],[\"PSF\",\"117\"]]]],[\"isolde\",\"Isolde Verrane\",\"student\",\"POL\",null],[\"lira\",\"Lira\",\"student\",\"BLM\",null],[\"lola-hopworth\",\"Lola Hopworth\",\"teacher\",null,[\"Professor\",[[\"CUL\",\"101\"],[\"CUL\",\"111\"]]]],[\"maren\",\"Maren\",\"student\",\"COM\",null],[\"morwenna\",\"Morwenna Thriceborn\",\"student\",\"WOM\",null],[\"ottilie\",\"Ottilie Marrow\",\"teacher\",null,[\"Dr\",[[\"SGN\",\"101\"],[\"RBI\",\"101\"],[\"SGN\",\"146\"]]]],[\"seraphine\",\"Seraphine V\",\"student\",\"POL\",null],[\"tamsin\",\"Tamsin\",\"student\",\"KIN\",null],[\"tink\",\"Tink Lightfoot\",\"student\",\"MEN\",null],[\"vespera\",\"Vespera Midnight\",\"teacher\",null,[\"Professor\",[[\"WTC\",\"101\"],[\"WTC\",\"128\"]]]],[\"yelena\",\"Yelena Goldvine\",\"student\",\"LAW\",null],[\"yulia\",\"Yulia Starkfelt\",\"student\",\"MEN\",null]]]",
+  "basis": "[[\"Monday\",\"Tuesday\",\"Wednesday\",\"Thursday\",\"Friday\"],8,18,\"lecture-halls\",1,3,2,2,3,4,[\"Professor Orlena Vey\",\"Dr Ysolde Marrin\",\"Professor Corwenna Ashby\",\"Dr Halcyon Reed\",\"Professor Petra Lindqvar\",\"Dr Sunniva Crane\",\"Professor Thessaly Rook\",\"Dr Maelis Varn\",\"Professor Isaura Penhallow\",\"Dr Winnow Sedge\",\"Professor Alba Quillon\",\"Dr Ferelith Moor\",\"Professor Hesper Lark\",\"Dr Odalys Brine\",\"Professor Sabel Thorn\",\"Dr Ianthe Coombe\",\"Professor Dagna Tor-Kesh\",\"Dr Senna Ashpaw\",\"Professor Aldous Thorne\",\"Dr Benedek Hale\"],[[\"POL\",false,false,[\"101\",\"153\"]],[\"LAW\",false,false,[\"101\",\"128\"]],[\"BUS\",false,false,[\"101\",\"184\"]],[\"CUL\",false,true,[\"101\",\"111\"]],[\"BLM\",false,true,[\"101\",\"147\"]],[\"WTC\",false,true,[\"101\",\"128\"]],[\"MEN\",false,true,[\"101\",\"135\",\"162\"]],[\"SGN\",false,true,[\"101\",\"146\"]],[\"KIN\",false,true,[\"101\",\"143\",\"176\"]],[\"PSF\",false,true,[\"101\",\"117\"]],[\"WOM\",false,false,[\"101\",\"193\"]],[\"EDU\",true,false,[\"101\"]],[\"COM\",false,false,[\"101\",\"119\"]],[\"HHS\",true,false,[\"101\"]],[\"BPS\",true,false,[\"101\"]],[\"CSC\",false,true,[\"101\",\"142\"]],[\"MTH\",true,false,[\"101\"]],[\"PTH\",true,true,[\"101\"]],[\"RBI\",true,true,[\"101\"]],[\"ART\",true,true,[\"101\"]],[\"ENG\",true,false,[\"101\"]],[\"GEO\",true,false,[\"101\"]],[\"HIS\",true,false,[\"101\"]],[\"MUS\",true,true,[\"101\"]],[\"RHE\",true,false,[\"101\"]]],[[\"anwen\",\"Anwen\",\"student\",\"MEN\",null],[\"baixue\",\"Baixue Fang\",\"student\",\"SGN\",null],[\"caelwen\",\"Caelwen Ashgrove\",\"teacher\",null,[\"Professor\",[[\"WOM\",\"101\"],[\"WOM\",\"193\"]]]],[\"daphne\",\"Daphne\",\"student\",\"KIN\",null],[\"dinah\",\"Dinah Silverith\",\"student\",\"BLM\",null],[\"elowen\",\"Elowen\",\"student\",\"CSC\",null],[\"faye\",\"Faye Fertillay\",\"student\",\"BUS\",null],[\"grushka\",\"Grushka Tor-Vael\",\"teacher\",null,[\"Coach\",[[\"KIN\",\"101\"],[\"KIN\",\"143\"],[\"PSF\",\"101\"],[\"PSF\",\"117\"]]]],[\"isolde\",\"Isolde Verrane\",\"student\",\"POL\",null],[\"lira\",\"Lira\",\"student\",\"BLM\",null],[\"lola-hopworth\",\"Lola Hopworth\",\"teacher\",null,[\"Professor\",[[\"CUL\",\"101\"],[\"CUL\",\"111\"]]]],[\"maren\",\"Maren\",\"student\",\"COM\",null],[\"morwenna\",\"Morwenna Thriceborn\",\"student\",\"WOM\",null],[\"ottilie\",\"Ottilie Marrow\",\"teacher\",null,[\"Dr\",[[\"SGN\",\"101\"],[\"RBI\",\"101\"],[\"SGN\",\"146\"]]]],[\"seraphine\",\"Seraphine V\",\"student\",\"POL\",null],[\"tamsin\",\"Tamsin\",\"student\",\"KIN\",null],[\"tink\",\"Tink Lightfoot\",\"student\",\"MEN\",null],[\"vespera\",\"Vespera Midnight\",\"teacher\",null,[\"Professor\",[[\"WTC\",\"101\"],[\"WTC\",\"128\"]]]],[\"yelena\",\"Yelena Goldvine\",\"student\",\"LAW\",null],[\"yulia\",\"Yulia Starkfelt\",\"student\",\"MEN\",null]]]",
   "courses": [
     {
       "id": "course-pol-101",
@@ -50,7 +50,8 @@
       "id": "course-law-101",
       "professor": "Professor Aldous Thorne",
       "studentIds": [
-        "yelena"
+        "yelena",
+        "yulia"
       ],
       "meetings": [
         {
@@ -71,8 +72,7 @@
       "id": "course-law-128",
       "professor": "Professor Aldous Thorne",
       "studentIds": [
-        "yelena",
-        "faye"
+        "yelena"
       ],
       "meetings": [
         {
@@ -93,7 +93,8 @@
       "id": "course-bus-101",
       "professor": "Professor Alba Quillon",
       "studentIds": [
-        "faye"
+        "faye",
+        "isolde"
       ],
       "meetings": [
         {
@@ -115,7 +116,7 @@
       "professor": "Professor Alba Quillon",
       "studentIds": [
         "faye",
-        "dinah"
+        "elowen"
       ],
       "meetings": [
         {
@@ -137,7 +138,7 @@
       "professor": "Professor Lola Hopworth",
       "teacherId": "lola-hopworth",
       "studentIds": [
-        "dinah"
+        "yelena"
       ],
       "meetings": [
         {
@@ -165,7 +166,7 @@
       "professor": "Professor Lola Hopworth",
       "teacherId": "lola-hopworth",
       "studentIds": [
-        "elowen"
+        "tamsin"
       ],
       "meetings": [
         {
@@ -249,7 +250,7 @@
       "professor": "Professor Vespera Midnight",
       "teacherId": "vespera",
       "studentIds": [
-        "yelena"
+        "seraphine"
       ],
       "meetings": [
         {
@@ -277,7 +278,7 @@
       "professor": "Professor Vespera Midnight",
       "teacherId": "vespera",
       "studentIds": [
-        "morwenna"
+        "lira"
       ],
       "meetings": [
         {
@@ -389,7 +390,7 @@
       "professor": "Dr Ottilie Marrow",
       "teacherId": "ottilie",
       "studentIds": [
-        "tamsin"
+        "baixue"
       ],
       "meetings": [
         {
@@ -417,7 +418,7 @@
       "professor": "Dr Ottilie Marrow",
       "teacherId": "ottilie",
       "studentIds": [
-        "isolde"
+        "baixue"
       ],
       "meetings": [
         {
@@ -445,7 +446,7 @@
       "professor": "Coach Grushka Tor-Vael",
       "teacherId": "grushka",
       "studentIds": [
-        "tamsin"
+        "daphne"
       ],
       "meetings": [
         {
@@ -473,7 +474,7 @@
       "professor": "Coach Grushka Tor-Vael",
       "teacherId": "grushka",
       "studentIds": [
-        "daphne"
+        "tamsin"
       ],
       "meetings": [
         {
@@ -500,8 +501,8 @@
       "id": "course-kin-176",
       "professor": "Dr Maelis Varn",
       "studentIds": [
-        "tamsin",
-        "daphne"
+        "daphne",
+        "tamsin"
       ],
       "meetings": [
         {
@@ -529,7 +530,7 @@
       "professor": "Coach Grushka Tor-Vael",
       "teacherId": "grushka",
       "studentIds": [
-        "tink"
+        "morwenna"
       ],
       "meetings": [
         {
@@ -557,7 +558,7 @@
       "professor": "Coach Grushka Tor-Vael",
       "teacherId": "grushka",
       "studentIds": [
-        "anwen"
+        "faye"
       ],
       "meetings": [
         {
@@ -628,8 +629,8 @@
       "id": "course-edu-101",
       "professor": "Professor Isaura Penhallow",
       "studentIds": [
-        "lira",
-        "yulia"
+        "dinah",
+        "morwenna"
       ],
       "meetings": [
         {
@@ -650,7 +651,8 @@
       "id": "course-com-101",
       "professor": "Professor Petra Lindqvar",
       "studentIds": [
-        "maren"
+        "maren",
+        "tink"
       ],
       "meetings": [
         {
@@ -671,7 +673,8 @@
       "id": "course-com-119",
       "professor": "Professor Petra Lindqvar",
       "studentIds": [
-        "maren"
+        "maren",
+        "yelena"
       ],
       "meetings": [
         {
@@ -693,7 +696,7 @@
       "professor": "Dr Benedek Hale",
       "studentIds": [
         "yulia",
-        "anwen"
+        "seraphine"
       ],
       "meetings": [
         {
@@ -714,8 +717,7 @@
       "id": "course-bps-101",
       "professor": "Dr Sunniva Crane",
       "studentIds": [
-        "faye",
-        "elowen"
+        "anwen"
       ],
       "meetings": [
         {
@@ -736,7 +738,8 @@
       "id": "course-csc-101",
       "professor": "Dr Ferelith Moor",
       "studentIds": [
-        "elowen"
+        "elowen",
+        "tamsin"
       ],
       "meetings": [
         {
@@ -764,7 +767,7 @@
       "professor": "Dr Ferelith Moor",
       "studentIds": [
         "elowen",
-        "morwenna"
+        "daphne"
       ],
       "meetings": [
         {
@@ -791,7 +794,7 @@
       "id": "course-mth-101",
       "professor": "Dr Senna Ashpaw",
       "studentIds": [
-        "maren"
+        "faye"
       ],
       "meetings": [
         {
@@ -812,7 +815,7 @@
       "id": "course-pth-101",
       "professor": "Professor Orlena Vey",
       "studentIds": [
-        "daphne"
+        "isolde"
       ],
       "meetings": [
         {
@@ -840,7 +843,7 @@
       "professor": "Dr Ottilie Marrow",
       "teacherId": "ottilie",
       "studentIds": [
-        "lira"
+        "elowen"
       ],
       "meetings": [
         {
@@ -867,7 +870,7 @@
       "id": "course-art-101",
       "professor": "Professor Dagna Tor-Kesh",
       "studentIds": [
-        "yelena"
+        "dinah"
       ],
       "meetings": [
         {
@@ -894,8 +897,8 @@
       "id": "course-eng-101",
       "professor": "Dr Ysolde Marrin",
       "studentIds": [
-        "daphne",
-        "maren"
+        "anwen",
+        "baixue"
       ],
       "meetings": [
         {
@@ -917,7 +920,7 @@
       "professor": "Professor Aldous Thorne",
       "studentIds": [
         "tink",
-        "tamsin"
+        "lira"
       ],
       "meetings": [
         {
@@ -938,7 +941,7 @@
       "id": "course-his-101",
       "professor": "Professor Alba Quillon",
       "studentIds": [
-        "seraphine"
+        "baixue"
       ],
       "meetings": [
         {
@@ -959,7 +962,7 @@
       "id": "course-mus-101",
       "professor": "Professor Thessaly Rook",
       "studentIds": [
-        "seraphine"
+        "maren"
       ],
       "meetings": [
         {
@@ -986,7 +989,8 @@
       "id": "course-rhe-101",
       "professor": "Professor Sabel Thorn",
       "studentIds": [
-        "isolde"
+        "daphne",
+        "maren"
       ],
       "meetings": [
         {

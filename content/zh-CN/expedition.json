@@ -1,0 +1,115 @@
+{
+  "name": "地下遗构",
+  "roles": [
+    {
+      "id": "guard",
+      "name": "地术师",
+      "actions": [
+        {
+          "id": "bash",
+          "name": "石刺"
+        },
+        {
+          "id": "hold",
+          "name": "重力井"
+        },
+        {
+          "id": "guard",
+          "name": "石肤"
+        }
+      ],
+      "friendAction": {
+        "id": "quake",
+        "name": "地震"
+      }
+    },
+    {
+      "id": "striker",
+      "name": "火术师",
+      "actions": [
+        {
+          "id": "strike",
+          "name": "火焰弹"
+        },
+        {
+          "id": "all-in",
+          "name": "火球"
+        },
+        {
+          "id": "guard",
+          "name": "烈焰护盾"
+        }
+      ],
+      "friendAction": {
+        "id": "flame-wave",
+        "name": "烈焰波"
+      }
+    },
+    {
+      "id": "hexer",
+      "name": "咒术师",
+      "actions": [
+        {
+          "id": "hex",
+          "name": "诅咒"
+        },
+        {
+          "id": "unravel",
+          "name": "暗影弹"
+        },
+        {
+          "id": "guard",
+          "name": "暗影帷幕"
+        }
+      ],
+      "friendAction": {
+        "id": "wither",
+        "name": "凋零诅咒"
+      }
+    },
+    {
+      "id": "warder",
+      "name": "结界师",
+      "actions": [
+        {
+          "id": "ward",
+          "name": "护盾"
+        },
+        {
+          "id": "push",
+          "name": "力场弹"
+        },
+        {
+          "id": "great-ward",
+          "name": "高等护盾"
+        }
+      ],
+      "friendAction": {
+        "id": "dispel",
+        "name": "驱散"
+      }
+    },
+    {
+      "id": "healer",
+      "name": "治疗师",
+      "actions": [
+        {
+          "id": "mend",
+          "name": "治疗"
+        },
+        {
+          "id": "jolt",
+          "name": "惩击"
+        },
+        {
+          "id": "deep-mend",
+          "name": "高等治疗"
+        }
+      ],
+      "friendAction": {
+        "id": "renewal",
+        "name": "复苏"
+      }
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+{
+  "months": [
+    {
+      "id": "thawmoon",
+      "name": "融雪月"
+    },
+    {
+      "id": "greening",
+      "name": "新绿月"
+    },
+    {
+      "id": "bloomtide",
+      "name": "花潮月"
+    },
+    {
+      "id": "suncrest",
+      "name": "日冠月"
+    },
+    {
+      "id": "highsun",
+      "name": "盛阳月"
+    },
+    {
+      "id": "goldenhay",
+      "name": "金草月"
+    },
+    {
+      "id": "emberfall",
+      "name": "落烬月"
+    },
+    {
+      "id": "harvestwane",
+      "name": "收获末月"
+    },
+    {
+      "id": "mistmoon",
+      "name": "雾月"
+    },
+    {
+      "id": "frostveil",
+      "name": "霜幕月"
+    },
+    {
+      "id": "deepwinter",
+      "name": "深冬月"
+    },
+    {
+      "id": "icebreak",
+      "name": "破冰月"
+    }
+  ],
+  "periods": [
+    {
+      "id": "morning",
+      "name": "上午"
+    },
+    {
+      "id": "afternoon",
+      "name": "下午"
+    },
+    {
+      "id": "evening",
+      "name": "傍晚"
+    },
+    {
+      "id": "night",
+      "name": "夜间"
+    }
+  ],
+  "weather": [
+    {
+      "id": "clear",
+      "name": "晴朗"
+    },
+    {
+      "id": "overcast",
+      "name": "阴天"
+    },
+    {
+      "id": "drizzle",
+      "name": "小雨"
+    },
+    {
+      "id": "downpour",
+      "name": "大雨"
+    },
+    {
+      "id": "windy",
+      "name": "大风"
+    },
+    {
+      "id": "mist",
+      "name": "薄雾"
+    },
+    {
+      "id": "snow",
+      "name": "下雪"
+    },
+    {
+      "id": "heat",
+      "name": "酷热"
+    }
+  ]
+}

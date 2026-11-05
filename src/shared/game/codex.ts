@@ -16,14 +16,14 @@ const MAX_ENTRY_CHARS = 1200
 export function codexExcerpt(entry: CodexEntry, maxChars = MAX_ENTRY_CHARS): string {
   if (entry.content.length <= maxChars) return entry.content
   const head = entry.content.slice(0, maxChars)
-  const sentenceEnd = Math.max(head.lastIndexOf('. '), head.lastIndexOf('.\n'))
+  const sentenceEnd = Math.max(head.lastIndexOf('. '), head.lastIndexOf('.\n'), head.lastIndexOf('。'), head.lastIndexOf('！'), head.lastIndexOf('？'))
   return `${head.slice(0, sentenceEnd > 0 ? sentenceEnd + 1 : maxChars).trimEnd()} [...]`
 }
 
 function mentions(text: string, term: string): boolean {
   const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  // Whole-word match, so "inn" doesn't fire on "beginning".
-  return new RegExp(`(^|[^\\p{L}\\p{N}])${escaped}($|[^\\p{L}\\p{N}])`, 'iu').test(text)
+  // Han text has no spaces between words, including around English names. Keep boundaries for alphabetic words.
+  return new RegExp(`(^|[^\\p{L}\\p{N}]|\\p{Script=Han})${escaped}($|[^\\p{L}\\p{N}]|\\p{Script=Han})`, 'iu').test(text)
 }
 
 export interface CodexQuery {

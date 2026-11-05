@@ -1,5 +1,5 @@
 import type { ContentPack, Course, GameState } from '../model'
-import { canEnrol, courseLabel, describeMeetings } from './courses'
+import { canEnrol, courseLabel, courseLoad, describeMeetings } from './courses'
 import { skillFor } from './skills'
 import { t } from '../i18n'
 
@@ -27,12 +27,12 @@ function courseLine(content: ContentPack, course: Course): string {
 
 /** The prompt asking the LLM to pick courses for what the player typed. */
 export function buildCoursePickPrompt(content: ContentPack, state: GameState, text: string): { system: string; user: string } {
-  const most = content.coursework?.maxCourses ?? 0
+  const { min, max } = courseLoad(content)
   const system = [
     t('llm.coursePick.systemRole', { player: state.player.name }),
     t('llm.coursePick.systemReply'),
     '{"courses": string[], "why": string}',
-    t('llm.coursePick.systemCourses', { field: '"courses"', most }),
+    t('llm.coursePick.systemCourses', { field: '"courses"', min, max, range: min < max }),
     t('llm.coursePick.systemClash'),
     t('llm.coursePick.systemWhy', { field: '"why"' }),
     t('llm.coursePick.systemOnly')

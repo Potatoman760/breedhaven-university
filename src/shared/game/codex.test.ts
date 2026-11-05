@@ -22,6 +22,16 @@ describe('selectCodexEntries', () => {
     expect(ids({ recentText: 'I saw a dragonfly' })).toEqual(['town'])
   })
 
+  it('matches Chinese keywords and English names within Chinese sentences', () => {
+    const translated = { ...content, codex: content.codex.map((entry) => entry.id === 'dragons'
+      ? { ...entry, title: '龙的传说', keywords: ['巨龙', 'Dragon'] }
+      : entry) }
+    for (const recentText of ['我想了解巨龙的故事。', '她提到了Dragon的故事。', '我读过龙的传说这篇文章。']) {
+      expect(selectCodexEntries({ content: translated, state: start(), recentText }).map((entry) => entry.id)).toEqual(['town', 'dragons'])
+    }
+    expect(selectCodexEntries({ content: translated, state: start(), recentText: '我看见dragonfly了。' }).map((entry) => entry.id)).toEqual(['town'])
+  })
+
   it('is not brought in by where the scene is: only by what is said', () => {
     expect(ids({ state: { ...start(), locationId: 'shop' } })).toEqual(['town'])
   })
@@ -41,6 +51,13 @@ describe('selectCodexEntries', () => {
     const entry = { ...content.codex[0], content: 'First sentence. Second sentence. Third one runs long.' }
     expect(codexExcerpt(entry, 40)).toBe('First sentence. Second sentence. [...]')
     expect(codexExcerpt(entry, 500)).toBe(entry.content)
+  })
+
+  it('cuts Chinese text at a sentence end', () => {
+    for (const punctuation of ['。', '！', '？']) {
+      const entry = { ...content.codex[0], content: `第一句${punctuation}第二句还有很长很长的内容。` }
+      expect(codexExcerpt(entry, 8)).toBe(`第一句${punctuation} [...]`)
+    }
   })
 
   it('stays within the budget', () => {

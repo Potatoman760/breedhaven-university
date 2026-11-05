@@ -1,7 +1,7 @@
 import { Button } from "../Button";
 import type { ContentPack, ScheduleEntry } from "../../../../shared/model";
 import { CheckPills, Group } from "./fields";
-import { t } from "../../../../shared/i18n";
+import { t, weekdayName } from "../../../../shared/i18n";
 
 interface Props {
   content: ContentPack;
@@ -15,7 +15,7 @@ interface Props {
 export function ScheduleTab({ content, schedule, onChange, before }: Props) {
   const weekdays = content.calendar.weekdays.map((day) => ({
     id: day,
-    name: day.slice(0, 3),
+    name: weekdayName(day, true),
   }));
   const periods = content.calendar.periods.map((p) => ({
     id: p.id,

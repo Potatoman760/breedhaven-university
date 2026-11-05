@@ -1,6 +1,6 @@
 import type { ContentPack, Course } from '../../../shared/model'
 import { courseLabel } from '../../../shared/game'
-import { t } from '../../../shared/i18n'
+import { t, weekdayName } from '../../../shared/i18n'
 
 const clock = (hour: number): string => `${String(hour).padStart(2, '0')}:00`
 
@@ -30,7 +30,7 @@ export function WeekPlanner({ content, courses, focusId, mark, onFocus, onPick }
       <span />
       {weekdays.map((day) => (
         <span key={day} className="caps planner-day">
-          {day}
+          {weekdayName(day)}
         </span>
       ))}
       {hours.map((hour) => [

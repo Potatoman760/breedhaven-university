@@ -68,6 +68,8 @@ const DESCRIBED: Record<string, string> = {
     "A young woman of eighteen with a clear, bright, crisp and polished voice and an aristocratic upper-class English accent. Poised, well-mannered and precise on the surface, with an eager, youthful excitement breaking through.",
   yulia:
     "A woman of twenty-one with a husky, lively, fast and loose voice and a Russian accent that slips into valley-girl speech when she gets excited. Bold, laughing and flirtatious, a party girl.",
+  baixue:
+    "A young woman of eighteen from China who speaks English as a second language, fluently and naturally. A warm, bright, quick mid-range voice. Shrewd and teasing, brisk like a market trader haggling, fussing and big-sisterly, with a wry smile in every line; elegant and polished.",
   zelie:
     "A woman of twenty-six with a smooth, poised, warm and slightly playful voice and a French accent. Unhurried, elegant and a little formal, quietly amused, teasing and affectionate; never raises her voice."
 }
@@ -94,6 +96,7 @@ const SAMPLE: Record<string, string> = {
   vespera: "Well, well. Look what wandered into my classroom. Did you come to learn a hex, sugar, or did you just want to see if the rumors were true? Either way, sit down.",
   yelena: "Good evening. My father would be appalled that I'm here, which is rather the point. I've never done anything I wasn't told to before. Show me something I'm not supposed to see.",
   yulia: "Hey, hey, you made it! Okay, so, like, this party is totally dead without you, I swear. Here, drink this. Don't ask what's in it, yeah? Just trust me. You trust me, right?",
+  baixue: "Sit, sit, eat the bun while it is hot. Three silver for the dumplings, and the stall woman wanted five. I told her five is for tourists. Now, 帅哥, let us talk about this thesis of mine.",
   zelie: "Ah, monsieur, you are home. Bien sûr, dinner is ready, and the little ones are asleep. Alors, sit, take off that coat. You look tired, non? Let me take care of you a little."
 }
 
@@ -134,7 +137,8 @@ const SAY: Record<string, Record<string, string>> = {
   isolde: { 'my baby': '[soft, intimate, composed] My baby.' },
   ottilie: { 'my True Sire': '[dry, quietly fond] My True Sire.' },
   seraphine: { 'my lord': '[shy, formal, a little breathless] My lord.' },
-  tink: { 'big guy': '[cheeky, teasing] Big guy.' }
+  tink: { 'big guy': '[cheeky, teasing] Big guy.' },
+  baixue: { '帅哥': '[warm, teasing, playful] 帅哥!' }
 }
 
 const ledger = (): Record<string, string> => (existsSync(LEDGER) ? JSON.parse(readFileSync(LEDGER, 'utf8')) : {})
@@ -194,7 +198,9 @@ async function record() {
   const file = JSON.parse(readFileSync(path, 'utf8'))
   const catchphrases: Record<string, string> = {}
   for (const phrase of Object.keys(file.catchphrases ?? {})) {
-    const slug = phrase.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+    const latin = phrase.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+    // A phrase in a script with no Latin letters (帅哥) is named for its characters' code points.
+    const slug = latin || [...phrase].map((char) => char.codePointAt(0)!.toString(16)).join('-')
     const ogg = join(out, `phrase-${slug}.ogg`)
     catchphrases[phrase] = `sounds/voices/${id}/phrase-${slug}.ogg`
     if (existsSync(ogg) && !args.includes('--overwrite')) continue

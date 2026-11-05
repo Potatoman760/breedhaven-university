@@ -98,7 +98,7 @@ const SUBJECTS: Record<string, Record<string, string>> = {
     'freewill-society': 'Two iron chain links snapped apart, a red ribbon tied to one of them, with white space all around.',
     'card-and-dice-society': 'A fan of three playing cards with two ivory dice in front of them.',
     'merchants-society': 'A small leather coin purse spilling gold coins beside a brass scale.',
-    'needle-and-thread': 'A pincushion shaped like a tomato with a needle and a spool of pink thread.',
+    'needle-and-thread': 'A glossy fashion magazine and a tube of pink lipstick.',
     'midnight-circle': 'A black candle burning beside a crescent moon and a chalk pentacle circle.'
   },
   stalls: {

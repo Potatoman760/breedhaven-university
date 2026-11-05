@@ -41,6 +41,12 @@ describe('format', () => {
   it('names the values a message takes', () => {
     expect(placeholders('{a} and {n, plural, one {{b}} other {#}} {"json": 1}')).toEqual(['a', 'b', 'n'])
   })
+
+  it('does not mistake words in select or plural branches for placeholders', () => {
+    expect(placeholders('{daughter, select, true {daughter} other {son}}')).toEqual(['daughter'])
+    expect(placeholders('{n, plural, =0 {none} one {one} other {many}}')).toEqual(['n'])
+    expect(placeholders('{kind, select, first {{a}} other {{n, plural, one {{b}} other {{c}}}}}')).toEqual(['a', 'b', 'c', 'kind', 'n'])
+  })
 })
 
 describe('t', () => {

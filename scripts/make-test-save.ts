@@ -25,6 +25,7 @@ import {
   applyForJob,
   buildRoom,
   canEnrol,
+  courseLoad,
   courierThread,
   createInitialState,
   deliverChild,
@@ -83,7 +84,7 @@ const wanted = ['WTC', 'BLM', 'BPS', 'RBI', 'RHE', 'HHS', 'CSC', 'HIS']
 let enrolment: string[] = []
 for (const code of wanted) {
   const course = state.courses.find((one) => one.code === code)
-  if (course && enrolment.length < (content.coursework?.maxCourses ?? 5) && canEnrol(content, state, enrolment, course.id).ok) enrolment = [...enrolment, course.id]
+  if (course && enrolment.length < courseLoad(content).max && canEnrol(content, state, enrolment, course.id).ok) enrolment = [...enrolment, course.id]
 }
 state = {
   ...state,

@@ -1,0 +1,901 @@
+{
+  "id": "baixue",
+  "name": "Baixue Fang",
+  "role": "",
+  "age": 18,
+  "pronouns": "she/her",
+  "bio": "Baixue Fang is a dazzling, fashion-conscious first-year Sire Genetics student from Yuelan and the only daughter of the CEO of White Crane Biotech, one of its largest conglomerates.",
+  "appearance": "A very beautiful Chinese girl aged 18, clear, smooth, flawless fair porcelain skin with a soft natural glow, bright dark brown almond-shaped eyes with long thick lashes and a lively gaze, neat arched dark brows, a delicate straight nose, full rosy lips, a soft oval face with high cheekbones, long, straight, silky ink-black hair with soft wispy see-through bangs, a slender and feminine body with a healthy, toned, smooth shoulders, full breasts, a narrow waist, and rounded hips.",
+  "personality": "Warm, playful, and unapologetically high-maintenance, Baixue is a modern city socialite whose glossy designer polish hides real sincerity and a quick wit. She is fiercely loyal and spoils the people she adores with expensive takeout, homemade dumplings from a sleek thermos, and late-night voice notes. Openly flirtatious and affectionate, she has a sharp possessive streak and turns instantly frosty when other girls hover around {player}. Above all, she refuses to be treated as a corporate asset or just another name on a Sire's roster, and aches to be chosen for who she truly is.",
+  "traitIds": [
+    "loyal",
+    "flirtatious",
+    "jealous"
+  ],
+  "likes": [
+    "tea",
+    "finery",
+    "sweets",
+    "flowers",
+    "candles"
+  ],
+  "dislikes": [
+    "ale",
+    "moss"
+  ],
+  "admires": [
+    "intelligence",
+    "endurance"
+  ],
+  "friends": [],
+  "enemies": [],
+  "handle": "baixue.whitecrane",
+  "outfits": [
+    {
+      "id": "default",
+      "name": "Usual clothes",
+      "description": "the top half of her hair pulled back and tied with a large black satin bow, a cropped cream tweed jacket with gold buttons over a black silk camisole, a high-waisted black mini skirt, a single strand of pearls, small diamond stud earrings, and a quilted black leather shoulder bag on a gold chain",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/default-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/baixue/default-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/baixue/default-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/baixue/default-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/baixue/default-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/baixue/default-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/baixue/default-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "pregnant",
+      "name": "Pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "default",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/baixue/pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/baixue/pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/baixue/pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/baixue/pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/baixue/pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/baixue/pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "nude",
+      "name": "Nude",
+      "description": "nothing at all, completely nude,",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/nude-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/baixue/nude-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/baixue/nude-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/baixue/nude-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/baixue/nude-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/baixue/nude-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/baixue/nude-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "nude-pregnant",
+      "name": "Nude, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "nude",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/nude-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/baixue/nude-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/baixue/nude-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/baixue/nude-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/baixue/nude-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/baixue/nude-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/baixue/nude-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "casual",
+      "name": "Daytime",
+      "description": "oversized tortoiseshell sunglasses pushed up on her head, an oversized cream cashmere sweater slipping off one shoulder, a short white pleated tennis skirt, stacked gold bangles, and a slim gold necklace",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/casual-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/baixue/casual-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/baixue/casual-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/baixue/casual-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/baixue/casual-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/baixue/casual-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/baixue/casual-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "day": true
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "Daytime, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "casual",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/casual-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/baixue/casual-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/baixue/casual-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/baixue/casual-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/baixue/casual-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/baixue/casual-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/baixue/casual-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "bathrobe",
+      "name": "Bathrobe",
+      "description": "a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/bathrobe-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "Bathrobe, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "bathrobe",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/bathrobe-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "swimsuit",
+      "name": "Swimsuit",
+      "description": "an elegant sky-blue bikini with thin ivory straps and a small jade bead at the center of the top",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/swimsuit-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "Swimsuit, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "swimsuit",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/swimsuit-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "ao-dai",
+      "name": "Ao dai",
+      "description": "a fitted sky-blue silk Vietnamese ao dai: a long close-fitting tunic of thick opaque silk, following her figure but lying smooth and unbroken over her stomach, with a high mandarin collar, long sleeves and side slits up to the waist, embroidered with small white tea blossoms, worn over loose flowing ivory silk trousers",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/ao-dai-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "Ao dai, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "ao-dai",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/ao-dai-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sarong",
+      "name": "Sarong",
+      "description": "a long sky-blue silk sarong printed with large ivory and white tropical hibiscus flowers, wrapped around her body under her arms as a strapless dress knotted above her chest, the thick opaque fabric hanging loose and smooth from her chest, hiding her stomach completely, falling to mid-calf, her shoulders bare, and a single white hibiscus flower in her hair",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/sarong-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "Sarong, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sarong",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/sarong-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "sari",
+      "name": "Sari",
+      "description": "a traditional sky-blue silk sari with an ivory woven border, the pallu draped over one shoulder, worn with a matching short fitted blouse, and thin jade bangles",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/sari-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "Sari, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "sari",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/sari-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "holi",
+      "name": "Festival whites",
+      "description": "a simple, loose-fitting white cotton kurta tunic of thick opaque cotton, hanging straight and loose from her chest to her knees and hiding her stomach completely, over loose white cotton trousers, with a thin sky-blue scarf, the clothes, her arms and her cheeks splashed and smeared with bright pink, yellow, green and blue festival color powder",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/holi-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "Festival whites, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "holi",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/holi-pregnant-neutral.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "echoes",
+      "name": "Guardian's silks",
+      "description": "a fantasy martial guardian's outfit: a fitted sky-blue silk jacket with a high mandarin collar and a row of jade frog buttons down the front, the fabric lying smooth over her stomach, a wide ivory silk sash tied at her waist, brown leather bracers on her forearms, and loose ivory trousers gathered at the ankle, her hands empty",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/echoes-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/baixue/echoes-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/baixue/echoes-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/baixue/echoes-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/baixue/echoes-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/baixue/echoes-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/baixue/echoes-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false,
+      "coversStomach": true,
+      "locked": "echoes",
+      "day": true
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "Guardian's silks, pregnant",
+      "description": "She has a round, pregnant belly.",
+      "inherits": "echoes",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/echoes-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/baixue/echoes-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/baixue/echoes-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/baixue/echoes-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/baixue/echoes-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/baixue/echoes-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/baixue/echoes-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    },
+    {
+      "id": "lingerie",
+      "name": "Ivory silk lingerie",
+      "description": "an ivory silk and lace balconette bra with a small sky-blue satin bow at the front, matching ivory silk and lace panties, a garter belt and sheer white stockings",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/lingerie-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/baixue/lingerie-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/baixue/lingerie-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/baixue/lingerie-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/baixue/lingerie-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/baixue/lingerie-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/baixue/lingerie-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": false
+    },
+    {
+      "id": "lingerie-pregnant",
+      "name": "Ivory silk lingerie, pregnant",
+      "description": "She has a round, pregnant belly, bare between her bra and her garter belt, which sits low beneath it with her panties.",
+      "inherits": "lingerie",
+      "sprites": {
+        "neutral": {
+          "image": "sprites/baixue/lingerie-pregnant-neutral.webp",
+          "description": ""
+        },
+        "happy": {
+          "image": "sprites/baixue/lingerie-pregnant-happy.webp",
+          "description": ""
+        },
+        "sad": {
+          "image": "sprites/baixue/lingerie-pregnant-sad.webp",
+          "description": ""
+        },
+        "angry": {
+          "image": "sprites/baixue/lingerie-pregnant-angry.webp",
+          "description": ""
+        },
+        "surprised": {
+          "image": "sprites/baixue/lingerie-pregnant-surprised.webp",
+          "description": ""
+        },
+        "embarrassed": {
+          "image": "sprites/baixue/lingerie-pregnant-embarrassed.webp",
+          "description": ""
+        },
+        "aroused": {
+          "image": "sprites/baixue/lingerie-pregnant-aroused.webp",
+          "description": ""
+        }
+      },
+      "pregnant": true
+    }
+  ],
+  "defaultOutfitId": "default",
+  "faceY": 4,
+  "imageSeed": 61,
+  "stageHeight": 95,
+  "partyRole": "guard",
+  "ultimate": {
+    "id": "cauldron-stance",
+    "name": "White Crane Elixir Breath",
+    "kind": "heal",
+    "power": 14,
+    "cooldown": 0,
+    "all": true,
+    "stuns": 0,
+    "cleanses": false,
+    "once": false
+  },
+  "studies": {
+    "major": "SGN",
+    "level": 1
+  },
+  "animations": [
+    {
+      "id": "blowjob",
+      "name": "Blowjob",
+      "description": "",
+      "image": "sprites/baixue/nsfw-blowjob.webp",
+      "clip": "sprites/baixue/nsfw-blowjob.mp4",
+      "loop": true
+    },
+    {
+      "id": "missionary",
+      "name": "Missionary",
+      "description": "",
+      "image": "sprites/baixue/nsfw-missionary.webp",
+      "clip": "sprites/baixue/nsfw-missionary.mp4",
+      "loop": true
+    },
+    {
+      "id": "doggy",
+      "name": "Doggy",
+      "description": "",
+      "image": "sprites/baixue/nsfw-doggy.webp",
+      "clip": "sprites/baixue/nsfw-doggy.mp4",
+      "loop": true
+    },
+    {
+      "id": "cowgirl",
+      "name": "Cowgirl",
+      "description": "",
+      "image": "sprites/baixue/nsfw-cowgirl.webp",
+      "clip": "sprites/baixue/nsfw-cowgirl.mp4",
+      "loop": true
+    },
+    {
+      "id": "pregnant-blowjob",
+      "name": "Blowjob, pregnant",
+      "description": "",
+      "image": "sprites/baixue/nsfw-pregnant-blowjob.webp",
+      "loop": true
+    },
+    {
+      "id": "pregnant-missionary",
+      "name": "Missionary, pregnant",
+      "description": "",
+      "image": "sprites/baixue/nsfw-pregnant-missionary.webp",
+      "loop": true
+    },
+    {
+      "id": "pregnant-doggy",
+      "name": "Doggy, pregnant",
+      "description": "",
+      "image": "sprites/baixue/nsfw-pregnant-doggy.webp",
+      "loop": true
+    },
+    {
+      "id": "pregnant-cowgirl",
+      "name": "Cowgirl, pregnant",
+      "description": "",
+      "image": "sprites/baixue/nsfw-pregnant-cowgirl.webp",
+      "loop": true
+    },
+    {
+      "id": "creampie",
+      "name": "Creampie",
+      "description": "",
+      "image": "sprites/baixue/nsfw-creampie.webp",
+      "clip": "sprites/baixue/nsfw-creampie.mp4",
+      "loop": true
+    },
+    {
+      "id": "facial",
+      "name": "Facial",
+      "description": "",
+      "image": "sprites/baixue/nsfw-facial.webp",
+      "clip": "sprites/baixue/nsfw-facial-2.mp4",
+      "loop": true
+    },
+    {
+      "id": "pregnant-creampie",
+      "name": "Creampie, pregnant",
+      "description": "",
+      "image": "sprites/baixue/nsfw-pregnant-creampie.webp",
+      "loop": true
+    },
+    {
+      "id": "pregnant-facial",
+      "name": "Facial, pregnant",
+      "description": "",
+      "image": "sprites/baixue/nsfw-pregnant-facial.webp",
+      "loop": true
+    }
+  ],
+  "tonedAnimations": {
+    "medium": [
+      {
+        "id": "blowjob",
+        "name": "Blowjob",
+        "description": "",
+        "image": "sprites/baixue/nsfw-medium-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "missionary",
+        "name": "Missionary",
+        "description": "",
+        "image": "sprites/baixue/nsfw-medium-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "doggy",
+        "name": "Doggy",
+        "description": "",
+        "image": "sprites/baixue/nsfw-medium-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "cowgirl",
+        "name": "Cowgirl",
+        "description": "",
+        "image": "sprites/baixue/nsfw-medium-cowgirl.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-blowjob",
+        "name": "Blowjob, pregnant",
+        "description": "",
+        "image": "sprites/baixue/nsfw-medium-pregnant-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-missionary",
+        "name": "Missionary, pregnant",
+        "description": "",
+        "image": "sprites/baixue/nsfw-medium-pregnant-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-doggy",
+        "name": "Doggy, pregnant",
+        "description": "",
+        "image": "sprites/baixue/nsfw-medium-pregnant-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-cowgirl",
+        "name": "Cowgirl, pregnant",
+        "description": "",
+        "image": "sprites/baixue/nsfw-medium-pregnant-cowgirl.webp",
+        "loop": true
+      }
+    ],
+    "dark": [
+      {
+        "id": "blowjob",
+        "name": "Blowjob",
+        "description": "",
+        "image": "sprites/baixue/nsfw-dark-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "missionary",
+        "name": "Missionary",
+        "description": "",
+        "image": "sprites/baixue/nsfw-dark-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "doggy",
+        "name": "Doggy",
+        "description": "",
+        "image": "sprites/baixue/nsfw-dark-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "cowgirl",
+        "name": "Cowgirl",
+        "description": "",
+        "image": "sprites/baixue/nsfw-dark-cowgirl.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-blowjob",
+        "name": "Blowjob, pregnant",
+        "description": "",
+        "image": "sprites/baixue/nsfw-dark-pregnant-blowjob.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-missionary",
+        "name": "Missionary, pregnant",
+        "description": "",
+        "image": "sprites/baixue/nsfw-dark-pregnant-missionary.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-doggy",
+        "name": "Doggy, pregnant",
+        "description": "",
+        "image": "sprites/baixue/nsfw-dark-pregnant-doggy.webp",
+        "loop": true
+      },
+      {
+        "id": "pregnant-cowgirl",
+        "name": "Cowgirl, pregnant",
+        "description": "",
+        "image": "sprites/baixue/nsfw-dark-pregnant-cowgirl.webp",
+        "loop": true
+      }
+    ]
+  },
+  "reactions": {
+    "giggle": "sounds/voices/baixue/giggle.ogg",
+    "sigh": "sounds/voices/baixue/sigh.ogg",
+    "sigh-content": "sounds/voices/baixue/sigh-content.ogg",
+    "gasp": "sounds/voices/baixue/gasp.ogg",
+    "huff": "sounds/voices/baixue/huff.ogg",
+    "surprised": "sounds/voices/baixue/surprised.ogg",
+    "yawn": "sounds/voices/baixue/yawn.ogg",
+    "aww": "sounds/voices/baixue/aww.ogg",
+    "satisfied": "sounds/voices/baixue/satisfied.ogg"
+  },
+  "catchphrases": {
+    "帅哥": "sounds/voices/baixue/phrase-5e05-54e5.ogg"
+  },
+  "schedule": [
+    {
+      "weekdays": [
+        "Saturday"
+      ],
+      "periods": [
+        "morning"
+      ],
+      "locationId": "market"
+    },
+    {
+      "weekdays": [
+        "Saturday"
+      ],
+      "periods": [
+        "evening"
+      ],
+      "locationId": "lantern-row"
+    },
+    {
+      "weekdays": [
+        "Sunday"
+      ],
+      "periods": [
+        "afternoon"
+      ],
+      "locationId": "boba-blossom"
+    },
+    {
+      "weekdays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "periods": [
+        "afternoon"
+      ],
+      "locationId": "library"
+    },
+    {
+      "weekdays": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday"
+      ],
+      "periods": [
+        "evening"
+      ],
+      "locationId": "commons"
+    },
+    {
+      "locationId": "dormitories"
+    }
+  ],
+  "room": {
+    "name": "her room in the Cloister Halls",
+    "description": "A stylish, tidy university dormitory room in ivory and sky-blue tones, a marble-topped vanity holding glass skincare bottles, crystal perfume atomizers and a designer scented candle, a silver-framed family photograph, a wall of neatly pinned genetics notes, a vase of fresh white orchids, a sleek modern rice cooker on a side counter, a neat bed with an ivory duvet, and a large window onto the campus.",
+    "locationId": "dormitories",
+    "images": {
+      "day": "generated/backgrounds/baixue/view.webp"
+    }
+  },
+  "skinTone": "light",
+  "birthPictures": {
+    "light": "sprites/baixue/birth-light.webp",
+    "medium": "sprites/baixue/birth-medium.webp"
+  },
+  "walkSprite": "sprites/baixue/walk.webp",
+  "childNames": {
+    "daughters": [
+      "Meilin",
+      "Xiaoyan",
+      "Chunhua",
+      "Yueqin",
+      "Lihua"
+    ],
+    "sons": [
+      "Jianyu",
+      "Wenhao"
+    ]
+  },
+  "birthControl": true,
+  "ai": {
+    "speechPattern": "She speaks with the fast, breezy cadence of a megacity it-girl, weaving luxury brand names and modern slang into bright, teasing banter. When her jealousy flares or her pride is pricked, her bubbly warmth drops into crisp, clipped precision.",
+    "tone": "playful, affectionate, glamorous, candid, possessive",
+    "verbalQuirks": [
+      "She calls {player} '帅哥' (handsome), always in Chinese, whatever language she is speaking.",
+      "She taps her knuckles twice on the nearest piece of wood for luck whenever she mentions the future.",
+      "She fusses over whether {player} has eaten and presses warm soup or snacks on him whenever she feels affectionate."
+    ],
+    "exampleDialogue": [],
+    "backstory": "Baixue grew up among the glittering towers of Yuelan, the only daughter of the CEO of White Crane Biotech, a conglomerate that makes everything from maglev components to luxury cultivation elixirs. For all its wealth, the Fang clan is new money: its matrilineal genealogy book goes back only three generations, so the Bureau of Lineages ranks it far below the old clans. White Crane can buy skyscrapers, but not a top Sire allotment.\n\nThe system came home when her younger brother sat the Imperial Assay at sixteen, was graded infertile, and was sent off to a rail-yard clerkship. Watching him be discarded broke her heart and left her with a quiet hatred for how her country ranks people.\n\nHer mother funded a research wing at Breedhaven University and sent Baixue to study Sire Genetics, so that White Crane can pioneer fertility treatments and force the Bureau to raise the clan's rank. She has just arrived and has not yet met {player}, whom she hopes to win as a research partner for her thesis on how a True Sire's aura warms Yuelan inner alchemy. She knows the Bureau will send an envoy for him, fears her clan will never make his list, and will not use her mother's money to outbid it, because then she would never know if he loved her for herself.\n\nHer magic is cultivation: steady breath and inner alchemy. Like most women at the University she takes a daily suppressant.",
+    "knowledge": [],
+    "secrets": [],
+    "extraInstructions": "Play Baixue as a warm, modern heiress who shows care by feeding {player} and sending voice notes, and lets her sharp jealousy show when rivals get close. She is not an old-world aristocrat or a working-class girl: no period-drama speech, haggling, or ledger and money metaphors."
+  }
+}

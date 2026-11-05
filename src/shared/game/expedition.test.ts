@@ -340,7 +340,7 @@ describe('the echoes', () => {
   // Every anchor set, and the wall of the Pit made something a party can beat in an echo.
   const echoing = { ...content, expedition: { ...expedition, enemies: expedition.enemies.map((one) => (one.id === 'wall' ? { ...one, footing: 30, attack: 2 } : one)), echoes: { ...expedition.echoes, power: 1, fights: 1, foes: 1 } } }
   const done = { ...start, expedition: { ...start.expedition, cleared: 2 } }
-  const robe = { id: 'echoes', name: 'Ranger garb', description: '', sprites: {}, pregnant: false, day: true, locked: 'echoes' as const }
+  const robe = { id: 'echoes', name: 'Ranger garb', description: '', sprites: { neutral: { image: 'sprites/ana/echoes-neutral.webp', description: '' } }, pregnant: false, day: true, locked: 'echoes' as const }
   const her = { ...content.loveInterests[0], outfits: [...content.loveInterests[0].outfits, robe] }
 
   it('open past the last depth once every anchor is set, put together from the depths', () => {
@@ -362,6 +362,8 @@ describe('the echoes', () => {
     expect(outfitOpen(setEchoOutfit(setEchoOutfit(state, 'ana', false), 'ana', true), her, robe)).toBe(true)
     expect(wearableOutfits(her, start).map((o) => o.id)).not.toContain('echoes')
     expect(wearableOutfits(her, state).map((o) => o.id)).toContain('echoes')
+    // Given to her with no pictures, it is not hers to wear until it is drawn.
+    expect(wearableOutfits({ ...her, outfits: her.outfits.map((o) => (o.id === 'echoes' ? { ...o, sprites: {} } : o)) }, state).map((o) => o.id)).not.toContain('echoes')
     // Below, she always goes in it once earned, even put away for her days.
     expect(belowOutfitId(start, her)).toBeUndefined()
     expect(belowOutfitId(setEchoOutfit(state, 'ana', false), her)).toBe('echoes')

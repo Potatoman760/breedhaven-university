@@ -86,6 +86,15 @@ describe('enrolment', () => {
     expect(canBeginTerm(content, ['pol', 'phy']).ok).toBe(true)
   })
 
+  it('lets the player take a range of courses where his load is one, whatever the love interests take', () => {
+    const ranged = { ...content, coursework: { ...content.coursework!, minCourses: 1, playerMaxCourses: 3 } }
+    expect(canBeginTerm(ranged, [])).toEqual({ ok: false, reasons: ['Choose 1 to 3 courses'] })
+    expect(canBeginTerm(ranged, ['pol']).ok).toBe(true)
+    expect(canBeginTerm(ranged, ['pol', 'phy', 'his']).ok).toBe(true)
+    expect(canBeginTerm(ranged, ['pol', 'phy', 'his', 'x']).ok).toBe(false)
+    expect(canEnrol(ranged, start(null), ['pol', 'phy'], 'his').reasons).not.toContain('You can take at most 2 courses')
+  })
+
   it('lists what the player is taking', () => {
     expect(enrolledCourses(start()).map((c) => c.id)).toEqual(['pol'])
     expect(enrolledCourses(start(null))).toEqual([])

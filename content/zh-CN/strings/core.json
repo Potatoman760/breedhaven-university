@@ -1,0 +1,8 @@
+{
+  "weekday.name": "{day, select, Sunday {周日} Monday {周一} Tuesday {周二} Wednesday {周三} Thursday {周四} Friday {周五} Saturday {周六} other {{day}}}",
+  "weekday.short": "{day, select, Sunday {周日} Monday {周一} Tuesday {周二} Wednesday {周三} Thursday {周四} Friday {周五} Saturday {周六} other {{day}}}",
+  "llm.writeIn": "用简体中文写作。世界观术语：Sire 为“育嗣者”，True Sire 为“真育嗣者”，Primordial Bloom 为“原初繁花”，the Bloom 为“繁花”。",
+  "editor.englishOnly": "只有在游戏语言为英语时才能编辑内容。",
+  "settings.language": "语言",
+  "language.en": "English（英语）"
+}

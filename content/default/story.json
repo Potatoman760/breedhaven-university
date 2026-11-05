@@ -3976,5 +3976,206 @@
       ],
       "stopsBirthControl": false
     }
+  ],
+  "baixue": [
+    {
+      "stage": "friend",
+      "invitation": "Meet me at Boba Blossom before the afternoon rush hits, {player}. I have a favor to ask you for my research, and I refuse to talk shop on an empty stomach. Do not be late, or I will drink your share too.",
+      "locationId": "boba-blossom",
+      "outfitId": "default",
+      "startHour": 15,
+      "hours": 2,
+      "cutscene": {
+        "speakerId": "baixue",
+        "outfitId": "default",
+        "scenes": [
+          {
+            "locationId": "boba-blossom",
+            "lines": [
+              "*You find her waiting at a sunny corner table at Boba Blossom in a cropped cream tweed jacket and a high-waisted black mini skirt, smiling warmly as she sets two cups of fresh oolong milk tea on the wood.*",
+              "Right on time, 帅哥, and here I thought I would have to drink both of these myself.",
+              "*She slides a warm cup across to you, taps her knuckles twice against the tabletop for good luck, and twists open a sleek insulated thermos filled with steaming homemade pork dumplings.*",
+              "Eat first while they are hot, {player}, because a girl with good manners never asks a favor of a hungry man.",
+              "*While you eat, she pulls a thick notebook from her quilted black leather shoulder bag, her dark eyes bright with curiosity and an easy, teasing warmth.*",
+              "My thesis for Sire Genetics examines how a True Sire's aura warms Yuelan inner alchemy during steady-breath cultivation, and frankly, every other boy on this campus is dull as dishwater compared to you.",
+              "*She props her chin in her palm, her single strand of pearls and small diamond stud earrings catching the afternoon light as she leans closer across the table.*",
+              "I take very good care of my research partners, 帅哥, so tell me: will you let me record your pulse and your aura in my notes this semester?"
+            ]
+          }
+        ]
+      },
+      "direction": "At a sunny corner table in Boba Blossom, she fusses over {player} with warm oolong milk tea and homemade pork dumplings from her thermos before teasingly asking him to help with her Sire Genetics thesis. Light, warm and flirtatious.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ]
+    },
+    {
+      "stage": "dating",
+      "invitation": "The dining hall food tonight is a crime against good taste, {player}. Come up to my room in the Cloister Halls around seven. I have the rice cooker going and a broth that will actually put some color in your cheeks.",
+      "locationId": "dormitories",
+      "inHerRoom": true,
+      "outfitId": "default",
+      "startHour": 19,
+      "hours": 2,
+      "cutscene": {
+        "speakerId": "baixue",
+        "outfitId": "default",
+        "scenes": [
+          {
+            "locationId": "dormitories",
+            "lines": [
+              "*You step into her tidy, stylish room in the Cloister Halls, where the air smells of roasted oolong and simmering bone broth, surrounded by neatly arranged skincare bottles and a wall covered in pinned thesis notes.*",
+              "Look at how windblown you are, 帅哥; sit down by the desk and let me get something warm into your stomach before you catch a chill.",
+              "*She ladles rich soup and steamed rice from her rice cooker into two porcelain bowls, her gaze lingering on a silver-framed family photograph beside a designer scented candle.*",
+              "That boy standing next to me in the picture is my little brother, taken the day before he sat the Imperial Assay at sixteen.",
+              "*Handing you a bowl, she sits beside you on the edge of her bed, her fingers absently smoothing a lock of silky black hair below her large black satin bow.*",
+              "The Bureau of Lineages graded him infertile and shipped him off to a rail-yard clerkship in the north like damaged goods, while my aunties just sighed and sent me here instead.",
+              "*She knocks her knuckles softly against the wooden bedframe, looking at you with eyes that are suddenly fierce and vulnerable.*",
+              "I was raised to be the dutiful daughter who makes the Fang family proud, {player}, so will you keep my secret if I tell you that I hate how our country treats people with all my heart?"
+            ]
+          }
+        ]
+      },
+      "direction": "In her stylish dormitory room filled with thesis notes, she feeds {player} homemade soup from her rice cooker and opens up about her younger brother's cruel rejection at the Imperial Assay. Tender, sad and warm.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 5
+        }
+      ]
+    },
+    {
+      "stage": "lover",
+      "invitation": "帅哥, are you still awake? The Bureau envoy just left my room in the Cloister Halls, and I really need to see your face tonight.",
+      "locationId": "dormitories",
+      "inHerRoom": true,
+      "outfitId": "default",
+      "startHour": 22,
+      "hours": 2,
+      "cutscene": {
+        "speakerId": "baixue",
+        "outfitId": "default",
+        "scenes": [
+          {
+            "locationId": "dormitories",
+            "lines": [
+              "*You step into Baixue's room past a wall of thesis notes and neatly arranged skincare bottles, finding her in her cropped cream tweed jacket and high-waisted black mini skirt, pouring hot broth from her thermos as a designer scented candle glows beside her silver-framed family photograph.*",
+              "Look at you rushing over so late, drink this before you catch a chill, 帅哥.",
+              "*She waits until you take a sip, then taps her knuckles twice on the wooden desk for luck before tucking a strand of hair behind her ear.*",
+              "An envoy from the Bureau came here tonight, a fierce woman who promised the Fang Clan a permanent charter if I steered you into their great-clan allotment, and I told her to march straight back to the Empress with empty hands.",
+              "*Walking to the corner by the humming rice cooker, she picks up a blister pack of pills and tosses it straight into the wastebasket with a decisive flick of her wrist.*",
+              "I am completely done taking my suppressant, because I want you to choose me for myself rather than my clan's name, and I want a child that belongs only to you and me, never the Bureau.",
+              "*Her fingertips brush the single strand of pearls at her collar as she steps close, her warm eyes searching yours without a trace of hesitation.*",
+              "I have already made my choice tonight, 帅哥, so will you lock the door and stay with me?"
+            ]
+          }
+        ]
+      },
+      "direction": "Baixue welcomes {player} into her dorm room after rejecting the Bureau envoy's political scheme and throws away her suppressant pills. She asks {player} to choose her for who she is and stay the night to start a family of their own.",
+      "ifIntimate": {
+        "cutscene": {
+          "speakerId": "baixue",
+          "outfitId": "default",
+          "scenes": [
+            {
+              "locationId": "dormitories",
+              "lines": [
+                "*You let yourself into her familiar Cloister Halls room where the rice cooker clicks softly beside her skincare bottles, and Baixue immediately fusses over your collar before pressing a warm cup from her thermos into your hands.*",
+                "帅哥, you always forget a scarf at night, so drink up while I tell you about the unwelcome guest who just left.",
+                "*Smoothing her high-waisted black mini skirt, she glances at the designer scented candle burning by her silver-framed family photograph and taps her knuckles firmly against the wooden table for luck.*",
+                "A woman from the Bureau offered the Fang Clan a permanent charter if I guided you into their great-clan allotment, and I sent her right back to the Empress with my refusal.",
+                "*She leans back against her wall of thesis notes, nudging the small wastebasket where a discarded packet of pills sits at the bottom.*",
+                "I threw out my suppressant before you walked in, {player}, because I want to be loved for myself rather than my bloodline, and I want the child we make in this bed to be purely ours, not the Bureau's.",
+                "*Reaching up, she tugs loose the black satin bow in her hair and unfastens the gold buttons on her cropped cream tweed jacket as she pulls you toward the mattress.*",
+                "You already know how warm this bed is, 帅哥, so will you stay the night and hold me close?"
+              ]
+            }
+          ]
+        },
+        "direction": "Already familiar as lovers, Baixue tells {player} how she turned down the Bureau envoy and discarded her suppressant to have a child with him. She invites him back into her bed for the night."
+      },
+      "ifUnprotected": {
+        "cutscene": {
+          "speakerId": "baixue",
+          "outfitId": "default",
+          "scenes": [
+            {
+              "locationId": "dormitories",
+              "lines": [
+                "*You step into the warm glow of her Cloister Halls room, breathing in the designer scented candle near her silver-framed family photograph as Baixue pours steaming tea from her thermos for you.*",
+                "Come sit by the rice cooker and warm your hands, 帅哥, it has been a noisy evening.",
+                "*She adjusts a gold button on her cropped cream tweed jacket and taps her knuckles twice on the wooden shelf beside her neatly arranged skincare bottles for luck.*",
+                "A Bureau envoy woman stood right here offering the Fang Clan a permanent charter if I steered you into their great-clan allotment, and I sent her straight back to the Empress with a flat refusal.",
+                "*Turning away from her wall of thesis notes, she smooths her high-waisted black mini skirt and steps into your embrace, resting her cheek against your chest.*",
+                "I do not care about clan charters or imperial schemes, because I only want you to choose me for the woman I am, never for the Fang name.",
+                "*She reaches behind her head to tug loose the black satin bow in her hair, her dark eyes crinkling with affectionate teasing as she looks up at you.*",
+                "The hall is quiet now, 帅哥, so will you stay here in my arms until morning?"
+              ]
+            }
+          ]
+        },
+        "direction": "Baixue tells {player} that she rejected the Bureau envoy's political offer because she only wants to be chosen for herself rather than her clan. She draws him close and asks him to spend the night with her."
+      },
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": true
+    },
+    {
+      "stage": "thriving",
+      "invitation": "帅哥, come up to the nursery when you finish in the hall, I brought my thermos and {child} is just drifting off.",
+      "locationId": "sire-house",
+      "viewId": "nursery",
+      "inHerRoom": false,
+      "startHour": 18,
+      "hours": 1,
+      "cutscene": {
+        "speakerId": "baixue",
+        "scenes": [
+          {
+            "locationId": "sire-house",
+            "lines": [
+              "*You enter the warm nursery of your house in the quiet evening, finding Baixue in her cropped cream tweed jacket and high-waisted black mini skirt, leaning over the cradle where {child} sleeps soundly.*",
+              "Look at {their} chubby cheeks after a whole month, {player}, you have kept {them} so healthy and thriving since the day {they} arrived.",
+              "*She taps her knuckles gently on the wooden rail of the crib for luck, her long hair falling over one shoulder as she turns to you with a proud smile.*",
+              "Thank you for building this sturdy house for us and taking such tireless care of the whole keep, 帅哥.",
+              "*Unscrewing the lid of her thermos, she pours a cup of rich soup and presses it firmly into your hands, fussing over a stray lock of your hair.*",
+              "You work yourself half to exhaustion looking after {child} and everyone under this roof, so I will not let you skip a single drop of my soup tonight.",
+              "*Her fingers brush the single strand of pearls at her throat as she glances fondly back at {child}, who stirs softly under the blanket and settles one tiny hand beneath {their} chin.*",
+              "I could not be prouder of the man you are, 帅哥, so will you sit here beside me and finish your cup while we watch {them} sleep?"
+            ],
+            "backgroundId": "nursery"
+          }
+        ]
+      },
+      "direction": "In the evening nursery a month after {child}'s birth, Baixue fusses over {player} with warm soup and tells him how proud she is of how well he cares for {them} and the keep. She asks him to sit and rest beside her while {child} sleeps.",
+      "effects": [
+        {
+          "type": "meter",
+          "meter": "affection",
+          "amount": 10
+        },
+        {
+          "type": "meter",
+          "meter": "trust",
+          "amount": 10
+        }
+      ],
+      "stopsBirthControl": false
+    }
   ]
 }

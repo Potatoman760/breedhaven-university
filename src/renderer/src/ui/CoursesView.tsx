@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { canBeginTerm, canEnrol, classChangeDeadline, courseLabel, courseMatches, describeMeetings, toDate, skillFor } from '../../../shared/game'
+import { canBeginTerm, canEnrol, classChangeDeadline, courseLabel, courseLoad, courseMatches, describeMeetings, toDate, skillFor } from '../../../shared/game'
 import type { ContentPack, GameState } from '../../../shared/model'
 import { Backdrop } from './Backdrop'
 import { Button } from './Button'
@@ -75,12 +75,14 @@ export function CoursesView({ content, state, onEnrol, toured, onToured, onCance
   const guide = content.loveInterests.find((li) => li.id === GUIDE_ID)
   const taught = state.courses.find((course) => skillFor(content, course) && course.studentIds.includes(GUIDE_ID)) ?? state.courses.find((course) => skillFor(content, course))
   const deadline = classChangeDeadline(content)
+  // His load, and whether it is a range, as the tour and the hint say it.
+  const load = { ...courseLoad(content), range: courseLoad(content).min < courseLoad(content).max }
   const tour: TourStep[] = config
     ? [
         {
           target: '.planner',
           expression: 'happy',
-          text: t('screens.courses.tourWeek', { player: state.player.name, lectures: config.lecturesPerWeek, labHours: config.labHours, max: config.maxCourses })
+          text: t('screens.courses.tourWeek', { player: state.player.name, lectures: config.lecturesPerWeek, labHours: config.labHours, ...load })
         },
         ...(taught
           ? [
@@ -160,7 +162,7 @@ export function CoursesView({ content, state, onEnrol, toured, onToured, onCance
             )}
           </label>
           <span className="hint">
-            {t('screens.courses.chosen', { n: selected.length, max: config?.maxCourses ?? '' })}
+            {t('screens.courses.chosen', { n: selected.length, max: load.max })}
           </span>
           <Button variant="secondary" data-tour="help" onClick={() => setHelping(true)}>
             {t('screens.courses.helpMePick')}
@@ -232,7 +234,7 @@ export function CoursesView({ content, state, onEnrol, toured, onToured, onCance
                 </>
               ) : (
                 <p className="hint">
-                  {t('screens.courses.planHint', { lectures: config.lecturesPerWeek, hours: config.lectureHours, labHours: config.labHours, max: config.maxCourses })}
+                  {t('screens.courses.planHint', { lectures: config.lecturesPerWeek, hours: config.lectureHours, labHours: config.labHours, ...load })}
                 </p>
               )}
             </aside>

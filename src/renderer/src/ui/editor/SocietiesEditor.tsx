@@ -7,7 +7,7 @@ import { useConfirm } from '../Confirm'
 import { JobIcon } from '../icons'
 import { Portrait } from '../Portrait'
 import { EditorFoot, Group, Text } from './fields'
-import { t } from '../../../../shared/i18n'
+import { t, weekdayName } from '../../../../shared/i18n'
 
 interface Props {
   content: ContentPack
@@ -144,7 +144,7 @@ export function SocietiesEditor({ content, onContent, switcher }: Props) {
                 <select value={draft.weekday} onChange={(e) => set({ weekday: e.target.value })}>
                   {weekdays.map((day) => (
                     <option key={day} value={day}>
-                      {day}
+                      {weekdayName(day)}
                     </option>
                   ))}
                 </select>

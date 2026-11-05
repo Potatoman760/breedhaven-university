@@ -14,6 +14,7 @@ import { Portrait } from '../Portrait'
 import { Group, Text } from './fields'
 import { EmptySlot, PictureSlot, SlotGrid } from './slots'
 import { t } from '../../../../shared/i18n'
+import { GAME_OUTFITS, gameOutfit } from '../../../../shared/game/gameOutfits'
 
 /** What the sprite editor needs of a character: a love interest and an NPC both have it. */
 type SpriteOwner = Pick<LoveInterest, 'id' | 'name' | 'pronouns' | 'appearance' | 'outfits' | 'defaultOutfitId' | 'faceY' | 'stageHeight' | 'animations' | 'tonedAnimations' | 'imageSeed' | 'birthPictures' | 'walkSprite' | 'room'>
@@ -38,14 +39,6 @@ const NSFW_PREGNANT_BATCH = '(nsfw-pregnant)'
 const CLIPS_BATCH = '(clips)'
 // What the run that makes her pictures smaller is filed under.
 const OPTIMIZE_BATCH = '(optimize)'
-
-// The outfits the game puts a woman in, ready to be added and drawn: the bathrobe at the springs, the swimsuit at the beach,
-// the ao dai on the bay cruise.
-const EVENT_OUTFITS = [
-  { id: 'bathrobe', name: 'Bathrobe', description: 'a short silk bathrobe, loosely tied at the waist and slipping off one shoulder, a deep plunging neckline showing her cleavage, the hem high on her bare thighs' },
-  { id: 'swimsuit', name: 'Swimsuit', description: 'a bikini' },
-  { id: 'ao-dai', name: 'Ao dai', coversStomach: true, description: 'a fitted silk Vietnamese ao dai: a long close-fitting tunic with a high mandarin collar, long sleeves and side slits up to the waist, worn over loose flowing silk trousers' }
-] as const
 
 /** A name not already taken in the list, made from the wanted one: "happy", "happy-2"... */
 function unique(wanted: string, taken: string[]): string {
@@ -241,20 +234,13 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
 
   function addOutfit() {
     const id = unique('outfit', draft.outfits.map((o) => o.id))
-    set({ outfits: [...draft.outfits, { id, name: 'New outfit', description: '', sprites: {}, pregnant: false }] })
+    set({ outfits: [...draft.outfits, { id, name: t('editor.sprites.newOutfit'), description: '', sprites: {}, pregnant: false }] })
   }
 
   /** An outfit the game puts her in, and its pregnant form: without it she goes as she is dressed. */
   function addEventOutfit(id: string) {
-    const made = EVENT_OUTFITS.find((one) => one.id === id)
-    if (!made) return
-    set({
-      outfits: [
-        ...draft.outfits,
-        { id: made.id, name: made.name, description: made.description, sprites: {}, pregnant: false, ...('coversStomach' in made && { coversStomach: made.coversStomach }) },
-        { id: `${made.id}-pregnant`, name: `${made.name}, pregnant`, inherits: made.id, description: 'She has a round, pregnant belly.', sprites: {}, pregnant: true }
-      ]
-    })
+    const made = GAME_OUTFITS.find((one) => one.id === id)
+    if (made) set({ outfits: [...draft.outfits, ...gameOutfit(made)] })
   }
 
   // The outfits of hers the game puts her in, by the id it names (the form she wears pregnant goes by its parent): not her
@@ -266,7 +252,7 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
   }
   const eventOwn = draft.outfits.flatMap((outfit, index) => (!outfit.babyTone && isEventOutfit(outfit) ? [{ outfit, index }] : []))
   // Those the game has, made ready to draw, that she has not yet.
-  const addable = EVENT_OUTFITS.filter((one) => eventIds.has(one.id) && !draft.outfits.some((outfit) => outfit.id === one.id))
+  const addable = GAME_OUTFITS.filter((one) => !draft.outfits.some((outfit) => outfit.id === one.id))
 
   function removeOutfit(index: number) {
     const outfits = draft.outfits.filter((_, i) => i !== index)
@@ -332,7 +318,7 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
   }
 
   /** Draws every standard pose that has no picture yet, one after another, and puts each in its slot as it arrives. */
-  async function generateMissingPoses(from: readonly { id: string; name: string; draws: string }[] = slots.poses, at: string = NSFW_BATCH) {
+  async function generateMissingPoses(from: readonly { id: string; name: string; draws: string; manShown?: boolean }[] = slots.poses, at: string = NSFW_BATCH) {
     const of = tone
     const missing = from.filter((pose) => !posesIn(latest.current, of).find((a) => a.id === pose.id)?.image)
     setNotice('')
@@ -348,8 +334,9 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
         kind: 'nsfw',
         subjectId: who.id,
         name: of === 'light' ? `nsfw-${pose.id}` : `nsfw-${of}-${pose.id}`,
-        // One drawn pregnant is the same pose, with her pregnant nude in place of her nude; the man is drawn in the tone's skin.
-        positive: nsfwPrompt(who, pose.draws, framingFor(settings, 'nsfw'), isPregnantPose(pose.id), of),
+        // One drawn pregnant is the same pose, with her pregnant nude in place of her nude; the man is drawn in the tone's
+        // skin, where he is in the picture at all.
+        positive: nsfwPrompt(who, pose.draws, framingFor(settings, 'nsfw'), isPregnantPose(pose.id), pose.manShown === false ? undefined : of),
         width: size.width,
         height: size.height,
         seed: who.imageSeed
@@ -707,7 +694,7 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
           target={{
             kind: 'nsfw',
             who: draft,
-            poses: [...poses, ...pregnantPoses].map((pose) => ({ id: pose.id, name: pose.name, draws: drawsOf(pose.id) })),
+            poses: [...poses, ...pregnantPoses].map((pose) => ({ id: pose.id, name: pose.name, draws: drawsOf(pose.id), manShown: slots.all.find((one) => one.id === pose.id)?.manShown })),
             pose: posing,
             man: tone,
             onUse: (poseId, image) => setPose(poseId, { image })
@@ -860,7 +847,7 @@ export function SpritesTab({ draft, set, plain, eventOutfits = [], looks = NO_LO
             <div className="row checks">
               {addable.map((one) => (
                 <Button key={one.id} title={eventOutfits.find((worn) => worn.id === one.id)?.worn.join(', ')} onClick={() => addEventOutfit(one.id)}>
-                  {t('editor.sprites.addEventOutfit', { name: one.name })}
+                  {t('editor.sprites.addEventOutfit', { name: t(one.name) })}
                 </Button>
               ))}
             </div>

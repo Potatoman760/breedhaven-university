@@ -127,11 +127,11 @@ Read the section for a system before changing it. For what the game is and how t
     one, whose syllabus and skill it shares, and nobody, the player included, takes two
     sections of one course.
   The title screen warns when the saved catalogue is out of date (a character's subject or year
-  has changed since) and it was not built again. At the start of term the player picks up to `maxCourses` on a week
+  has changed since) and it was not built again. At the start of term the player picks `minCourses` to `playerMaxCourses` (4 to 5; both default to `maxCourses`, the love interests' load) on a week
   planner, a column per day and a row per hour; two courses whose hours overlap cannot
   both be taken. Until the end of day `changeUntilDay` of term (13, the Saturday of week 2,
   pinned in `catalogue.test.ts`) Change classes on the calendar opens the same planner on the
-  classes he has (`changeClasses` in `src/shared/game/courses.ts`): only a full load with no
+  classes he has (`changeClasses` in `src/shared/game/courses.ts`): only a load in that range with no
   two classes at once is checked, nothing else he has on, and his calendar shows the new week
   as soon as it is saved. What he earned in a course he drops is kept, should he take it back. While a course meets, everyone taking it is at the Lecture Halls, and
   in class (`inClass` in `src/shared/game/map.ts`): not in the day view's "Here" row, not
@@ -674,7 +674,11 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
   pregnancy, memories, and what has been found out about her) and Feed (the Bloomr feed).
   A further app is one entry in `APPS` in `PhonePanel.tsx`. A love interest's `handle`
   is her name on both; left out, one is made from her name.
-  - **Selfies in DMs**: the camera button beside Send asks a love interest for one. The LLM
+  - **Selfies in DMs**: the camera button beside Send opens two ways to ask a love interest for
+    one. **Surprise me** asks as the game does; **Detailed** opens the request the game would
+    send (the user part of `buildSelfiePrompt`: the day, where she is, who she is, the DMs of
+    late) for the player to change, and what he sends goes in its place (`request` on the IPC
+    call); the system part, which says how she answers, is the game's either way. The LLM
     writes her message and what the picture shows (`src/shared/game/selfie.ts`), and it is drawn
     with the photo workflow, in what she has on now and against where she is at this hour. The
     picture stays on the note (`image`). NPCs in his DMs send none.
@@ -983,7 +987,7 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
   (`societies.test.ts` pins both, and that each meets after `coursework.dayEnd` somewhere
   open). Nothing meets, and none can be joined, until their fair (`fairId`, the Societies
   Fair) begins; at the fair the day view offers its tables, and after it he joins or leaves
-  them on the phone's Societies app, up to `maxJoined` (2) at once and never two that meet
+  them on the phone's Societies app, up to `maxJoined` (3) at once and never two that meet
   in the same hour. A meeting can clash with a shift. While one meets its members are at
   its place (`locationOf`, after classes and before work), it is on his calendar and is
   the next thing on his day like a class, and going is a scene with whichever of them are
@@ -1201,7 +1205,16 @@ scene goes through `wornOutfit`, which reads this. Her room has a picture by day
 night (`room.images`; either shows when the other is missing), or uses a view of the
 place it is in (`room.viewId`). Everyone is saved to the add-on folder as
 `love-interests/<id>.json`; one with a built-in character's id takes that character's
-place, and deleting the add-on puts the original back.
+place, and deleting the add-on puts the original back. Such a file saved by an older version
+is brought up to date as it is loaded (`upToDate` in `addons.ts`): every outfit the game's
+character has that the file lacks is added after its own, and every field the file leaves out
+is hers; what the file says is kept, and the file is not written. A love interest of the
+player's own is given each of the game's outfits she lacks as it loads (`GAME_OUTFITS` in
+`src/shared/game/gameOutfits.ts`: bathrobe, swimsuit, ao dai, sarong, sari, festival whites
+and the adventurer's outfit of the echoes, each with its pregnant form), with no pictures:
+slots for the player to draw. One of these with no pictures is not yet hers (`drawn`): it is
+not drawn for her day nor offered to the LLM, and where a part asks for it she goes as she
+is. The Sprites tab's Event outfits offers to add any of them she does not have.
 
 ## Art tool (ComfyUI)
 
