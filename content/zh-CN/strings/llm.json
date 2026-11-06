@@ -143,5 +143,7 @@
   "saves.autosave": "自动存档",
   "saves.slot": "存档位 {n}",
   "saves.empty": "{slot}为空",
-  "saves.unreadable": "无法读取{slot}，可能已损坏或来自其他游戏版本。"
+  "saves.unreadable": "无法读取{slot}，可能已损坏或来自其他游戏版本。",
+  "banter.systemEnglish": "用简体中文写作。",
+  "momentLines.english": "用简体中文写作。"
 }

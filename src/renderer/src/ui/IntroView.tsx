@@ -4,7 +4,7 @@ import { Portrait } from './Portrait'
 import type { ContentPack, GameState, Intro } from '../../../shared/model'
 import { Backdrop } from './Backdrop'
 import { ChevronIcon } from './icons'
-import { emphasise } from './SceneView'
+import { emphasise, textSelected } from './SceneView'
 import { playLine, stopLine } from '../sound'
 
 interface Props {
@@ -61,7 +61,10 @@ export function IntroView({ content, state, intro, onDone }: Props) {
   return (
     <main
       className="stage intro"
-      onClick={next}
+      // A click that ends a drag over the text is someone selecting it to copy, not asking for the next line.
+      onClick={() => {
+        if (!textSelected()) next()
+      }}
       onWheel={(event) => {
         // One line for each turn of the wheel, however many events a turn sends.
         if (event.deltaY === 0 || event.timeStamp - turned.current < 180) return

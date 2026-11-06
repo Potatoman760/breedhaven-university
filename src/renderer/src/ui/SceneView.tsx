@@ -108,6 +108,11 @@ function ExitMenu({ label, busy, photoBusy, onExit, onGoodbye, onPhoto, onSchedu
   )
 }
 
+/** Whether some text is selected in the window: the player marking a line to copy, which a click to go on must not lose. */
+export function textSelected(): boolean {
+  return (window.getSelection()?.toString() ?? '').trim() !== ''
+}
+
 /** Renders *asterisked* runs inside a spoken line as emphasis. */
 export function emphasise(text: string) {
   return text
@@ -487,7 +492,10 @@ export function SceneView(props: Props) {
                   'aria-label': t('screens.sceneView.next'),
                   autoFocus: true,
                   ref: (box: HTMLDivElement | null) => box?.focus(),
-                  onClick: () => setShown(shown + 1)
+                  // A click that ends a drag over the text is someone selecting it to copy, not asking for the next line.
+                  onClick: () => {
+                    if (!textSelected()) setShown(shown + 1)
+                  }
                 }
               : {})}
           >

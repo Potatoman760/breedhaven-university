@@ -61,6 +61,16 @@ describe('the Simplified Chinese translation', () => {
     expect(chinese.calendar.weekdays).toEqual(english.calendar.weekdays)
   })
 
+  it('never tells the LLM to write in English', () => {
+    // Every prompt ends with the language's own instruction; one that still says "Write in US English" says the
+    // opposite, and the model takes the English one.
+    const { messages } = readStrings(dir)
+    expect(messages['core.llm.writeIn']).toContain('简体中文')
+    for (const key of ['scene.prompt.usEnglish', 'llm.banter.systemEnglish', 'llm.momentLines.english'] as const) {
+      expect(messages[key], key).toContain('简体中文')
+    }
+  })
+
   it('sees sex written in Chinese of a woman who will not, as it does in English, and not talk about it', () => {
     const { messages } = readStrings(dir)
     const cast = [{ id: 'tamsin', name: 'Tamsin', aliases: ['塔姆辛'] }, { id: 'maren', name: 'Maren', aliases: ['玛伦'] }]
