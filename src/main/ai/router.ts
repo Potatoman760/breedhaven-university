@@ -1,3 +1,4 @@
+import { plainTags } from '../../shared/game/scene'
 import { looksLikeRefusal } from '../../shared/game/refusal'
 import { isConfigured, pickProfileId, type LlmProfileId, type Settings } from '../../shared/settings'
 import { t } from '../../shared/i18n'
@@ -24,7 +25,8 @@ async function attempt(
   try {
     const reply = await complete(profile, input)
     const said = reply.replace(THINKING, '').replace(/^[\s\S]*<\/think(?:ing)?>/i, '').trim()
-    return looksLikeRefusal(said) ? { declined: t('llm.router.answered', { said: said.slice(0, 120) }) } : { reply }
+    // Its hidden lines and speaker names in plain ASCII, however the language it wrote in punctuates: see `plainTags`.
+    return looksLikeRefusal(said) ? { declined: t('llm.router.answered', { said: said.slice(0, 120) }) } : { reply: plainTags(reply) }
   } catch (error) {
     if (error instanceof RefusalError) return { declined: error.message }
     throw error

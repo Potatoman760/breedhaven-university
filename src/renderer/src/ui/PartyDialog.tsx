@@ -28,7 +28,14 @@ export function PartyDialog({ content, state, onGo, onClose }: Props) {
   const [depth, setDepth] = useState(last)
   const echo = depth === config.depths.length
   const [party, setParty] = useState<string[]>([])
-  const choices = partyChoices(content, state)
+  // Who may come to the depth shown: one that takes only women at a stage with him greys out the rest.
+  const choices = partyChoices(content, state, depth)
+  /** Goes to another depth, letting go of anyone picked who may not come to it. */
+  const toDepth = (next: number) => {
+    const able = new Set(partyChoices(content, state, next).filter((one) => one.reason === undefined).map((one) => one.li.id))
+    setDepth(next)
+    setParty(party.filter((id) => able.has(id)))
+  }
   const check = canGoBelow(content, state, party, depth)
   const relics = relicsHeld(content, state)
   // What going would cost him of his day: a class, a shift or a plan in those hours.
@@ -49,7 +56,7 @@ export function PartyDialog({ content, state, onGo, onClose }: Props) {
 
       {/* One depth at a time, with room for its picture, and a way to the one above or below it among those he has opened. It opens on the deepest. */}
       <div className="depth-carousel">
-        <Button variant="secondary" className="flip" aria-label={t('screens.party.depthAbove')} disabled={depth <= 0} onClick={() => setDepth(depth - 1)}>
+        <Button variant="secondary" className="flip" aria-label={t('screens.party.depthAbove')} disabled={depth <= 0} onClick={() => toDepth(depth - 1)}>
           <ChevronIcon size={24} />
         </Button>
         <div className="depth-card">
@@ -61,7 +68,7 @@ export function PartyDialog({ content, state, onGo, onClose }: Props) {
             {echo ? t('screens.party.echoesWon', { n: state.expedition.echoes }) : t('screens.party.anchorState', { set: depth < state.expedition.cleared, n: depth + 1, total: config.depths.length })}
           </span>
         </div>
-        <Button variant="secondary" aria-label={t('screens.party.depthBelow')} disabled={depth >= last} title={depth >= last && open < config.depths.length ? t('screens.party.setToOpen') : undefined} onClick={() => setDepth(depth + 1)}>
+        <Button variant="secondary" aria-label={t('screens.party.depthBelow')} disabled={depth >= last} title={depth >= last && open < config.depths.length ? t('screens.party.setToOpen') : undefined} onClick={() => toDepth(depth + 1)}>
           <ChevronIcon size={24} />
         </Button>
       </div>

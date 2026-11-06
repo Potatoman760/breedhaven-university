@@ -1,0 +1,112 @@
+{
+  "id": "maren",
+  "aliases": [
+    "玛伦"
+  ],
+  "bio": "来自维拉的狐裔少女，从头到脚一身粉色哥特洛丽塔装扮，传媒与传播学系二年级学生——她所在的研讨班之所以有一半人都人手一把阳伞，全是因为她。",
+  "outfits": [
+    {
+      "id": "default",
+      "name": "日常服装"
+    },
+    {
+      "id": "pregnant",
+      "name": "孕期"
+    },
+    {
+      "id": "nude",
+      "name": "裸体"
+    },
+    {
+      "id": "nude-pregnant",
+      "name": "裸体，孕期"
+    },
+    {
+      "id": "casual",
+      "name": "荷叶边水手服"
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "荷叶边水手服，孕期"
+    },
+    {
+      "id": "lingerie",
+      "name": "粉色蕾丝内衣"
+    },
+    {
+      "id": "lingerie-pregnant",
+      "name": "粉色蕾丝内衣，孕期"
+    },
+    {
+      "id": "bathrobe",
+      "name": "浴袍"
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "浴袍，孕期"
+    },
+    {
+      "id": "baby-medium",
+      "name": "抱着宝宝（中等肤色）"
+    },
+    {
+      "id": "baby-dark",
+      "name": "抱着宝宝（深肤色）"
+    },
+    {
+      "id": "swimsuit",
+      "name": "泳装"
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "泳装，孕期"
+    },
+    {
+      "id": "ao-dai",
+      "name": "奥黛"
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "奥黛，孕期"
+    },
+    {
+      "id": "sari",
+      "name": "纱丽"
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "纱丽，孕期"
+    },
+    {
+      "id": "holi",
+      "name": "节日白衣"
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "节日白衣，孕期"
+    },
+    {
+      "id": "sarong",
+      "name": "纱笼"
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "纱笼，孕期"
+    },
+    {
+      "id": "echoes",
+      "name": "吟游诗人华服"
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "吟游诗人华服，孕期"
+    }
+  ],
+  "ultimate": {
+    "id": "ribbon-bind",
+    "name": "缎带缚锁"
+  },
+  "room": {
+    "name": "她在回廊宿舍的粉色房间"
+  }
+}

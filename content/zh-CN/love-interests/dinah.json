@@ -1,0 +1,113 @@
+{
+  "id": "dinah",
+  "aliases": [
+    "黛娜·西尔弗里斯",
+    "黛娜"
+  ],
+  "bio": "繁花学研究生、初垄修会的见习修女，也是那些受了惊吓的一年级新生会被送去求助的心理辅导员。",
+  "outfits": [
+    {
+      "id": "default",
+      "name": "修会法衣"
+    },
+    {
+      "id": "pregnant",
+      "name": "孕期"
+    },
+    {
+      "id": "nude",
+      "name": "裸体"
+    },
+    {
+      "id": "nude-pregnant",
+      "name": "裸体，孕期"
+    },
+    {
+      "id": "casual",
+      "name": "礼拜日便装"
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "礼拜日便装，孕期"
+    },
+    {
+      "id": "lingerie",
+      "name": "象牙白衬裙"
+    },
+    {
+      "id": "lingerie-pregnant",
+      "name": "象牙白衬裙，孕期"
+    },
+    {
+      "id": "bathrobe",
+      "name": "浴袍"
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "浴袍，孕期"
+    },
+    {
+      "id": "baby-light",
+      "name": "抱着宝宝（浅肤色）"
+    },
+    {
+      "id": "baby-medium",
+      "name": "抱着宝宝（中等肤色）"
+    },
+    {
+      "id": "swimsuit",
+      "name": "泳装"
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "泳装，孕期"
+    },
+    {
+      "id": "ao-dai",
+      "name": "奥黛"
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "奥黛，孕期"
+    },
+    {
+      "id": "sarong",
+      "name": "纱笼"
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "纱笼，孕期"
+    },
+    {
+      "id": "sari",
+      "name": "纱丽"
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "纱丽，孕期"
+    },
+    {
+      "id": "holi",
+      "name": "节日白衣"
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "节日白衣，孕期"
+    },
+    {
+      "id": "echoes",
+      "name": "牧师法衣"
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "牧师法衣，孕期"
+    }
+  ],
+  "ultimate": {
+    "id": "benediction",
+    "name": "恩典祝祷"
+  },
+  "room": {
+    "name": "垄沟小教堂旁的小公寓"
+  }
+}

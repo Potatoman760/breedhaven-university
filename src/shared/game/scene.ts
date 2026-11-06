@@ -72,10 +72,58 @@ export function plainName(name: string): string {
   return name.normalize('NFD').replace(/\p{M}/gu, '').trim().toLowerCase()
 }
 
-/** Whether what was written names this character: her id, her name, or her first name, whatever became of the accents. */
-export function namesHer(written: string, character: { id: string; name: string }): boolean {
+/**
+ * What she goes by in a reply: her first name, and the forms of her name a language gives her in its own script, whole
+ * and its first part ("艾达·洛恩" and "艾达"), for when the LLM writes her name so.
+ */
+export function nameForms(character: { name: string; aliases?: readonly string[] }): string[] {
+  const own = (character.aliases ?? []).filter((alias) => alias.trim() !== '').flatMap((alias) => [alias, alias.split(/[\s·・]/)[0]])
+  return [...new Set([character.name.split(' ')[0], ...own])]
+}
+
+/**
+ * Her names as looked for inside running text: a single Chinese character (Yann's 扬) is part of too many words to be
+ * found by, though written alone it still names her.
+ */
+function searchedNames(character: { name: string; aliases?: readonly string[] }): string[] {
+  return nameForms(character).filter((name) => !/^[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]$/u.test(name.trim()))
+}
+
+/** Whether what was written names this character: her id, her name, or her first name, whatever became of the accents, or her name in another script. */
+export function namesHer(written: string, character: { id: string; name: string; aliases?: readonly string[] }): boolean {
   const asked = plainName(written)
-  return [character.id, character.name, character.name.split(' ')[0]].some((known) => plainName(known) === asked)
+  return [character.id, character.name, ...nameForms(character)].some((known) => plainName(known) === asked)
+}
+
+/**
+ * Where in a text she is named, as a word of her own, or -1. A name in a script without spaces between words (Chinese)
+ * is found wherever it stands, since nothing sets it off.
+ */
+export function namedAt(text: string, character: { name: string; aliases?: readonly string[] }): number {
+  const said = plainName(text)
+  const at = searchedNames(character).map((name) => {
+    const word = plainName(name).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const unspaced = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u.test(name)
+    const found = new RegExp(unspaced ? word : `(^|[^\\p{L}])${word}($|[^\\p{L}])`, 'u').exec(said)
+    return found ? found.index + (unspaced ? 0 : found[1].length) : -1
+  })
+  const seen = at.filter((index) => index >= 0)
+  return seen.length > 0 ? Math.min(...seen) : -1
+}
+
+/**
+ * A reply with the punctuation of its hidden lines put in plain ASCII: a model writing Chinese may
+ * use full-width brackets, colons and equals signs ("【LEAVES：Tamsin】"), which are the same marks to
+ * the reader but not to the parser. Only tags are touched; the prose keeps its own punctuation, and a speaker line
+ * ("Tamsin：…") is read as such where lines are read.
+ */
+export function plainTags(reply: string): string {
+  // A hidden line opens with its tag in capitals ("LEAVES", "SEX-ACT"); a bracket that does not is prose, or JSON, and is left be.
+  const tag = /^\s*[A-Z][A-Z\s_-]+(?:[:：=＝]|$)/
+  const plain = (inside: string) => (tag.test(inside) ? `[${inside.replace(/：/g, ':').replace(/＝/g, '=').replace(/，/g, ',')}]` : null)
+  return reply
+    .replace(/[［【]([^\]［］【】\n]*)[\]］】]/g, (whole, inside: string) => plain(inside) ?? whole)
+    .replace(/\[([^\]\n]*)\]/g, (whole, inside: string) => plain(inside) ?? whole)
 }
 
 /** A love interest's own reading of how much she wants to be here, as written in a reply. */
@@ -134,8 +182,9 @@ export function lookLines(reply: string): string {
 }
 
 export function parseDirectives(written: string): Directives {
-  // What a reasoning model thought before answering is no part of the answer.
-  const reply = written.replace(/<think(?:ing)?>[\s\S]*?<\/think(?:ing)?>/gi, '').replace(/^[\s\S]*<\/think(?:ing)?>/i, '')
+  // What a reasoning model thought before answering is no part of the answer. Its tags are put in plain ASCII, as the
+  // router already does, so that a reply that came another way is read the same.
+  const reply = plainTags(written.replace(/<think(?:ing)?>[\s\S]*?<\/think(?:ing)?>/gi, '').replace(/^[\s\S]*<\/think(?:ing)?>/i, ''))
   const look: SceneLook = {}
   const named: NamedLook[] = []
   const withoutLook = reply.replace(LOOK_TAG, (_tag, kind: string, written: string) => {
@@ -319,7 +368,8 @@ export function dialogueLines(reply: string, cast: Pick<LoveInterest, 'id' | 'na
     .map((line) => {
       const action = /^\*[^*]+\*$/.exec(line)
       if (action) return { action: true, text: line.slice(1, -1).trim() }
-      const named = /^\**([^:*]{1,40}?)\**\s*:\s*(.+)$/.exec(line)
+      // A full-width colon, as Chinese writes it, says the same.
+      const named = /^\**([^:：*]{1,40}?)\**\s*[:：]\s*(.+)$/.exec(line)
       const speaker =
         named &&
         cast.find((li) => namesHer(named[1], li))
@@ -340,6 +390,16 @@ const SEX_WRITTEN = new RegExp(
   ].join('|').replace(/^/, '\\b(?:').replace(/$/, ')\\b'),
   'i'
 )
+/**
+ * Sex as a reply in the game's language writes it: the language's own words for the acts the English list names
+ * (`scene.detect.sexWritten`, separated by "|"; empty in English), found wherever they stand, since a language such
+ * as Chinese sets no spaces between words.
+ */
+function writtenInLanguage(text: string): boolean {
+  const words = t('scene.detect.sexWritten').split('|').map((word) => word.trim()).filter((word) => word !== '')
+  return words.some((word) => text.includes(word))
+}
+
 // Her tags that only sex writes.
 const SEX_TAGS = /\[\s*(?:SEX[\s_-]?ACT|POSE|ANIMATION|SEEDED)\s*(?::\s*([^\]\n]*?))?\s*\]/gi
 
@@ -362,11 +422,11 @@ export function sexWrittenOf(reply: string, cast: Pick<LoveInterest, 'id' | 'nam
   }
   const alone = cast.length < 2
   for (const line of dialogueLines(reply.replace(/\[[^\]\n]*\]/g, ''), cast)) {
-    if (!SEX_WRITTEN.test(line.text)) continue
+    if (!SEX_WRITTEN.test(line.text) && !writtenInLanguage(line.text)) continue
     if (line.speakerId) found.add(line.speakerId)
     else if (alone) found.add(leadId)
     // Anyone the line names is in it too: "watching Morwenna ride him", whoever says it, is of Morwenna.
-    for (const li of cast) if (plainName(line.text).includes(plainName(li.name.split(' ')[0]))) found.add(li.id)
+    for (const li of cast) if (searchedNames(li).some((name) => plainName(line.text).includes(plainName(name)))) found.add(li.id)
   }
   return ids.filter((id) => found.has(id))
 }
@@ -415,12 +475,9 @@ export function firstToSpeak(content: Pick<ContentPack, 'loveInterests'>, scene:
     .filter((id) => !gone.has(id))
     .flatMap((id) => content.loveInterests.filter((li) => li.id === id))
   if (cast.length < 2) return undefined
-  const said = scene.messages.at(-1)?.role === 'user' ? plainName(scene.messages.at(-1)!.content) : ''
+  const said = scene.messages.at(-1)?.role === 'user' ? scene.messages.at(-1)!.content : ''
   // Named anywhere in his line, as a word of its own: the one named first.
-  const at = (li: LoveInterest) => {
-    const name = plainName(li.name.split(' ')[0]).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    return new RegExp(`(^|[^\\p{L}])${name}($|[^\\p{L}])`, 'u').exec(said)?.index ?? -1
-  }
+  const at = (li: LoveInterest) => namedAt(said, li)
   const named = cast.filter((li) => at(li) >= 0).sort((a, b) => at(a) - at(b))[0]
   if (named) return named.id
   if (scene.messages.filter((m) => m.role === 'user').length % UNLED_EVERY === 0) return undefined

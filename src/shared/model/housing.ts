@@ -26,6 +26,8 @@ export type HouseholdFeeling = z.infer<typeof FeelSchema>
 
 /** A better fitting-out of a room that is already built. */
 export const HouseTierSchema = z.object({
+  /** What a translation knows it by; left out, it is matched by its place. */
+  id: z.string().optional(),
   name: z.string(),
   description: z.string().default(''),
   cost: z.number().int().min(0),
@@ -65,6 +67,8 @@ export type HouseRoom = z.infer<typeof HouseRoomSchema>
 
 /** How a baby is doing, from worst to best: a name, and what its mother is told of it. */
 export const BabyLevelSchema = z.object({
+  /** What a translation knows it by; left out, it is matched by its place. */
+  id: z.string().optional(),
   /** What the nanny says of a child at this level, beside it in the house. */
   said: z.string().default(''), name: z.string(), description: z.string().default('') })
 

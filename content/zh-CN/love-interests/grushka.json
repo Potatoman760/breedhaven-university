@@ -1,0 +1,109 @@
+{
+  "id": "grushka",
+  "aliases": [
+    "格鲁什卡·托尔-瓦尔",
+    "格鲁什卡"
+  ],
+  "bio": "来自卡拉德托尔的兽人，退伍军官，现任大学总教练：她负责主持体能与力量训练、培训校园安保学员，并担任竞技场总决赛的裁判。",
+  "outfits": [
+    {
+      "id": "default",
+      "name": "日常服装"
+    },
+    {
+      "id": "pregnant",
+      "name": "孕期"
+    },
+    {
+      "id": "nude",
+      "name": "裸体"
+    },
+    {
+      "id": "nude-pregnant",
+      "name": "裸体，孕期"
+    },
+    {
+      "id": "casual",
+      "name": "场下便装"
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "场下便装，孕期"
+    },
+    {
+      "id": "lingerie",
+      "name": "纯黑简约"
+    },
+    {
+      "id": "lingerie-pregnant",
+      "name": "纯黑简约，孕期"
+    },
+    {
+      "id": "bathrobe",
+      "name": "浴袍"
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "浴袍，孕期"
+    },
+    {
+      "id": "baby-light",
+      "name": "抱着宝宝（浅肤色）"
+    },
+    {
+      "id": "swimsuit",
+      "name": "泳装"
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "泳装，孕期"
+    },
+    {
+      "id": "ao-dai",
+      "name": "奥黛"
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "奥黛，孕期"
+    },
+    {
+      "id": "sarong",
+      "name": "纱笼"
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "纱笼，孕期"
+    },
+    {
+      "id": "sari",
+      "name": "纱丽"
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "纱丽，孕期"
+    },
+    {
+      "id": "holi",
+      "name": "节日白衣"
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "节日白衣，孕期"
+    },
+    {
+      "id": "echoes",
+      "name": "野蛮人毛皮"
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "野蛮人毛皮，孕期"
+    }
+  ],
+  "ultimate": {
+    "id": "oath-kept",
+    "name": "誓言必践"
+  },
+  "room": {
+    "name": "她那间俯瞰比武场的公寓"
+  }
+}

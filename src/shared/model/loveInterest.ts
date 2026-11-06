@@ -430,6 +430,11 @@ export type LoveInterestKind = (typeof LOVE_INTEREST_KINDS)[number];
 export const LoveInterestSchema = z.object({
   id: z.string(),
   name: z.string(),
+  /**
+   * Other ways her name is written, which a reply naming her by is read as naming her: given by a language, her name in
+   * its own script ("塔姆辛"), for when the LLM writes it so. Never shown; her name is.
+   */
+  aliases: z.array(z.string()).optional(),
   /** What they are, in a few words: "hall manager of the Cloister Halls". Shown beside an NPC's name. */
   role: z.string().default(""),
   age: z.number().int().min(18),

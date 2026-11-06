@@ -1,0 +1,113 @@
+{
+  "id": "isolde",
+  "aliases": [
+    "伊索尔德·维兰",
+    "伊索尔德"
+  ],
+  "bio": "公共管理系研究生，正在撰写关于共同家庭财政的学位论文，同时靠给一年级新生教统计学来赚取学费。",
+  "outfits": [
+    {
+      "id": "default",
+      "name": "日常服装"
+    },
+    {
+      "id": "pregnant",
+      "name": "孕期"
+    },
+    {
+      "id": "nude",
+      "name": "裸体"
+    },
+    {
+      "id": "nude-pregnant",
+      "name": "裸体，孕期"
+    },
+    {
+      "id": "casual",
+      "name": "卷袖衬衫"
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "卷袖衬衫，孕期"
+    },
+    {
+      "id": "lingerie",
+      "name": "岩灰真丝"
+    },
+    {
+      "id": "lingerie-pregnant",
+      "name": "岩灰真丝，孕期"
+    },
+    {
+      "id": "bathrobe",
+      "name": "浴袍"
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "浴袍，孕期"
+    },
+    {
+      "id": "baby-medium",
+      "name": "抱着宝宝（中等肤色）"
+    },
+    {
+      "id": "baby-dark",
+      "name": "抱着宝宝（深肤色）"
+    },
+    {
+      "id": "swimsuit",
+      "name": "泳装"
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "泳装，孕期"
+    },
+    {
+      "id": "ao-dai",
+      "name": "奥黛"
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "奥黛，孕期"
+    },
+    {
+      "id": "sari",
+      "name": "纱丽"
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "纱丽，孕期"
+    },
+    {
+      "id": "holi",
+      "name": "节日白衣"
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "节日白衣，孕期"
+    },
+    {
+      "id": "sarong",
+      "name": "纱笼"
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "纱笼，孕期"
+    },
+    {
+      "id": "echoes",
+      "name": "密探长皮甲"
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "密探长皮甲，孕期"
+    }
+  ],
+  "ultimate": {
+    "id": "closing-argument",
+    "name": "结案陈词"
+  },
+  "room": {
+    "name": "灯笼街的一间书房兼卧室"
+  }
+}

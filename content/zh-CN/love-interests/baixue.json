@@ -1,0 +1,105 @@
+{
+  "id": "baixue",
+  "aliases": [
+    "方白雪",
+    "白雪"
+  ],
+  "bio": "Baixue Fang是来自月兰的育嗣者遗传学系一年级新生，光彩照人、讲究穿搭，也是月兰最大财团之一“白鹤生物科技”总裁的独生女。",
+  "outfits": [
+    {
+      "id": "default",
+      "name": "日常服装"
+    },
+    {
+      "id": "pregnant",
+      "name": "孕期"
+    },
+    {
+      "id": "nude",
+      "name": "裸体"
+    },
+    {
+      "id": "nude-pregnant",
+      "name": "裸体，孕期"
+    },
+    {
+      "id": "casual",
+      "name": "日间便服"
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "日间便服，孕期"
+    },
+    {
+      "id": "bathrobe",
+      "name": "浴袍"
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "浴袍，孕期"
+    },
+    {
+      "id": "swimsuit",
+      "name": "泳装"
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "泳装，孕期"
+    },
+    {
+      "id": "ao-dai",
+      "name": "奥黛"
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "奥黛，孕期"
+    },
+    {
+      "id": "sarong",
+      "name": "纱笼"
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "纱笼，孕期"
+    },
+    {
+      "id": "sari",
+      "name": "纱丽"
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "纱丽，孕期"
+    },
+    {
+      "id": "holi",
+      "name": "节日白衣"
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "节日白衣，孕期"
+    },
+    {
+      "id": "echoes",
+      "name": "守护者绸衣"
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "守护者绸衣，孕期"
+    },
+    {
+      "id": "lingerie",
+      "name": "象牙白真丝内衣"
+    },
+    {
+      "id": "lingerie-pregnant",
+      "name": "象牙白真丝内衣，孕期"
+    }
+  ],
+  "ultimate": {
+    "id": "cauldron-stance",
+    "name": "白鹤仙息"
+  },
+  "room": {
+    "name": "她在回廊宿舍的房间"
+  }
+}

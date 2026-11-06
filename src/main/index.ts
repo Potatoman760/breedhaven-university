@@ -896,7 +896,9 @@ function registerIpc(
       hours: hoursPassed > 0 ? hoursPassed : undefined,
       look: li ? { ...fitted(validLook({ outfitId: look.outfitId, expression: look.expression }, li, scene), li), ...posed } : {},
       looks,
-      voices: [reaction, npc ? undefined : catchphraseIn(text, present.flatMap((id) => cast.loveInterests.filter((c) => c.id === id)), scene.loveInterestId)].filter(
+      // Her catch phrases are recorded in English: in another language the reply around one is not, so only her
+      // wordless sounds are played.
+      voices: [reaction, npc || lang.language !== DEFAULT_LANGUAGE ? undefined : catchphraseIn(text, present.flatMap((id) => cast.loveInterests.filter((c) => c.id === id)), scene.loveInterestId)].filter(
         (file): file is string => file !== undefined
       )
     }

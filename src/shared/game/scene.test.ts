@@ -20,6 +20,8 @@ import {
   lookLines,
   plainName,
   namesHer,
+  namedAt,
+  plainTags,
   sceneBaseline,
   sceneOutcome,
   splitSceneEnd,
@@ -496,5 +498,33 @@ describe('a name the LLM wrote', () => {
     // Two spellings of one name are one person's look, not two people's.
     expect(parseDirectives('[EXPRESSION: Zélie=happy]\n[OUTFIT: Zelie=nude]\nZélie: Oui.').named).toEqual([{ name: 'Zélie', expression: 'happy', outfitId: 'nude' }])
     expect(parseDirectives('She goes.\n[LEAVES: Zelie=content the baby is crying]').leaving).toEqual([{ name: 'Zelie', feeling: 'content', reason: 'the baby is crying' }])
+  })
+})
+
+describe('a reply written in Chinese', () => {
+  const tamsin = { id: 'tamsin', name: 'Tamsin', aliases: ['塔姆辛'] }
+  const edda = { id: 'edda', name: 'Edda Lorne', aliases: ['艾达·洛恩'] }
+  const yann = { id: 'yann', name: 'Yann Roux', aliases: ['扬·鲁'] }
+
+  it('puts the punctuation of its tags in ASCII, and leaves the prose and its JSON alone', () => {
+    expect(plainTags('她转身。\n【LEAVES：Tamsin=hurt：太晚了】')).toBe('她转身。\n[LEAVES:Tamsin=hurt:太晚了]')
+    expect(plainTags('[EXPRESSION：Maren＝aroused]')).toBe('[EXPRESSION:Maren=aroused]')
+    expect(parseDirectives('好吧。\n【LEAVES：Tamsin】').leaving.map((one) => one.name)).toEqual(['Tamsin'])
+    // A bracket of prose, or a list in JSON, keeps its Chinese commas and colons.
+    expect(plainTags('["你好，世界", "她说：走吧"]')).toBe('["你好，世界", "她说：走吧"]')
+    expect(plainTags('她低声说：【不要走】')).toBe('她低声说：【不要走】')
+  })
+
+  it('knows a woman by her name in Chinese as by her own, but not by one character inside a word', () => {
+    expect(namesHer('塔姆辛', tamsin)).toBe(true)
+    expect(namesHer('艾达', edda)).toBe(true)
+    expect(namesHer('扬', yann)).toBe(true)
+    expect(namedAt('我想和塔姆辛说话', tamsin)).toBe(3)
+    expect(namedAt('他扬起眉毛', yann)).toBe(-1)
+    expect(namedAt('I want Tamsin to come', tamsin)).toBe(7)
+  })
+
+  it('reads a speaker line with a full-width colon', () => {
+    expect(dialogueLines('塔姆辛：来吧。\nTamsin：走。', [tamsin as never]).map((line) => line.speakerId)).toEqual(['tamsin', 'tamsin'])
   })
 })

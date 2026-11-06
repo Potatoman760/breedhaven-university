@@ -1,0 +1,132 @@
+[
+  {
+    "id": "study",
+    "name": "在图书馆学习",
+    "description": "占一个自习隔间和一个插座，享受安静的两个小时。"
+  },
+  {
+    "id": "train",
+    "name": "在比武场训练",
+    "description": "举铁、跑圈，再和沙场上的随便哪个人对练几招。"
+  },
+  {
+    "id": "eat",
+    "name": "在学生公共楼就餐",
+    "description": "端一盘热食，在炉火旁找个座位。"
+  },
+  {
+    "id": "bathe",
+    "name": "去浴场泡澡",
+    "description": "在温水池里泡上一小时。"
+  },
+  {
+    "id": "sleep",
+    "name": "睡觉",
+    "description": "回自己的套间休息过夜。"
+  },
+  {
+    "id": "talk",
+    "name": "交谈",
+    "description": "找个安静的空当聊聊天。"
+  },
+  {
+    "id": "study-together",
+    "name": "一起学习",
+    "description": "共用一个自习隔间和一盏台灯。"
+  },
+  {
+    "id": "meal-together",
+    "name": "一起吃饭",
+    "description": "两个餐盘，一条长椅，还有一段聊天的时间。"
+  },
+  {
+    "id": "spar-together",
+    "name": "一起对练",
+    "description": "在沙场上来一场友好的切磋。"
+  },
+  {
+    "id": "court-stroll",
+    "name": "在大庭院散步",
+    "description": "沿着露台慢悠悠地绕上一圈，不急着去任何地方。"
+  },
+  {
+    "id": "drinks",
+    "name": "一起喝一杯",
+    "description": "在蜜蜂酒馆点上一轮酒，边喝边聊。"
+  },
+  {
+    "id": "revise-cafe",
+    "name": "在咒语与啜饮自习",
+    "description": "一杯馥芮白、一张扶手椅，还有你的笔记。"
+  },
+  {
+    "id": "tinker",
+    "name": "在铸坊鼓捣小玩意",
+    "description": "借一张工作台，做个基本能用的小物件。"
+  },
+  {
+    "id": "arcade",
+    "name": "打街机",
+    "description": "投币、刷高分、抓娃娃，消磨一个小时。"
+  },
+  {
+    "id": "river-run",
+    "name": "沿河岸步道跑步",
+    "description": "一路跑到石桥再折返。"
+  },
+  {
+    "id": "coffee-together",
+    "name": "一起喝咖啡",
+    "description": "两杯咖啡，舒服的扶手椅，哪儿也不用赶着去。"
+  },
+  {
+    "id": "arcade-together",
+    "name": "一起打街机",
+    "description": "打桌上冰球、玩音游，再打赌谁去买下一轮游戏币。"
+  },
+  {
+    "id": "film-together",
+    "name": "看电影",
+    "description": "流明影院二楼包厢的两个座位。"
+  },
+  {
+    "id": "river-walk",
+    "name": "河畔散步",
+    "description": "绕着公园走远路，漫步在果树林下。"
+  },
+  {
+    "id": "dance-together",
+    "name": "去跳舞",
+    "description": "在林下夜店的弹簧舞池里嗨上一晚。"
+  },
+  {
+    "id": "lift",
+    "name": "在铁根举铁",
+    "description": "在力量架上练一个小时，玻璃另一边就是正在操练的法师们。"
+  },
+  {
+    "id": "bubble-tea",
+    "name": "喝杯珍珠奶茶",
+    "description": "坐在靠窗的位置，喝点冰凉甜糯的东西。"
+  },
+  {
+    "id": "bubble-tea-together",
+    "name": "一起喝珍珠奶茶",
+    "description": "两杯奶茶，一个靠窗座，再为加什么小料争论一番。"
+  },
+  {
+    "id": "workout-together",
+    "name": "一起健身",
+    "description": "在铁根互相做力量保护，或者去隔壁的以太看她操练。"
+  },
+  {
+    "id": "dinner-together",
+    "name": "在坩埚餐厅共进晚餐",
+    "description": "开放式厨房旁的餐桌，两人分食一份雷霆蛋糕。"
+  },
+  {
+    "id": "night-together",
+    "name": "一起过夜",
+    "description": "邀请对方回你的套间过夜。"
+  }
+]

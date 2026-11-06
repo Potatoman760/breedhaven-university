@@ -1,0 +1,114 @@
+{
+  "id": "zelie",
+  "aliases": [
+    "泽莉·马尔尚",
+    "泽莉"
+  ],
+  "role": "安栖居的住家保姆",
+  "bio": "Zélie是育嗣者关系办公室随房子一同派驻的保姆。她是维斯佩拉人，来自港口城市Port-Lumière，毕业于同盟一所历史悠久的女家庭教师学校，四年前凭办公室的合约来到蕃荫。这是她驻过的第四座育嗣者宅邸。她按自己的标准打理着这栋房子，也按这标准要求屋里的每一个人。",
+  "outfits": [
+    {
+      "id": "default",
+      "name": "保姆制服"
+    },
+    {
+      "id": "pregnant",
+      "name": "孕期"
+    },
+    {
+      "id": "nude",
+      "name": "裸体"
+    },
+    {
+      "id": "nude-pregnant",
+      "name": "裸体，孕期"
+    },
+    {
+      "id": "casual",
+      "name": "休假便服"
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "休假便服，孕期"
+    },
+    {
+      "id": "lingerie",
+      "name": "巴黎风情"
+    },
+    {
+      "id": "lingerie-pregnant",
+      "name": "巴黎风情，孕期"
+    },
+    {
+      "id": "bathrobe",
+      "name": "浴袍"
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "浴袍，孕期"
+    },
+    {
+      "id": "baby-light",
+      "name": "抱着宝宝（浅肤色）"
+    },
+    {
+      "id": "baby-medium",
+      "name": "抱着宝宝（中等肤色）"
+    },
+    {
+      "id": "swimsuit",
+      "name": "泳装"
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "泳装，孕期"
+    },
+    {
+      "id": "ao-dai",
+      "name": "奥黛"
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "奥黛，孕期"
+    },
+    {
+      "id": "sari",
+      "name": "纱丽"
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "纱丽，孕期"
+    },
+    {
+      "id": "holi",
+      "name": "节日白衣"
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "节日白衣，孕期"
+    },
+    {
+      "id": "sarong",
+      "name": "纱笼"
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "纱笼，孕期"
+    },
+    {
+      "id": "echoes",
+      "name": "魅惑女巫长裙"
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "魅惑女巫长裙，孕期"
+    }
+  ],
+  "ultimate": {
+    "id": "withering-look",
+    "name": "凛冽一瞥"
+  },
+  "room": {
+    "name": "安栖居的保姆房"
+  }
+}

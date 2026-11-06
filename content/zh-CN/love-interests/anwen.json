@@ -1,0 +1,112 @@
+{
+  "id": "anwen",
+  "aliases": [
+    "安文"
+  ],
+  "bio": "魔法工程系二年级学生，自己翻新组装了一辆摩托车，去哪儿都骑着它——全校人都有点怵的那个女生。",
+  "outfits": [
+    {
+      "id": "default",
+      "name": "日常服装"
+    },
+    {
+      "id": "pregnant",
+      "name": "孕期"
+    },
+    {
+      "id": "nude",
+      "name": "裸体"
+    },
+    {
+      "id": "nude-pregnant",
+      "name": "裸体，孕期"
+    },
+    {
+      "id": "casual",
+      "name": "休班便服"
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "休班便服，孕期"
+    },
+    {
+      "id": "lingerie",
+      "name": "黑色皮革"
+    },
+    {
+      "id": "lingerie-pregnant",
+      "name": "黑色皮革，孕期"
+    },
+    {
+      "id": "bathrobe",
+      "name": "浴袍"
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "浴袍，孕期"
+    },
+    {
+      "id": "baby-medium",
+      "name": "抱着宝宝（中等肤色）"
+    },
+    {
+      "id": "baby-dark",
+      "name": "抱着宝宝（深肤色）"
+    },
+    {
+      "id": "swimsuit",
+      "name": "泳装"
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "泳装，孕期"
+    },
+    {
+      "id": "ao-dai",
+      "name": "奥黛"
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "奥黛，孕期"
+    },
+    {
+      "id": "sari",
+      "name": "纱丽"
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "纱丽，孕期"
+    },
+    {
+      "id": "holi",
+      "name": "节日白衣"
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "节日白衣，孕期"
+    },
+    {
+      "id": "sarong",
+      "name": "纱笼"
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "纱笼，孕期"
+    },
+    {
+      "id": "echoes",
+      "name": "决斗者大衣"
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "决斗者大衣，孕期"
+    }
+  ],
+  "ultimate": {
+    "id": "velvet-rope",
+    "name": "闲人免进"
+  },
+  "room": {
+    "name": "她在回廊宿舍的房间"
+  }
+}

@@ -7,6 +7,8 @@ import { StatSchema } from './stats'
  * everyone of it who is there in which nothing holds anyone back. `{player}` is filled in.
  */
 export const AdultEventSchema = z.object({
+  /** What a translation knows it by; left out, it is matched by its place. */
+  id: z.string().optional(),
   /** Which of his own meetings of the society it is, counted from 1. */
   meeting: z.number().int().min(1),
   name: z.string(),
@@ -18,7 +20,7 @@ export const AdultEventSchema = z.object({
    * else, and the night is told the way written for that (`ifIntimate`), where there is one.
    */
   reserved: z
-    .array(z.object({ loveInterestId: z.string(), ifIntimate: z.object({ intro: IntroSchema, direction: z.string() }).optional() }))
+    .array(z.object({ id: z.string().optional(), loveInterestId: z.string(), ifIntimate: z.object({ intro: IntroSchema, direction: z.string() }).optional() }))
     .default([])
 })
 export type AdultEvent = z.infer<typeof AdultEventSchema>
@@ -66,7 +68,7 @@ export const SocietiesFairSchema = z.object({
    * By booth (a society's id, or a visitor's): the hello read there as a cutscene, one for each company that stands at
    * it, since the students take turns at their tables. Lines start with the speaker's name or are *narration*.
    */
-  hellos: z.record(z.string(), z.array(z.object({ cast: z.array(z.string()).min(1), lines: z.array(z.string()).min(1) })).min(1)),
+  hellos: z.record(z.string(), z.array(z.object({ id: z.string().optional(), cast: z.array(z.string()).min(1), lines: z.array(z.string()).min(1) })).min(1)),
   rivalry: z.object({ societyIds: z.tuple([z.string(), z.string()]), intro: IntroSchema }).optional()
 })
 export type SocietiesFair = z.infer<typeof SocietiesFairSchema>

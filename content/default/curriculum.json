@@ -47,6 +47,7 @@
           "description": "Introduction to the constitutional structure of Breedhaven: the Crown, the elected Assembly, the courts, and the conventions that have shaped government since the founding of House Dawnbloom. Covers the role of the heir's education and the relationship between custom and statute.",
           "topics": [
             {
+              "id": "crown-assembly-and-courts",
               "title": "Crown, Assembly and Courts",
               "content": "Breedhaven is a constitutional monarchy with three branches. The Crown, held by House Dawnbloom, reigns and appoints. The Assembly, 240 members elected for five-year terms, makes law and controls taxation. The courts, headed by the Court of the Charter, decide disputes and may strike down acts that breach the Charter. All three sit within a mile of one another in Seedblossom. The schoolroom summary: the Crown reigns, the Assembly rules, the courts remember.",
               "question": {
@@ -60,6 +61,7 @@
               }
             },
             {
+              "id": "house-dawnbloom-and-the-charter",
               "title": "House Dawnbloom and the Charter",
               "content": "House Dawnbloom united the river lordships of the lowlands and has held the throne ever since. The Charter of Seedblossom, sealed some four centuries ago, ended rule by decree: the Crown agreed to tax and legislate only through an elected Assembly, and in return the Assembly swore to the dynasty. The throne passes to the monarch's named heir, by long practice her eldest daughter. A monarch who dies with a single heir leaves no contest, only a very young queen.",
               "question": {
@@ -73,6 +75,7 @@
               }
             },
             {
+              "id": "how-a-bill-becomes-law",
               "title": "How a Bill Becomes Law",
               "content": "A bill is read three times in the Assembly. First reading is a formality, second reading debates the principle, and a committee then amends it clause by clause before third reading and the final vote. A simple majority of members present carries it, provided at least 120 of the 240 are in the chamber. The bill then goes to Dawnbloom House for royal assent. Assent has not been refused in over a century, and money bills must begin with the First Minister's government.",
               "question": {
@@ -86,6 +89,7 @@
               }
             },
             {
+              "id": "custom-convention-and-statute",
               "title": "Custom, Convention and Statute",
               "content": "Much of the constitution is unwritten. By convention the monarch appoints as First Minister whoever commands a majority in the Assembly, does not vote, and acts on ministers' advice. By custom the heir is educated at the University's College of Government and Law, among ordinary students. None of this is statute, and no court can enforce it. Conventions hold because breaking one costs more than keeping it. Where statute and custom conflict, statute prevails.",
               "question": {
@@ -99,6 +103,7 @@
               }
             },
             {
+              "id": "elections-parties-and-the-vote",
               "title": "Elections, Parties and the Vote",
               "content": "Every citizen of eighteen or over votes, in 240 single-member districts, with the candidate who wins most votes taking the seat. Seven voters in eight are women, and about twenty sitting members are men. No seats are reserved by sex or by people. Parties form around taxation, trade and the land, but the deepest dividing line is the oldest one: Bloomist-leaning members favor policy that supports childbearing, and Freewill-leaning members resist any state hand on it.",
               "question": {
@@ -112,6 +117,7 @@
               }
             },
             {
+              "id": "state-and-the-bloom",
               "title": "The State and the Bloom",
               "content": "No government in the Expanse can ignore the Bloom, and Breedhaven's does not try. The Ministry of Health tracks birth rates, Sire numbers and where the magical population lives. The Registry Act places fertility assays in the national Sire Registry and makes each record private, the Sire's own to disclose. Contraception is funded at every clinic. One side calls all this planning for survival. The other replies that people are not livestock, and both sit in the Assembly.",
               "question": {
@@ -150,6 +156,7 @@
           "description": "Graduate seminar on contemporary challenges in Breedhaven public administration, including the management of the Sire Registry, cross-border policy in the Sown Expanse, and the capacity constraints of governing a state where seven in eight citizens are women.",
           "topics": [
             {
+              "id": "registry-as-an-administrative-problem",
               "title": "The Registry as an Administrative Problem",
               "content": "Breedhaven has roughly twenty-four million people, three million of them men and some three hundred thousand of those assayed Sires. The Sire Registry holds every one of their records under the Registry Act, with each query logged against a named officer. Audits find that the central file seldom leaks. Clinics, employers and households do. The reform question is therefore not how to lock the file tighter, but whether the state can govern knowledge it does not hold.",
               "question": {
@@ -163,6 +170,7 @@
               }
             },
             {
+              "id": "state-capacity-at-seven-to-one",
               "title": "State Capacity at Seven to One",
               "content": "Seven in eight citizens are women, so nearly the whole civil service is of childbearing age or past it. A pregnancy lasts under two months, which makes absence short but frequent, and an official's magic rises sharply while she carries. Departments plan around both: surge rosters put pregnant mages at the head of heavy circle-work, then lose them to leave within weeks. Continuity, not headcount, is the binding constraint, and no ministry has yet solved succession at short notice.",
               "question": {
@@ -176,6 +184,7 @@
               }
             },
             {
+              "id": "demographic-planning-and-its-critics",
               "title": "Demographic Planning and its Critics",
               "content": "The Ministry of Health publishes an annual Demographic Return: births, Sire numbers by province, and the distribution of magical strength. Planners use it to site schools, clinics and Bloom Chambers. Sires are unevenly spread, thick in the cities and thin in the orchard counties, and every instrument proposed to correct that is contested. Grants and housing offers are lawful. Direction of persons is not. Critics hold that even an incentive treats a man as a resource to be allocated.",
               "question": {
@@ -189,6 +198,7 @@
               }
             },
             {
+              "id": "cross-border-sire-policy",
               "title": "Cross-Border Sire Policy",
               "content": "Every neighbor wants strong Sires and each asks differently. Kharad-Tor negotiates openly, hold by hold, in exact contracts. Iscara's interest is clinical and run by the state. The Vesperan League folds Sire terms into trade agreements. The Starkelands are said to rest their prosperity on a single man. Breedhaven's settled doctrine is that no treaty can bind a Sire's person: the Crown may permit an arrangement, but only he can make it. Whether that doctrine survives a rich enough offer is open.",
               "question": {
@@ -202,6 +212,7 @@
               }
             },
             {
+              "id": "dependence-on-shared-infrastructure",
               "title": "Dependence on Shared Infrastructure",
               "content": "Breedhaven does not control two systems it cannot do without. Iscara built and operates the long-range portal lines, and Iscaran wards protect half the ports in the Expanse, Breedhaven's river harbors among them. A dispute with the mage state could close both within a day. Veyra's Quiet Office, the most capable intelligence service known, raises a quieter risk to Registry data. Proposed remedies, domestic ward standards and a second portal operator, are costly and decades away.",
               "question": {
@@ -215,6 +226,7 @@
               }
             },
             {
+              "id": "reform-under-a-young-crown",
               "title": "Reform Under a Young Crown",
               "content": "A newly crowned monarch of eighteen, still at university by custom, sharpens three reform debates. One would write the conventions on assent and the appointment of the First Minister into statute, trading flexibility for certainty. A second would make the Registrar answer to the Assembly alone, not to a minister. A third would end the custom that the heir studies among ordinary students, on security grounds. Each fixes a real weakness and removes a habit that has kept the Crown trusted.",
               "question": {
@@ -266,6 +278,7 @@
           "description": "Survey of the Breedhaven legal system: constitutional structure under House Dawnbloom, the Assembly, courts, and the hierarchy of statute and custom. Introduces legal reasoning, case analysis, and the basics of civil and criminal procedure.",
           "topics": [
             {
+              "id": "sources-of-breedhaven-law",
               "title": "Sources of Breedhaven Law",
               "content": "Breedhaven law has five sources, ranked. First is the Charter of Seedblossom, which no ordinary act may breach. Second is statute, passed by the Assembly and assented to by the Crown. Third is regulation, made by ministers under powers a statute grants. Fourth is precedent, the reasoning of earlier judgments, binding on lower courts. Fifth is custom, which a court will recognize only if it is ancient, certain and continuous. Where two sources conflict, the higher wins.",
               "question": {
@@ -279,6 +292,7 @@
               }
             },
             {
+              "id": "structure-of-the-courts",
               "title": "The Structure of the Courts",
               "content": "Magistrates' courts hear minor crime and small claims in every town. The High Court tries serious crime with a jury and hears large civil suits and appeals from below. The Court of the Charter, seven justices sitting in Seedblossom, is final and alone may strike down a statute. Beside this ladder stand the Courts of Lineage, a specialist branch for paternity, inheritance and reproductive contracts, whose judges sit with a clinical assessor and hear most cases in private.",
               "question": {
@@ -292,6 +306,7 @@
               }
             },
             {
+              "id": "reading-and-briefing-a-case",
               "title": "Reading and Briefing a Case",
               "content": "A case brief has four parts: facts, issue, holding and reasoning. Take the teaching case Harrow v Pell. A door ward set too strong burned a courier delivering a parcel. The issue was whether a householder owes a duty of care to lawful callers. The court held that she does. Its reasoning: a ward is a thing kept on land, and its keeper must make it safe for those she invites. The holding binds later courts. Remarks made in passing do not, though they may persuade.",
               "question": {
@@ -305,6 +320,7 @@
               }
             },
             {
+              "id": "criminal-procedure-and-grave-offenses",
               "title": "Criminal Procedure and Grave Offenses",
               "content": "A person arrested must be charged or released within forty-eight hours and may have a lawyer from the first interview. Serious charges go before a High Court jury of twelve, and the Crown must prove guilt beyond reasonable doubt. The defendant need prove nothing. Under the Sire Protection Act, assault, kidnapping and reproductive coercion of a Sire sit in the gravest class of offense, alongside murder, and a conviction carries a sentence measured in decades.",
               "question": {
@@ -318,6 +334,7 @@
               }
             },
             {
+              "id": "civil-procedure-and-household-law",
               "title": "Civil Procedure and Household Law",
               "content": "A civil claim runs in stages: the claim, the defense, exchange of documents, trial and judgment. The claimant must prove her case on the balance of probabilities, a lower standard than in crime. Much civil work concerns households. Adults who share a home may register a household deed, which sets out shared property, liability for debts and who holds parental responsibility for each child. Leaving a household dissolves no duty to its children unless a court so orders.",
               "question": {
@@ -331,6 +348,7 @@
               }
             },
             {
+              "id": "persons-privacy-and-magical-liability",
               "title": "Persons, Privacy and Magical Liability",
               "content": "Every people of the Bloom holds full legal personhood, slimes included, and a form that demands a street address cannot lawfully bar one who lives in a pond. A Sire's Registry record is private. Disclosing another person's fertility status without consent is an offense, however the knowledge was come by. Magic is judged like any other act: a caster answers for harm she could foresee. A pregnant woman's surge is foreseeable, so she must take the precautions the surge demands.",
               "question": {
@@ -369,6 +387,7 @@
           "description": "The law of the Breedhaven household: how a household is formed and registered, the contracts a Sire makes with the women he fathers children with, and the rules of parentage, support, dissolution and inheritance. Students draft household deeds and Sire agreements and argue disputes before a mock Court of Lineage. Prerequisite: LAW 101.",
           "topics": [
             {
+              "id": "legal-household",
               "title": "The Legal Household",
               "content": "The Household Act recognizes any group of two or more adults who share a home and register a deed with the county clerk. A deed must name every adult member, the household's seat, and one member as steward, who signs for the household in law and receives its post from the courts. Members need not be related or partnered. A household without a deed is a mere tenancy in common: its members share nothing but the lease, and a child born into it has no household standing until a deed is filed.",
               "question": {
@@ -382,6 +401,7 @@
               }
             },
             {
+              "id": "sire-contracts-and-registration-agreements",
               "title": "Sire Contracts and Registration Agreements",
               "content": "A Sire on the Registry may sign a registration agreement with a woman or a household, filed with the Registry within thirty days. It sets how many children are sought, who bears the costs of pregnancy and whether the Sire joins the household or remains a visiting father. Under the rule in Thorne v Ashgrove, a clause binding a Sire to father children with no one else is void as a restraint on the Bloom. Either side may end the agreement on ninety days' notice, but no notice ends a duty to a child already conceived.",
               "question": {
@@ -395,6 +415,7 @@
               }
             },
             {
+              "id": "parentage-and-the-registry-presumption",
               "title": "Parentage and the Registry Presumption",
               "content": "The mother of a child is the woman who bears her. Fatherhood is fixed by the Registry presumption: a Sire party to a filed agreement with the mother at the time of conception is presumed the father. Where no agreement exists, or the presumption is challenged, the Court of Lineage orders a lineage reading, a clinical charm that traces the Bloom in the child's blood to its source. A reading is taken as conclusive. A challenge must be brought within one year of the birth, after which the record stands.",
               "question": {
@@ -408,6 +429,7 @@
               }
             },
             {
+              "id": "support-and-the-shared-purse",
               "title": "Support and the Shared Purse",
               "content": "Every parent owes support until a child turns eighteen. The Support Schedule sets the amount as a share of income: a parent pays one-tenth of her income for the first child and one-twentieth for each further child, up to a cap of three-tenths. Where the child lives in a registered household, the household purse meets support first and members contribute as the deed provides. A Sire's Crown stipend, paid to every registered father, is not counted as income and cannot be taken for support.",
               "question": {
@@ -421,6 +443,7 @@
               }
             },
             {
+              "id": "partnership-and-dissolution",
               "title": "Partnership and Dissolution",
               "content": "A member leaves a household by filing a notice of withdrawal; the household dissolves when fewer than two adults remain or when every member signs a deed of dissolution. Property is then divided as the deed provides, or, where it is silent, equally among the adults who were members for at least a year. Children stay where the court finds their welfare best served, and the guiding case is Merrow v Merrow, which holds that siblings are not to be separated without strong cause. Parental responsibility survives dissolution.",
               "question": {
@@ -434,6 +457,7 @@
               }
             },
             {
+              "id": "inheritance-and-lineage-disputes",
               "title": "Inheritance and Lineage Disputes",
               "content": "A will must be written, signed and witnessed by two adults who take nothing under it. Where there is no will, the Lineage Succession Act divides the estate: half to the household, half shared equally among the children, whichever household each was born into. A Sire's estate is split among all his children alike, so a father of forty leaves forty equal shares. Disputes go first to compulsory mediation before a lineage assessor, and only a dispute still unresolved after sixty days may be heard by the Court of Lineage.",
               "question": {
@@ -484,6 +508,7 @@
           "description": "Operational systems for hotels, banquet halls, and tourist sites, including staff scheduling, enchanted inventory tracking, and complaint resolution. Students learn to design guest experiences that accommodate diverse populations, including traveling Sires and their security needs.",
           "topics": [
             {
+              "id": "guest-journey-and-service-design",
               "title": "The Guest Journey and Service Design",
               "content": "A stay has five stages: booking, arrival, the stay itself, departure and follow-up. A service blueprint maps each stage in two rows, what the guest sees and what the staff do out of sight to make it happen. Breedhaven hotels sell suites more than rooms, because the ordinary traveling party is a household of four to six adults. Staff never guess who shares with whom. The booking form asks only how many beds are to be made up and how many keys are wanted, and the answer is taken as given.",
               "question": {
@@ -497,6 +522,7 @@
               }
             },
             {
+              "id": "rostering-and-shift-design",
               "title": "Rostering and Shift Design",
               "content": "A roster matches staff to demand hour by hour. The working ratios are one server to eight guests for a plated dinner and one to twelve for a buffet. Magic tires, so charm duties such as warming rooms, mending linen and refreshing lights are rotated in two-hour blocks and never given to one woman for a whole shift. With pregnancies lasting under two months, leave is short but frequent, and a sound roster carries one spare in every ten. Pregnant staff are rostered away from fragile fittings.",
               "question": {
@@ -510,6 +536,7 @@
               }
             },
             {
+              "id": "enchanted-inventory-tracking",
               "title": "Enchanted Inventory Tracking",
               "content": "Stock is tracked with tally-charms: small tags on linen, bottles and crates that register in the ledger each time they cross a warded doorway. The system sets a par level for every item. Linen par is three sets to a bed: one on it, one in the laundry and one in the store. Tally-charms fade after about ninety days and must be reset, and a tag that has faded reads as stock that has vanished. So the charmed tally is reconciled against a hand count each week, and the difference is investigated.",
               "question": {
@@ -523,6 +550,7 @@
               }
             },
             {
+              "id": "hosting-a-traveling-sire",
               "title": "Hosting a Traveling Sire",
               "content": "A Sire's status is his own to disclose, so it never appears in an open booking record; the reservation carries only a private-guest flag that the duty manager can read. He is roomed near a staircase, behind a logged door, with a side entrance agreed in advance with his security. Staff are briefed not to stare, not to ask and never to post his presence on Bloomr, which is cause for dismissal. Good service treats him as a guest first: his name, his breakfast order, his preference for quiet.",
               "question": {
@@ -536,6 +564,7 @@
               }
             },
             {
+              "id": "complaint-resolution-and-service-recovery",
               "title": "Complaint Resolution and Service Recovery",
               "content": "Complaints are handled in four steps: hear it out, apologize, mend it, follow up. The guest is never interrupted and never told the fault lies with another department. A worked case: a warming charm fails in a suite at midnight in winter. The desk apologizes, sends a heater and someone to recast within ten minutes, and rings the room an hour later. Front desk staff may refund up to one night without asking a manager. A complaint mended well leaves a guest more loyal than one who had no trouble.",
               "question": {
@@ -549,6 +578,7 @@
               }
             },
             {
+              "id": "banquets-festivals-and-tourist-sites",
               "title": "Banquets, Festivals and Tourist Sites",
               "content": "A banquet for two hundred is twenty tables of ten and twenty-five servers. Guests arriving by teleport array come in pulses, a dozen at once every few minutes, so the cloakroom is staffed for the pulse and not the average. Foreign parties differ: Kharadi hosts want every term written into the contract, while Vesperans expect to bargain and enjoy it. Because a birth discharges magic that can crack masonry, large venues post the route to the nearest Bloom Chamber and keep a warded quiet room.",
               "question": {
@@ -587,6 +617,7 @@
           "description": "Advanced seminar on economic regulation in Breedhaven and the wider Sown Expanse: ward standards, Sire Registry policy, agricultural enchantment subsidies, and competition among magitech firms. Students model policy outcomes using current national data.",
           "topics": [
             {
+              "id": "scarcity-rent-in-a-seven-to-one-economy",
               "title": "Scarcity Rent in a Seven-to-One Economy",
               "content": "Standard models assume labor and households come in balanced pairs; the Expanse offers neither. One birth in 80 is a fertile man, so reproductive capacity on the male side is fixed in supply and cannot be expanded by price. Whatever attaches to it earns a scarcity rent. The contested question is who captures that rent: the Sire, his household, or the state. The household of one Sire and two to five women is read by some as a pooling of that rent and by others as risk-sharing among earners.",
               "question": {
@@ -600,6 +631,7 @@
               }
             },
             {
+              "id": "sire-registry-as-market-regulation",
               "title": "The Sire Registry as Market Regulation",
               "content": "The Registry answers an information problem: fertility cannot be observed, so without a trusted assay record false claims would flood the market in reproductive contracts and drive out honest ones. Its cost is the opposite failure: a private record still leaks, and a leak imposes on the Sire a lifelong cost he never agreed to bear. Abolitionists argue that private assay certificates would serve as well; defenders reply that only a state record stands up in the paternity and contract courts.",
               "question": {
@@ -613,6 +645,7 @@
               }
             },
             {
+              "id": "ward-standards-safety-or-barrier",
               "title": "Ward Standards: Safety or Barrier",
               "content": "A ward standard sets minimum retention, fail-safe behavior and inspection intervals for wards sold to the public. The public-interest reading is plain: buyers cannot test a ward themselves. The capture reading notes who drafts the standards. Certification costs fall hardest on small workshops, and incumbents sit on the committees. Trade sharpens it: Iscaran wards protect half the world's ports, so a rule written to Iscaran practice imports safety and dependence together.",
               "question": {
@@ -626,6 +659,7 @@
               }
             },
             {
+              "id": "who-gains-from-enchantment-subsidies",
               "title": "Who Gains From Enchantment Subsidies",
               "content": "Breedhaven pays growers a subsidy per charmed hectare. The stated aim is yield; the question is incidence. Growth charms are limited by labor, not land: one grower charms about half a hectare of orchard a day. With casting labor scarce, a payment per hectare is bid into the wages of casters, the fees of contract circles and orchard rents, with little effect on output. Critics propose subsidizing training instead. Defenders answer that higher rural wages for women's magic are the point.",
               "question": {
@@ -639,6 +673,7 @@
               }
             },
             {
+              "id": "monopoly-and-competition-in-magitech",
               "title": "Monopoly and Competition in Magitech",
               "content": "Magitech markets tip toward a single supplier: networks grow more valuable with each user, and enchanted infrastructure is costly to build before it carries one traveler. The long-range portal network is the limiting case: built and operated by Iscara, with no rival, and priced by treaty, not by a market. Device makers compete, but all face one bottleneck: the supply of casters to recharge what they sell. Whether to regulate portal fares as a utility or fund a second network is unresolved.",
               "question": {
@@ -652,6 +687,7 @@
               }
             },
             {
+              "id": "sires-in-trade-policy",
               "title": "Sires in Trade Policy",
               "content": "Access to strong Sires is negotiated between states. Kharad-Tor bargains openly for lawful access for its holds; Iscara's state takes a clinical interest; Hearthspire's prosperity is said to rest on one man of record assay; a Vesperan trade offer may carry terms concerning one Sire. Economists split three ways. One school treats such terms as trade in services, one as a claim on a person's body that no treaty can bind, and one as proof that Registry privacy cannot survive a record assay.",
               "question": {
@@ -707,6 +743,7 @@
           "description": "The biochemistry and magical theory of fermentation, covering beer, cider, mead, and Bloom-infused cordials. Weekly lab practices batch brewing, yeast management, and quality control, with attention to Breedhaven's orchard-based brewing traditions.",
           "topics": [
             {
+              "id": "fermentation-yeast-sugar-and-bloom",
               "title": "Fermentation: Yeast, Sugar and Bloom",
               "content": "Fermentation is yeast eating sugar and giving off alcohol and carbon dioxide. Ale yeast works warm, at 18 to 22 degrees, and finishes in about a week; lager yeast works cold, at 8 to 12, and takes a month. The Bloom is already in the water and the fruit, so every brew carries a faint charge before a brewer touches it. A coaxing charm, the same one used on houseplants, can shorten a ferment by a third, but hurried yeast throws harsh flavors. The brewhouse rule: nudge, never push.",
               "question": {
@@ -720,6 +757,7 @@
               }
             },
             {
+              "id": "orchard-cider-of-the-lowlands",
               "title": "Orchard Cider of the Lowlands",
               "content": "Breedhaven cider apples fall into four classes: sweets, sharps, bittersweets and bittersharps. A sound lowland blend is half bittersweet, a third sharp and the rest sweet. Growth-charmed orchards give bigger fruit with thinner juice, so every pressing is checked with a hydrometer: a reading of 1.050 ferments out to about 6.5 percent. By custom pressing starts after the first frost, and farmhouse cider is left to the wild yeast on the skins, which takes three months and cannot be hurried.",
               "question": {
@@ -733,6 +771,7 @@
               }
             },
             {
+              "id": "mashing-wort-and-the-boil",
               "title": "Mashing, Wort and the Boil",
               "content": "Beer begins with the mash: crushed malted barley held in water at 65 degrees for an hour, so that its starch turns to sugar. At 62 the beer comes out dry and thin, at 68 sweet and full. A warming charm will hold a small mash within half a degree, but anything over fifty liters is run on a steam jacket and a thermostat, because magic tires and steel does not. The sweet wort is boiled for an hour with hops, early for bitterness and in the last five minutes for aroma, then chilled fast to 20.",
               "question": {
@@ -746,6 +785,7 @@
               }
             },
             {
+              "id": "mead-and-honey-ferments",
               "title": "Mead and Honey Ferments",
               "content": "Honey is nearly pure sugar and poor in what yeast needs, so mead ferments slowly and stalls if neglected. One kilo of honey to three liters of water gives about 12 percent; nutrient is added in stages on days one, three and five. Honey from hives kept in charmed orchards carries more Bloom and a floral note. Mead with fruit is a melomel, with spice a metheglin, with apple juice a cyser. By old custom a new household lays down a cask at its founding and opens it at the first naming.",
               "question": {
@@ -759,6 +799,7 @@
               }
             },
             {
+              "id": "bloom-infused-cordials-and-tonics",
               "title": "Bloom-Infused Cordials and Tonics",
               "content": "A cordial is a sweetened infusion, with or without alcohol, steeped with herbs and fruit gathered from Bloom-rich ground. Its effect is modest: warmth, calm, a clearer head. The charge fades once bottled, about half of it gone in three weeks, so cordials are made small and sold fresh. The label must state the effect and its strength. Because pregnancy multiplies magic, a pregnant brewer charms at a tenth of her usual effort, and cordials made for pregnant drinkers are always alcohol-free.",
               "question": {
@@ -772,6 +813,7 @@
               }
             },
             {
+              "id": "yeast-management-and-quality-control",
               "title": "Yeast Management and Quality Control",
               "content": "Healthy yeast is harvested from the bottom of one batch and pitched into the next, for five or six generations before it tires. Every batch has a log: gravity, temperature and acidity, which for beer should settle between pH 4.2 and 4.6. Common faults are named by smell: butter for diacetyl, green apple for acetaldehyde, vinegar for acetic spoilage. An unevenly cast charm leaves a batch fermenting in layers. The triangle test sets out three glasses, two alike, to find the odd one out.",
               "question": {
@@ -815,6 +857,7 @@
           "description": "Advanced cookery integrating culinary technique with deliberate magical effect, including Bloom-resonant dishes for seasonal festivals and restorative meals for pregnant women. Weekly lab develops tasting menus that balance flavor, nutrition, and magical coherence.",
           "topics": [
             {
+              "id": "magical-coherence-on-the-plate",
               "title": "Magical Coherence on the Plate",
               "content": "An enchanted dish carries one intended effect, and its flavor should point the same way. Kitchen effects fall into three families: warming, soothing and quickening. A warming charm belongs in a broth with ginger and pepper, not in a chilled custard. Two opposed charms on one plate cancel and leave a flat, metallic aftertaste that any diner can detect. Coherence is the test of the craft: the charm, the seasoning and the temperature of a dish must all agree on what it is meant to do.",
               "question": {
@@ -828,6 +871,7 @@
               }
             },
             {
+              "id": "charmed-ingredients-and-their-handling",
               "title": "Charmed Ingredients and Their Handling",
               "content": "Growth-charmed produce reaches the kitchen already carrying a charge, strongest on the day it is picked and mostly gone within a week. Fat carries a charm, acid sharpens it and salt fixes it, which is why charmed butter keeps its effect longer than charmed lettuce. Hard boiling strips most charges, so charged herbs go in at the end, off the heat. Stock is held in a larder under a preservation charm at about four degrees, and charged and plain ingredients are shelved apart and labeled.",
               "question": {
@@ -841,6 +885,7 @@
               }
             },
             {
+              "id": "casting-at-the-stove",
               "title": "Casting at the Stove",
               "content": "There are three ways to put a charm into food. Steeping lets a charged ingredient give up its effect slowly, as in a stock or a tea. Folding works the charm in by hand during a rest, as when dough is proving. Finishing is cast over the plated dish in the last seconds before it leaves the pass. Kitchen charms are Tier I work, small and repeatable. A cook can finish about forty plates in a service before she tires, so a banquet is finished by a circle of three taking turns.",
               "question": {
@@ -854,6 +899,7 @@
               }
             },
             {
+              "id": "restorative-cookery-for-pregnant-women",
               "title": "Restorative Cookery for Pregnant Women",
               "content": "A pregnancy runs under two months, so the body builds fast and the appetite is enormous. Restorative menus are dense in iron, calcium and protein: liver, dark greens, eggs, bone broth, oily river fish. The diner's own rising magic amplifies any charm she eats, so dishes for pregnant women are charmed at a quarter of the usual strength, and quickening dishes are left off the menu altogether in the final weeks. Soothing dishes suit best, served warm, little and often, six small meals in a day.",
               "question": {
@@ -867,6 +913,7 @@
               }
             },
             {
+              "id": "festival-dishes-of-the-bloom-year",
               "title": "Festival Dishes of the Bloom Year",
               "content": "Breedhaven's festival tables follow the orchard. At First Blossom in spring the centerpiece is the seven-and-one loaf, seven plaited strands of enriched dough around a single seeded heart, torn and shared, never cut. Pressing suppers in autumn are built on new cider, roast pork and baked apples. Bloom-resonant dishes use ingredients picked that day from charmed ground and are given only a light warming finish, since the produce already carries the season's charge and a heavy hand muddies it.",
               "question": {
@@ -880,6 +927,7 @@
               }
             },
             {
+              "id": "designing-the-tasting-menu",
               "title": "Designing the Tasting Menu",
               "content": "A formal tasting menu runs to seven courses, and its effects are planned as an arc: one quickening course to open, soothing dishes through the middle, a warming close. No more than three courses are charmed, with plain dishes between to rest the palate. Every effect is printed on the menu, and an uncharmed version of each course is kept ready for guests who are pregnant or would rather not. Paired drinks must not double an effect: a warming cordial never accompanies a warming dish.",
               "question": {
@@ -936,6 +984,7 @@
           "description": "Foundational study of the Primordial Bloom as a natural force: its presence in soil, water, and blood, its observed effects on living things, and the basic principles by which women channel it. Weekly lab introduces measurement of Bloom fields and basic exercises in directed enchantment.",
           "topics": [
             {
+              "id": "bloom-as-a-natural-force",
               "title": "The Bloom as a Natural Force",
               "content": "The Primordial Bloom is a living force present in soil, water and blood, and it is studied like any other part of nature: by observation, measurement and repeatable test. Its four standing rules open every textbook. Seven girls are born for each boy. Only women can work magic. About one man in ten is fertile. Pregnancy amplifies a woman's power. Bloomology asks how these rules operate, and leaves the question of why to the theologians.",
               "question": {
@@ -949,6 +998,7 @@
               }
             },
             {
+              "id": "soil-and-water-ambient-fields",
               "title": "Soil and Water: Ambient Fields",
               "content": "Bloom field strength is measured in thaums. Ordinary tilled soil reads about two to four thaums, old orchard ground six or more, and still shaded water higher again, which is why slimes arise in ponds and not on hillsides. Fields pool where life is dense and undisturbed, and thin over bare rock and fresh concrete. A simple demonstration: two trays of cress, one on orchard loam and one on washed sand, show a visible difference in growth inside a week.",
               "question": {
@@ -962,6 +1012,7 @@
               }
             },
             {
+              "id": "blood-the-bloom-in-the-body",
               "title": "Blood: The Bloom in the Body",
               "content": "Every living body carries the Bloom, but only a woman's can direct it. A resting adult woman reads roughly ten to twenty thaums at the wrist, varying with health, sleep and season of life. A man's blood reads much the same, and yet nothing he does will move it: he is a vessel without a channel. The difference is not one of quantity. This single observation, repeatable at any bench, overturned the old belief that men simply had less of the Bloom in them.",
               "question": {
@@ -975,6 +1026,7 @@
               }
             },
             {
+              "id": "channeling-intent-focus-and-fatigue",
               "title": "Channeling: Intent, Focus and Fatigue",
               "content": "A working has three parts. Intent is the clear picture of the result. Focus is the place where the result is asked for: a hand, a seam, a seedling. Release is letting the field move without forcing it. Most women manage warming, mending, a light or easing pain with no training. Magic is tiring because the body's own field is spent and must refill, usually within hours. Spell-work is graded in tiers by the output it needs, and a beginner works at Tier I.",
               "question": {
@@ -988,6 +1040,7 @@
               }
             },
             {
+              "id": "measuring-a-bloom-field",
               "title": "Measuring a Bloom Field",
               "content": "The standard bench instrument is the thaumometer, a sealed glass cell of charmed water whose glow is read by a light sensor and shown as a number. Three habits make a reading trustworthy. Zero the cell away from people and plants. Take three readings and report the middle one. Note who is in the room, because a pregnant woman two benches away can lift every reading on the floor. The first exercise is a map of the teaching garden, one reading per square meter.",
               "question": {
@@ -1001,6 +1054,7 @@
               }
             },
             {
+              "id": "circles-and-amplification",
               "title": "Circles and Amplification",
               "content": "One woman's field is limited, so larger workings are done in a circle. Fields in a circle do not simply add: four women working well together commonly reach five or six times the output of one, and working badly together less than two. One member leads and shapes the working while the rest feed it. The other great amplifier is pregnancy, which raises a woman's output through the whole term. The most demanding circles in industry and medicine are led by pregnant mages.",
               "question": {
@@ -1048,6 +1102,7 @@
           "description": "Study of the Bloom in growing things: how its field gathers in soil, orchards and crops, how growth-charms move it, and how it rises and falls with the seasons. Weekly lab in the teaching garden and orchard covers soil mapping, growth-charming and the keeping of a household kitchen garden. Prerequisite: BLM 101.",
           "topics": [
             {
+              "id": "living-soil",
               "title": "Living Soil",
               "content": "Soil holds the Bloom in proportion to the life in it: roots, fungi, worms and the slow rot of leaves. A field builds over undisturbed years and is lost quickly. Deep plowing halves a bed's reading in a single season, because it breaks the root and fungal mat that holds the field. For this reason Breedhaven growers favor shallow tilling and no-dig beds topped with compost each autumn. A well-kept no-dig bed gains roughly half a thaum a year until it levels off near six.",
               "question": {
@@ -1061,6 +1116,7 @@
               }
             },
             {
+              "id": "growth-charming",
               "title": "Growth-Charming",
               "content": "A growth-charm is a Tier I working in which the caster draws the soil's field into a single plant. The charm creates nothing: it borrows from the ground around the roots. A charmed seedling grows about a third faster than its neighbors, and the bed pays for it. Charm the same bed every day for a season and it reads below one thaum and must lie fallow. The working rule is one charm per bed per week, laid at the stem with an open palm, never on fruit already set.",
               "question": {
@@ -1074,6 +1130,7 @@
               }
             },
             {
+              "id": "orchards-and-heartwood",
               "title": "Orchards and Heartwood",
               "content": "Fruit trees store the Bloom in their heartwood and give it back to the ground through their roots each spring. This is why old orchard ground reads six thaums or more, and a century-old orchard near ten. A graft cut from an old tree carries some of that store into young stock, which is why Breedhaven nurseries prize scions from the oldest royal orchards. Felling an old orchard drops the ground's reading for decades, and the Assembly licenses every such clearing.",
               "question": {
@@ -1087,6 +1144,7 @@
               }
             },
             {
+              "id": "seasonal-cycle",
               "title": "The Seasonal Cycle",
               "content": "The land's field follows the year. It is lowest in midwinter, rises through spring, peaks at blossom and falls away after harvest. A bed that reads two thaums in midwinter commonly reads three at blossom. Growers time sowing by the thaumometer rather than the calendar: seed goes in once the soil reads three thaums at a hand's depth for three mornings running. Growth-charms laid in the weeks after harvest do little, because there is little field left to draw.",
               "question": {
@@ -1100,6 +1158,7 @@
               }
             },
             {
+              "id": "land-and-people",
               "title": "Land and People",
               "content": "The Bloom moves between the land and the people on it. A household that works its own ground keeps a stronger field in its soil than one that leaves it to hired hands, and the strongest gardener of all is a pregnant woman, whose surging field lifts any bed she tends by a thaum or more over a season. Old households planted orchards at the birth of each daughter for this reason. The land does not change the birth ratio: seven girls are born for each boy on rich ground and poor alike.",
               "question": {
@@ -1113,6 +1172,7 @@
               }
             },
             {
+              "id": "kitchen-garden",
               "title": "The Kitchen Garden",
               "content": "A household kitchen garden of about ten square meters can keep a house in greens, roots and herbs from spring to autumn. It is laid out as the three-bed round: one bed of greens, one of roots and one of legumes, moved on by one bed each year. Greens draw the field hardest, roots less, and legumes restore it, so no bed is spent. Herbs go along the edges, where a light charm keeps them through the first frosts. Picking is done in the morning, when the field in the leaves is highest.",
               "question": {
@@ -1164,6 +1224,7 @@
           "description": "The working witch's craft as it is practiced, not theorized: small charms cast by hand, the hexes every student is warned about and how each is undone, and the discipline of working with the Bloom rather than drawing on it. Half of every week is at the bench.",
           "topics": [
             {
+              "id": "working-with-not-drawing-on",
               "title": "Working With, Not Drawing On",
               "content": "Witchcraft is the craft of small workings done by hand, and its first discipline is to work with the Bloom and not draw on it. Drawing means spending the body's own field, which is quick and tiring. Working with means borrowing the field already present in the thing itself: the warmth left in a hearthstone, the growth in a stem. A witch who draws can light ten candles and must then sit down. One who works with the wax and the wick lights fifty.",
               "question": {
@@ -1177,6 +1238,7 @@
               }
             },
             {
+              "id": "three-hand-charms",
               "title": "The Three Hand Charms",
               "content": "Three charms are the grammar of the craft. Warming: cup the object, breathe once, and ask the heat already in it to gather. Mending: bring the broken edges together and hold until they remember being whole, which works on cloth, clay and wood but never on anything alive. Light: pinch the air above a surface that has seen daylight. Each holds for about an hour unless anchored to a knot, a stitch or a scratched mark, which can carry it for days.",
               "question": {
@@ -1190,6 +1252,7 @@
               }
             },
             {
+              "id": "anchors-knots-and-thresholds",
               "title": "Anchors, Knots and Thresholds",
               "content": "A charm lasts as long as its anchor. Knots hold best in natural fiber, with nine turns as the working standard. Scratched marks hold in stone and fired clay, poorly in metal and not at all in plastic. Thresholds are natural anchors: doorsills, window frames, lids and hems all divide an inside from an outside, which is why wards sit there. A sound bench exercise is a jar ward that keeps bread fresh for a week, anchored on the thread of the lid.",
               "question": {
@@ -1203,6 +1266,7 @@
               }
             },
             {
+              "id": "four-hexes-worth-recognizing",
               "title": "Four Hexes Worth Recognizing",
               "content": "A hex is a charm set against its subject's interest. Four are common enough to meet in any residence hall. The Tangle knots hair, laces and cables. The Souring turns milk and spoils a brew. The Misplace makes one object persistently overlooked. The Stumble catches a foot on flat ground. All four are Tier I, all need an anchor near the victim, and all leave a signature: a faint cold spot that a trained hand can feel from a few inches away.",
               "question": {
@@ -1216,6 +1280,7 @@
               }
             },
             {
+              "id": "undoing-unpick-break-return",
               "title": "Undoing: Unpick, Break, Return",
               "content": "Every hex has three counters. Unpicking finds the anchor and reverses it turn by turn: slow, clean and safe. Breaking destroys the anchor by burning the knot or washing the mark in running water: fast, but the released charge goes somewhere, often into the nearest glass. Returning sends the hex back along its thread to the caster, and is forbidden at the bench because it escalates. The rule of the craft is to unpick where possible and break only when in haste.",
               "question": {
@@ -1229,6 +1294,7 @@
               }
             },
             {
+              "id": "hexing-consent-and-the-law",
               "title": "Hexing, Consent and the Law",
               "content": "Breedhaven law treats a hex as it treats a blow. A working set on a person or their property without consent is an offense, however small, and intent to harm is presumed where the anchor was hidden. Three cases are tried far more severely: a working on a pregnant woman, a working that interferes with contraception, and a working aimed at a Sire. The craft's own older rule is shorter. Nothing is cast on a person that could not be cast in front of them.",
               "question": {
@@ -1276,6 +1342,7 @@
           "description": "The witchcraft of a home: thresholds and wards, the workings that keep a house fed, warm and quiet, and how a ward is read, tended and taken down. Weekly bench work builds and tests a full set of household wards.",
           "topics": [
             {
+              "id": "house-as-one-working",
               "title": "The House as One Working",
               "content": "A household witch treats a house as a single working with many anchors. Each door, hearth and window is a threshold, and a ward set on one changes how the others hold. Laid out well, a house keeps its own warmth, sours no milk and lets in only those its people welcome. Laid out badly, wards fight each other at the corners and every room is cold. The first bench task is to map a house: each threshold, what it divides, and what crosses it each day.",
               "question": {
@@ -1289,6 +1356,7 @@
               }
             },
             {
+              "id": "door-ward",
               "title": "The Door Ward",
               "content": "The door ward is the oldest working of the craft and the simplest to set badly. It is anchored in the sill, never in the door, since a door is opened a hundred times a day and a sill is not. It is keyed to the household: anyone who has slept under the roof three nights crosses freely, and anyone else feels a slight reluctance, enough to knock. A door ward does not stop a determined visitor. It is a courtesy made solid, and its real use is that it tells the house who has come in.",
               "question": {
@@ -1302,6 +1370,7 @@
               }
             },
             {
+              "id": "hearth-larder-and-cradle",
               "title": "Hearth, Larder and Cradle",
               "content": "Three household workings are taught to every first-year. The hearth charm keeps a banked fire alive until morning on a single log. The larder ward slows spoiling, anchored on the shelf edge, and keeps bread a week and milk three days. The cradle charm is the gentlest working of the craft: a hum anchored in the rocker that settles a waking infant back to sleep. It is never set on the child itself, only on the cradle, and it fails on purpose if the child is hungry or ill.",
               "question": {
@@ -1315,6 +1384,7 @@
               }
             },
             {
+              "id": "reading-a-ward",
               "title": "Reading a Ward",
               "content": "Every ward leaves a signature a trained hand can read: its strength, its age and whose it is. A fresh ward feels sharp, like the cold of a window pane. An old one feels dull and spread, and a failing one has gaps, places along the threshold where the hand passes through. A ward carries something of its maker, so a practiced reader can tell two witches apart by their work alone. Reading comes before every repair, since a ward patched without being read is often made worse.",
               "question": {
@@ -1328,6 +1398,7 @@
               }
             },
             {
+              "id": "tending-and-renewal",
               "title": "Tending and Renewal",
               "content": "A ward is renewed, not replaced. Renewal means tracing the working along its anchor and feeding it from the field already in the threshold, which keeps the original keying intact. A replaced ward must be keyed to the household again from nothing, and for three nights nobody crosses freely. Household wards are renewed at the turn of each season, and after any birth or death in the house, since either changes who the household is. A ward left untended fades in about a year.",
               "question": {
@@ -1341,6 +1412,7 @@
               }
             },
             {
+              "id": "taking-a-ward-down",
               "title": "Taking a Ward Down",
               "content": "Wards are taken down in the reverse of the order they were set: the inner rooms first and the front door last, so that no part of the house is left guarding against the rest. Each anchor is unpicked, not broken, because a broken ward releases its charge into the nearest glass and a house full of wards can crack every window it has. A witch moving out takes her wards with her or hands them on to the next household, and the law counts a ward left behind and keyed to the wrong people as a nuisance.",
               "question": {
@@ -1404,6 +1476,7 @@
           "description": "Foundations of engineering with the Bloom, covering the principles by which enchantments are structured into materials, circuits, and devices, and the safety standards that govern magical engineering in Breedhaven. Weekly lab in the Foundry introduces basic enchantment construction, measurement, and calibration.",
           "topics": [
             {
+              "id": "what-engineering-does-with-magic",
               "title": "What Engineering Does With Magic",
               "content": "Magic is personal, limited and tiring; technology is scalable and predictable. Magical engineering exists to move a working out of the woman and into a device, so that it runs when she has gone home. Every enchantment has three parts: an anchor (the material that holds it), a pattern (what it does) and a charge (the Bloom stored to drive it). A mage can heat a room for an hour. A warming charm anchored in a radiator plate and topped up monthly heats it all winter.",
               "question": {
@@ -1417,6 +1490,7 @@
               }
             },
             {
+              "id": "anchors-materials-that-hold-a-working",
               "title": "Anchors: Materials That Hold a Working",
               "content": "An anchor is judged by retention, the share of charge still held after a set time. Living and once-living materials take a charge easily and lose it fast: untreated oak holds a ward for days. Dense crystalline materials are harder to charge and far better at keeping it: quartz, granite and fired ceramic hold for years. Copper and silver conduct a working instead of storing it, which is why they form the traces between anchors. Self-mending stone is granite carrying a mending pattern.",
               "question": {
@@ -1430,6 +1504,7 @@
               }
             },
             {
+              "id": "measuring-the-bloom-thaums-and-tiers",
               "title": "Measuring the Bloom: Thaums and Tiers",
               "content": "Charge is measured in thaums and output in thaums per hour, read on a thaumometer, a quartz sensor whose response rises with the Bloom passing through it. Tiers grade workings by the output they demand and the harm they do if they slip. Tier I covers what most women manage unaided: a light, a warming, a simple mend. Tier III and above need training, a circle or a pregnancy surge. Calibration comes first: zero the meter in a warded box, then check it against a reference stone of known charge.",
               "question": {
@@ -1443,6 +1518,7 @@
               }
             },
             {
+              "id": "coupling-enchantment-to-circuits",
               "title": "Coupling Enchantment to Circuits",
               "content": "A magitech device joins an enchantment to ordinary electronics at a coupler, a quartz element that turns a change in charge into a voltage and back. A door ward shows the pattern. The ward lives in the frame; a coupler reports its state to a microcontroller; the controller checks a phone key and tells the ward to admit or refuse. The electronics decide, the enchantment acts. The design rule follows: logic belongs in silicon, where it is cheap and testable, and force belongs in the working.",
               "question": {
@@ -1456,6 +1532,7 @@
               }
             },
             {
+              "id": "decay-recharge-and-maintenance",
               "title": "Decay, Recharge and Maintenance",
               "content": "Every stored charge leaks. Loss is exponential, so anchors are rated by half-life: a household ward plate at about six months, an enchanted street lamp at a year. A device is serviced before it falls below its working threshold. Recharging is skilled labor, done by hand or, for large installations, by a circle. Short-range teleport arrays are the costliest case: a station array is topped up by a circle every night, which is why arrays stand only at major stations and on the campus shuttle.",
               "question": {
@@ -1469,6 +1546,7 @@
               }
             },
             {
+              "id": "safety-standards-and-the-warded-bench",
               "title": "Safety Standards and the Warded Bench",
               "content": "Breedhaven law treats an enchanted device like any other product: it must fail safe, meaning a drained or broken working leaves the device inert, never active. In the Foundry every casting above Tier I is done at a warded bench, which contains a slipped working, and Tier III work needs a spotter. Pregnancy changes the arithmetic, since output climbs week by week: a pregnant engineer is re-measured weekly, moved to the advanced practical for the length of the surge, and works with a spotter.",
               "question": {
@@ -1516,6 +1594,7 @@
           "description": "How enchantment moves things: the charm-cores, drives, gearing and brakes of the trams, scooters and motorbikes of Breedhaven, and how to keep one running. Weekly lab in the Foundry's engine bay strips, tunes and rebuilds a working charm-drive.",
           "topics": [
             {
+              "id": "charm-core",
               "title": "The Charm-Core",
               "content": "A charm-core is a crystal anchor carrying a motive pattern and a store of charge: the heart of every vehicle in Breedhaven that does not burn fuel. The pattern turns stored charge into rotation, as a warming charm turns it into heat. Quartz cores are cheap and steady; corundum cores take more charge and deliver it faster, which is why racing bikes use them. A core is rated in thaums stored and thaums per hour delivered.",
               "question": {
@@ -1529,6 +1608,7 @@
               }
             },
             {
+              "id": "combustion-and-charm-drives",
               "title": "Combustion and Charm-Drives",
               "content": "An old combustion engine burns fuel to push pistons; a charm-drive turns a shaft directly from the core. The charm-drive is quiet, has few moving parts and gives full torque from standstill, but it is heavy for the range it gives, and a core must be recharged rather than refilled. Hybrid bikes keep a small combustion engine to recharge the core on long rides. Many riders convert an old engine to a charm-drive and keep the frame.",
               "question": {
@@ -1542,6 +1622,7 @@
               }
             },
             {
+              "id": "gearing-and-transmission",
               "title": "Gearing and Transmission",
               "content": "Gearing trades speed for force. A small gear driving a large one turns it more slowly but with more force: low gear, for pulling away and climbing hills. A large gear driving a small one turns it faster with less: high gear, for the open road. A chain or belt carries the drive to the rear wheel. Because a charm-drive is strong at every speed, many charm bikes need only one or two gears where a combustion bike needs six.",
               "question": {
@@ -1555,6 +1636,7 @@
               }
             },
             {
+              "id": "brakes-and-recovery",
               "title": "Brakes and Recovery",
               "content": "Friction brakes squeeze pads against a disc and turn motion into heat. A charm-drive can also brake by running its pattern backward, turning the wheel's motion back into charge in the core. This recovery braking returns a share of the charge on every stop, which is why tram lines with many stops are cheap to run. Recovery cannot stop a vehicle quickly on its own, so every vehicle keeps friction brakes for emergencies.",
               "question": {
@@ -1568,6 +1650,7 @@
               }
             },
             {
+              "id": "tuning-and-maintenance",
               "title": "Tuning and Maintenance",
               "content": "Tuning matches the pattern's draw to the core and the rider: a hotter tune gives more speed and drains the core faster, a cooler one gives range. A core loses retention with every deep discharge, so a well-kept bike is recharged before it runs empty. Chains are cleaned and oiled, pads checked for wear, and pattern traces inspected for cracks, which leak charge as a faint warmth along the frame. Most breakdowns are a cracked trace or a tired core.",
               "question": {
@@ -1581,6 +1664,7 @@
               }
             },
             {
+              "id": "safety-and-the-road",
               "title": "Safety and the Road",
               "content": "Every vehicle with a core above the second tier must be registered, inspected each year and ridden by a licensed driver. A cracked core can discharge all at once, which is why cores sit in warded housings and are never opened with the charge still in them. Riders wear a helmet and armored leathers.Most accidents happen at junctions, to riders the other driver did not see.",
               "question": {
@@ -1619,6 +1703,7 @@
           "description": "Design of enchanted systems at the scale of a household and a city, covering enchanted circuits, ward networks, power budgets and mana storage, failure analysis, and the testing standards a system must pass before it enters service. Weekly lab in the Foundry builds, loads, and deliberately breaks small working systems at the warded bench. Prerequisite: MEN 101.",
           "topics": [
             {
+              "id": "enchanted-circuits-series-and-parallel",
               "title": "Enchanted Circuits: Series and Parallel",
               "content": "An enchanted circuit links anchors with copper or silver traces so that one charge drives several workings. In series, each working draws in turn and the first to fail cuts every one after it, as in a string of festival lights. In parallel, each working draws from the common trace on its own, so one failure leaves the rest running. Household and city systems are wired in parallel. Series is kept for interlocks, where one open link must stop the whole chain, such as a kiln that will not fire while its door ward is down.",
               "question": {
@@ -1632,6 +1717,7 @@
               }
             },
             {
+              "id": "power-budgets",
               "title": "Power Budgets",
               "content": "A power budget lists every working in a system with its draw in thaums per hour and adds them up. The total is set against what the store can supply, and a design is passed only with a margin of at least a quarter above the expected peak load. Peak matters more than average: a house that warms, lights and cooks at six in the evening draws three times its overnight load. The budget also counts losses, since every meter of copper trace bleeds a little charge, which is why stores sit close to the workings they feed.",
               "question": {
@@ -1645,6 +1731,7 @@
               }
             },
             {
+              "id": "mana-storage-cells-and-banks",
               "title": "Mana Storage: Cells and Banks",
               "content": "Charge for a system is kept in storage cells, blocks of fired ceramic or quartz rated by capacity in thaums and by discharge rate, the most they can give up in an hour. Capacity says how long a system runs; discharge rate says how much it can run at once. A large cell with a low rate cannot start a heavy working. Cells are joined into a bank to raise both figures. A household bank sits in the cellar and is recharged quarterly; a district bank under a tram depot is topped up by a circle each week.",
               "question": {
@@ -1658,6 +1745,7 @@
               }
             },
             {
+              "id": "ward-networks",
               "title": "Ward Networks",
               "content": "A ward network joins many ward plates into one field by linking them through nodes, quartz junctions that share charge and pass state between plates. A single plate covers a door; a network covers a building or a street. Networks are built as meshes, with each node linked to at least two others, so that one broken link never opens a gap. A controller polls every node through its coupler each minute and flags any plate that falls silent. The city wall wards, the oldest network in Breedhaven, still run on this principle.",
               "question": {
@@ -1671,6 +1759,7 @@
               }
             },
             {
+              "id": "failure-analysis",
               "title": "Failure Analysis",
               "content": "Failure analysis asks why a device stopped and what else would stop the same way. Engineers sort causes into three classes: drain, where the charge ran out; fracture, where the anchor cracked and the pattern broke; and drift, where the pattern slowly lost its shape and the working began doing something slightly different. Drift is the most dangerous, because the device still runs. Every failure in a public system is written up in a failure report, which names the root cause and the change that prevents it, and is filed with the Foundry.",
               "question": {
@@ -1684,6 +1773,7 @@
               }
             },
             {
+              "id": "testing-and-design-for-service",
               "title": "Testing and Design for Service",
               "content": "No system enters service untested. Each device passes a bench test at the warded bench, then a load test at full peak draw for a day, then a drain test, where its store is run to empty to prove it fails safe and goes inert. The design rule for a household or city system is design for service: every anchor, cell and node must be reachable and replaceable without taking the rest offline. A tram line's lamp wards are fitted in sections of ten so that one crew can change a section in an hour while the others stay lit.",
               "question": {
@@ -1740,6 +1830,7 @@
           "description": "Introduction to the genetics of the sex ratio and Sire fertility, covering the Bloom's role in sex determination, the clinical assay that establishes Sire status, and the basic biology of inheritance in the Sown Expanse. Weekly lab involves microscopy, assay demonstration, and basic genetic analysis.",
           "topics": [
             {
+              "id": "what-makes-a-sire",
               "title": "What Makes a Sire",
               "content": "A Sire is a man whose seed can begin a pregnancy. A True Sire is the rare Sire with whom a woman who is taking nothing against it always conceives. About one man in ten is one, and men are one birth in eight, so a Sire is roughly one birth in eighty. The other nine men in ten are healthy in every ordinary sense: the difference lies in the seed alone and cannot be seen or felt by the man himself. Sire Genetics asks two questions. Why are sons so few, and why are so few sons fertile? Neither has a complete answer yet.",
               "question": {
@@ -1753,6 +1844,7 @@
               }
             },
             {
+              "id": "sex-determination-and-the-daughter-bias",
               "title": "Sex Determination and the Daughter Bias",
               "content": "A father's seed carries the factor that decides a child's sex, in equal numbers for daughters and sons. The seven to one ratio arises afterward. The egg's own Bloom field strongly favors daughter-bearing seed, so seven conceptions in eight are girls. The proof is that the ratio holds in assisted conception, where seed and egg meet in a dish. The bias is the same in humans, elves, orcs, halflings and beastkin, which points to the Bloom and not to any one bloodline.",
               "question": {
@@ -1766,6 +1858,7 @@
               }
             },
             {
+              "id": "clinical-assay",
               "title": "The Clinical Assay",
               "content": "Fertility is established by assay of a seed sample. Under the microscope, fertile seed takes up a Bloom-reactive stain and glows green: this is bound seed. The result is the bound fraction, the percentage of seed that is bound. Below five percent a man is recorded as not fertile. Most Sires score between twenty and forty, and a score above ninety is a record assay and makes the news abroad. Two samples two weeks apart are required before any entry is made.",
               "question": {
@@ -1779,6 +1872,7 @@
               }
             },
             {
+              "id": "does-fertility-run-in-families",
               "title": "Does Fertility Run in Families?",
               "content": "Only weakly. The sons of Sires are fertile about one time in six, against one in ten for men at large, and the brothers of a Sire fare little better than strangers. So fertility is not a single inherited trait passed from father to son. The working model is that many small inherited factors raise or lower the chance, and that the mother's Bloom field during the pregnancy matters as much. Assay scores among fertile kin do show a clear family resemblance.",
               "question": {
@@ -1792,6 +1886,7 @@
               }
             },
             {
+              "id": "registry-data-and-its-limits",
               "title": "Registry Data and Its Limits",
               "content": "Every assay result is entered in the national Sire Registry, and the record is private by law. Geneticists never see names. Research uses stripped records: score, age, people and region, released under license. Two cautions apply to any Registry study. Men who are never assayed do not appear, so the one in ten figure is an estimate. And a count of three Sires in one small town cannot be published at all, because a number that small identifies the men.",
               "question": {
@@ -1805,6 +1900,7 @@
               }
             },
             {
+              "id": "why-so-few-open-questions",
               "title": "Why So Few: Open Questions",
               "content": "Three hypotheses compete. The Cost hypothesis holds that binding seed draws heavily on the Bloom, so that only a few bodies can sustain it. The Maternal Field hypothesis places the cause in the womb, where a mother's field sets her son's fertility before birth. The Balance hypothesis treats scarcity as a stable ratio the Bloom returns to whenever it is disturbed. No treatment has ever made an infertile man fertile, and any model must explain that failure.",
               "question": {
@@ -1843,6 +1939,7 @@
           "description": "The laboratory course of the major: how the assay is run and read in practice, how inheritance is traced through families and the Registry, and what the numbers can and cannot say about any one man. Weekly lab runs full assays on prepared samples.",
           "topics": [
             {
+              "id": "running-an-assay",
               "title": "Running an Assay",
               "content": "An assay is run in four steps. The sample is diluted to a standard count, stained with the Bloom-reactive dye, rested for twenty minutes in darkness, and read under the microscope across ten fields of view. Each field is scored separately for bound and unbound seed, and the bound fraction is the total bound over the total counted. Rushing the rest period is the most common error at the bench. A sample read early scores low, because the stain has not yet finished taking up.",
               "question": {
@@ -1856,6 +1953,7 @@
               }
             },
             {
+              "id": "error-and-the-second-sample",
               "title": "Error and the Second Sample",
               "content": "No single assay is trusted. The bound fraction of one man varies from week to week with rest, fever, drink and the time since he last finished, by as much as ten points either way. This is why the Registry asks for two samples two weeks apart and records their mean. A man who scores four and then seven is reassayed a third time, since the line at five is too close to call. Most disputed assays turn out to be a single sample taken on a bad day.",
               "question": {
@@ -1869,6 +1967,7 @@
               }
             },
             {
+              "id": "tracing-a-family",
               "title": "Tracing a Family",
               "content": "Inheritance is studied through pedigrees: charts of a family over three or more generations showing every man, his assay where there is one, and every pregnancy. Because the Registry keeps assays private, a pedigree is built with the family's consent and from their own records. The patterns are faint. Fertile men cluster slightly in some families, sons of high-scoring Sires score a little higher, and daughters carry no measurable trace at all. A single pedigree proves nothing, and only hundreds together show a trend.",
               "question": {
@@ -1882,6 +1981,7 @@
               }
             },
             {
+              "id": "mother-s-part",
               "title": "The Mother's Part",
               "content": "Studies of half-brothers give the strongest evidence for the mother's part in a son's fertility. Sons of one father by different mothers differ in fertility far more than full brothers do, which a father's inheritance alone cannot explain. A mother's Bloom field during the pregnancy appears to set part of her son's chance before birth. Mothers who had already borne several daughters raise slightly more fertile sons, a finding the Maternal Field hypothesis predicts and the others do not.",
               "question": {
@@ -1895,6 +1995,7 @@
               }
             },
             {
+              "id": "reading-the-registry-numbers",
               "title": "Reading the Registry Numbers",
               "content": "Registry figures are read with care. The share of men who are Sires is counted only among men assayed, and men assayed are not a fair sample: those with reason to hope are tested more often. Regional differences are mostly differences in how often men are tested. Trends over time follow changes in law, as when the assay became free and the counted share fell. A careful paper states the assay rate beside every figure, so that a reader can tell a real difference from a change in who came forward.",
               "question": {
@@ -1908,6 +2009,7 @@
               }
             },
             {
+              "id": "counseling-and-disclosure",
               "title": "Counseling and Disclosure",
               "content": "A geneticist who runs assays will also tell men their results, and the telling is part of the craft. A result is given in person, never by message, with the bound fraction, what it means for the chance of a child and what it does not mean. A man who is not fertile is not ill, and is told so plainly. A Sire is told his legal duties, his rights over his own record, and that nobody else will be told without his consent, which includes his family and any woman he is seeing.",
               "question": {
@@ -1971,6 +2073,7 @@
           "description": "Introduction to resistance training, conditioning, and movement mechanics for students of all body types and Bloom states. Weekly lab covers proper lifting technique, program design, and safe training practices for pregnant and non-pregnant students alike.",
           "topics": [
             {
+              "id": "six-movements-and-the-brace",
               "title": "Six Movements and the Brace",
               "content": "All strength training is built from six movements: squat, hinge, push, pull, lunge and carry. Before any of them comes the brace. The lifter breathes low into the belly, tightens the trunk as if about to take a punch, and holds the spine in its natural curve from start to finish. A broomstick laid along the back should touch the head, the upper back and the tailbone throughout a hinge. If one of the three points lifts off, the back has moved, and no weight is added until it stays put.",
               "question": {
@@ -1984,6 +2087,7 @@
               }
             },
             {
+              "id": "squat-and-the-deadlift",
               "title": "The Squat and the Deadlift",
               "content": "In the squat the bar sits across the upper back, feet are set shoulder width with toes turned slightly out, and the hips drop until they are just below the top of the knee. Knees track over the toes and the heels stay down. In the deadlift the bar starts over the middle of the foot, the hips hinge back, the arms hang straight, and the legs push the floor away. In both lifts the bar travels in a straight vertical line over mid-foot. A beginner learns both with an empty twenty-kilo bar.",
               "question": {
@@ -1997,6 +2101,7 @@
               }
             },
             {
+              "id": "pressing-rowing-and-balance",
               "title": "Pressing, Rowing and Balance",
               "content": "The bench press and the overhead press train pushing; the row and the pull-up train pulling. On the bench, the shoulder blades are pinched together, the feet stay planted, and the bar touches the lower chest. Overhead, the bar finishes above the ears with the elbows locked. A sound program does at least as many pulling sets as pushing sets, since desks and phones already round the shoulders forward. One spotter stands at the head of the bench for any set taken near its limit.",
               "question": {
@@ -2010,6 +2115,7 @@
               }
             },
             {
+              "id": "program-design-and-progressive-overload",
               "title": "Program Design and Progressive Overload",
               "content": "A muscle grows stronger only when asked for slightly more than last time; this is progressive overload. The beginner's plan is three sessions a week with a rest day between, three sets of five on each main lift. Each session adds 2.5 kilos to the bar. A worked example: a squat begun at 40 kilos reaches 70 after twelve sessions, four weeks. When a weight fails twice running, it is cut by a tenth and built back up. Sleep, food and rest days are part of the plan and not a break from it.",
               "question": {
@@ -2023,6 +2129,7 @@
               }
             },
             {
+              "id": "magical-aid-and-the-three-divisions",
               "title": "Magical Aid and the Three Divisions",
               "content": "Sport is played in three divisions: Unaugmented, with no magic; Mage, which allows it; and Bloom, for pregnant competitors. A strengthening nudge will move more weight on the day, but tendons and bone adapt only to load they actually bear, so an augmented lifter with no plain base gets hurt. The rule in the weight room is no pain-easing charm before or during a session, because pain is the warning. A healer can close a strain in minutes, but the mended tissue still needs its rest days.",
               "question": {
@@ -2036,6 +2143,7 @@
               }
             },
             {
+              "id": "training-through-pregnancy",
               "title": "Training Through Pregnancy",
               "content": "A pregnant lifter is hardier than before and her power rises week by week, but in a pregnancy of under two months her balance and her joints change faster than her habits. Training goes by effort, not by numbers: every set stops with two clean repetitions in hand. Breath is never held under load, and after the middle weeks nothing is pressed lying flat. Maximum attempts are made only on a warded platform with a spotter, since a surge under the bar can bend steel.",
               "question": {
@@ -2086,6 +2194,7 @@
           "description": "The senior course in sport: how a season is planned, how a squad is led, and how magic is and is not allowed on the field. Half of every week is at the Tiltyard, coaching a junior side under supervision.",
           "topics": [
             {
+              "id": "planning-a-season-backward",
               "title": "Planning a Season Backward",
               "content": "A season is planned from its last match backward. The Arena Finals fall in the closing weeks of term, so a squad should peak then and not in the opening fixtures. The year is cut into blocks of three to five weeks: a base block of high volume and low intensity, a build block where volume falls and intensity climbs, and a taper of seven to ten days before the match that matters. A coach who trains hardest in the final week sends tired players onto the field.",
               "question": {
@@ -2099,6 +2208,7 @@
               }
             },
             {
+              "id": "load-fatigue-and-the-training-log",
               "title": "Load, Fatigue and the Training Log",
               "content": "Training load is volume multiplied by intensity, and it is written down. The simplest measure is session minutes times a rating of effort from one to ten, totalled by week. A jump of more than a tenth from one week to the next is where most soft-tissue injuries come from. Fatigue shows first in sleep, mood and resting pulse, a day or two before it shows in performance. The log exists so that a coach can see the bad week coming instead of explaining it afterward.",
               "question": {
@@ -2112,6 +2222,7 @@
               }
             },
             {
+              "id": "magic-on-the-field-the-three-divisions",
               "title": "Magic on the Field: The Three Divisions",
               "content": "University sport is played in three divisions, set by how much magic is allowed. The Open division permits any working a player can cast unaided. The Limited division allows only Tier I workings and bans anything cast on an opponent. The Plain division allows none, and wards on the pitch void a match if one is tripped. Men play almost entirely in the Plain division. Most of the crowd follows Limited, where skill and a small working decide a point together.",
               "question": {
@@ -2125,6 +2236,7 @@
               }
             },
             {
+              "id": "pregnant-athletes-and-the-surge-rule",
               "title": "Pregnant Athletes and the Surge Rule",
               "content": "A pregnant player's magic climbs steeply through her term, which upsets any division that allows casting. The surge rule answers it: from the middle weeks she is reclassified upward, playing Open even if she registered for Limited, and she takes the field only with a warded spotter on the touchline. Physical load is cut by a third, contact drills stop, and she is not asked to play through a term's last two weeks. No coach may bench a player for being pregnant; the rule changes where she plays, not whether.",
               "question": {
@@ -2138,6 +2250,7 @@
               }
             },
             {
+              "id": "leading-a-squad-of-twelve",
               "title": "Leading a Squad of Twelve",
               "content": "A captain leads by what she tolerates. The first job is standards: who is on time, who finishes the last rep, who speaks to an official. The second is the bench, because a squad of twelve fields six or seven and the rest decide the mood. A workable rule is to give every player a named role and one thing she is trusted with, and to give bad news in private and credit in front of the squad. Rivalries inside a team are managed by pairing the rivals in drills, never by pretending they are friends.",
               "question": {
@@ -2151,6 +2264,7 @@
               }
             },
             {
+              "id": "reading-a-match-and-changing-it",
               "title": "Reading a Match and Changing It",
               "content": "A coach watches for three things in the opening ten minutes: where the opposition's best player wants the ball, which of her own players is a step slow, and what the official is letting go. A timeout is spent to change one thing only, said in one sentence. Substitutions are for tempo as often as for tiredness: a fresh server changes the rhythm of a set. The post-match review happens the next day, with the scoresheet, and starts with what went right.",
               "question": {
@@ -2193,6 +2307,7 @@
           "description": "The mind in competition: what makes an athlete train, how she keeps her nerve when a match turns on one point, and how she comes back from injury or burnout. Weekly lab at the Tiltyard puts each technique to work in pressure drills with the varsity volleyball and soccer squads. Prerequisite: KIN 101.",
           "topics": [
             {
+              "id": "why-an-athlete-trains",
               "title": "Why an Athlete Trains",
               "content": "Motivation comes in two kinds. Intrinsic motivation is the pleasure of the game itself; extrinsic motivation is the medal, the stipend or the coach's praise. Players who train for intrinsic reasons stay in the sport longer and train harder when nobody is watching. Coaches feed it with three things: a sense of choice in how a drill is run, a sense of getting better that can be measured, and a sense of belonging to the side. A prize helps for a season, but a player who trains only for the prize stops when it is won.",
               "question": {
@@ -2206,6 +2321,7 @@
               }
             },
             {
+              "id": "arousal-and-the-inverted-u",
               "title": "Arousal and the Inverted U",
               "content": "Arousal is how keyed up the body is: heart rate, breath and muscle tension. The inverted-U model holds that performance rises with arousal up to a middle point and then falls off. Too flat and a player is slow to the ball; too high and her hands shake and her vision narrows. The best point is lower for fine skills such as a volleyball serve and higher for raw effort such as a sprint. Box breathing lowers arousal: in for four counts, hold four, out four, hold four, repeated three times.",
               "question": {
@@ -2219,6 +2335,7 @@
               }
             },
             {
+              "id": "focus-and-the-pre-performance-routine",
               "title": "Focus and the Pre-Performance Routine",
               "content": "Attention has two dimensions: broad or narrow, and outward or inward. A setter reading the whole court uses a broad outward focus; a penalty taker uses a narrow outward one, fixed on a single spot of the net. Distraction is handled with a pre-performance routine, the same short sequence before every serve, kick or lift. A good routine lasts under ten seconds and ends on one cue word, such as \"smooth\" or \"through\". Mages at Aether are taught the same habit before a casting, since a wandering mind spills magic.",
               "question": {
@@ -2232,6 +2349,7 @@
               }
             },
             {
+              "id": "pressure-and-choking",
               "title": "Pressure and Choking",
               "content": "Choking is a sudden drop in performance under pressure, below what the player does in training. The usual cause is overthinking: a skill that runs on its own is taken back under conscious control, and it comes apart, so that a smooth serve turns stiff. The cure is to rehearse under pressure, with a crowd noise drill, a forfeit for a miss, or a scoreboard running. On the day the player thinks about the target and not the movement. Arena Finals squads practice in front of a full Tiltyard stand for the last three weeks of term.",
               "question": {
@@ -2245,6 +2363,7 @@
               }
             },
             {
+              "id": "confidence-self-talk-and-the-team",
               "title": "Confidence, Self-Talk and the Team",
               "content": "Confidence comes mostly from past success, so a coach builds it with drills a player can win before raising the bar. Self-talk is the running voice in a player's head. Instructional self-talk names the task (\"eyes up\", \"drive the hip\") and suits skills; motivational self-talk (\"I can hold this\") suits endurance. Spoken in the third person, by her own name, it calms a player faster than in the first person. A team is cohesive in two ways: task cohesion, agreeing on the goal, and social cohesion, liking each other. Task cohesion predicts winning.",
               "question": {
@@ -2258,6 +2377,7 @@
               }
             },
             {
+              "id": "injury-burnout-and-the-way-back",
               "title": "Injury, Burnout and the Way Back",
               "content": "An injured player goes through stages much like grief: denial, anger, low mood and then acceptance. Recovery is faster when she sets small weekly rehab goals, stays at training with the squad, and pictures the movement she cannot yet do. A healer mends tissue in minutes, but the fear of reinjury stays, and it is retrained with a graded return over two weeks. Burnout is exhaustion, a loss of meaning and a sense of getting worse. It follows months of training without rest, and the treatment is a full week away from the sport.",
               "question": {
@@ -2314,6 +2434,7 @@
           "description": "Capstone course in executive and high-value protective operations, emphasizing Sire escort detail, threat assessment, and coordination with national Sire Registry enforcement. Weekly lab runs simulated protection scenarios under graduated magical and physical pressure.",
           "topics": [
             {
+              "id": "threat-assessment-for-sire-principals",
               "title": "Threat Assessment for Sire Principals",
               "content": "Threats to a Sire fall into five classes: abduction, reproductive coercion, fraud, crowd pressure and disclosure. Violence is the rarest. Most incidents begin with a leak of status, then fixation by people who mean no harm and still close every exit. An assessment scores each venue for the number of young women present who have never carried a child, in whom the Bloom's pull runs strongest, and for how widely the principal's status is already known. Known status doubles the detail.",
               "question": {
@@ -2327,6 +2448,7 @@
               }
             },
             {
+              "id": "structure-of-a-protective-detail",
               "title": "Structure of a Protective Detail",
               "content": "A standard escort detail is four: a leader who stays at the principal's shoulder, a close escort, an advance officer who reaches each venue first, and a driver who never leaves the vehicle. On foot the team walks a diamond with the principal at its center. Officers of childbearing age take suppressants on duty as a matter of protocol, so that attention stays on the crowd. Officers in their Second Bloom feel no pull at all and are prized for night and residential posts.",
               "question": {
@@ -2340,6 +2462,7 @@
               }
             },
             {
+              "id": "advance-work-and-secure-venues",
               "title": "Advance Work and Secure Venues",
               "content": "The advance officer surveys a venue for three things: entrances, wards and exits by magic. Every door the principal uses should be logged, as in a university Sire wing, and one entrance reserved. Existing wards are tested, since a ward set to keep people out can as easily keep a detail in. Short-range teleport arrays at stations are the classic abduction point: a principal moved forty paces is out of sight. Details board last, hold the platform, and never split across two arrays.",
               "question": {
@@ -2353,6 +2476,7 @@
               }
             },
             {
+              "id": "magical-threat-and-counter-warding",
               "title": "Magical Threat and Counter-Warding",
               "content": "The principal has no magic and every likely adversary has some. Most women manage only a nudge, a light or a minor ward, which a trained officer shrugs off. The serious cases are a circle of several casters and a pregnant adversary, whose power near term can exceed the whole detail's. Doctrine against either is distance and departure, not contest. Detail officers carry warded armor and a blade. Firearms belong to the army and city police and stay outside University walls.",
               "question": {
@@ -2366,6 +2490,7 @@
               }
             },
             {
+              "id": "registry-enforcement-and-legal-limits",
               "title": "Registry Enforcement and Legal Limits",
               "content": "Registry enforcement officers investigate unlawful disclosure, forged assays and coerced contracts, and a detail that witnesses any of these must preserve evidence and report within a day. The detail itself has no special powers. Its officers may use reasonable force to defend the principal and may detain an attacker until police arrive. They may not detain the principal. He is the client, not the cargo, and if he chooses to leave with someone, the detail advises, records and follows.",
               "question": {
@@ -2379,6 +2504,7 @@
               }
             },
             {
+              "id": "protection-or-custody-contested-cases",
               "title": "Protection or Custody: Contested Cases",
               "content": "The unsolved problem of Sire security is where protection becomes custody. Secure housing, logged doors and escorts reduce attempted walk-offs, yet a man who cannot go for coffee alone is not obviously safe so much as kept. Foreign offers complicate it: an approach from abroad may be a lawful contract proposal, an intelligence operation or both. Current doctrine grades restriction by assessed threat and requires the principal's written consent, renewed each term, for anything beyond escort.",
               "question": {
@@ -2421,6 +2547,7 @@
           "description": "The groundwork of public safety: how crowds behave and move, how to read one before it turns, first response to injury and panic, and the footwork and holds an officer needs on a crowded street. Weekly field drills run in the Tiltyard.",
           "topics": [
             {
+              "id": "how-a-crowd-moves",
               "title": "How a Crowd Moves",
               "content": "A crowd behaves less like many people and more like a fluid. Below about two people to the square meter it flows freely and anyone can cross it. Between two and four it slows and bunches at every narrowing. Above five it no longer chooses where it goes: pressure passes through it in waves, and people are carried. Almost every crowd injury happens at that density, and almost always at a gate, a stair or a corner, where a flow meets something it cannot pass.",
               "question": {
@@ -2434,6 +2561,7 @@
               }
             },
             {
+              "id": "reading-the-signs",
               "title": "Reading the Signs",
               "content": "A crowd gives warning before it turns. The first sign is sound: chatter falls and a low murmur takes its place. The second is movement against the flow, as people at the edges try to leave. The third is the sway, a slow rolling motion that means pressure is building inside. An officer who sees the sway has minutes, not hours. The response is always to open space, by opening another gate, stopping the music or holding the flow at the back, and never to push from the front.",
               "question": {
@@ -2447,6 +2575,7 @@
               }
             },
             {
+              "id": "first-response",
               "title": "First Response",
               "content": "The first officer at an injury does three things in order: makes the scene safe, calls for the Health Center, and keeps the injured person breathing. Safety comes first because an officer who is hurt helps nobody. Breathing is checked by sight and sound for ten seconds. A person who is breathing but not awake is rolled onto the side with the head tilted back, so the airway stays open. Healing charms are left to trained healers, since a mending charm on a bleeding wound seals it over damage still inside.",
               "question": {
@@ -2460,6 +2589,7 @@
               }
             },
             {
+              "id": "panic-and-the-bloom",
               "title": "Panic and the Bloom",
               "content": "Panic spreads through a crowd by sight and sound, and in Breedhaven also by the Bloom. A frightened woman's field sharpens, and those near her feel it as unease before they know why. Panic in a crowd of young women can run faster than any officer can follow. The counter is calm that can be seen: an officer who stands still, speaks slowly and lowers her own field steadies those around her. Women in their Second Bloom are steadier anchors in a crowd, and details place them at the narrow points.",
               "question": {
@@ -2473,6 +2603,7 @@
               }
             },
             {
+              "id": "footwork-and-balance",
               "title": "Footwork and Balance",
               "content": "An officer in a crowd works from the feet up. The stance is wide and low, feet a shoulder apart and one ahead, knees soft, weight over the balls of the feet. From it an officer can turn, step back and take a push without falling. A fall in a dense crowd is the most dangerous thing that can happen to anyone in it, because those behind cannot stop. Drills train the reflex to stay upright and, failing that, to curl on the side with the arms over the head until the pressure passes.",
               "question": {
@@ -2486,6 +2617,7 @@
               }
             },
             {
+              "id": "holds-escorts-and-restraint",
               "title": "Holds, Escorts and Restraint",
               "content": "Public safety officers use the least force that will serve. A guiding hold at the elbow moves a willing person out of a crush. An escort hold, one arm locked and the other at the shoulder, moves an unwilling one without injury. Restraint on the ground is the last resort and lasts only until help arrives, since pressure on a person's chest or back can stop their breathing within minutes. Every use of force beyond a guiding hold is written up the same day, with names, times and the reason.",
               "question": {
@@ -2545,6 +2677,7 @@
           "description": "Introduction to women's studies through the magic of everyday life: household wards, Bloom suppressants, fertility assays, and enchantments embedded in consumer goods. Students examine consent, privacy, and who decides where personal magic ends and public harm begins.",
           "topics": [
             {
+              "id": "why-everyday-magic-raises-moral-questions",
               "title": "Why Everyday Magic Raises Moral Questions",
               "content": "Every woman has some magic and most of it is small: a warmth, a mending, a light, a ward, a nudge. Small acts done by millions of people each day are exactly what ethics is for. Three tests recur. Consent: did the person affected agree? Privacy: did the working reveal what was not offered? Harm: who bears the cost if it goes wrong? A fourth matter sits beneath all three, and every first-year writes on it. Does a will the Bloom leans on still count as free?",
               "question": {
@@ -2558,6 +2691,7 @@
               }
             },
             {
+              "id": "wards-thresholds-and-neighbors",
               "title": "Wards, Thresholds and Neighbors",
               "content": "A household ward is the commonest enchantment there is and the easiest to misuse. A ward that refuses entry is a locked door. A ward that hurts whoever tries the handle is a trap, and the courier, the meter reader and the lost child meet it first. The working rule is proportion: a ward may do no more than the keeper could rightly do in person. Shared homes add a second problem. A ward keyed by one member of a household can shut out another, and locks are a form of speech.",
               "question": {
@@ -2571,6 +2705,7 @@
               }
             },
             {
+              "id": "consent-and-the-kindly-nudge",
               "title": "Consent and the Kindly Nudge",
               "content": "Easing a friend's headache without asking seems harmless. The difficulty is that the same act, a small working on another person's body or mood, covers calming someone who is rightly angry. The standard position is that magic worked on a person needs that person's consent, however kind the aim. Two exceptions are accepted: emergency healing where the patient cannot answer, and wards a person walks into knowingly. A glamour raises the inverse case, since it works on everyone who looks.",
               "question": {
@@ -2584,6 +2719,7 @@
               }
             },
             {
+              "id": "suppressants-and-the-authentic-self",
               "title": "Suppressants and the Authentic Self",
               "content": "Dampers are cheap, legal and ordinary, and turn the Bloom's pull down to a background hum. One view holds that taking them is self-government: a person chooses the conditions under which she chooses. Another holds that muting an instinct muffles part of the self. A third view cuts across both. The clearer wrong is pressure, whether a household urging a member to stop her dampers or an employer expecting her to stay on them. Either way someone else is deciding how loud her wants are.",
               "question": {
@@ -2597,6 +2733,7 @@
               }
             },
             {
+              "id": "assay-and-the-right-not-to-tell",
               "title": "The Assay and the Right Not to Tell",
               "content": "A clinical assay establishes whether a man is a Sire, and the result is recorded in the national Registry. The record is private and the status is his to disclose. The ethical ground is that the fact changes how everyone treats him: a known Sire is a prospect before he is a person. So asking on a first date is rude, repeating what one was told is a serious breach, and guessing aloud is little better. The hard case is a household weighing a child, where his silence shapes others' lives.",
               "question": {
@@ -2610,6 +2747,7 @@
               }
             },
             {
+              "id": "enchanted-goods-and-public-harm",
               "title": "Enchanted Goods and Public Harm",
               "content": "Enchantment is built into what people buy: growth-charmed fruit, self-mending stone, lighting, a salon tattoo that moves. A buyer cannot inspect a charm as she can a seam, so the maker's duty to say what a thing does, and for how long, is stronger than for plain goods. Public harm is the limit of private magic. A pregnant woman whose surge cracks a neighbor's wall intended nothing, yet she knew the surge was coming. Responsibility can exist without fault, and precautions follow from it.",
               "question": {
@@ -2649,6 +2787,7 @@
           "description": "Capstone seminar on the central debate of women's studies: whether the Bloom's wants are a woman's own. Students engage primary philosophical and political texts, produce a substantial research paper, and present to the colloquium. Prerequisite: WOM 101.",
           "topics": [
             {
+              "id": "framing-the-oldest-argument",
               "title": "Framing the Oldest Argument",
               "content": "The question is whether a want the Bloom produces belongs to the woman who feels it. Two claims must be kept apart. The causal claim, that the Bloom inclines women toward generativity and above all toward pregnancy, is agreed by all sides. The ownership claim is the dispute. Bloomists hold the want is hers and sacred. Freewill advocates hold it acts upon her without being her. The facts do not divide the two camps. What divides them is what counts as a self.",
               "question": {
@@ -2662,6 +2801,7 @@
               }
             },
             {
+              "id": "classical-bloomism-and-its-texts",
               "title": "Classical Bloomism and its Texts",
               "content": "Classical Bloomism begins from the fact that the Bloom is in the blood, not outside it. A want that rises from a woman's own living substance cannot be foreign to her, any more than hunger is. On this view resisting the pull is a kind of self-estrangement, and the Order teaches accord: to know the want, name it and act with it. The strong form calls suppressants a mutilation of the will. The moderate form, now the majority, treats them as a pause that settles nothing.",
               "question": {
@@ -2675,6 +2815,7 @@
               }
             },
             {
+              "id": "freewill-tradition",
               "title": "The Freewill Tradition",
               "content": "Freewill writers accept the Bloom's influence and deny its title. The founding argument is from choice: the pull is an instinct, not a command, and a woman can and does refuse it. What can be refused is a proposal made to the self, not the self. The tradition's central text, Maud Hollin's The Leaning Will, gives it the image still used: the Bloom leans on a woman as wind leans on a walker, and nobody says the wind chose her road. Critics reply that a walker is not made of wind.",
               "question": {
@@ -2688,6 +2829,7 @@
               }
             },
             {
+              "id": "damper-and-the-two-selves",
               "title": "The Damper and the Two Selves",
               "content": "Suppressants turn the pull down to a background hum, and both camps claim the result. Freewill advocates say the woman on dampers is the baseline, her judgment cleared of pressure. Bloomists say she is the altered one, since the pill is the intervention and the want is the nature. This is the two selves problem: no neutral state exists from which to ask which woman is authentic. Surveys do not settle it, because each self tends to endorse the choices made while she was in charge.",
               "question": {
@@ -2701,6 +2843,7 @@
               }
             },
             {
+              "id": "second-bloom-as-a-test-case",
               "title": "Second Bloom as a Test Case",
               "content": "After menopause the pull is simply absent, which makes older women the nearest thing to a neutral witness. If most repudiated their earlier wants, the Freewill reading would gain; if most endorsed them, the Bloomist one would. The evidence is mixed and contested. Many women in their Second Bloom describe their childbearing as their own best work and also say they would not want the pull back. Whether that is endorsement, or the ordinary kindness people show their past, is disputed.",
               "question": {
@@ -2714,6 +2857,7 @@
               }
             },
             {
+              "id": "from-philosophy-to-policy",
               "title": "From Philosophy to Policy",
               "content": "The debate has consequences. Free suppressants at every clinic are a Freewill settlement in practice, and the Bloomist case for supporting motherhood shapes housing and leave. The Sire Registry divides both camps internally. Recent compatibilist work argues that origin is the wrong test: a want is a woman's own if she would endorse it on reflection, whatever caused it. The objection is the regress. Reflection is done by a mind the Bloom also leans on, and no vantage lies outside it.",
               "question": {
@@ -2765,6 +2909,7 @@
           "description": "How infants and young children are raised in Breedhaven: the creche and the household nursery, a child's first months, and the work of the nannies and teachers who do most of it. Includes placement hours at the University creche.",
           "topics": [
             {
+              "id": "who-raises-a-child",
               "title": "Who Raises a Child",
               "content": "In Breedhaven a child is rarely raised by two people. The usual household has several adults, and the law names each mother's own children as hers while leaving the daily work to whoever is home. Where a household cannot manage, the creche can: every district keeps one, and the University's takes a student's child from the first week at no charge. A third arrangement is the nanny, employed by the household or, for a registered Sire, by the Office. The course treats all three as ordinary.",
               "question": {
@@ -2778,6 +2923,7 @@
               }
             },
             {
+              "id": "first-six-weeks",
               "title": "The First Six Weeks",
               "content": "A newborn's needs in the first six weeks are few and constant: feeding every two to three hours, warmth, sleep and being held. Crying is its only signal and has a small number of causes, checked in order: hunger, a wet cloth, wind, cold, tiredness. A child that is fed, clean, warm and still crying usually wants to be carried. Weight is taken weekly and should climb steadily after the first few days. A carer who keeps a simple written record sees a problem days before one who trusts memory.",
               "question": {
@@ -2791,6 +2937,7 @@
               }
             },
             {
+              "id": "sleep-and-where-a-child-sleeps",
               "title": "Sleep, and Where a Child Sleeps",
               "content": "An infant sleeps most of the day in short stretches, and where it sleeps matters. A cot of its own, on its back, with nothing loose in it, is the standard taught in every clinic. The room is kept cool and free of draughts. A listening charm on the sill is common in houses with a nursery and carries a cry to whoever wears its twin. Children settle faster on a fixed routine: the same order of bath, feed and song each evening does more than any working sold for the purpose.",
               "question": {
@@ -2804,6 +2951,7 @@
               }
             },
             {
+              "id": "seven-daughters-and-a-son",
               "title": "Seven Daughters and a Son",
               "content": "Seven children in eight are girls, and nurseries are built around that. Girls show their first unreliable magic between five and seven, and a creche for that age is warded, with soft floors and nothing breakable above waist height. Boys are few, noticed, and too often either indulged or fussed over. Good practice treats a son like any other child in the room and resists making him a mascot. Whether a boy will be fertile cannot be known before he is grown, and carers are taught not to guess aloud.",
               "question": {
@@ -2817,6 +2965,7 @@
               }
             },
             {
+              "id": "what-a-child-costs",
               "title": "What a Child Costs",
               "content": "Keeping a child at home has a weekly cost that students of the subject learn to itemize: milk or a wet nurse's fee, cloths, clothes outgrown in weeks, fuel for a warm room and the carer's time. A household that skimps shows it first in the child, who grows fretful and slow to gain. One that spends steadily sees a child settle and then thrive. Comfort in the house sets the ceiling: a dedicated nursery, a garden and a calm household let a child do better than money alone can buy.",
               "question": {
@@ -2830,6 +2979,7 @@
               }
             },
             {
+              "id": "carer-and-the-parents",
               "title": "The Carer and the Parents",
               "content": "A nanny or creche worker serves the child first and the household second, and trouble comes when the two pull apart. The working rules are plain. She reports what she sees, good and bad, without softening. She does not take sides between a child's mother and the other adults of the house. She keeps what she learns of the family to herself. And she says early when a child is not being provided for, because a carer who stays silent to keep her post has stopped doing the job.",
               "question": {
@@ -2881,6 +3031,7 @@
           "description": "How reputation is made and lost in a country that lives on its phones: Bloomr and the feed, the press, the public life of a Sire, and the difference between being known and being talked about.",
           "topics": [
             {
+              "id": "how-a-feed-decides",
               "title": "How a Feed Decides",
               "content": "Bloomr shows a post to a few of the poster's followers first and then widens or buries it by how they respond in the opening hour. Likes count for little; replies and shares count for much more. A picture with a face in it travels further than one without. The practical lesson is timing and reply: a post made when followers are awake, and answered by its author in the first hour, reaches several times the audience of the same post left alone. Nothing about the feed is neutral, and nothing about it is secret.",
               "question": {
@@ -2894,6 +3045,7 @@
               }
             },
             {
+              "id": "reputation-is-what-others-repeat",
               "title": "Reputation Is What Others Repeat",
               "content": "A reputation is not what a person says of herself but what a third party will repeat about her unprompted. It is built by small consistent acts seen by others: turning up, remembering a name, keeping a confidence. It travels through people, so one well-connected friend who speaks warmly is worth a hundred posts. It is also sticky in both directions. A good name survives one bad evening, and a bad one is not repaired by a single generous gesture, however public.",
               "question": {
@@ -2907,6 +3059,7 @@
               }
             },
             {
+              "id": "public-life-of-a-sire",
               "title": "The Public Life of a Sire",
               "content": "A registered Sire is a public figure whether he chooses to be or not. His Registry record is private by law, but where he was seen and with whom is not, and the gossip press pays for both. Coverage follows a pattern: curiosity when he is new, scrutiny when he is linked with several women, and judgment when a child is born. Sires who fare well are seen keeping their word and are never seen boasting. The public forgives a full household far more readily than a careless one.",
               "question": {
@@ -2920,6 +3073,7 @@
               }
             },
             {
+              "id": "gossip-and-how-it-moves",
               "title": "Gossip, and How It Moves",
               "content": "Gossip moves fastest between people who share a room: a seminar, a hall, a shift. It is passed on because telling it buys standing, so the most repeated stories flatter the teller's judgment. A rumor denied loudly spreads further than one ignored, and one corrected quietly by a trusted friend tends to die. On a campus of thirty thousand, a story about a known figure crosses it in about two days. The useful habit is to assume that anything done before two witnesses will be known by all three households.",
               "question": {
@@ -2933,6 +3087,7 @@
               }
             },
             {
+              "id": "writing-a-message-that-lands",
               "title": "Writing a Message That Lands",
               "content": "A message is read in the first eight words or not at all. The working rules are short: say the one thing, say it early, and end on something the reader can answer. Warmth survives in writing only when it is specific, so naming the thing remembered does more than any endearment. A reply sent within the hour reads as interest; the same reply a day late reads as duty. Humor travels badly without a face behind it, which is why a careless joke starts more quarrels by text than in person.",
               "question": {
@@ -2946,6 +3101,7 @@
               }
             },
             {
+              "id": "handling-a-bad-story",
               "title": "Handling a Bad Story",
               "content": "When a damaging story breaks, the first hour decides its shape. The steps are fixed. Find out what is true before saying anything. If it is true, say so once, plainly, and say what will be done. If it is false, have someone else correct it, because a denial from the subject is discounted. Never answer in anger and never answer every critic. Then be seen doing something ordinary and decent. Most stories last four days, and the person who feeds one makes it last twelve.",
               "question": {
@@ -2984,6 +3140,7 @@
           "description": "Interpersonal and intercultural communication in practice: interpreting and translation between Breedhaven and its neighbors, the signals a body sends before a word is said, listening, and framing a message for the people who will hear it. Weekly exercises pair students across languages and kinds, and close with the habits of conversation in a country where anything said may be posted. No prerequisites.",
           "topics": [
             {
+              "id": "interpreting-in-practice",
               "title": "Interpreting in Practice",
               "content": "Interpreting is spoken; translation is written. Consecutive interpreting waits for the speaker to pause, then renders the passage whole, and suits a clinic, a court or a dinner. Simultaneous interpreting runs two or three seconds behind the speaker from a booth, and is so tiring that interpreters work in pairs and change over every thirty minutes. The Veyran National Assembly sits in nine working languages, and its interpreters work only into their own mother tongue.",
               "question": {
@@ -2997,6 +3154,7 @@
               }
             },
             {
+              "id": "sense-before-words",
               "title": "Sense Before Words",
               "content": "A word-for-word translation is almost always a wrong one. The working rule is sense before words: render what the speaker meant, in the register she meant it, and let the grammar fall where the second language puts it. Idioms are replaced by an idiom of equal weight, never carried across literally. Titles and forms of address are the commonest trap; a Veyran honorific dropped from a letter reads as a snub. When no equivalent exists, the translator keeps the word and explains it once.",
               "question": {
@@ -3010,6 +3168,7 @@
               }
             },
             {
+              "id": "signals-before-speech",
               "title": "Signals Before Speech",
               "content": "Most of a first impression is formed in the opening seven seconds, before much is said. Posture, distance and the eyes do the work. Comfortable conversation in Breedhaven stands at about an arm's length; Kharad-Tor stands closer, and Veyran custom further. Held eye contact reads as honesty here but as challenge to many wolfkin, who glance away to show respect. Beastkin ears and tails show feeling faster than any face: ears laid flat mean unease, whatever the smile says. When signal and words disagree, listeners believe the signal.",
               "question": {
@@ -3023,6 +3182,7 @@
               }
             },
             {
+              "id": "listening-is-work",
               "title": "Listening Is Work",
               "content": "People speak at about 130 words a minute and think at three times that, so a listener's mind has room to wander, rehearse a reply or judge. Active listening fills the gap with three moves: attend without interrupting, reflect back the gist in fresh words, and ask one open question that follows from what was said. Advice offered before the speaker asks for it is heard as not listening. The test of a good listener is simple: the speaker leaves feeling understood, not answered.",
               "question": {
@@ -3036,6 +3196,7 @@
               }
             },
             {
+              "id": "framing-for-an-audience",
               "title": "Framing for an Audience",
               "content": "Before any message, three questions: who will hear it, what do they already know, and what should they do afterward. The same fact is framed differently for each audience. A risk is put as a loss to the cautious and as a chance to the ambitious; a rule is explained to a peer and simply stated to a crowd. Audiences remember the first and the last thing said, so the point goes at both ends. A message framed for everyone at once lands with no one in particular.",
               "question": {
@@ -3049,6 +3210,7 @@
               }
             },
             {
+              "id": "conversation-in-a-posted-world",
               "title": "Conversation in a Posted World",
               "content": "On a campus where every student carries a camera, the working assumption is a third listener: anything said aloud in company may reach the feed by evening. The common courtesy is to ask before posting anyone's face, and to ask again before posting it with a name. A screenshot of a private message breaks a confidence even when every word in it is true. Arguments are settled in person or by voice, never in replies, because a public quarrel on Bloomr has an audience and no ending.",
               "question": {
@@ -3106,6 +3268,7 @@
           "description": "Practical and theoretical introduction to the enchanted household: built-in wards, preservation charms, heating and lighting systems, garden magic, and the domestic economy of a magitech home. No prerequisites.",
           "topics": [
             {
+              "id": "household-as-an-institution",
               "title": "The Household as an Institution",
               "content": "The ordinary family of Breedhaven is a household: several adults who share a home, money and the raising of children. A common shape is one Sire and two to five women, but households of women alone are just as usual. Most set down a house agreement when they form, a plain written list of who the members are, what each pays into the common purse, who owns which furniture, and how a member joins or leaves. It is not romantic, and households that write one last longer than those that do not.",
               "question": {
@@ -3119,6 +3282,7 @@
               }
             },
             {
+              "id": "wards-on-doors-and-windows",
               "title": "Wards on Doors and Windows",
               "content": "A threshold ward is set into the door frame when a house is built and keyed to the people who live there. It does not stop a determined burglar; it wakes the household and marks the intruder. Wards weaken with use and are renewed once a season, a ten-minute job for any woman in the house. Keying a new member to the door is done with everyone present, as a small courtesy with real weight. Rooms kept for a pregnant member are given a second, inward ward, to protect the plaster from her.",
               "question": {
@@ -3132,6 +3296,7 @@
               }
             },
             {
+              "id": "preservation-charms-and-the-larder",
               "title": "Preservation Charms and the Larder",
               "content": "A preservation charm slows spoilage by holding a cupboard or larder at about four degrees and still air. A well-cast one lasts a week and fades from the door inward, so the food nearest the hinge spoils first. Most homes keep both a charmed larder and an electric refrigerator: the larder for bread, fruit, cheese and anything eaten within days, the refrigerator for meat and milk. Renewing the charm goes on the house rota like any other chore, with the date chalked on the inside of the door.",
               "question": {
@@ -3145,6 +3310,7 @@
               }
             },
             {
+              "id": "heat-light-and-the-monthly-bills",
               "title": "Heat, Light and the Monthly Bills",
               "content": "A warming charm heats one room for an evening and costs nothing but effort; a boiler heats the whole house and costs money. Sensible homes use the boiler as a base and charms to top up. Costs are met from a common purse, usually paid into in proportion to income. A worked example: five adults each pay in three tenths of what they earn, so a member earning 2,000 a month gives 600 and one earning 1,000 gives 300. Rent, heat, light and food come out of the purse; the rest stays private.",
               "question": {
@@ -3158,6 +3324,7 @@
               }
             },
             {
+              "id": "garden-magic-and-the-kitchen-plot",
               "title": "Garden Magic and the Kitchen Plot",
               "content": "Coaxing plants is among the commonest magics, and nearly every household keeps a plot or at least a window box. A growth charm brings a crop on about a third faster, but the plant draws the difference from the soil, so charmed beds need compost dug in twice a year. A four-bed rotation moves roots, greens, beans and fruiting crops round one place each spring. Fruit trees are coaxed lightly and only at blossom. Over-charmed tomatoes are the classic beginner's error: large, watery and tasteless.",
               "question": {
@@ -3171,6 +3338,7 @@
               }
             },
             {
+              "id": "house-meeting-and-its-manners",
               "title": "The House Meeting and Its Manners",
               "content": "A household that works keeps a weekly meeting, short and at the kitchen table. Three things are settled: the rota for cooking, cleaning and children, the state of the purse, and anything that needs saying. Etiquette is exact on the last point. Who is with whom is said plainly, and a member who wants a new partner raises it with the house first. Wanting is no offense; going behind the household's back is. Jealousy is treated as ordinary weather, to be named early and not left to sour.",
               "question": {
@@ -3215,6 +3383,7 @@
           "description": "Introduction to the psychological dimensions of the Bloom in women: the generative drive, its developmental trajectory, its intensification in pregnancy, and its absence after menopause. Covers damper effects and the psychology of Sire proximity. No prerequisites.",
           "topics": [
             {
+              "id": "generative-drive",
               "title": "The Generative Drive",
               "content": "In women the Bloom is felt as a drive toward generativity: to create, nurture, grow and protect life. Bearing a child is its strongest expression, but not its only one. The same drive is at work in the gardener, the teacher, the healer and the woman who guards a door. Bloom Psychology treats it as an instinct like hunger: it supplies wanting and never decides action. A person can be hungry and decline a meal, and the same holds here.",
               "question": {
@@ -3228,6 +3397,7 @@
               }
             },
             {
+              "id": "from-adolescence-to-adulthood",
               "title": "From Adolescence to Adulthood",
               "content": "The drive is faint in childhood and rises through adolescence alongside a girl's first reliable magic. It is strongest in young adults and in women who have never carried a child, and usually settles after a first pregnancy into something steadier. University age is close to the peak, which is one reason Bloom Counseling is free on campus. Strength varies widely between individuals, and a weak drive and a strong one are equally normal.",
               "question": {
@@ -3241,6 +3411,7 @@
               }
             },
             {
+              "id": "proximity-to-a-sire",
               "title": "Proximity to a Sire",
               "content": "Near a Sire a woman feels the pull as warmth, heightened attention and want. It arises in the body before any thought and does not wait for her to know his status, which is one way that status leaks. The classic finding is attention drift: asked to read aloud in a shared room, subjects glance toward a Sire several times more often than toward other men, and underestimate how often they did so. The pull is a feeling. What follows it is a choice.",
               "question": {
@@ -3254,6 +3425,7 @@
               }
             },
             {
+              "id": "dampers-and-the-background-hum",
               "title": "Dampers and the Background Hum",
               "content": "Bloom suppressants, called dampers, are cheap, legal and ordinary. Taken daily, they turn the pull down to what users describe as a background hum: present and ignorable, like traffic behind a closed window. They do not dull magic, mood or affection. Common reasons for use are study, work near Sires and simply wanting quiet. Stopping brings the pull back to full strength within days, and the first week off is often reported as louder than remembered.",
               "question": {
@@ -3267,6 +3439,7 @@
               }
             },
             {
+              "id": "pregnant-mind",
               "title": "The Pregnant Mind",
               "content": "Pregnancy is the drive's strongest pull and its strongest expression at once. Protectiveness rises sharply, attention narrows toward home and household, and many women report a settled confidence that accompanies the surge in power. A mother often feels the child's moods as her own and senses other pregnancies nearby. The psychological risk is overreach: strength arrives in weeks, faster than judgment can adjust to it. After the birth, mood and power fall together.",
               "question": {
@@ -3280,6 +3453,7 @@
               }
             },
             {
+              "id": "second-bloom-and-whose-want",
               "title": "Second Bloom and Whose Want",
               "content": "After menopause the pull is absent. Women in these years, called the Second Bloom, commonly describe relief, clarity and time that is their own, and some describe loss. Their testimony feeds the oldest argument. Bloomists hold that the Bloom's wants are sacred and truly a woman's own. Freewill advocates answer that the Bloom may influence a woman but does not own her. Psychology cannot settle it, but can show that a want felt as one's own may still have an outside cause.",
               "question": {
@@ -3330,6 +3504,7 @@
           "description": "Fundamentals of programming, data structures, and algorithms, with applications to enchantment modeling, ward simulation, and Registry database systems. Weekly laboratory covers hands-on coding and debugging. No prerequisites.",
           "topics": [
             {
+              "id": "algorithms-instructions-without-judgment",
               "title": "Algorithms: Instructions Without Judgment",
               "content": "An algorithm is a finite list of exact steps that turns an input into an output. A computer follows it with no judgment: unlike a working, which varies with the woman casting and how tired she is, a program gives the same answer every time. Programs keep values in named variables with types: an integer for a tram number, a decimal for a ward's charge, a string for a Bloomr handle, a boolean for whether a door is locked. First exercise: compute the hours until a lamp charm needs renewing.",
               "question": {
@@ -3343,6 +3518,7 @@
               }
             },
             {
+              "id": "branches-loops-and-functions",
               "title": "Branches, Loops and Functions",
               "content": "Three structures build every program. A branch chooses: if the ward's charge is below threshold, raise an alert, otherwise do nothing. A loop repeats: for each of the forty doors in a residence hall, read its ward and record the value. A function names a piece of work so it can be reused: charge_remaining(initial, half_life, days) returns a number and hides the arithmetic. Most loop bugs are off-by-one errors; checking thirty-nine doors out of forty is the classic.",
               "question": {
@@ -3356,6 +3532,7 @@
               }
             },
             {
+              "id": "lists-dictionaries-and-queues",
               "title": "Lists, Dictionaries and Queues",
               "content": "A data structure arranges values so the common operation is fast. A list keeps items in order and is read by position: the stops on a tram line. A dictionary maps a key to a value and finds it in one step however large it grows: a handle to an account. A queue serves first come, first served: travelers waiting at a teleport array, which sends one group at a time. Finding one account among thirty thousand in an unsorted list takes fifteen thousand comparisons on average; a dictionary takes one.",
               "question": {
@@ -3369,6 +3546,7 @@
               }
             },
             {
+              "id": "searching-sorting-and-cost",
               "title": "Searching, Sorting and Cost",
               "content": "Cost is counted in steps as the input grows. Linear search checks every record: a million records, up to a million steps. Binary search works on sorted data, halving the range each time: a million records in at most twenty steps, since two to the twentieth exceeds a million. Merge sort splits a list in half, sorts each half and merges them, taking about n log n steps: twenty million for a million records, against a trillion for the naive method of comparing every pair.",
               "question": {
@@ -3382,6 +3560,7 @@
               }
             },
             {
+              "id": "databases-and-the-sire-registry",
               "title": "Databases and the Sire Registry",
               "content": "A database stores records in tables, each row found by a unique key. The national Sire Registry is a system designed around who may read it. Each assay record is held under a reference number, not a name; the table linking numbers to people is kept apart and encrypted. The record is private by law, so access is by role, a clinician sees only her own patients, and every query is written to a log that cannot be edited. Sound design assumes leaks come from people with access, not from broken code.",
               "question": {
@@ -3395,6 +3574,7 @@
               }
             },
             {
+              "id": "simulating-wards-in-software",
               "title": "Simulating Wards in Software",
               "content": "A model is a program that imitates a real system well enough to answer a question. A ward can be modeled as a state machine with three states, armed, tripped and drained, and rules for moving between them. A simulation steps time forward, one hour per loop, reducing the charge by its decay rate and testing the threshold. Run for a year, it predicts the service date before any stone is charged. A model is only as good as its measurements: a wrong half-life gives a confident wrong answer.",
               "question": {
@@ -3426,6 +3606,7 @@
           "description": "How messages travel between devices, from the charm-relays under Seedblossom to the servers behind Bloomr, and what a platform learns about the people who use it. Covers protocols, encryption, feeds and security. Weekly laboratory builds a small chat service and then breaks into it.",
           "topics": [
             {
+              "id": "packets-and-addresses",
               "title": "Packets and Addresses",
               "content": "A network moves data in packets: small numbered pieces, each carrying the address it came from and the address it is going to. A message to a friend across the city is cut into dozens of packets that may each take a different route through the charm-relays, and are put back in order when they arrive. A lost packet is simply asked for again. Every device on a network has an address, as every house on Lantern Row has a number.",
               "question": {
@@ -3439,6 +3620,7 @@
               }
             },
             {
+              "id": "protocols-agreeing-how-to-talk",
               "title": "Protocols: Agreeing How to Talk",
               "content": "A protocol is a set of rules two machines agree on before they exchange anything: who speaks first, how a message is marked as finished, what to do when something goes missing. A handshake opens the conversation, each side confirming the other is listening. Protocols are layered: one moves packets, one keeps them in order, one carries web pages or chat. A phone and a server in another city can talk because both keep to the same layers.",
               "question": {
@@ -3452,6 +3634,7 @@
               }
             },
             {
+              "id": "encryption-and-keys",
               "title": "Encryption and Keys",
               "content": "Encryption scrambles a message so only the holder of the right key can read it. In public-key encryption each person has two keys: a public one anyone may use to lock a message to her, and a private one only she holds to unlock it. A message locked with her public key can be read by no one else, not even the platform carrying it. This is end-to-end encryption, and it is why a ward-cracker who copies the packets gets only noise.",
               "question": {
@@ -3465,6 +3648,7 @@
               }
             },
             {
+              "id": "metadata-what-the-envelope-says",
               "title": "Metadata: What the Envelope Says",
               "content": "Even when a message is encrypted, its metadata is not: who sent it, to whom, when, how large it was and from where. Metadata is the envelope, not the letter. It says a great deal: a message to a clinic at midnight, a Sire's phone at the same address three nights a week. Platforms keep metadata because it is cheap and useful, and the Registry can ask for it. Turning off location sharing removes one of its richest fields.",
               "question": {
@@ -3478,6 +3662,7 @@
               }
             },
             {
+              "id": "feeds-and-recommendation",
               "title": "Feeds and Recommendation",
               "content": "A feed does not show posts in the order they were made. A recommendation algorithm scores each one by how likely a reader is to stop, like or reply, from what she and readers like her have done before, and shows the highest first. It optimizes for attention, not truth or kindness. A streamer who learns what the algorithm rewards grows; one who does not is shown to nobody. Small changes in what is rewarded change what millions of people see.",
               "question": {
@@ -3491,6 +3676,7 @@
               }
             },
             {
+              "id": "security-attacks-on-people",
               "title": "Security: Attacks on People",
               "content": "Most break-ins attack people, not code. Phishing sends a message that looks like it is from someone trusted and asks for a password or a click. A strong password is long rather than clever, and different for every account; a second factor, such as a code on the phone, stops most stolen passwords from working. Software is patched because every program has bugs, and some bugs let a stranger in. The weakest point of any system is usually the person using it.",
               "question": {
@@ -3541,6 +3727,7 @@
           "description": "Differential and integral calculus with an introduction to probability and statistics, emphasizing applications in magical engineering, thaumic measurement, and biological assay. No prerequisites.",
           "topics": [
             {
+              "id": "rates-of-change-and-the-derivative",
               "title": "Rates of Change and the Derivative",
               "content": "The derivative measures how fast one quantity changes with another: the slope of its graph at a point. If a ward holds Q(t) thaums at time t, then dQ/dt is its rate of loss. By the power rule, the derivative of t squared is 2t, of t cubed is 3t squared. Worked example: a pregnant mage's output is modeled as P(t) = 40 + 5t squared thaums per hour, with t in weeks. Then dP/dt = 10t, so at week six her output is rising by 60 thaums per hour each week, twice the rate at week three.",
               "question": {
@@ -3554,6 +3741,7 @@
               }
             },
             {
+              "id": "integration-and-accumulated-charge",
               "title": "Integration and Accumulated Charge",
               "content": "Integration reverses differentiation and measures accumulation: the area under a curve. If r(t) is the rate at which a circle pours charge into an anchor, the integral of r from start to finish is the total charge delivered. Worked example: a circle charges a station array at r(t) = 60t squared thaums per hour for two hours. The total is 20t cubed evaluated from 0 to 2, which is 160 thaums. The fundamental theorem of calculus states that the two operations undo each other.",
               "question": {
@@ -3567,6 +3755,7 @@
               }
             },
             {
+              "id": "exponential-decay-and-half-life",
               "title": "Exponential Decay and Half-Life",
               "content": "A quantity that loses a fixed fraction of itself per unit time decays exponentially: Q(t) = Q0 times e to the power minus kt. It solves dQ/dt = minus kQ. The half-life is ln 2 divided by k, about 0.693 over k. Worked example: a household ward plate has a half-life of six months and fails below a quarter of full charge. A quarter is two halvings, so it lasts twelve months and must be serviced before then. The same curve describes cooling, drug clearance and assay reagents.",
               "question": {
@@ -3580,6 +3769,7 @@
               }
             },
             {
+              "id": "probability-and-the-seven-to-one-ratio",
               "title": "Probability and the Seven-to-One Ratio",
               "content": "Probability assigns each outcome a number from 0 to 1. Seven girls are born for every boy, so the chance that a birth is a boy is 1 in 8, or 0.125. About one man in ten is a Sire, and independent chances multiply: 1/8 times 1/10 gives 1 birth in 80. Worked example: a mother of three. The chance all three are daughters is 7/8 cubed, about 0.67, so the chance of at least one son is 0.33. The complement rule, one minus the chance of none, is the quickest route to any at-least-one question.",
               "question": {
@@ -3593,6 +3783,7 @@
               }
             },
             {
+              "id": "expected-counts-and-the-binomial-distribution",
               "title": "Expected Counts and the Binomial Distribution",
               "content": "When n independent trials each succeed with chance p, the number of successes is binomial, with mean np and standard deviation the square root of np(1 minus p). Worked example: a hall of 200 drawn at random from a population that is one-eighth male. Expected men: 25. Standard deviation: the root of 200 times 1/8 times 7/8, about 4.7, so 16 to 34 men covers nearly every such hall. Expected Sires at 1 in 80: 2.5, and the chance of none at all is 79/80 to the power 200, about 8 percent.",
               "question": {
@@ -3606,6 +3797,7 @@
               }
             },
             {
+              "id": "conditional-probability-and-assay-error",
               "title": "Conditional Probability and Assay Error",
               "content": "The inverse probability rule turns the chance of a result given a condition into the chance of the condition given the result. Suppose a screening assay detects 99 percent of fertile men and wrongly flags 2 percent of infertile ones. Of 1,000 men tested, 100 are fertile and 99 test positive; 900 are not and 18 test positive. So 99 of 117 positives are true, about 85 percent: nearly one positive in six is false. Hence the case for confirming any positive with a second assay.",
               "question": {
@@ -3657,6 +3849,7 @@
           "description": "Survey of the magical changes of pregnancy and their practical applications and risks. Weekly laboratory covers measurement of gestational thaumic output, prenatal warding, and safety protocols for pregnant practitioners. No prerequisites.",
           "topics": [
             {
+              "id": "gestational-curve",
               "title": "The Gestational Curve",
               "content": "A woman's thaumic output rises through pregnancy along a known curve. In the early weeks the lift is slight, about a fifth above her baseline. By the middle of term it has doubled or trebled. Near term it commonly reaches eight to ten times baseline, so that a middling caster can exceed a trained professor. The curve is plotted against her own resting figure and never against other women, because baselines differ far more than the multipliers do.",
               "question": {
@@ -3670,6 +3863,7 @@
               }
             },
             {
+              "id": "measuring-gestational-output",
               "title": "Measuring Gestational Output",
               "content": "Output is measured weekly with a thaumometer at the wrist, seated, after ten minutes of rest and before any casting that day. The reading is entered on a gestational chart beside the baseline taken at registration. A jump of more than half in a single week is reported to the clinic. Readings are unreliable for an hour after strong emotion, and whenever another pregnant woman is within a few meters, since fields that near raise one another.",
               "question": {
@@ -3683,6 +3877,7 @@
               }
             },
             {
+              "id": "hardiness-and-the-sympathetic-sense",
               "title": "Hardiness and the Sympathetic Sense",
               "content": "Pregnancy changes more than output. The mother becomes hardier: she heals faster, tires later and resists cold and minor illness. She senses other pregnancies nearby, usually as a warmth with a direction to it, sometimes before the other woman has told anyone. And she commonly feels the child's moods as her own, a restlessness or a calm with no cause in her own day. Practitioners are taught to ask of any sudden feeling whether it is truly theirs.",
               "question": {
@@ -3696,6 +3891,7 @@
               }
             },
             {
+              "id": "prenatal-warding-and-field-leakage",
               "title": "Prenatal Warding and Field Leakage",
               "content": "A surging field leaks, and leaks do damage: cracked plaster, blown bulbs, soured milk, a kettle boiled dry. Prenatal warding contains it. A personal ward, worn as a band or stitched into a hem, bleeds excess power into the ground. Room wards are set into walls and floor, which is why pregnant students are offered ground-floor rooms. Wards are rated in thaums and must be re-rated as term advances, since a ward fitted early will be overwhelmed later.",
               "question": {
@@ -3709,6 +3905,7 @@
               }
             },
             {
+              "id": "protocols-for-the-pregnant-practitioner",
               "title": "Protocols for the Pregnant Practitioner",
               "content": "Practical classes are streamed by tier, and pregnancy overturns the streaming. A woman who could not hold a Tier III working may exceed it by the middle of her term, so she is moved into advanced practicals while the surge lasts. Three rules apply there. She works at a warded bench. A spotter stands ready to ground the working. And she casts at half effort first, because the habit of pushing hard, learned when she was weaker, is what wrecks laboratories.",
               "question": {
@@ -3722,6 +3919,7 @@
               }
             },
             {
+              "id": "birth-discharge-and-the-bloom-chamber",
               "title": "Birth Discharge and the Bloom Chamber",
               "content": "Birth ends the surge at a stroke. The stored field leaves the mother in a single discharge strong enough to crack masonry, and within hours her output falls to near baseline. Hospitals therefore deliver in Bloom Chambers: rooms with layered wards in walls, floor and ceiling that carry the discharge safely to ground. Midwives work inside under personal wards. The discharge harms neither mother nor child, only whatever stands unwarded nearby.",
               "question": {
@@ -3771,6 +3969,7 @@
           "description": "The biology of the seven-to-one sex ratio, Sire fertility, and the mechanisms by which pregnancy amplifies a woman's magic. Weekly laboratory introduces assay techniques, basic histology, and statistical analysis of fertility data. No prerequisites.",
           "topics": [
             {
+              "id": "seven-daughters-to-a-son",
               "title": "Seven Daughters to a Son",
               "content": "In every nation and every people of the Sown Expanse, seven girls are born for each boy. A hall of two hundred therefore holds about twenty-five men. Because only one man in ten is fertile, a town of eight thousand people contains about a thousand men and about a hundred Sires. The ratio is fixed at conception and not by losses in the womb: miscarriage rates are the same for daughters and sons. Everything else in reproductive biology follows from these figures.",
               "question": {
@@ -3784,6 +3983,7 @@
               }
             },
             {
+              "id": "fertile-and-infertile-seed",
               "title": "Fertile and Infertile Seed",
               "content": "All men produce seed, and under an ordinary microscope a Sire's sample looks like any other. The difference appears with a Bloom-reactive stain. Bound seed carries a trace of the Bloom and can enter an egg. Unbound seed swims normally and is turned away at the egg's surface. A Sire's sample contains a substantial share of bound seed, and other men's almost none. The standard laboratory exercise is to count the bound cells among two hundred on a prepared slide.",
               "question": {
@@ -3797,6 +3997,7 @@
               }
             },
             {
+              "id": "conception-and-the-lock-in",
               "title": "Conception and the Lock-In",
               "content": "Conception needs bound seed, a ripe egg and a body not under contraception. When all three meet, the mother's field closes around the new life within moments. This is the lock-in, and most women report feeling it at once as certainty and a rush of magic. Daily suppressants, long-acting implants and ward-charms all work by keeping the field from closing, so that no pregnancy begins. A healer can set a ward-charm in a minute, and all three are free at any clinic.",
               "question": {
@@ -3810,6 +4011,7 @@
               }
             },
             {
+              "id": "hurried-term",
               "title": "The Hurried Term",
               "content": "The Bloom hastens pregnancy. A term is counted in weeks, and under two months from conception to birth is ordinary. Growth that would otherwise take far longer is driven by the mother's field, which feeds the child directly alongside the placenta. The cost is appetite and rest: a pregnant woman may eat half as much again and sleep ten hours a night. Clinics see patients weekly, since a single week of such a pregnancy covers a great deal of development.",
               "question": {
@@ -3823,6 +4025,7 @@
               }
             },
             {
+              "id": "why-pregnancy-amplifies-magic",
               "title": "Why Pregnancy Amplifies Magic",
               "content": "A pregnant woman's power rises from the first weeks: a small lift early, a marked one in the middle of term and exceptional strength near the end. Two mechanisms are accepted. The child has a field of its own, which adds to the mother's. And the placenta acts as a Bloom organ, gathering and concentrating the field as it gathers nutrients. The child of a high-assay Sire tends to produce a stronger surge, a difference of degree and not of kind.",
               "question": {
@@ -3836,6 +4039,7 @@
               }
             },
             {
+              "id": "reading-fertility-data",
               "title": "Reading Fertility Data",
               "content": "A worked example. The University has about thirty thousand students, one in eight of them men: 3,750. One in ten of those is expected to be fertile: about 375. Suppose a hall of 400 residents were found to hold twelve Sires where five are expected. Is that chance? Small counts swing widely, yet the test shows a result this high would arise by luck less than one time in a hundred. The habit to learn is stating the expected figure before looking at the observed one.",
               "question": {
@@ -3891,6 +4095,7 @@
           "description": "Introduction to drawing, painting, and sculptural practice, with attention to the use of Bloom-infused pigments and materials. Weekly laboratory provides guided studio time and critique. No prerequisites.",
           "topics": [
             {
+              "id": "line-contour-and-learning-to-see",
               "title": "Line, Contour and Learning to See",
               "content": "Drawing starts with the eye, not the hand. A contour drawing follows the edge of a form slowly, without lifting the charcoal; a gesture drawing catches the whole pose in thirty seconds. Proportion is checked by sighting: a pencil held at arm's length, the thumb marking the height of a head, then counted down the figure, which stands about seven and a half heads tall. By long studio tradition the first term is worked unaided, with no steadying charm on the hand, so the skill is truly learned.",
               "question": {
@@ -3904,6 +4109,7 @@
               }
             },
             {
+              "id": "value-light-and-form",
               "title": "Value, Light and Form",
               "content": "Value is how light or dark a tone is, set out on a scale of nine steps from white paper to the blackest charcoal. A lit sphere shows five zones: highlight, halftone, core shadow, reflected light and cast shadow. Rendering those five turns a flat circle into a ball. Enchanted lighting is soft and comes from every side, which flattens form, so studios are built with tall north windows and life drawing is done by daylight or by a single plain lamp set high and to one side of the model.",
               "question": {
@@ -3917,6 +4123,7 @@
               }
             },
             {
+              "id": "color-and-bloom-infused-pigments",
               "title": "Color and Bloom-Infused Pigments",
               "content": "The three primaries are red, yellow and blue; mixing two gives a secondary, and colors opposite on the wheel dull each other toward gray. Bloom-infused pigments are ground from minerals and plants taken from Bloom-rich ground and bound in oil or egg. They are not illusions but living color: orchard green, made from moss, deepens over decades, and some reds warm visibly in a crowded room. They are costly and fade in direct sun, so a painter uses them for accents and plain pigment for the rest.",
               "question": {
@@ -3930,6 +4137,7 @@
               }
             },
             {
+              "id": "painting-traditions-of-breedhaven",
               "title": "Painting Traditions of Breedhaven",
               "content": "Two genres define Breedhaven painting. The first is the orchard landscape: low horizons, rivers, trees in blossom, painted outdoors in a single sitting. The second is the household portrait, the national form for some three centuries. Its convention is that the adults of a house are shown in a ring or a loose group at one table, none set above the others, with the children in front. Court portraits of House Dawnbloom follow an older rule: the queen stands alone, holding a flowering branch.",
               "question": {
@@ -3943,6 +4151,7 @@
               }
             },
             {
+              "id": "art-of-the-neighboring-nations",
               "title": "Art of the Neighboring Nations",
               "content": "Each neighbor has a signature craft. Kharad-Tor works steel: chased relief panels and the woven banners that hang in every hold. Veyra carves theater masks, and a mask-maker ranks there with a painter. The Vesperan League prizes painted sea charts and ship figureheads. Iscara has ward-calligraphy, where the written working is itself the ornament. In the Starkelands, sculptors in Hearthspire work glass and ice lit from within, an art made for a city that spends half the year in the dark.",
               "question": {
@@ -3956,6 +4165,7 @@
               }
             },
             {
+              "id": "clay-stone-and-sculptural-form",
               "title": "Clay, Stone and Sculptural Form",
               "content": "Sculpture is either additive, built up in clay or wax over a wire armature, or subtractive, cut away from wood or stone. Clay shrinks by about a tenth as it dries and fires, so work is modeled oversize, and walls thicker than a thumb are hollowed or they burst in the kiln. A mending charm must never be used on a crack in wet clay: it seals the surface and traps the flaw. Self-mending building stone closes over every chisel cut, so carvers order plain quarry stone that has never been warded.",
               "question": {
@@ -4012,6 +4222,7 @@
           "description": "A general-education course in reading closely and writing clearly: the argued essay, the use of sources, and a short run of Breedhaven fiction and poetry, from the orchard ballads to the household novel. No prerequisites.",
           "topics": [
             {
+              "id": "thesis",
               "title": "The Thesis",
               "content": "An essay argues one thing, and says what it is in its first paragraph. A thesis is a claim someone could disagree with: \"The Lantern Festival is popular\" is a fact, \"The Lantern Festival survives because it lets a household be seen together in public\" is a thesis. Each paragraph after it gives one reason for it, and a paragraph that does not serve the thesis is cut, however good it is.",
               "question": {
@@ -4025,6 +4236,7 @@
               }
             },
             {
+              "id": "using-sources",
               "title": "Using Sources",
               "content": "A source is quoted when its exact words matter and paraphrased when only its idea does. Either way it is cited, by author and page, so the reader can check it. A quotation never stands alone: it is introduced, then explained in the writer's own words. Passing off another writer's words or ideas as one's own is plagiarism, and the University treats it as cheating, whatever the intent.",
               "question": {
@@ -4038,6 +4250,7 @@
               }
             },
             {
+              "id": "orchard-ballads",
               "title": "The Orchard Ballads",
               "content": "Breedhaven's oldest poems are the orchard ballads, sung at harvest long before they were written down. They are in four-line stanzas with a refrain, and most tell the same story in a hundred forms: a household that plants, waits and is rewarded or ruined by the season. The refrain is the point: the community sings it together, so the ballad is less one singer's tale than everyone's.",
               "question": {
@@ -4051,6 +4264,7 @@
               }
             },
             {
+              "id": "household-novel",
               "title": "The Household Novel",
               "content": "The household novel is Breedhaven's great prose form, as the household portrait is its great painting. It follows several women of one house over years, none of them the single heroine, and its drama is the balance between them: who is heard, who gives way, how a child changes the house. Its classic, Sabine Orrell's The Long Table, has no villain at all, and readers still argue about whether it has an ending.",
               "question": {
@@ -4064,6 +4278,7 @@
               }
             },
             {
+              "id": "point-of-view",
               "title": "Point of View",
               "content": "Who tells a story decides what the reader can know. A first-person narrator knows only what she saw and may be wrong about it. A close third-person narrator follows one character's mind without being her. An omniscient narrator moves between minds at will. When analyzing fiction, ask what the narrator cannot see, because a story's meaning often lies in the gap between what she says and what the reader understands.",
               "question": {
@@ -4077,6 +4292,7 @@
               }
             },
             {
+              "id": "revision",
               "title": "Revision",
               "content": "A draft is where the writer finds out what she thinks; revision is where she makes the essay say it. Work from the largest change to the smallest: first whether the thesis is the one the essay actually argues, then the order of paragraphs, then sentences, and only last the spelling. Reading the essay aloud catches what the eye skips. A finished essay is usually shorter than its first draft.",
               "question": {
@@ -4127,6 +4343,7 @@
           "description": "Comparative survey of the nations and peoples of the Sown Expanse: their governments, economies, magical traditions, and relations with Breedhaven. Covers the regions beyond the Expanse and the status of migrants and outsiders. No prerequisites.",
           "topics": [
             {
+              "id": "shape-of-the-sown-expanse",
               "title": "The Shape of the Sown Expanse",
               "content": "The Sown Expanse is the known world, and the Bloom reaches all of it. In every nation seven girls are born for each boy, magic belongs to women, and about one man in ten is fertile. Six states matter most. Breedhaven is a green lowland kingdom of rivers and orchards. North lies Kharad-Tor, east Veyra, with Iscara, the Vesperan League and the Starkelands beyond. Rail, shipping, the net and a few long-range portal lines join them, and a Sire of record assay is news in all six.",
               "question": {
@@ -4140,6 +4357,7 @@
               }
             },
             {
+              "id": "kharad-tor-and-the-holds",
               "title": "Kharad-Tor and the Holds",
               "content": "Kharad-Tor is the orc federation of the red hills north of Breedhaven. Its wealth is mines, steelworks and mountain rail, and its army is the most disciplined in the Expanse. The basic unit is the hold, a large extended household led by a War-Mother who has proved she can protect her people and keep her word. The Council of War-Mothers governs. Kharadi are blunt, loyal and exact about contracts, and they bargain openly for lawful access to strong Sires for their holds.",
               "question": {
@@ -4153,6 +4371,7 @@
               }
             },
             {
+              "id": "veyra-federation-of-the-beastkin",
               "title": "Veyra, Federation of the Beastkin",
               "content": "Veyra lies east of Breedhaven and is shared by foxkin, catkin, wolfkin, rabbitkin and many smaller peoples under an elected National Assembly. No people holds a majority, so every government is a coalition and compromise is the national skill. Its diplomats are accordingly very good. Veyra also runs the Quiet Office, the most capable intelligence service in the Expanse, whose emblem is two masks, one smiling and one blank. Veyrans abroad are often, and unfairly, suspected of reporting to it.",
               "question": {
@@ -4166,6 +4385,7 @@
               }
             },
             {
+              "id": "iscara-the-state-of-mages",
               "title": "Iscara, the State of Mages",
               "content": "Iscara is governed by its mages, and office is earned by demonstrated ability. The head of state, the Sorceress Queen, wins her title in open demonstration. Iscaran magic is the best organized anywhere: the state built and runs the long-range portal network, its wards protect half the world's ports, and its disaster teams are the ones other nations call. Since pregnancy multiplies power, its greatest workings are led by pregnant mages, and it takes a frank, clinical interest in strong Sires.",
               "question": {
@@ -4179,6 +4399,7 @@
               }
             },
             {
+              "id": "vesperan-league-and-the-starkelands",
               "title": "The Vesperan League and the Starkelands",
               "content": "The Vesperan League is islands and harbor cities, founded by pirate queens who agreed to divide the sea lanes instead of raiding each other. It lives by shipping, insurance and banking, and its elected High Queen governs from the Admiralty Exchange. The Starkelands are the frozen north, where humans and dark elves live almost entirely in one enclosed city, Hearthspire, on geothermal heat. The Council of Hearths governs, and the hearthmark, its currency, is a measured share of warmth.",
               "question": {
@@ -4192,6 +4413,7 @@
               }
             },
             {
+              "id": "peoples-migrants-and-outsiders",
               "title": "Peoples, Migrants and Outsiders",
               "content": "Humans are Breedhaven's majority, yet the country is not thought of as human. Elves are common in the old families and the Order, halflings in the cities, and foxkin from Veyra are long settled. Orcs from Kharad-Tor work in every trade, most visibly the army and the building sites. Slimes keep to the water and hold full personhood. Since the Expanse is the whole known world, an outsider means a foreign national, and what lies past the charted seas and the northern ice is unsurveyed.",
               "question": {
@@ -4246,6 +4468,7 @@
           "description": "A general-education survey of the Primordial Bloom as a historical force, from oral traditions and early natural philosophy to its role in the founding of the Sown Expanse's modern states. No prerequisites.",
           "topics": [
             {
+              "id": "before-writing-the-oral-tradition",
               "title": "Before Writing: The Oral Tradition",
               "content": "The oldest knowledge of the Bloom was carried in sayings, songs and counting rhymes long before anyone wrote it down. Every people of the Expanse has a version of the seven petals rhyme, counting seven daughters before a son, and the Seven Petals shop sign is its last descendant. These traditions already held the four rules: the ratio, women's magic, the rarity of fertile men and the power of pregnancy. What they lacked was number and test, not observation.",
               "question": {
@@ -4259,6 +4482,7 @@
               }
             },
             {
+              "id": "early-natural-philosophers",
               "title": "The Early Natural Philosophers",
               "content": "Natural philosophy began when the rules were counted instead of recited. Birth rolls kept by the Order gave the first firm figures and showed the ratio to be the same in famine and plenty, in city and on farm. Early philosophers argued over whether the Bloom was a goddess, a fluid or a habit of nature. The view that prevailed, and that Breedhaven still teaches, is that the Bloom is an active force in soil, water and blood and not a distant god.",
               "question": {
@@ -4272,6 +4496,7 @@
               }
             },
             {
+              "id": "household-and-the-old-law",
               "title": "The Household and the Old Law",
               "content": "With fertile men so few, the earliest law codes of the lowlands were household law. They fixed who belonged to a household, who inherited from it and what a fertile man owed the women who kept him. In the worst periods Sires were held, traded and fought over like land. The long reform of that practice, from possession to protection, is the main thread of Expanse legal history, and it is why paternity and reproductive contracts still have courts of their own.",
               "question": {
@@ -4285,6 +4510,7 @@
               }
             },
             {
+              "id": "dawnbloom-seedblossom-and-the-university",
               "title": "Dawnbloom, Seedblossom and the University",
               "content": "Breedhaven took its lasting shape under House Dawnbloom, which bound the river lowlands and their orchards into one kingdom with its seat at Seedblossom. The University's oldest stone was laid some seven centuries ago on the north bank. By long custom the heir to the throne studies there, in what is now the College of Government and Law, among ordinary students. Notes between the colleges were once carried by runners, remembered today in the word courier.",
               "question": {
@@ -4298,6 +4524,7 @@
               }
             },
             {
+              "id": "damper-and-the-freewill-movement",
               "title": "The Damper and the Freewill Movement",
               "content": "For most of history a woman met the pull with nothing but her own resolve. The reliable suppressant changed that. Once dampers became cheap and ordinary, a woman could turn the pull down to a background hum and plan her years around something other than bearing. The modern Freewill movement grew from that experience, holding that the Bloom may influence a woman but does not own her. Bloomism took its modern form in reply, defending the pull as sacred.",
               "question": {
@@ -4311,6 +4538,7 @@
               }
             },
             {
+              "id": "bloom-and-the-modern-states",
               "title": "The Bloom and the Modern States",
               "content": "Each modern state of the Expanse is an answer to the Bloom. Iscara gave rule to its strongest mages and built the long-range portal network. Kharad-Tor organized its holds under War-Mothers and a governing council. Veyra made coalition a principle. The Vesperan League began when pirate queens agreed to share the sea lanes. Breedhaven chose a crown checked by an elected Assembly, and a Sire Registry that both protects fertile men and keeps a file on them.",
               "question": {
@@ -4361,8 +4589,9 @@
           "description": "Foundations of melody, harmony, rhythm, and form, with an introduction to resonant and thaumically enhanced instruments. Weekly laboratory includes ensemble performance and ear training. No prerequisites.",
           "topics": [
             {
+              "id": "pitch-scale-and-the-octave",
               "title": "Pitch, Scale and the Octave",
-              "content": "Pitch is how high or low a note sounds. Doubling the speed of vibration gives the same note an octave higher, and the octave is divided into twelve equal semitones. A major scale picks seven of them in the pattern tone, tone, semitone, tone, tone, tone, semitone. An old nursery rhyme calls the seven notes the seven sisters and the eighth, the octave, the brother who comes home. Sung up from C on the white keys of a piano, the scale needs no sharps or apartments, which is why teaching starts there.",
+              "content": "Pitch is how high or low a note sounds. Doubling the speed of vibration gives the same note an octave higher, and the octave is divided into twelve equal semitones. A major scale picks seven of them in the pattern tone, tone, semitone, tone, tone, tone, semitone. An old nursery rhyme calls the seven notes the seven sisters and the eighth, the octave, the brother who comes home. Sung up from C on the white keys of a piano, the scale needs no sharps or flats, which is why teaching starts there.",
               "question": {
                 "ask": "From which note is a major scale sung on the white keys alone?",
                 "answer": "C",
@@ -4374,6 +4603,7 @@
               }
             },
             {
+              "id": "rhythm-meter-and-pulse",
               "title": "Rhythm, Meter and Pulse",
               "content": "Pulse is the steady beat under a piece; meter groups the beats into bars. Four beats to a bar is the commonest meter and the one Kharadi marching drums keep. Three to a bar is the waltz. Breedhaven's orchard work songs swing in six, two big beats each split in three, timed to the reach and drop of picking. Veyran dances often run in seven, counted two, two, three. A reliable exercise is to clap the pulse while speaking the rhythm, then to swap, until the two no longer pull each other off.",
               "question": {
@@ -4387,6 +4617,7 @@
               }
             },
             {
+              "id": "intervals-chords-and-harmony",
               "title": "Intervals, Chords and Harmony",
               "content": "An interval is the distance between two notes. A triad stacks two thirds: C, E and G make the chord of C major. Three chords, built on the first, fourth and fifth notes of the scale, will harmonize most folk tunes, and the move from the fifth back to the first is the cadence that sounds like an ending. Because most singers are women, Breedhaven choral music is written for two soprano and two alto parts. A bass line, when a choir has the men for it, is called the ground and is a prized color.",
               "question": {
@@ -4400,6 +4631,7 @@
               }
             },
             {
+              "id": "resonant-and-enhanced-instruments",
               "title": "Resonant and Enhanced Instruments",
               "content": "A resonant instrument has a charm built into its body, so a note rings longer and carries further: the resonant harp of the lowlands sustains a plucked string for ten seconds or more. A thaumically enhanced instrument is different: the player feeds it her own magic as she plays, bending tone and volume at will. It is tiring, and a pregnant player can overdrive one badly enough to crack it. Conservatoire auditions are played on plain instruments, so that the hands are what is judged.",
               "question": {
@@ -4413,6 +4645,7 @@
               }
             },
             {
+              "id": "song-forms-and-musical-structure",
               "title": "Song Forms and Musical Structure",
               "content": "Form is the plan of a piece. Binary form has two sections, A then B, each usually repeated. Ternary form returns home: A, B, A. Most popular songs alternate verse and chorus, the verse changing its words and the chorus keeping them. A round is one tune sung by several voices entering in turn, each starting when the last reaches the second line. Breedhaven lullabies are nearly all rounds, written so that every adult of a household can join one after another without waking the child.",
               "question": {
@@ -4426,6 +4659,7 @@
               }
             },
             {
+              "id": "ensemble-playing-and-ear-training",
               "title": "Ensemble Playing and Ear Training",
               "content": "An ensemble tunes to one A, given by the oboe, and every player then listens more than she plays. The first rule is to match the note's start and its end, not only its pitch. Ear training fixes each interval to a known tune: a rising fourth opens most marching songs, a rising fifth most hymns of the Order. Players sit in an arc so each can see the leader's breath. A choir that sings in a closed ring can carry a working as a circle does, which is why the Order's cathedral choirs stand in one.",
               "question": {
@@ -4476,6 +4710,7 @@
           "description": "Principles of argumentation, persuasion, and public speaking. Students analyze and construct arguments on topics of public controversy, including Bloom policy, Sire regulation, and royal prerogative. No prerequisites.",
           "topics": [
             {
+              "id": "claim-grounds-and-warrant",
               "title": "Claim, Grounds and Warrant",
               "content": "An argument has three working parts. The claim is what the speaker wants accepted. The grounds are the evidence offered. The warrant is the unstated rule linking the two, and it is where most arguments fail. Example: suppressants should stay free at clinics (claim), because uptake falls when a charge is made (grounds). The hidden warrant is that high uptake is good, which a Bloomist opponent may deny. Find the warrant, state it aloud, and the real disagreement appears.",
               "question": {
@@ -4489,6 +4724,7 @@
               }
             },
             {
+              "id": "ethos-pathos-and-logos",
               "title": "Ethos, Pathos and Logos",
               "content": "Persuasion works by three appeals. Ethos is the speaker's credibility: a midwife on Bloom Chambers is heard differently from a minister. Pathos is the audience's feeling, and logos is the reasoning itself. A speech that leans on one alone is weak. In the Assembly, a member arguing for Registry reform typically opens with standing, such as a Sire in her own household, moves to a single case that stirs the chamber, and only then gives numbers. Reverse the order and nobody listens long enough.",
               "question": {
@@ -4502,6 +4738,7 @@
               }
             },
             {
+              "id": "fallacies-common-in-bloom-debates",
               "title": "Fallacies Common in Bloom Debates",
               "content": "Four errors dominate public argument. The appeal to nature: the Bloom wants it, therefore it is right. The false dilemma: either the state tracks Sires or the nation dies out. The slippery slope: a Registry today, breeding quotas tomorrow, with no step shown between. And the argument against the person, in two local forms: she is on dampers, so she cannot feel what she is talking about, or she is pregnant, so that is the Bloom talking. Each attacks a speaker and leaves her case standing.",
               "question": {
@@ -4515,6 +4752,7 @@
               }
             },
             {
+              "id": "motions-rebuttal-and-points-of-information",
               "title": "Motions, Rebuttal and Points of Information",
               "content": "Formal debate follows Assembly practice. A motion is put, for instance that this house would let a Sire's household see his Registry record. Proposition and opposition field three speakers each, speaking alternately for seven minutes. First speakers define and build, second speakers rebut and extend, and third speakers weigh the clash without adding new matter. An opponent may rise to offer a point of information of fifteen seconds, which the speaker may accept or decline.",
               "question": {
@@ -4528,6 +4766,7 @@
               }
             },
             {
+              "id": "arguing-the-royal-prerogative",
               "title": "Arguing the Royal Prerogative",
               "content": "Any dispute can be sorted by four questions asked in order: what happened, what to call it, whether it was justified, and what should be done. Take a monarch who withholds assent from a bill, which has not occurred in over a century. Fact: was assent refused or only delayed? Definition: is that a lawful use of prerogative or a breach of convention? Quality: did circumstances excuse it? Policy: should assent be made automatic by statute? Most debaters lose by answering the fourth question first.",
               "question": {
@@ -4541,6 +4780,7 @@
               }
             },
             {
+              "id": "delivery-audience-and-the-fair-close",
               "title": "Delivery, Audience and the Fair Close",
               "content": "Delivery is pace, pause and eye. A trained speaker runs near 150 words a minute and slows for whatever she most wants remembered. Audience comes next. Seven in eight listeners are women, and a speech on Sire regulation that speaks of men as though none were in the room loses the men and the fair-minded with them. The strongest close concedes something true to the other side before restating the claim. A concession costs a speaker one point and buys her credit on every other.",
               "question": {

@@ -92,6 +92,15 @@ describe('who can come below', () => {
       ['bea', 'healer', undefined]
     ])
     expect(canGoBelow(content, start, ['ana', 'bea'], 0)).toEqual({ ok: true, reasons: [] })
+    // A depth for lovers only: asked for that depth, the rest are not to be picked, for the same reason going would give.
+    const lovers = { ...content, expedition: { ...expedition, depths: expedition.depths.map((d, i) => (i === 0 ? { ...d, partyStage: 'lover' } : d)) } }
+    const loved = { ...start, relationships: { ...start.relationships, ana: { ...trusting, affection: 90 } } }
+    expect(partyChoices(lovers, loved, 0).map((choice) => [choice.li.id, choice.reason])).toEqual([
+      ['ana', undefined],
+      ['bea', 'She must be your lover to come this deep']
+    ])
+    expect(partyChoices(lovers, loved).map((choice) => choice.reason)).toEqual([undefined, undefined])
+    expect(canGoBelow(lovers, loved, ['bea'], 0).reasons).toEqual(['Bea: She must be your lover to come this deep'])
     expect(canGoBelow(content, start, ['cy'], 0).reasons).toEqual(['Cy: She would not be of use below'])
     expect(canGoBelow(content, { ...start, relationships: { ...start.relationships, ana: { ...trusting, trust: 29 } } }, ['ana'], 0).reasons).toEqual(['Ana: She does not trust you enough (30)'])
     expect(canGoBelow(content, { ...start, locationId: 'home' }, [], 0).reasons).toContain('The way down is at the Shop')

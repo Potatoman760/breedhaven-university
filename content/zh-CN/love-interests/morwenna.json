@@ -1,0 +1,113 @@
+{
+  "id": "morwenna",
+  "aliases": [
+    "莫温娜·三生",
+    "莫温娜"
+  ],
+  "bio": "女性研究学系四年级学姐，文章里写的是作为权力象征的繁花，穿得却像是在主持父权制的葬礼。传闻她手里有一份记满了所有令她失望之人的名单——也就是所有人。",
+  "outfits": [
+    {
+      "id": "default",
+      "name": "日常服装"
+    },
+    {
+      "id": "pregnant",
+      "name": "孕期"
+    },
+    {
+      "id": "nude",
+      "name": "裸体"
+    },
+    {
+      "id": "nude-pregnant",
+      "name": "裸体，孕期"
+    },
+    {
+      "id": "casual",
+      "name": "紧身胸衣"
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "紧身胸衣，孕期"
+    },
+    {
+      "id": "lingerie",
+      "name": "黑色蕾丝束胸"
+    },
+    {
+      "id": "lingerie-pregnant",
+      "name": "黑色蕾丝束胸，孕期"
+    },
+    {
+      "id": "bathrobe",
+      "name": "浴袍"
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "浴袍，孕期"
+    },
+    {
+      "id": "baby-light",
+      "name": "抱着宝宝（浅肤色）"
+    },
+    {
+      "id": "baby-medium",
+      "name": "抱着宝宝（中等肤色）"
+    },
+    {
+      "id": "swimsuit",
+      "name": "泳装"
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "泳装，孕期"
+    },
+    {
+      "id": "ao-dai",
+      "name": "奥黛"
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "奥黛，孕期"
+    },
+    {
+      "id": "sari",
+      "name": "纱丽"
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "纱丽，孕期"
+    },
+    {
+      "id": "holi",
+      "name": "节日白衣"
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "节日白衣，孕期"
+    },
+    {
+      "id": "sarong",
+      "name": "纱笼"
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "纱笼，孕期"
+    },
+    {
+      "id": "echoes",
+      "name": "咒术师盛装"
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "咒术师盛装，孕期"
+    }
+  ],
+  "ultimate": {
+    "id": "already-decided",
+    "name": "早有定论"
+  },
+  "room": {
+    "name": "蜜蜂酒馆楼上点着烛光的公寓"
+  }
+}

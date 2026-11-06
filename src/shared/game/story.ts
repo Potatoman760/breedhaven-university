@@ -45,7 +45,8 @@ export function thrivingChildOf(state: GameState, motherId: string): Child | und
 
 /** A cutscene with the child's name and pronouns put in: `{child}`, `{they}`, `{them}`, `{their}`. */
 export function aboutChild(intro: Intro, child: Child): Intro {
-  const words: Record<string, string> = { child: child.name, they: child.daughter ? 'she' : 'he', them: child.daughter ? 'her' : 'him', their: child.daughter ? 'her' : 'his' }
+  const daughter = child.daughter === true
+  const words: Record<string, string> = { child: child.name, they: t('game.story.they', { daughter }), them: t('game.story.them', { daughter }), their: t('game.story.their', { daughter }) }
   const fill = (line: string) => line.replace(/\{(child|they|them|their)\}/g, (_, key: string) => words[key])
   return { ...intro, scenes: intro.scenes.map((scene) => ({ ...scene, lines: scene.lines.map(fill) })) }
 }

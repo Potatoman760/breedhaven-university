@@ -292,6 +292,7 @@
       "image": "sprites/undercroft/drowned-valve-cutout.webp",
       "phases": [
         {
+          "id": "at-50",
           "at": 0.5,
           "text": "shudders and starts building pressure.",
           "charges": 2
@@ -313,6 +314,7 @@
       },
       "phases": [
         {
+          "id": "at-50",
           "at": 0.5,
           "text": "tears open and puts out new roots faster.",
           "summons": {
@@ -334,6 +336,7 @@
       "armor": 4,
       "phases": [
         {
+          "id": "at-50",
           "at": 0.5,
           "text": "sheds its plates and lashes out wildly.",
           "armor": 0,
@@ -352,6 +355,7 @@
       "charges": 2,
       "phases": [
         {
+          "id": "at-50",
           "at": 0.5,
           "text": "glows white-hot with fury.",
           "attack": 11
@@ -370,6 +374,7 @@
       "silences": true,
       "phases": [
         {
+          "id": "at-50",
           "at": 0.5,
           "text": "rattles its chains and calls loose wards to it.",
           "summons": {
@@ -391,6 +396,7 @@
       "mends": 8,
       "phases": [
         {
+          "id": "at-50",
           "at": 0.5,
           "text": "freezes over into a hard shell.",
           "armor": 3
@@ -409,11 +415,13 @@
       "charges": 3,
       "phases": [
         {
+          "id": "at-66",
           "at": 0.66,
           "text": "cracks wide and its light spills over everyone.",
           "sweeps": true
         },
         {
+          "id": "at-33",
           "at": 0.33,
           "text": "flares with the last of its strength.",
           "attack": 12
@@ -436,11 +444,13 @@
       },
       "phases": [
         {
+          "id": "at-66",
           "at": 0.66,
           "text": "surges, its blows gathering weight.",
           "charges": 2
         },
         {
+          "id": "at-33",
           "at": 0.33,
           "text": "boils over, smothering every spell near it.",
           "silences": true,
@@ -451,10 +461,12 @@
   ],
   "depths": [
     {
+      "id": "old-drains",
       "name": "the Old Drains",
       "appearance": "A vaulted brick storm drain under an old bathhouse. Ankle-deep warm water steams along the floor between mossy stone walkways. Rusted iron grates, dripping copper pipes along the walls, limescale. A pale green glow pools in the water and lights the brick arches from below.",
       "nodes": [
         {
+          "id": "a-flooded-culvert",
           "kind": "fight",
           "name": "A flooded culvert",
           "enemyIds": [
@@ -466,6 +478,7 @@
           }
         },
         {
+          "id": "a-dropped-satchel",
           "kind": "find",
           "name": "A dropped satchel",
           "finds": {
@@ -476,9 +489,11 @@
           }
         },
         {
+          "id": "checkpoint",
           "kind": "checkpoint"
         },
         {
+          "id": "valve-room",
           "kind": "guardian",
           "name": "The valve room",
           "enemyIds": [
@@ -504,10 +519,12 @@
       "power": 1.0
     },
     {
+      "id": "root-cellars",
       "name": "the Root Cellars",
       "appearance": "Low stone cellars broken through by enormous pale tree roots that hang from the ceiling and coil across an earth floor. Sagging shelves of forgotten dusty jars. The roots glow faintly violet where they have split the masonry. Dark, close, damp.",
       "nodes": [
         {
+          "id": "roots-through-the-brick",
           "kind": "fight",
           "name": "Roots through the brick",
           "enemyIds": [
@@ -519,6 +536,7 @@
           }
         },
         {
+          "id": "a-gardener-s-cache",
           "kind": "find",
           "name": "A gardener's cache",
           "finds": {
@@ -529,9 +547,11 @@
           }
         },
         {
+          "id": "checkpoint",
           "kind": "checkpoint"
         },
         {
+          "id": "mother-root",
           "kind": "guardian",
           "name": "The mother root",
           "enemyIds": [
@@ -558,10 +578,12 @@
       "power": 1.0
     },
     {
+      "id": "ward-gallery",
       "name": "the Ward Gallery",
       "appearance": "A long underground stone gallery with a barrel vault and heavy pillars. The walls are carved with great concentric circles and bands of runes that glow blue; some are cracked and flicker, leaking light like mist. Loose flagstones, drifting motes of blue light.",
       "nodes": [
         {
+          "id": "a-corridor-of-slipped-wards",
           "kind": "fight",
           "name": "A corridor of slipped wards",
           "enemyIds": [
@@ -573,6 +595,7 @@
           }
         },
         {
+          "id": "wards-still-walking",
           "kind": "fight",
           "name": "Wards still walking",
           "enemyIds": [
@@ -587,9 +610,11 @@
           }
         },
         {
+          "id": "checkpoint",
           "kind": "checkpoint"
         },
         {
+          "id": "lattice",
           "kind": "guardian",
           "name": "The lattice",
           "enemyIds": [
@@ -616,10 +641,12 @@
       "power": 1.12
     },
     {
+      "id": "boiler-vaults",
       "name": "the Boiler Vaults",
       "appearance": "A vast vaulted chamber around a colossal riveted copper boiler, green with age. Brass pipes as thick as tree trunks, valve wheels, gauges, catwalks of iron grating. Steam hangs in the air, lit orange by a furnace glow from the boiler seams.",
       "nodes": [
         {
+          "id": "steam-in-the-dark",
           "kind": "fight",
           "name": "Steam in the dark",
           "enemyIds": [
@@ -631,6 +658,7 @@
           }
         },
         {
+          "id": "a-sealed-locker",
           "kind": "find",
           "name": "A sealed locker",
           "finds": {
@@ -641,9 +669,11 @@
           }
         },
         {
+          "id": "checkpoint",
           "kind": "checkpoint"
         },
         {
+          "id": "great-boiler",
           "kind": "guardian",
           "name": "The great boiler",
           "enemyIds": [
@@ -668,10 +698,12 @@
       "power": 1.15
     },
     {
+      "id": "chained-stacks",
       "name": "the Chained Stacks",
       "appearance": "A buried library hall far underground. Towering dark bookshelves lean into the gloom, every book bound shut with small chains, longer chains hanging slack from the ceiling. Thick dust, fallen ladders, a single cold violet lantern glow between the stacks.",
       "nodes": [
         {
+          "id": "shelves-that-should-not-be-here",
           "kind": "fight",
           "name": "Shelves that should not be here",
           "enemyIds": [
@@ -684,6 +716,7 @@
           }
         },
         {
+          "id": "what-the-books-were-chained-for",
           "kind": "fight",
           "name": "What the books were chained for",
           "enemyIds": [
@@ -698,9 +731,11 @@
           }
         },
         {
+          "id": "checkpoint",
           "kind": "checkpoint"
         },
         {
+          "id": "stack",
           "kind": "guardian",
           "name": "The stack",
           "enemyIds": [
@@ -725,10 +760,12 @@
       "power": 1.2
     },
     {
+      "id": "still-pools",
       "name": "the Still Pools",
       "appearance": "A natural limestone cavern of perfectly still black pools like mirrors, joined by worn stepping stones. Stalactites and their exact reflections. Pale blue bioluminescence along the waterline. Utterly calm, no ripples, deep shadows.",
       "nodes": [
         {
+          "id": "water-that-watches",
           "kind": "fight",
           "name": "Water that watches",
           "enemyIds": [
@@ -741,6 +778,7 @@
           }
         },
         {
+          "id": "an-offering-left-on-a-ledge",
           "kind": "find",
           "name": "An offering left on a ledge",
           "finds": {
@@ -751,9 +789,11 @@
           }
         },
         {
+          "id": "checkpoint",
           "kind": "checkpoint"
         },
         {
+          "id": "stillwater",
           "kind": "guardian",
           "name": "The Stillwater",
           "enemyIds": [
@@ -778,10 +818,12 @@
       "power": 1.38
     },
     {
+      "id": "first-foundations",
       "name": "the First Foundations",
       "appearance": "The oldest masonry under the University: cyclopean rough-hewn stone blocks fitted without mortar, carved with masons marks. A great ward-ring is cut into the floor of a round chamber and filled with dim gold light. Broken tools, stone dust, immense weight overhead.",
       "nodes": [
         {
+          "id": "oldest-stone",
           "kind": "fight",
           "name": "The oldest stone",
           "enemyIds": [
@@ -794,6 +836,7 @@
           }
         },
         {
+          "id": "masons-own-wards",
           "kind": "fight",
           "name": "The masons' own wards",
           "enemyIds": [
@@ -809,9 +852,11 @@
           }
         },
         {
+          "id": "checkpoint",
           "kind": "checkpoint"
         },
         {
+          "id": "first-ward",
           "kind": "guardian",
           "name": "The First Ward",
           "enemyIds": [
@@ -837,10 +882,12 @@
       "partyStage": "lover"
     },
     {
+      "id": "wellspring",
       "name": "the Wellspring",
       "appearance": "A cathedral-sized cavern at the bottom of everything. A hot spring wells up in a wide stone basin, glowing green-gold and throwing light up through rising mist. Giant roots and ancient copper pipes converge on it from every side. At its center stands a weathered stone anchor pillar carved with runes.",
       "nodes": [
         {
+          "id": "last-stair",
           "kind": "fight",
           "name": "The last stair",
           "enemyIds": [
@@ -853,6 +900,7 @@
           }
         },
         {
+          "id": "water-s-edge",
           "kind": "find",
           "name": "The water's edge",
           "finds": {
@@ -864,9 +912,11 @@
           }
         },
         {
+          "id": "checkpoint",
           "kind": "checkpoint"
         },
         {
+          "id": "wellspring",
           "kind": "guardian",
           "name": "The Wellspring",
           "enemyIds": [

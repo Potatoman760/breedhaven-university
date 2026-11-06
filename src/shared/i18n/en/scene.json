@@ -152,7 +152,7 @@
   "prompt.appear.option": "- {id} ({name}): {about}",
   "prompt.appear.onNow": "what you have on now, described above",
   "prompt.appear.facesGroup": "- {first} may also have, in place of a face: {faces}",
-  "prompt.appear.picture":"  - in place of a face, {tag} shows: {description}",
+  "prompt.appear.picture": "  - in place of a face, {tag} shows: {description}",
   "prompt.appear.actsUp": "During sex, an explicit picture of one of these sex-acts can be shown over the whole scene, on top of your picture. \"{pose}\" was up for your last reply:",
   "prompt.appear.acts": "During sex, an explicit picture of one of these sex-acts can be shown over the whole scene, on top of your picture:",
   "prompt.appear.actsRules": "A sex-act is chosen in addition to your face and outfit, never in their place: go on writing the {expression} line every reply, and {outfit} when what you wear changes, and add {tag} on a line of its own when the scene reaches one of these sex-acts: for example {example}. Most replies have no {bare} line at all. Write one only in a reply whose own lines show that act happening at that moment; a reply of talk, kissing, undressing, lying together or anything afterwards has none. A sex-act is up for the one reply that asks for it and comes down with the next, so do not carry it on out of habit: ask for it again only while the same act is still going on in what you write. {creampie} and {facial} are a single moment and are never shown twice running.",
@@ -380,5 +380,6 @@
   "viewing.officer": "The housing officer",
   "viewing.activity": "Being shown {house}",
   "viewing.description": "{officer} has walked you through {house} room by room, keys in hand, and brings you back to the hearth room, where the nanny is waiting to meet you.",
-  "viewing.direction": "This is the hour {player} is given {house}. {officer}, the housing officer of the Sire Relations Office, has just shown him round it: which rooms are furnished, which stand bare for him to build, where the wards are, and the terms of the rent. She has introduced you, the nanny who lives in the house, and you have told him how the children are looked after here and what makes a child thrive. You are meeting {player} for the first time, in what is now his home and yours. {officer} is here and speaks for herself, exact and brief, and leaves once his questions are answered. Stay in the house: do not move the scene anywhere."
+  "viewing.direction": "This is the hour {player} is given {house}. {officer}, the housing officer of the Sire Relations Office, has just shown him round it: which rooms are furnished, which stand bare for him to build, where the wards are, and the terms of the rent. She has introduced you, the nanny who lives in the house, and you have told him how the children are looked after here and what makes a child thrive. You are meeting {player} for the first time, in what is now his home and yours. {officer} is here and speaks for herself, exact and brief, and leaves once his questions are answered. Stay in the house: do not move the scene anywhere.",
+  "detect.sexWritten": ""
 }

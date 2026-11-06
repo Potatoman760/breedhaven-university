@@ -44,6 +44,7 @@
     "private": false,
     "drills": [
       {
+        "id": "work-the-crowd-on-the-steps",
         "stat": "charisma",
         "title": "Work the crowd on the steps",
         "description": "You take a spot on the terrace steps, and one stranger after another sits down beside you."
@@ -155,6 +156,7 @@
     "private": false,
     "drills": [
       {
+        "id": "light-the-chapel-candles",
         "stat": "wisdom",
         "title": "Light the chapel candles",
         "description": "The sacristan lights the candles in an order and lets them burn down. Then it is your turn to light them the same way."
@@ -261,11 +263,13 @@
     "private": false,
     "drills": [
       {
+        "id": "fine-soldering-at-the-benches",
         "stat": "dexterity",
         "title": "Fine soldering at the benches",
         "description": "A magnifier, a steady hand, and a board of joints the size of pinheads."
       },
       {
+        "id": "mend-a-ward-circuit",
         "stat": "intelligence",
         "title": "Mend a ward circuit",
         "description": "A bench, a ward board that should glow and does not, and its runes to turn until the spark reaches the lamp."
@@ -590,6 +594,7 @@
     "eventOnly": false,
     "drills": [
       {
+        "id": "a-workout-on-the-racks",
         "stat": "strength",
         "title": "A workout on the racks",
         "description": "You load a bar, chalk your hands and start on the first set."
@@ -676,6 +681,7 @@
     "private": false,
     "drills": [
       {
+        "id": "a-run-along-the-river",
         "stat": "endurance",
         "title": "A run along the river",
         "description": "You set off down the river path at a pace you mean to keep."

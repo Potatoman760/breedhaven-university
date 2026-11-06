@@ -1,0 +1,114 @@
+{
+  "id": "caelwen",
+  "aliases": [
+    "凯尔文·灰林",
+    "凯尔文·阿什格罗夫",
+    "凯尔文"
+  ],
+  "bio": "一位精灵，女性研究学教授，今年一百三十二岁。六十年来她给一年级新生布置的论文题目从未变过，却也从未透露过她心目中的答案是什么。",
+  "outfits": [
+    {
+      "id": "default",
+      "name": "日常服装"
+    },
+    {
+      "id": "pregnant",
+      "name": "孕期"
+    },
+    {
+      "id": "nude",
+      "name": "裸体"
+    },
+    {
+      "id": "nude-pregnant",
+      "name": "裸体，孕期"
+    },
+    {
+      "id": "casual",
+      "name": "花园日常"
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "花园日常，孕期"
+    },
+    {
+      "id": "lingerie",
+      "name": "花园蕾丝"
+    },
+    {
+      "id": "lingerie-pregnant",
+      "name": "花园蕾丝，孕期"
+    },
+    {
+      "id": "bathrobe",
+      "name": "浴袍"
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "浴袍，孕期"
+    },
+    {
+      "id": "baby-light",
+      "name": "抱着宝宝（浅肤色）"
+    },
+    {
+      "id": "baby-medium",
+      "name": "抱着宝宝（中等肤色）"
+    },
+    {
+      "id": "swimsuit",
+      "name": "泳装"
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "泳装，孕期"
+    },
+    {
+      "id": "ao-dai",
+      "name": "奥黛"
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "奥黛，孕期"
+    },
+    {
+      "id": "sarong",
+      "name": "纱笼"
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "纱笼，孕期"
+    },
+    {
+      "id": "sari",
+      "name": "纱丽"
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "纱丽，孕期"
+    },
+    {
+      "id": "holi",
+      "name": "节日白衣"
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "节日白衣，孕期"
+    },
+    {
+      "id": "echoes",
+      "name": "法师长袍"
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "法师长袍，孕期"
+    }
+  ],
+  "ultimate": {
+    "id": "unhurried-hour",
+    "name": "从容一刻"
+  },
+  "room": {
+    "name": "她在河滨公园旁的高顶小楼"
+  }
+}

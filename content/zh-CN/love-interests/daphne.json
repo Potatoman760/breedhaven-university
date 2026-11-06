@@ -1,0 +1,112 @@
+{
+  "id": "daphne",
+  "aliases": [
+    "达芙妮"
+  ],
+  "bio": "体育系四年级学生，排球队队长",
+  "outfits": [
+    {
+      "id": "default",
+      "name": "运动套装"
+    },
+    {
+      "id": "pregnant",
+      "name": "孕期"
+    },
+    {
+      "id": "nude",
+      "name": "裸体"
+    },
+    {
+      "id": "nude-pregnant",
+      "name": "裸体，孕期"
+    },
+    {
+      "id": "casual",
+      "name": "休闲便装"
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "休闲便装，孕期"
+    },
+    {
+      "id": "lingerie",
+      "name": "运动内衣"
+    },
+    {
+      "id": "lingerie-pregnant",
+      "name": "运动内衣，孕期"
+    },
+    {
+      "id": "bathrobe",
+      "name": "浴袍"
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "浴袍，孕期"
+    },
+    {
+      "id": "baby-medium",
+      "name": "抱着宝宝（中等肤色）"
+    },
+    {
+      "id": "baby-dark",
+      "name": "抱着宝宝（深肤色）"
+    },
+    {
+      "id": "swimsuit",
+      "name": "泳装"
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "泳装，孕期"
+    },
+    {
+      "id": "ao-dai",
+      "name": "奥黛"
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "奥黛，孕期"
+    },
+    {
+      "id": "sarong",
+      "name": "纱笼"
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "纱笼，孕期"
+    },
+    {
+      "id": "sari",
+      "name": "纱丽"
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "纱丽，孕期"
+    },
+    {
+      "id": "holi",
+      "name": "节日白衣"
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "节日白衣，孕期"
+    },
+    {
+      "id": "echoes",
+      "name": "圣骑士铠甲"
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "圣骑士铠甲，孕期"
+    }
+  ],
+  "ultimate": {
+    "id": "earthshatter",
+    "name": "撼地重击"
+  },
+  "room": {
+    "name": "回廊宿舍大门上方的值班公寓"
+  }
+}

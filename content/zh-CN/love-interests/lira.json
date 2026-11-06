@@ -1,0 +1,36 @@
+{
+  "id": "lira",
+  "aliases": [
+    "莉拉"
+  ],
+  "bio": "一只约两百岁的原初史莱姆，在学校里大多数建筑拔地而起之前，她就已经住在这里的池塘与水池中了，平时还喜欢去旁听一年级的大课。",
+  "outfits": [
+    {
+      "id": "default",
+      "name": "本体"
+    },
+    {
+      "id": "pregnant",
+      "name": "孕期"
+    },
+    {
+      "id": "nude",
+      "name": "裸体"
+    },
+    {
+      "id": "nude-pregnant",
+      "name": "裸体，孕期"
+    },
+    {
+      "id": "baby-medium",
+      "name": "抱着宝宝（中等肤色）"
+    }
+  ],
+  "ultimate": {
+    "id": "two-centuries",
+    "name": "二百春秋"
+  },
+  "room": {
+    "name": "她在浴场水池旁的壁龛"
+  }
+}

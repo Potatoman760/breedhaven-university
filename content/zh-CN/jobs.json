@@ -1,0 +1,99 @@
+{
+  "jobs": [
+    {
+      "id": "market-stallhand",
+      "title": "摊位帮工",
+      "description": "替摊主搬箱子、看管刷卡机，再跟客人讨价还价。"
+    },
+    {
+      "id": "commons-kitchen",
+      "title": "后厨帮工",
+      "description": "在用餐高峰期洗碗、端托盘，并在热食台打菜。"
+    },
+    {
+      "id": "halls-desk",
+      "title": "前台值班员",
+      "description": "在回廊宿舍前台值班：签收包裹、给忘带钥匙的人开门、维持秩序。"
+    },
+    {
+      "id": "store-tills",
+      "title": "收银员",
+      "description": "在店面标语下收银结账、整理货架。"
+    },
+    {
+      "id": "lumen-usher",
+      "title": "影院引座员",
+      "description": "检票、领位，并在放映间隙清扫地上的爆米花。"
+    },
+    {
+      "id": "bathhouse-attendant",
+      "title": "浴场管理员",
+      "description": "分发毛巾、拖净地砖，并留意浴池高温区的情况。"
+    },
+    {
+      "id": "boba-maker",
+      "title": "奶茶调饮师",
+      "description": "摇茶、封口、递上珍珠奶茶，并对着排队的客人保持微笑。"
+    },
+    {
+      "id": "garden-hand",
+      "title": "园艺帮工",
+      "description": "无论刮风下雨，在教学花园里翻土、除草、浇水和搬运杂物。"
+    },
+    {
+      "id": "library-page",
+      "title": "图书馆助理",
+      "description": "将归还的图书上架、去书库取书，并维持自习隔间的安静。"
+    },
+    {
+      "id": "arcade-floor",
+      "title": "电玩城场务",
+      "description": "兑换零钱、清理卡币、重启街机，顺便给桌上冰球当裁判。"
+    },
+    {
+      "id": "barista",
+      "title": "咖啡师",
+      "description": "萃取浓缩咖啡、端上糕点，并看住自习卡座别被人施了恶咒。"
+    },
+    {
+      "id": "armoury-assistant",
+      "title": "军械库助理",
+      "description": "在比武场的工坊里搬运装备、将刀剑上架，并拉动风箱。"
+    },
+    {
+      "id": "bar-staff",
+      "title": "酒吧侍应",
+      "description": "打酒、收酒杯，并在知识竞答之夜负责记分板。"
+    },
+    {
+      "id": "clinic-reception",
+      "title": "诊所前台",
+      "description": "登记预约、分发处方，并对所有事守口如瓶。"
+    },
+    {
+      "id": "gym-floor",
+      "title": "健身房巡场员",
+      "description": "为举铁的人提供保护、归位杠铃片，并指导新手完成循环训练。"
+    },
+    {
+      "id": "club-door",
+      "title": "夜店门卫兼场务",
+      "description": "负责夜店门口检票和场内巡视，并把需要休息的客人扶进静音室。"
+    },
+    {
+      "id": "waiter",
+      "title": "服务员",
+      "description": "端上燃烧着、冰封着或是嗡嗡作响的菜肴，且一盘都不能摔。"
+    },
+    {
+      "id": "foundry-technician",
+      "title": "工坊实验技术员",
+      "description": "校准工作台、为防护结界充能，并防止一年级新生把测试间炸上天。"
+    },
+    {
+      "id": "research-assistant",
+      "title": "研究助理",
+      "description": "为一位教授撰写的育嗣者登记册专著阅读、整理并归纳档案盒里的资料。"
+    }
+  ]
+}

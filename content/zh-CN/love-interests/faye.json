@@ -1,0 +1,113 @@
+{
+  "id": "faye",
+  "aliases": [
+    "费伊·费蒂莱",
+    "费伊"
+  ],
+  "bio": "商科毕业班学生、天赋异禀的法师、繁育市集的实习生，也是整个学院里最危险的谈判专家。",
+  "outfits": [
+    {
+      "id": "default",
+      "name": "日常服装"
+    },
+    {
+      "id": "pregnant",
+      "name": "孕期"
+    },
+    {
+      "id": "nude",
+      "name": "裸体"
+    },
+    {
+      "id": "nude-pregnant",
+      "name": "裸体，孕期"
+    },
+    {
+      "id": "casual",
+      "name": "商务正装"
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "商务正装，孕期"
+    },
+    {
+      "id": "lingerie",
+      "name": "午夜绸缎"
+    },
+    {
+      "id": "lingerie-pregnant",
+      "name": "午夜绸缎，孕期"
+    },
+    {
+      "id": "bathrobe",
+      "name": "浴袍"
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "浴袍，孕期"
+    },
+    {
+      "id": "baby-light",
+      "name": "抱着宝宝（浅肤色）"
+    },
+    {
+      "id": "baby-medium",
+      "name": "抱着宝宝（中等肤色）"
+    },
+    {
+      "id": "swimsuit",
+      "name": "泳装"
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "泳装，孕期"
+    },
+    {
+      "id": "ao-dai",
+      "name": "奥黛"
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "奥黛，孕期"
+    },
+    {
+      "id": "sarong",
+      "name": "纱笼"
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "纱笼，孕期"
+    },
+    {
+      "id": "sari",
+      "name": "纱丽"
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "纱丽，孕期"
+    },
+    {
+      "id": "holi",
+      "name": "节日白衣"
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "节日白衣，孕期"
+    },
+    {
+      "id": "echoes",
+      "name": "女术士长裙"
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "女术士长裙，孕期"
+    }
+  ],
+  "ultimate": {
+    "id": "dragons-kiss",
+    "name": "巨龙之吻"
+  },
+  "room": {
+    "name": "灯笼街精品店楼上的公寓"
+  }
+}

@@ -1,0 +1,108 @@
+{
+  "pieces": [
+    {
+      "id": "barbell",
+      "name": "杠铃"
+    },
+    {
+      "id": "iron",
+      "name": "电烙铁"
+    },
+    {
+      "id": "heart",
+      "name": "爱心"
+    },
+    {
+      "id": "tile",
+      "name": "电路块"
+    },
+    {
+      "id": "spark",
+      "name": "火花"
+    },
+    {
+      "id": "lamp",
+      "name": "防护结界灯"
+    },
+    {
+      "id": "candle",
+      "name": "蜡烛"
+    },
+    {
+      "id": "flame-red",
+      "name": "红色火焰"
+    },
+    {
+      "id": "flame-orange",
+      "name": "橙色火焰"
+    },
+    {
+      "id": "flame-gold",
+      "name": "金色火焰"
+    },
+    {
+      "id": "flame-green",
+      "name": "绿色火焰"
+    },
+    {
+      "id": "flame-blue",
+      "name": "蓝色火焰"
+    },
+    {
+      "id": "flame-violet",
+      "name": "紫色火焰"
+    },
+    {
+      "id": "compliment",
+      "name": "赞美"
+    },
+    {
+      "id": "joke",
+      "name": "开玩笑"
+    },
+    {
+      "id": "comfort",
+      "name": "安慰"
+    },
+    {
+      "id": "space",
+      "name": "给她留出空间"
+    },
+    {
+      "id": "stopwatch",
+      "name": "秒表"
+    },
+    {
+      "id": "finish-flag",
+      "name": "终点旗"
+    },
+    {
+      "id": "run-progress",
+      "name": "跑者，前进进度"
+    },
+    {
+      "id": "run-pace",
+      "name": "跑者，跟上配速"
+    },
+    {
+      "id": "run-behind",
+      "name": "跑者，掉队落后"
+    },
+    {
+      "id": "run-fast",
+      "name": "跑者，速度过快"
+    }
+  ],
+  "runners": [
+    {
+      "id": "pacer",
+      "name": "领跑员，奔跑中"
+    }
+  ],
+  "scenery": [
+    {
+      "id": "river-path",
+      "name": "河岸步道"
+    }
+  ]
+}

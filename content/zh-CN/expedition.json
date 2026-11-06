@@ -1,5 +1,32 @@
 {
   "name": "地下遗构",
+  "intro": {
+    "text": "别问我是怎么知道的，也别留下任何字据。{place}底下有样东西你必须亲眼看看，只有站在它上方你才能明白。{date}，在那里见我。独自前来。就一小时。",
+    "missedText": "你没来{place}。我没法一直自己一个人下去，也没法在这里跟你解释清楚。再约一次：{date}，老地方。务必要到。",
+    "cutscene": {
+      "scenes": [
+        {
+          "lines": [
+            "*Vespera穿着一件深色长外套在热水池边等着，帽檐压得很低。她朝你身后的门口张望了两遍，才露出笑容。*",
+            "Vespera: 你来了。很好。别一副忧心忡忡的样子，甜心。没人会因为泡个澡就被开除。",
+            "*她领着你绕到热气腾腾的水池后面，来到一扇你从没注意过的窄门前。门后是一道通往黑暗深处的古老阶梯。*",
+            "Vespera: 这座大学是建在别的东西之上的。排水渠、根窖、初代石匠刻下防护结界的回廊，而在最底层，则是涌出繁花的泉眼。",
+            "Vespera: 七百年的结界脉络都锚定在下面。你睡过的每一座厅堂上方的防护结界，全靠它们撑着。而它们正在松脱。",
+            "Vespera: 脉络一旦松脱，纯粹的繁花就会淤积成形。没有神智的史莱姆、会抓人的树根、散落下来自己到处走的古老结界。在你开口问之前我先说明，它们跟Lira可完全不一样。",
+            "Vespera: 你要是大意，它们能把你直接拍趴下。没做好准备就下去，等你爬上来的时候就只剩一身淤青和两个空口袋了。",
+            "Vespera: 接下来是你喜欢的部分了。繁花会在真育嗣者身边平息下来。锚点只有在你手里才能稳固。我不行，委员会也不行。只有你行。",
+            "Vespera: 你没有魔力，所以不能独自下去。你得带上懂魔法的女人，每次两个，而且得是足够信任你、愿意跟你走进黑暗的人。",
+            "Vespera: 还有，怀着你孩子的女人在下面会强得多。怎么用这一点，你自己琢磨。",
+            "Vespera: 为什么要费这个劲？因为一旦防护结界崩溃，整座大学也会跟着完蛋。而且锚点旁边总会留着些东西：钱、稀奇古怪的老物件，还有遗物。",
+            "Vespera: 遗物才是真正的头奖，甜心。每一件都寄宿着有自我意志的古老魔法，而且没有哪两件的作用是相同的。有些会改变这地方所有女人在你身边的举止；有些则能在顷刻间干出些我在小教堂里都不好意思说出口的事。",
+            "Vespera: 跟你一起下去的女人也会记住这份经历。没有什么比在下水道里并肩作战更能拉近两个人的距离了。",
+            "Vespera: 还有一件事。未经奥术委员会许可触碰结界脉络是违法的。我一直都是独自一人、悄悄地在做。继续保持这样。",
+            "Vespera: 好了。趁你还没跑下去把自己送进怪物嘴里，让我先教你怎么操作。"
+          ]
+        }
+      ]
+    }
+  },
   "roles": [
     {
       "id": "guard",
@@ -111,5 +138,328 @@
         "name": "复苏"
       }
     }
-  ]
+  ],
+  "enemies": [
+    {
+      "id": "wild-slime",
+      "name": "野生史莱姆"
+    },
+    {
+      "id": "root-tangle",
+      "name": "缠结树根"
+    },
+    {
+      "id": "pipe-wight",
+      "name": "管道尸鬼"
+    },
+    {
+      "id": "loose-ward",
+      "name": "游离结界"
+    },
+    {
+      "id": "steam-shade",
+      "name": "蒸汽幽影"
+    },
+    {
+      "id": "drowned-valve",
+      "name": "淹没之阀",
+      "phases": [
+        {
+          "id": "at-50",
+          "text": "剧烈震颤，开始积蓄压力。"
+        }
+      ]
+    },
+    {
+      "id": "root-mother",
+      "name": "树根之母",
+      "phases": [
+        {
+          "id": "at-50",
+          "text": "撕裂开来，以更快的速度抽出新根。"
+        }
+      ]
+    },
+    {
+      "id": "broken-lattice",
+      "name": "破碎晶格",
+      "phases": [
+        {
+          "id": "at-50",
+          "text": "褪下外层护板，疯狂地四处抽打。"
+        }
+      ]
+    },
+    {
+      "id": "boiler-saint",
+      "name": "锅炉圣徒",
+      "phases": [
+        {
+          "id": "at-50",
+          "text": "在狂怒中发出炽白的光芒。"
+        }
+      ]
+    },
+    {
+      "id": "chained-stack",
+      "name": "锁链书架",
+      "phases": [
+        {
+          "id": "at-50",
+          "text": "哗啦啦地晃动锁链，将游离结界唤至身边。"
+        }
+      ]
+    },
+    {
+      "id": "stillwater",
+      "name": "止水",
+      "phases": [
+        {
+          "id": "at-50",
+          "text": "冻结成一层坚硬的外壳。"
+        }
+      ]
+    },
+    {
+      "id": "first-ward",
+      "name": "初始结界",
+      "phases": [
+        {
+          "id": "at-66",
+          "text": "裂开一道大口子，光芒倾泻在所有人身上。"
+        },
+        {
+          "id": "at-33",
+          "text": "燃尽最后的力量，骤然迸发出强光。"
+        }
+      ]
+    },
+    {
+      "id": "wellspring",
+      "name": "涌泉",
+      "phases": [
+        {
+          "id": "at-66",
+          "text": "汹涌翻腾，攻势愈发沉重。"
+        },
+        {
+          "id": "at-33",
+          "text": "沸腾外溢，扼杀了周围的一切法术。"
+        }
+      ]
+    }
+  ],
+  "depths": [
+    {
+      "id": "old-drains",
+      "name": "旧排水渠",
+      "nodes": [
+        {
+          "id": "a-flooded-culvert",
+          "name": "淹没的暗渠"
+        },
+        {
+          "id": "a-dropped-satchel",
+          "name": "遗落的挎包"
+        },
+        {
+          "id": "checkpoint"
+        },
+        {
+          "id": "valve-room",
+          "name": "阀门室"
+        }
+      ],
+      "relic": {
+        "id": "silver-tongue",
+        "name": "巧言银舌",
+        "description": "挂在细链上的坠饰，能撬开每个女人的嘴。启用期间，她们都会满嘴骚话。"
+      }
+    },
+    {
+      "id": "root-cellars",
+      "name": "根窖",
+      "nodes": [
+        {
+          "id": "roots-through-the-brick",
+          "name": "穿砖而过的树根"
+        },
+        {
+          "id": "a-gardener-s-cache",
+          "name": "园丁的藏匿处"
+        },
+        {
+          "id": "checkpoint"
+        },
+        {
+          "id": "mother-root",
+          "name": "母根"
+        }
+      ],
+      "relic": {
+        "id": "exhibitionists-lantern",
+        "name": "露出癖提灯",
+        "description": "一盏泛着玫瑰色光芒的提灯，能让人觉得被人注视是件美妙无比的事。启用期间，每个女人都喜欢被人看着。"
+      }
+    },
+    {
+      "id": "ward-gallery",
+      "name": "结界回廊",
+      "nodes": [
+        {
+          "id": "a-corridor-of-slipped-wards",
+          "name": "结界松脱的走廊"
+        },
+        {
+          "id": "wards-still-walking",
+          "name": "仍在游荡的结界"
+        },
+        {
+          "id": "checkpoint"
+        },
+        {
+          "id": "lattice",
+          "name": "晶格"
+        }
+      ],
+      "relic": {
+        "id": "apple-of-discord",
+        "name": "纷争金苹果",
+        "description": "被咬掉一口的金苹果。启用期间，醋意高涨：争风吃醋的闹剧翻倍，被打断的次数也翻倍。"
+      }
+    },
+    {
+      "id": "boiler-vaults",
+      "name": "锅炉穹窖",
+      "nodes": [
+        {
+          "id": "steam-in-the-dark",
+          "name": "暗处蒸汽"
+        },
+        {
+          "id": "a-sealed-locker",
+          "name": "密封储物柜"
+        },
+        {
+          "id": "checkpoint"
+        },
+        {
+          "id": "great-boiler",
+          "name": "大锅炉"
+        }
+      ],
+      "relic": {
+        "id": "unraveling",
+        "name": "解衣之缕",
+        "description": "一轴闪烁着微光的丝线。在场景中使用时，在场所有人身上的每一寸衣物都会瞬间消失。"
+      }
+    },
+    {
+      "id": "chained-stacks",
+      "name": "锁链书库",
+      "nodes": [
+        {
+          "id": "shelves-that-should-not-be-here",
+          "name": "不该存在于此的书架"
+        },
+        {
+          "id": "what-the-books-were-chained-for",
+          "name": "锁住书籍的真正原因"
+        },
+        {
+          "id": "checkpoint"
+        },
+        {
+          "id": "stack",
+          "name": "主书架"
+        }
+      ],
+      "relic": {
+        "id": "hourglass-of-stillness",
+        "name": "静止沙漏",
+        "description": "流沙悬停不动的沙漏。在场景中使用时，除了你和与你同行的人之外，所有人的时间都会静止。"
+      }
+    },
+    {
+      "id": "still-pools",
+      "name": "静水池",
+      "nodes": [
+        {
+          "id": "water-that-watches",
+          "name": "注视着人的池水"
+        },
+        {
+          "id": "an-offering-left-on-a-ledge",
+          "name": "留在岩架上的祭品"
+        },
+        {
+          "id": "checkpoint"
+        },
+        {
+          "id": "stillwater",
+          "name": "止水"
+        }
+      ],
+      "relic": {
+        "id": "sapphic-charm",
+        "name": "百合护符",
+        "description": "两轮紧紧相扣的新月。在场景中使用时，在场的女人们会被彼此吸引，想要互相亲吻。"
+      }
+    },
+    {
+      "id": "first-foundations",
+      "name": "初始地基",
+      "nodes": [
+        {
+          "id": "oldest-stone",
+          "name": "最古老的基石"
+        },
+        {
+          "id": "masons-own-wards",
+          "name": "石匠自留的结界"
+        },
+        {
+          "id": "checkpoint"
+        },
+        {
+          "id": "first-ward",
+          "name": "初始结界"
+        }
+      ],
+      "relic": {
+        "id": "minds-eye",
+        "name": "心灵之眼",
+        "description": "一枚紫罗兰色的水晶眼眸。在场景中使用时，你能听见在场的女人们心里的真实想法。"
+      }
+    },
+    {
+      "id": "wellspring",
+      "name": "涌泉",
+      "nodes": [
+        {
+          "id": "last-stair",
+          "name": "最后一级台阶"
+        },
+        {
+          "id": "water-s-edge",
+          "name": "水畔"
+        },
+        {
+          "id": "checkpoint"
+        },
+        {
+          "id": "wellspring",
+          "name": "涌泉"
+        }
+      ],
+      "relic": {
+        "id": "seed-of-the-first-bloom",
+        "name": "初始繁花之种",
+        "description": "大学建立之初便旨在守护的种子。在场景中使用时，在场的女人们服用的任何抑制繁花的药物都会完全失效。"
+      }
+    }
+  ],
+  "echoes": {
+    "name": "回响"
+  }
 }

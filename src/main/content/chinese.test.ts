@@ -1,9 +1,10 @@
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { ENGLISH, format, placeholders, setLanguage, t, weekdayName, type Namespace } from '../../shared/i18n'
 import { createInitialState } from '../../shared/game/state'
 import { selectCodexEntries } from '../../shared/game/codex'
+import { sexWrittenOf } from '../../shared/game/scene'
 import { languagesIn, readStrings } from './language'
 import { loadContentPack } from './loader'
 
@@ -11,6 +12,9 @@ const root = resolve(__dirname, '../../../content')
 const dir = join(root, 'zh-CN')
 const english = loadContentPack(join(root, 'default'))
 const chinese = loadContentPack(join(root, 'default'), dir)
+// The fields a translation may change: what the player reads. Everything else (numbers, ids, references, and the
+// directions and prompts written for the LLM and the image model) has to come through as the English has it.
+const TEXT_FIELDS = ['name', 'title', 'description', 'bio', 'invitation', 'subject', 'content', 'ask', 'answer', 'wrong', 'label', 'definition', 'lines', 'blurb', 'highlights', 'summary', 'text', 'missedText', 'said', 'telling', 'syllabus', 'texts']
 
 describe('the Simplified Chinese translation', () => {
   it('is discoverable and has valid message placeholders', () => {
@@ -37,19 +41,71 @@ describe('the Simplified Chinese translation', () => {
       const { title: _tt, category: _tc, content: _tb, keywords: _tk, ...translatedRules } = entry
       expect(translatedRules, source.id).toEqual(sourceRules)
     }
-    const withoutLabels = (value: unknown): unknown => Array.isArray(value)
-      ? value.map(withoutLabels)
+    const withoutLabels = (value: unknown, also: readonly string[] = []): unknown => Array.isArray(value)
+      ? value.map((entry) => withoutLabels(entry, also))
       : value !== null && typeof value === 'object'
-        ? Object.fromEntries(Object.entries(value).filter(([key]) => !['name', 'title', 'description'].includes(key)).map(([key, entry]) => [key, withoutLabels(entry)]))
+        ? Object.fromEntries(Object.entries(value).filter(([key]) => !TEXT_FIELDS.includes(key) && !also.includes(key)).map(([key, entry]) => [key, withoutLabels(entry, also)]))
         : value
-    const { codex: _ec, housing: englishHousing, ...sourceRest } = english
-    const { codex: _cc, housing: chineseHousing, ...translatedRest } = chinese
+    // The loading tips are a list of text and nothing else: translated whole, one for one.
+    expect(chinese.tips).toHaveLength(english.tips.length)
+    const { codex: _ec, housing: englishHousing, tips: _et, loveInterests: englishCharacters, npcs: englishNpcs, ...sourceRest } = english
+    const { codex: _cc, housing: chineseHousing, tips: _ct, loveInterests: chineseCharacters, npcs: chineseNpcs, ...translatedRest } = chinese
     expect(withoutLabels(translatedRest)).toEqual(withoutLabels(sourceRest))
+    // A character's role is the words she is introduced by (a house room's is what the game does with it, and stays);
+    // her aliases are the language's own way of writing her name, which only the parser reads.
+    expect(withoutLabels([...chineseCharacters, ...chineseNpcs], ['role', 'aliases'])).toEqual(withoutLabels([...englishCharacters, ...englishNpcs], ['role', 'aliases']))
     const { floors: _ef, ...sourceHouse } = englishHousing!
     const { floors: _cf, ...translatedHouse } = chineseHousing!
     expect(chineseHousing!.floors).toHaveLength(englishHousing!.floors.length)
     expect(withoutLabels(translatedHouse)).toEqual(withoutLabels(sourceHouse))
     expect(chinese.calendar.weekdays).toEqual(english.calendar.weekdays)
+  })
+
+  it('sees sex written in Chinese of a woman who will not, as it does in English, and not talk about it', () => {
+    const { messages } = readStrings(dir)
+    const cast = [{ id: 'tamsin', name: 'Tamsin', aliases: ['塔姆辛'] }, { id: 'maren', name: 'Maren', aliases: ['玛伦'] }]
+    try {
+      setLanguage('zh-CN', messages)
+      expect(sexWrittenOf('Tamsin: 我骑在他身上，慢慢坐了下去。', cast, ['tamsin'], 'tamsin')).toEqual(['tamsin'])
+      // Narrated of her by name, whoever says it; in her Chinese name too.
+      expect(sexWrittenOf('*玛伦看着塔姆辛，他的肉棒插入她的身体。*', cast, ['tamsin', 'maren'], 'tamsin').sort()).toEqual(['maren', 'tamsin'])
+      // Talk about it is not it.
+      expect(sexWrittenOf('Tamsin: 今晚不做爱，我们只是聊聊交合受孕的课。', cast, ['tamsin'], 'tamsin')).toEqual([])
+    } finally {
+      setLanguage('en')
+    }
+    // In English the language adds nothing, and the English list still reads an English reply.
+    expect(sexWrittenOf('Tamsin: 我骑在他身上。', cast, ['tamsin'], 'tamsin')).toEqual([])
+    expect(sexWrittenOf('Tamsin: I straddle him.', cast, ['tamsin'], 'tamsin')).toEqual(['tamsin'])
+  })
+
+  it("gives every character her name in Chinese script, for the parser to know her by, and English none", () => {
+    const of = (pack: typeof english, id: string) => [...pack.loveInterests, ...pack.npcs].find((one) => one.id === id)
+    for (const li of [...english.loveInterests, ...english.npcs]) {
+      expect(li.aliases ?? [], li.id).toEqual([])
+      expect(of(chinese, li.id)?.aliases?.some((alias) => /\p{Script=Han}/u.test(alias)), li.id).toBe(true)
+      expect(of(chinese, li.id)?.name, li.id).toBe(li.name)
+    }
+  })
+
+  it('names the entry each translated one is for, wherever the English entries have an id', () => {
+    // Matched by place, a translation goes on the wrong entry as soon as the English list is reordered or grows.
+    const loose: string[] = []
+    const walk = (eng: unknown, over: unknown, where: string): void => {
+      if (Array.isArray(eng) && Array.isArray(over)) {
+        const identity = ['id', 'code', 'number', 'key'].find((field) => eng.length > 0 && eng.every((entry) => entry !== null && typeof entry === 'object' && field in entry))
+        over.forEach((entry, i) => {
+          const keyed = identity && entry !== null && typeof entry === 'object' ? (entry as Record<string, unknown>)[identity] : undefined
+          if (identity && keyed === undefined) loose.push(`${where}[${i}]`)
+          walk(identity ? eng.find((one) => one[identity] === keyed) : eng[i], entry, `${where}[${String(keyed ?? i)}]`)
+        })
+      } else if (eng !== null && typeof eng === 'object' && over !== null && typeof over === 'object') {
+        for (const [key, value] of Object.entries(over)) walk((eng as Record<string, unknown>)[key], value, `${where}.${key}`)
+      }
+    }
+    const files = readdirSync(dir, { recursive: true, encoding: 'utf8' }).filter((file) => file.endsWith('.json') && !file.startsWith('strings') && file !== 'language.json')
+    for (const file of files) walk(JSON.parse(readFileSync(join(root, 'default', file), 'utf8')), JSON.parse(readFileSync(join(dir, file), 'utf8')), file)
+    expect(loose).toEqual([])
   })
 
   it('covers every interface catalog key and every game message', () => {

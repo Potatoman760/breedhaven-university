@@ -1,6 +1,7 @@
 {
   "anwen": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "Get down to the Foundry, pretty boy. I need two hands that don't shake and you're the only one awake.",
       "locationId": "foundry",
@@ -36,6 +37,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "Meet me by the west gate. Wear a jacket if you have one that isn't an embarrassment.",
       "locationId": "ridge-road",
@@ -76,6 +78,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "My room. Don't knock like a coward, just come in.",
       "locationId": "dormitories",
@@ -154,6 +157,7 @@
       "stopsBirthControl": true
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "Get up to the nursery, pretty boy. Don't make me ask twice.",
       "locationId": "sire-house",
@@ -198,6 +202,7 @@
   ],
   "elowen": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "Get over to my dorm right now, I'm live and the goblins are demanding proof you exist. Bring snacks or face the banhammer.",
       "locationId": "dormitories",
@@ -235,6 +240,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "Fixed the charm-board on the owner's old cabinet at Pixel & Rune so I've got the keys after close. Come take an L in two-player.",
       "locationId": "pixel-and-rune",
@@ -276,6 +282,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "Come over to my room. Not streaming tonight, just want to see you.",
       "locationId": "dormitories",
@@ -360,6 +367,7 @@
       ]
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "get to the nursery rn, no shot you're busy. {child} and i are waiting.",
       "locationId": "sire-house",
@@ -404,6 +412,7 @@
   ],
   "caelwen": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "If you find yourself near Riverside Park, I have just put the kettle on. My house has been altogether too quiet, and I would be glad of the company.",
       "locationId": "riverside-park",
@@ -442,6 +451,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "I have the key to the old library wing and a rare evening without essays to mark. Walk with me among the stacks, if you are not otherwise engaged.",
       "locationId": "library",
@@ -484,6 +494,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "Come to the house by the park when you are free. The conservatory is open, and I have an overdue confession to make to you.",
       "locationId": "riverside-park",
@@ -565,6 +576,7 @@
       "stopsBirthControl": true
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "Come up to the nursery when you have a moment, my dear. There is something I wish to show you.",
       "locationId": "sire-house",
@@ -609,6 +621,7 @@
   ],
   "daphne": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "Tiltyard. Bring water and don't be late. I need a second pair of hands for warm-ups.",
       "locationId": "tiltyard",
@@ -644,6 +657,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "My apartment over the Cloister gate. Door's off the latch. Come up if you're free.",
       "locationId": "dormitories",
@@ -685,6 +699,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "Meet me at the Tiltyard. Main gate's locked, use the side wicket by the equipment shed.",
       "locationId": "tiltyard",
@@ -766,6 +781,7 @@
       ]
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "Nursery. Come check the board with me.",
       "locationId": "sire-house",
@@ -810,6 +826,7 @@
   ],
   "dinah": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "The rooms over the chapel are quiet now, {player}. If you have half an hour to spare, I have the kettle on. I would be glad of your company.",
       "locationId": "chapel",
@@ -845,6 +862,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "I am going to the Physic Garden to cut feverfew before the dew settles. Walk with me, {player}. There is something I have been meaning to set in order, and I think I can only say it to you.",
       "locationId": "physic-garden",
@@ -885,6 +903,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "My apartment beside the Furrow Chapel is open to you, {player}. Please come when you are able. I have something I must ask of you in full honesty.",
       "locationId": "chapel",
@@ -964,6 +983,7 @@
       ]
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "Please come to the nursery when you are able, {player}. I would speak with you beside {child}.",
       "locationId": "sire-house",
@@ -1008,6 +1028,7 @@
   ],
   "faye": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "Come up to my place on Lantern Row, {player}. I have a fresh batch coming off the still and I need an honest mouth. Don't make me ask twice, sweetheart.",
       "locationId": "lantern-row",
@@ -1046,6 +1067,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "Meet me at my stall before they lock the gates, {player}. The crowd is gone and I'm weighing out the day's take. Bring me some company.",
       "locationId": "market",
@@ -1087,6 +1109,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "Come up to the apartment, {player}. Leave the door bolted behind you and come straight to the bedroom. We have terms to go over.",
       "locationId": "lantern-row",
@@ -1165,6 +1188,7 @@
       "stopsBirthControl": true
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "Come up to the nursery, {player}. I've finished reviewing the month's figures.",
       "locationId": "sire-house",
@@ -1209,6 +1233,7 @@
   ],
   "grushka": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "Come up to my rooms above the Tiltyard. Your form on the heavy bag was a disgrace and I have mutton on the hob. Do not be late.",
       "locationId": "tiltyard",
@@ -1245,6 +1270,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "The cadets are dismissed and the ring is empty. Meet me down on the sand. I have something to say to you off the clock.",
       "locationId": "tiltyard",
@@ -1285,6 +1311,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "Come to my quarters. Leave your gear in the hall. We have terms to settle.",
       "locationId": "tiltyard",
@@ -1362,6 +1389,7 @@
       "stopsBirthControl": true
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "Come to the nursery, {player}. I have a word for you.",
       "locationId": "sire-house",
@@ -1406,6 +1434,7 @@
   ],
   "isolde": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "I have the raw ledgers from Household Seven at my usual table in the library. If you have twenty minutes, I can show you how five adults lie to each other in ink.",
       "locationId": "library",
@@ -1442,6 +1471,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "I am at Spell & Sip with a corner table and a small dataset I put together this week. Come sit with me for half an hour; the numbers concern you.",
       "locationId": "spell-and-sip",
@@ -1483,6 +1513,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "Come to my room on Lantern Row when you are free. I have a model on my screens that refuses to reconcile, and it requires your input.",
       "locationId": "lantern-row",
@@ -1562,6 +1593,7 @@
       "stopsBirthControl": true
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "If you have five minutes, {player}, please join me in the nursery. The four-week figures are worth reviewing.",
       "locationId": "sire-house",
@@ -1606,6 +1638,7 @@
   ],
   "lira": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "The sky is leaking again and the pond is very loud. Come to the Physic Garden. I have put my stones in order of how round they are.",
       "locationId": "physic-garden",
@@ -1641,6 +1674,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "Come to my alcove in the Bathhouse. The water is very clean because I cleaned it. I want to show you my other shapes.",
       "locationId": "bathhouse",
@@ -1682,6 +1716,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "The pond is quiet and the frogs have gone to sleep. Come to the Physic Garden, {player}. I have a piece of news about my body.",
       "locationId": "physic-garden",
@@ -1761,6 +1796,7 @@
       ]
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "Come to the nursery room, {player}. {child} is very round and I have news.",
       "locationId": "sire-house",
@@ -1805,6 +1841,7 @@
   ],
   "lola-hopworth": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "Kitchen's cleared out and the pass is clean. Get down to the Honeyed Bee, love, I've got a knife with your name on it.",
       "locationId": "honeyed-bee-inn",
@@ -1840,6 +1877,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "Come up the back stairs to the apartment. Put the kettle on if you beat me to the landing, I've got something on the table for you.",
       "locationId": "honeyed-bee-inn",
@@ -1882,6 +1920,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "Down in the kitchen before the bakers get in. Come down while the bricks are still coming up to heat, dear, I want a word.",
       "locationId": "honeyed-bee-inn",
@@ -1962,6 +2001,7 @@
       ]
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "Up to the nursery, love. Come see what a month of good keeping looks like.",
       "locationId": "sire-house",
@@ -2006,6 +2046,7 @@
   ],
   "maren": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "Come to Boba Blossom! I got roped into sitting with the new exchange students and none of them have a single language in common. Save me, or at least come watch me show off a little.",
       "locationId": "boba-blossom",
@@ -2041,6 +2082,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "The girls just left and there are still three lemon tartlets on the stand. Come up to my room? I finished making something for you and I refuse to wait until tomorrow to see if it fits.",
       "locationId": "dormitories",
@@ -2082,6 +2124,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "Come to my room when the halls are quiet. Leave the ribbon cravat on if you want, or don't. I have something to ask you without any tea on the table.",
       "locationId": "dormitories",
@@ -2164,6 +2207,7 @@
       "stopsBirthControl": true
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "Come to the nursery right now, {player}, or I'll sulk for a whole minute. {child} and I have something to show you.",
       "locationId": "sire-house",
@@ -2208,6 +2252,7 @@
   ],
   "morwenna": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "Come to the upstairs room at the Honeyed Bee, {player}. My table is crowded with tedious people, and I require an excuse to clear it.",
       "locationId": "honeyed-bee-inn",
@@ -2243,6 +2288,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "Come up to my apartment above the tavern. I have been reviewing my notes, and your name appears with an intolerable frequency.",
       "locationId": "honeyed-bee-inn",
@@ -2284,6 +2330,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "Come to my apartment, {player}. Do not keep me waiting; I have an experiment in progress and you are the complicating factor.",
       "locationId": "honeyed-bee-inn",
@@ -2365,6 +2412,7 @@
       "stopsBirthControl": true
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "Join me in the nursery when you have a moment, darling. I have a month of empirical evidence to discuss with you.",
       "locationId": "sire-house",
@@ -2409,6 +2457,7 @@
   ],
   "ottilie": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "Come to the Reproductive Health Center, room 3B. I have the raw curves from your intake assay up on the main monitor. You ought to see what the fuss is about in actual numbers.",
       "locationId": "health-centre",
@@ -2445,6 +2494,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "Come up to the apartment above Petal & Pill. Use the side stair by the dispensary. I have coffee, and a piece of unfinished business that belongs to you.",
       "locationId": "lantern-row",
@@ -2487,6 +2537,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "Come to the apartment. I have eleven days of longitudinal data on the whiteboard and the sample size is one. I require the control present.",
       "locationId": "lantern-row",
@@ -2566,6 +2617,7 @@
       "stopsBirthControl": true
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "Come to the nursery, {player}. The four-week developmental metrics on {child} are in, and they require your presence.",
       "locationId": "sire-house",
@@ -2610,6 +2662,7 @@
   ],
   "seraphine": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "{player}, we have a private appointment at the Aether training center off Lantern Row tomorrow, early. I mean, I have a lesson, and I would like it very much if you came. Before the shops open, please.",
       "locationId": "aether",
@@ -2647,6 +2700,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "The council dines at Dawnbloom House at eight, and I will not be at the table. The garden gate in the east wall will be unlatched at half past. Please come, {player}.",
       "locationId": "dawnbloom-house",
@@ -2689,6 +2743,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "Please come to our bedchamber at Dawnbloom House tonight, {player}. I have dismissed the guards for the evening. There is something I need to show you.",
       "locationId": "dawnbloom-house",
@@ -2768,6 +2823,7 @@
       }
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "We—I mean I—would like to see you in the nursery, {player}. {child} is awake, and I wanted to speak with you.",
       "locationId": "sire-house",
@@ -2812,6 +2868,7 @@
   ],
   "tamsin": [
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "Get over to my room before we head to the Bee. Need a second opinion on something. Don't be weird about it or I'll shove you down the stairs.",
       "locationId": "dormitories",
@@ -2849,6 +2906,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "Get over to my room tonight, {player}. Don't make me spell it out over text. Just come.",
       "locationId": "dormitories",
@@ -2927,6 +2985,7 @@
       }
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "Get yourself up to the nursery, {player}. I've been watching you for a month and I've got a bone to pick.",
       "locationId": "sire-house",
@@ -2970,6 +3029,7 @@
   ],
   "tink": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "Get down to the Honeyed Bee, {player}. Rosk's tab is open and I bet you a round you can't make it past the door with everything in your pockets.",
       "locationId": "honeyed-bee-inn",
@@ -3006,6 +3066,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "Come by the Foundry if you're free, {player}. I'm stuck doing actual work and I need someone tall to reach the top shelf. Kidding. Mostly.",
       "locationId": "foundry",
@@ -3047,6 +3108,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "Come up to my room in the Cloister Halls, {player}. Door's unlocked. Don't make me wait or I'll go through your pockets.",
       "locationId": "dormitories",
@@ -3130,6 +3192,7 @@
       ]
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "Nursery, {player}, ten silver says you can't get up here in two minutes. Come look at {child}.",
       "locationId": "sire-house",
@@ -3174,6 +3237,7 @@
   ],
   "vespera": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "Come up to the tower study, puppy. I have a specimen that needs a second pair of hands, and yours look remarkably idle.",
       "locationId": "lecture-halls",
@@ -3210,6 +3274,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "Meet me on Lantern Row by the old cistern. Bring a coat, pet, the wards are coughing tonight and I want company.",
       "locationId": "lantern-row",
@@ -3250,6 +3315,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "Get up to the tower, {player}. Leave your books, I'm doing old work tonight and it requires you.",
       "locationId": "lecture-halls",
@@ -3291,7 +3357,7 @@
                 "I took yours off your shirt the second night you stayed in my bed. Didn't ask, just tied the link over the circle while you slept.",
                 "*As she holds the knot over the glowing grooves in the wood, a familiar, steady warmth pulses beneath your breastbone.*",
                 "I've felt you across the campus for weeks, {player}—every lecture hall, every staircase. And three days ago, I stopped taking my dampers.",
-                "*She picks up a bone-handled blade, lays the apartment of the steel under the knotted threads, and meets your eyes without a trace of a drawl.*",
+                "*She picks up a bone-handled blade, lays the flat of the steel under the knotted threads, and meets your eyes without a trace of a drawl.*",
                 "It's a hex you earned, but it's yours to break. Say the word—do I cut the thread, or do we keep it?"
               ]
             }
@@ -3332,6 +3398,7 @@
       "stopsBirthControl": true
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "Come up to the nursery, pet. There is a spell at work in this room and I want you to see it.",
       "locationId": "sire-house",
@@ -3376,6 +3443,7 @@
   ],
   "yelena": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "It would be a great pleasure if you could spare an hour, {player}. Like, just come to my room in halls. I need a second pair of eyes that don't work for my father.",
       "locationId": "dormitories",
@@ -3412,6 +3480,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "Meet me in Riverside Park by the low wall, {player}. I have a free hour and I really don't want to spend it indoors.",
       "locationId": "riverside-park",
@@ -3452,6 +3521,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "Come to my room tonight, {player}. There is something I have already done, and I want to tell you to your face.",
       "locationId": "dormitories",
@@ -3533,6 +3603,7 @@
       "stopsBirthControl": true
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "I would be most pleased if you joined me in the nursery, {player}. Like, come up here whenever, I want to talk to you.",
       "locationId": "sire-house",
@@ -3577,6 +3648,7 @@
   ],
   "yulia": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "Rent week, babe, which means I'm pouring overpriced glow-rot at the Undergrowth. Come keep me company before my ears bleed. First one's free if you pretend to tip.",
       "locationId": "undergrowth",
@@ -3611,6 +3683,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "Come up to my place above Byte & Bloom. Street's loud and I don't feel like going out. Door's unlocked, just kick the coats out of the way.",
       "locationId": "lantern-row",
@@ -3651,6 +3724,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "Come over to Lantern Row. Just you, nobody else, and I didn't even turn the speakers on. Don't make me wait around, okay?",
       "locationId": "lantern-row",
@@ -3730,6 +3804,7 @@
       ]
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "Hey babe, get up to the nursery when you can. {child} is looking huge and I've got something on my mind.",
       "locationId": "sire-house",
@@ -3774,6 +3849,7 @@
   ],
   "zelie": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "The house is quiet, mon cher, and I have left my door open off the hearth room. Come sit a moment if you are not yet asleep.",
       "locationId": "sire-house",
@@ -3811,6 +3887,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "I have a basket of table linen still to press in the kitchen. Come keep me company, {player}, if you can manage not to wrinkle what I have folded.",
       "locationId": "sire-house",
@@ -3852,6 +3929,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "Come to my room when the house is still. Do not knock, chéri, just shut the door behind you.",
       "locationId": "sire-house",
@@ -3935,6 +4013,7 @@
       "stopsBirthControl": true
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "Come to the nursery, mon cher. The weekly ledger is closed and I wish to show you the result.",
       "locationId": "sire-house",
@@ -3979,6 +4058,7 @@
   ],
   "baixue": [
     {
+      "id": "friend",
       "stage": "friend",
       "invitation": "Meet me at Boba Blossom before the afternoon rush hits, {player}. I have a favor to ask you for my research, and I refuse to talk shop on an empty stomach. Do not be late, or I will drink your share too.",
       "locationId": "boba-blossom",
@@ -4014,6 +4094,7 @@
       ]
     },
     {
+      "id": "dating",
       "stage": "dating",
       "invitation": "The dining hall food tonight is a crime against good taste, {player}. Come up to my room in the Cloister Halls around seven. I have the rice cooker going and a broth that will actually put some color in your cheeks.",
       "locationId": "dormitories",
@@ -4055,6 +4136,7 @@
       ]
     },
     {
+      "id": "lover",
       "stage": "lover",
       "invitation": "帅哥, are you still awake? The Bureau envoy just left my room in the Cloister Halls, and I really need to see your face tonight.",
       "locationId": "dormitories",
@@ -4136,6 +4218,7 @@
       "stopsBirthControl": true
     },
     {
+      "id": "thriving",
       "stage": "thriving",
       "invitation": "帅哥, come up to the nursery when you finish in the hall, I brought my thermos and {child} is just drifting off.",
       "locationId": "sire-house",

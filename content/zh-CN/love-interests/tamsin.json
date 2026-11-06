@@ -1,0 +1,112 @@
+{
+  "id": "tamsin",
+  "aliases": [
+    "塔姆辛"
+  ],
+  "bio": "运动科学与体育系一年级新生，也是{player}从小一起长大的挚友：当年那个膝盖总带着擦伤的邻家假小子，六年过去，早已不再是谁的“小哥们儿”了。",
+  "outfits": [
+    {
+      "id": "default",
+      "name": "日常服装"
+    },
+    {
+      "id": "pregnant",
+      "name": "孕期"
+    },
+    {
+      "id": "nude",
+      "name": "裸体"
+    },
+    {
+      "id": "nude-pregnant",
+      "name": "裸体，孕期"
+    },
+    {
+      "id": "casual",
+      "name": "背带裤"
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "背带裤，孕期"
+    },
+    {
+      "id": "lingerie",
+      "name": "初次蕾丝"
+    },
+    {
+      "id": "lingerie-pregnant",
+      "name": "初次蕾丝，孕期"
+    },
+    {
+      "id": "bathrobe",
+      "name": "浴袍"
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "浴袍，孕期"
+    },
+    {
+      "id": "baby-medium",
+      "name": "抱着宝宝（中等肤色）"
+    },
+    {
+      "id": "baby-dark",
+      "name": "抱着宝宝（深肤色）"
+    },
+    {
+      "id": "swimsuit",
+      "name": "泳装"
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "泳装，孕期"
+    },
+    {
+      "id": "ao-dai",
+      "name": "奥黛"
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "奥黛，孕期"
+    },
+    {
+      "id": "sarong",
+      "name": "纱笼"
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "纱笼，孕期"
+    },
+    {
+      "id": "sari",
+      "name": "纱丽"
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "纱丽，孕期"
+    },
+    {
+      "id": "holi",
+      "name": "节日白衣"
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "节日白衣，孕期"
+    },
+    {
+      "id": "echoes",
+      "name": "游侠行装"
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "游侠行装，孕期"
+    }
+  ],
+  "ultimate": {
+    "id": "pile-on",
+    "name": "一拥而上"
+  },
+  "room": {
+    "name": "她在回廊宿舍的房间"
+  }
+}

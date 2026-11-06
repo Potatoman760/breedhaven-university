@@ -15,6 +15,8 @@ export type Light = (typeof LIGHTS)[number]['id']
  * the day view suggests when he asks how to raise a stat.
  */
 export const DrillSchema = z.object({
+  /** What a translation knows it by; left out, it is matched by its place. */
+  id: z.string().optional(),
   stat: StatSchema,
   /** A few words, as it reads after "Raise strength:" and as the scene is named: "A workout on the racks". */
   title: z.string(),

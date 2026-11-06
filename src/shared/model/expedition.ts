@@ -84,6 +84,8 @@ export const EnemySchema = z.object({
   phases: z
     .array(
       z.object({
+        /** What a translation knows it by; left out, it is matched by its place. */
+        id: z.string().optional(),
         at: z.number().gt(0).lt(1),
         text: z.string(),
         attack: z.number().min(0).optional(),
@@ -119,6 +121,8 @@ export type Finds = z.infer<typeof FindsSchema>
  */
 export const NODE_KINDS = ['fight', 'find', 'checkpoint', 'guardian'] as const
 export const NodeSchema = z.object({
+  /** What a translation knows it by; left out, it is matched by its place. */
+  id: z.string().optional(),
   kind: z.enum(NODE_KINDS),
   name: z.string().default(''),
   enemyIds: z.array(z.string()).default([]),
@@ -153,6 +157,8 @@ export const RelicSchema = z.object({
 export type Relic = z.infer<typeof RelicSchema>
 
 export const DepthSchema = z.object({
+  /** What a translation knows it by; the game knows a depth by its place. */
+  id: z.string().optional(),
   name: z.string(),
   /** What the place looks like, for whoever draws it. */
   appearance: z.string().default(''),

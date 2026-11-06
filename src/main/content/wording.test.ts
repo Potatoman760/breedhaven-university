@@ -35,8 +35,8 @@ describe('the wording of the default pack', () => {
         String.raw`plough|ploughed|queue|queues|flats|reads (?:Government|Law|Economics|Agriculture|Medicine|Engineering|History))(?![\w/_-])`,
       'i'
     )
-    // Kept as they are: a coffee, and the programming course's queues.
-    const kept = /flat white|Dictionaries and Queues|A queue serves|in a queue$/g
+    // Kept as they are: a coffee, the programming course's queues, and music's sharps and flats.
+    const kept = /flat white|sharps or flats|Dictionaries and Queues|A queue serves|in a queue$/g
     const slips = files.flatMap((file) =>
       texts(JSON.parse(readFileSync(file, 'utf8')))
         .map((text) => text.replace(kept, ''))

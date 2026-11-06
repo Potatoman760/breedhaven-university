@@ -13,6 +13,8 @@ export type Question = z.infer<typeof QuestionSchema>
 
 /** One thing a course teaches: what a class of it is about, and what is true of that in this world. */
 export const TopicSchema = z.object({
+  /** What a translation knows it by; the game knows a topic by its place in the course. */
+  id: z.string().optional(),
   title: z.string(),
   /** Told to whoever is teaching, to teach from. */
   content: z.string(),

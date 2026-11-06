@@ -14,6 +14,8 @@ const TellingSchema = z.object({
  * and opens a scene with her alone, run on the beat's direction. One ask: missed, it is gone. Each is had once.
  */
 export const StoryBeatSchema = z.object({
+  /** What a translation knows it by (the shipped beats use their stage); left out, it is matched by its place. */
+  id: z.string().optional(),
   /**
    * What earns it: the relationship stage, by id; or `thriving`, a child of theirs kept thriving in his house for
    * `THRIVING_WEEKS` running, whatever they are to each other.

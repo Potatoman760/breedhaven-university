@@ -1,0 +1,121 @@
+{
+  "id": "seraphine",
+  "aliases": [
+    "瑟拉芬五世",
+    "瑟拉芬"
+  ],
+  "bio": "十八岁便登基的蕃荫女王，同时也是蕃荫大学政务系的一年级新生。",
+  "outfits": [
+    {
+      "id": "default",
+      "name": "日常服装"
+    },
+    {
+      "id": "pregnant",
+      "name": "孕期"
+    },
+    {
+      "id": "nude",
+      "name": "裸体"
+    },
+    {
+      "id": "nude-pregnant",
+      "name": "裸体，孕期"
+    },
+    {
+      "id": "casual",
+      "name": "日间连衣裙"
+    },
+    {
+      "id": "casual-pregnant",
+      "name": "日间连衣裙，孕期"
+    },
+    {
+      "id": "slip",
+      "name": "真丝衬裙"
+    },
+    {
+      "id": "slip-pregnant",
+      "name": "真丝衬裙，孕期"
+    },
+    {
+      "id": "lingerie",
+      "name": "王室蕾丝"
+    },
+    {
+      "id": "lingerie-pregnant",
+      "name": "王室蕾丝，孕期"
+    },
+    {
+      "id": "bathrobe",
+      "name": "浴袍"
+    },
+    {
+      "id": "bathrobe-pregnant",
+      "name": "浴袍，孕期"
+    },
+    {
+      "id": "baby-medium",
+      "name": "抱着宝宝（中等肤色）"
+    },
+    {
+      "id": "baby-dark",
+      "name": "抱着宝宝（深肤色）"
+    },
+    {
+      "id": "swimsuit",
+      "name": "泳装"
+    },
+    {
+      "id": "swimsuit-pregnant",
+      "name": "泳装，孕期"
+    },
+    {
+      "id": "ao-dai",
+      "name": "奥黛"
+    },
+    {
+      "id": "ao-dai-pregnant",
+      "name": "奥黛，孕期"
+    },
+    {
+      "id": "sari",
+      "name": "纱丽"
+    },
+    {
+      "id": "sari-pregnant",
+      "name": "纱丽，孕期"
+    },
+    {
+      "id": "holi",
+      "name": "节日白衣"
+    },
+    {
+      "id": "holi-pregnant",
+      "name": "节日白衣，孕期"
+    },
+    {
+      "id": "sarong",
+      "name": "纱笼"
+    },
+    {
+      "id": "sarong-pregnant",
+      "name": "纱笼，孕期"
+    },
+    {
+      "id": "echoes",
+      "name": "德鲁伊披风"
+    },
+    {
+      "id": "echoes-pregnant",
+      "name": "德鲁伊披风，孕期"
+    }
+  ],
+  "ultimate": {
+    "id": "royal-decree",
+    "name": "王室敕令"
+  },
+  "room": {
+    "name": "曦花宫的王室寝宫"
+  }
+}

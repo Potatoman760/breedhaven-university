@@ -312,7 +312,7 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
   (`{ "name": "Deutsch" }`), `strings/<namespace>.json` with any of the English keys
   translated, and any content file laid out as in `content/default/` (`codex.json`,
   `love-interests/anwen.json`) holding only the text it translates. Content is laid over the
-  English entry by entry, by `id` (or a subject's `code`, a course's `number`), and by place
+  English entry by entry, by `id` (or a subject's `code`, a course's `number`, a house room's `key`), and by place
   where entries have none; lists of plain values are replaced whole. Ids, numbers and
   fields that name other entries (`locationId`, `traitIds`) are never changed by it
   (`src/main/content/language.ts`). Anything a language leaves out is in English. Messages
@@ -323,6 +323,8 @@ asked to write. The choice is kept in `settings.json` with the LLM profiles.
   In another language the LLM is told which one to write in by `core.llm.writeIn`, added
   to every system prompt (empty in English).
 - **Saves** keep text as it was written: memories written in one language stay in it.
+- **Names in replies.** The LLM is told (`core.llm.writeIn`) to keep characters' names in Latin letters and tags exactly; in case it does not, a language may give each character `aliases`, her name in its own script (the one field a translation may add), which `namesHer` and `namedAt` in `src/shared/game/scene.ts` also accept. A single Chinese character is never searched for inside text. Full-width brackets, colons and equals signs in a reply's tags are put in ASCII as it arrives (`plainTags`, in `src/main/ai/router.ts`), and speaker lines accept a full-width colon. `sexWrittenOf`, which has a reply written again when it writes sex of a woman who will not, reads the code's English words and the language's own (`scene.detect.sexWritten`, words for the acts separated by "|", empty in English).
+- **Voice** is recorded in English. A line written ahead is found by its exact words, so a translated one has no recording and plays silent; catch phrases play only in English (`src/main/index.ts`); wordless reactions play in every language.
 - **The content editor** saves nothing while the game is in another language: what it
   shows is the translation, and saving would write it over the English.
 

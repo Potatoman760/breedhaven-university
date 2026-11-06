@@ -117,13 +117,21 @@ export function whyNot(content: ContentPack, state: GameState, li: LoveInterest)
 }
 
 /** Everyone who could be asked, in the order the content lists them, each with what stands in her way if anything does. */
-export function partyChoices(content: ContentPack, state: GameState): { li: LoveInterest; role: RoleConfig; reason: string | undefined }[] {
+export function partyChoices(content: ContentPack, state: GameState, depth?: number): { li: LoveInterest; role: RoleConfig; reason: string | undefined }[] {
   const config = content.expedition
   if (!config) return []
   return content.loveInterests.flatMap((li) => {
     const role = roleOf(config, li)
-    return role && hasMet(state, li.id) ? [{ li, role, reason: whyNot(content, state, li) }] : []
+    return role && hasMet(state, li.id) ? [{ li, role, reason: whyNot(content, state, li) ?? (depth === undefined ? undefined : belowStage(content, state, li.id, depth)) }] : []
   })
+}
+
+/** Why she may not come to that depth, where it takes only women at a stage with him (the echoes as the last depth does) and she is not at it. */
+function belowStage(content: ContentPack, state: GameState, id: string, depth: number): string | undefined {
+  const config = content.expedition!
+  const stageId = (depth === config.depths.length ? config.depths.at(-1) : config.depths[depth])?.partyStage
+  const stage = stageId && content.relationships.stages.find((one) => one.id === stageId)
+  return stage && !atStage(content, state, id, stage.id) ? t('game.expedition.needsStage', { stage: stage.name.toLowerCase() }) : undefined
 }
 
 /** Whether he can go below now, to a depth, with these women. */
@@ -137,10 +145,10 @@ export function canGoBelow(content: ContentPack, state: GameState, partyIds: str
   const echo = depth === config.depths.length
   if (echo ? !echoesOpen(content, state) : depth < 0 || depth >= depthsOpen(content, state)) reasons.push(t('game.expedition.notThatDeep'))
   if (partyIds.length > config.partySize) reasons.push(t('game.expedition.partySize', { size: config.partySize }))
-  // A depth that asks it, and the echoes as the last does, takes only women at its stage with him.
-  const stageId = (echo ? config.depths.at(-1) : config.depths[depth])?.partyStage
-  const stage = stageId && content.relationships.stages.find((one) => one.id === stageId)
-  if (stage) for (const id of partyIds) if (!atStage(content, state, id, stage.id)) reasons.push(t('game.expedition.whyNot', { name: firstName(content.loveInterests.find((li) => li.id === id) ?? { name: id }), why: t('game.expedition.needsStage', { stage: stage.name.toLowerCase() }) }))
+  for (const id of partyIds) {
+    const why = belowStage(content, state, id, depth)
+    if (why) reasons.push(t('game.expedition.whyNot', { name: firstName(content.loveInterests.find((li) => li.id === id) ?? { name: id }), why }))
+  }
   for (const id of partyIds) {
     const li = content.loveInterests.find((one) => one.id === id)
     const why = li ? whyNot(content, state, li) : t('game.expedition.nobodyOfThatName')

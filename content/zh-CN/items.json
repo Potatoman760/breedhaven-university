@@ -1,0 +1,409 @@
+[
+  {
+    "id": "posy",
+    "name": "野花小花束",
+    "description": "用麻绳扎起的草地野花，今天早上刚采的。"
+  },
+  {
+    "id": "potted-fern",
+    "name": "蕨类盆栽",
+    "description": "栽在陶盆里的一小株蕨类，很难养死。"
+  },
+  {
+    "id": "moss-ball",
+    "name": "苔藓球",
+    "description": "盛在浅碟里的池塘苔藓球，湿润又绒软。"
+  },
+  {
+    "id": "seed-packets",
+    "name": "种子包",
+    "description": "用纸包拧好的香草和豆类种子，上面有手写的标签。"
+  },
+  {
+    "id": "lavender-soap",
+    "name": "薰衣草香皂",
+    "description": "用亚麻布包裹的浅色香皂。"
+  },
+  {
+    "id": "honey-cakes",
+    "name": "蜂蜜小蛋糕",
+    "description": "纸袋里装着三块甜糯的小蛋糕，还温热着。"
+  },
+  {
+    "id": "candied-plums",
+    "name": "糖渍李子",
+    "description": "一小盒裹着糖霜的李子。"
+  },
+  {
+    "id": "loose-leaf-tea",
+    "name": "罐装散叶茶",
+    "description": "装在彩绘小铁罐里的高地红茶。"
+  },
+  {
+    "id": "coffee-beans",
+    "name": "袋装咖啡豆",
+    "description": "由“咒语与啜饮”的供货商本周新鲜烘焙。"
+  },
+  {
+    "id": "spiced-cider",
+    "name": "瓶装香料苹果酒",
+    "description": "浓烈、甘甜，最适合与人共饮。"
+  },
+  {
+    "id": "salt-pretzels",
+    "name": "粗盐扭结面包",
+    "description": "表皮撒满粗盐的扭结面包。"
+  },
+  {
+    "id": "blank-ledger",
+    "name": "横线账本",
+    "description": "内页带横线的硬皮账册，适合那些依然习惯在纸上思考的人。"
+  },
+  {
+    "id": "trade-treatise",
+    "name": "《论货币与信用》",
+    "description": "备受争议的经济学经典之作，这是一本翻旧了的学生平装版。"
+  },
+  {
+    "id": "book-of-hymns",
+    "name": "垄沟圣歌集",
+    "description": "修会圣歌的袖珍册，带有一根丝带书签。"
+  },
+  {
+    "id": "sketchbook",
+    "name": "粉色速写本",
+    "description": "玫瑰色硬封皮里夹着厚实的画纸。"
+  },
+  {
+    "id": "old-map",
+    "name": "沃种大陆旧铁路图",
+    "description": "已经过时，但绘制精美，纸面略微泛黄长斑。上面有两条传送门线路根本没建起来。"
+  },
+  {
+    "id": "playing-cards",
+    "name": "扑克牌",
+    "description": "一副磨旧了的牌。背面可能做了记号，但卖家闭口不谈。"
+  },
+  {
+    "id": "silk-ribbon",
+    "name": "丝绸缎带",
+    "description": "一截色彩鲜亮的丝带，可以系在发间或手腕上。"
+  },
+  {
+    "id": "lace-choker",
+    "name": "蕾丝颈链",
+    "description": "精致的黑色蕾丝颈链，配有一枚小巧的银扣。"
+  },
+  {
+    "id": "river-stone",
+    "name": "河石",
+    "description": "一块光滑的灰色石头，还留存着阳光的暖意。"
+  },
+  {
+    "id": "whetstone",
+    "name": "磨刀石",
+    "description": "质地细腻的磨石，能让比赛用的剑刃常保锋利。"
+  },
+  {
+    "id": "sword-belt",
+    "name": "压花执勤腰带",
+    "description": "结实的皮革配上朴素的黄铜扣，专为佩剑和挂对讲机而制，经久耐用。"
+  },
+  {
+    "id": "lockpicks",
+    "name": "开锁工具组",
+    "description": "打着“结界测试工具”的名义售卖。但谁都糊弄不了。"
+  },
+  {
+    "id": "glass-vials",
+    "name": "玻璃小药瓶",
+    "description": "软垫盒里装着六个带塞子的玻璃小瓶，用于精细的魔药调配。"
+  },
+  {
+    "id": "game-cartridge",
+    "name": "复古游戏卡带",
+    "description": "某款比你岁数还大的游戏机上的经典大作。贴纸已经磨损，里面还留着别人的存档。"
+  },
+  {
+    "id": "hobby-kit",
+    "name": "符咒电路套件",
+    "description": "一块需要自己动手焊接的电路板，可承载一个小型附魔。包装盒上写着适合十岁及以上。"
+  },
+  {
+    "id": "earbuds",
+    "name": "翻新无线耳机",
+    "description": "音质不错，上一任主人用得很爱惜，就是充电盒上有道划痕。"
+  },
+  {
+    "id": "charm-case",
+    "name": "结界手机壳",
+    "description": "轻薄的手机壳，内衬缝有防摔结界。抗摔等级为一段楼梯。"
+  },
+  {
+    "id": "instant-ramen",
+    "name": "杯装烈焰拉面",
+    "description": "坩埚餐厅招牌名菜的速食版。拉开拉环就会自动加热——通常来说是这样。"
+  },
+  {
+    "id": "energy-drink",
+    "name": "罐装星火根饮",
+    "description": "罐身微微嗡鸣的精力饮料。在考试季颇受欢迎。"
+  },
+  {
+    "id": "scratchcard",
+    "name": "幸运七刮刮乐",
+    "description": "上面有七片花瓣可供刮开。中奖概率用小字印在背面。"
+  },
+  {
+    "id": "phone-charger",
+    "name": "手机充电器",
+    "description": "充电头配数据线，毕竟每个人都丢过自己的充电器。"
+  },
+  {
+    "id": "bath-salts",
+    "name": "薰衣草浴盐",
+    "description": "一罐适合用来泡个长澡的芳香浴盐。"
+  },
+  {
+    "id": "chamomile-tea",
+    "name": "盒装洋甘菊茶",
+    "description": "从收银台旁的货架上拿的安神茶饮，一盒二十包。"
+  },
+  {
+    "id": "study-tonic",
+    "name": "助学补剂",
+    "description": "装在棕色瓶子里的正规专注补剂。大课前喝一瓶就好，千万别喝两瓶。"
+  },
+  {
+    "id": "pocket-speaker",
+    "name": "袖珍音箱",
+    "description": "只有李子大小的音箱，音量却大得不可思议。"
+  },
+  {
+    "id": "game-controller",
+    "name": "游戏手柄",
+    "description": "半透明紫色的无线游戏手柄。"
+  },
+  {
+    "id": "smart-lamp",
+    "name": "符光台灯",
+    "description": "用小型照明符咒代替灯泡的台灯。只要开口吩咐，它就会调暗亮度。"
+  },
+  {
+    "id": "quartz-point",
+    "name": "水晶晶柱",
+    "description": "一根手指长的透明水晶柱，名义上是用来为小型术式聚能的，但大家买它多半是因为好看。"
+  },
+  {
+    "id": "component-pouch",
+    "name": "袋装施法材料",
+    "description": "用贴有标签的纸包分装好的干草药、盐粒与粉末，适合魔药调配和实践课使用。"
+  },
+  {
+    "id": "charm-bracelet",
+    "name": "护符手链",
+    "description": "精致的银手链，上面挂着一枚小巧的幸运护符，还留有挂更多吊坠的空间。"
+  },
+  {
+    "id": "tarot-deck",
+    "name": "塔罗牌",
+    "description": "装在天鹅绒袋里的七十八张牌。第二十二张大阿卡纳牌是“繁花”。"
+  },
+  {
+    "id": "grimoire",
+    "name": "影印版魔导书",
+    "description": "一本四百年前的咒语书的印刷复制品，连页边的批注都原样保留。"
+  },
+  {
+    "id": "heretics-history",
+    "name": "《异端者眼中的垄沟史》",
+    "description": "由修会内部一位女祭司撰写的修会史。严格来说，还不算禁书。"
+  },
+  {
+    "id": "antique-atlas",
+    "name": "古董地图册",
+    "description": "铁路时代之前的手工上色沃种大陆地图册。"
+  },
+  {
+    "id": "curio",
+    "name": "用途可疑的古物",
+    "description": "一个带铰链的黄铜小物件，看不出有什么明显用途。标签上只写着“可打开”。"
+  },
+  {
+    "id": "vintage-scarf",
+    "name": "复古真丝围巾",
+    "description": "一条比你年纪还大的印花丝巾，保存得非常完好。"
+  },
+  {
+    "id": "band-tee",
+    "name": "旧乐队T恤",
+    "description": "背面印着褪色的巡演日期，那支乐队在你出生前就解散了。"
+  },
+  {
+    "id": "worn-leather-jacket",
+    "name": "旧皮夹克",
+    "description": "经年累月穿得柔软贴身，一只手肘处被懂行的人修补过。"
+  },
+  {
+    "id": "paperback",
+    "name": "二手平装书",
+    "description": "一本书脊开裂的小说，里面夹着不知是谁的公交车票当书签。"
+  },
+  {
+    "id": "heartsease-draught",
+    "name": "悦心饮剂",
+    "description": "一小瓶你亲手熬制的玫瑰金色药剂。喝下后一整天都让人容易对你产生好感。"
+  },
+  {
+    "id": "bloom-cordial",
+    "name": "繁花甜露",
+    "description": "你亲手酿制的深色甜露，适合倒给两人共饮。它能让她用来对抗繁花的药失效一天。",
+    "use": {
+      "effects": [
+        {
+          "telling": "你与他共饮了他酿制的甜露，而且你很清楚它的功效：今天之内，你用来对抗繁花的药将失去作用。你明知如此，还是喝了下去。"
+        }
+      ]
+    }
+  },
+  {
+    "id": "charmed-confection",
+    "name": "附魔糖果",
+    "description": "一盒你在炉子旁亲手熬制并施了咒的小糖果。收到它的人从来没有不高兴的。"
+  },
+  {
+    "id": "stillwater",
+    "name": "止水",
+    "description": "一瓶取自地下的水，从未流动过。在战斗中能让倒下的人重新站起来。"
+  },
+  {
+    "id": "grounding-salt",
+    "name": "定神盐",
+    "description": "从老旧管道上刮下来的灰盐。在战斗中能立刻平息孕妇的涌潮。"
+  },
+  {
+    "id": "spring-tonic",
+    "name": "暖泉补剂",
+    "description": "取自泉眼，尚带余温，味道微苦。喝下可恢复精力，也能在地下用来帮人稳住状态。"
+  },
+  {
+    "id": "resonance-token",
+    "name": "共鸣信物",
+    "description": "一枚充能圆片，贴在掌心会微微嗡鸣。在女人身边激发它，就能挑起她对你的欲望。"
+  },
+  {
+    "id": "stamina-band",
+    "name": "耐力腕带",
+    "description": "你亲手制作的腕带，已经充好能，随时可以激发。"
+  },
+  {
+    "id": "first-blossom-bouquet",
+    "name": "初绽花束",
+    "description": "七朵白花配一朵红花，按照大家过节时的习惯捆扎成束。"
+  },
+  {
+    "id": "dawnbloom-rose",
+    "name": "曦花玫瑰",
+    "description": "一支王室品种的金边玫瑰，由王宫花房特许培育。"
+  },
+  {
+    "id": "beeswax-tapers",
+    "name": "蜂蜡细烛",
+    "description": "一束手工浸制的细长蜡烛，散发着淡淡的蜂蜜香气。"
+  },
+  {
+    "id": "charmed-trowel",
+    "name": "附魔园艺铲",
+    "description": "手柄上刻有生长咒文的园艺小铲。幼苗很喜欢它。"
+  },
+  {
+    "id": "moss-terrarium",
+    "name": "苔藓生态瓶",
+    "description": "一个密封的玻璃球，里面种着活苔藓和一株蕨草，湿润而翠绿。"
+  },
+  {
+    "id": "kharadi-stout",
+    "name": "瓶装卡拉德托尔世涛",
+    "description": "漆黑、苦涩，浓稠得能立住勺子。氏堡佳酿，并以此为傲。"
+  },
+  {
+    "id": "brown-ale",
+    "name": "陶罐装籽花城棕色艾尔",
+    "description": "一陶罐本地自产的艾尔啤酒，出自铁路拱桥下的酒厂。"
+  },
+  {
+    "id": "apple-tart",
+    "name": "果园苹果挞",
+    "description": "装在纸托里的低地苹果挞，刷了糖釉，还热乎着。"
+  },
+  {
+    "id": "starkeland-honey-drops",
+    "name": "斯塔克兰蜂蜜硬糖",
+    "description": "产自炉心尖塔城的琥珀色硬糖，用蜡纸包着。特别耐吃，仿佛永远吃不完。"
+  },
+  {
+    "id": "vesperan-romance",
+    "name": "维斯佩拉言情小说",
+    "description": "一个海盗船长、一个被掳走的育嗣者，以及公海之上的无数次颠簸与起伏。极其畅销，但从来没人承认自己看过。"
+  },
+  {
+    "id": "paint-set",
+    "name": "繁花水彩颜料盒",
+    "description": "十二色固体水彩，其中两块是充能颜料，干透后会闪烁微光。"
+  },
+  {
+    "id": "practice-blade",
+    "name": "比武场练习剑",
+    "description": "学员们操练用的那种未开锋训练剑。比看上去要沉。"
+  },
+  {
+    "id": "banded-agate",
+    "name": "缠丝玛瑙",
+    "description": "从河滩砾石中捡来的一片玛瑙，有着树木年轮般的环状纹路。"
+  },
+  {
+    "id": "prayer-beads",
+    "name": "垄沟念珠",
+    "description": "由七颗木珠和一颗米珠串成的念珠，用来在晨祷时计数。"
+  },
+  {
+    "id": "match-ball",
+    "name": "比赛用排球",
+    "description": "一颗标准比赛排球，上面还没有任何人的签名。"
+  },
+  {
+    "id": "lantern-row-whisper",
+    "name": "《灯笼街耳语》",
+    "description": "校园八卦小报。内容半真半假，但每个人都会一字不落地看完。"
+  },
+  {
+    "id": "arena-program",
+    "name": "大竞技场总决赛赛程册",
+    "description": "今年总决赛的赛程手册，记录了每一场对决和每一位选手，上一任物主还用铅笔在上面批注了赔率。"
+  },
+  {
+    "id": "ward-candles",
+    "name": "伊斯卡拉结界蜡烛",
+    "description": "三根紫罗兰色蜡烛，蜡体中封存着小型防护结界。无论多大的穿堂风，烛火都稳如泰山。"
+  },
+  {
+    "id": "first-rain",
+    "name": "罐装初春雨水",
+    "description": "春季第一场暴风雨时收集的雨水，按罐出售，供有需要的施法仪式使用。"
+  },
+  {
+    "id": "veyran-mask",
+    "name": "维拉木雕面具",
+    "description": "来自维拉的彩绘戏剧面具，是一张咧嘴怪笑的狐狸脸。原本是某人的纪念品，现在归你了。"
+  },
+  {
+    "id": "coffee-to-go",
+    "name": "咒语与啜饮招牌烘焙咖啡",
+    "description": "一大杯外带招牌烘焙咖啡，杯套里织入了保温咒文。"
+  },
+  {
+    "id": "almond-croissant",
+    "name": "杏仁可颂",
+    "description": "酥脆、甜糯，大多数日子里不到中午就会卖光。"
+  }
+]

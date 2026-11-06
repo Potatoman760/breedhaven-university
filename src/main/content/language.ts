@@ -67,8 +67,11 @@ export function readStrings(languageDir: string): { messages: Messages; issues: 
   return { messages: messages as Messages, issues }
 }
 
-// What tells apart the entries of a list in the content: a character, place or event by its id, a subject by its code, a course by its number.
-const IDENTITIES = ['id', 'code', 'number']
+// What tells apart the entries of a list in the content: a character, place or event by its id, a subject by its code,
+// a course by its number, a room of the house by its key.
+const IDENTITIES = ['id', 'code', 'number', 'key']
+// Other ways a character's name is written, which a language gives her: see `translated`.
+const ALIASES = 'aliases'
 // A field that holds another entry's id, or ids: `locationId`, `traitIds`.
 const REFERENCE = /[a-z]Ids?$/
 
@@ -95,7 +98,12 @@ export function translated(base: unknown, over: unknown): unknown {
   if (isObject(base)) {
     if (!isObject(over)) return base
     // What names something else in the content is a reference, not text: it stays as the English has it.
-    return Object.fromEntries(Object.entries(base).map(([key, value]) => [key, IDENTITIES.includes(key) || REFERENCE.test(key) ? value : translated(value, over[key])]))
+    const laid = Object.fromEntries(Object.entries(base).map(([key, value]) => [key, IDENTITIES.includes(key) || REFERENCE.test(key) ? value : translated(value, over[key])]))
+    // The one thing a language adds: a character's name in its own script, which a reply may name her by. It is only
+    // ever another way to know her, never shown, so it cannot change how the game works.
+    const aliases = over[ALIASES]
+    if (typeof base.name === 'string' && !(ALIASES in base) && Array.isArray(aliases) && aliases.every((one) => typeof one === 'string')) laid[ALIASES] = aliases
+    return laid
   }
   return base
 }

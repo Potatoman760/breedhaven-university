@@ -105,7 +105,8 @@ export function parseBanter(reply: string, content: ContentPack, state: GameStat
 export function readLines(reply: string, people: LoveInterest[], most = BANTER_LINES): BanterLine[] {
   const lines: BanterLine[] = []
   for (const raw of reply.replace(/<think(?:ing)?>[\s\S]*?<\/think(?:ing)?>/gi, '').split('\n')) {
-    const found = /^\s*[-*"“]*\s*([^:"”]{1,40}?)\s*[*"”]*\s*:\s*(.+)$/.exec(raw)
+    // A full-width colon, as Chinese writes it, says the same.
+    const found = /^\s*[-*"“]*\s*([^:："”]{1,40}?)\s*[*"”]*\s*[:：]\s*(.+)$/.exec(raw)
     if (!found) continue
     const speaker = people.find((li) => namesHer(found[1], li))
     // What is said is said aloud: anything wrapped round it comes off, and stage directions between asterisks go.

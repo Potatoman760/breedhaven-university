@@ -80,6 +80,25 @@ describe('loadWithAddons', () => {
     expect(wornOutfit(content, createInitialState(content), loaded, 'swimsuit')?.id).not.toBe('swimsuit')
   })
 
+  it('plays the player\'s own characters in another language as their author wrote them, beside the translated ones', () => {
+    // A translation is laid over the game's own content, and add-ons over that: a character it has no words for, or one
+    // of the game's own that an add-on rewrote, keeps the add-on's English, and nothing of it is lost or refused.
+    const chinese = join(process.cwd(), 'content', 'zh-CN')
+    const dir = addons()
+    expect(saveLoveInterest(dir, base.content, mira)).toEqual([])
+    expect(saveLoveInterest(dir, base.content, { ...faye, bio: 'Rewritten by the player.' })).toEqual([])
+    const { content, info } = loadWithAddons(packDir, dir, chinese)
+    expect(info.issues).toEqual([])
+    const theirs = content.loveInterests.find((li) => li.id === 'mira')!
+    expect(theirs.bio).toBe(mira.bio)
+    expect(theirs.outfits.map((o) => o.name)).toEqual(expect.arrayContaining(mira.outfits.map((o) => o.name)))
+    expect(content.loveInterests.find((li) => li.id === 'faye')?.bio).toBe('Rewritten by the player.')
+    // The game's own, untouched by the add-ons, are in the language.
+    const tink = content.loveInterests.find((li) => li.id === 'tink')!
+    expect(tink.bio).toMatch(/\p{Script=Han}/u)
+    expect(tink.name).toBe(base.content.loveInterests.find((li) => li.id === 'tink')!.name)
+  })
+
   it('leaves out an add-on that is broken, and says why, without stopping the game', () => {
     const dir = addons()
     mkdirSync(join(dir, 'love-interests'), { recursive: true })
